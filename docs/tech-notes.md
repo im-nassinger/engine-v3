@@ -39,3 +39,25 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Eyedropper.** Sampling the level view needs a pixel read from the renderer, not the browser's eyedropper, whose support varies.
 - **Dashes.** PixiJS has no dash option for outlines, so dashes would mean building dash geometry that follows curves. This is why dashes were left out.
 - **Font download size.** The target for bundled fonts was under 1 MB with Latin subsets. Not measured.
+
+## Assets, sound and spawning
+
+- **Import safety.** Read an image's size from its header before decoding it, on import and on level load, to stop decompression bombs. Levels are untrusted input.
+- **Clipboard quirks.** Screenshots paste with blank file names, some browsers list one image twice, and Firefox returns only the first of several files.
+- **Storage errors** from the browser must surface as messages, never as a silent failed save.
+- **Deleted files** stay in memory for undo during the session. Cap this or drop the oldest if memory grows.
+- **Is a sound still playing?** A script's answer must be worked out from ticks and the file's length, never from the real audio state. Real audio may be blocked, late or unsupported, and asking it would break determinism.
+- **Decoded sound is big.** Web Audio decodes whole files into float samples: about 21 MB per stereo minute. Long sounds should stream through a media element instead, at the cost of exact loop points. This is why the old draft streamed sounds over 60 seconds.
+- **Autoplay.** Resume the audio context inside the Play click.
+- **OGG in Safari** needs testing. Sources disagree on support. If it fails, drop OGG or convert on import.
+- **Avoid `PannerNode`** for any later positional sound: reports describe distorted audio in Chrome. A stereo panner and gain are enough for 2D.
+- **Image scaling mode.** In PixiJS v8 smooth or sharp scaling is set on the texture, so using both for one image needs a second texture.
+- **Tiled and smooth images** can bleed at the edges. Clamp or extrude at load.
+- **Spawn refusal must be deterministic:** count waiting spawns when the call is made, not when they are applied.
+- **Split polygons ahead of time** for every `.entity` file, so spawning does no polygon splitting during a tick.
+- **Preload** every image an `.entity` file uses when Play starts, or spawned art pops in.
+- **Moving a Kinematic body along a path:** set its velocity to (next point minus position) divided by the tick length, don't teleport it, so contacts stay valid. Path sampling must use only arithmetic and square roots, so every computer gets the same result.
+- **Speed limit.** Box2D caps movement per step, about 6,000 px/s at 60 ticks per second and 50 px per metre. Setting ranges stay below this.
+- **Ground contacts.** A Box2D contact can exist without touching, so use its touching state.
+- **Order of custom events.** Define a stable delivery order, and whether an event fired inside a handler arrives in the same tick. The 32-step limit for trigger chains should cover events fired by scripts too.
+- **Jump feel.** The platformer defaults come from Celeste's published values (0.1 s of grace, 0.65 air control) scaled to 1080p, and from the idea of falling faster than rising.
