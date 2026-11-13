@@ -120,3 +120,14 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Limits** to tune: chain 32, trigger runs per tick 1,024, waiting runs per trigger 32, 64 triggers per entity, 64 actions per trigger. Import must enforce them and refuse times and strengths that aren't finite numbers.
 - **Trigger lines** for the Console should exist only in test play, in a capped buffer.
 - **Tags change during play**, so "find by tag" and the "no entity with this tag is left" event need a live index, updated in a stable order.
+
+## Scripts
+
+- **One copy of a script per entity.** Compile a file once, then run it once per entity with a fresh environment, so memory stays low and line numbers stay right.
+- **The editor has no Lua.** Checking syntax and reading a script's settings needs a separate worker, which can reuse the game's Lua build for exact error messages.
+- **`__gc` and `__mode`.** Finalizers run outside any instruction counting, and weak tables make results depend on memory history. Refuse both in `setmetatable`.
+- **Table order.** Tables, functions and ids used as keys hash by address, so `pairs` order repeats only if allocation is identical. `print` must behave the same in every mode for that reason.
+- **Read-only library tables** must be frozen for real: a proxy can still be written through `rawset`.
+- **A hung game.** The watchdog must ignore hidden-tab throttling and debugger pauses.
+- **Old size limits, as starting values:** 32 MB of Lua memory per level, 256 KB per script and 4 MB per level, 5,000 Console lines.
+- **Monaco replaces CodeMirror**, so the old notes about CodeMirror's Lua mode and key bindings no longer apply. Ctrl+Enter must still reach Play from inside the editor.

@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-What we decided against, and why. **Check here before proposing something**: an idea on this page needs a new reason to come back. Two parts: ideas the owner rejected or replaced in the review, and things left out on purpose. **This file is a draft**: it covers every topic except scripts and play-and-save, which still have to be added (see [progress.md](progress.md)).
+What we decided against, and why. **Check here before proposing something**: an idea on this page needs a new reason to come back. Two parts: ideas the owner rejected or replaced in the review, and things left out on purpose. **This file is a draft**: it covers every topic except play-and-save, which still has to be added (see [progress.md](progress.md)).
 
 ## Rejected or replaced in the review
 
@@ -58,6 +58,14 @@ What we decided against, and why. **Check here before proposing something**: an 
 | A fixed set of inputs that creators can't change | Inputs defined on the World's InputComponent, plus raw keys | The owner wanted both |
 | "Lowest id first" run order | Layers panel order | The order you see is the order things run |
 | Trigger templates | Component presets, not in v1 | A preset works the same on every component |
+| An object-style Lua API (`self:setText`) | Ids and functions | Handles, not references |
+| `onStart`, `onUpdate` and other callbacks | `on(name, function)` | One list of events for triggers and scripts |
+| A limit on script work per tick | No limit. The game runs separately from the editor | Rejected by the owner |
+| Scripts blocked from reading the clock | Scripts may read the date and time | The determinism test fixes the clock |
+| "Data" and "saved data" | Variables, with Keep between runs | One concept |
+| Script templates | Builtin `.lua` files as examples, component presets later | A preset works the same on every component |
+| Watched values, a Variables tab, breakpoints, shapes drawn from scripts | Live values, `print()`, Pause and Step | No feature appears inside another question |
+| CodeMirror | Monaco | The owner's choice |
 | A 12-font list | Inter, then Lora, JetBrains Mono and Roboto Mono | The owner's list |
 
 ## Left out on purpose
@@ -73,5 +81,7 @@ Not planned for any version. Each would need its own review.
 **Camera:** camera rotation, automatic framing of several targets, vertical look-ahead, pixel-perfect scaling, art in the bars, a fade-to-colour action (a rectangle inside the camera does it), text input fields, a constant-size screen layout, a player-controlled camera, split screen, picture-in-picture.
 
 **Triggers:** branches, loops or nested actions in a trigger, random choice in a trigger, changing a value smoothly over time, a visual node graph, mouse drag, the right and middle buttons as trigger events, "view this trigger as Lua".
+
+**Scripts:** typed Lua, external editors, stepping through code, hot reload, profiler charts.
 
 **Assets:** a sound component, a music setting on the World, positional sound, nine-slice images, drawing pixels, sound editing beyond trim, loading files from web addresses, wall jump, ladders, dash and crush detection in the builtin platformer script, local multiplayer.

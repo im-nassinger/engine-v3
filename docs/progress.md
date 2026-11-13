@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**The docs rewrite is half done** (2026-11-13). Written and committed: glossary, principles, scope, and six of the eight requirement topics (editor, drawing, assets, physics, camera, triggers), plus technical notes for those six. **Still to write:** scripts, play-and-save, then `overview.md`, `rejected.md`, `decisions.md`, the docs checker and the "nothing lost" check. No code exists. The source is `~/projects/ecs-game-v2` (read-only). The next session should read "How to continue" below and carry on with scripts.
+**The docs rewrite is about 80% done** (2026-11-13). Written and committed: glossary, principles, scope, and seven of the eight requirement topics (editor, drawing, assets, physics, camera, triggers, scripts), plus technical notes for those seven. **Still to write:** play-and-save (test play and saving), then `overview.md`, `rejected.md`, `decisions.md`, the docs checker and the "nothing lost" check. No code exists. The source is `~/projects/ecs-game-v2` (read-only). The next session should read "How to continue" below and carry on with play-and-save.
 
 ## Done
 
@@ -15,16 +15,22 @@
 | [requirements/physics/](requirements/physics/README.md) | Done, 3 files |
 | [requirements/camera.md](requirements/camera.md) | Done |
 | [requirements/triggers/](requirements/triggers/README.md) | Done, 2 files |
+| [requirements/scripts/](requirements/scripts/README.md) | Done, 2 files |
 | [requirements/later.md](requirements/later.md) | Started: sprite sheets, public uploads. Publishing, accounts, replays, parallax, main menu still to add from source files 07, 11, 12 |
-| [tech-notes.md](tech-notes.md) | Editor, drawing, assets, physics, camera, triggers done |
+| [tech-notes.md](tech-notes.md) | Editor, drawing, assets, physics, camera, triggers, scripts done |
 
 ## Still to do, in order
 
 1. Done: physics.
 2. Done: camera.
 3. Done: triggers.
-4. `requirements/scripts/` from 10 (scope ids LU): `scripts.md` and `code-editor-and-console.md` (triggers.md already links to the second name). The Lua API may need its own file.
-5. `requirements/play-and-save/`: `test-play.md` and `saving.md` from 11 and 12 (scope ids PL, SA). Other files already link to these two names.
+4. Done: scripts.
+5. **Next:** `requirements/play-and-save/`: `README.md`, `test-play.md` and `saving.md` from source files 11 and 12 (scope ids PL1 to PL11, SA1 to SA6). Other files already link to these two names. Neither source file has been read yet, except 11's input sections (2.10 to 2.12), which are already in `triggers/variables-and-inputs.md`. Decisions that apply:
+   - Test play: UI1, PS1, PS2, PN1, RS2 (no restart key), PM1 (Tab opens the pause menu, R restarts, Esc only leaves full screen), LS1 (a run is playing, won or lost, one end window), SD1 and SD2 with CL1 (seed, determinism test), 11 2.1 to 11 2.22 in rounds 9 and 10, D13, D69, D73 to D77, K1, R54.
+   - Rejected there: Play from here (11 2.5), a title card (11 2.14), a suggested way to handle lives (11 2.16), reduced motion (11 2.21), replacing the end window (D74).
+   - Saving: LV1, SV1, SV2, ST1 (round 12, the storage request), TB1, EXT1, FMT1, FMT2, 12 A1 to A12 in round 11, D8, D30, D79, D80.
+   - Add what 11 and 12 say about publishing, accounts and replays to `requirements/later.md`. Also add parallax and the main menu there.
+   - Then add the play-and-save rows to `rejected.md` and remove its "draft" note.
 6. `requirements/README.md` (one line per topic), `docs/README.md`, `overview.md`, `decisions.md`, `rejected.md`, a small `CLAUDE.md` at the repo root.
 7. `tools/check-docs.js`: every file has a TL;DR, stays under about 300 lines, links resolve, every `###` feature heading ends in `· v1`, `· v2` or `· Later`, dropped words appear only in the glossary and `rejected.md`.
 8. The "nothing lost" check: every decision id in `ecs-game-v2/docs/requirements/review-decisions/round-*.md`, every D number in `00-decisions.md` and every scope id in `review/scope.js` must appear in a `Source:` line or in `rejected.md`.
@@ -71,4 +77,6 @@ Found while rewriting. None was decided by Claude.
 15. **Can a variable hold text**, or only numbers?
 16. **Inputs of a new level:** suggested `left`, `right`, `up`, `down`, `jump`.
 17. **The Trigger zone tool** is in the tool list but has no version. Suggested v1.
-18. **Events between builtin scripts** (`damage`, `heal` and so on) were never reviewed.
+18. **The Lua function list** has to be rewritten as functions that take ids. The old one used an object style the review rejected.
+19. **How a script declares its settings, and how it names its own entity**, were never written.
+20. **Events between builtin scripts** (`damage`, `heal` and so on) were never reviewed.
