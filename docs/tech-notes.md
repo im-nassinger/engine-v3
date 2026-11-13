@@ -23,3 +23,19 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Layers panel.** A fixed row height allows a virtualised list. Virtualisation plus drag and drop is where hand-made trees tend to break, so prototype both together at 10,000 rows. Browser find can't see off-screen rows, which is one reason for the panel's own search.
 - **Order keys.** If draw order uses fractional keys, repeated inserts between the same neighbours run out of precision. Rebalance quietly, outside undo.
 - **Negative scale** must be allowed (mirroring, Flip). Polygon winding and joint limits need a rule under mirroring.
+
+## Drawing and text
+
+- **Fill and outline as tagged values**, such as `{ kind: "solid", color }`, so gradients and image fills need no format change.
+- **Rounded rectangles** have more than 8 points, so they go through the same splitting as any polygon. The splits are internal and add no seams.
+- **Self-crossing polygons.** A polygon library must cut the outline at its crossings before the convex split. Check how the renderer fills a self-crossing closed path: fills based on ear clipping may show artefacts.
+- **Bad polygon input.** Treat a point lying on an edge, and duplicate points, as errors. Godot users report convex decomposition failing on exactly these.
+- **Lines in Box2D.** Chains assume no self-crossing for their ghost collision handling, and points very close together cause problems. Clean lines up before they reach physics.
+- **Converted polygons are stored results**, so how the points are sampled can't affect determinism.
+- **Sharp text.** Text drawn as a bitmap blurs when scaled above 1. Editor zoom, camera zoom and group scale all count, so text must be redrawn at its real size or drawn another way. Text that a script changes every tick needs a speed test.
+- **Text can't be measured off the main thread**, which is one reason a text has a rectangle as its box.
+- **Fonts** must be hosted with the game and loaded before the first draw and before any measuring.
+- **Typing on the level** can be a DOM text area placed with the entity's matrix, which gives accent keys and input methods for free.
+- **Eyedropper.** Sampling the level view needs a pixel read from the renderer, not the browser's eyedropper, whose support varies.
+- **Dashes.** PixiJS has no dash option for outlines, so dashes would mean building dash geometry that follows curves. This is why dashes were left out.
+- **Font download size.** The target for bundled fonts was under 1 MB with Latin subsets. Not measured.
