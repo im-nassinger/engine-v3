@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**The docs rewrite is half done** (2026-11-13). Written and committed: glossary, principles, scope, and five of the eight requirement topics (editor, drawing, assets, physics, camera), plus technical notes for those five. **Still to write:** triggers, scripts, play-and-save, then `overview.md`, `rejected.md`, `decisions.md`, the docs checker and the "nothing lost" check. No code exists. The source is `~/projects/ecs-game-v2` (read-only). The next session should read "How to continue" below and carry on with triggers.
+**The docs rewrite is half done** (2026-11-13). Written and committed: glossary, principles, scope, and six of the eight requirement topics (editor, drawing, assets, physics, camera, triggers), plus technical notes for those six. **Still to write:** scripts, play-and-save, then `overview.md`, `rejected.md`, `decisions.md`, the docs checker and the "nothing lost" check. No code exists. The source is `~/projects/ecs-game-v2` (read-only). The next session should read "How to continue" below and carry on with scripts.
 
 ## Done
 
@@ -14,15 +14,16 @@
 | [requirements/assets/](requirements/assets/README.md) | Done, 3 files |
 | [requirements/physics/](requirements/physics/README.md) | Done, 3 files |
 | [requirements/camera.md](requirements/camera.md) | Done |
+| [requirements/triggers/](requirements/triggers/README.md) | Done, 2 files |
 | [requirements/later.md](requirements/later.md) | Started: sprite sheets, public uploads. Publishing, accounts, replays, parallax, main menu still to add from source files 07, 11, 12 |
-| [tech-notes.md](tech-notes.md) | Editor, drawing, assets, physics, camera done |
+| [tech-notes.md](tech-notes.md) | Editor, drawing, assets, physics, camera, triggers done |
 
 ## Still to do, in order
 
 1. Done: physics.
 2. Done: camera.
-3. `requirements/triggers/` from 09, plus inputs from 11 (scope ids TR, VA, IN).
-4. `requirements/scripts/` from 10 (scope ids LU). The Lua API probably needs its own file.
+3. Done: triggers.
+4. `requirements/scripts/` from 10 (scope ids LU): `scripts.md` and `code-editor-and-console.md` (triggers.md already links to the second name). The Lua API may need its own file.
 5. `requirements/play-and-save/`: `test-play.md` and `saving.md` from 11 and 12 (scope ids PL, SA). Other files already link to these two names.
 6. `requirements/README.md` (one line per topic), `docs/README.md`, `overview.md`, `decisions.md`, `rejected.md`, a small `CLAUDE.md` at the repo root.
 7. `tools/check-docs.js`: every file has a TL;DR, stays under about 300 lines, links resolve, every `###` feature heading ends in `· v1`, `· v2` or `· Later`, dropped words appear only in the glossary and `rejected.md`.
@@ -67,4 +68,7 @@ Found while rewriting. None was decided by Claude.
 12. **Spawn settings:** what the trigger's Spawn action offers (position, speed), now that `spawn(path)` returns an id.
 13. **Follow by tag:** can the camera's target be a tag, so a spawned player is found without a script?
 14. **Does the camera have an eye?** The review says no, but the old draft used it to hide everything inside the camera.
-15. **Events between builtin scripts** (`damage`, `heal` and so on) were never reviewed.
+15. **Can a variable hold text**, or only numbers?
+16. **Inputs of a new level:** suggested `left`, `right`, `up`, `down`, `jump`.
+17. **The Trigger zone tool** is in the tool list but has no version. Suggested v1.
+18. **Events between builtin scripts** (`damage`, `heal` and so on) were never reviewed.

@@ -90,7 +90,7 @@ Source: scope PH3; round 6: 05 2.11; round 7: SN1; old: PH-58 to PH-63
 - A passing contact produces no collision event. A blocked one behaves like any collision.
 - Only faces looking along the arrow can block. Walking into the end of a platform passes through.
 - With Sensor on, One-way has no effect.
-- A script or trigger can make a body drop through the one-way platforms it is standing on.
+- A script can make a body drop through the one-way platforms it is standing on. The builtin platformer script uses it for Down plus Jump.
 
 Source: scope PH5; round 6: 05 2.10; round 7: OW1; old: PH-47 to PH-57
 

@@ -107,3 +107,16 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Sharpness.** Level and screen content scale with the window. Text and vectors should be redrawn at the final size after a resize or a big zoom.
 - **Text that changes often** (a score) should be written only when the value changes.
 - **Parallax**, if it comes, is drawing-side only, which is why parallax content can't be clicked or collide.
+
+## Triggers
+
+- **Counting touches.** Counts must be kept per trigger owner and per touching entity, not per pair of shapes, because one entity may be built from several shapes.
+- **Box2D facts behind the rules (v2.4, recheck for v3):** sensors make no contact points, and a contact forms only if one body is Dynamic. Contact begin happens inside the step. Contact end can happen outside it when a body is destroyed, so those must be queued for the next round of events.
+- **Two sensors** must be filtered in our own code.
+- **One-way platforms:** collision events must use the stored pass-or-block decision, since contact begin has already happened when a contact is disabled.
+- **Clicks on entities inside the camera.** With Flex against the screen, positions there depend on the window's width, which the game never learns. The drawing side should resolve which entity was hit and send it as recorded input, with the mouse position and buttons. Replays in Happy Wheels do the same.
+- **Waiting runs are game state.** They belong in the determinism check, and should be plain data.
+- **One queue for custom events**, shared by triggers and scripts, first in, first out, carrying the chain depth.
+- **Limits** to tune: chain 32, trigger runs per tick 1,024, waiting runs per trigger 32, 64 triggers per entity, 64 actions per trigger. Import must enforce them and refuse times and strengths that aren't finite numbers.
+- **Trigger lines** for the Console should exist only in test play, in a capped buffer.
+- **Tags change during play**, so "find by tag" and the "no entity with this tag is left" event need a live index, updated in a stable order.

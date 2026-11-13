@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-What we decided against, and why. **Check here before proposing something**: an idea on this page needs a new reason to come back. Two parts: ideas the owner rejected or replaced in the review, and things left out on purpose. **This file is a draft**: it covers the editor, drawing, assets, physics and camera topics. Triggers, scripts and play-and-save still have to be added (see [progress.md](progress.md)).
+What we decided against, and why. **Check here before proposing something**: an idea on this page needs a new reason to come back. Two parts: ideas the owner rejected or replaced in the review, and things left out on purpose. **This file is a draft**: it covers every topic except scripts and play-and-save, which still have to be added (see [progress.md](progress.md)).
 
 ## Rejected or replaced in the review
 
@@ -50,6 +50,14 @@ What we decided against, and why. **Check here before proposing something**: an 
 | Camera smoothing per direction | One value for both | Rejected by the owner |
 | A camera pinned at the top of the Layers panel | An ordinary row that can be moved | Its position changes nothing |
 | A corner drag that changes the camera's shape | A corner drag only zooms | It would quietly change what players see |
+| A one-sentence trigger (T1) | When, If, Do | The sentence hid the "who" inside the When |
+| Triggers that can't read values | The event "a variable changes" and the If checks | The owner's direction |
+| Actions for teleport, variables, tags, switching triggers, world settings | Change value | If it's data, change it with Change value |
+| "Messages" | Custom events | "Event" was already in use, and "messages" was unclear |
+| A "Call Lua function" action | Fire a custom event the script listens for | One way for triggers and scripts to talk |
+| A fixed set of inputs that creators can't change | Inputs defined on the World's InputComponent, plus raw keys | The owner wanted both |
+| "Lowest id first" run order | Layers panel order | The order you see is the order things run |
+| Trigger templates | Component presets, not in v1 | A preset works the same on every component |
 | A 12-font list | Inter, then Lora, JetBrains Mono and Roboto Mono | The owner's list |
 
 ## Left out on purpose
@@ -63,5 +71,7 @@ Not planned for any version. Each would need its own review.
 **Physics:** setting mass or centre of mass directly, changing the collision grid or level bounds during play, changing shape or scale during play, a physics preview in the editor, radial gravity, wind and water, several background layers, tracing an image into a collision polygon, showing pixels per metre as a setting, Pulley and Gear joints (after v2), motor, friction and mouse joints, a chain generator tool, switching a joint off and on during play (destroy covers it), joint presets, separate force and torque limits for breaking.
 
 **Camera:** camera rotation, automatic framing of several targets, vertical look-ahead, pixel-perfect scaling, art in the bars, a fade-to-colour action (a rectangle inside the camera does it), text input fields, a constant-size screen layout, a player-controlled camera, split screen, picture-in-picture.
+
+**Triggers:** branches, loops or nested actions in a trigger, random choice in a trigger, changing a value smoothly over time, a visual node graph, mouse drag, the right and middle buttons as trigger events, "view this trigger as Lua".
 
 **Assets:** a sound component, a music setting on the World, positional sound, nine-slice images, drawing pixels, sound editing beyond trim, loading files from web addresses, wall jump, ladders, dash and crush detection in the builtin platformer script, local multiplayer.
