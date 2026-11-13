@@ -96,3 +96,14 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Disabling a joint** doesn't exist in Box2D. Disconnect means destroy.
 - **Scaling a group with joints.** For uneven scale use the geometric mean for distances. A mirrored parent shows in the sign of the matrix determinant.
 - **Editor mass estimates** for warnings come from area and density, since the editor doesn't run physics.
+
+## Camera
+
+- **Two camera positions.** The game keeps a logical camera, limited using the camera's own box. This is what scripts read, so it is the same on every computer. The drawing side derives the shown camera by limiting again to the real window and adding shake. The shown view always contains the camera's own box.
+- **Follow runs with the game**, after physics, so scripts read a deterministic position. Draw the camera interpolated the same way as entities, or a followed body jitters.
+- **Entities inside the camera** need their own drawing layer outside the level's transform, drawn last.
+- **Mouse input.** Level positions of the mouse use the real window and are recorded as input. A player with a wide window can click things outside the camera's own box. It is an input, so it doesn't break determinism.
+- **Time.** Camera moves count ticks, not scaled time. Shake runs on the drawing side, so it must stop on Pause.
+- **Sharpness.** Level and screen content scale with the window. Text and vectors should be redrawn at the final size after a resize or a big zoom.
+- **Text that changes often** (a score) should be written only when the value changes.
+- **Parallax**, if it comes, is drawing-side only, which is why parallax content can't be clicked or collide.

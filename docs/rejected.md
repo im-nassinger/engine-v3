@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-What we decided against, and why. **Check here before proposing something**: an idea on this page needs a new reason to come back. Two parts: ideas the owner rejected or replaced in the review, and things left out on purpose. **This file is a draft**: it covers the editor, drawing, assets and physics topics. Camera, triggers, scripts and play-and-save still have to be added (see [progress.md](progress.md)).
+What we decided against, and why. **Check here before proposing something**: an idea on this page needs a new reason to come back. Two parts: ideas the owner rejected or replaced in the review, and things left out on purpose. **This file is a draft**: it covers the editor, drawing, assets, physics and camera topics. Triggers, scripts and play-and-save still have to be added (see [progress.md](progress.md)).
 
 ## Rejected or replaced in the review
 
@@ -43,6 +43,13 @@ What we decided against, and why. **Check here before proposing something**: an 
 | A "joints of this body" list | The Used by list | "What points to this?" is the general question |
 | A line on a Dynamic body with a warning | The Dynamic option is greyed out for lines | Decided in round 2 |
 | Level bounds of 3840×2160, then 2000×1000 | 20000×10000 px | The owner's size |
+| Anchors, a ScreenAnchorComponent, a 3×3 anchor setting | The FlexComponent, also against the screen. Its 3×3 picker only sets Flex values | One layout system |
+| "HUD entity" as a kind of thing | Entities inside the camera | They are regular entities |
+| "Entities inside the camera have no physics" as a rule | Any component is allowed. Physics and joints don't run there, and the cards show a warning | A warning explains it instead of a forbidden rule |
+| A limit on how wide Fill window can show (21:9) | No limit. Bars only where the view would pass the level bounds | Rejected by the owner |
+| Camera smoothing per direction | One value for both | Rejected by the owner |
+| A camera pinned at the top of the Layers panel | An ordinary row that can be moved | Its position changes nothing |
+| A corner drag that changes the camera's shape | A corner drag only zooms | It would quietly change what players see |
 | A 12-font list | Inter, then Lora, JetBrains Mono and Roboto Mono | The owner's list |
 
 ## Left out on purpose
@@ -54,5 +61,7 @@ Not planned for any version. Each would need its own review.
 **Drawing:** union and subtract of shapes (a group with a body already merges shapes, and subtract needs holes), polygons with holes, dashed outlines, outlines drawn inside or outside the edge, rich text, text on a path, fonts uploaded by users, a radius per corner, star, arc and pie tools, a polygon that updates by itself when its path changes, collision that follows the outer edge of a thick outline (it follows the centre), joining two paths into one, brushes and arrowheads, shared named styles, group opacity.
 
 **Physics:** setting mass or centre of mass directly, changing the collision grid or level bounds during play, changing shape or scale during play, a physics preview in the editor, radial gravity, wind and water, several background layers, tracing an image into a collision polygon, showing pixels per metre as a setting, Pulley and Gear joints (after v2), motor, friction and mouse joints, a chain generator tool, switching a joint off and on during play (destroy covers it), joint presets, separate force and torque limits for breaking.
+
+**Camera:** camera rotation, automatic framing of several targets, vertical look-ahead, pixel-perfect scaling, art in the bars, a fade-to-colour action (a rectangle inside the camera does it), text input fields, a constant-size screen layout, a player-controlled camera, split screen, picture-in-picture.
 
 **Assets:** a sound component, a music setting on the World, positional sound, nine-slice images, drawing pixels, sound editing beyond trim, loading files from web addresses, wall jump, ladders, dash and crush detection in the builtin platformer script, local multiplayer.
