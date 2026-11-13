@@ -61,3 +61,38 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Ground contacts.** A Box2D contact can exist without touching, so use its touching state.
 - **Order of custom events.** Define a stable delivery order, and whether an event fired inside a handler arrives in the same tick. The 32-step limit for trigger chains should cover events fired by scripts too.
 - **Jump feel.** The platformer defaults come from Celeste's published values (0.1 s of grace, 0.65 air control) scaled to 1080p, and from the idea of falling faster than rising.
+
+## Physics and joints
+
+**These notes were written against Box2D v2.4.1.** The review assumes Box2D v3 (64 collision bits, the same result on every computer). Recheck each one against v3 before relying on it.
+
+| Limit | Box2D value | At 50 px per metre |
+|---|---|---|
+| Moving shapes | 0.1 to 10 m | 5 to 500 px |
+| Static shapes "without trouble" | up to 50 m | 2,500 px |
+| Most movement per step | 2 m | 6,000 px/s |
+| Most rotation per step | 90° | 5,400 °/s, 15 turns per second |
+| Polygon skin | 0.01 m | 0.5 px |
+
+- **Degenerate polygons.** In v2.4.1 a polygon with under 3 usable points silently became a 2×2 m box. Shapes too small to collide must be skipped before they reach physics.
+- **Two-sided lines.** Chains were one-sided in v2.4.1. Options were two chains in opposite directions, or plain two-sided edges. Chain points must be more than 0.25 px apart, and chains can't cross themselves.
+- **Zero mass.** A Dynamic body with no mass may hang motionless. Give it an explicit 1 kg.
+- **Sensor mass.** Give sensors density 0 when building bodies.
+- **Changing gravity** only stores the value. Wake every body explicitly.
+- **One-way platforms** aren't a Box2D feature. Keep the pass or block decision per pair of bodies, not per pair of surfaces, make it when contact begins, keep it stable, and send no events for passing contacts. Allow a small tolerance for bodies at rest.
+- **Mass and centre of mass in the editor** must come from shared geometry code, not from the physics engine, and must match what play produces.
+- **Level bound walls** can be static surfaces that collide with everything.
+- **Game speed.** Scale the time step, keeping 60 ticks per second. 2× gives 1/30 s, the coarsest step Box2D's docs suggest. Determinism holds because the step comes from level state.
+- **Far from the origin.** Float precision at 2,000 m is about 0.1 mm, well below Box2D's slop, so ±100,000 px is safe.
+- **Ellipses** that aren't circles need more than 8 sides to roll smoothly, so several convex pieces. Pin the side count, because it affects determinism.
+- **Joint ends.** Box2D measures angles of body B against body A and keeps slider and wheel axes in body A's frame. Decide the mapping of fields A and B once. An empty end maps to the ground body.
+- **Clockwise.** Box2D's counter-clockwise positive reads as clockwise on screen when y points down. Confirm.
+- **Rod, Rope, Spring** are one distance joint: Rod sets min and max to the length, Rope sets no stiffness and only a max, Spring sets a rest length with stiffness and damping.
+- **Stiffness.** Users enter bounces per second and a 0 to 1 damping. Converting needs the bodies' mass, and is plain arithmetic. Box2D advises staying under a quarter of the step rate, hence the cap of 15.
+- **Resistance** is a motor at speed 0 with a small strength, so a real motor replaces it.
+- **Limits must include zero**, or the joint lurches at the start. The editor guarantees it, and import must clamp it.
+- **Skip joints that do nothing:** both ends on one body (Box2D asserts they differ), or neither end able to move.
+- **Breaking.** Compare the joint's reaction force against the limit after the physics step and before queued destroys. Only check joints with Breakable on.
+- **Disabling a joint** doesn't exist in Box2D. Disconnect means destroy.
+- **Scaling a group with joints.** For uneven scale use the geometric mean for distances. A mirrored parent shows in the sign of the matrix determinant.
+- **Editor mass estimates** for warnings come from area and density, since the editor doesn't run physics.
