@@ -1,3 +1,13 @@
 node_modules/
+dist/
 .DS_Store
 *.log
+*.tsbuildinfo
+.vite/
+.eslintcache
+coverage/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+__screenshots__/
