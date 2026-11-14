@@ -57,7 +57,7 @@ Source: scope AS8; round 6: E4, FMT2; round 8: AP1
 - A **My files** folder in the Assets panel is shared by every level in this browser.
 - *Why v2: v1 holds one level, so there is nothing to share it with yet.*
 
-Source: scope AS9; round 2: O6
+Source: scope AS9; round 2: O6; decisions: D59
 
 ## Images
 

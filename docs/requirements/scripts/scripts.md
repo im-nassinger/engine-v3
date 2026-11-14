@@ -18,7 +18,7 @@ A script is a `.lua` file from the Assets panel, attached to an entity through i
 - A script on a hidden entity still runs.
 - A new `.lua` file is made in the Assets panel. The builtin `.lua` files can be read as examples.
 
-Source: scope LU1; round 1: C12; round 3: S2; round 4: FT1; round 5: R45; round 10: SC1, OR1; old: LU-01, LU-02, LU-04, LU-50
+Source: scope LU1; round 1: C12; round 3: S2; round 4: FT1; round 5: R45; round 9: 10 2.1; round 10: SC1, OR1; old: LU-01, LU-02, LU-04, LU-50
 
 ## How a script works
 
@@ -112,7 +112,7 @@ Source: round 9: 10 2.7; round 10: API1, 11 2.18; round 11: CL1; round 12: MS2; 
 - A game update never changes how a level plays.
 - Exporting a `.lua` file needs nothing special: it is a file in the Assets panel.
 
-Source: round 10: API1; round 11: 12 A12; old: LU-143, LU-151
+Source: round 9: 10 2.19; round 10: API1; round 11: 12 A12; old: LU-143, LU-151
 
 ## Safety
 

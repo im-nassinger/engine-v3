@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Facts and warnings for the architecture work, collected from the old research. **These are not requirements and not decisions.** They are what the earlier attempt learned about browsers, Box2D and Lua that the new design should know. Grouped by topic. Notes that named the old code's own parts were dropped, and anything a later decision made untrue was removed.
+Facts and warnings for the architecture work, collected from the old research. **These are not requirements and not decisions.** They are what the earlier attempt learned about browsers, Box2D and Lua that the new design should know. Grouped by topic, plus the first attempt's implementation choices at the end. Notes that named the old code's own parts were dropped, and anything a later decision made untrue was removed.
 
 ## Editor
 
@@ -131,3 +131,55 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **A hung game.** The watchdog must ignore hidden-tab throttling and debugger pauses.
 - **Old size limits, as starting values:** 32 MB of Lua memory per level, 256 KB per script and 4 MB per level, 5,000 Console lines.
 - **Monaco replaces CodeMirror**, so the old notes about CodeMirror's Lua mode and key bindings no longer apply. Ctrl+Enter must still reach Play from inside the editor.
+
+## Test play
+
+- **Messages between the editor and the game.** Beyond pause, step and stop, the editor needs to send: speed, restart, which View menu switches are on, which entity the Inspector watches, and a click to resolve into an entity. The game sends back: numbers for the performance view, shapes for the debug views, the watched entity's values, variable values and "the run ended".
+- **Clock.** The speed menu and the player's game speed scale how often ticks run, never the tick itself. Stamp each input with the tick it applied to: that log is the record of a run. How timers behave in a hidden tab's worker is undocumented, so pause when hidden and don't depend on it.
+- **Restart.** Rebuild from the prepared copy with a fresh Lua state, physics world, id counter and random stream. Resetting in place risks leaking state into a run. Keeping the prepared level and a spare worker ready makes Restart fast.
+- **First Play.** Loading the Lua and Box2D wasm files on the first Play is slow. Preload them when the editor opens.
+- **A hung game.** The watchdog must be off during pause and while the tab is hidden, and must ignore a late heartbeat when the page itself was asleep (a laptop waking up). Naming the script that hung needs shared memory, which needs cross-origin isolation headers (to verify). The old draft ended a run after 5 seconds without a response, with a note after 2.
+- **Drawing between ticks.** Entities need a "snap" flag for teleports, spawns and the first tick, so they aren't drawn sliding. Convert the mouse position with the camera that was actually drawn.
+- **What a run starts from.** The seed, the clock time and the kept variables' values go together in the start message. All of them belong in any later replay record.
+- **Run end.** Win, Lose and Restart are applied at the end of the tick, so a tick always completes.
+- **Sound.** Pause suspends the audio output. Browsers block sound until a click or key press: pressing Play counts, Esc doesn't, and a gamepad button may not. The old draft therefore held a player's run until sound could start.
+- **Keys.** Match on physical key codes. The API that gives a key's label for the user's layout is Chrome-family only, so plan a US-label fallback. Poll gamepads on the page, not in the worker.
+- **Frozen pages.** Browsers can freeze or discard hidden pages with no event. Both are safe, because a run holds no unsaved work.
+- **A long stall.** The old draft dropped the backlog after a stall of more than 0.25 seconds, so the game continues from where it was instead of racing to catch up.
+- **Full screen.** Esc, tab switching and Alt+Tab all end it, and going back needs a click.
+
+## Saving and files
+
+Browser storage as checked in October 2026:
+
+| Browser | Space for one site | Asking to keep data | Private window |
+|---|---|---|---|
+| Chromium | About 60% of the disk | Decided silently, from signs such as visits, install or bookmark. Can be asked again | A memory pool, about 1 GB on a 16 GB computer |
+| Firefox | The smaller of 10% of the disk or 10 GiB | Asks the user | Works since about Firefox 115 |
+| Safari 17+ | About 60% of the disk | Decided silently | Not documented. Don't rely on it |
+
+- **Deleting is all or nothing per site.** The browser removes a whole site's data at once, least recently used first, and skips sites it agreed to keep.
+- **Safari's 7-day rule.** With tracking prevention on, data is deleted if the site had no interaction in the last 7 days of Safari use. Whether `persist()` exempts a site is implied but not stated. Test it.
+- **Space left can't be read.** `estimate()` hides the real quota in Chrome. Show only what the game itself uses. A quota error on write is the only real signal, and its name differs between browsers, so test all three.
+- **Private windows can't be detected reliably**, so the game shouldn't try.
+- **One address.** Saved levels belong to the exact website address. `localhost` and a staging address are separate stores. This is why the address is chosen before public launch.
+- **Save writes.** Use strict durability, or a save may be lost on a power cut. A save started while the page unloads may not finish, so the timed saves are the guarantee, plus a save when the tab is hidden.
+- **Save cost.** Store each file once by hash. If full saves make the editor stutter, write only what changed.
+- **One tab.** Web Locks: one exclusive lock for the level, `ifAvailable` to detect the other tab. Whether a crashed tab releases its lock is only implied by the spec. Test it.
+- **Import in a worker**, to keep the page responsive and contain hostile files. Decode images only after the checks pass. Zip bombs must be refused without freezing the page.
+- **Reading script settings** means running the top of a script in a throwaway Lua state on load. That state needs the same safety as play, which is why importing a level counts as running untrusted code.
+- **Never roll back a shipped file format version.** Saved levels would become unreadable. Roll forward.
+- **Offline.** An editor that opens offline needs a service worker. That brings old open tabs after an update: a tab that finds a level saved by a newer version should offer Reload, not an error.
+- **The old limits, as starting values:** 2,000 files in a level, 250 MB unpacked, and a level's data read with a memory bound.
+- **A content security policy for the game's worker** was planned for the first release, as a backstop if a script ever escapes.
+
+## From the first attempt's code
+
+Implementation choices the first attempt made, worth reconsidering when the new design is written:
+
+- Trigonometry done in plain arithmetic, so results match on every computer.
+- Hosting on Cloudflare static assets, because GitHub Pages can't set headers by path.
+- A separate path for drawing oversized text at maximum zoom.
+- Antialiasing always on.
+- A spare worker kept ready, so Restart takes about 300 ms.
+- Checking x86 against ARM with a test page on a phone before each release.

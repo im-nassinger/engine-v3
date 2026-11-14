@@ -54,7 +54,7 @@ Source: round 10: CN1, UI1; round 11: CN3, PN1; old: LU-123 to LU-130
 - A message repeated many times shows once with a count, such as "Coin not found ×12".
 - *Why v1: a `print()` that runs every tick would otherwise bury everything else.*
 
-Source: scope LU6; round 10: CN2; old: LU-128
+Source: scope LU6; round 9: 10 2.15; round 10: CN2; old: LU-128
 
 ### Filters · v2
 
@@ -68,7 +68,7 @@ Source: scope LU7; round 10: CN1; round 11: CN3; old: LU-127
 - When a trigger's When happens but an If check fails, a line names the check.
 - *Why: it shows which trigger made something happen, or why it didn't. v2 because Pause, Step and live values already show what happened.*
 
-Source: scope LU8; round 10: TL1, TL2; round 11: PN1; old: TR-140, TR-144
+Source: scope LU8; round 9: 09 2.17; round 10: TL1, TL2; round 11: PN1; old: TR-140, TR-144
 
 ## Debugging
 

@@ -18,7 +18,7 @@ How values are edited and how mistakes are reversed. **v1:** the Inspector shows
 - Hovering a field's label shows its description.
 - During play the Inspector is read-only, and shows live values when brought back with Panels.
 
-Source: round 3: R15; round 4: H2, SEL1; decisions: D14, D15; old: WS-84 to WS-89, WS-124
+Source: round 1: C1, C10; round 3: R15; round 4: H2, SEL1; decisions: D14, D15; old: WS-84 to WS-89, WS-124
 
 ### One fixed list of field types · v1
 

@@ -2,71 +2,86 @@
 
 ## TL;DR
 
-What we decided against, and why. **Check here before proposing something**: an idea on this page needs a new reason to come back. Two parts: ideas the owner rejected or replaced in the review, and things left out on purpose. **This file is a draft**: it covers every topic except play-and-save, which still has to be added (see [progress.md](progress.md)).
+What we decided against, and why. **Check here before proposing something**: an idea on this page needs a new reason to come back. Two parts: ideas the owner rejected or replaced in the review, and things left out on purpose. The Source column names the review decision, written like the `Source:` lines in the requirements.
 
 ## Rejected or replaced in the review
 
-| Idea | What we do instead | Why |
-|---|---|---|
-| Prefabs | `.entity` files | If something is just a file, it stays a file |
-| Behaviours | Builtin `.lua` scripts | Same reason |
-| A built-in player | A builtin `.entity` file anyone could rebuild | There is no special player |
-| Checkpoints | Nothing, in v1 or later, for now. A full save state could be added later | The owner's decision |
-| Soft respawn, lives, a fall limit | Nothing. Lives are up to the creator | The game decides nothing the creator should |
-| A script that watches a variable | The trigger event "a variable changes" | One fewer builtin script |
-| Automatic text such as `Coins: {coins}` | A text entity with the builtin Show Variable script | Keeps it out of the engine |
-| "Extract assets" on an `.entity` file | Packages: an explicit Export package command | One file type must not behave two ways |
-| Original hero art | Kenney art | Free to use, so no trademark check of our own |
-| Spawning by name | Spawning by path | Two files can hold entities with the same name. No two files share a path |
-| Music and Sound effects groups, base volume on the asset | One kind of audio, settings on each "Play sound" | Simpler, and assets are raw files |
-| An ImageComponent, image opacity, "Add hitbox" | A shape with an image fill | Everything known about shapes works on images for free |
-| A separate tool for editing points, and tools for each shape | Double-click with Select, one Shape tool | The owner wanted fewer tools |
-| Ctrl+click for the deepest entity | Alt+click for the next entity underneath | One key is enough |
-| "Select same type" and "Select same tag" | Select all and Invert only | Dropped by the owner |
-| A selection box that needs entities fully inside | It selects anything it touches | The owner's change |
-| Duplicate with an offset | The copy sits on top of the original | The owner's change |
-| A polygon that crosses itself is refused | It is allowed, and every enclosed area is filled and collides | Both work, and it keeps "what you see is what collides" |
-| Copy style and Paste style | Copy value and Copy component on any field or card | Colours stop being a special case |
-| Adding a partner component automatically | A note on the card with a button | Nothing happens behind the user's back |
-| Body chips, joint badges and script badges in Layers rows | One row is one entity: name, eye, lock | Joints are their own rows |
-| A "Problems" tab | Editor messages on the card, listed from the status bar | One name and look for every note |
-| Version history, named versions | Nothing. Ctrl+S exports the project file | Rejected by the owner |
-| Material presets (Wood, Ice, Rubber) | Typing density, friction and restitution | Presets would be a real feature of their own, for every component |
-| Collision categories, a Category field on surfaces | Tags in the collision grid | One label system instead of two |
-| A "parts don't collide" setting, a collision group component | The collision grid and the right tags | Once the grid exists, nothing else is needed. The first proposal also used "group" in two meanings |
-| A hidden body under a sensor | A surface with no body acts as Static | Nothing happens behind the user's back |
-| Invented field names (Keep upright, Air drag, Bounciness) | Box2D's names: Fixed rotation, Linear damping, Restitution | Tutorials and the Lua API match |
-| A one-way component or script | A SurfaceComponent setting | It must be decided inside the physics step |
-| A joint that follows its bodies in the editor, or is copied with them | A joint moves and copies only when selected | Only what is selected moves or copies |
-| A joint's automatic place in the tree | A joint sits where the user puts it | A joint is an ordinary entity |
-| A "joint broke" event | The ordinary "destroyed" event | Breaking is being destroyed |
-| A "joints of this body" list | The Used by list | "What points to this?" is the general question |
-| A line on a Dynamic body with a warning | The Dynamic option is greyed out for lines | Decided in round 2 |
-| Level bounds of 3840×2160, then 2000×1000 | 20000×10000 px | The owner's size |
-| Anchors, a ScreenAnchorComponent, a 3×3 anchor setting | The FlexComponent, also against the screen. Its 3×3 picker only sets Flex values | One layout system |
-| "HUD entity" as a kind of thing | Entities inside the camera | They are regular entities |
-| "Entities inside the camera have no physics" as a rule | Any component is allowed. Physics and joints don't run there, and the cards show a warning | A warning explains it instead of a forbidden rule |
-| A limit on how wide Fill window can show (21:9) | No limit. Bars only where the view would pass the level bounds | Rejected by the owner |
-| Camera smoothing per direction | One value for both | Rejected by the owner |
-| A camera pinned at the top of the Layers panel | An ordinary row that can be moved | Its position changes nothing |
-| A corner drag that changes the camera's shape | A corner drag only zooms | It would quietly change what players see |
-| A one-sentence trigger (T1) | When, If, Do | The sentence hid the "who" inside the When |
-| Triggers that can't read values | The event "a variable changes" and the If checks | The owner's direction |
-| Actions for teleport, variables, tags, switching triggers, world settings | Change value | If it's data, change it with Change value |
-| "Messages" | Custom events | "Event" was already in use, and "messages" was unclear |
-| A "Call Lua function" action | Fire a custom event the script listens for | One way for triggers and scripts to talk |
-| A fixed set of inputs that creators can't change | Inputs defined on the World's InputComponent, plus raw keys | The owner wanted both |
-| "Lowest id first" run order | Layers panel order | The order you see is the order things run |
-| Trigger templates | Component presets, not in v1 | A preset works the same on every component |
-| An object-style Lua API (`self:setText`) | Ids and functions | Handles, not references |
-| `onStart`, `onUpdate` and other callbacks | `on(name, function)` | One list of events for triggers and scripts |
-| A limit on script work per tick | No limit. The game runs separately from the editor | Rejected by the owner |
-| Scripts blocked from reading the clock | Scripts may read the date and time | The determinism test fixes the clock |
-| "Data" and "saved data" | Variables, with Keep between runs | One concept |
-| Script templates | Builtin `.lua` files as examples, component presets later | A preset works the same on every component |
-| Watched values, a Variables tab, breakpoints, shapes drawn from scripts | Live values, `print()`, Pause and Step | No feature appears inside another question |
-| CodeMirror | Monaco | The owner's choice |
-| A 12-font list | Inter, then Lora, JetBrains Mono and Roboto Mono | The owner's list |
+| Idea | What we do instead | Why | Source |
+|---|---|---|---|
+| Prefabs | `.entity` files | If something is just a file, it stays a file | round 1: C14 |
+| Behaviours | Builtin `.lua` scripts | Same reason | round 1: C13 |
+| A built-in player | A builtin `.entity` file anyone could rebuild | There is no special player | round 1: C15 |
+| Checkpoints | Nothing, in v1 or later, for now. A full save state could be added later | The owner's decision | round 3: K1, K2 |
+| Soft respawn, lives, a fall limit | Nothing. Lives are up to the creator | The game decides nothing the creator should | decisions: D9; round 10: 11 2.16 |
+| A script that watches a variable | The trigger event "a variable changes" | One fewer builtin script | decisions: D1; round 4: T2 |
+| Automatic text such as `Coins: {coins}` | A text entity with the builtin Show Variable script | Keeps it out of the engine | decisions: D2; round 2: R2 |
+| "Extract assets" on an `.entity` file | Packages: an explicit Export package command | One file type must not behave two ways | round 2: R9; round 6: E4 |
+| Original hero art | Kenney art | Free to use, so no trademark check of our own | round 1: D32, D60; round 7: 08 2.12 |
+| Spawning by name | Spawning by path | Two files can hold entities with the same name. No two files share a path | round 3: D67; round 7: 08 2.11 |
+| Music and Sound effects groups, base volume on the asset | One kind of audio, settings on each "Play sound" | Simpler, and assets are raw files | round 6: SND1; round 8: FX3 |
+| An ImageComponent, image opacity, "Add hitbox" | A shape with an image fill | Everything known about shapes works on images for free | round 1: D31; round 5: 04 2.8; round 6: ST1 |
+| A separate tool for editing points, and tools for each shape | Double-click with Select, one Shape tool | The owner wanted fewer tools | round 4: TK1; round 5: TK2 |
+| Ctrl+click for the deepest entity | Alt+click for the next entity underneath | One key is enough | round 4: 02 2.2 |
+| "Select same type" and "Select same tag" | Select all and Invert only | Dropped by the owner | round 4: 02 2.5 |
+| A selection box that needs entities fully inside | It selects anything it touches | The owner's change | round 1: D19 |
+| Duplicate with an offset | The copy sits on top of the original | The owner's change | round 3: 01 2.9 |
+| A polygon that crosses itself is refused | It is allowed, and every enclosed area is filled and collides | Both work, and it keeps "what you see is what collides" | round 6: PG1 |
+| Copy style and Paste style | Copy value and Copy component on any field or card | Colours stop being a special case | round 6: CP1 |
+| Adding a partner component automatically | A note on the card with a button | Nothing happens behind the user's back | round 5: AD2 |
+| Body chips, joint badges and script badges in Layers rows | One row is one entity: name, eye, lock | Joints are their own rows | round 6: LY2 |
+| A "Problems" tab | Editor messages on the card, listed from the status bar | One name and look for every note | round 8: WN1; round 10: EM1 |
+| Version history, named versions | Nothing. Ctrl+S exports the project file | Rejected by the owner | round 11: 12 A4, 12 A5; round 12: SV1 |
+| Material presets (Wood, Ice, Rubber) | Typing density, friction and restitution | Presets would be a real feature of their own, for every component | round 6: 05 2.5 |
+| Collision categories, a Category field on surfaces | Tags in the collision grid | One label system instead of two | round 8: CT1 |
+| A "parts don't collide" setting, a collision group component | The collision grid and the right tags | Once the grid exists, nothing else is needed. The first proposal also used "group" in two meanings | round 1: D37; round 8: CF3, CF4 |
+| A hidden body under a sensor | A surface with no body acts as Static | Nothing happens behind the user's back | round 7: SN1 |
+| Invented field names (Keep upright, Air drag, Bounciness) | Box2D's names: Fixed rotation, Linear damping, Restitution | Tutorials and the Lua API match | round 7: 05 2.4, SF1 |
+| A one-way component or script | A SurfaceComponent setting | It must be decided inside the physics step | round 7: OW1 |
+| A joint that follows its bodies in the editor, or is copied with them | A joint moves and copies only when selected | Only what is selected moves or copies | round 7: 06 2.9, 06 2.10; round 8: JM1, JC1 |
+| A joint's automatic place in the tree | A joint sits where the user puts it | A joint is an ordinary entity | round 1: D45 |
+| A "joint broke" event | The ordinary "destroyed" event | Breaking is being destroyed | round 5: R45; round 6: JB1 |
+| A "joints of this body" list | The Used by list | "What points to this?" is the general question | round 8: LK1 |
+| A line on a Dynamic body with a warning | The Dynamic option is greyed out for lines | Decided in round 2 | round 2: O8 |
+| Level bounds of 3840×2160, then 2000×1000 | 20000×10000 px | The owner's size | round 6: 05 2.15; round 7: BND2 |
+| Anchors, a ScreenAnchorComponent, a 3×3 anchor setting | The FlexComponent, also against the screen. Its 3×3 picker only sets Flex values | One layout system | decisions: D51; round 1: D50; round 4: FX1; round 9: AN2 |
+| "HUD entity" as a kind of thing | Entities inside the camera | They are regular entities | round 8: HUD1 |
+| "Entities inside the camera have no physics" as a rule | Any component is allowed. Physics and joints don't run there, and the cards show a warning | A warning explains it instead of a forbidden rule | round 8: HUD2 |
+| A limit on how wide Fill window can show (21:9) | No limit. Bars only where the view would pass the level bounds | Rejected by the owner | round 1: D49; round 2: O10 |
+| Camera smoothing per direction | One value for both | Rejected by the owner | round 1: D52 |
+| A camera pinned at the top of the Layers panel | An ordinary row that can be moved | Its position changes nothing | round 4: 02 2.11 |
+| A corner drag that changes the camera's shape | A corner drag only zooms | It would quietly change what players see | round 8: CA1 |
+| A one-sentence trigger (T1) | When, If, Do | The sentence hid the "who" inside the When | round 5: T3 |
+| Triggers that can't read values | The event "a variable changes" and the If checks | The owner's direction | round 4: T2; round 5: T5 |
+| Actions for teleport, variables, tags, switching triggers, world settings | Change value | If it's data, change it with Change value | round 9: 09 2.4b |
+| "Messages" | Custom events | "Event" was already in use, and "messages" was unclear | round 3: M1; round 9: MSG2 |
+| A "Call Lua function" action | Fire a custom event the script listens for | One way for triggers and scripts to talk | round 10: EV1 |
+| A fixed set of inputs that creators can't change | Inputs defined on the World's InputComponent, plus raw keys | The owner wanted both | round 9: 09 2.8; round 10: IN1 |
+| "Lowest id first" run order | Layers panel order | The order you see is the order things run | round 9: 09 2.12; round 10: OR1 |
+| Trigger templates | Component presets, not in v1 | A preset works the same on every component | round 9: 09 2.14; round 10: CP1 |
+| An object-style Lua API (`self:setText`) | Ids and functions | Handles, not references | round 3: D66 |
+| `onStart`, `onUpdate` and other callbacks | `on(name, function)` | One list of events for triggers and scripts | round 1: D4; round 10: EV1 |
+| A limit on script work per tick | No limit. The game runs separately from the editor | Rejected by the owner | round 3: D72; round 9: 10 2.11; round 10: LP1 |
+| Scripts blocked from reading the clock | Scripts may read the date and time | The determinism test fixes the clock | round 10: SB1; round 11: CL1 |
+| "Data" and "saved data" | Variables, with Keep between runs | One concept | round 2: O2 |
+| Script templates | Builtin `.lua` files as examples, component presets later | A preset works the same on every component | round 9: 10 2.14; round 11: CP2 |
+| Watched values, a Variables tab, breakpoints, shapes drawn from scripts | Live values, `print()`, Pause and Step | No feature appears inside another question | round 9: 10 2.16; round 10: DB1; round 11: DB2 |
+| "Play from here" | Move the entity the camera follows and press Play | There is no special player | round 9: 11 2.5 |
+| A title card before a level starts | A loading screen, then the level starts | The owner's choice | round 10: 11 2.14 |
+| A level that replaces the end window, or puts its own text on it | One built-in end window: a title, the time, Restart and Leave | It always lets the player leave | round 3: D74; round 4: LS1 |
+| Esc opens the pause menu | Tab opens and closes it | Esc is what browsers use to leave full screen | round 10: 11 2.13; round 12: PM1 |
+| A restart key (hold R), a builtin `restart` input | Open the pause menu, then R | Restarting goes through the pause menu | round 9: 11 2.6; round 10: RS1; round 11: RS2 |
+| Panels that stay visible during play | Play hides every panel, and the Panels button brings them back | The game should look like the real thing | round 10: UI1, 11 2.8; round 11: PN1 |
+| Step 10 ticks, and speeds from 0.1× to 4× | Step one tick, and a speed menu of ¼×, ½×, 1×, 2× | The owner couldn't understand the first version: a list of numbers with no picture | round 9: 11 2.4; round 10: PS1, PS2 |
+| A fixed seed as a level setting | A pinned seed is a test setting, stored in the browser | The seed is a testing tool, not part of the level | round 4: SD1 |
+| Separate saved data for test play | Test play and playing use the same kept variables, with a Reset kept values button | Keep between runs was already agreed | round 10: 11 2.22; round 11: KV1 |
+| A reduced motion setting | Nothing for now | The owner's choice | round 10: 11 2.21 |
+| Backup reminders | The game asks the browser once to keep its data | The owner doesn't want reminders | round 11: 12 A6 |
+| Ctrl+S saves a version | Ctrl+S exports the project file | Version history was dropped, and a Ctrl+S that did nothing would look like a save | round 12: SV1 |
+| One `.level` file | `.editable` to keep editing, `.playable` to play | The owner's names: they say what each file is for | round 11: 12 A10; round 12: EXT1 |
+| Limits of 10,000 entities and a 100 MB file | 100,000 entities and 256 MB | The owner's numbers | round 11: 12 A8 |
+| An import that compares level ids and asks Keep both or Replace | Import replaces the open level after asking | v1 keeps no list of levels, so there is nothing to compare against | round 11: 12 A11; round 12: LV1 |
+| CodeMirror | Monaco | The owner's choice | round 9: 10 2.13 |
+| A 12-font list | Inter, then Lora, JetBrains Mono and Roboto Mono | The owner's list | decisions: D26; round 3: F1 |
 
 ## Left out on purpose
 
@@ -85,3 +100,7 @@ Not planned for any version. Each would need its own review.
 **Scripts:** typed Lua, external editors, stepping through code, hot reload, profiler charts.
 
 **Assets:** a sound component, a music setting on the World, positional sound, nine-slice images, drawing pixels, sound editing beyond trim, loading files from web addresses, wall jump, ladders, dash and crush detection in the builtin platformer script, local multiplayer.
+
+**Test play:** editing the running game or keeping changes made during play, stepping through Lua line by line, rewind, levels linked into a campaign, a pause menu or end window made by the level, locking or hiding the mouse pointer, a custom pointer, the mouse wheel as an input, key names inside a level's text such as `{jump}`, showing physics shapes to players, a function that makes the player leave, a built-in countdown, assist options such as invincibility (the game has no health to protect), a guided tutorial drawn over the editor.
+
+**Saving:** saving straight to a file on disk (only Chromium browsers can), cloud saving before accounts exist, exporting for an older version of the game, two people editing one level, merging two versions of a level, live syncing between tabs, detecting private windows (browsers hide it on purpose), a question that blocks importing a level with scripts (the safe set of functions is the protection, not the user's judgement), payments and marketplaces.

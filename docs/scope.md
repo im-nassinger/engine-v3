@@ -14,6 +14,10 @@ Every feature in one line, with the version it ships in and why. **v1 is the sma
 
 The versions were set in the scope review on 2026-11-13. The owner accepted every pick as proposed.
 
+Versions are decided in a scope review, never inside a requirement. An earlier decision to keep every proposed trigger event and action in the first release is replaced by the versions below.
+
+Source: round 2: O3; round 3: S1; decisions: D64
+
 ## Settled before the scope review
 
 These versions were decided during the requirements review, so the scope review did not ask about them.
@@ -39,7 +43,7 @@ Trigger templates were folded into component presets. Version history was reject
 
 ## Editor
 
-Rules: [requirements/editor](requirements/editor.md)
+Rules: [requirements/editor](requirements/editor/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
@@ -56,7 +60,7 @@ Rules: [requirements/editor](requirements/editor.md)
 
 ## Selecting and the Layers panel
 
-Rules: [requirements/editor](requirements/editor.md)
+Rules: [requirements/editor](requirements/editor/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
@@ -95,7 +99,7 @@ Rules: [requirements/drawing](requirements/drawing.md)
 
 ## Assets
 
-Rules: [requirements/assets](requirements/assets.md)
+Rules: [requirements/assets](requirements/assets/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
@@ -111,7 +115,7 @@ Rules: [requirements/assets](requirements/assets.md)
 
 ## Physics
 
-Rules: [requirements/physics](requirements/physics.md)
+Rules: [requirements/physics](requirements/physics/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
@@ -130,7 +134,7 @@ Rules: [requirements/physics](requirements/physics.md)
 
 ## Joints
 
-Rules: [requirements/physics](requirements/physics.md)
+Rules: [requirements/physics](requirements/physics/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
@@ -158,7 +162,7 @@ Rules: [requirements/camera](requirements/camera.md)
 
 ## .entity files and builtin content
 
-Rules: [requirements/assets](requirements/assets.md)
+Rules: [requirements/assets](requirements/assets/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
@@ -171,7 +175,7 @@ Rules: [requirements/assets](requirements/assets.md)
 
 ## Triggers and variables
 
-Rules: [requirements/triggers](requirements/triggers.md)
+Rules: [requirements/triggers](requirements/triggers/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
@@ -189,7 +193,7 @@ Rules: [requirements/triggers](requirements/triggers.md)
 
 ## Keys and mouse
 
-Rules: [requirements/triggers](requirements/triggers.md)
+Rules: [requirements/triggers](requirements/triggers/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
@@ -200,7 +204,7 @@ Rules: [requirements/triggers](requirements/triggers.md)
 
 ## Scripts and the Console
 
-Rules: [requirements/scripts](requirements/scripts.md)
+Rules: [requirements/scripts](requirements/scripts/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
@@ -216,7 +220,7 @@ Rules: [requirements/scripts](requirements/scripts.md)
 
 ## Test play
 
-Rules: [requirements/play-and-save](requirements/play-and-save.md)
+Rules: [requirements/play-and-save](requirements/play-and-save/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
@@ -234,7 +238,7 @@ Rules: [requirements/play-and-save](requirements/play-and-save.md)
 
 ## Saving and files
 
-Rules: [requirements/play-and-save](requirements/play-and-save.md)
+Rules: [requirements/play-and-save](requirements/play-and-save/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|

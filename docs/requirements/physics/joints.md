@@ -20,7 +20,7 @@ All lengths are pixels and all angles are degrees. Positive angles and speeds ar
 - A hidden joint still works.
 - Joints don't run inside the camera, because positions there are screen positions.
 
-Source: round 1: C9, D43; round 4: G2, R44; round 5: R45; round 6: LY2; round 8: VW1, HUD2; old: JT-07, JT-47 to JT-53
+Source: round 1: C9, D43; round 4: G2, R44; round 5: R45; round 6: LY2; round 8: VW1, HUD2; decisions: D44; old: JT-07, JT-47 to JT-53
 
 ### Three joints: Hinge, Rope, Spring · v1
 

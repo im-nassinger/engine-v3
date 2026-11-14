@@ -204,7 +204,7 @@ Source: scope SE10; round 1: C5; round 2: R7; round 5: 02 2.13; decisions: D7; o
 - Locking applies to children, the same way as hiding. A locked entity still moves with its unlocked parent, and can still be snapped to.
 - Lock can be undone. It is saved in the project file only, because it is editor-only.
 
-Source: scope SE11; round 1: C5; round 3: R17; round 5: 02 2.13, FMT1; old: SG-114, SG-116, SG-121
+Source: scope SE11; round 1: C5; round 3: R17; round 5: 02 2.13, FMT1; decisions: D17; old: SG-114, SG-116, SG-121
 
 ## Special entities
 

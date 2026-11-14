@@ -67,7 +67,7 @@ Source: scope TR3; round 8: 09 2.2; old: TR-21
 - A clickable button in a level is just an entity with a "When this is clicked" trigger.
 - *Why v2: keys are enough for a platformer test, and mouse events need the rules for which entity gets the click.*
 
-Source: scope TR4; round 9: 09 2.7b; old: TR-66 to TR-72
+Source: scope TR4; round 9: 09 2.7b; decisions: D54; old: TR-66 to TR-72
 
 ### "While touching" and "left the level" · v2
 
@@ -110,7 +110,7 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27
 - Actions on a group use the group's own components. Body actions go to the body the entity belongs to.
 - *Why v1: the full set except sound and camera shake.*
 
-Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b; round 11: WT2; round 8: 09 2.4; old: TR-30 to TR-53, TR-78 to TR-84
+Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b, 09 2.9; round 10: WT1; round 11: WT2; round 8: 09 2.4; old: TR-30 to TR-53, TR-78 to TR-84
 
 ### Play sound, Stop sound, Camera shake · v2
 
