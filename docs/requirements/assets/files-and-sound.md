@@ -137,7 +137,7 @@ Accepted in the requirements review but never given a version, or left over from
 |---|---|---|
 | Extra "Play sound" settings | The old draft had pitch, random pitch, fade in, and "if already playing: play another, restart, keep playing". The review kept only volume, loop, and start and end times | Later |
 | Too many of one sound | One file starts at most 3 times per tick, so 20 coins picked up together don't spike the volume | v3 |
-| Usage bar | The panel shows "23.4 of 64 MB, 142 of 500 files", and turns amber at 80% | v3 |
+| Usage bar | The panel shows "23.4 of 64 MB", and turns amber at 80% | v3 |
 | Remove unused | Lists files with no uses and removes the ticked ones | v3 |
 | Swap with another file | Points every use of one file to another of the same kind | v3 |
 | Mute in test play | A mute switch on the Play bar, saved in the browser | v3 |

@@ -207,7 +207,7 @@ Left over from the old draft. The last column is Claude's suggestion, not a deci
 | Free view | Pan and zoom the game during test play without moving the level's camera | v3 |
 | Preview size | Show the run as a 16:9, 21:9 or 4:3 window would see it. Only matters with Fill window | v3 |
 | Performance warnings | A note on the Play bar when the game can't keep 60 ticks per second | v3 |
-| End window extras | The old draft's end window also had the creator's own win and lose text, a score taken from a variable, the best time and an attempt count. The review kept a title, the time, Restart and Leave | Later |
+| End window extras | The old draft's end window also had the creator's own win and lose text, a score taken from a variable, the best time and an attempt count. The review kept a title, the time, Restart and Leave | Later, decided (owner: 2026-11-13) |
 | Retry instantly | A level setting that skips the end window after Lose and restarts at once | Later |
 
 Source: old: PL-07, PL-08, PL-26, PL-45, PL-46, PL-48, PL-49, PL-54, PL-102 to PL-105, PL-109, PL-112

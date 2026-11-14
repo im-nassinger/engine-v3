@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. Rounds 2 to 6 of its review are answered. **Waiting for the owner:** one open question below, and a review of the proposal.
+The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. Rounds 2 to 6 of its review are answered. **Waiting for the owner:** round 7 on the review page, which holds everything still open.
 
 ## Where things stand
 
@@ -49,9 +49,9 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 ## Next
 
-1. **The owner reviews the architecture proposal.** Once approved, its files move into the main docs, and `plan.md` becomes the project's plan.
-2. **The owner answers the open question** below. Each answer is written into its topic file, and the question is removed from this list.
-3. **One pass over the features without a version.** Each topic file ends with a "Not in the scope review" table with Claude's suggested version.
+1. **The owner answers round 7 on the [review page](proposals/architecture/review.html).** It holds everything still open, so no more rounds should be needed: questions 29 to 31, the approval of the architecture proposal (AP1), the 14 proposed glossary words, and every open row of the "Not in the scope review" tables (120 cards), each with Claude's suggested version. *Why one page: the owner asked for every open question at once instead of a few per round (owner, 2026-11-14).*
+2. **Write the answers in.** Each version goes into its feature heading, the topic's README and [scope.md](scope.md), and the row leaves its "Not in the scope review" table. If AP1 is yes, the proposal's files move into the main docs and `plan.md` becomes the project's plan.
+3. **Start coding at stage 1** of the plan.
 
 ## How to change a requirement
 
@@ -65,6 +65,8 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 
 ## Open questions for the owner
 
-One question left, from round 6. Not decided by Claude.
+Three questions from round 6, on the review page as round 7 with the rest. Not decided by Claude.
 
 29. **Where the Spawn action's position is measured from.** Spawn asks for TransformComponent values. The position can be measured from the level's origin, or from the entity the trigger is on. Example: a cannon that moves spawns a bullet at position 40, 0. Measured from the level, the bullet always appears at the same spot near the origin. Measured from the cannon, it always appears 40 px to the right of the cannon, wherever the cannon is.
+30. **Does Spawn's TransformComponent replace the one saved in the `.entity` file?** Suggested: yes, so the trigger shows what you get.
+31. **A Toggle choice in Change value for boolean variables** (v2). Suggested: yes, so a lever is one trigger.

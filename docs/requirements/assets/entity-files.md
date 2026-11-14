@@ -65,7 +65,6 @@ Left over from the old draft and not asked about in the review. The last column 
 |---|---|---|
 | Origin of an .entity file | The point that lands on the mouse when placed, and on the given position when spawned. Default: the centre of the selection | v2 |
 | Where a spawned entity sits | At the top level of the tree, above the level's entities, unless a parent is given. A spawned entity never merges into a body above it, so a bullet never becomes part of its shooter | v2 |
-| Spawn settings | The old draft let a spawn set position, rotation, speed, parent and a few values in one call. With `spawn(path)` returning an id, a script sets these afterwards. What the trigger's Spawn action offers is in [triggers](../triggers/triggers.md) | Needs a decision |
 | Replace selection with an .entity file | Swaps selected entities for a chosen file, keeping each one's place. Linked copies cover most of the need | Later |
 | Player notice | Placing a second entity tagged `player` showed a notice offering to replace the first. It assumes a special player, which the review dropped | Dropped |
 

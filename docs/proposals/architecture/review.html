@@ -71,7 +71,7 @@
   <div class="pbar"><i id="pfill"></i></div>
 </header>
 <main>
-  <p class="intro">Round 6: the last three open questions. Two were asked in round 5 and need plainer words; one is new, from your round 5 answer that variables can hold text. Rounds 1 to 5 are answered and written into the docs. None of these blocks v1. Each card is one question, with my view under it. <b>Yes</b> means you agree with my view, <b>No</b> means you don't, and a comment says what you'd change. "More" explains the card with an example. Any click on a card counts it as answered. Underlined words are explained when you hover them. Answers are kept in this browser. When you're done, press Copy answers and paste the text into the chat.</p>
+  <p class="intro">Round 7: <b>everything still open, on one page.</b> Three questions from your round 6 answers, the approval of the architecture proposal, 14 new words, and every feature from the old review that never got a version, each with my suggested version. Versions: <b>v1</b> build and watch a level, <b>v2</b> logic and play (triggers, scripts, files), <b>v3</b> polish, <b>Later</b> after v3, not designed now. Each card is one question, with my view under it. <b>Yes</b> means you agree with my view, <b>No</b> means you don't, and a comment says what you'd change, such as another version. "More" explains the card with an example. Underlined words are explained when you hover them. Answers are kept in this browser, so you can stop and come back. When you're done, press Copy answers and paste the text into the chat.</p>
   <details class="glossary"><summary>Glossary</summary><dl id="glossary"></dl></details>
   <div id="list"></div>
   <div class="footer">
@@ -127,27 +127,180 @@ const GLOSSARY = [
 ["Schema (new word)","The list of fields a component declares once: each field's type, label, unit, range, default and whether it can change during play.",["schema","schemas"]],
 ["Current group (new word)","The group you are inside: double-click goes in, Esc goes up.",["current group"]],
 ["Culling","Drawing only what is on screen, and skipping the rest.",["culling"]],
+["Version","When a feature is built. v1: build and watch a level. v2: logic and play (triggers, scripts, files). v3: polish. Later: after v3, not designed now.",["version","versions"]],
+[".entity file","A saved entity, such as bullet.entity, that can be placed in the level or spawned during play. v2.",[".entity file",".entity files"]],
+["Spawn","Creating a new entity from an .entity file during play, such as a bullet.",["Spawn","spawn","spawned","spawning"]],
+["Boolean","A variable type that is true or false, such as door_open.",["boolean","booleans"]],
+["String","A variable type that holds text, such as player_name = \"Ada\".",["string","strings"]],
 ["Lint rule","An automatic check on the code (ESLint) that fails the build when a rule is broken, such as an import pointing the wrong way.",["lint rule"]]
 ];
 
 // Groups: [title, note, [[id, short, detail, myView], ...]]. Yes = you agree with my view.
 const GROUPS = [
-["Editor", "How you pick things in the level view.", [
-["Q8","Remove \"Entities here\" from the right-click menu. It is a list of everything under the mouse, used to pick something hidden behind something else.",
- "Background: when shapes overlap, a click selects the one in front. Sometimes you want the one behind it. Example: a coin is hidden behind a big background rectangle. With \"Entities here\", you right-click that spot, the menu lists \"Background\" and \"Coin\", and you click Coin to select it. Two other ways already do the same: click the coin's row in the Layers panel (v1), or Alt+click the spot twice (v3), where the first Alt+click picks the background and the second picks the coin.",
- "Drop it: the Layers panel already does this in v1, and Alt+click does it in v3."]
+["Spawn and variables", "Three questions that came out of your round 6 answers. Spawn and variables are v2.", [
+["Q29","A spawned entity's position and rotation are measured from the entity the trigger is on, not from the level's origin.",
+ "Background: in round 6 you said Spawn asks for TransformComponent values (position, rotation, scale, skew). Those numbers need a starting point. Example: a cannon that drives around has the trigger “When the key fire is pressed, Spawn bullet.entity” at position 40, 0. Measured from the cannon, the bullet always appears 40 px to the right of the cannon, wherever it has driven, and if the cannon is tilted 30°, the bullet is tilted 30° too. Measured from the level's origin, the bullet always appears at the same spot near the middle of the level, even when the cannon is far away. Either way, this only decides where the bullet appears: after that it moves on its own.",
+ "From the trigger's entity: a moving cannon, a gun or an enemy dropping a coin then work without a script. For a fixed spot, put the trigger on the World, whose position is the level's origin."],
+["Q30","Spawn's values replace the position, rotation, scale and skew saved in the .entity file.",
+ "Background: an .entity file is a saved entity, such as bullet.entity. It already has its own TransformComponent from when you saved it. Spawn now asks for TransformComponent values too, so one of the two has to win. Example: bullet.entity was saved at scale 2, and the Spawn action says scale 1. With this rule, the bullet appears at scale 1, exactly what the trigger shows.",
+ "Yes: what you read on the trigger is what you get."],
+["Q31","In v2, Change value has a Toggle choice for boolean variables: true becomes false, and false becomes true.",
+ "Background: in round 6 you made boolean a variable type. Change value can only set a boolean, so flipping one takes two triggers. Example: a lever opens and closes a door. With Toggle it is one trigger: “When something starts touching this, Toggle door_open”. Without it, you need “If door_open is true, Set door_open to false” and a second trigger for the other way.",
+ "Yes: a switch is the most common use of a boolean, and this makes it one trigger."]
 ]],
-["Triggers", "Triggers are no-code logic (When, If, Do). They come in v2.", [
-["Q14","When a trigger's Spawn action creates an entity, the entity appears where the action's target is, moved by an offset in px that you type. Anything else about it comes from its .entity file or a script.",
- "Background: Spawn creates an entity from an .entity file during play, such as a bullet. Every trigger action has a target: this (the entity the trigger is on), other (the thing that touched it), an entity by name, or a tag. Spawn puts the new entity on its target's position, and the offset moves it from there by x and y px. Example: a cannon has the trigger \"When the key fire is pressed, Spawn bullet.entity\", target this, offset 40, 0. The bullet appears 40 px to the right of the cannon's centre, at its mouth. With offset 0, 0 it would appear inside the cannon, at its centre. The bullet's speed is in bullet.entity, or a script sets it.",
- "Yes: the target plus an offset covers where things appear, and the rest belongs in the .entity file or a script."],
-["Q28","In v2, each variable is either a Number or a Text, chosen when you create it. Add, Subtract and checks like \"10 or more\" only work on Number variables. A Text variable can only be set, and checked with \"is\" and \"is not\".",
- "Background: in round 5 you said variables can hold text in v2. Variables live on the World, and triggers read and change them. Adding 1 to a text, or asking whether a name is \"10 or more\", means nothing, so each variable needs to say what it holds. Example: coins is a Number. A coin's trigger does \"Add 1 to coins\", and a door checks \"If coins is 10 or more\". door_colour is a Text. A switch does \"Set door_colour to red\", and the door checks \"If door_colour is red\".",
- "Yes: one kind per variable means a trigger only offers the actions that fit it."]
+["The architecture proposal", "How the game is built, in docs/proposals/architecture/. You approved its outline and 24 cards in round 1; rounds 2 to 6 changed details.", [
+["AP1","The architecture proposal is approved. Its files move into the main docs, plan.md becomes the project's plan, and coding starts at stage 1.",
+ "Background: the proposal says which libraries we use, how the code is split into five parts (core, editor, adapters, ui, app), how the editor, saving and test play work, and the 18 stages to build v1. Its README lists the files in reading order. A No, or a comment naming a file, keeps it a proposal until that part is fixed.",
+ "Approve: every open question that touches v1 is answered, and the rest are v2 or later."]
+]],
+["New words", "Words the proposal uses that aren't in the glossary yet. Yes adds the word with this meaning. The nine words you approved in round 1 move in too.", [
+["GL1","Part (of the code): one of the five top folders of src: core, editor, adapters, ui, app. Used instead of “layer”.","Example: “the editor part may import core, never ui.” “Layer” isn't used because the Layers panel already owns it.","Yes."],
+["GL2","Module: a folder directly under a part, with one index.ts that other modules import from.","Example: core/geometry is a module. Other code imports from core/geometry, never from a file deep inside it.","Yes."],
+["GL3","Composition root: the one place that builds the real classes and connects them.","Example: the editor page creates the Box2D adapter and hands it to the code that needs physics. There are three: the editor page, the game worker, the import worker.","Yes."],
+["GL4","Open level: the level open in the editor, together with its history, selection, current group and caches. New and Import replace it.","Example: pressing New throws away the open level, its undo history included, and makes a fresh one.","Yes."],
+["GL5","Game worker: the worker that runs the play copy during test play.","Example: while you test play, the physics runs in the game worker, so a heavy level never freezes the editor's buttons.","Yes."],
+["GL6","Play mirror: the editor page's own copy of the running level, updated from tick reports and drawn by the level view.","Example: the game worker moves a crate; the play mirror gets the crate's new position and the level view draws it there.","Yes."],
+["GL7","Tick report: what the game worker sends back after running ticks: the bodies that moved, entities removed, the camera's position.","Example: “crate 12 is now at 300, 140; coin 7 was removed; the camera is at 250, 0.”","Yes."],
+["GL8","Collision piece: one convex part of a shape, at most 8 points, as handed to the physics engine and drawn by the physics view.","Example: an L-shaped polygon is split into two rectangles, two collision pieces, because Box2D only takes convex shapes.","Yes."],
+["GL9","Value type: a class that knows how to check, store, copy and compare one kind of value. Every field type is a value type the Inspector can show.","Example: the colour value type checks that “#ff0000” is a colour, copies it, and tells whether two colours are equal.","Yes."],
+["GL10","Change signal: the notice a class sends when its state changed, so caches, the level view and panels can update. Not a game event.","Example: you rename a box; a change signal tells the Layers panel to redraw that row.","Yes."],
+["GL11","Derived cache: a value worked out from the level and kept until something it depends on changes.","Example: a group's bounds are computed once and kept until one of its children moves.","Yes."],
+["GL12","Status text: the short result the status bar's left slot shows for 4 seconds.","Example: “Undid: Move 3 entities”.","Yes."],
+["GL13","Browser event: something the browser reports to the page, such as a key press or a paste. Never a game event.","Example: pressing Space is a browser event; the trigger “When the jump input is pressed” is a game event made from it.","Yes."],
+["GL14","Body pose: a body's position and angle during play, as the physics engine reports it.","Example: “x 300, y 140, angle 12°”. Tick reports carry body poses.","Yes."]
+]],
+["Suggested v1", "Features accepted in the old review that never got a version. I suggested v1 for these, and the proposal already builds them, marked “waiting for the owner”. Yes keeps them in v1.", [
+["WS1","v1: closing or reloading the tab while a change isn't saved yet asks “Leave site?” first.","Background: the level saves itself 2 seconds after your last change, so a close in those 2 seconds would lose it. The prompt only shows while something is unsaved, and a waiting save is written as soon as you switch tabs. Example: you move a box and press Ctrl+W at once: the browser asks before closing.","v1: losing work is the worst thing v1 can do, and it is small."],
+["WS2","v1: the browser's own page scrolling, bounce, swipe-back, middle-click autoscroll and Alt menu are off on the editor page.","Background: these browser habits fight the editor. Example: on a trackpad, a two-finger swipe while panning would go back a page and leave the editor; on Windows, pressing Alt alone opens the browser's menu bar.","v1: each one can break a drag or leave the page by accident."],
+["WS3","v1: if the window loses focus during a drag, the drag cancels and held keys count as released.","Example: you are dragging a box and Alt+Tab or a popup steals focus. Without this rule, the box stays stuck to the mouse when you come back, or Shift stays “held” because the browser never said it was released.","v1: it prevents stuck keys at almost no cost."],
+["WS4","v1: browser zoom (Ctrl and + or −) makes the panels bigger or smaller, while the level view stays sharp and clicks stay accurate.","Example: a laptop set to 125% zoom. Without this, the level view is blurry and clicks land a few pixels off.","v1: many laptops run at 125% or 150% by default."],
+["IN1","v1: with several entities selected, the Inspector shows the components they all have. Different values show “Mixed”, and typing a value sets it on all.","Example: select 5 crates and type Density 2: all five get 2. If their frictions differ, the Friction field shows Mixed until you type one.","v1: it is the only way to change many things at once in v1."],
+["WO2","v1: any body more than 100,000 px from the level's origin is removed, with a warning.","Background: far from the origin, numbers lose precision and physics goes wrong. Open edges already remove what leaves the level, so this is a safety net for bugs. In v1 the warning is the status text; the Console comes in v2.","v1: one check per tick, and it stops a broken level from going haywire."],
+["WO3","v1: a level is at most 200,000 × 200,000 px.","Example: that is about 100 screens wide. The World's rectangle can't be made bigger.","v1: it keeps everything inside the safety net above."],
+["JO4","v1: when a joint connects two bodies, the smaller one becomes body A.","Background: a joint connects body A to body B, and settings such as a motor's direction depend on which is which. Example: a wheel hinged to a car is always A, whichever you drew first, so its motor turns the same way in every car you build.","v1: the result never depends on draw order."],
+["JO5","v1: scaling a group with joints scales the joints too, and mirroring it mirrors their limits and motor direction.","Example: a car group with wheel hinges. Scale it to 2 and the wheel joints move with the wheels. Mirror it and the motors turn the other way, so the mirrored car still drives forward.","v1: without it, scaling or mirroring a car breaks it."],
+["CA1","v1: however soft the camera's smoothing, the followed entity never gets within 10% of the screen's edge. A far teleport becomes a cut, not a long slide.","Example: with very soft smoothing, a fast player would run off screen while the camera lags. With this rule the camera speeds up at the margin. If the player teleports across the level, the camera jumps there at once.","v1: it keeps the player visible with any smoothing."],
+["SV1","v1: dropping a level file on the editor imports it, after the same question Import asks.","Example: drag mylevel.editable from your Downloads folder onto the editor; it asks whether to replace the open level, then imports.","v1: it is the import you already have, with a shortcut people expect."],
+["SV2","v1: after a crash, reopening the editor loads the last save and says “Recovered from your last save at 14:32. The last few seconds may be missing.”","Example: the browser crashes while you edit. You reopen the tab and the note tells you what you got back.","v1: it tells you what you may have lost."],
+["SV3","v1: if the saved level won't open, the editor offers to export its raw data and never deletes it.","Example: a bug writes a broken level. Instead of an empty editor and a lost level, you get a button to save the data so it can be fixed.","v1: it turns a lost level into a bug report."],
+["SV4","v1: if the browser's site data is cleared while the level is open, the editor saves it again and says so.","Example: you clear browsing data in another tab. The open level is still in memory, so it is written back and nothing is lost.","v1: small, and it prevents a silent loss."]
+]],
+["Suggested v2", "These come with something that is v2 anyway. Yes keeps them in v2.", [
+["EF1","v2: an .entity file has an origin: the point that lands on the mouse when you place it, and on the Spawn position when it is spawned. By default, the centre of what you saved.","Example: tree.entity has its origin at the bottom of the trunk, so placing it puts the roots on the mouse, and spawning it at 0, 0 puts the roots there.","v2, with .entity files."],
+["EF2","v2: a spawned entity goes at the top of the Layers tree, unless a parent is given. It never merges into a body above it.","Example: a cannon inside a tank group spawns a bullet. The bullet goes to the top level, not into the tank group, so it isn't glued to the tank's body and flies on its own.","v2, with Spawn."],
+["TP1","v2: while test play is paused, clicking the game selects an entity and the Inspector shows its live values.","Example: pause, click the falling crate, read its speed. The old review accepted “inspect things while paused” without a version.","v2, with the pause menu."],
+["TP2","v2: after Stop, the entities you selected during the run stay selected if they exist in the level.","Example: during the run you click a crate to inspect it, press Stop, and the crate is still selected in the editor to fix it.","v2, with selecting during play."],
+["TP3","v2: if the selected entity is destroyed during play, the Inspector says so and greys out its last values.","Example: you are watching a coin's values and the player picks it up: the card stays, greyed, with “Destroyed”.","v2, with Destroy."],
+["TP4","v2: after a run is won or lost, the panels and View menu switches still work.","Example: the level ends with “You lost”. You can still open the physics view to see why the player fell through.","v2, with Win and Lose."],
+["SC2","v2: the same script listed twice on one entity runs twice, each with its own settings.","Example: two copies of Spin.lua on a gear, one at speed 1 and one at speed 3.","v2, with scripts."],
+["CE4","v2: the code editor keeps a draft of unsaved text every few seconds, so a crash loses seconds at most.","Example: you write 40 lines, the browser crashes, and when you reopen the script the 40 lines are still there.","v2, with the code editor."],
+["CE5","v2: the Console has a Clear button, and clears itself when Play starts.","Example: each run starts with an empty Console, so you only see this run's print() lines.","v2, with the Console."],
+["VI1","v2: some keys can't be used in inputs: Esc, Tab, Ctrl, Alt and Cmd in any combination, F1 to F12, Caps Lock and Num Lock.","Background: these belong to the browser, the system or the editor. Example: F5 reloads the page, so jump on F5 would reload the game.","v2, with inputs."],
+["TG2","v2: each trigger can hold at most 32 runs waiting on a Wait. More are skipped with a Console warning.","Example: a trigger fires every tick and waits 10 seconds each time. Without a limit, it would pile up 600 waiting runs in 10 seconds and slow the game.","v2, with Wait."],
+["TG6","v2: each trigger gets a name made from its When, which you can edit.","Example: “When the key fire is pressed” is named “fire pressed”, and you can rename it “Shoot”. The name shows on the card and in the Console.","v2, with triggers."]
+]],
+["Suggested v3: editor", "Polish for the editor. v3 is the polish version. Yes keeps them in v3.", [
+["WS5","v3: in a small window the panels get narrower, then fold away one by one. Under 640 × 480 a notice asks for a bigger window.","Example: a 1024 px wide window folds the Console first, then the left panels, then the Inspector, so the level view stays usable.","v3: v1 targets a normal desktop window."],
+["WS6","v3: on a phone or tablet, a notice says the editor needs a mouse and keyboard.","Example: someone opens the editor on an iPad and sees the notice instead of a broken editor.","v3: nobody else uses the editor before then."],
+["WS7","v3: a new, empty level shows a hint card (“Press 4 and drag to draw a shape”), then a hint pointing to Play. Hints end after the first Play.","Example: a first-time user sees how to draw, draws, then sees where Play is.","v3: it helps people who aren't you."],
+["WS8","v3: Ctrl+\\ hides every panel and bar, leaving the level view and a small button to bring them back.","Example: a clean screenshot of your level.","v3."],
+["WS9","v3: hold Z for a zoom tool: drag a box to zoom to it, click to zoom in, Alt+click to zoom out.","Example: hold Z and drag a box around a small gear; the view fills with the gear.","v3: the scroll wheel already zooms."],
+["WS10","v3: a setting for trackpads: two-finger scrolling pans the view, pinch zooms.","Example: on a laptop trackpad you move around the level the way you scroll a web page.","v3."],
+["WS11","v3: rulers along the top and left of the level view, in level pixels, off by default.","Example: checking that a platform is 64 px above the floor without reading the Inspector.","v3: the grid and the Inspector already give numbers."],
+["WS12","v3: a snapping switch that keeps positions on whole pixels, on by default.","Example: a box dragged by the mouse lands at 120, not 120.37.","v3."],
+["WS13","v3: editor animations take 150 ms or less, and are off when your system asks for reduced motion.","Example: a panel folding open.","v3."],
+["SL1","v3: while you are inside a group, the rest of the level dims to about half. A View menu switch turns it off.","Example: you double-click into the car to edit a wheel; everything outside the car fades, so you see where you are.","v3."],
+["SL2","v3: the selection shows the point it rotates around, and you can drag that point.","Example: drag the point to the end of a plank, then rotate: the plank swings around that end.","v3."],
+["SL3","v3: Set origin to pivot moves an entity's origin for good, without moving it on screen.","Example: a door rotates around its centre. Move the pivot to its edge and Set origin to pivot: now rotation 90 swings it like a door.","v3."],
+["SL4","v3: Tab and Shift+Tab select the next and previous entity in the same group.","Example: select one of ten coins in a group, press Tab to step through the others.","v3."],
+["SL5","v3: the view pans by itself when a drag gets near the edge of the level view.","Example: you drag a box to the right edge of the screen and the view scrolls so you can keep going.","v3."],
+["SL6","v3: Alt+click an eye shows only that entity and its children, until you Alt+click again. Never saved, never affects play.","Example: Alt+click the player's eye to see only the player.","v3."],
+["SL7","v3: dragging across eye or lock icons sets every row you touch the same way.","Example: press on the first eye and drag down over five rows: all five hide.","v3."],
+["SL8","v3: the Layers panel works with the keyboard: arrows move, Right unfolds, Left folds, typing a letter jumps to a name.","Example: type “c” to jump to the camera row.","v3."],
+["SL9","v3: the bottom of the Layers panel counts selected, hidden and locked entities.","Example: “3 selected · 2 hidden · 1 locked”.","v3."],
+["IN2","v3: in a field showing Mixed, +=10, -=, *= and /= change each entity from its own value.","Example: five platforms at different heights; type +=10 in Y and each moves 10 px from where it is.","v3."],
+["IN3","v3: number fields accept sums such as 100/2+8.","Example: type 100/2+8 in Width and get 58.","v3."],
+["IN4","v3: dragging a number field's label changes the value live: 1 per pixel, Shift 10, Alt 0.1. One undo step. Up and Down in the field do the same.","Example: drag the word Rotation left and right to turn a box while you watch.","v3."],
+["IN5","v3: right-click a field: Reset to default.","Example: you changed a body's Friction and want it back to what a new body has.","v3."],
+["IN6","v3: align and distribute buttons in the Inspector and the Arrange menu. A group counts as one entity.","Example: select five coins and press Distribute horizontally: the gaps between them become equal.","v3."],
+["IN7","v3: Bring forward, Send backward, Bring to front and Send to back, within the same group.","Example: send a tree to the back so the player walks in front of it.","v3: dragging rows in the Layers panel already does it in v1."],
+["IN8","v3: Ctrl+Shift+V pastes at the original position. “Paste here” in the right-click menu pastes where you clicked.","Example: copy a platform, scroll away, Ctrl+Shift+V puts the copy exactly on top of the original.","v3."],
+["IN9","v3: move a duplicate and press Ctrl+D again: the next copy repeats the same move.","Example: duplicate a step, move it up and right, press Ctrl+D three times: a staircase.","v3."],
+["IN10","v3: Alt+drag an entity drags out a copy, as one undo step.","Example: Alt+drag a coin to the right to make a second one.","v3: Ctrl+D does the same in v1."],
+["IN11","v3: copied entities paste into another level or tab, bringing the files they use. Text or an image on the clipboard pastes as a text entity or a new image file.","Example: copy the car from one level and paste it in another, with its scripts.","v3."],
+["IN12","v3: the editor's right-click menus show every entry's shortcut and keep disabled entries visible; text fields and the code editor keep the browser's menu.","Example: right-click a box: “Duplicate  Ctrl+D”, with “Paste” greyed out when the clipboard is empty.","v3."],
+["IN13","v3: an arrow beside Undo lists the last 50 steps; click one to go back to it.","Example: “Move 3 entities”, “Delete box”, “Change Density”: click the third to undo all three.","v3."],
+["DR1","v3: a rectangle has a corner radius, set by a dot on the level or typed. Rounded corners are part of what collides.","Example: a rounded platform; a ball rolls off its round corners.","v3."],
+["DR2","v3: outline caps and joins, under “More” on the StyleComponent.","Example: an outline whose ends are round instead of square, and whose corners are rounded.","v3."],
+["DR3","v3: Apply scale folds a shape's scale into its size and sets scale back to 1.","Example: a 100 × 50 rectangle at scale 2 becomes 200 × 100 at scale 1. It looks the same.","v3."],
+["DR4","v3: Break opens a closed path at a point, or splits an open path in two. Join closes an open path.","Example: break a circle's outline to make an arc.","v3."],
+["DR5","v3: Create path from shape adds a path that exactly matches a shape.","Example: make a box's art curvy with a path, without changing what collides.","v3."],
+["DR6","v3: Convert a rectangle or ellipse to a polygon. On an ellipse, you pick the point count.","Example: an ellipse with 6 points becomes a hexagon you can edit point by point.","v3."],
+["DR7","v3: after Convert to polygon, if the path changes, the shape shows “Out of date” with a Regenerate button.","Example: you reshape the curvy path; the polygon made from it says it no longer matches.","v3."],
+["DR8","v3: a polygon with almost no area gets a warning and has no collision.","Example: a polygon whose points are nearly in one line. In v1 it simply has no collision, without the warning.","v3 for the warning."],
+["DR9","v3: the Text tool remembers the last font, size and colour. New text is dark, or light on a dark background.","Example: the second label you type looks like the first.","v3 (texts are v2)."],
+["DR10","v3: drawing tools show a one-line hint of what clicks and keys do right now.","Example: “Click to add a point. Enter to finish. Esc to cancel.”","v3."],
+["JO1","v3: press on one body and drag to another to join two bodies that don't overlap.","Example: a hinge between a lamp and a ceiling that don't touch.","v3."],
+["JO2","v3: holding Alt pins a joint to the background, even with another body under the mouse.","Example: pin a sign to the background even though a wall shape is behind it.","v3."],
+["JO3","v3: with three or more bodies under the mouse, Tab steps through the pairs a joint could connect.","Example: three planks overlap; Tab until the two you want are highlighted.","v3."],
+["SV5","v3: when the level is open in two tabs, the read-only tab has an “Edit here instead” button.","Example: you left the editor open in one tab and opened it again in another; one click moves editing to the tab you are in.","v3."],
+["SV6","v3: Export shows a window with the file name, the counts of entities and files, the size, and one button.","Example: “mylevel.editable · 214 entities · 12 files · 3.1 MB · Export”.","v3: v1 exports at once."],
+["SV7","v3: importing a level with scripts says “Contains 4 scripts. They can't reach your files or other levels.” It never asks a blocking question.","Example: you import a friend's level and know what the scripts can and can't do.","v3."],
+["SV8","v3: when a new version of the game is out, an open tab offers Reload and never reloads by itself.","Example: a small bar: “A new version is ready. Reload.”","v3."]
+]],
+["Suggested v3: play, physics, scripts", "Polish for playing, physics, the camera, files and scripts. Yes keeps them in v3.", [
+["WO4","v3: a hint under Gravity: “490 px/s². An entity falls 245 px in the first second.”","Example: you see what the number means without doing the maths.","v3."],
+["WO5","v3: a background image can fill the screen or tile, and scroll from 0% to 100% with the camera.","Example: a sky that tiles and moves at 20% of the camera's speed, so it looks far away.","v3, with images."],
+["WO6","v3: the collision grid window gets a colour per tag, painting by dragging across cells, and “Collide with all” and “Collide with none” per row.","Example: drag across a row of cells to turn them all off.","v3."],
+["WO7","v3: the Console says “Crate left the level and was removed.”","Example: you wonder where a crate went; the Console tells you.","v3."],
+["BO2","v3: a Shape tool option for new shapes: no physics, Static or Dynamic.","Example: set it to Static and draw ten platforms without adding a body to each.","v3."],
+["BO3","v3: the physics view gets a colour per body, hatching for Static, dashes for sensors, the centre of mass, contact points and a legend.","Example: you see at once which shapes belong to one body.","v3: v1 draws the plain collision pieces."],
+["BO4","v3: the Density field's hint warns that stacks and joints get wobbly past a 10 to 1 mass difference.","Example: a box 20 times heavier than the plank under it jitters.","v3."],
+["JO6","v3: while a Breakable joint is selected in test play, the Inspector shows its current and highest force.","Example: you see the bridge joint reach 900 of its 1000 limit, and raise the limit.","v3."],
+["CA2","v3: following can be switched off sideways or up and down.","Example: a side-scroller where the camera follows left and right but stays at one height.","v3."],
+["CA4","v3: a trigger or script can limit the camera to the bounds of any shape, then restore the level bounds.","Example: rooms in a dungeon; entering a room limits the camera to that room.","v3."],
+["CA5","v3: View through camera turns the level view into a read-only preview of what players see.","Example: check that the whole first screen fits at 16:9.","v3."],
+["CA6","v3: the colour of the bars when the window's shape differs from the view, black by default.","Example: dark blue bars beside a 4:3 level on a wide screen.","v3."],
+["CA7","v3: a list of common view sizes (16:9, 16:10, 4:3, 1:1, 9:16), all 1080 high, plus custom from 160 to 7680.","Example: pick 9:16 for a phone-shaped level.","v3."],
+["MU1","v3: a mute switch on the Play bar, saved in the browser, which doesn't change the level's own volume settings.","Example: you test a level 50 times and stop hearing the music.","v3, with sound."],
+["FS2","v3: one sound file starts at most 3 times per tick.","Example: 20 coins picked up at once play the coin sound 3 times, not 20 times at full volume.","v3, with sound."],
+["FS3","v3: the Assets panel shows how much of the 64 MB is used, and turns amber at 80%.","Example: “23.4 of 64 MB”.","v3, with imported files."],
+["FS4","v3: Remove unused lists files nothing uses, and removes the ones you tick.","Example: clean out five old images you replaced.","v3."],
+["FS5","v3: Swap with another file points every use of one file to another of the same kind.","Example: replace grass.png with grass2.png on all 40 platforms at once.","v3."],
+["TP6","v3: during test play you can pan and zoom freely without moving the level's camera.","Example: zoom out to see the whole level while the game runs.","v3."],
+["TP7","v3: preview the run as a 16:9, 21:9 or 4:3 window would see it, with Fill window.","Example: check that a wide screen doesn't show beyond the level's edge.","v3."],
+["TP8","v3: a note on the Play bar when the game can't keep 60 ticks per second.","Example: “Running slow: 42 ticks per second” while 2,000 crates fall.","v3."],
+["SC1","v3: more ways to wait in scripts: a number of ticks, until something is true, or running a function later or every N seconds.","Example: “every 2 seconds, spawn an enemy” in one line. v2 has wait(seconds), and timer triggers.","v3."],
+["SC3","v3: a checkbox to switch a script off without removing it.","Example: switch off the enemy's AI script to test the level without it.","v3."],
+["SC4","v3: when a script removes a setting, its value is kept under “Unused settings”. A renamed setting can say its old name.","Example: you rename speed to jump_speed in the script; the value 300 moves over instead of being lost.","v3."],
+["CE1","v3: the code editor underlines syntax errors shortly after you stop typing, and warns about unknown function and event names.","Example: you type is_dwn(\"jump\") and it is underlined before you press Play.","v3."],
+["CE2","v3: inside quotes, the code editor suggests the level's inputs, tags, variables and file paths.","Example: type is_down(\" and get left, right, up, down, jump.","v3."],
+["CE3","v3: search every .lua file of the level.","Example: find every script that uses coins.","v3."],
+["CE6","v3: hints and help for Lua's surprises: lists start at 1, ~= means “not equal”, .. joins text.","Example: you write != and the hint says Lua uses ~=.","v3."],
+["VI2","v3: every built-in menu works with the keyboard, and later a gamepad.","Example: the pause menu: arrows to move, Enter to pick.","v3."],
+["TG1","v3: the trigger card says why a touch trigger can never fire: no shape, only sensors, neither side Dynamic.","Example: “This can't fire: nothing that touches it can move.”","v3: v2 shows only the missing SurfaceComponent note."],
+["TG8","v3: a View menu switch shows every entity's arrows at once.","Example: see every lever-to-door connection in the level.","v3."],
+["TG9","v3: a switch on a trigger that pauses test play when it fires.","Example: pause the moment the player touches the spikes, to see why.","v3."]
+]],
+["Later or dropped", "Later means after v3 and not designed now. Dropped means never.", [
+["WO1","Later: a setting to keep entities that leave through an open edge, instead of removing them.","Example: a rocket that flies off the top of the level and comes back.","Later: you only kept removal in review."],
+["BO1","Later: Start asleep, a starting speed and a starting spin on the BodyComponent.","Example: a ball that starts rolling at 200 px/s. In v2, a Level start trigger with Push does it.","Later."],
+["CA3","Later: camera follow presets (Platformer, Free, Vehicle, Locked) that fill in the follow values.","Example: pick Platformer and the smoothing and margins are set for you.","Later: presets were dropped on other components too."],
+["EF3","Later: Replace selection with an .entity file, keeping each one's place.","Example: replace 30 placeholder boxes with tree.entity.","Later: linked copies (v3) cover most of it."],
+["EF4","Dropped: the notice when you place a second entity tagged player.","Background: it assumed one special player, which the review dropped.","Dropped."],
+["BC1","Later: a builtin script that plays animations from movement (walking, jumping).","Background: animations aren't designed yet.","Later."],
+["BC2","Later: a script declaring what it needs (such as a Dynamic body), shown as a checklist with Fix buttons.","Example: you put the platformer player script on a shape with no body, and the card says “Needs a Dynamic body. [Fix]”.","Later: v2 has few builtin scripts, and their help says what they need."],
+["FS1","Later: more Play sound settings: pitch, random pitch, fade in, and what to do if it is already playing.","Example: a coin sound with a slightly random pitch each time.","Later: you kept volume, loop, start and end in review."],
+["TP10","Later: a level setting that skips the end window after Lose and restarts at once.","Example: a hard platformer where you retry instantly.","Later."],
+["SV9","Later: a description, author, instructions and tags for a level, in a Level info window.","Background: they are for a level's page, which comes with publishing.","Later."],
+["VI3","Later: on-screen touch controls mapped to inputs.","Example: arrow buttons on a phone screen.","Later."],
+["TG3","Later: a smallest impact speed for the collision event.","Example: a vase that breaks only when hit hard.","Later: a script can check the speed."],
+["TG4","Later: touch events that count entities, such as “when the last heavy thing leaves this”.","Example: a pressure plate that closes the door only when every crate is off it.","Later."],
+["TG5","Dropped: a Repeat choice that fires on the Nth time.","Background: the review kept three Repeat choices. A variable counting up does the same.","Dropped."],
+["TG7","No trigger action for dropping through a one-way platform; scripts call drop_through().","Example: the player presses down on a one-way platform and falls through it. The Lua API already has drop_through(id).","Script-only: it is one line in the player's script."]
 ]]
 ];
-
-const KEY = "engine-v3-architecture-review-6";
+const KEY = "engine-v3-architecture-review-7";
 let answers = {};
 try { answers = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { answers = {}; }
 function persist() { try { localStorage.setItem(KEY, JSON.stringify(answers)); } catch (e) {} }
@@ -321,7 +474,7 @@ function buildText() {
     if (groupLines.length) lines.push("## " + group, ...groupLines, "");
   }
   const head = [
-    "Architecture review answers, round 6",
+    "Architecture review answers, round 7",
     "Answered " + (total - open.length) + " of " + total + " (" + yes + " yes, " + no + " no)",
     ""
   ];
