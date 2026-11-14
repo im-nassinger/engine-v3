@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**, which waits for the owner. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). Nothing is open. **Next: stage 2**, the v1 components and the file format.
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**, which waits for the owner. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **Stage 2's plan waits for the owner:** [proposals/stage-2.md](proposals/stage-2.md) and round 10 on the [review page](review.html) (2026-11-14). Nothing of stage 2 is built.
 
 ## Where things stand
 
@@ -20,7 +20,8 @@
 | Small features without a version | Done: all given a version in round 7 |
 | Stage 0, project setup | Done, except the first CI run, which needs a push. See below |
 | Stage 1, the model | Done on 2026-11-14. See below |
-| Code | Stages 0 and 1 done. Next: stage 2 of [plan.md](plan.md) |
+| The stage 2 plan | Proposed on 2026-11-14, waiting for the owner: [proposals/stage-2.md](proposals/stage-2.md), round 10 |
+| Code | Stages 0 and 1 done. Next: stage 2 of [plan.md](plan.md), once its plan is answered |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -82,7 +83,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 ## Next
 
 1. **Push, when the owner asks,** so CI runs for the first time on x86 and ARM (step 7 of stage 0).
-2. **Stage 2 of [plan.md](plan.md): the v1 components and the file format.** Like stage 1, it starts with a plan in `proposals/` for the owner when the docs can't be built as written.
+2. **Stage 2 of [plan.md](plan.md): the v1 components and the file format.** Its plan is [proposals/stage-2.md](proposals/stage-2.md); the work starts when the owner answers round 10.
 3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
@@ -97,6 +98,6 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 
 ## Open questions for the owner
 
-Nothing is open (2026-11-14).
+**Round 10** on the [review page](review.html) (2026-11-14): the stage 2 plan, the background colour, custom gravity's angle, the grid size's range, the camera's size range and smoothing, three joint gaps, a flat line's height, which values change during play, files missing a TransformComponent or NameComponent, and the new fields' descriptions.
 
 When several come up, they go on the [review page](review.html) all at once, not a few per round (owner, 2026-11-14).
