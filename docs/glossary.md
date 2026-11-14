@@ -32,6 +32,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Inspector | The panel on the right showing the components of what is selected, so you can edit their values. |
 | Card | One component as the Inspector shows it: a title and its fields. |
 | Field | One editable value on a card. Fields come from one fixed list of field types. |
+| Attribute | One value of a component, as the Lua API names it: the Inspector field "Linear damping" is the attribute `linear_damping`. Scripts read it with `get_attribute` and change it with `set_attribute`. |
 | Assets panel | The panel listing the level's files in folders, like a small file system. |
 | Console | The panel at the bottom showing errors, `print()` messages and trigger lines from test play. |
 | Top bar | The bar along the top with the menus, the tools and Play. |

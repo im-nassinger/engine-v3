@@ -9,6 +9,8 @@ Code for what triggers can't do. **Nothing here is in v1.** **In v2** an entity'
 | File | Covers |
 |---|---|
 | [scripts.md](scripts.md) | The ScriptComponent, `on()`, handles, component values, `spawn`, `wait`, the Lua API, safety, errors |
+| [lua-api.md](lua-api.md) | Every Lua function, with its status: named in the review or proposed |
+| [lua-examples.md](lua-examples.md) | Whole example scripts: a coin, a door, walking, a turret, a score, health |
 | [code-editor-and-console.md](code-editor-and-console.md) | Monaco, suggestions, help, the Console, debugging |
 
 ## Features and versions
@@ -28,4 +30,4 @@ Code for what triggers can't do. **Nothing here is in v1.** **In v2** an entity'
 | Script help and tutorial levels | v3 | code-editor-and-console |
 | Console filters, trigger lines | v3 | code-editor-and-console |
 
-The exact list of Lua functions is not written yet. See the last table in [scripts.md](scripts.md).
+The Lua functions are in [lua-api.md](lua-api.md). Most of them wait for the owner's answers in [the Lua API proposal](../../proposals/lua-api.md).

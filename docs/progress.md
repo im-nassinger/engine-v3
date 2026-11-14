@@ -13,7 +13,7 @@ The docs rewrite is finished and both checks pass. No code exists. **v1 is now a
 | [rejected.md](rejected.md), [tech-notes.md](tech-notes.md) | Done |
 | `tools/check-docs.js`, `tools/check-sources.js` | Done, both pass |
 | The smaller v1: v1 build and watch, v2 logic and play, v3 polish, v4 accounts and publishing | Done, applied everywhere. See [decisions.md](decisions.md) |
-| [proposals/lua-api.md](proposals/lua-api.md): the Lua API as functions on ids | **Waiting for the owner:** seven yes-or-no questions |
+| [proposals/lua-api.md](proposals/lua-api.md): the Lua API questions | **Waiting for the owner:** seven yes-or-no questions |
 | Open questions below | Waiting for the owner |
 | Architecture, stack, `plan.md`, code | Not started |
 
@@ -25,6 +25,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 - **Every level file records its physics version from v1** (was open question 14). Claude's call after the owner said "you decide". See [saving](requirements/play-and-save/saving.md).
 - **A smaller v1** (owner): 43 features moved to a new v2, the old v2 became v3, accounts and publishing v4. See [scope.md](scope.md).
 - **Every Lua function is top level** (owner), such as `spawn(path)`, never `world.spawn(path)`. Written into [scripts.md](requirements/scripts/scripts.md); the Lua API proposal follows it.
+- **A component value is changed with `set_attribute`** (owner), next to the review's `get_attribute`. The full function list is in [the Lua API](requirements/scripts/lua-api.md), with [example scripts](requirements/scripts/lua-examples.md).
 - Small fixes: the glossary's Variable row no longer decides open question 3, and decisions made after the review are cited as `owner: <date>`.
 
 ## Next

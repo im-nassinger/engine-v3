@@ -6,4 +6,4 @@ Proposals waiting for the owner's answer. **Nothing in this folder is decided.**
 
 | File | Proposes | State |
 |---|---|---|
-| [lua-api.md](lua-api.md) | The Lua API rewritten as functions that take ids, with a version for each, and seven yes-or-no questions | Waiting for the owner |
+| [lua-api.md](lua-api.md) | Seven yes-or-no questions about the Lua API. The functions themselves are in the requirements, marked as proposed | Waiting for the owner |
