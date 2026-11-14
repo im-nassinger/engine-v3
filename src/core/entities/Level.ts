@@ -1,9 +1,17 @@
-import { NameComponent, TransformComponent } from '../components/index.ts';
+import {
+    CameraComponent,
+    NameComponent,
+    PhysicsWorldComponent,
+    ShapeComponent,
+    StyleComponent,
+    TransformComponent,
+} from '../components/index.ts';
 import type { EntityId } from '../fields/index.ts';
 
 import { Entity } from './Entity.ts';
 import type { EntityChange } from './EntityChange.ts';
 import { EntityIdAllocator } from './EntityIdAllocator.ts';
+import { LevelEditorData } from './LevelEditorData.ts';
 import { LevelSignals } from './LevelSignals.ts';
 import { LevelTree } from './LevelTree.ts';
 import type { LevelUpdate } from './LevelUpdate.ts';
@@ -14,6 +22,10 @@ import type { RenameOutcome } from './RenameOutcome.ts';
 const MAX_DEPTH = 256;
 const MAX_NAME_LENGTH = 60;
 const NEW_LEVEL_NAME = 'Untitled level';
+const NEW_LEVEL_BOUNDS_WIDTH = 20000;
+const NEW_LEVEL_BOUNDS_HEIGHT = 10000;
+// A soft light blue every default shape colour stands out on.
+const NEW_LEVEL_BACKGROUND_COLOUR = '#BFE3F5FF';
 
 type ListenedEntity = {
     readonly entity: Entity;
@@ -25,6 +37,8 @@ export class Level {
     readonly world: Entity;
     readonly camera: Entity;
     readonly signals = new LevelSignals();
+    // Grid size and folded rows: saved, never part of the tree.
+    readonly editorData = new LevelEditorData();
     private readonly tree = new LevelTree<Entity>();
     private readonly listenedById = new Map<EntityId, ListenedEntity>();
     private readonly idAllocator = new EntityIdAllocator();
@@ -38,16 +52,33 @@ export class Level {
 
         const cameraId = this.idAllocator.next();
         this.camera = this.attach(cameraId, this.world, 0);
+
+        this.editorData.version.subscribe(() => this.signals.levelVersion.increment());
     }
 
-    // The World is id 1 and the camera id 2. Their other components come with stage 2, and the registry with them.
+    // The World is id 1 and the camera id 2, at the origin. The World's rectangle is the level bounds,
+    // centred on the origin, and its fill is the background, with no outline: the editor draws the bounds.
     static createNew() {
         const level = new Level();
 
+        const bounds = new ShapeComponent({
+            geometry: { kind: 'rectangle', width: NEW_LEVEL_BOUNDS_WIDTH, height: NEW_LEVEL_BOUNDS_HEIGHT },
+        });
+        const background = new StyleComponent({
+            ...StyleComponent.schema.defaults(),
+            fill: { kind: 'solid', colour: NEW_LEVEL_BACKGROUND_COLOUR },
+            outlineWidth: 0,
+        });
+
         level.world.addComponent(new TransformComponent());
         level.world.addComponent(new NameComponent({ name: 'World' }));
+        level.world.addComponent(bounds);
+        level.world.addComponent(background);
+        level.world.addComponent(new PhysicsWorldComponent());
+
         level.camera.addComponent(new TransformComponent());
         level.camera.addComponent(new NameComponent({ name: 'Camera' }));
+        level.camera.addComponent(new CameraComponent());
 
         return level;
     }

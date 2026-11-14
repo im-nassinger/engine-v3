@@ -5,6 +5,7 @@ export { entityName } from './entityName.ts';
 export { EntityIdAllocator } from './EntityIdAllocator.ts';
 export { EntityVersions } from './EntityVersions.ts';
 export { Level } from './Level.ts';
+export { LevelEditorData } from './LevelEditorData.ts';
 export { LevelSignals } from './LevelSignals.ts';
 export type { LevelUpdate } from './LevelUpdate.ts';
 export type { MoveOutcome, MoveRefusal } from './MoveOutcome.ts';

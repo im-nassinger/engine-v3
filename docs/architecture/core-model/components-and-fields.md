@@ -185,6 +185,7 @@ export class ComponentRegistry {
 export function createV1Registry(): ComponentRegistry;
 ```
 
+- **As built (2026-11-14):** the registry holds `ComponentClass<AnyComponent>`, refuses a type registered twice, and has `all()`, the classes in the order they were registered, which the schema tests run over. **`indexOf` is that order**, and an unknown name throws. `createV1Registry` registers the ten v1 components in a fixed order, and new types only ever go at the end, so a component id in Lua never changes. *Why: the index must be the same in every run and every version, and the order of registration is the one order nothing else moves (standing yes, 2026-11-14).*
 - The reader finds a component by its type name in the file, the Inspector's Add Component menu lists what the entity lacks (see [the Inspector](../editor/inspector-and-entities.md)), and v2 registers its components into the same registry. Nothing else changes when a component type is added.
 
 ## The v1 components

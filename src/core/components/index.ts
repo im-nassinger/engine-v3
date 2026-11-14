@@ -8,10 +8,12 @@ export type {
 export { camelCaseOfLabel, snakeCaseOfKey, snakeCaseOfLabel } from './attributeNames.ts';
 export { Component } from './Component.ts';
 export type { ComponentClass } from './ComponentClass.ts';
+export { ComponentRegistry } from './ComponentRegistry.ts';
 export { ComponentSchema } from './ComponentSchema.ts';
 export type { ComponentSchemaOptions, FieldOf, StoredValueOf, ValueEntryOf } from './ComponentSchema.ts';
 export type { ComponentTypeName } from './ComponentTypeName.ts';
 export type { ComponentValues } from './ComponentValues.ts';
+export { createV1Registry } from './createV1Registry.ts';
 export { derivedField } from './DerivedFieldDefinition.ts';
 export type { DerivedFieldDefinition } from './DerivedFieldDefinition.ts';
 export type { PartnerRule } from './PartnerRule.ts';

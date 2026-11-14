@@ -1,6 +1,13 @@
 import { describe, expect, test } from 'vitest';
 
-import { NameComponent, TransformComponent } from '../components/index.ts';
+import {
+    CameraComponent,
+    NameComponent,
+    PhysicsWorldComponent,
+    ShapeComponent,
+    StyleComponent,
+    TransformComponent,
+} from '../components/index.ts';
 import { WeightComponent } from '../components/testing/index.ts';
 
 import type { Entity } from './Entity.ts';
@@ -55,6 +62,34 @@ describe('Level ids', () => {
         expect(level.world.hasComponent(TransformComponent)).toBe(true);
         expect(level.world.hasComponent(NameComponent)).toBe(true);
         expect(cameraTransform.get('position')).toEqual({ x: 0, y: 0 });
+    });
+
+    test("the World's rectangle is the 20000 x 10000 bounds, filled with the background and no outline", () => {
+        const level = Level.createNew();
+        const bounds = level.world.requireComponent(ShapeComponent);
+        const background = level.world.requireComponent(StyleComponent);
+
+        expect(bounds.get('geometry')).toEqual({ kind: 'rectangle', width: 20000, height: 10000 });
+        expect(background.get('fill')).toEqual({ kind: 'solid', colour: '#BFE3F5FF' });
+        expect(background.get('outlineWidth')).toBe(0);
+        expect(level.world.hasComponent(PhysicsWorldComponent)).toBe(true);
+    });
+
+    test('the camera has its CameraComponent, and only the World has the physics settings', () => {
+        const level = Level.createNew();
+
+        expect(level.camera.hasComponent(CameraComponent)).toBe(true);
+        expect(level.camera.hasComponent(PhysicsWorldComponent)).toBe(false);
+        expect(level.world.hasComponent(CameraComponent)).toBe(false);
+    });
+
+    test('a change to the editor data counts as a change to the level, for autosave', () => {
+        const level = Level.createNew();
+        const before = level.signals.levelVersion.version;
+
+        level.editorData.setGridSize(25);
+
+        expect(level.signals.levelVersion.version).toBe(before + 1);
     });
 
     test('ids only count up, and a removed id is never handed out again', () => {

@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 2, step 4 of 8. The [runner](runner.md) keeps this line up to date.
+**Runner:** stage 2, step 5 of 8. The [runner](runner.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -23,7 +23,7 @@
 | Stage 0, project setup | Done, except the first CI run, which needs a push. See below |
 | Stage 1, the model | Done on 2026-11-14. See below |
 | The stage 2 plan | Approved under the standing yes on 2026-11-14, with round 10: [proposals/stage-2.md](proposals/stage-2.md) |
-| Code | Stages 0 and 1 done. Stage 2: steps 1 to 4 of 8 done, all nine v1 components built |
+| Code | Stages 0 and 1 done. Stage 2: steps 1 to 5 of 8 done: all v1 components, the registry, `LevelEditorData`, and a new level's World and camera with all their components |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
