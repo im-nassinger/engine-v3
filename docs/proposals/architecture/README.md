@@ -21,7 +21,7 @@ How engine-v3 is built: the stack, the five parts of the code and their folders,
 
 | File | What it decides |
 |---|---|
-| [review.html](review.html) | The review page for round 1: 24 questions and decisions, all answered yes |
+| [review.html](review.html) | The review page. Round 1 (24 cards, all yes) is in git history; round 2 asks A1 to A8 and the TypeScript version |
 | [stack.md](stack.md) | Exact versions; TypeScript 6.0 rather than 7; `box2d3-wasm/compat`; what is left out on purpose |
 | [parts-and-folders.md](parts-and-folders.md) | core, editor, adapters, ui, app; what may import what; how ESLint and TypeScript enforce it; where tests go |
 | [core-model/README.md](core-model/README.md) | The model in one picture and the rules it keeps |

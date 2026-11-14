@@ -71,7 +71,7 @@
   <div class="pbar"><i id="pfill"></i></div>
 </header>
 <main>
-  <p class="intro">Round 1 of the architecture proposal. Each card is one question or one decision, with my view under it. <b>Yes</b> means you agree with my view, <b>No</b> means you don't, and a comment says what you'd change. "More" explains the card with an example. Any click on a card counts it as answered. Underlined words are explained when you hover them. Answers are kept in this browser. When you're done, press Copy answers and paste the text into the chat.</p>
+  <p class="intro">Round 2 of the architecture proposal: the questions that came up while writing it (docs/proposals/architecture/). Round 1's 24 cards were all answered yes. Each card is one question or one decision, with my view under it. <b>Yes</b> means you agree with my view, <b>No</b> means you don't, and a comment says what you'd change. "More" explains the card with an example. Any click on a card counts it as answered. Underlined words are explained when you hover them. Answers are kept in this browser. When you're done, press Copy answers and paste the text into the chat.</p>
   <details class="glossary"><summary>Glossary</summary><dl id="glossary"></dl></details>
   <div id="list"></div>
   <div class="footer">
@@ -114,87 +114,38 @@ const GLOSSARY = [
 
 // Groups: [title, note, [[id, short, detail, myView], ...]]. Yes = you agree with my view.
 const GROUPS = [
-["Questions only you can answer", "New questions from the architecture work.", [
-["AR1","The Transform component is called TransformComponent everywhere: in the code, in the level file, on its card and in Lua.",
- "This is open question 1. The principle says component names end in Component, but every source writes Transform. The name goes into every saved project file and into Lua's get_component(id, \"TransformComponent\"), so it has to be fixed before the first file is saved. Renaming it later means upgrading every saved file.",
- "One rule with no exception is easier to learn and to code. Use TransformComponent everywhere. Its card stays first, as today."],
-["AR2","In v1 a fill is a colour field that you can empty. Gradients in v2 add one new field type, \"fill\", to the fixed list.",
- "The fixed list of field types has nothing for a fill, which can be nothing, a solid colour, a gradient or an image. v1 only has nothing and solid colours, so a colour field you can empty covers it: clear the field and the shape has no fill. The file stores it from the first day as a tagged value such as { kind: \"solid\", colour: \"#4A90D9\" }, so gradients and images never change saved levels. The rule \"a new need adds a type to the list\" then adds \"fill\" in v2.",
- "Agree with this. It keeps v1 small and the file format ready."],
-["AR3","The physics view draws the game's own collision pieces, in the editor and in test play, instead of asking Box2D to draw them.",
- "The physics view also works in the editor, where no Box2D world exists, because there is no physics preview. The game already cuts every shape into the exact pieces it hands to Box2D: a self-crossing polygon into simple convex pieces, an ellipse that isn't a circle into a many-sided shape. Drawing those same pieces shows exactly what collides, looks the same in both places, and needs nothing extra sent from the running game. Only the requirement's reason (\"Box2D draws it for us\") would change, not what you see.",
- "Draw our own pieces. One way to draw the physics view instead of two."],
-["AR4","The v1 plan builds the small features marked \"Suggested v1\" in the \"Not in the scope review\" tables, each labelled \"waiting for the owner\" until you confirm it.",
- "They are: editing several entities at once with Mixed values, the leave prompt, no page gestures, losing focus mid-drag, browser zoom staying sharp, which body is A in a joint, scaling a group with joints, the camera's safety margin, the hard limit at 100,000 px, the maximum level size, the level's name, import by dropping a file, the note after a crash, a saved level that won't open, and site data cleared while open. Most are a few lines of code. Some are hard to add later, such as browser zoom and no page gestures. If you answer No, the design only leaves room for them.",
- "Build them in v1, labelled as waiting, so nothing has to be reworked later."],
-["AR5","Each test file sits next to the file it tests: Level.ts and Level.test.ts in the same folder.",
- "The other common layout is a separate tests folder that copies the source tree. Tests that need a real browser (drawing, browser storage, the clipboard) end in .browser.test.ts, so the fast tests can run alone. The determinism test and the speed tests get their own folder, because they test the whole game, not one file.",
- "Next to the file: you see at once what is tested, and moving a file moves its test."],
-["AR6","New words for the architecture docs: command, change, history step, contract, adapter, worker, play copy, schema, current group.",
- "Each one is explained in the glossary at the top of this page (hover it). They go in glossary-additions.md, not in the glossary, until you approve them. \"Action\" and \"message\" are avoided, because they already mean trigger actions and custom events.",
- "Each is needed to describe the code, and none clashes with an agreed word."]
-]],
-["The big decisions", "Yes means go ahead and write it this way.", [
-["D1","The code is split into five parts, and the game's rules never import a library, React or the browser.",
- "core: the game's rules (entities, components, the level, geometry, the simulation). editor: the editing rules (undo, selection, tools, what the Inspector shows), with no web page code. adapters: the classes that talk to Box2D, PixiJS, browser storage, the keyboard and the clock. ui: the React panels. app: the one place that builds everything and connects it. Imports only point inward: ui and adapters may use editor and core, never the other way. A lint rule fails the build when an import points the wrong way. Example: the code that decides how merging works is in core and is tested without a browser; Box2D is reached only through a contract that core declares.",
- "This is the main fix for the first attempt: rules that can't reach a detail can't get tangled with it."],
-["D2","Each component declares its fields once, in a schema, and that one list drives the Inspector, undo, saving, copy and paste, and later Lua and Change value.",
- "Each field names its field type and its details: label, unit, range, precision, display scale (radians shown as degrees), description, and whether it can change during play. Example: BodyComponent declares Linear damping as a number from 0 to 100, default 0, changeable in play. From that alone the Inspector shows a number field with a slider, typing 150 clamps to 100, the file stores it, and in v2 Lua reads it as the attribute linear_damping. Each field type is a class that reads a value from a file, writes it, clamps it and compares it, so a damaged file is caught in one place.",
- "Without it every component needs its own Inspector, save and Lua code, and they drift apart."],
-["D3","Entity ids are whole numbers handed out by the level and never reused. Test play keeps the editor's ids.",
- "Joints, the camera's follow target and other entity fields store ids. A pasted or duplicated entity gets new ids, and links between the copies are rewired. Because the play copy keeps the same ids, live values and the selection map straight across. Spawned entities (v2) get ids above the highest one. Each entity keeps its children in a plain ordered list, in Layers panel order, so draw order and run order come straight from the tree.",
- "Simple and enough for every rule in the requirements, Lua's \"an id is a number\" included."],
-["D4","Every edit is a change that can be applied and reverted. The undo history keeps 500 steps and restores the selection and the current group.",
- "Example: Group makes three changes (add the group, move the entities into it, select it), which become one history step named \"Group 3 entities\". Arrow-key moves within 1 second join into one step. A drag makes one step on release. Deleting keeps a full copy of what was removed, so undo brings it back with the same ids. Nothing outside the level (the view, the tool, panel sizes) is ever a change.",
- "This is how most editors do undo (the Command pattern). It is exact without copying the whole level each time."],
-["D5","React draws the panels but never holds the level. The level view is drawn by PixiJS, outside React.",
- "The level, the selection and the history are classes. When one changes, it raises a version number and tells whoever listens. A React panel watches that number and draws again only when it moves (React's useSyncExternalStore). There is no state library. The level view is one empty box that React places on the page; a separate class draws the level into it with PixiJS and updates only what changed. Example: dragging a crate updates its drawing every frame and the Inspector shows the new position, while the Layers panel doesn't redraw at all.",
- "One owner for the level, and no second copy to keep in sync."],
-["D6","From v1, test play runs in a worker. The editor page keeps drawing and can always stop it.",
- "The rule \"the game runs separately from the editor\" is already v1 (\"When something goes wrong in a run\"). The page decides when ticks are due and asks the worker to run them, sending the keys held for each tick. The worker answers with what moved. If it doesn't answer for 5 seconds, the page ends the run with a message and starts a fresh worker. In a hidden tab the page stops asking, so the game pauses by itself. On a slow computer the page asks for fewer ticks, so the game slows down rather than skipping. The page draws between two ticks, so a 144 Hz screen stays smooth.",
- "It is what the requirements need, and building it in v1 means scripts in v2 slot in without moving anything."],
-["D7","Play makes its copy of the level the same way saving does: it writes the level out as file data, and the worker reads it back.",
- "So the play copy can never share anything with the editor's level, and Stop just throws it away. Hidden entities, ids and every value come along, because the file has them. In v2 Restart rebuilds from the same data with a fresh physics world, a fresh Lua state and a new seed.",
- "One way to copy a level, and it is tested every time you save."],
-["D8","One geometry module cuts every shape into the exact pieces that are drawn and collide, and the game's rules use only maths that gives the same answer on every computer.",
- "A self-crossing polygon is cut at its crossings and every enclosed area is filled, then it is split into convex pieces of at most 8 points, Box2D's limit. Drawing, Box2D, clicking and the read-only Mass all use those same pieces, so what you see is what collides. The browser's Math.sin and Math.random can differ between computers, so the rules use the game's own sine and cosine and random numbers from the seed, and a lint rule bans the browser's versions there.",
- "Both come straight from the determinism requirement and the tech notes."],
-["D9","v1 builds culling, cached positions and bounds, a virtual Layers panel, and redraws a shape only when it changes. A faster index for clicking waits until a speed test shows it is needed.",
- "Culling: only what is on screen is drawn. Each entity's level position, bounds and hidden state are worked out once and kept until it or a parent changes. The Layers panel only builds the rows you can see, so 10,000 rows open in under 0.2 s; its own drag and drop is built together with it. Clicking checks each entity's cached bounds, well under a millisecond for 10,000 entities. A speed test in the plan checks the requirement's targets, and a grid index is built only if it fails. Physics always runs every body, because skipping bodies off screen would break determinism.",
- "Build what the speed targets clearly need, and measure before building the rest."],
-["D10","The level saves itself in the browser's database (IndexedDB), and exports as an .editable file: a zip holding level.json and, from v2, the level's files.",
- "level.json starts with the file format version and the physics version, both whole numbers starting at 1. The physics version goes up whenever the game's Box2D build changes. Then come the level's name, the editor-only data (grid size, locks, folded rows) and every entity with its components. A save writes everything at once, so it either fully happens or not at all. Import runs in a worker: it checks the size, unpacks with a limit so a \"zip bomb\" can't fill memory, checks every value, and only then replaces the level. Small editor settings (panel sizes, the view, grid shown) go in the browser's simpler storage (localStorage), because they are needed before the first draw. A second tab is detected with the browser's Web Locks.",
- "Each part follows a saving requirement or a tech note."],
-["D11","Fixed: TypeScript, Vite, React, PixiJS 8 and Box2D v3. Recommended: Vitest, Playwright, ESLint, box2d3-wasm, Clipper2, fflate, idb, TanStack Virtual and the React Compiler. Lua (wasmoon) and Monaco come with v2.",
- "Vitest runs the tests, and Playwright runs the ones that need a browser, in Chromium, Firefox and WebKit. box2d3-wasm is Box2D v3 already built for the browser; its single-thread build needs no special server headers. Clipper2 cuts self-crossing polygons. fflate makes and reads zips. idb is a thin helper for browser storage. TanStack Virtual builds only the visible Layers rows. The React Compiler keeps panels fast without hand-written memo code. No state library and no CSS framework: each React component has its own CSS file. Exact versions are pinned in stack.md after checking they work together.",
- "Each library does one job the requirements need. Each is a recommendation you can refuse on its own in a comment."]
-]],
-["Open questions that change the v1 design", "From the open questions in progress.md. The number is the same as there.", [
-["Q2","The camera gets an eye icon like every other row. Hiding it hides everything inside the camera.",
- "The review said the camera has no eye. The old draft used it to hide everything inside the camera at once. The camera itself is never drawn in play, so its eye would only affect what is inside it.",
- "Give it an eye. \"Hiding applies to children\" then works for the camera like for any row, and one special case goes away."],
-["Q5","Removing a component that others need removes only that one. The cards left without their partner show their note.",
- "Example: removing the ShapeComponent from a crate leaves its SurfaceComponent, whose card then shows \"Needs a ShapeComponent to collide. [Add ShapeComponent]\". The old rule removed the dependants too, before \"nothing happens behind the user's back\" existed.",
- "Remove only that one. It follows the principle, and undo brings it back anyway."],
-["Q6","Adding physics in one click adds only the BodyComponent. If nothing in it collides, its card shows a note with [Add SurfaceComponent].",
- "A body on a group whose children already have surfaces needs no surface of its own, so adding one automatically would often be wrong. The note appears only when the body has nothing that collides.",
- "Body only, with the note. It is the same rule as every other partner."],
-["Q10","The level's name is shown and edited in the top bar in v1, and saved in the project file.",
- "1 to 60 characters, \"Untitled level\" at first. It is the default file name on export and appears in the browser tab title. Renaming is an undo step.",
- "v1, as written in the top bar section."],
-["Q11","Both limits stand: 50 MB of imported files per level (v3) and a level file of at most 256 MB (v1).",
- "They measure different things: one counts the images and sounds you import, the other the whole file. v1 only checks the 256 MB, because v1 has no imported files.",
- "Keep both."],
-["Q12","Drop the old 2,000 files limit, and count the 256 MB level limit on the unpacked size.",
- "The v3 limit of 500 files per level already replaces 2,000 files. Import needs some limit on the unpacked size anyway, to refuse a zip bomb. Images and sounds are already compressed and level.json only gets smaller when zipped, so a level's unpacked size is always at least its file size. One number, 256 MB unpacked, then covers both, and the editor can check it without zipping first.",
- "One limit: 256 MB unpacked."],
-["Q15","The camera follows an entity in v1. Following by tag can be added later without changing saved levels.",
- "Following by tag finds a spawned player without a script, which matters once spawning exists in v2. The file stores the follow target as a tagged value, such as { kind: \"entity\", id: 12 }, so a later { kind: \"tag\", tag: \"player\" } fits beside it.",
- "Entity only in v1, with room left for tags."]
+["Questions from writing the proposal", "The requirements don't settle these. Each has a suggested answer; the proposal is written so any answer fits. The full list is in open-questions.md.", [
+["A1","The World's background colour lives in a StyleComponent on the World: its fill is the background.",
+ "The requirements say the background colour is on the World but name no component, and the PhysicsWorldComponent is for physics. A StyleComponent already holds a fill. In v3 an image fill then becomes the background image with no new setting, and a missing image falls back to the colour, as the requirement says.",
+ "Reuse before adding: no new component and no special background setting."],
+["A2","The level bounds are fields on the PhysicsWorldComponent: Bounds position (top-left corner, default 0, 0), Bounds size (20000 × 10000), and Top, Bottom, Left and Right edge, each Wall or Open (all Open).",
+ "The requirements give the size, the four edges and the handles, but no component and no position. The bounds are there because a physics world needs an edge, so the physics settings are their home. With the corner at (0, 0), a new level's camera sits at (960, 540), in the top-left corner of the bounds.",
+ "Physics settings stay in one component, and the numbers stay positive and easy to read."],
+["A3","\"Merge\" is a checkbox on the BodyComponent, on by default.",
+ "The requirements say whether a child merges \"is a setting on a component, on by default\", without naming the component. A shape with a SurfaceComponent and no BodyComponent always merges into the body above it. To give it its own body, add a BodyComponent and untick Merge. This matches \"a merged shape keeps its own body settings, greyed\".",
+ "It belongs with the body settings it greys out."],
+["A4","The TagsComponent comes in v2, not v1.",
+ "It is in the glossary with no version. Nothing in v1 reads tags: triggers and scripts (v2) and the collision grid (v3) are the first to use them.",
+ "v1 is the smallest thing that can be tested, and tags do nothing in it."],
+["A5","The World keeps a TransformComponent fixed at zero, and its card isn't shown in the Inspector.",
+ "The glossary says every entity has a TransformComponent, but the World can't move, so a card full of values you can't change would only be noise when you click empty space.",
+ "Keep the rule, hide the useless card."],
+["A6","Partner notes follow one pattern: \"Needs a X to Y. [Add X]\".",
+ "The requirements give two notes word for word (\"Needs a ShapeComponent to draw anything\", \"Needs a SurfaceComponent to notice touching\"). The others would read: a StyleComponent without a shape \"Needs a ShapeComponent to draw anything\", a SurfaceComponent without a shape \"Needs a ShapeComponent to collide\", a BodyComponent on a shape with no surface \"Needs a SurfaceComponent to collide\".",
+ "One pattern, so every note reads the same."],
+["A7","A pasted entity keeps a link to an entity outside the copied set only within one opening of the level. After a reload, New or Import, such links become missing.",
+ "The rule says the link stays \"in the same level\" and becomes missing \"in another level\". v1 has no level id (that is Later), so the editor can only tell the level it has open right now. Example: copy a joint without its wheel, reload, paste: the joint's end on the wheel is missing.",
+ "Safe and simple until level ids exist."],
+["A8","Changing the grid size is an undo step. Showing or hiding the grid isn't.",
+ "The grid size is saved in the project file, but the requirement's table of what is and isn't a step lists neither way. Every other value saved in the level is a step.",
+ "Treat it like every other value saved in the level."],
+["S1","TypeScript is pinned to 6.0.3, not 7.0.",
+ "TypeScript 7.0 is out, but typescript-eslint (8.72.2), which runs the import-direction rules, only supports TypeScript below 6.1. Moving to 7 is one version change once it does.",
+ "Use 6.0 now, so the ESLint rules that protect the architecture work from the first day."]
 ]]
 ];
 
-const KEY = "engine-v3-architecture-review-1";
+const KEY = "engine-v3-architecture-review-2";
 let answers = {};
 try { answers = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { answers = {}; }
 function persist() { try { localStorage.setItem(KEY, JSON.stringify(answers)); } catch (e) {} }
@@ -368,7 +319,7 @@ function buildText() {
     if (groupLines.length) lines.push("## " + group, ...groupLines, "");
   }
   const head = [
-    "Architecture review answers, round 1",
+    "Architecture review answers, round 2",
     "Answered " + (total - open.length) + " of " + total + " (" + yes + " yes, " + no + " no)",
     ""
   ];
