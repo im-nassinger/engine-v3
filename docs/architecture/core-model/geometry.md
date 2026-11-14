@@ -38,6 +38,7 @@ export class Matrix2D {
 
 - **The order is `M = T(position) · R(rotation) · K(skew) · S(scale)`**, where `K` slants horizontally: `[[1, tan(skew)], [0, 1]]`. **Skew is strictly between −90° and 90°** (owner, 2026-11-14): at ±90° the tangent is infinite and the matrix can't be inverted, and past 90° the same slant is a smaller skew with the scale flipped. `decompose()` always returns a skew inside that range. Tangent is `sin ÷ cos` inside `Matrix2D`. Position, rotation, two scales and one skew are six numbers, exactly the six numbers of any 2D matrix, so **any** combination of parents can be expressed. That is what the requirement "moving between groups keeps the place on screen, skew included" needs.
 - **Moving an entity to a new parent** keeps its level matrix: `newLocal = inverse(newParentWorld) · oldWorld`, then `decompose()`. A new parent with scale 0 can't be inverted, so the command refuses the move. The scale field already refuses 0.
+- **What `decompose()` returns** (Claude's call while building stage 1): the x scale is always positive, so a mirror shows as a negative y scale (a scale of (−1, 1) comes back as rotation 180° and scale (1, −1), the same matrix). Rotation comes back above −180° and at most 180°, and no value is ever −0.
 - Matrices are values: every operation returns a new one.
 - `fromTransform()` and `decompose()` use `DeterministicMath`, like all of core (owner, 2026-11-14). ESLint bans `Math.sin` and the others in core, so there is no exception for the editor.
 
