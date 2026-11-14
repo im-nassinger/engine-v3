@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Everything known about the project: a 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved, and the code is built stage by stage from [plan.md](plan.md). Stage 0, the project setup, is done. **Start with [progress.md](progress.md)** to see where things stand, then [overview.md](overview.md) for the whole game in one page. Every file opens with a TL;DR, and the docs read from high level down to detail.
+Everything known about the project: a 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved, and the code is built stage by stage from [plan.md](plan.md). Stages 0 and 1, the project setup and the model, are done. **Start with [progress.md](progress.md)** to see where things stand, then [overview.md](overview.md) for the whole game in one page. Every file opens with a TL;DR, and the docs read from high level down to detail.
 
 ## Files
 
@@ -18,7 +18,7 @@ Everything known about the project: a 2D physics game with a level editor, for t
 | [design/](design/README.md) | How the editor looks: the round 8 answers, the mockups, and later the design system |
 | [plan.md](plan.md) | The v1 plan in 18 stages, each with the docs it implements |
 | [review.html](review.html) | The review page where the owner answers questions in the browser. Earlier rounds are in git history |
-| [proposals/](proposals/README.md) | Proposals waiting for the owner's answer: the stage 1 plan |
+| [proposals/](proposals/README.md) | Proposals waiting for the owner's answer. Empty now |
 | [rejected.md](rejected.md) | What we decided against, and why. Check it before proposing something |
 | [decisions.md](decisions.md) | Project-level choices: starting over, the reviews, how these docs are organised |
 | [tech-notes.md](tech-notes.md) | Facts and warnings for the architecture work. Not requirements |

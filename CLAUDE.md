@@ -1,6 +1,6 @@
 # engine-v3
 
-A 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved (2026-11-14). Stage 0 of `docs/plan.md` (project setup) is done; the work goes stage by stage from there.
+A 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved (2026-11-14). Stages 0 (project setup) and 1 (the model) of `docs/plan.md` are done; the work goes stage by stage from there.
 
 Start at `docs/README.md`, then `docs/progress.md`.
 

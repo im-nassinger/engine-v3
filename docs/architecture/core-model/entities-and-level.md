@@ -94,7 +94,8 @@ export class Level {
 - The `index` of `moveEntity` is the entity's position among its new siblings once it has moved.
 - `RenameOutcome` is `{ renamed: true, name } | { renamed: false, reason: 'empty' | 'tooLong' }`, counting characters (code points) after trimming.
 - **Removing the World or the camera throws**, and so does `restoreEntity` with an id already in the level: commands never ask for either.
-- **As built (2026-11-14), `Level.createNew` takes no registry yet** and makes a bare World and camera. Their TransformComponent and NameComponent are added when those classes are built (round 9), and the `registry` parameter in stage 2.
+- **As built (2026-11-14), `Level.createNew` takes no registry yet.** It gives the World and the camera a TransformComponent and a NameComponent (`World`, `Camera`); their other components and the `registry` parameter come in stage 2.
+- **`LevelEditorData` isn't built yet.** It comes with the first stage that reads it: the grid size or the folded rows.
 - `Level` changes only the tree. **Keeping an entity in place on screen when it changes parent is the command's job** (it rewrites the TransformComponent with the maths in [geometry.md](geometry.md)), because the rule is an editor rule.
 - What other entities a removal affects (joints attached to a deleted entity) is also the command's job. `Level.removeEntity` removes exactly the subtree it is given.
 - `LevelTree` is a small internal class holding the parent of each entity and the ordered children of each entity. It isn't exported from the module.
@@ -166,6 +167,7 @@ Values worked out from the tree, kept until something they depend on changes. Th
 | `BoundsCache` | Each entity's own bounds in level positions, and the bounds of its subtree | Its matrix, shape, path or outline width changes; subtree bounds also when a child's do |
 | `PiecesCache` | The collision pieces of each shape, in its own space | Its shape changes. Moving it never splits the polygon again |
 
+- **As built (2026-11-14):** each cache subscribes to `LevelSignals.updated` in its constructor and has `dispose()`. Both keep their values in a small internal `PerEntityValues`: a value is stored only after its parent's, so marking a subtree stops at the first entity with no value. `WorldMatrixCache` treats an entity without a TransformComponent as not moved.
 - **Marking is cheap and computing is lazy.** A change marks the entity and its subtree with one walk, and nothing is computed until someone asks. Dragging 1,000 entities marks 1,000 subtrees once per frame and recomputes only what is drawn or hit-tested.
 - In the play copy, `WorldMatrixCache` takes body poses from the simulation, see [simulation.md](../simulation.md#bodies-and-their-entities).
 

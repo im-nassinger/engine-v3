@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**, which waits for the owner. **Now: stage 1 of [plan.md](plan.md), the model**, following its [approved plan](proposals/stage-1.md): imports in core go one way, `DeterministicMath` (without `exp`) is built now, and skew is strictly between −90° and 90°. **Round 9 is answered** (owner, 2026-11-14): every pick as suggested, and stage 3 tries `clipper2-ts`. Nothing is open.
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**, which waits for the owner. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). Nothing is open. **Next: stage 2**, the v1 components and the file format.
 
 ## Where things stand
 
@@ -19,7 +19,8 @@
 | The stage 0 plan | Done, approved by the owner on 2026-11-14, written into [tooling.md](architecture/tooling.md) |
 | Small features without a version | Done: all given a version in round 7 |
 | Stage 0, project setup | Done, except the first CI run, which needs a push. See below |
-| Code | Stage 1, the model: steps 1 to 6 of 8 done (signals, `DeterministicMath`, `Matrix2D`, the field types, the components with TransformComponent and NameComponent, `Entity` and `Level`). Next: step 7, the caches. See [proposals/stage-1.md](proposals/stage-1.md) |
+| Stage 1, the model | Done on 2026-11-14. See below |
+| Code | Stages 0 and 1 done. Next: stage 2 of [plan.md](plan.md) |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -63,11 +64,13 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 - **Round 9** (owner): a name is never empty (an empty one in a file makes it damaged) and reads as `Entity` when missing; names can't change during play; only position and rotation change during play; the five hover descriptions as proposed; a level name past 60 characters is refused, not cut; **stage 3 tries `clipper2-ts` first**. See [selection.md](requirements/editor/selection.md), [inspector-and-undo.md](requirements/editor/inspector-and-undo.md), [saving.md](requirements/play-and-save/saving.md) and [geometry.md](architecture/core-model/geometry.md).
 
-### Stage 1, step 6, built on 2026-11-14
+### Stage 1, built on 2026-11-14
 
+- All eight steps of the approved plan are done, one commit each, and the plan file is deleted. Its decisions are in [core-model/](architecture/core-model/README.md); what stays for later is in [plan.md](plan.md).
 - `core/entities` holds `EntityIdAllocator`, `EntityVersions`, `LevelSignals`, `LevelTree`, `Entity` and `Level`, with the tree's rules as tests. What differs from the docs is written into [entities-and-level.md](architecture/core-model/entities-and-level.md): an entity raises its own signal, which `Level` forwards, to keep imports one way.
 - **Draw order puts the World first**, because its fill is the background; the docs had the whole walk backwards, which drew the World in front of everything.
-- The test with skew in both parents comes with step 7, `WorldMatrixCache`.
+- `core/derived` holds `WorldMatrixCache` and `HiddenCache`. Moving an entity between parents with skew in both keeps its level matrix to within 1e-9.
+- `TextFieldType` has a `minLength`, so `parse` refuses an empty name. Test components for code that holds components are in `core/components/testing/`.
 
 ### Stage 0, built on 2026-11-14
 
@@ -79,7 +82,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 ## Next
 
 1. **Push, when the owner asks,** so CI runs for the first time on x86 and ARM (step 7 of stage 0).
-2. **Stage 1 of [plan.md](plan.md): the model.** The work follows the eight steps of [proposals/stage-1.md](proposals/stage-1.md).
+2. **Stage 2 of [plan.md](plan.md): the v1 components and the file format.** Like stage 1, it starts with a plan in `proposals/` for the owner when the docs can't be built as written.
 3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
