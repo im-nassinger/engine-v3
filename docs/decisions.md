@@ -76,6 +76,7 @@ The owner asked for v1 to be built to the end with nobody typing "continue": one
 | Date | Decision | Written in |
 |---|---|---|
 | 2026-11-14 | Round 10 took every pick: the stage 2 plan with its eight changes; background `#BFE3F5` with no outline; custom gravity angle starts at 90°; grid size 5 to 1,000 px, whole; camera 160 to 7,680 px each way; Smoothing 0 to 5 s, starting at 0.3 s; joints only from the Joint tool; one shared Match drawn distance; Length and Rest length 100 px when missing; a flat line has height 0; StyleComponent values change in play, the camera's size, Walls and Merge don't; a missing TransformComponent or NameComponent reads as defaults; the descriptions as proposed | [world](requirements/physics/world.md), [workspace](requirements/editor/workspace.md), [camera](requirements/camera.md), [joints](requirements/physics/joints.md), [drawing](requirements/drawing.md), [bodies](requirements/physics/bodies.md), [saving](requirements/play-and-save/saving.md), [inspector](requirements/editor/inspector-and-undo.md), [components](architecture/core-model/components-and-fields.md), [persistence](architecture/persistence.md) |
+| 2026-11-14 | Follow and Smoothing change during play (v3's Change value sets them), and so do the gravity fields; the PhysicsWorldComponent's card comes last, at 10 | [components](architecture/core-model/components-and-fields.md) |
 
 ## Still to decide
 

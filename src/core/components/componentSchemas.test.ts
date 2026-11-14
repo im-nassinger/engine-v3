@@ -3,10 +3,12 @@ import { describe, expect, test } from 'vitest';
 import type { AnyComponentSchema } from './AnyComponent.ts';
 import { camelCaseOfLabel, snakeCaseOfLabel } from './attributeNames.ts';
 import { BodyComponent } from './BodyComponent/BodyComponent.ts';
+import { CameraComponent } from './CameraComponent/CameraComponent.ts';
 import { JointComponent } from './JointComponent/JointComponent.ts';
 import { SurfaceComponent } from './SurfaceComponent/SurfaceComponent.ts';
 import { NameComponent } from './NameComponent/NameComponent.ts';
 import { PathComponent } from './PathComponent/PathComponent.ts';
+import { PhysicsWorldComponent } from './PhysicsWorldComponent/PhysicsWorldComponent.ts';
 import { ShapeComponent } from './ShapeComponent/ShapeComponent.ts';
 import { StyleComponent } from './StyleComponent/StyleComponent.ts';
 import { TransformComponent } from './TransformComponent/TransformComponent.ts';
@@ -21,6 +23,8 @@ const SCHEMAS: readonly AnyComponentSchema[] = [
     BodyComponent.schema,
     SurfaceComponent.schema,
     JointComponent.schema,
+    CameraComponent.schema,
+    PhysicsWorldComponent.schema,
 ];
 
 describe.each(SCHEMAS)('the $typeName schema', (schema) => {
