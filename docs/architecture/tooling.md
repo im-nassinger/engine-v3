@@ -34,7 +34,7 @@ tests/
   e2e/       whole-app tests
 ```
 
-`tools/check-docs.js` and `tools/check-sources.js` stay as they are, in JavaScript. ESLint and Prettier skip them.
+`tools/check-docs.js` and `tools/check-sources.js` stay as they are, in JavaScript. ESLint and Prettier skip them. **`tools/package.json`** holds only `"type": "commonjs"`: the project's `package.json` says `"type": "module"`, which would make Node refuse the two tools' `require` (found in stage 0).
 
 **The package manager is npm.** `package-lock.json` is committed and CI installs from it with `npm ci`. `.npmrc` sets `save-exact=true`, so an install can't write a version range, and `engine-strict=true`, so a wrong Node version stops the install instead of failing later in a strange way.
 
@@ -44,6 +44,7 @@ tests/
 |---|---|---|
 | `npm run dev` | The Vite dev server | Working on the page |
 | `npm run build` | `tsc -b`, then the Vite build | |
+| `npm run preview` | Serves the built page | Playwright starts it by itself |
 | `npm run typecheck` | `tsc -b`: every part with its own config | |
 | `npm run lint` | ESLint on everything | |
 | `npm run format` | Prettier, writing | |
@@ -68,6 +69,7 @@ tests/
 | `moduleDetection` | `force` | An `index.ts` that exports nothing yet is still a module |
 | `jsx` | `react-jsx` | |
 | `skipLibCheck` | true | Don't type-check the packages' own files |
+| `types` | `[]` | No package's global types reach a part unless its config names them. Only `tests/tsconfig.json` and `tsconfig.node.json` name `node` |
 
 **One config per part, inside its folder**, each only naming its `lib`:
 
@@ -150,7 +152,8 @@ One file, `eslint.config.ts`, with one block per part. ESLint needs `jiti` to re
 | core | `for ... in`, whose order over numeric and text keys differs from the order they were added | `for ... of` over a known order |
 | editor | `Date`, `Math.random` | The `Clock` contract. The type check catches `setTimeout` in editor, but `Date.now()` compiles without the browser's types |
 
-- **Allowed in core:** `abs`, `sign`, `min`, `max`, `floor`, `ceil`, `round`, `trunc`, `sqrt`, `fround`, `imul`, `clz32` and the constants. These are exact by the standard.
+- **Allowed in core:** `abs`, `sign`, `min`, `max`, `floor`, `ceil`, `round`, `trunc`, `sqrt`, `fround`, `f16round`, `imul`, `clz32` and the constants. These are exact by the standard. `f16round` is new in Node 26 and was found by the `Math` list guard in stage 0; like `fround` it rounds exactly. core's `lib` (`ES2023`) doesn't declare it yet anyway.
+- The two lists live in `eslint.config.ts` as `BANNED_MATH_IN_CORE` and `ALLOWED_MATH_IN_CORE`, which the `Math` list guard imports.
 - **The editor may use `Math.sin` and the rest:** what it works out is stored in the level, and stored values are the same everywhere.
 
 ### Style
@@ -168,6 +171,8 @@ One file, `.dependency-cruiser.json`, with three rules:
 | No circles between modules | `core/entities` → `core/components` → `core/entities`, even when no single file is in a circle |
 
 - **Why a second tool:** ESLint reads one import's text, so it can't know what a path leads to or follow a chain. `eslint-plugin-import-x` finds circles between files only, and a trial showed a circle between two modules with no circle between single files (module A's file imports B's `index.ts`, another of B's files imports A). That case is the likely one here: entities and components will want to know each other.
+- **How the circle between modules is found:** a rule with `"scope": "folder"`. Folder dependencies roll up from subfolders, so `core/components/BodyComponent/` reaching another module counts as `core/components` reaching it, and a module and its own subfolders are never reported as a circle. `--collapse` was tried first and doesn't work: it only changes the report, the rules still run on files (stage 0).
+- **The config is `.json`** and works. dependency-cruiser refuses a regular expression it thinks may be slow (such as `(.+/)?`), so the patterns stay simple.
 - **Imports of types count too.** Two modules that only know each other's types are still tied together. The answer is the one in [parts-and-folders.md](parts-and-folders.md#modules-and-their-public-entry): move the shared piece to a third module, or let one side declare a contract.
 
 ## Guard tests
@@ -184,7 +189,9 @@ In `tests/guards/`, run by `npm test`. Each hands a check a small sample that br
 | No page in a worker | A file using `document`, compiled with the workers' config | The type check fails |
 | Module entries and circles | A tiny tree of two modules with one deep import and one circle | dependency-cruiser reports both, and nothing on the fixed tree |
 
-The ESLint guards hand ESLint the sample's text with a path such as `src/core/sample.ts`, so no broken file ever sits in `src/`.
+The ESLint guards hand ESLint the sample's text with a path such as `src/core/sample.ts`, so no broken file ever sits in `src/`. They switch off the rules that read types (`disableTypeChecked`), because the type-aware project service only finds files that exist on disk. The rules they test read one import or one line and need no types.
+
+Each guard was seen to fail with its check switched off (stage 0).
 
 ## The first real tests
 
@@ -206,14 +213,13 @@ One workflow, `.github/workflows/ci.yml`:
 | browser | `ubuntu-24.04` | Installs the three browsers, `npm run test:browser`, `npm run build` | Every push |
 | journeys | `ubuntu-24.04` | `npm run test:e2e` | Pushes to master |
 
-- Node comes from `.node-version`.
+- Node comes from `.node-version`. The actions are `actions/checkout@v7` and `actions/setup-node@v7`, with npm's cache.
+- `npx playwright install --with-deps` installs the browsers' system packages on the runner. On the laptop WebKit needed three (`libevent-2.1-7t64`, `libavif16`, `libmanette-0.2-0`), installed once with apt.
 - `tools/check-sources.js` doesn't run in CI: it reads `~/projects/ecs-game-v2`, which only the laptop has.
 - The determinism test joins the check job in stage 13. Running the job on ARM from stage 0 means the ARM runner is known to work long before that test depends on it.
 
 ## Not tried yet
 
-Every setup above was tried in a throwaway folder outside the project on 2026-11-14, except:
+Stage 0 built and ran every setup above on 2026-11-14, except **CI**, which needs a push. The browser tests run in all three browsers, and the dependency-cruiser details are settled above.
 
-- **The browser tests.** The config loaded, then stopped because Playwright 1.65.1's browser builds weren't downloaded. Stage 0 downloads them.
-- **CI**, which needs a push.
-- **Two details of dependency-cruiser:** the trial used a JavaScript config, not `.json`, and a module with subfolders (such as `core/components/`) may need the circle rule limited to whole modules. Both are settled when stage 0 sets it up.
+`npm audit` reports a moderate advisory in a `minimatch` that `typescript-eslint` 8.72.2 brings in. It only runs inside ESLint on our own files, and the suggested fix is an older `typescript-eslint`, so nothing was changed.

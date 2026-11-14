@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Next: stage 0, waiting for the owner to say start.** **Then stage 0 of [plan.md](plan.md), project setup.** Its detailed plan was approved on 2026-11-14 and is written into [tooling.md](architecture/tooling.md) and the [plan's stage 0 steps](plan.md#stage-0-in-steps). One question is open, about the polygon library, needed by stage 3. No code exists yet.
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**, which waits for the owner. **Next: stage 1 of [plan.md](plan.md), the model.** One question is open, about the polygon library, needed by stage 3.
 
 ## Where things stand
 
@@ -18,7 +18,8 @@
 | The editor's look: [design/](design/README.md) | Done, approved by the owner on 2026-11-14 |
 | The stage 0 plan | Done, approved by the owner on 2026-11-14, written into [tooling.md](architecture/tooling.md) |
 | Small features without a version | Done: all given a version in round 7 |
-| Code | Not started. Next: stage 0 |
+| Stage 0, project setup | Done, except the first CI run, which needs a push. See below |
+| Code | Next: stage 1, the model |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -57,10 +58,18 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 - **Direction A is picked** (owner): the design system is written in [design/](design/README.md): [tokens](design/tokens.md), [controls](design/controls.md), [the level view's colours](design/level-view.md). Direction B was dropped. Some states are Claude's proposals, marked there.
 - **The stage 0 plan is approved** (owner): all ten changes to the architecture docs, including **Node 26** instead of 24, `jiti`, dependency-cruiser, the guard tests and the worker files in `src/app/workers/`. See [decisions.md](decisions.md).
 
+### Stage 0, built on 2026-11-14
+
+- Steps 1 to 8 of the [plan](plan.md#stage-0-in-steps) are done, one commit each, except steps 1 and 2, which are one commit: `src/app` has no file to type-check until `main.tsx` exists.
+- `npm run check` passes on a clean `npm ci` in about 8 seconds. `npm run test:browser` passes in Chromium, Firefox and WebKit, `npm run test:e2e` passes.
+- What the build showed differs from the plan is written into [tooling.md](architecture/tooling.md): `Math.f16round` (new in Node 26) is allowed in core, the ESLint guards switch off the type-aware rules, the circle between modules is a folder-scope rule in dependency-cruiser, and `tools/package.json` keeps the two doc tools CommonJS.
+- WebKit needed three system packages on the laptop, installed with apt.
+
 ## Next
 
-1. **Stage 0 of [plan.md](plan.md): project setup**, in the [eight steps](plan.md#stage-0-in-steps). Waits for the owner to say start. Step 6 may need the owner's password, step 7 needs a push.
-2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
+1. **Push, when the owner asks,** so CI runs for the first time on x86 and ARM (step 7 of stage 0).
+2. **Stage 1 of [plan.md](plan.md): the model.**
+3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
 

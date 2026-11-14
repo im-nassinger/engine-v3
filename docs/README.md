@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Everything known about the project: a 2D physics game with a level editor, for the browser. No code yet: the requirements, the scope and the architecture are approved, and coding starts at stage 0 of [plan.md](plan.md). **Start with [progress.md](progress.md)** to see where things stand, then [overview.md](overview.md) for the whole game in one page. Every file opens with a TL;DR, and the docs read from high level down to detail.
+Everything known about the project: a 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved, and the code is built stage by stage from [plan.md](plan.md). Stage 0, the project setup, is done. **Start with [progress.md](progress.md)** to see where things stand, then [overview.md](overview.md) for the whole game in one page. Every file opens with a TL;DR, and the docs read from high level down to detail.
 
 ## Files
 
