@@ -80,7 +80,7 @@ Source: scope TR5; round 8: 09 2.2; old: TR-12, TR-22
 ### If checks · v2
 
 - **`other` has a tag:** "If other is tagged player". The tag may be on the touching entity or on any group above it, so tagging the player's group is enough.
-- **A variable compared with a number:** "If coins is 10 or more".
+- **A variable compared with a value:** "If coins is 10 or more". A string or boolean variable is only checked with "is" or "is not", see [variables](variables-and-inputs.md).
 - **A component value compared with a number:** "If this BodyComponent speed is more than 200".
 - All checks must be true. Anything more complex is a script.
 - *Why v2: a coin that only the player can pick up needs the tag check.*
@@ -92,7 +92,7 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27; owner: 2026-11-13
 | Action | What it does |
 |---|---|
 | Change value | Sets, adds to or subtracts from any component value on the target |
-| Spawn | Creates an entity from an `.entity` file, picked by path, at the target |
+| Spawn | Creates an entity from an `.entity` file, picked by path, with the TransformComponent values you type: position, rotation, scale and skew |
 | Destroy | Removes the target and its children |
 | Push | Gives a body a kick: a fixed direction, away from `this` or towards `this`, and a strength. By default it ignores mass, so a jump pad feels the same for everything |
 | Fire custom event | Fires a named event on the target, with an optional number |
@@ -102,6 +102,7 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27; owner: 2026-11-13
 
 - **If it's data, change it with Change value.** One action covers teleporting (the TransformComponent's position), variables (on the World's VariablesComponent), tags, switching triggers on or off, a joint's motor, the camera's zoom and follow target, gravity. *Why: the owner pointed out that teleporting is just changing a component value. What is left on the list does something no value can.*
 - Change value only offers values that are allowed to change during play.
+- **Spawn asks for TransformComponent values and has no target.** *Why: you say exactly where the new entity appears and how it is turned and sized (owner: 2026-11-14).*
 - **A destroyed entity disappears at the end of the tick**, so the actions after Destroy in the list still run.
 - **Wait** is one action in the list. A trigger that fires again during a wait gets its own run, so two enemies in a "wait, then destroy other" trigger both die. Destroying the entity, or switching the trigger off, cancels what is still waiting. *Why a list with Wait: without a list, "add a coin, play a sound, destroy this" needs three triggers with the same When.*
 - **Restart is guarded against abuse**, such as a restart loop that could freeze the player's computer.
@@ -110,7 +111,7 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27; owner: 2026-11-13
 - Actions on a group use the group's own components. Body actions go to the body the entity belongs to.
 - *Why v2: the full set except sound and camera shake.*
 
-Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b, 09 2.9; round 10: WT1; round 11: WT2; round 8: 09 2.4; old: TR-30 to TR-53, TR-78 to TR-84; owner: 2026-11-13
+Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b, 09 2.9; round 10: WT1; round 11: WT2; round 8: 09 2.4; old: TR-30 to TR-53, TR-78 to TR-84; owner: 2026-11-13; owner: 2026-11-14
 
 ### Play sound, Stop sound, Camera shake · v3
 
@@ -193,7 +194,6 @@ Left over from the old draft, or accepted without a version. The last column is 
 | "First one in", "last one out" | Touch events that count entities, such as "when the last heavy thing leaves this" | Later |
 | "On the Nth time" | A Repeat choice that fires on a set count. The review kept three choices | Dropped |
 | Trigger names | Each trigger gets a name made from its When, which can be edited | v2 |
-| Spawn settings | Where the new entity appears. Asked again in round 6 of the architecture review | Needs a decision |
 | Drop through | An action that drops a body through the one-way platform under it. Not in the reviewed action list, so it is script-only for now | Needs a decision |
 | Show every link | A View menu switch that shows the arrows of every entity | v3 |
 | Pause when this fires | A switch on a trigger that pauses test play when it fires | v3 |

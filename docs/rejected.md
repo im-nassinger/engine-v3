@@ -18,10 +18,12 @@ What we decided against, and why. **Check here before proposing something**: an 
 | "Extract assets" on an `.entity` file | Packages: an explicit Export package command | One file type must not behave two ways | round 2: R9; round 6: E4 |
 | Original hero art | Kenney art | Free to use, so no trademark check of our own | round 1: D32, D60; round 7: 08 2.12 |
 | Spawning by name | Spawning by path | Two files can hold entities with the same name. No two files share a path | round 3: D67; round 7: 08 2.11 |
+| Spawning at the action's target, moved by an offset | Spawn asks for TransformComponent values | Plainer, and it sets rotation and scale too | owner: 2026-11-14 |
 | Music and Sound effects groups, base volume on the asset | One kind of audio, settings on each "Play sound" | Simpler, and assets are raw files | round 6: SND1; round 8: FX3 |
 | An ImageComponent, image opacity, "Add hitbox" | A shape with an image fill | Everything known about shapes works on images for free | round 1: D31; round 5: 04 2.8; round 6: ST1 |
 | A separate tool for editing points, and tools for each shape | Double-click with Select, one Shape tool | The owner wanted fewer tools | round 4: TK1; round 5: TK2 |
 | Ctrl+click for the deepest entity | Alt+click for the next entity underneath | One key is enough | round 4: 02 2.2 |
+| An "Entities here" list in the right-click menu | The Layers panel, and Alt+click in v3 | Two ways to reach a hidden entity are enough | owner: 2026-11-14 |
 | "Select same type" and "Select same tag" | Select all and Invert only | Dropped by the owner | round 4: 02 2.5 |
 | A selection box that needs entities fully inside | It selects anything it touches | The owner's change | round 1: D19 |
 | Duplicate with an offset | The copy sits on top of the original | The owner's change | round 3: 01 2.9 |

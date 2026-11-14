@@ -2,20 +2,24 @@
 
 ## TL;DR
 
-Two lists on the World that triggers and scripts share. **Variables** are named numbers or texts during play, such as `coins = 5`. **Inputs** are names such as `jump` with keys mapped to them. **v2:** variables (a number or a text) with a starting value, raw keys, and inputs on the World's InputComponent, five of them in a new level. **v3:** variables kept between runs, gamepads, players remapping inputs, and scripts reading the mouse. Core rules: a variable is the one concept for level values (it replaces "data" and "saved data"), and players can remap inputs but not raw keys.
+Two lists on the World that triggers and scripts share. **Variables** are named values during play, such as `coins = 5`. **Inputs** are names such as `jump` with keys mapped to them. **v2:** variables (a number, a string or a boolean) with a starting value, raw keys, and inputs on the World's InputComponent, five of them in a new level. **v3:** variables kept between runs, gamepads, players remapping inputs, and scripts reading the mouse. Core rules: a variable is the one concept for level values (it replaces "data" and "saved data"), and players can remap inputs but not raw keys.
 
 ## Variables
 
 ### Variables on the World · v2
 
 - The World has a **VariablesComponent** listing each variable: a name and a starting value. Example: `coins = 0`.
-- **A variable holds a number or a text.** Example: `coins = 0`, `player_name = "Ada"`. *Why: the owner wants text in v2 (owner: 2026-11-13).* How text works in Change value and If checks is asked in round 6 of the architecture review.
+- **Each variable has one type, picked when you create it: number, string or boolean.** Example: `coins = 0`, `player_name = "Ada"`, `door_open = false`. *Why: the owner wants text in v2 (owner: 2026-11-13), and named the three types (owner: 2026-11-14).*
+- **What a trigger can do with each type:**
+  - **number:** Change value sets, adds or subtracts. An If compares it, such as "If coins is 10 or more".
+  - **string** and **boolean:** Change value only sets it. An If only checks "is" or "is not", such as "If door_open is true".
+  - *Why: adding 1 to a string or asking whether a boolean is "10 or more" means nothing.*
 - Triggers and scripts read and change variables. A trigger changes one with Change value: set, add or subtract.
 - A trigger can react to a variable with the event "a variable changes", and check one in an If.
 - Restarting the level puts every variable back to its starting value.
 - *Why: variables replace the older "data" and "saved data", which were two concepts for one thing. A score needs one.*
 
-Source: scope VA1; round 2: O2; round 4: T2; round 5: T5; round 9: 09 2.4b; owner: 2026-11-13
+Source: scope VA1; round 2: O2; round 4: T2; round 5: T5; round 9: 09 2.4b; owner: 2026-11-13; owner: 2026-11-14
 
 ### Keep between runs · v3
 

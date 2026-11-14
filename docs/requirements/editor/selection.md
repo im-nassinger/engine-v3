@@ -242,7 +242,6 @@ Accepted in the requirements review but never given a version. The last column i
 | Dimming outside a group | While you are inside a group, the rest of the level dims to about 50%. A View menu switch turns it off | v3 |
 | Pivot marker | The selection shows the point it rotates around. Drag it to rotate around another point. It resets when the selection changes | v3 |
 | Set origin to pivot | Moves an entity's origin for good without moving it on screen. This is how a door gets its hinge point | v3 |
-| "Entities here" list | Right-click lists every entity under the mouse. The review kept only Alt+click for reaching entities underneath, so this may be dropped | Later |
 | Tab to the next entity | Tab and Shift+Tab select the next and previous entity in the same group | v3 |
 | Auto-pan | The view pans by itself when a drag nears the edge of the level view | v3 |
 | Solo | Alt+click an eye shows only that entity and its children until repeated. Never saved, never affects play | v3 |

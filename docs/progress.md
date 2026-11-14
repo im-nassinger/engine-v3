@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. Rounds 2 to 5 of its review are answered. **Waiting for the owner:** three open questions below (round 6, on the review page), and a review of the proposal.
+The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. Rounds 2 to 6 of its review are answered. **Waiting for the owner:** one open question below, and a review of the proposal.
 
 ## Where things stand
 
@@ -44,12 +44,13 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
   - **Merge** is a checkbox on the BodyComponent. **The TagsComponent is v2.** The World's TransformComponent card isn't shown. Partner notes read "Needs a X to Y. [Add X]". Links to outside entities last one opening of the level. Changing the grid size is an undo step. TypeScript is pinned to 6.0.3.
 - **The architecture review, round 3** (owner): **the World's rectangle is centred on the level's origin**, and dragging one edge moves the opposite edge by the same amount, so the centre never moves. A new level's camera starts at the origin. Questions 26 and 27 got comments asking for plainer words, so they are asked again in round 4.
 - **The architecture review, round 5** (owner): every tool returns to Select, a text's corner changes its size, the **Trigger tool** (renamed from Trigger zone) is v2, builtin files are changed through a copy, **variables hold a number or a text** in v2, the camera follows a tag in v2, a new level starts with five inputs, Leave in test play goes back to the editor, the end window extras and the main menu stay Later, Play as player and version history stay rejected.
+- **The architecture review, round 6** (owner, 2026-11-14): the right-click "Entities here" list is dropped. **Spawn asks for TransformComponent values** (position, rotation, scale, skew) instead of using a target and an offset. **A variable's type is number, string or boolean**: only numbers are added to and compared, strings and booleans are set and checked with "is" or "is not".
 - **The architecture review, round 4** (owner): **one Walls checkbox** on the PhysicsWorldComponent makes all four edges walls or all open, off by default (the owner's change to a choice per edge). **The World's rectangle is never solid:** the World can't take a BodyComponent or a SurfaceComponent.
 
 ## Next
 
 1. **The owner reviews the architecture proposal.** Once approved, its files move into the main docs, and `plan.md` becomes the project's plan.
-2. **The owner goes through the open questions** below. Each answer is written into its topic file, and the question is removed from this list.
+2. **The owner answers the open question** below. Each answer is written into its topic file, and the question is removed from this list.
 3. **One pass over the features without a version.** Each topic file ends with a "Not in the scope review" table with Claude's suggested version.
 
 ## How to change a requirement
@@ -64,8 +65,6 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 
 ## Open questions for the owner
 
-Found while rewriting. None was decided by Claude. Round 5 of the review page answered the rest. **These three are on the [review page](proposals/architecture/review.html) as round 6.**
+One question left, from round 6. Not decided by Claude.
 
-8. **The "Entities here" item in the right-click menu:** a list of every entity stacked under the mouse, to pick one hidden behind another. The owner asked for a plainer explanation. Suggested: drop it, the Layers panel and Alt+click (v3) already reach them.
-14. **Where the trigger's Spawn action puts the new entity.** The owner asked what "an offset from the target" means. Each action picks a target (`this`, `other`, an entity by name, or a tag); Spawn puts the new entity on the target's position, and an offset in px moves it from there. Example: a cannon spawns a bullet 40 px to the right of its centre.
-28. **Text variables in triggers** (raised by the owner's round 5 answer that variables hold text in v2): suggested each variable is Number or Text; Add, Subtract and "10 or more" only for numbers, text only set and checked with "is" and "is not".
+29. **Where the Spawn action's position is measured from.** Spawn asks for TransformComponent values. The position can be measured from the level's origin, or from the entity the trigger is on. Example: a cannon that moves spawns a bullet at position 40, 0. Measured from the level, the bullet always appears at the same spot near the origin. Measured from the cannon, it always appears 40 px to the right of the cannon, wherever the cannon is.
