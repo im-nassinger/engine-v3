@@ -37,7 +37,7 @@ The accent colour draws every selection (owner, 2026-11-14: blue, chosen over or
 | One group | The box with handles only |
 | A joint | A 2 px ring around its icon |
 | The camera | A 3 px frame (*proposal*: the requirement says "a heavier frame") |
-| Only hidden entities, from the Layers panel | A dashed box, no handles |
+| Only hidden entities, from the Entities panel | A dashed box, no handles |
 | Over 500 entities | The shared box and a count (as the requirement says) |
 
 ## Drawing

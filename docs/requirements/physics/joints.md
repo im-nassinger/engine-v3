@@ -10,7 +10,7 @@ All lengths are pixels and all angles are degrees. Positive angles and speeds ar
 
 ### A joint is an ordinary entity · v1
 
-- A joint is an entity with a TransformComponent and a JointComponent. It has its own row in the Layers panel, and can be renamed and hidden like any entity.
+- A joint is an entity with a TransformComponent and a JointComponent. It has its own row in the Entities panel, and can be renamed and hidden like any entity.
 - It can hold children, triggers and scripts, like any entity. *Why: one rule for every entity. Treating joints as special was left over from an earlier design.*
 - The JointComponent names its two entities in fields **A** and **B**. Clicking a field selects that entity. An empty B pins A to the background.
 - Joints connect bodies. A sensor or a line can be an end.
@@ -166,7 +166,7 @@ Source: scope JO3; round 6: JB1; round 7: 06 2.5; decisions: D47; old: JT-39, JT
 - **Copying copies a joint only when it is selected.** A copied joint connects the copies of its entities if they were copied too. Otherwise it connects the originals in the same level, or shows them as missing in another level. `.entity` files follow the same rule.
 - *Why: the same rule as everything else. It also makes placing an end easy. The old rule, that a joint's position comes from its two bodies, is only true in play.*
 - Deleting an entity deletes the joints attached to it. Deleting a joint deletes only the joint. Removing physics from an end doesn't delete the joint.
-- Where a joint's row sits in the Layers panel only affects the tree, never what it connects.
+- Where a joint's row sits in the Entities panel only affects the tree, never what it connects.
 
 Source: round 1: D45; round 7: 06 2.9, 06 2.10, 06 2.11; round 8: JM1, JC1; old: JT-55, JT-63 to JT-78
 

@@ -11,7 +11,7 @@ The code has five parts. **core** holds the game's rules, **editor** the editing
 | Part | Folder | What it holds | May import |
 |---|---|---|---|
 | core | `src/core/` | Entities, components, the level, field types, geometry, deterministic maths, the level data format, the simulation, and the contracts core needs (such as `PhysicsWorld`) | core, and the polygon library (pure computation). Its tests may also import `vitest` |
-| editor | `src/editor/` | Undo, selection, tools, what the Inspector and the Layers panel show, editor messages, the clipboard format, shortcuts, saving and test play as use cases, and the contracts they need (such as `LevelStore`, `GameRunner`, `Clock`) | core, editor |
+| editor | `src/editor/` | Undo, selection, tools, what the Inspector and the Entities panel show, editor messages, the clipboard format, shortcuts, saving and test play as use cases, and the contracts they need (such as `LevelStore`, `GameRunner`, `Clock`) | core, editor |
 | adapters | `src/adapters/` | One class per contract, built on a library or a browser API: Box2D, PixiJS, IndexedDB, Web Locks, the keyboard and pointer, timers, workers, zips | core, editor, their library |
 | ui | `src/ui/` | React components and their CSS. They read editor and core state and call editor commands | core, editor, React. **Never adapters** |
 | app | `src/app/` | The composition roots: the editor page, the game worker, the import worker. The only code that knows the concrete classes on both sides | everything |
@@ -52,7 +52,7 @@ src/
     hit-testing/       HitTester, SpatialIndex, LinearSpatialIndex
     snapping/          Snapper, GridSnapper
     view/              ViewState (pan and zoom), ViewSettings
-    layers/            LayersRows (the visible rows), LayersDrop (where a drag lands)
+    entities-panel/    EntitiesRows (the visible rows), EntitiesDrop (where a drag lands)
     inspector/         InspectorModel, CardModel, FieldModel, ValueInput (typed text)
     messages/          EditorMessages, EditorMessageRule, rules/
     clipboard/         ClipboardCodec, PastePlacement, IdRemapping
@@ -74,7 +74,7 @@ src/
     hooks/             useVersion, useSelection, useEntityVersion, useLevelTree
     theme.css          colour and size tokens of the one dark theme
     shell/ top-bar/ status-bar/ toolbar/ main-menu/ tool-options/ level-view-host/
-    layers-panel/ inspector/ play-bar/ dialogs/
+    entities-panel/ inspector/ play-bar/ dialogs/
     fields/            one component per field type: NumberField/, ColourField/, ...
     shared/            Button/, Menu/, Tooltip/, Icon/
 tests/

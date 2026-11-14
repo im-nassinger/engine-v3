@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**`Level` owns the tree:** which entity sits in which parent, in which order. **`Entity` owns its components and its own hidden and locked switches.** Every change raises a change signal, which the derived caches, the renderer and React listen to. Ids are whole numbers from an `EntityIdAllocator` that only counts up, so an id is never reused in a session or a run. Children are kept in Layers panel order, so a pre-order walk of the tree is both the run order and, read backwards, the draw order. Copies, undo of a delete, saving, the clipboard and the play copy all use one data shape, `EntityData`, from [the level data format](../persistence.md).
+**`Level` owns the tree:** which entity sits in which parent, in which order. **`Entity` owns its components and its own hidden and locked switches.** Every change raises a change signal, which the derived caches, the renderer and React listen to. Ids are whole numbers from an `EntityIdAllocator` that only counts up, so an id is never reused in a session or a run. Children are kept in Entities panel order, so a pre-order walk of the tree is both the run order and, read backwards, the draw order. Copies, undo of a delete, saving, the clipboard and the play copy all use one data shape, `EntityData`, from [the level data format](../persistence.md).
 
 ## Ids
 
@@ -30,7 +30,7 @@ export class Entity {
     constructor(id: EntityId, tree: LevelTree, signals: LevelSignals);
 
     get parent(): Entity | undefined;
-    get children(): readonly Entity[];          // Layers panel order, index 0 is the top row
+    get children(): readonly Entity[];          // Entities panel order, index 0 is the top row
     get depth(): number;
     isAncestorOf(entity: Entity): boolean;
 
@@ -79,7 +79,7 @@ export class Level {
     moveEntity(entity: Entity, newParent: Entity, index: number): MoveOutcome;
     removeEntity(entity: Entity): void;                                   // with all its children
 
-    entitiesInLayersOrder(): Iterable<Entity>;  // pre-order, top row first: the run order
+    entitiesInPanelOrder(): Iterable<Entity>;  // pre-order, top row first: the run order
     entitiesInDrawOrder(): Iterable<Entity>;    // back to front
 }
 ```
@@ -93,7 +93,7 @@ export class Level {
 
 - **Children are a plain ordered array per entity**, top row first. Inserting at an index is an array splice. There are no fractional order keys, so nothing ever needs rebalancing.
 - **Run order** (v2: triggers and scripts) is the pre-order walk, top row first. **Draw order** is the same walk read backwards, so the top row ends up in front.
-- The Layers panel's visible rows and the run order are both cached and rebuilt only when the tree version changes, see [performance.md](../performance.md).
+- The Entities panel's visible rows and the run order are both cached and rebuilt only when the tree version changes, see [performance.md](../performance.md).
 
 ### The World and the camera
 
@@ -134,7 +134,7 @@ export type LevelUpdate =
 export class LevelSignals {
     readonly updated: Signal<LevelUpdate>;
     readonly treeVersion: VersionCounter;      // any add, remove or move
-    readonly entityVersions: EntityVersions;   // one counter per entity, for one Layers row or card
+    readonly entityVersions: EntityVersions;   // one counter per entity, for one Entities panel row or card
     readonly levelVersion: VersionCounter;     // anything at all: used by autosave
 }
 ```

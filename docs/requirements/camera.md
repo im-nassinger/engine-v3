@@ -10,7 +10,7 @@ What the player sees. There is exactly one camera, an entity with a CameraCompon
 
 - A level has exactly one camera: an entity with a TransformComponent and a CameraComponent. New levels start with it.
 - It can't be deleted or duplicated, and a second one can't be added. It always sits directly inside the World.
-- In the Layers panel it is an ordinary row. Where it sits changes nothing, because what is inside the camera is always drawn over the level.
+- In the Entities panel it is an ordinary row. Where it sits changes nothing, because what is inside the camera is always drawn over the level.
 - The editor's own view is separate. Panning or zooming the editor never changes the camera.
 - The camera's position is the centre of what it shows. The default camera is **1920×1080**.
 - A new level's camera starts at the level's origin, which is the middle of the level bounds. *Why: the World's rectangle is centred on the origin (owner: 2026-11-13).*
@@ -62,7 +62,7 @@ Source: scope CM1; round 1: D52; round 7: 07 2.4, 07 2.5; round 9: 11 2.5; old: 
 
 ### Follow a tag · v2
 
-- **The follow target can be a tag instead of an entity.** The camera follows the entity with that tag that is highest in the Layers panel.
+- **The follow target can be a tag instead of an entity.** The camera follows the entity with that tag that is highest in the Entities panel.
 - Example: the target is the tag `player`. When the level spawns `player.entity`, the camera finds it at once, with no script.
 - Levels saved with an entity as the target keep working.
 - *Why v2: a spawned player doesn't exist in the editor, so it can't be picked as an entity. Spawning is v2 (owner: 2026-11-13).*
@@ -109,7 +109,7 @@ Source: scope CM9; round 7: 07 2.6; round 9: 09 2.4b; old: CM-50 to CM-57
 - What is inside the camera is drawn above the level, and below the end window and pause menu.
 - Moving an entity into or out of the camera keeps it where it appears, like any move between groups.
 - Until Flex in v3 you place these entities by hand. With Fixed size their positions are the same on every screen.
-- In the level view, single clicks pass through the entities inside the camera, so they never block the level. Double-click the camera's frame, or select them in the Layers panel, to reach them.
+- In the level view, single clicks pass through the entities inside the camera, so they never block the level. Double-click the camera's frame, or select them in the Entities panel, to reach them.
 - Something that moves with the view and touches the level, such as a wall that chases the player, can't be inside the camera. Make it a Kinematic body that the camera follows.
 - *Why v2: its reason is a score or a timer, which need variables.*
 

@@ -32,7 +32,7 @@ export class CurrentGroup {
 
 - Both listen to the level: a removed entity leaves the selection, and a removed current group falls back to its nearest existing parent.
 - Neither is ever saved or undone, as the requirements say. Undo restores them from the history step.
-- **"Selected" in the Inspector:** an empty selection shows the World, see [inspector-and-layers.md](inspector-and-layers.md).
+- **"Selected" in the Inspector:** an empty selection shows the World, see [inspector-and-entities.md](inspector-and-entities.md).
 
 ## Hit testing
 

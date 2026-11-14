@@ -45,7 +45,7 @@ A field is a row of `--row` height: the label in `--muted` in a 128 px column, t
 - **Card:** a fold arrow, the component's name in weight 600, and a `…` menu button with Remove and Reset to defaults. A 1 px line closes each card. **Add Component** sits under the last card, as a button with a `--line` edge across the panel.
 - **Editor message on a card** (*proposal*): a `--field` box inside the card, the icon (warning in `--warning`, tip in `--tip`), the sentence in `--text`, and the fix button as a link in `--accent`, such as "Needs a SurfaceComponent to collide. Add SurfaceComponent".
 
-## Layers rows
+## Entities panel rows
 
 | State | Looks like |
 |---|---|

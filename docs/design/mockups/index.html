@@ -60,7 +60,7 @@
   .tip-box .k { color: #8a93a3; }
 
   .panel { position: absolute; top: 44px; bottom: 24px; background: var(--panel); z-index: 2; display: flex; flex-direction: column; }
-  .layers { right: 0; width: 260px; border-left: 1px solid var(--line); }
+  .entities { right: 0; width: 260px; border-left: 1px solid var(--line); }
   .insp { left: 44px; width: 300px; border-right: 1px solid var(--line); overflow: hidden; }
   .ph { height: 36px; display: flex; align-items: center; padding: 0 12px; font-weight: 600; border-bottom: 1px solid var(--line); flex-shrink: 0; }
 
@@ -291,7 +291,7 @@ function scene(w, h, z, cx, cy, opts) {
   return s + '</svg>';
 }
 
-// Layers rows: [depth, icon, name, folded state, row state]. The top row is drawn in front.
+// Entities panel rows: [depth, icon, name, folded state, row state]. The top row is drawn in front.
 const ROWS_NEW = [[0, 'world', 'World', 'open'], [1, 'camera', 'Camera']];
 const ROWS_LEVEL = [
   [0, 'world', 'World', 'open'], [1, 'camera', 'Camera'], [1, 'rect', 'Rectangle 1'], [1, 'ellipse', 'Ball'],
@@ -300,8 +300,8 @@ const ROWS_LEVEL = [
   [2, 'ellipse', 'Wheel 1'], [2, 'polygon', 'Cabin'], [2, 'rect', 'Body'],
   [1, 'polygon', 'Ramp'], [1, 'rect', 'Ground']
 ];
-function layers(rows, selected, hover) {
-  let s = `<div class="panel layers"><div class="ph">Layers</div><div>`;
+function entities(rows, selected, hover) {
+  let s = `<div class="panel entities"><div class="ph">Entities</div><div>`;
   for (const [d, icon, name, fold] of rows) {
     const state = name === selected ? ' sel' : name === hover ? ' hover' : '';
     const arrow = fold ? ic(fold === 'open' ? 'down' : 'right', 'style="width:14px;height:14px;color:var(--muted)"') : '<span style="width:16px"></span>';
@@ -373,7 +373,7 @@ const VIEW_W = 1440, VIEW_H = 832, Z = 0.4, CX = 762, CY = 416;
 function editor(o) {
   return topbar(o.top) +
     `<div class="view">${scene(VIEW_W, VIEW_H, o.zoom || Z, CX, CY, o.scene)}</div>` +
-    toolstrip(o.tool || 'select', o.tooltip) + layers(o.rows, o.selectedRow, o.hoverRow) +
+    toolstrip(o.tool || 'select', o.tooltip) + entities(o.rows, o.selectedRow, o.hoverRow) +
     (o.inspector === 'rect' ? inspectorRect() : inspectorWorld()) +
     statusbar(o.hint, o.pos, o.sel, o.warnings || 0) + (o.extra || '');
 }
@@ -407,10 +407,10 @@ const DIALOG = `<div class="scrim"></div><div class="dialog">
 
 const LEVEL_SCENE = { grid: true, cameraFrame: true, joints: true };
 const MOMENTS = [
-  ['1', 'A new level', 'The empty editor right after New: the World and the camera in the Layers panel, the World\'s cards in the Inspector (nothing is selected). The mouse rests on the Shape tool, showing its tooltip.',
+  ['1', 'A new level', 'The empty editor right after New: the World and the camera in the Entities panel, the World\'s cards in the Inspector (nothing is selected). The mouse rests on the Shape tool, showing its tooltip.',
     (d) => editor({ rows: ROWS_NEW, scene: { grid: true, cameraFrame: true, empty: true }, tooltip: 'shape',
       hint: 'Select · click to select, drag to move', pos: 'x 412, y −96', sel: 'Nothing selected' })],
-  ['2', 'A selected shape', 'A new shape in the default look, selected: its row in the Layers panel, its cards in the Inspector with the Height field focused, the outline and handles in the level view.',
+  ['2', 'A selected shape', 'A new shape in the default look, selected: its row in the Entities panel, its cards in the Inspector with the Height field focused, the outline and handles in the level view.',
     (d) => editor({ rows: ROWS_LEVEL, selectedRow: 'Rectangle 1', hoverRow: 'Crate 2', inspector: 'rect',
       scene: Object.assign({ selected: 'rect1' }, LEVEL_SCENE), top: { name: 'Car test', canUndo: true },
       hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Rectangle 1', warnings: 1 })],
@@ -457,7 +457,7 @@ function statesSheet() {
       line(`<span class="play">${ic('play')}Play</span>`, 'Play, the one primary button of the top bar'))}
     ${box('Tools', line(`<span class="tool">${ic('select')}</span><span class="tool hover">${ic('select')}</span><span class="tool on">${ic('shape')}</span><span class="tool on locked">${ic('joint')}</span>`, 'Normal, hover, active, active with tool lock (the dot)') +
       line(`<span class="tip-box static">Shape<span class="k">4</span></span><span class="tip-box static">Nothing to paste</span>`, 'Tooltips: a name and its key; a disabled button\'s reason'))}
-    ${box('Layers rows', row('Crate 1', 'rect') + row('Crate 2', 'rect', 'hover') + row('Rectangle 1', 'rect', 'sel') +
+    ${box('Entities panel rows', row('Crate 1', 'rect') + row('Crate 2', 'rect', 'hover') + row('Rectangle 1', 'rect', 'sel') +
       `<div class="dropline"></div>` + row('Ball', 'ellipse', '', 'off') + row('Wheel 1', 'ellipse', '', 'dim', 2) +
       `<div class="cap" style="padding-top:4px">Normal, hover, selected, drop line, hidden, hidden by its parent (dimmed eye)</div>`)}
     ${box('Editor messages', `<div class="note">${ic('warning', 'style="color:var(--warning);margin-top:1px"')}<span>Needs a SurfaceComponent to collide. <span class="fix">Add SurfaceComponent</span></span></div>

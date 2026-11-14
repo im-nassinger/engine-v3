@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Everything about the editor that isn't specific to one kind of entity: the workspace, the tools, the Inspector, selection, groups, the Layers panel and undo. **In v1** you get fixed panels over a full-window level view, three of the seven tools (Select, Shape, Joint), pan and zoom, a grid, the Inspector with cards and partner notes, copy and paste, undo, click and box selection, handles, grouping, the Layers panel and the eye icon. **In v2** come the other four tools and the searchable shortcut list. **In v3** come panel resizing, snapping to entities, copying values, tips and more warnings, multi-entity resize and rotate, the path bar, hover outlines, Layers search and the lock icon.
+Everything about the editor that isn't specific to one kind of entity: the workspace, the tools, the Inspector, selection, groups, the Entities panel and undo. **In v1** you get fixed panels over a full-window level view, three of the seven tools (Select, Shape, Joint), pan and zoom, a grid, the Inspector with cards and partner notes, copy and paste, undo, click and box selection, handles, grouping, the Entities panel and the eye icon. **In v2** come the other four tools and the searchable shortcut list. **In v3** come panel resizing, snapping to entities, copying values, tips and more warnings, multi-entity resize and rotate, the path bar, hover outlines, Entities panel search and the lock icon.
 
 ## Files
 
@@ -11,7 +11,7 @@ Everything about the editor that isn't specific to one kind of entity: the works
 | [workspace.md](workspace.md) | Layout, top bar, status bar, tools, Esc, pan and zoom, grid, snapping, browser concerns |
 | [shortcuts.md](shortcuts.md) | The keyboard and mouse shortcuts, and the keys the editor never uses |
 | [inspector-and-undo.md](inspector-and-undo.md) | Inspector cards, field types, adding components, editor messages, copy and paste, undo |
-| [selection.md](selection.md) | Selecting, handles, groups, the Layers panel, hide and lock, the World and the camera |
+| [selection.md](selection.md) | Selecting, handles, groups, the Entities panel, hide and lock, the World and the camera |
 
 ## Features and versions
 
@@ -31,7 +31,7 @@ Everything about the editor that isn't specific to one kind of entity: the works
 | Click, drag-box, Shift+click, Select all | v1 | selection |
 | Handles and arrow keys | v1 | selection |
 | Group, ungroup, go in, go out | v1 | selection |
-| The Layers panel | v1 | selection |
+| The Entities panel | v1 | selection |
 | Hide | v1 | selection |
 | Resize and collapse the panels | v3 | workspace |
 | Snapping to other entities, pink guides | v3 | workspace |
@@ -43,7 +43,7 @@ Everything about the editor that isn't specific to one kind of entity: the works
 | The path bar | v3 | selection |
 | Next entity underneath (Alt+click) | v3 | selection |
 | Hover outlines | v3 | selection |
-| Layers search | v3 | selection |
+| Entities panel search | v3 | selection |
 | Lock | v3 | selection |
 | Invert selection | v3 | selection |
 

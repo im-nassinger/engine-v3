@@ -1,14 +1,14 @@
-# Editor: selection, groups and the Layers panel
+# Editor: selection, groups and the Entities panel
 
 ## TL;DR
 
-How entities are picked, moved and arranged in the tree. **v1:** click and drag-box selection, handles to move, resize and rotate one entity, arrow-key moves, grouping with Ctrl+G, going into groups by double-click, the Layers panel as the real tree, and the eye icon. **v3:** resizing and rotating several entities together, the path bar, Alt+click for the entity underneath, hover outlines, Layers search, the lock icon, and invert selection. Core rules: one selection everywhere, one row is one entity, and moving an entity between groups never moves it on screen.
+How entities are picked, moved and arranged in the tree. **v1:** click and drag-box selection, handles to move, resize and rotate one entity, arrow-key moves, grouping with Ctrl+G, going into groups by double-click, the Entities panel as the real tree, and the eye icon. **v3:** resizing and rotating several entities together, the path bar, Alt+click for the entity underneath, hover outlines, Entities panel search, the lock icon, and invert selection. Core rules: one selection everywhere, one row is one entity, and moving an entity between groups never moves it on screen.
 
 ## Selecting
 
 ### Click, drag-box, Shift+click, Select all · v1
 
-- There is **one selection**, shown in the level view, the Layers panel and the Inspector.
+- There is **one selection**, shown in the level view, the Entities panel and the Inspector.
 - A click selects the entity under the mouse. If it is inside a group, the click selects the whole group, as seen from the group you are inside.
 - Shift+click adds an entity to the selection or removes it.
 - Dragging on empty space draws a selection box. **It selects every entity it touches.** Shift adds to the selection. Ctrl selects entities inside groups instead of their groups. *Why touch: the owner's change from "fully inside".*
@@ -63,7 +63,7 @@ Source: scope SE6; round 4: 02 2.2; round 5: 02 2.2
 ### Hover outlines · v3
 
 - Hovering outlines what a click would select: the whole group, not the child under the mouse.
-- Hovering a Layers row outlines that entity in the level view, and hovering in the level view tints its row.
+- Hovering an Entities panel row outlines that entity in the level view, and hovering in the level view tints its row.
 - Hidden entities show no outline. Hover is off during a drag.
 
 Source: scope SE7; round 4: 02 2.6
@@ -77,8 +77,8 @@ Source: scope SE7; round 4: 02 2.6
 | Several entities | A thin outline each, and one shared box |
 | A joint | A ring around its icon |
 | The camera | A heavier frame |
-| A locked entity, selected from the Layers panel | A plain outline with a padlock, no handles |
-| Only hidden entities, selected from the Layers panel | A dashed box where they are, no handles |
+| A locked entity, selected from the Entities panel | A plain outline with a padlock, no handles |
+| Only hidden entities, selected from the Entities panel | A dashed box where they are, no handles |
 
 - Outlines and handles stay the same size on screen at any zoom.
 - Selecting anything with physics outlines its whole body in the level view.
@@ -132,9 +132,9 @@ Source: scope SE3; round 5: 02 2.8; round 6: MS1; old: SG-57 to SG-61
 - **Double-click a group to go into it. Esc goes up one group.** Inside a group, clicks select its direct children. This is how Inkscape does it.
 - After going in, the child under the mouse is selected, so another double-click goes one deeper. Enter on a selected group goes in too.
 - A single click outside the group you are inside clears the selection and stays inside. A double-click outside leaves.
-- Selecting an entity in the Layers panel works at any depth.
+- Selecting an entity in the Entities panel works at any depth.
 - Going in or out is never an undo step.
-- Dragging in the level view never changes an entity's parent. Parents change only in the Layers panel or by grouping.
+- Dragging in the level view never changes an entity's parent. Parents change only in the Entities panel or by grouping.
 
 | Double-click on | Result |
 |---|---|
@@ -162,11 +162,11 @@ Source: scope SE5; round 2: O7; old: SG-85
 
 Source: round 6: RP1; old: SG-135 to SG-137
 
-## The Layers panel
+## The Entities panel
 
 ### The tree of entities · v1
 
-- The Layers panel shows the real tree of entities. There is no separate layer system.
+- The Entities panel shows the real tree of entities. There is no separate layer system.
 - **One row is one entity.** A row has an arrow to fold it, an icon for its kind, its name and an eye, and from v3 a lock. Nothing else. *Why the lock waits: Lock is v3 (owner: 2026-11-14).* *Why: joints are their own rows, so showing them inside another row breaks the picture.*
 - **The top row is drawn in front.** The World is the top row, because it is the root. A new entity appears at the top of the group you are inside.
 - The camera is an ordinary row that can be moved up and down. Where it sits changes nothing, because what is inside the camera is always drawn over the level.
@@ -200,7 +200,7 @@ Source: scope SE10; round 1: C5; round 2: R7; round 5: 02 2.13; decisions: D7; o
 ### Lock · v3
 
 - The lock icon stops an entity from being grabbed in the level view. Example: lock a big background so that dragging over it draws a selection box.
-- A locked entity can still be selected from its row in the Layers panel and edited in the Inspector.
+- A locked entity can still be selected from its row in the Entities panel and edited in the Inspector.
 - Locking applies to children, the same way as hiding. A locked entity still moves with its unlocked parent, and can still be snapped to.
 - Lock can be undone. It is saved in the project file only, because it is editor-only.
 
@@ -215,7 +215,7 @@ Source: scope SE11; round 1: C5; round 3: R17; round 5: 02 2.13, FMT1; decisions
 | Select | From its row, alone. Clicking empty space shows it in the Inspector | From its row, or by the edge of its frame |
 | Move | No | Yes |
 | Rename, hide | No | Yes. Hiding it hides everything inside the camera |
-| Reorder in the Layers panel | No, it is the root | Yes, but always directly inside the World |
+| Reorder in the Entities panel | No, it is the root | Yes, but always directly inside the World |
 | Delete, duplicate, copy, group | No | No |
 | Hold children | Yes | Yes |
 
@@ -228,7 +228,7 @@ Source: round 1: C3, C4; round 5: 02 2.15; round 7: 07 2.1; round 8: HUD1; old: 
 
 ### Large levels stay responsive · v1
 
-- Selecting shows within 0.05 s. Moving 1,000 selected entities stays smooth. The Layers panel opens in under 0.2 s and scrolls smoothly at any size.
+- Selecting shows within 0.05 s. Moving 1,000 selected entities stays smooth. The Entities panel opens in under 0.2 s and scrolls smoothly at any size.
 - These are targets for a level of 10,000 entities on a mid-range laptop.
 
 Source: round 5: 02 2.17; old: SG-140 to SG-145
@@ -246,7 +246,7 @@ Small features from the old draft and review that the scope review never asked a
 | Auto-pan | The view pans by itself when a drag nears the edge of the level view | v3 |
 | Solo | Alt+click an eye shows only that entity and its children until repeated. Never saved, never affects play | v3 |
 | Drag across eyes | Dragging across eye or lock icons sets every row touched to the same state | v3 |
-| Keyboard in the Layers panel | Arrows move, Right unfolds, Left folds, typing a letter jumps to a name | v3 |
-| Layers footer | Counts of selected, hidden and locked entities | v3 |
+| Keyboard in the Entities panel | Arrows move, Right unfolds, Left folds, typing a letter jumps to a name | v3 |
+| Entities panel footer | Counts of selected, hidden and locked entities | v3 |
 
 Source: old: SG-16 to SG-19, SG-32, SG-49 to SG-51, SG-82, SG-97, SG-111, SG-112, SG-118b, SG-120; owner: 2026-11-14

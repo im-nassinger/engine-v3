@@ -12,7 +12,7 @@ How values are edited and how mistakes are reversed. **v1:** the Inspector shows
 - **Clicking empty space shows the World's components.** There is no settings window. *Why: the World is an entity like any other, so its settings are its components.*
 - The World's TransformComponent is fixed at zero and its card isn't shown, because the World never moves (owner: 2026-11-13).
 - The header shows the entity's name (editable), and its hide switch, and from v3 its lock switch. With several selected it reads `3 entities`.
-- The Inspector doesn't show the parent. The Layers panel tree does.
+- The Inspector doesn't show the parent. The Entities panel tree does.
 - Cards appear in one fixed order, the same on every entity: TransformComponent, shape, path, text, style, body, surface, joint, camera, tags, scripts, triggers. Users can't reorder them.
 - Clicking a card's title folds it. The folded state is remembered per component type, in the browser.
 - TransformComponent fields are measured from the parent, and the tooltip says so. The level position of the selection is in the status bar.
@@ -37,7 +37,7 @@ Source: round 3: S2; round 4: FT1
 - Units show as a faded suffix and may be typed: `px`, `°`, `%`, `px/s`, `s`. Rotation is in degrees, lengths and speeds in pixels.
 - Both `1.5` and `1,5` are decimals. *Why: the owner's locale and many others use a comma.*
 - A number with both a minimum and a maximum also shows a slider.
-- An **entity** field is filled by dragging a row from the Layers panel, from a dropdown, or with a picker that lets you click an entity in the level view. A deleted target shows a `missing entity` warning.
+- An **entity** field is filled by dragging a row from the Entities panel, from a dropdown, or with a picker that lets you click an entity in the level view. A deleted target shows a `missing entity` warning.
 
 | Typed | Result |
 |---|---|
@@ -144,7 +144,7 @@ Source: round 7: 06 2.11; old: WS-80, WS-81
 | A move, resize or rotate drag | Going into or out of a group |
 | A committed Inspector value | The view, zoom, grid display |
 | Adding or removing a component | The active tool, tool lock |
-| Group, ungroup, reorder, move between groups, rename, hide, lock | Panel sizes, folded cards, tabs, folded Layers rows |
+| Group, ungroup, reorder, move between groups, rename, hide, lock | Panel sizes, folded cards, tabs, folded Entities panel rows |
 | World settings, level rename, the grid size | Snapping switches |
 | Importing, renaming or deleting a file. Several files at once is one step | Test play, Console contents |
 | A committed script edit | Keystrokes in the code editor before commit |
@@ -171,7 +171,7 @@ Small features from the old draft and review that the scope review never asked a
 | Scrubbing | Dragging a number field's label changes it live: 1 per pixel, Shift 10, Alt 0.1. One undo step. Up and Down in a focused field do the same | v3 |
 | Reset to default | Right-click a field: Reset to default | v3 |
 | Align and distribute | Buttons at the top of the Inspector and in the Arrange menu: align left, centre, right, top, middle, bottom, and spread evenly. A group counts as one entity. One-off moves, unlike Flex | v3 |
-| Draw order commands | Bring forward, send backward, to front, to back, within the same group. Dragging rows in the Layers panel already does this | v3 |
+| Draw order commands | Bring forward, send backward, to front, to back, within the same group. Dragging rows in the Entities panel already does this | v3 |
 | Paste in place | Ctrl+Shift+V pastes at the original level position. `Paste here` in the context menu uses the right-click position | v3 |
 | Repeat duplicate | Move a duplicate, press Ctrl+D again, and the next copy repeats the same move | v3 |
 | Alt+drag copy | Alt+drag an entity drags out a copy, as one undo step | v3 |

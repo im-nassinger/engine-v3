@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-`src/editor` holds every editing rule, with no browser code: undo, selection, the current group, tools, what the Inspector and the Layers panel show, editor messages, the clipboard format, shortcuts and menu commands, plus saving and test play as use cases (described in [persistence.md](../persistence.md) and [simulation.md](../simulation.md)). The root object is **`EditorSession`**. It holds the **`OpenLevel`**: the level open in the editor together with everything that belongs to it (its caches, selection, current group, history and editor messages), which New and Import replace as one piece. Every change to the level goes through an **edit transaction** and becomes one **history step**.
+`src/editor` holds every editing rule, with no browser code: undo, selection, the current group, tools, what the Inspector and the Entities panel show, editor messages, the clipboard format, shortcuts and menu commands, plus saving and test play as use cases (described in [persistence.md](../persistence.md) and [simulation.md](../simulation.md)). The root object is **`EditorSession`**. It holds the **`OpenLevel`**: the level open in the editor together with everything that belongs to it (its caches, selection, current group, history and editor messages), which New and Import replace as one piece. Every change to the level goes through an **edit transaction** and becomes one **history step**.
 
 ## Files
 
@@ -10,7 +10,7 @@
 |---|---|
 | [history.md](history.md) | Changes, edit transactions, history steps, joining, drags, what is and isn't a step |
 | [selection-and-tools.md](selection-and-tools.md) | The selection, the current group, hit testing, the tool contract, the Select, Shape and Joint tools, snapping, Esc |
-| [inspector-and-layers.md](inspector-and-layers.md) | What the Inspector shows and how a typed value becomes a change, editor messages, the Layers panel's rows and drops |
+| [inspector-and-entities.md](inspector-and-entities.md) | What the Inspector shows and how a typed value becomes a change, editor messages, the Entities panel's rows and drops |
 | [clipboard-and-shortcuts.md](clipboard-and-shortcuts.md) | Copy, cut, paste and duplicate, commands and the main menu, shortcuts and keys |
 
 ## The objects

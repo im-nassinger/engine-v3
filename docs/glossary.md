@@ -27,8 +27,8 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Word | Meaning |
 |---|---|
 | Level view | Where you see and edit the level. It fills the whole window, with the panels on top. Older docs say "viewport". |
-| Panel | A fixed area on top of the level view: Layers, Inspector, Assets, Console. |
-| Layers panel | The panel listing every entity as a tree: groups with their children inside. One row is one entity. The top row is drawn in front. |
+| Panel | A fixed area on top of the level view: Entities, Inspector, Assets, Console. |
+| Entities panel | The panel listing every entity as a tree: groups with their children inside. One row is one entity. The top row is drawn in front. |
 | Inspector | The panel on the left showing the components of what is selected, so you can edit their values. |
 | Card | One component as the Inspector shows it: a title and its fields. |
 | Field | One editable value on a card. Fields come from one fixed list of field types. |
@@ -39,8 +39,8 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Status bar | The bar along the bottom with the tool's hint, the mouse position, the selection and the count of editor messages. |
 | View menu | The top bar menu that switches what the editor draws over the level: Grid, Joint icons, Camera frame, Physics view. |
 | Tool | What the mouse does in the level view: Select, Pencil, Bézier pen, Shape, Text, Joint, Trigger. |
-| Selection | The entities currently selected. There is one selection, shown in the level view, the Layers panel and the Inspector. |
-| Draw order | Which entity is painted on top when entities overlap. It is the Layers panel order. |
+| Selection | The entities currently selected. There is one selection, shown in the level view, the Entities panel and the Inspector. |
+| Draw order | Which entity is painted on top when entities overlap. It is the Entities panel order. |
 | Hidden | An entity whose eye icon is off. It is not drawn, in the editor or in play. It still collides and runs its triggers and scripts. |
 | Locked | An entity whose lock icon is on. You can't click or drag it in the level view. Editor-only. |
 | Snapping | When an entity you move jumps into line with the grid or with other entities. |
@@ -136,7 +136,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Tick | One step of the game. The game runs 60 ticks per second. |
 | Seed | The number all random values in a run come from. The same seed gives the same random values. |
 | Play bar | The small bar shown during test play, with Stop, Pause, Step and Panels. |
-| Panels button | The Play bar button that brings the Inspector, Layers and Console back during play, read-only. |
+| Panels button | The Play bar button that brings the Inspector, Entities panel and Console back during play, read-only. |
 | Pause menu | The menu Tab opens during play: Resume, Restart (R), and later Controls, Settings and Quit. |
 | End window | The window shown when a run is won or lost: a title, the time, Restart and Leave. |
 | Fixed size | A camera mode: players see exactly the camera's box, with black bars if their window is a different shape. |
@@ -240,3 +240,4 @@ Don't use these. Each was replaced in the requirements review.
 | Hitbox | Surface on a shape | Physics is added like on any shape |
 | Trigger zone (the tool) | Trigger tool | Shorter (owner: 2026-11-13) |
 | Transform | TransformComponent | Component names end in `Component`, with no exception (owner: 2026-11-13) |
+| Layers panel | Entities panel | Renamed (owner: 2026-11-14) |

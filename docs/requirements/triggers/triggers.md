@@ -146,7 +146,7 @@ Source: scope TR2, TR7; round 3: M1; round 9: MSG2; round 10: EV1; owner: 2026-1
 
 ### Order and limits · v2
 
-- **Triggers and scripts run in Layers panel order:** the top row first, and top to bottom inside an entity's card. Drag a row or a trigger to change it. Spawned entities run where they sit in the tree.
+- **Triggers and scripts run in Entities panel order:** the top row first, and top to bottom inside an entity's card. Drag a row or a trigger to change it. Spawned entities run where they sit in the tree.
 - *Why: the order you see is the order things happen, and it needs nothing new. Godot works this way. The trade-off: moving a row for drawing also changes when it runs. A priority number can be added later without breaking levels.*
 - Which triggers fire for an event is decided once, before any of that event's actions run.
 - When several entities touch at once, each is its own firing.

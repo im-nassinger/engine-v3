@@ -53,8 +53,8 @@ Source: round 9: 10 2.3; round 10: EV1; owner: 2026-11-13
 | Function | Does | Status |
 |---|---|---|
 | `this` | Not a function: the id of the entity this script is on | Owner |
-| `get_entity_by_name(name)` | The first entity with this name in Layers panel order, or `nil` | Review |
-| `get_entities_by_tag(tag)` | A list of ids, in Layers panel order | Owner |
+| `get_entity_by_name(name)` | The first entity with this name in Entities panel order, or `nil` | Review |
+| `get_entities_by_tag(tag)` | A list of ids, in Entities panel order | Owner |
 | `get_world()`, `get_camera()` | The World's id, the camera's id | Owner |
 | `get_parent(id)`, `get_children(id)` | The parent's id, a list of the children's ids | Owner |
 | `exists(id)` | False once the entity is destroyed | Owner |

@@ -22,8 +22,8 @@ export function useVersion(source: Versioned): number {
 ```
 
 ```tsx
-// ui/layers-panel/LayersRow/LayersRow.tsx
-export function LayersRow({ entityId }: LayersRowProps) {
+// ui/entities-panel/EntitiesRow/EntitiesRow.tsx
+export function EntitiesRow({ entityId }: EntitiesRowProps) {
     const session = useEditorSession();
     const { level } = session.openLevel;
     useVersion(level.signals.entityVersions.of(entityId));
@@ -31,11 +31,11 @@ export function LayersRow({ entityId }: LayersRowProps) {
     const entity = level.requireEntity(entityId);
     const name = entityName(entity);
 
-    return <div className="layers-row">{name}</div>;
+    return <div className="entities-row">{name}</div>;
 }
 ```
 
-- **A component subscribes to the smallest thing it shows:** a Layers row to its entity's version, the Inspector to `InspectorModel.version`, the top bar's Undo button to `History.version`. Dragging one crate wakes its row and its card, not the panel.
+- **A component subscribes to the smallest thing it shows:** an Entities panel row to its entity's version, the Inspector to `InspectorModel.version`, the top bar's Undo button to `History.version`. Dragging one crate wakes its row and its card, not the panel.
 - **The version is the snapshot.** The component then reads current values straight from the class. React never stores a copy that could fall behind.
 - **Changes go the other way through commands:** a button calls `session.commands.find(id).run()`, a field calls its `FieldModel`'s commit. Components never change a core class directly.
 - Pure display state (a menu being open, a hovered button, a field's uncommitted text) stays in React state, because nothing outside the component needs it.
@@ -63,7 +63,7 @@ export function useEditorSession() {
 ```
 ┌ TopBar ────────────────────────────────────────────────────┐
 ├──┬──────────────┬──────────────────────────┬──────────────┤
-│T │ Inspector    │                          │ LayersPanel  │
+│T │ Inspector    │                          │ EntitiesPanel  │
 │o │              │   LevelViewHost          │              │
 │o │              │   (PixiJS canvas, fills  │              │
 │l │              │    the whole window,     │              │
@@ -115,7 +115,7 @@ export function LevelViewHost() {
 | `TopBar` | `History`, `SaveState`, `ViewSettings`, `PlaySession`, the level's name | The main menu is built from `CommandRegistry.menu()` |
 | `Toolbar` | `ToolController` | Three buttons in v1 |
 | `ToolOptions` | The active tool | The options strip over the level view's top left |
-| `LayersPanel` | `LayersRows` | Virtual list, below |
+| `EntitiesPanel` | `EntitiesRows` | Virtual list, below |
 | `Inspector` | `InspectorModel` | One `Card` per card model, one field component per field type |
 | `StatusBar` | `ToolController`, the mouse position, `Selection`, `EditorMessages`, `StatusText` | |
 | `PlayBar` | `PlaySession` | Stop, Pause, Step |
@@ -123,12 +123,12 @@ export function LevelViewHost() {
 
 **Fields:** `ui/fields/` has one component per field type (`NumberField`, `TextField`, `CheckboxField`, `ChoiceField`, `ColourField`, `VectorField`, `AngleField`, `EntityField`). `Card` picks the component from `FieldModel.definition.type.kind` through a lookup table, so a new field type adds one entry and one component. `NumberField` uses `ValueInput` from the editor for parsing and formatting.
 
-**The Layers panel** uses `@tanstack/react-virtual` with a fixed row height, the row design token (28 px, see [design](../design/README.md)), so only the rows on screen exist. Drag and drop is the panel's own pointer handling: it asks `LayersDrop` for the target on each move and draws the line it returns. The tech notes warn that virtual lists and drag and drop break together, so the plan builds both at once and tests them at 10,000 rows.
+**The Entities panel** uses `@tanstack/react-virtual` with a fixed row height, the row design token (28 px, see [design](../design/README.md)), so only the rows on screen exist. Drag and drop is the panel's own pointer handling: it asks `EntitiesDrop` for the target on each move and draws the line it returns. The tech notes warn that virtual lists and drag and drop break together, so the plan builds both at once and tests them at 10,000 rows.
 
 ## Styles
 
 - **One dark theme.** Colours, sizes and spacing are CSS custom properties in `ui/theme.css`, the only global CSS file.
-- Every component's CSS has one top-level selector, its root class in kebab-case (`.layers-row`), with everything else nested inside.
+- Every component's CSS has one top-level selector, its root class in kebab-case (`.entities-row`), with everything else nested inside.
 - No component styles another component's inside. A child that should look different gets a prop.
 
 ## Speed

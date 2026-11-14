@@ -1,8 +1,8 @@
-# The Inspector, editor messages and the Layers panel
+# The Inspector, editor messages and the Entities panel
 
 ## TL;DR
 
-The Inspector and the Layers panel are drawn by React but **decided in `src/editor`**: `InspectorModel` works out which cards and fields to show, with their values or `Mixed`, and turns a typed value into one change; `LayersRows` works out the visible rows; `LayersDrop` decides where a dragged row lands. **Editor messages** come from small rule classes, one per kind of problem; v1 has the missing-partner rule, the missing-entity rule and the failed save. Everything here reads only the field schemas, so a new component needs no Inspector code.
+The Inspector and the Entities panel are drawn by React but **decided in `src/editor`**: `InspectorModel` works out which cards and fields to show, with their values or `Mixed`, and turns a typed value into one change; `EntitiesRows` works out the visible rows; `EntitiesDrop` decides where a dragged row lands. **Editor messages** come from small rule classes, one per kind of problem; v1 has the missing-partner rule, the missing-entity rule and the failed save. Everything here reads only the field schemas, so a new component needs no Inspector code.
 
 ## InspectorModel
 
@@ -60,7 +60,7 @@ export type ValueInputResult =
 - **Commit** (Enter, Tab, clicking away) runs `SetValuesCommand` on every selected entity with that component, as one step labelled with the field, such as `Change Linear damping`. A value that didn't change makes no step.
 - **Ctrl+Z in a field:** while the field's text differs from the committed value, the field's own text undo handles it. The React field component checks this and only lets the key reach the shortcut dispatcher when the text is unchanged.
 - Colour, choice, checkbox, vector, angle and entity fields commit on each pick. One drag in the colour picker is one step, through `LiveEdit`.
-- An **entity field** is filled by dragging a Layers row onto it, from a dropdown, or with a picker that waits for a click in the level view (a short-lived tool mode in `ToolController`).
+- An **entity field** is filled by dragging an Entities panel row onto it, from a dropdown, or with a picker that waits for a click in the level view (a short-lived tool mode in `ToolController`).
 
 ## Editor messages
 
@@ -97,19 +97,19 @@ export class EditorMessages {
 - v3's tips and the physics and joint warnings are new rule classes added to the list. Each is "its own small rule", as the scope review put it.
 - Script errors are never editor messages; they go to the Console (v2).
 
-## The Layers panel
+## The Entities panel
 
 ```typescript
-export class LayersRows {
+export class EntitiesRows {
     readonly version: VersionCounter;      // tree version + folded rows + selection, for the rows' look
 
     constructor(level: Level, caches: DerivedCaches);
-    get rows(): readonly LayersRow[];      // only rows whose parents are all unfolded
+    get rows(): readonly EntitiesRow[];      // only rows whose parents are all unfolded
     indexOf(id: EntityId): number;
     reveal(id: EntityId): number;          // unfolds its parents, returns the row index to scroll to
 }
 
-export type LayersRow = {
+export type EntitiesRow = {
     readonly entityId: EntityId;
     readonly depth: number;
     readonly hasChildren: boolean;
@@ -117,7 +117,7 @@ export type LayersRow = {
     readonly hiddenByParent: boolean;      // the dimmed eye
 };
 
-export class LayersDrop {
+export class EntitiesDrop {
     target(rowIndex: number, offsetInRow: number, pointerX: number): DropTarget | undefined;
 }
 

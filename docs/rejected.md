@@ -26,14 +26,14 @@ What we decided against, and why. **Check here before proposing something**: an 
 | An ImageComponent, image opacity, "Add hitbox" | A shape with an image fill | Everything known about shapes works on images for free | round 1: D31; round 5: 04 2.8; round 6: ST1 |
 | A separate tool for editing points, and tools for each shape | Double-click with Select, one Shape tool | The owner wanted fewer tools | round 4: TK1; round 5: TK2 |
 | Ctrl+click for the deepest entity | Alt+click for the next entity underneath | One key is enough | round 4: 02 2.2 |
-| An "Entities here" list in the right-click menu | The Layers panel, and Alt+click in v3 | Two ways to reach a hidden entity are enough | owner: 2026-11-14 |
+| An "Entities here" list in the right-click menu | The Entities panel, and Alt+click in v3 | Two ways to reach a hidden entity are enough | owner: 2026-11-14 |
 | "Select same type" and "Select same tag" | Select all and Invert only | Dropped by the owner | round 4: 02 2.5 |
 | A selection box that needs entities fully inside | It selects anything it touches | The owner's change | round 1: D19 |
 | Duplicate with an offset | The copy sits on top of the original | The owner's change | round 3: 01 2.9 |
 | A polygon that crosses itself is refused | It is allowed, and every enclosed area is filled and collides | Both work, and it keeps "what you see is what collides" | round 6: PG1 |
 | Copy style and Paste style | Copy value and Copy component on any field or card | Colours stop being a special case | round 6: CP1 |
 | Adding a partner component automatically | A note on the card with a button | Nothing happens behind the user's back | round 5: AD2 |
-| Body chips, joint badges and script badges in Layers rows | One row is one entity: name, eye, lock | Joints are their own rows | round 6: LY2 |
+| Body chips, joint badges and script badges in Entities panel rows | One row is one entity: name, eye, lock | Joints are their own rows | round 6: LY2 |
 | A "Problems" tab | Editor messages on the card, listed from the status bar | One name and look for every note | round 8: WN1; round 10: EM1 |
 | Version history, named versions | Nothing. Ctrl+S exports the project file | Rejected by the owner | round 11: 12 A4, 12 A5; round 12: SV1 |
 | Material presets (Wood, Ice, Rubber) | Typing density, friction and restitution | Presets would be a real feature of their own, for every component | round 6: 05 2.5 |
@@ -53,7 +53,7 @@ What we decided against, and why. **Check here before proposing something**: an 
 | "Entities inside the camera have no physics" as a rule | Any component is allowed. Physics and joints don't run there, and the cards show a warning | A warning explains it instead of a forbidden rule | round 8: HUD2 |
 | A limit on how wide Fill window can show (21:9) | No limit. Bars only where the view would pass the level bounds | Rejected by the owner | round 1: D49; round 2: O10 |
 | Camera smoothing per direction | One value for both | Rejected by the owner | round 1: D52 |
-| A camera pinned at the top of the Layers panel | An ordinary row that can be moved | Its position changes nothing | round 4: 02 2.11 |
+| A camera pinned at the top of the Entities panel | An ordinary row that can be moved | Its position changes nothing | round 4: 02 2.11 |
 | A corner drag that changes the camera's shape | A corner drag only zooms | It would quietly change what players see | round 8: CA1 |
 | A one-sentence trigger (T1) | When, If, Do | The sentence hid the "who" inside the When | round 5: T3 |
 | Triggers that can't read values | The event "a variable changes" and the If checks | The owner's direction | round 4: T2; round 5: T5 |
@@ -61,7 +61,7 @@ What we decided against, and why. **Check here before proposing something**: an 
 | "Messages" | Custom events | "Event" was already in use, and "messages" was unclear | round 3: M1; round 9: MSG2 |
 | A "Call Lua function" action | Fire a custom event the script listens for | One way for triggers and scripts to talk | round 10: EV1 |
 | A fixed set of inputs that creators can't change | Inputs defined on the World's InputComponent, plus raw keys | The owner wanted both | round 9: 09 2.8; round 10: IN1 |
-| "Lowest id first" run order | Layers panel order | The order you see is the order things run | round 9: 09 2.12; round 10: OR1 |
+| "Lowest id first" run order | Entities panel order | The order you see is the order things run | round 9: 09 2.12; round 10: OR1 |
 | Trigger templates | Component presets, not in v1 | A preset works the same on every component | round 9: 09 2.14; round 10: CP1 |
 | An object-style Lua API (`self:setText`) | Ids and functions | Handles, not references | round 3: D66 |
 | Lua functions inside tables (`world.spawn`, `input.isDown`, `math.clamp`) | Top-level functions: `spawn`, `is_down`, `clamp` | The owner's rule | owner: 2026-11-13 |
@@ -109,7 +109,7 @@ What we decided against, and why. **Check here before proposing something**: an 
 
 Not planned for any version. Each would need its own review.
 
-**Editor:** free docking and floating panels, a light theme, custom shortcuts, an interface scale setting, a command palette, guides dragged from rulers, Inspector search, branching undo, undo history that survives a reload, touch and tablet editing, keyboard-only editing of the level view, translations, editing one level in several windows, skew handles, rotating each selected entity around its own centre, per-pixel clicking on images, thumbnails in Layers rows, batch rename, saved selection sets, lasso selection.
+**Editor:** free docking and floating panels, a light theme, custom shortcuts, an interface scale setting, a command palette, guides dragged from rulers, Inspector search, branching undo, undo history that survives a reload, touch and tablet editing, keyboard-only editing of the level view, translations, editing one level in several windows, skew handles, rotating each selected entity around its own centre, per-pixel clicking on images, thumbnails in Entities panel rows, batch rename, saved selection sets, lasso selection.
 
 **Drawing:** union and subtract of shapes (a group with a body already merges shapes, and subtract needs holes), polygons with holes, dashed outlines, outlines drawn inside or outside the edge, rich text, text on a path, fonts uploaded by users, a radius per corner, star, arc and pie tools, a polygon that updates by itself when its path changes, collision that follows the outer edge of a thick outline (it follows the centre), joining two paths into one, brushes and arrowheads, shared named styles, group opacity.
 

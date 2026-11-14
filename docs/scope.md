@@ -72,7 +72,7 @@ Rules: [requirements/editor](requirements/editor/README.md)
 | ED9 | Tips: a blue note saying something works but there's an easier way. Example: an entity with more than 12 triggers gets a tip suggesting a script. | v3 | Tips help people learn, but nothing breaks without them. |
 | ED10 | Warnings for setups likely to behave badly in physics and joints. Examples: a joint end that is off its entity, or a small, fast Dynamic body without Bullet that may pass through walls. | v3 | Each warning is its own small rule to find and write. Add them as testing shows which problems people hit. |
 
-## Selecting and the Layers panel
+## Selecting and the Entities panel
 
 Rules: [requirements/editor](requirements/editor/README.md)
 
@@ -83,10 +83,10 @@ Rules: [requirements/editor](requirements/editor/README.md)
 | SE3 | Resize and rotate several selected entities together, around the centre of the selection box. Example: select five platforms and turn them as one block. | v3 | Moving several at once is enough to build. To turn them together you can group them first, since a group resizes and rotates. |
 | SE4 | Group and ungroup with Ctrl+G and Ctrl+Shift+G. Double-click to go into a group, Esc to go back up. Example: a car is a group of a body and two wheels. | v1 | Groups are how a car or a player becomes one body. |
 | SE5 | A bar above the level view showing which group you're inside, such as World › Car › Wheel. Click a name to jump there. Inkscape has the same bar. | v3 | Esc already goes back up one group at a time. |
-| SE6 | Alt+click the same spot again to select the next entity underneath. Example: reach a small coin covered by a big background shape. | v3 | The Layers panel already reaches any entity. |
-| SE7 | Hover outlines what a click would select. Hovering a Layers row highlights its entity in the level view, and the other way round. | v3 | Helps in crowded levels. Small test levels don't need it. |
-| SE8 | The Layers panel: the tree of entities. Drag rows to reorder them or move them into a group, F2 to rename. The top row is drawn in front. | v1 | It's the only way to see and change the tree. |
-| SE9 | Search the Layers panel by name, with filters. | v3 | Small test levels have few rows. |
+| SE6 | Alt+click the same spot again to select the next entity underneath. Example: reach a small coin covered by a big background shape. | v3 | The Entities panel already reaches any entity. |
+| SE7 | Hover outlines what a click would select. Hovering an Entities panel row highlights its entity in the level view, and the other way round. | v3 | Helps in crowded levels. Small test levels don't need it. |
+| SE8 | The Entities panel: the tree of entities. Drag rows to reorder them or move them into a group, F2 to rename. The top row is drawn in front. | v1 | It's the only way to see and change the tree. |
+| SE9 | Search the Entities panel by name, with filters. | v3 | Small test levels have few rows. |
 | SE10 | Hide an entity with its eye icon. A hidden entity isn't drawn but still collides and runs its scripts. | v1 | You need it to work on things behind other things, and it's saved in the level. |
 | SE11 | Lock an entity with its lock icon, so you can't grab it in the level view. Example: lock a big background so dragging over it draws a selection box instead of moving it. | v3 | Mostly for big backgrounds, which come with images. |
 | SE12 | Invert the selection. | v3 | Rarely needed. |

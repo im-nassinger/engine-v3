@@ -36,8 +36,8 @@ Source: round 10: PS1; round 11: DB2; old: PL-19, PL-21, PL-22
 
 ### The Panels button and live values · v2
 
-- Panels stay hidden during play until you press **Panels** on the Play bar. Then the Inspector, the Layers panel and the Console come back, read-only.
-- The Inspector and the Layers panel show **live values** from the run. Spawned entities appear in the Layers panel, and destroyed ones leave it.
+- Panels stay hidden during play until you press **Panels** on the Play bar. Then the Inspector, the Entities panel and the Console come back, read-only.
+- The Inspector and the Entities panel show **live values** from the run. Spawned entities appear in the Entities panel, and destroyed ones leave it.
 - A script error opens the Console by itself.
 - **After Stop, the Console keeps the run's lines.** *Why: you often don't need Panels at all.*
 - *Why hidden by default: play should look like the real thing.*
@@ -136,7 +136,7 @@ Source: scope PL7; round 3: D73; round 4: SD1; old: PL-39
 ### The determinism test · v1
 
 - **Determinism is a requirement with a test: the same level, seed, inputs and clock time give the same run on any computer.**
-- What makes it hold: every random value comes from one seed, Box2D v3 gives the same result everywhere, and triggers and scripts run in Layers panel order.
+- What makes it hold: every random value comes from one seed, Box2D v3 gives the same result everywhere, and triggers and scripts run in Entities panel order.
 - **Scripts may read the real date and time.** The test fixes the clock the same way it fixes the seed. Timing during play should still use the level's time. *Why: the owner's rule that reading the clock is fine. Fixing it in the test keeps determinism without blocking anything.*
 - Pausing, the speed menu and a player slowing the game change no tick, so they can't break it.
 - *Why v1: it is far cheaper to keep determinism from the first day than to find what broke it later. The test catches the moment something breaks it.*

@@ -116,14 +116,14 @@ v1 phases, in order:
 | `CameraPhase` | Follows the target with smoothing, stops at the bounds |
 | `EndOfTickPhase` | Removes marked entities, writes the report |
 
-- **v2 adds phases, not code paths:** `EventPhase` (keys, timers, level start, touches from the physics step), `TriggerPhase` and `ScriptPhase` (in Layers panel order), a `CustomEventQueue` shared by triggers and scripts with the chain limit of 32, `SpawnPhase` and the run's end in `EndOfTickPhase`. The order follows the requirements: touches are delivered after the physics step, destroys and spawns at the end of the tick.
+- **v2 adds phases, not code paths:** `EventPhase` (keys, timers, level start, touches from the physics step), `TriggerPhase` and `ScriptPhase` (in Entities panel order), a `CustomEventQueue` shared by triggers and scripts with the chain limit of 32, `SpawnPhase` and the run's end in `EndOfTickPhase`. The order follows the requirements: touches are delivered after the physics step, destroys and spawns at the end of the tick.
 - **The Lua host** is a contract in core, `ScriptEngine`, fulfilled in v2 by `adapters/lua/WasmoonScriptEngine`. The Lua API functions call a `GameApi` class in core, which uses the same schemas (`findFieldByAttribute`, `changeableInPlay`) as the Inspector.
 - **Restart** (v2) builds a new `Simulation` from the same `LevelData` with a fresh physics world, Lua state, id counter and seed, as the tech notes advise. Nothing is reset in place.
 
 ## Bodies and their entities
 
 - **`BodyMembership`** (core/physics) answers which body each entity belongs to: its own BodyComponent if it has one and Merge is off or no group above has a body; otherwise the nearest group above with a body; a surface with no body on it or above it is Static. The editor uses the same class for the Joint tool and for outlining the whole body of a selected entity.
-- **`PhysicsSceneBuilder`** turns the play copy into bodies, surfaces and joints for the `PhysicsWorld`, **in Layers panel order**, so Box2D receives everything in the same order on every computer. Each body's pieces come from the [polygon pipeline](core-model/geometry.md#the-polygon-pipeline), moved into the body's space.
+- **`PhysicsSceneBuilder`** turns the play copy into bodies, surfaces and joints for the `PhysicsWorld`, **in Entities panel order**, so Box2D receives everything in the same order on every computer. Each body's pieces come from the [polygon pipeline](core-model/geometry.md#the-polygon-pipeline), moved into the body's space.
 - **Each body's level matrix is split once at the start** into its pose (position and angle) and the rest (scale and skew). During play, `WorldMatrixCache` in the play copy and in the mirror computes `pose · rest` for the body's entity, and children follow through the tree as usual.
 - **Body poses are the simulation's state.** A body entity's TransformComponent values during play are derived from its pose when someone asks (v2 live values, `get_position`), not written every tick.
 - **Joints:** limits and lengths are measured from how the joint was built, so the reference angle is read from the editor's level at the start. An empty B is attached to a static ground body. A joint with both ends on one body, or neither end able to move, is skipped, as the tech notes advise.
@@ -135,16 +135,16 @@ The same level, seed, inputs and clock time give the same run on any computer. W
 
 | Source of difference | How it is closed |
 |---|---|
-| The physics engine | One Box2D build everywhere (`box2d3-wasm/compat`), fed in Layers panel order |
+| The physics engine | One Box2D build everywhere (`box2d3-wasm/compat`), fed in Entities panel order |
 | Floating-point maths | `DeterministicMath` instead of `Math.sin` and friends; an ESLint rule bans the browser's versions in core |
 | Randomness (v2) | `SeededRandom` from the run's seed; `math.random` in Lua uses it |
 | The clock | The clock time is part of `start`; nothing in a run reads the real time |
 | Inputs | Stamped with the tick they apply to; that list is the record of a run |
-| Order | Layers panel order for building, phases, triggers and scripts; never the order of a hash map of objects |
+| Order | Entities panel order for building, phases, triggers and scripts; never the order of a hash map of objects |
 | Timing | The tick is fixed at 1/60 s; pacing only decides when ticks run |
 
 `stateHash()` folds every body's position, angle and speeds, the camera and the tick into one hash. The determinism test compares it tick by tick, see [testing.md](testing.md).
 
 ## The page side
 
-`PlayMirror` is a second `Level` read from the same `LevelData` as the worker's, plus the poses from tick reports. It exists so the page can draw the run and, in v2, show live values in the read-only Inspector and Layers panel through the same models as the editor. The renderer draws whichever `Level` it is given, the editor's or the mirror's, so the drawing code has no play mode of its own.
+`PlayMirror` is a second `Level` read from the same `LevelData` as the worker's, plus the poses from tick reports. It exists so the page can draw the run and, in v2, show live values in the read-only Inspector and Entities panel through the same models as the editor. The renderer draws whichever `Level` it is given, the editor's or the mirror's, so the drawing code has no play mode of its own.

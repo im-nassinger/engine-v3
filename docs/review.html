@@ -89,7 +89,7 @@
 // Glossary: [term, meaning, words that link to it].
 const GLOSSARY = [
 ["Level view","Where you see and edit the level. It fills the whole window, with the panels on top.",["level view"]],
-["Layers panel","The panel on the left listing every entity as a tree. One row is one entity.",["Layers panel","Layers"]],
+["Entities panel","The panel on the left listing every entity as a tree. One row is one entity.",["Entities panel","Entities"]],
 ["Inspector","The panel on the right showing the components of what is selected, as cards.",["Inspector"]],
 ["Card","One component as the Inspector shows it: a title and its fields.",["card","cards"]],
 ["Field","One editable value on a card, such as Density.",["field","fields"]],
@@ -106,7 +106,7 @@ const GLOSSARY = [
 // Small sketches for the options. Static content written for this page.
 const swatch = (app, panel, line, text) =>
   `<div class="pv" style="display:flex;height:54px;background:${app};border:1px solid ${line}">
-     <div style="width:38%;background:${panel};border-right:1px solid ${line};padding:6px;font:11px system-ui;color:${text};white-space:nowrap;overflow:hidden">Layers<br><span style="opacity:.6">Rectangle 1</span></div>
+     <div style="width:38%;background:${panel};border-right:1px solid ${line};padding:6px;font:11px system-ui;color:${text};white-space:nowrap;overflow:hidden">Entities<br><span style="opacity:.6">Rectangle 1</span></div>
      <div style="flex:1"></div></div>`;
 const sel = (accent) =>
   `<div class="pv" style="height:64px;background:#d6ebf7;position:relative">
@@ -152,13 +152,13 @@ const GROUPS = [
  "Neutral grey: it doesn't change how the level's own colours look, which matters in an editor where you pick colours.",
  [["Neutral grey","Figma, Blender",swatch("#1e1e1e","#2c2c2c","#3a3a3a","#ddd")],["Cool blue-grey","Godot, VS Code",swatch("#1b1e24","#262b33","#353b45","#d8dde6")],["Warm grey","Affinity",swatch("#1f1d1b","#2c2926","#3b3733","#e2ddd6")]], 0, false],
 ["D3","Which accent colour?",
- "Background: the accent colour marks what is selected or active: the active tool, the selected rows in the Layers panel, the focused field, and the outline and handles around the selection in the level view. The level view is the hard place: a new shape is blue (#4A90D9) on a soft light blue background, so a blue selection outline is hard to see on it. Example: each preview shows a new rectangle, selected. Tips already use a blue icon and warnings a yellow one.",
+ "Background: the accent colour marks what is selected or active: the active tool, the selected rows in the Entities panel, the focused field, and the outline and handles around the selection in the level view. The level view is the hard place: a new shape is blue (#4A90D9) on a soft light blue background, so a blue selection outline is hard to see on it. Example: each preview shows a new rectangle, selected. Tips already use a blue icon and warnings a yellow one.",
  "Orange: it stands out on the default blue shapes and the light blue background, the way Blender's orange selection does, and it is far enough from the warning yellow.",
  [["Orange","Stands out on blue",sel("#ff8a3d")],["Blue","Figma's choice",sel("#2f7cf6")],["Violet","",sel("#9b6bff")],["Magenta","",sel("#ff3fa4")]], 0, false]
 ]],
 ["Shape and size", "How tight and how round.", [
 ["D4","How dense should the panels be?",
- "Background: the panel widths are fixed by the requirements (Layers 260 px, Inspector 300 px), so density decides how many rows and fields fit. Example: a BodyComponent card has about ten fields. Compact shows all of them and the next card; roomy needs scrolling sooner but is easier to read.",
+ "Background: the panel widths are fixed by the requirements (Entities panel 260 px, Inspector 300 px), so density decides how many rows and fields fit. Example: a BodyComponent card has about ten fields. Compact shows all of them and the next card; roomy needs scrolling sooner but is easier to read.",
  "Medium: like Figma. The Inspector fits a whole card, and 12 px text stays easy to read at 300 px wide.",
  [["Compact","22 px rows, 11 px text (Blender, Unity)",rows(22,11)],["Medium","28 px rows, 12 px text (Figma)",rows(28,12)],["Roomy","32 px rows, 13 px text",rows(32,13)]], 1, false],
 ["D5","How round should corners be?",
@@ -172,7 +172,7 @@ const GROUPS = [
 ]],
 ["Icons and text", "", [
 ["D7","Which icon style?",
- "Background: the tools, the eye and lock in the Layers panel, the menus and the Play bar all need icons. Outline icons are thin lines, filled ones are solid. Example: the four previews are the Select tool, a rectangle, an ellipse and Play.",
+ "Background: the tools, the eye and lock in the Entities panel, the menus and the Play bar all need icons. Outline icons are thin lines, filled ones are solid. Example: the four previews are the Select tool, a rectangle, an ellipse and Play.",
  "Outline icons, from one free open set such as Lucide (ISC licence, over 1,500 icons), so every icon matches. The package itself would be proposed in stage 6, when the first icon is drawn.",
  [["Outline","Thin lines (Figma, Lucide)",icons(false)],["Filled","Solid shapes",icons(true)]], 0, false],
 ["D8","The editor's own text uses Inter too.",

@@ -11,10 +11,10 @@ Sizes in pixels are starting values until tested.
 ### Fixed panels over the level view · v1
 
 - The level view fills the whole window. The panels sit on top of it, in fixed places. *Why: the owner's change, so the level is always as big as it can be.*
-- **Left: the toolbar strip, then the Inspector, full height. Right: the Layers panel above the Assets panel** (owner: 2026-11-14). Bottom: the Console, collapsed to a strip by default. Top: the top bar. Bottom edge: the status bar.
-- **In v1 there is no Assets panel and no Console**: the Layers panel takes the whole right side. Both come in v2 with scripts. *Why: the owner's smaller v1 has no files and no scripts.*
+- **Left: the toolbar strip, then the Inspector, full height. Right: the Entities panel above the Assets panel** (owner: 2026-11-14). Bottom: the Console, collapsed to a strip by default. Top: the top bar. Bottom edge: the status bar.
+- **In v1 there is no Assets panel and no Console**: the Entities panel takes the whole right side. Both come in v2 with scripts. *Why: the owner's smaller v1 has no files and no scripts.*
 - Panels can't be dragged to other places or floated. *Why: fixed panels are enough for the first version, and docking is a large feature.*
-- Starting sizes: toolbar 44 px wide, Inspector 300 px, Layers and Assets panels 260 px, top bar 44 px, status bar 24 px, Console 220 px when open.
+- Starting sizes: toolbar 44 px wide, Inspector 300 px, Entities and Assets panels 260 px, top bar 44 px, status bar 24 px, Console 220 px when open.
 - The centre has a permanent `Level` tab. A `.lua` file opens as an extra closable tab beside it, one per file. The tab strip shows only while an extra tab is open.
 - A tool with options, such as the Joint tool's joint type, shows a small options strip over the top left of the level view. It never shifts the layout.
 - One dark theme. *Why: art and levels read well on it.*
@@ -24,7 +24,7 @@ Source: round 1: D12; round 3: 01 2.1; old: WS-01 to WS-15; owner: 2026-11-13, 2
 
 ### Resize and collapse the panels · v3
 
-- Drag a panel's edge to make it wider or narrower: Layers and Assets panels 200 to 480 px, Inspector 260 to 520 px, Console 120 px to 60% of the window.
+- Drag a panel's edge to make it wider or narrower: Entities and Assets panels 200 to 480 px, Inspector 260 to 520 px, Console 120 px to 60% of the window.
 - Click a panel's title to fold it away. A folded side panel becomes a 28 px strip. Double-clicking an edge restores the default size.
 - Sizes and folded states are remembered in the browser. `Reset layout` in the main menu restores the defaults.
 - In v1 the panels have one size each.
@@ -173,7 +173,7 @@ Small features from the old draft and review that the scope review never asked a
 | No page gestures | Page scrolling, overscroll bounce and swipe-back are off on the editor page, because they would wreck a drag. The middle mouse button never starts the browser's autoscroll, and Alt alone never opens the browser menu | v1 |
 | Losing focus mid-drag | If the window loses focus during a drag, the drag cancels and held keys count as released | v1 |
 | Browser zoom | Browser zoom scales the interface. The level view stays sharp and the mouse stays accurate at any browser zoom | v1 |
-| Small windows | Under 1280 px wide the panels get narrower. Under 1024 px the Console, then the Layers and Assets panels, then the Inspector fold away by themselves and come back when there is room. Under 640×480 a notice asks for a bigger window. The level is never lost | v3 |
+| Small windows | Under 1280 px wide the panels get narrower. Under 1024 px the Console, then the Entities and Assets panels, then the Inspector fold away by themselves and come back when there is room. Under 640×480 a notice asks for a bigger window. The level is never lost | v3 |
 | Touch devices | On a touch-only device a notice says the editor needs a mouse and keyboard | v3 |
 | First-run hints | A hint card in an empty level ("Press 4 and drag to draw a shape"), then one hint pointing to Play. Hints end after the first Play | v3 |
 | Hide all panels | `Ctrl+\` hides every panel and bar, leaving the level view and a small restore button | v3 |

@@ -32,7 +32,7 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 | Ctrl+Shift+arrows | Move the selection one grid step | Editor | Handles, v1 |
 | Ctrl+G, Ctrl+Shift+G | Group, ungroup | Editor | Groups, v1 |
 | Enter | Go into the selected group | Editor | Groups, v1 |
-| F2 | Rename the selected entity | Editor | Layers panel, v1 |
+| F2 | Rename the selected entity | Editor | Entities panel, v1 |
 | G | Show or hide the grid | Editor | Grid, v1 |
 | Shift+G | Grid snapping on or off | Editor | Grid, v1 |
 | Shift+P | Physics view on or off | Editor | Physics view, v1 |

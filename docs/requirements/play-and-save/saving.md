@@ -70,7 +70,7 @@ Source: owner: 2026-11-13
 - **The project file, `.editable`, is the level as you edit it.** Example: `castle.editable`.
 - It is a package: a `.zip` inside, under its own extension, holding the level and every file it uses. *Why its own extension: it says what the file is for, and it stops someone importing a random `.zip`.*
 - **Ctrl+S exports the project file**, the same as the Export button. *Why: version history was dropped. If Ctrl+S did nothing, people pressing it out of habit would think they had saved.*
-- In the file: the level, its files (also unused ones), and editor-only data such as the grid size, locks and folded Layers rows.
+- In the file: the level, its files (also unused ones), and editor-only data such as the grid size, locks and folded Entities panel rows.
 - Not in the file: undo history, and what stays in the browser: the view position, the zoom, the pinned seed and the values of kept variables.
 - **Import checks a file before loading it**, and is all or nothing: a file with a problem changes nothing and gets a plain message. The cases: not a level file, too big, damaged, made by a newer version of the game, missing a file it lists, over a limit.
 - A level file that lists a file it doesn't contain is refused. A use of a file that doesn't exist is only a warning.
@@ -120,7 +120,7 @@ Source: scope SA6; round 11: 12 A8
 ### The play file · v3
 
 - **The play file, `.playable`, is made from the project file and holds only what is needed to play.** Example: `castle.playable`.
-- It drops editor-only data: the grid size, locks, folded Layers rows. Hidden is not editor-only, so it stays. *Why: the grid serves no purpose to a player.*
+- It drops editor-only data: the grid size, locks, folded Entities panel rows. Hidden is not editor-only, so it stays. *Why: the grid serves no purpose to a player.*
 - It is a package too: a `.zip` inside with the level and every file it uses. *Why: one packing idea for everything, instead of a second rule.*
 - v3 also adds a way to open a play file and run the level without the editor, see [test play](test-play.md).
 - *Why v3: before publishing, nobody else plays your levels. The project file already keeps and moves them.*

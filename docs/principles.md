@@ -16,8 +16,8 @@ The rules every requirement follows, and the rules for proposing a change. They 
 | **No special cases** | A rule or list for one kind of entity should be a general one | A joint is an ordinary entity, and breaking is being destroyed. The Used by list, not a "list of its joints" |
 | **Only what is selected moves or copies** | Nothing is dragged or copied along because it is connected | Moving a wheel doesn't move its hinge |
 | **Nothing happens behind the user's back** | No hidden packing, no partner components added on their own. Show a note with a button instead | "Needs a ShapeComponent to draw anything. [Add ShapeComponent]" |
-| **One row = one entity** | The Layers panel shows the tree and nothing else | Joints aren't shown inside another entity's row |
-| **The order you see is the order things run** | Triggers and scripts run in Layers panel order | Drag a row to change when it runs |
+| **One row = one entity** | The Entities panel shows the tree and nothing else | Joints aren't shown inside another entity's row |
+| **The order you see is the order things run** | Triggers and scripts run in Entities panel order | Drag a row to change when it runs |
 | **Assets are raw files** | Settings never live on the asset. They live where it is used | Volume is on the "Play sound" action, tiling on the image fill |
 | **One place decides what hits what** | The collision grid on the World. No second collision system beside it | Nothing extra for ragdolls: give the parts the right tags |
 | **If it's data, change it with Change value** | Trigger actions only exist for what no component value can do | Teleporting is changing the TransformComponent |

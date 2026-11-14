@@ -26,7 +26,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Swipe back.** `overscroll-behavior` stops scroll chaining, but its effect on swipe navigation at the page root isn't documented. Test on a Mac.
 - **Hit testing and hover** need a spatial index over level bounds to meet the speed targets. Bounds are derived, so a move must invalidate a subtree cheaply.
 - **Hide and lock from parents** are derived by walking up the tree. Cache per subtree. The play copy must carry the hidden state so play draws the same thing.
-- **Layers panel.** A fixed row height allows a virtualised list. Virtualisation plus drag and drop is where hand-made trees tend to break, so prototype both together at 10,000 rows. Browser find can't see off-screen rows, which is one reason for the panel's own search.
+- **Entities panel.** A fixed row height allows a virtualised list. Virtualisation plus drag and drop is where hand-made trees tend to break, so prototype both together at 10,000 rows. Browser find can't see off-screen rows, which is one reason for the panel's own search.
 - **Order keys.** If draw order uses fractional keys, repeated inserts between the same neighbours run out of precision. Rebalance quietly, outside undo.
 - **Negative scale** must be allowed (mirroring, Flip). Polygon winding and joint limits need a rule under mirroring.
 

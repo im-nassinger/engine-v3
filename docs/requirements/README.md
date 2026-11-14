@@ -8,7 +8,7 @@ What the game does, in eight topics: editor, drawing, assets, physics, camera, t
 
 | Topic | Covers |
 |---|---|
-| [editor/](editor/README.md) | The workspace, tools, shortcuts, the Inspector, undo, selecting, groups, the Layers panel |
+| [editor/](editor/README.md) | The workspace, tools, shortcuts, the Inspector, undo, selecting, groups, the Entities panel |
 | [drawing.md](drawing.md) | Shapes, paths, point editing, fill and outline, text, images, effects |
 | [assets/](assets/README.md) | The Assets panel, files, sound, `.entity` files, spawning, the builtin folder |
 | [physics/](physics/README.md) | Bodies, surfaces, merging, the World's settings, the collision grid, level bounds, joints |

@@ -54,8 +54,8 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--status-bar` | 24 px | requirement |
 | `--toolbar` | 44 px wide | requirement |
 | `--inspector` | 300 px wide, on the left | requirement |
-| `--layers` | 260 px wide, on the right | requirement |
-| `--row` | 28 px: a Layers row, an Inspector field | medium density, round 8 |
+| `--entities` | 260 px wide, on the right | requirement |
+| `--row` | 28 px: an Entities panel row, an Inspector field | medium density, round 8 |
 | `--panel-head` | 36 px: a panel's title | |
 | `--inspector-head` | 44 px: the entity's name and its eye | |
 | `--card-head` | 32 px | |
@@ -65,7 +65,7 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--menu-item` | 26 px | |
 | `--label` | 128 px: a field's label column | |
 | `--icon` | 16 px, 13 px in the status bar and in fields | |
-| `--indent` | 16 px per level of the Layers tree | |
+| `--indent` | 16 px per level of the Entities panel tree | |
 | `--dialog` | 400 px wide | |
 
 ## Spacing, corners, shadows

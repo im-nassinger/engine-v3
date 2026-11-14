@@ -15,7 +15,7 @@ A script is a `.lua` file from the Assets panel, attached to an entity through i
 - Each entity keeps its own values for those settings, and the script reads them from the same table, such as `settings.run_speed`.
 - Each entity runs its own copy of a script, so twenty enemies never share state by accident.
 - Any entity can have scripts, joints and the camera included.
-- Scripts in the list run top to bottom. Across entities they run in Layers panel order, see [triggers](../triggers/triggers.md).
+- Scripts in the list run top to bottom. Across entities they run in Entities panel order, see [triggers](../triggers/triggers.md).
 - A script on a hidden entity still runs.
 - A new `.lua` file is made in the Assets panel. The builtin `.lua` files can be read as examples.
 

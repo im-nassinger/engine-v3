@@ -37,7 +37,7 @@ ComponentSchema ──lists──> FieldDefinitions ──use──> FieldTypes
 | Every entity can hold children, groups nest up to 256 deep | `Level.moveEntity` refuses a cycle or a depth past 256 |
 | One World, the root, never moved, deleted or copied | `Level` creates it and refuses to move or remove it |
 | One camera, always directly inside the World | `Level` creates it and refuses to move it anywhere else |
-| The top row is drawn in front | Children are kept in Layers panel order, index 0 is the top row |
+| The top row is drawn in front | Children are kept in Entities panel order, index 0 is the top row |
 | A level holds at most 100,000 entities | `LevelLimits`, checked by every command and by the reader before anything changes |
 | An id never points at a newer entity | `EntityIdAllocator` only counts up |
 | Values stay in their range | Every write goes through the field type, which clamps or refuses |

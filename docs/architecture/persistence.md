@@ -34,7 +34,7 @@
 ```
 
 - The values in the example are illustrations. The requirements give the background as "a soft light blue" with no exact colour, which is picked in plan stage 2.
-- **Entities are a flat list in Layers panel order** (pre-order, top row first). Each names its parent, which must appear before it; the order of the list is the order of each parent's children. A flat list is easy to check for cycles and depth, and reads well in a diff.
+- **Entities are a flat list in Entities panel order** (pre-order, top row first). Each names its parent, which must appear before it; the order of the list is the order of each parent's children. A flat list is easy to check for cycles and depth, and reads well in a diff.
 - **Component values are keyed by attribute name** (the field's label in snake_case), the same names Lua uses. Values are written by each field type's `serialize`.
 - **Editor-only data** is `editor` (grid size, folded rows) and each entity's `locked`. The v3 play file drops them; `hidden` stays.
 - **A missing value reads as its default**, so a field added to a component later needs no upgrade code. An unknown component type or an unknown value makes the file "damaged".
