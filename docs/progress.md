@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. Rounds 2 to 4 of its review are answered. **Waiting for the owner:** a review of the proposal, and the other open questions below.
+The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. Rounds 2 to 4 of its review are answered. **Waiting for the owner:** the 14 open questions below, asked on the [review page](proposals/architecture/review.html) as round 5, and a review of the proposal.
 
 ## Where things stand
 
@@ -63,7 +63,7 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 
 ## Open questions for the owner
 
-Found while rewriting. None was decided by Claude. Where the docs had to say something, they say what is written after "Written as". Which parts of the architecture each one touches is in the proposal's [open questions](proposals/architecture/open-questions.md).
+Found while rewriting. None was decided by Claude. **All of them are on the [review page](proposals/architecture/review.html) as round 5**, with background and a suggested answer. Where the docs had to say something, they say what is written after "Written as". Which parts of the architecture each one touches is in the proposal's [open questions](proposals/architecture/open-questions.md).
 
 ### Words and components
 
