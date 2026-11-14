@@ -19,7 +19,7 @@
 | The stage 0 plan | Done, approved by the owner on 2026-11-14, written into [tooling.md](architecture/tooling.md) |
 | Small features without a version | Done: all given a version in round 7 |
 | Stage 0, project setup | Done, except the first CI run, which needs a push. See below |
-| Code | Stage 1, the model: in progress. See [proposals/stage-1.md](proposals/stage-1.md) |
+| Code | Stage 1, the model: steps 1 to 3 of 8 done (signals, `DeterministicMath`, `Matrix2D`). Next is step 4, the field types. See [proposals/stage-1.md](proposals/stage-1.md) |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
