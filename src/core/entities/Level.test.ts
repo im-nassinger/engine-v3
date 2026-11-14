@@ -1,8 +1,10 @@
 import { describe, expect, test } from 'vitest';
 
+import { NameComponent, TransformComponent } from '../components/index.ts';
 import { WeightComponent } from '../components/testing/index.ts';
 
 import type { Entity } from './Entity.ts';
+import { entityName } from './entityName.ts';
 import { Level } from './Level.ts';
 import type { LevelUpdate } from './LevelUpdate.ts';
 
@@ -42,6 +44,17 @@ describe('Level ids', () => {
         expect(level.camera.parent).toBe(level.world);
         expect(level.world.parent).toBeUndefined();
         expect(level.entityCount).toBe(2);
+    });
+
+    test('the World and the camera are named, and each has a TransformComponent at the origin', () => {
+        const level = Level.createNew();
+        const cameraTransform = level.camera.requireComponent(TransformComponent);
+
+        expect(entityName(level.world)).toBe('World');
+        expect(entityName(level.camera)).toBe('Camera');
+        expect(level.world.hasComponent(TransformComponent)).toBe(true);
+        expect(level.world.hasComponent(NameComponent)).toBe(true);
+        expect(cameraTransform.get('position')).toEqual({ x: 0, y: 0 });
     });
 
     test('ids only count up, and a removed id is never handed out again', () => {

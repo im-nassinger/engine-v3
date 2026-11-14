@@ -41,4 +41,12 @@ describe('TextFieldType', () => {
 
         expect(fieldType.normalize('😀😀😀')).toBe('😀😀');
     });
+
+    test('parse refuses a text shorter than the minimum, counted after trimming', () => {
+        const fieldType = new TextFieldType({ minLength: 1, trimmed: true });
+
+        expect(fieldType.parse('')).toEqual({ ok: false, problem: { reason: 'tooShort', minLength: 1 } });
+        expect(fieldType.parse('   ')).toEqual({ ok: false, problem: { reason: 'tooShort', minLength: 1 } });
+        expect(fieldType.parse(' a ')).toEqual({ ok: true, value: ' a ' });
+    });
 });

@@ -1,3 +1,4 @@
+import { NameComponent, TransformComponent } from '../components/index.ts';
 import type { EntityId } from '../fields/index.ts';
 
 import { Entity } from './Entity.ts';
@@ -39,9 +40,16 @@ export class Level {
         this.camera = this.attach(cameraId, this.world, 0);
     }
 
-    // The World is id 1 and the camera id 2. Their components are added when those classes exist.
+    // The World is id 1 and the camera id 2. Their other components come with stage 2, and the registry with them.
     static createNew() {
-        return new Level();
+        const level = new Level();
+
+        level.world.addComponent(new TransformComponent());
+        level.world.addComponent(new NameComponent({ name: 'World' }));
+        level.camera.addComponent(new TransformComponent());
+        level.camera.addComponent(new NameComponent({ name: 'Camera' }));
+
+        return level;
     }
 
     get name() {

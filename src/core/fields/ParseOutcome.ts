@@ -3,6 +3,7 @@ export type ParseProblem =
     | { readonly reason: 'wrongType' }
     | { readonly reason: 'notFinite' }
     | { readonly reason: 'zero' }
+    | { readonly reason: 'tooShort'; readonly minLength: number }
     | { readonly reason: 'outsideLimits'; readonly min: number; readonly max: number }
     | { readonly reason: 'unknownChoice' }
     | { readonly reason: 'badColour' }

@@ -8,3 +8,6 @@ export type { ComponentTypeName } from './ComponentTypeName.ts';
 export type { ComponentValues } from './ComponentValues.ts';
 export type { DerivedFieldDefinition } from './DerivedFieldDefinition.ts';
 export type { PartnerRule } from './PartnerRule.ts';
+export { NameComponent } from './NameComponent/NameComponent.ts';
+export type { NameValues } from './NameComponent/NameValues.ts';
+export { TransformComponent } from './TransformComponent/TransformComponent.ts';
