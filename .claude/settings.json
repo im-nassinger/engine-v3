@@ -1,0 +1,6 @@
+{
+    "permissions": {
+        "allow": ["Bash(git push origin master)", "Bash(git push)"],
+        "deny": ["Bash(sudo:*)", "Bash(pkexec:*)", "Bash(git push --force:*)", "Bash(git push -f:*)", "Skill(sudo)"]
+    }
+}

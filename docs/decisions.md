@@ -67,6 +67,10 @@ The owner approved the three places where the stage 1 plan differs from the arch
 
 The owner: "from now on, I agree with all your decisions, since they are minor decisions (the important ones are already decided). so you can just implement the project without waiting for me." So **Claude decides what the docs don't answer and keeps building.** A stage's plan is no longer proposed first: its decisions are written into the architecture docs as the stage is built. Each decision made this way is written where it belongs, with its reason, marked *(standing yes, date)* or cited `owner: <date>` on a `Source:` line, and listed below so the owner can review them in one place and overturn any.
 
+## 2026-11-14: The runner builds v1 without the owner
+
+The owner asked for v1 to be built to the end with nobody typing "continue": one fresh Claude session per step, progress on Discord, and waiting out the usage limit on its own. That is the [runner](runner.md). For it to finish alone, the owner agreed to three changes: **Claude pushes `master` after each step** (before, pushes waited for the owner to ask), **stage 17's layout and phone checks are Playwright tests** instead of checks by hand, and **anything that needs `sudo` is sent to Discord** while the work goes on without it.
+
 ### Decided under the standing yes
 
 | Date | Decision | Written in |

@@ -2,9 +2,11 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**, which waits for the owner. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **The owner gave a standing yes** (2026-11-14): Claude decides the smaller questions and keeps building without waiting, listing each decision in [decisions.md](decisions.md). Round 10 was settled that way. **Stage 2 is being built** from [proposals/stage-2.md](proposals/stage-2.md).
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**; the [runner](runner.md) pushes after each step. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **The owner gave a standing yes** (2026-11-14): Claude decides the smaller questions and keeps building without waiting, listing each decision in [decisions.md](decisions.md). Round 10 was settled that way. **Stage 2 is being built** from [proposals/stage-2.md](proposals/stage-2.md).
 
 ## Where things stand
+
+**Runner:** stage 2, step ? of ?. The [runner](runner.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -86,7 +88,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 ## Next
 
-1. **Push, when the owner asks,** so CI runs for the first time on x86 and ARM (step 7 of stage 0).
+1. **Push** so CI runs for the first time on x86 and ARM (step 7 of stage 0). The [runner](runner.md) does it after its first step.
 2. **Stage 2 of [plan.md](plan.md): the v1 components and the file format**, following [proposals/stage-2.md](proposals/stage-2.md).
 3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
