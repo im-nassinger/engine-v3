@@ -8,7 +8,7 @@
 
 | Message | When |
 |---|---|
-| ✅ **engine-v3: N%** | After each step, with the summary and the new commits |
+| ✅ **v1: N%** · the stage and step, then one sentence on what the step did | After each step |
 | ⚠️ N% of the usage limit used | Once per limit window, at 90% |
 | 🛑 Usage limit reached, resuming at a time | When the limit is hit. A ▶️ follows when it resumes |
 | 🔑 Needs your password | When something needs `sudo`. The work goes on without it |
@@ -19,6 +19,7 @@
 
 - **Progress:** every session ends with `STATUS`, `STAGE`, `STEP`, `SUMMARY` and `NEEDS` lines. The % is (stage + finished steps ÷ steps in the stage) ÷ 18 stages.
 - **The usage limit:** `claude -p --output-format stream-json` prints a `rate_limit_event` line with how much of the 5-hour and 7-day windows is used and when each resets. The CLI prints it, not the model, so the runner sees the limit even when the model is cut off mid-step. The next session finishes the cut-off step first.
+- **A change to the runner's own code:** it restarts itself between sessions, so the change applies without stopping a step.
 - **A hung session:** no output for 30 minutes ends it, and it counts as a failure.
 
 ## Files

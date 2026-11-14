@@ -18,7 +18,7 @@ End your last message with exactly these lines, and nothing after them:
 STATUS: <done | sudo | blocked | finished>
 STAGE: <current stage number, 0 to 17>
 STEP: <S>/<T>
-SUMMARY: <one plain sentence: what this step did>
+SUMMARY: <what this step did, in one short plain sentence the owner understands without reading code, under 20 words>
 NEEDS: <for sudo: the exact command; for blocked: what you need from the owner; otherwise: none>
 ```
 

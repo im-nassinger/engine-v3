@@ -21,6 +21,8 @@ const stateFolder = path.join(os.homedir(), '.local/state/engine-v3-runner');
 const logFolder = path.join(stateFolder, 'sessions');
 const pauseFile = path.join(stateFolder, 'paused');
 const promptFile = path.join(import.meta.dirname, 'prompt.md');
+const planFile = path.join(projectFolder, 'docs/plan.md');
+const RESTART_EXIT_CODE = 75;
 
 const webhookUrl = process.env.DISCORD_WEBHOOK_URL ?? '';
 if (webhookUrl === '') {
@@ -73,14 +75,39 @@ async function waitForLimitReset() {
     await discord.send('▶️ Limit reset, resuming.');
 }
 
+// Reads the stage names from the plan's table, such as "The model" for stage 1.
+function readStageName(stage: number) {
+    const planText = fs.readFileSync(planFile, 'utf8');
+    const rowPattern = new RegExp(`^\\| ${stage} \\| \\*\\*(.+?)\\*\\* \\|`, 'm');
+    const match = rowPattern.exec(planText);
+
+    return match?.[1] ?? '';
+}
+
 async function reportStep(report: StatusReport, newCommits: string) {
     const percent = percentComplete(report);
-    const stepText = report.stepCount > 0 ? `, step ${report.step} of ${report.stepCount}` : '';
-    const commitLines = newCommits === '' ? '(no commit)' : newCommits;
+    const stageName = readStageName(report.stage);
 
-    await discord.send(
-        `✅ **engine-v3: ${percent}%** (stage ${report.stage}${stepText})\n${report.summary}\n\`\`\`\n${commitLines}\n\`\`\``,
-    );
+    let stageText = `Stage ${report.stage}: ${stageName}`;
+    if (report.stepCount > 0) {
+        stageText += `, step ${report.step} of ${report.stepCount}`;
+    }
+
+    let summary = report.summary;
+    if (newCommits === '') {
+        summary += ' (nothing committed)';
+    }
+
+    await discord.send(`✅ **v1: ${percent}%** · ${stageText}\n${summary}`);
+}
+
+// The runner's own code changes when a session or the owner edits it. Restarting between
+// sessions picks up the change; systemd starts it again because the exit code isn't 0.
+function readRunnerCode() {
+    const fileNames = fs.readdirSync(import.meta.dirname).filter((fileName) => fileName.endsWith('.ts'));
+    const contents = fileNames.map((fileName) => fs.readFileSync(path.join(import.meta.dirname, fileName), 'utf8'));
+
+    return contents.join('\n');
 }
 
 async function reportNeeds(report: StatusReport) {
@@ -124,11 +151,16 @@ async function runOneStep() {
 
 async function main() {
     fs.mkdirSync(logFolder, { recursive: true });
-    await discord.send('🚀 Runner started.');
 
+    const startingCode = readRunnerCode();
     let failuresInARow = 0;
 
     while (true) {
+        if (readRunnerCode() !== startingCode) {
+            console.log('The runner code changed, restarting.');
+            process.exit(RESTART_EXIT_CODE);
+        }
+
         await waitWhilePaused();
 
         const outcome = await runOneStep();
