@@ -18,7 +18,6 @@ Everything known about the project: a 2D physics game with a level editor, for t
 | [plan.md](plan.md) | The v1 plan in 18 stages, each with the docs it implements |
 | [review.html](review.html) | The review page where the owner answers questions in the browser. Earlier rounds are in git history |
 | [proposals/](proposals/README.md) | Proposals waiting for the owner's answer. None open now |
-| [prompts/](prompts/README.md) | Prompts that start a new AI session on a piece of work, such as the architecture proposal |
 | [rejected.md](rejected.md) | What we decided against, and why. Check it before proposing something |
 | [decisions.md](decisions.md) | Project-level choices: starting over, the reviews, how these docs are organised |
 | [tech-notes.md](tech-notes.md) | Facts and warnings for the architecture work. Not requirements |
