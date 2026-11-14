@@ -188,7 +188,7 @@ export function createV1Registry(): ComponentRegistry;
 - Every setting of every joint type is stored, whatever the current type, so switching type in v3 keeps them, as the joints rules ask.
 - **Merge** is a checkbox on the BodyComponent, on by default (owner, 2026-11-13).
 - **The TagsComponent is v2** (owner, 2026-11-13): nothing in v1 reads tags.
-- **The World has a ShapeComponent and a StyleComponent** (owner, 2026-11-13). The rectangle's width and height are the level bounds, 20000 × 10000 by default; the fill is the background colour. Both are World components: they can't be removed, and the shape's kind is always rectangle. Where the rectangle sits and how its handles resize it while the World never moves is [open question 25](../open-questions.md).
+- **The World has a ShapeComponent and a StyleComponent** (owner, 2026-11-13). The rectangle's width and height are the level bounds, 20000 × 10000 by default; the fill is the background colour. Both are World components: they can't be removed, and the shape's kind is always rectangle. The rectangle is centred on the level's origin, and a resize changes both opposite edges by the same amount, so the centre never moves (owner, 2026-11-13).
 
 ## v2 and v3 seams
 

@@ -82,8 +82,9 @@ Source: scope PH7; round 6: 05 2.13; round 8: CF4; old: PH-80, PH-81
 - **A level has a fixed size.** Every level has a bounds rectangle, always. *Why: a physics world needs an edge, otherwise lost entities cost time forever and the camera has nothing to stop at.*
 - **The level bounds are the World's rectangle:** the World has a ShapeComponent holding a rectangle, and its width and height are the bounds' size. It is always a rectangle and can't be removed. *Why: the owner's change. A rectangle already has a size, a card and handles, so the bounds need no settings of their own (owner: 2026-11-13).*
 - Default size: **20000×10000 px**. The default camera is 1920×1080.
-- The bounds show as a thin frame in the editor. Resize them by dragging their handles with the World selected, or by typing the rectangle's width and height.
-- Where the rectangle sits around the level's origin, how its handles resize it while the World itself never moves, and where the four edge settings live are open questions, see [progress](../../progress.md).
+- **The World's rectangle is centred on the level's origin**, and stays there. *Why: the World never moves, so its rectangle can't be moved either, and a centred rectangle needs no offset setting (owner: 2026-11-13).*
+- The bounds show as a thin frame in the editor. Resize them by dragging their handles with the World selected, or by typing the rectangle's width and height. **Dragging one edge moves the opposite edge by the same amount**, so the centre never moves. Example: bounds 20000 wide run from −10000 to 10000; dragging the right edge out by 1000 makes them 22000 wide, from −11000 to 11000.
+- Where the four edge settings live, and whether the World's rectangle can collide, are open questions, see [progress](../../progress.md).
 - The camera stops at the bounds.
 - **Each edge is a wall or open.** All four are open by default. A wall blocks everything that collides.
 - **An entity that is fully outside an open edge is removed**, where it can no longer be seen. That is all the game does: it decides nothing about lives or falling.

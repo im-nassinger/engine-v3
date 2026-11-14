@@ -71,7 +71,7 @@
   <div class="pbar"><i id="pfill"></i></div>
 </header>
 <main>
-  <p class="intro">Round 3 of the architecture proposal: three details about the World's rectangle. Rounds 1 and 2 are answered and written into the docs. Each card is one question, with my view under it. <b>Yes</b> means you agree with my view, <b>No</b> means you don't, and a comment says what you'd change. "More" explains the card with an example. Any click on a card counts it as answered. Underlined words are explained when you hover them. Answers are kept in this browser. When you're done, press Copy answers and paste the text into the chat.</p>
+  <p class="intro">Round 4 of the architecture proposal: two questions about the edges of the level, asked again in plainer words. Rounds 1 to 3 are answered and written into the docs. Each card is one question, with my view under it. <b>Yes</b> means you agree with my view, <b>No</b> means you don't, and a comment says what you'd change. "More" explains the card with an example. Any click on a card counts it as answered. Underlined words are explained when you hover them. Answers are kept in this browser. When you're done, press Copy answers and paste the text into the chat.</p>
   <details class="glossary"><summary>Glossary</summary><dl id="glossary"></dl></details>
   <div id="list"></div>
   <div class="footer">
@@ -95,6 +95,11 @@ const GLOSSARY = [
 ["Merge","When shapes inside a group with a body become part of that one body.",["merge","merged","merging"]],
 ["Level bounds","The rectangle around the level that marks where it ends: the World's rectangle ShapeComponent. Each edge is a wall or open.",["level bounds","bounds"]],
 ["World","The top entity of every level. Everything else sits inside it. It holds the level-wide settings.",["World"]],
+["ShapeComponent","The geometry of an entity: a rectangle, ellipse, polygon or line. On the World, a rectangle: the level bounds.",["ShapeComponent"]],
+["StyleComponent","How a shape is painted: fill, outline, opacity. On the World, its fill is the background colour.",["StyleComponent"]],
+["BodyComponent","Makes an entity take part in physics: Static, Dynamic or Kinematic.",["BodyComponent"]],
+["SurfaceComponent","Makes an entity's shape something others bump into, with friction and bounce.",["SurfaceComponent"]],
+["PhysicsWorldComponent","The World's physics card: gravity, and in v3 game speed and the collision grid.",["PhysicsWorldComponent"]],
 ["Test play","Pressing Play in the editor. It runs a copy of the level, and Stop returns to the editor with nothing changed.",["test play"]],
 ["Tick","One step of the game. The game runs 60 ticks per second.",["tick","ticks"]],
 ["Seed","The number all random values in a run come from.",["seed"]],
@@ -116,20 +121,17 @@ const GLOSSARY = [
 
 // Groups: [title, note, [[id, short, detail, myView], ...]]. Yes = you agree with my view.
 const GROUPS = [
-["The World's rectangle", "Your round 2 answer: the level bounds are a rectangle ShapeComponent on the World. These three details follow from it. The numbers match the open questions in progress.md.", [
-["Q25","The World's rectangle is centred on the level's origin. Dragging one of its sides moves the opposite side by the same amount, so the centre never moves.",
- "The World never moves (its TransformComponent is fixed at zero), so its rectangle can't be moved by moving the World. A normal shape's resize keeps the opposite side still, which moves the shape's centre, and the World can't do that. Example: the bounds are 20000 × 10000, from −10000 to 10000 sideways. Dragging the right side out by 1000 makes them 22000 wide, from −11000 to 11000. Typing the width does the same. A new level's camera then starts at the origin, in the middle of the level.",
- "Centred and resized from both sides: the World stays fixed and the bounds stay one simple rectangle. The other way would need a new \"offset\" setting on every rectangle."],
-["Q26","The four edge settings live on the PhysicsWorldComponent: Top edge, Bottom edge, Left edge and Right edge, each Wall or Open, all Open by default.",
- "A ShapeComponent has no setting for its edges, and adding one there would put a physics setting on every shape for the World's sake. Walls are physics: they block everything that collides, and an open edge removes entities that leave. The PhysicsWorldComponent already holds the World's physics settings.",
- "Physics settings stay together, and the ShapeComponent stays the same on every entity."],
-["Q27","The World's rectangle never collides: the World can't take a BodyComponent or a SurfaceComponent. Walls come only from the edge settings.",
- "With a SurfaceComponent, the World's rectangle would act as one Static surface covering the whole level, and everything would start stuck inside it. The Add Component menu on the World shows both as disabled, with the reason.",
- "Refuse them on the World, with a reason in the menu, so nobody builds a level that can't move."]
+["The edges of the level", "Round 3 settled where the World's rectangle sits: centred on the level's origin. These two cards are Q26 and Q27 again, rewritten more plainly. Background: the level bounds are the World's rectangle. The requirements already say each of its four edges (top, bottom, left, right) is either a Wall or Open. A wall stops anything that collides, like an invisible floor. When an entity goes fully past an open edge, it is removed from the level. Example: in a platformer you make the bottom edge open, so a crate that falls off the map is removed instead of falling forever, and the left and right edges walls, so the player can't walk out. These two cards decide where you set this, and what the World's rectangle itself does in physics.", [
+["Q26","You choose Wall or Open for each edge on the World's PhysicsWorldComponent card, the card that already holds gravity: four choices named Top edge, Bottom edge, Left edge and Right edge.",
+ "What you see: select the World, and the Inspector shows its cards. The ShapeComponent card holds the rectangle's width and height, the StyleComponent card the background colour, and the PhysicsWorldComponent card the gravity. The four choices need a home on one of them. The ShapeComponent card is the same card every rectangle has, so a Wall/Open choice there would appear on every crate and platform too, where it means nothing. The PhysicsWorldComponent card exists only on the World and already holds the level's physics, so the choices go there, under gravity: Top edge [Open], Bottom edge [Wall], Left edge [Wall], Right edge [Wall]. All four start Open, as the requirements already say.",
+ "On the PhysicsWorldComponent card. The ShapeComponent stays the same on every entity."],
+["Q27","The World's rectangle is never solid. You can't add a BodyComponent or a SurfaceComponent to the World. The only walls are the edges you set to Wall in Q26.",
+ "How any rectangle becomes solid today: you add a BodyComponent (it takes part in physics) and a SurfaceComponent (other things bump into it). A crate is a rectangle with both. The World now has a rectangle too, 20000 × 10000. If you could add both to the World, its rectangle would become one giant solid block filling the whole level, and every entity would start stuck inside it. The edge walls are a different thing: when the level runs, the game puts an invisible wall along each edge set to Wall, and nothing else. So the World's Add Component menu shows BodyComponent and SurfaceComponent greyed out, with the reason: \"The World can't collide. To block the edges of the level, set them to Wall on the PhysicsWorldComponent.\"",
+ "Grey both out on the World, with that reason, so nobody turns the whole level into one solid block by accident."]
 ]]
 ];
 
-const KEY = "engine-v3-architecture-review-3";
+const KEY = "engine-v3-architecture-review-4";
 let answers = {};
 try { answers = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { answers = {}; }
 function persist() { try { localStorage.setItem(KEY, JSON.stringify(answers)); } catch (e) {} }
@@ -303,7 +305,7 @@ function buildText() {
     if (groupLines.length) lines.push("## " + group, ...groupLines, "");
   }
   const head = [
-    "Architecture review answers, round 3",
+    "Architecture review answers, round 4",
     "Answered " + (total - open.length) + " of " + total + " (" + yes + " yes, " + no + " no)",
     ""
   ];

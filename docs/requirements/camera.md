@@ -13,6 +13,7 @@ What the player sees. There is exactly one camera, an entity with a CameraCompon
 - In the Layers panel it is an ordinary row. Where it sits changes nothing, because what is inside the camera is always drawn over the level.
 - The editor's own view is separate. Panning or zooming the editor never changes the camera.
 - The camera's position is the centre of what it shows. The default camera is **1920×1080**.
+- A new level's camera starts at the level's origin, which is the middle of the level bounds. *Why: the World's rectangle is centred on the origin (owner: 2026-11-13).*
 - In the level view the camera shows as a frame of what players will see. Clicking inside the frame goes through to the level behind it. Clicking its edge selects the camera.
 - **Dragging a corner of the frame keeps its proportions, so it only zooms.** Width and height are typed in the CameraComponent. *Why: a corner drag that changed the shape would quietly change what players see.*
 - **The camera never rotates**, in the editor or in play, and doesn't turn with what it follows.

@@ -127,7 +127,7 @@ The Select tool holds one **drag state** at a time (the State pattern):
 | `IdleState` | | |
 | `PressState` | A press, until it moves 3 px or is released | A click: select, narrow, toggle |
 | `MoveState` | Pressing an entity and moving | One step: `Move N entities` |
-| `ResizeState` | Pressing one of the eight handles | One step. One shape: width and height. A group: scale |
+| `ResizeState` | Pressing one of the eight handles | One step. One shape: width and height. A group: scale. The World's rectangle always resizes from its centre, as if Alt were held, because the World never moves |
 | `RotateState` | Pressing just outside a corner | One step. Shift snaps to 15° |
 | `BoxSelectState` | Pressing empty space and moving | Selects everything the box touches |
 | `PointEditState` | Double-clicking a polygon or line | Esc. Each point drag, add or delete is one step |
