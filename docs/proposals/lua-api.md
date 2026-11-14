@@ -6,7 +6,7 @@
 
 The old function list (sections 2.1 to 2.8 of `10-lua-and-data.md` in `ecs-game-v2`) rewritten in the style the review agreed: **plain snake_case functions that take an entity id**, pixels and degrees, the Inspector's names, and events through `on()`. The list is small on purpose: **if something is a component value, scripts change it with `set_value`**, the same way triggers use Change value, so most of the old setters (`setText`, `setMotorSpeed`, `setGravity`) disappear. Seven yes-or-no questions settle what the review never wrote.
 
-Versions use the numbering of [the smaller v1](smaller-v1.md), which is also waiting for an answer: scripts are **v2**, and what comes with today's v2 features (sound, the mouse, one-way platforms) is **v3**. If that proposal changes, these shift with it.
+Versions use the new numbering of [scope.md](../scope.md): scripts are **v2**, and what comes with today's v2 features (sound, the mouse, one-way platforms) is **v3**.
 
 ## Conventions
 

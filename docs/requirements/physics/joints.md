@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-A joint is an ordinary entity with a JointComponent that connects two bodies. **v1:** three joints (Hinge, Rope, Spring), the Joint tool, each joint's typed settings, and Rope and Spring that show in play when styled. **v2:** Weld, Rod, Slider and Wheel, dragging limits on the level, re-attaching an end or changing type, joints that break, and the joint warnings. Core rule: **no special cases for joints.** A joint moves and copies only when it is selected, and breaking is just being destroyed.
+A joint is an ordinary entity with a JointComponent that connects two bodies. **v1:** three joints (Hinge, Rope, Spring), the Joint tool, each joint's typed settings, and Rope and Spring that show in play when styled. **v3:** Weld, Rod, Slider and Wheel, dragging limits on the level, re-attaching an end or changing type, joints that break, and the joint warnings. Core rule: **no special cases for joints.** A joint moves and copies only when it is selected, and breaking is just being destroyed.
 
 All lengths are pixels and all angles are degrees. Positive angles and speeds are clockwise on screen. Values marked (tune) are starting points.
 
@@ -35,7 +35,7 @@ Source: round 1: C9, D43; round 4: G2, R44; round 5: R45; round 6: LY2; round 8:
 
 Source: round 6: 06 2.1; round 8: JV2; round 1: D42; old: JT-01, JT-02
 
-### Four more joints: Weld, Rod, Slider, Wheel · v2
+### Four more joints: Weld, Rod, Slider, Wheel · v3
 
 | Joint | Does what | Used for |
 |---|---|---|
@@ -44,7 +44,7 @@ Source: round 6: 06 2.1; round 8: JV2; round 1: D42; old: JT-01, JT-02
 | Slider | Slides along a line, no turning | Lifts, crushers, pistons |
 | Wheel | Spins freely, with sprung travel along a line | Vehicle wheels with suspension |
 
-- *Why v2: Weld is the easiest to leave out, because merging shapes into one body already glues them. Rod is a Rope that can't go slack, so it is cheap to add.*
+- *Why v3: Weld is the easiest to leave out, because merging shapes into one body already glues them. Rod is a Rope that can't go slack, so it is cheap to add.*
 - Rod, Rope and Spring are one kind underneath, so switching between them keeps everything they share.
 - Pulley and Gear joints come after that, see [rejected.md](../../rejected.md).
 
@@ -109,7 +109,7 @@ Spring:
 
 Source: scope JO1; round 7: 06 2.5, 06 2.14, 06 2.15; old: JT-36 to JT-38, JT-79, JT-81 to JT-84
 
-### Settings of the v2 joints · v2
+### Settings of the v3 joints · v3
 
 | Joint | Settings |
 |---|---|
@@ -132,7 +132,7 @@ Source: round 7: 06 2.5, 06 2.14; round 8: JV2; old: JT-28, JT-36, JT-79
 
 Source: scope JO5; round 1: D43; round 3: J1; old: JT-41
 
-### Drag limits on the level · v2
+### Drag limits on the level · v3
 
 - A Hinge with limits shows an arc with a handle at each end. A Slider or Wheel shows a bar along its axis.
 - Hovering or dragging a handle shows a ghost of the part at that limit.
@@ -140,7 +140,7 @@ Source: scope JO5; round 1: D43; round 3: J1; old: JT-41
 
 Source: scope JO2; round 7: 06 2.6; old: JT-42 to JT-46
 
-### Re-attach an end, change the type · v2
+### Re-attach an end, change the type · v3
 
 - After placing a joint you can drag an end to attach it elsewhere, change its two entities in fields A and B, or change its type.
 - Settings both types share are kept. Settings that don't apply to the new type stay stored and come back when you switch back.
@@ -148,7 +148,7 @@ Source: scope JO2; round 7: 06 2.6; old: JT-42 to JT-46
 
 Source: scope JO4; round 8: 06 2.4; old: JT-26 to JT-33
 
-### Joints that break · v2
+### Joints that break · v3
 
 - A joint can be set to break under too much force: a Breakable switch and a Break force.
 - **Breaking destroys the joint entity**, so triggers and scripts use the ordinary "destroyed" event. **There is no "joint broke" event.** *Why: the owner's idea. Breaking is the physics engine destroying the joint when the force passes its limit, so a separate event would be a second name for one thing.*
@@ -170,7 +170,7 @@ Source: scope JO3; round 6: JB1; round 7: 06 2.5; decisions: D47; old: JT-39, JT
 
 Source: round 1: D45; round 7: 06 2.9, 06 2.10, 06 2.11; round 8: JM1, JC1; old: JT-55, JT-63 to JT-78
 
-### Warnings for joints · v2
+### Warnings for joints · v3
 
 Editor messages on the JointComponent's card. None of them stops you playing.
 
@@ -195,12 +195,12 @@ Left over from the old draft. The last column is Claude's suggestion, not a deci
 
 | Feature | Rule | Suggested |
 |---|---|---|
-| Connecting bodies that don't overlap | Press on one body and drag to another, for one-point joints | v2 |
-| Pin on purpose | Alt pins to the background even with a second body under the mouse | v2 |
-| Choosing among three bodies | With three or more bodies under the mouse, Tab steps through the pairs | v2 |
+| Connecting bodies that don't overlap | Press on one body and drag to another, for one-point joints | v3 |
+| Pin on purpose | Alt pins to the background even with a second body under the mouse | v3 |
+| Choosing among three bodies | With three or more bodies under the mouse, Tab steps through the pairs | v3 |
 | Which body is A | The smaller of the two becomes A, so the wheel or the door is A whatever the draw order | v1 |
 | Scaling a group with joints | Scaling a group scales its joints' distances, and mirroring it mirrors their limits and motor direction | v1 |
-| Force readout | While a Breakable joint is selected in test play, the Inspector shows the current and peak force | v2 |
+| Force readout | While a Breakable joint is selected in test play, the Inspector shows the current and peak force | v3 |
 | Joints stay active in the tool | The old draft kept the Joint tool active after each joint. The review says tools return to Select | Needs a decision |
 
 Source: old: JT-12 to JT-16, JT-40, JT-68, JT-69

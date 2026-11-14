@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-How shapes, paths and text are made and how they look. **v1:** the Shape tool (rectangle, ellipse, polygon, line), the Bézier pen and the Pencil, point editing by double-click, polygons that may cross themselves, the StyleComponent with solid colours and gradients, and the Text tool with one font. **v2:** images (a shape with an image fill), Convert to polygon, the W/A/S/D size keys, colour picker extras, toolbar swatches, three more fonts, line height and letter spacing, Flip, and the EffectsComponent. Core rules: a shape can collide and a path never does, an image is not its own kind of entity, and each entity draws exactly one thing.
+How shapes, paths and text are made and how they look. **v1:** the Shape tool (rectangle, ellipse, polygon, line), point editing by double-click, polygons that may cross themselves, and the StyleComponent with solid colours. **v2:** the Bézier pen and the Pencil, gradients, and the Text tool with one font. **v3:** images (a shape with an image fill), Convert to polygon, the W/A/S/D size keys, colour picker extras, toolbar swatches, three more fonts, line height and letter spacing, Flip, and the EffectsComponent. Core rules: a shape can collide and a path never does, an image is not its own kind of entity, and each entity draws exactly one thing.
 
 ## Drawing tools
 
@@ -32,7 +32,7 @@ Source: round 1: D39; round 5: 03 2.1; old: DR-01 to DR-09
 
 Source: scope DR1; round 5: TK2; round 7: SH1; old: DR-10 to DR-16
 
-### W, A, S, D set the preview size · v2
+### W, A, S, D set the preview size · v3
 
 - With the Shape tool: D makes the preview wider, A narrower, W taller, S shorter, centred on the mouse. 1 px per press, Shift 10 px, Ctrl+Shift one grid step.
 - *Why these steps: they match the arrow keys, so nothing is relearned, and unlike grid-only steps they allow small sizes.*
@@ -49,7 +49,7 @@ Source: scope DR4; round 8: SH3
 
 Source: round 1: D21; round 5: 03 2.4; old: DR-21 to DR-30
 
-### The Bézier pen · v1
+### The Bézier pen · v2
 
 It works like Illustrator's pen.
 
@@ -62,17 +62,19 @@ It works like Illustrator's pen.
 - A path is one continuous line: no branches, no separate parts. It is open or closed. Only a closed path can be filled.
 - The result is an entity with a Transform, a PathComponent and a StyleComponent.
 - Limit: 2,000 points in a path.
+- *Why v2: a path never collides, and Convert to polygon is v3, so in v1 a path would be decoration only. It was settled before the scope review.*
 
-Source: round 1: D24; round 5: 03 2.5; old: DR-33 to DR-45
+Source: round 1: D24; round 5: 03 2.5; old: DR-33 to DR-45; owner: 2026-11-13
 
-### The Pencil · v1
+### The Pencil · v2
 
 - Drag to draw freehand. On release the drawing becomes an ordinary path with a small number of curve points.
 - If you finish near the start (within 12 screen pixels), the path closes.
 - Smoothness is Low, Medium or High, Medium by default.
 - *Why it exists: the pen is the hardest tool in vector drawing, and lumpy ground is exactly what a level needs. It adds no new kind of data.*
+- *Why v2: the same as the Bézier pen.*
 
-Source: round 1: D24; round 5: 03 2.6; old: DR-46 to DR-48
+Source: round 1: D24; round 5: 03 2.6; old: DR-46 to DR-48; owner: 2026-11-13
 
 ### Point editing · v1
 
@@ -96,7 +98,7 @@ Source: scope DR2; round 5: TK2, 03 2.7; old: DR-49 to DR-63
 
 Source: scope DR3; round 6: PG1
 
-### Convert a path to a polygon · v2
+### Convert a path to a polygon · v3
 
 - A path never collides. To make a drawn curve collide, right-click the path and choose **Convert to polygon**.
 - A dialog shows a slider for how many points to use and a live preview over the dimmed path. A readout such as "Stays within 2 px of the path" shows how closely it matches.
@@ -114,7 +116,7 @@ Source: scope DR5; round 1: D22, D58; round 5: 03 2.8; old: DR-64 to DR-79
 
 - The StyleComponent works the same on everything that draws: a ShapeComponent, a PathComponent and a TextComponent. *Why: style belongs to anything drawn, not shapes only.*
 - It holds a **fill**, an **outline** (colour and width) and an **opacity**.
-- A fill is nothing, a solid colour, a gradient, or (v2) an image.
+- A fill is nothing, a solid colour, a gradient, or (v3) an image.
 - A path's fill paints only when the path is closed. A line has no fill.
 - On text, the fill colours the letters and the outline traces them.
 - Colours can be see-through. Outline width goes from 0 to 200, and 0 means no outline.
@@ -124,14 +126,14 @@ Source: scope DR5; round 1: D22, D58; round 5: 03 2.8; old: DR-64 to DR-79
 
 Source: round 1: D23; round 6: ST2; old: DR-90 to DR-94
 
-### Gradients · v1
+### Gradients · v2
 
 - A fill can be a linear or a radial gradient.
-- *Why v1: the owner changed this from "solid colours first".*
+- *Why: the owner changed this from "solid colours first". Why v2: it is decoration, and solid colours are enough to test a v1 level. It was settled before the scope review.*
 
-Source: round 1: D25; round 6: ST2
+Source: round 1: D25; round 6: ST2; owner: 2026-11-13
 
-### Colour picker extras · v2
+### Colour picker extras · v3
 
 - **Level colours:** up to 16 colours most used in this level, worked out automatically.
 - **Recent colours:** the last 12 picked, kept in the browser.
@@ -139,13 +141,13 @@ Source: round 1: D25; round 6: ST2
 
 Source: scope DR6; round 6: ST2; old: DR-95, DR-96
 
-### Toolbar swatches · v2
+### Toolbar swatches · v3
 
 - Two swatches on the toolbar show the last fill and outline you picked. New shapes use them.
 
 Source: scope DR7; round 5: 03 2.3; old: DR-18 to DR-20
 
-### Images · v2
+### Images · v3
 
 - **An image is not its own kind of entity. It is a shape whose fill is the image.** There is no `ImageComponent`.
 - Dropping a PNG, JPEG, WebP or GIF on the level makes an entity with a Transform, a rectangle ShapeComponent the image's size, and a StyleComponent with that image as its fill. 1 image pixel is 1 level pixel.
@@ -161,16 +163,16 @@ Source: scope DR7; round 5: 03 2.3; old: DR-18 to DR-20
 
 Source: scope DR11; round 5: 04 2.3, 04 2.6, 04 2.7, 04 2.8; round 6: ST1, ST3
 
-### Flip · v2
+### Flip · v3
 
 - A Flip button sets the Transform's scale to −1, for any entity. Typing −1 does the same.
 
 Source: scope DR12; round 6: ST3
 
-### The EffectsComponent · v2
+### The EffectsComponent · v3
 
 - An EffectsComponent adds pixelate, shadow and blur to an entity that draws. Tint belongs here too.
-- *Why v2: each effect needs a drawing pass per entity.*
+- *Why v3: each effect needs a drawing pass per entity.*
 
 Source: round 2: O9; round 6: ST3; round 8: FX3
 
@@ -184,34 +186,35 @@ Source: round 5: 03 2.13; old: DR-117 to DR-122
 
 ## Text
 
-### The Text tool · v1
+### The Text tool · v2
 
 - Click on the level and type. The text shows in its real font, size, colour and rotation as you type.
 - Enter starts a new line. Esc or clicking elsewhere finishes. Empty text creates nothing, and emptying a text deletes the entity.
 - Double-clicking a text with Select edits it again.
-- **TextComponent settings in v1:** Width, font, weight, size, alignment.
+- **TextComponent settings in v2:** Width, font, weight, size, alignment.
 - **Width** is "Fit to text" or "Fixed". With Fixed, the text wraps at that width. The height always fits the text, so text never spills out of its box. *Why a two-option choice: it reads better than a checkbox.*
 - Size is a whole number from 8 to 400, default 32. Weight takes any value. Alignment is left, centre or right.
 - One style for the whole text. No mixed bold or colours.
 - **A text entity has a rectangle ShapeComponent as its box, like an image.** The rectangle isn't drawn. It is what you click, what Flex uses, and what collides if you add physics. With Fit to text the editor sets its width and height. With Fixed you set the width and the editor sets the height. *Why: the owner's idea. Text works exactly like images, and "text doesn't collide unless you add a shape" goes away.*
-- The one font in v1 is **Inter**. Fonts come with the game, so a level looks the same on every computer. A font is never removed from the list.
+- The one font in v2 is **Inter**. Fonts come with the game, so a level looks the same on every computer. A font is never removed from the list.
 - **Non-Latin text uses the system font, with a warning** that it may look different on other computers. Emoji too.
 - Text stays sharp at any zoom and inside a scaled group.
 - A text holds up to 10,000 characters.
 - Typing inside a text has its own undo. The whole edit is one level undo step when finished.
+- *Why v2: the reason it was v1 was a score on the screen, which needs variables. Text also brings fonts and sharp text at any zoom.*
 
-Source: scope DR8; round 1: D27; round 3: F1; round 6: TX1; round 7: TX2; old: DR-100 to DR-116
+Source: scope DR8; round 1: D27; round 3: F1; round 6: TX1; round 7: TX2; old: DR-100 to DR-116; owner: 2026-11-13
 
-### Line height and letter spacing · v2
+### Line height and letter spacing · v3
 
 - Line height from 0.8 to 3, default 1.2. Letter spacing.
 
 Source: scope DR9; round 6: TX1
 
-### More fonts · v2
+### More fonts · v3
 
 - Lora, JetBrains Mono and Roboto Mono, beside Inter.
-- *Why v2: one font is enough to test, and every font adds download size.*
+- *Why v3: one font is enough to test, and every font adds download size.*
 
 Source: scope DR10; round 3: F1
 
@@ -221,16 +224,16 @@ Accepted in the requirements review but never given a version. The last column i
 
 | Feature | Rule | Suggested |
 |---|---|---|
-| Corner radius | A rectangle has one corner radius, set by a dot on the level or typed. A free resize keeps it. Rounded corners are part of what collides | v2 |
-| Line caps and joins | Cap, join and miter limit for outlines, under "More" on the StyleComponent | v2 |
-| Apply scale | On a single shape with a scale other than 1, a button folds the scale into its size and resets scale to 1 | v2 |
-| Break and join path points | Break opens a closed path at a point, or splits an open path in two. Join closes an open path | v2 |
-| Create path from shape | Adds a path that exactly matches a shape, so the art can be curved without touching what collides | v2 |
-| Convert a rectangle or ellipse to a polygon | Replaces it with a polygon. On an ellipse, the point count gives a triangle, a hexagon or any regular polygon | v2 |
-| "Out of date" after converting | When a path changes after Convert to polygon, the shape shows an "Out of date" note with a Regenerate button | v2 |
-| Polygon too thin to collide | A polygon with almost no area gets a warning and has no collision | v2 |
+| Corner radius | A rectangle has one corner radius, set by a dot on the level or typed. A free resize keeps it. Rounded corners are part of what collides | v3 |
+| Line caps and joins | Cap, join and miter limit for outlines, under "More" on the StyleComponent | v3 |
+| Apply scale | On a single shape with a scale other than 1, a button folds the scale into its size and resets scale to 1 | v3 |
+| Break and join path points | Break opens a closed path at a point, or splits an open path in two. Join closes an open path | v3 |
+| Create path from shape | Adds a path that exactly matches a shape, so the art can be curved without touching what collides | v3 |
+| Convert a rectangle or ellipse to a polygon | Replaces it with a polygon. On an ellipse, the point count gives a triangle, a hexagon or any regular polygon | v3 |
+| "Out of date" after converting | When a path changes after Convert to polygon, the shape shows an "Out of date" note with a Regenerate button | v3 |
+| Polygon too thin to collide | A polygon with almost no area gets a warning and has no collision | v3 |
 | Text size by handles | Dragging a text's corner changes the font size in whole numbers. Written before the text box existed, so it needs a decision | Needs a decision |
-| Text tool remembers | The Text tool remembers the last font, size and colour. New text is dark, or light on a dark background | v2 |
-| Drawing hint line | Drawing tools show a one-line hint of what clicks and keys do right now | v2 |
+| Text tool remembers | The Text tool remembers the last font, size and colour. New text is dark, or light on a dark background | v3 |
+| Drawing hint line | Drawing tools show a one-line hint of what clicks and keys do right now | v3 |
 
 Source: old: DR-03, DR-29, DR-31, DR-32, DR-61, DR-66, DR-67, DR-77, DR-86, DR-91, DR-110, DR-115

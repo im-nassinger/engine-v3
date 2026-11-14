@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Everything about the editor that isn't specific to one kind of entity: the workspace, the tools, the Inspector, selection, groups, the Layers panel and undo. **In v1** you get fixed panels over a full-window level view, seven tools on number keys, pan and zoom, a grid, the Inspector with cards and partner notes, copy and paste, undo, click and box selection, handles, grouping, the Layers panel and the eye icon. **In v2** come panel resizing, snapping to entities, copying values, tips and more warnings, multi-entity resize and rotate, the path bar, hover outlines, Layers search and the lock icon.
+Everything about the editor that isn't specific to one kind of entity: the workspace, the tools, the Inspector, selection, groups, the Layers panel and undo. **In v1** you get fixed panels over a full-window level view, three of the seven tools (Select, Shape, Joint), pan and zoom, a grid, the Inspector with cards and partner notes, copy and paste, undo, click and box selection, handles, grouping, the Layers panel and the eye icon. **In v2** come the other four tools and the searchable shortcut list. **In v3** come panel resizing, snapping to entities, copying values, tips and more warnings, multi-entity resize and rotate, the path bar, hover outlines, Layers search and the lock icon.
 
 ## Files
 
@@ -19,8 +19,8 @@ Everything about the editor that isn't specific to one kind of entity: the works
 |---|---|---|
 | Fixed panels over the level view | v1 | workspace |
 | Top bar and status bar | v1 | workspace |
-| Seven tools on number keys, tool lock | v1 | workspace |
-| The searchable list of shortcuts | v1 | workspace, shortcuts |
+| Seven tools on number keys, tool lock. Three of them in v1 | v1 | workspace |
+| The searchable list of shortcuts | v2 | workspace, shortcuts |
 | Pan and zoom, 1% to 1000% | v1 | workspace |
 | The grid, with snapping | v1 | workspace |
 | Inspector cards, field types, typing values | v1 | inspector-and-undo |
@@ -33,18 +33,18 @@ Everything about the editor that isn't specific to one kind of entity: the works
 | Group, ungroup, go in, go out | v1 | selection |
 | The Layers panel | v1 | selection |
 | Hide | v1 | selection |
-| Resize and collapse the panels | v2 | workspace |
-| Snapping to other entities, pink guides | v2 | workspace |
-| Copy values and components | v2 | inspector-and-undo |
-| The Used by list | v2 | inspector-and-undo |
-| Tips | v2 | inspector-and-undo |
-| Warnings for physics and joints | v2 | inspector-and-undo |
-| Resize and rotate several entities together | v2 | selection |
-| The path bar | v2 | selection |
-| Next entity underneath (Alt+click) | v2 | selection |
-| Hover outlines | v2 | selection |
-| Layers search | v2 | selection |
-| Lock | v2 | selection |
-| Invert selection | v2 | selection |
+| Resize and collapse the panels | v3 | workspace |
+| Snapping to other entities, pink guides | v3 | workspace |
+| Copy values and components | v3 | inspector-and-undo |
+| The Used by list | v3 | inspector-and-undo |
+| Tips | v3 | inspector-and-undo |
+| Warnings for physics and joints | v3 | inspector-and-undo |
+| Resize and rotate several entities together | v3 | selection |
+| The path bar | v3 | selection |
+| Next entity underneath (Alt+click) | v3 | selection |
+| Hover outlines | v3 | selection |
+| Layers search | v3 | selection |
+| Lock | v3 | selection |
+| Invert selection | v3 | selection |
 
 Each file ends with a "Not in the scope review" table: small features that were accepted but never given a version.

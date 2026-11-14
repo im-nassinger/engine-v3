@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The level-wide physics settings, all on the World entity. **v1:** gravity strength and direction, the background colour, and level bounds whose edges are walls or open. **v2:** the collision grid (which tags hit which), the Collision check, gravity buttons, game speed, and a background image. Core rule: **the collision grid on the World is the one place that decides what hits what.** There is no second system beside it.
+The level-wide physics settings, all on the World entity. **v1:** gravity strength and direction, the background colour, and level bounds whose edges are walls or open. **v3:** the collision grid (which tags hit which), the Collision check, gravity buttons, game speed, and a background image. Core rule: **the collision grid on the World is the one place that decides what hits what.** There is no second system beside it.
 
 ## World settings
 
@@ -19,13 +19,13 @@ The level-wide physics settings, all on the World entity. **v1:** gravity streng
 
 Source: scope PH9; round 1: C3, D6, D38; round 3: D75, R15; round 6: 05 2.14; round 7: CF1; old: PH-82 to PH-84, PH-88, PH-89
 
-### Buttons for gravity · v2
+### Buttons for gravity · v3
 
 - Quick buttons for the strength: Earth 9.8, Moon 1.6, Arcade 30, None 0.
 
 Source: scope PH10; round 6: 05 2.14; old: PH-85
 
-### Game speed · v2
+### Game speed · v3
 
 - A World setting: 1 is normal, 0.5 half, 2 double. Triggers and scripts can change it, such as slow motion for 2 seconds after a bomb.
 - It slows physics, timers and script waits together. Keys and sound stay at real speed.
@@ -34,7 +34,7 @@ Source: scope PH10; round 6: 05 2.14; old: PH-85
 
 Source: scope PH11; round 3: D75; round 6: 05 2.14; round 9: 09 2.10; old: PH-87
 
-### Background image · v2
+### Background image · v3
 
 - The background can be an image instead of a colour. It comes with images.
 - A missing image falls back to the colour.
@@ -43,7 +43,7 @@ Source: scope DR11; round 6: 05 2.14; old: PH-88
 
 ## What hits what
 
-### The collision grid · v2
+### The collision grid · v3
 
 - **The collision grid uses tags.** You pick which tags appear in the grid, and tick which of them hit each other. An entity's tags decide what its surfaces hit.
 - Tags that aren't in the grid don't affect collisions.
@@ -60,7 +60,7 @@ Source: scope DR11; round 6: 05 2.14; old: PH-88
 
 Source: scope PH6; round 6: 05 2.12, 05 2.13; round 7: CF1; round 8: CF3, CF4, CT1; old: PH-64 to PH-77
 
-### The Collision check · v2
+### The Collision check · v3
 
 - Right-click two entities: **"Why do these collide?"**. It answers "These collide", or names the first rule that stops them.
 
@@ -99,9 +99,9 @@ Left over from the old draft. The last column is Claude's suggestion, not a deci
 | "Keep going" past an open edge | A setting to keep entities instead of removing them. The review only kept removal | Later |
 | Hard limit | Any body 100,000 px from the origin is removed, with a Console warning | v1 |
 | Maximum level size | 200,000×200,000 px | v1 |
-| Gravity in pixels hint | Under Gravity: "490 px/s². An entity falls 245 px in the first second." | v2 |
-| Background image layout | Fill the screen or tile, and how much it scrolls with the camera, from 0% to 100% | v2 |
-| Grid window details | Colours per tag, drag across cells to paint, "Collide with all" and "Collide with none" per row | v2 |
-| Removal line in the Console | "Crate left the level and was removed." | v2 |
+| Gravity in pixels hint | Under Gravity: "490 px/s². An entity falls 245 px in the first second." | v3 |
+| Background image layout | Fill the screen or tile, and how much it scrolls with the camera, from 0% to 100% | v3 |
+| Grid window details | Colours per tag, drag across cells to paint, "Collide with all" and "Collide with none" per row | v3 |
+| Removal line in the Console | "Crate left the level and was removed." | v3 |
 
 Source: old: PH-73, PH-74, PH-86, PH-88, PH-93, PH-95, PH-96, PH-99

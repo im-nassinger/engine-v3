@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-How entities are picked, moved and arranged in the tree. **v1:** click and drag-box selection, handles to move, resize and rotate one entity, arrow-key moves, grouping with Ctrl+G, going into groups by double-click, the Layers panel as the real tree, and the eye icon. **v2:** resizing and rotating several entities together, the path bar, Alt+click for the entity underneath, hover outlines, Layers search, the lock icon, and invert selection. Core rules: one selection everywhere, one row is one entity, and moving an entity between groups never moves it on screen.
+How entities are picked, moved and arranged in the tree. **v1:** click and drag-box selection, handles to move, resize and rotate one entity, arrow-key moves, grouping with Ctrl+G, going into groups by double-click, the Layers panel as the real tree, and the eye icon. **v3:** resizing and rotating several entities together, the path bar, Alt+click for the entity underneath, hover outlines, Layers search, the lock icon, and invert selection. Core rules: one selection everywhere, one row is one entity, and moving an entity between groups never moves it on screen.
 
 ## Selecting
 
@@ -47,20 +47,20 @@ Clicks pass through hidden entities and locked entities.
 
 Source: scope SE1; round 1: D19; round 4: SEL1, 02 2.3, 02 2.4; round 5: 02 2.2, 04 2.7; old: SG-01 to SG-14, SG-21 to SG-33
 
-### Invert selection · v2
+### Invert selection · v3
 
 - Selects every entity directly inside the current group that isn't selected. "Select same type" and "Select same tag" are dropped.
 
 Source: scope SE12; round 4: 02 2.5
 
-### Next entity underneath · v2
+### Next entity underneath · v3
 
 - Each Alt+click on the same spot selects the next entity underneath, children of groups included. After the bottom it starts again from the top.
 - There is no Ctrl+click for the deepest entity. *Why: one key is enough. Reaching the deepest entity is a few more clicks, with fewer keys to learn.*
 
 Source: scope SE6; round 4: 02 2.2; round 5: 02 2.2
 
-### Hover outlines · v2
+### Hover outlines · v3
 
 - Hovering outlines what a click would select: the whole group, not the child under the mouse.
 - Hovering a Layers row outlines that entity in the level view, and hovering in the level view tints its row.
@@ -109,7 +109,7 @@ Source: round 6: LY2; old: SG-39 to SG-42
 
 Source: scope SE2; round 1: D21; round 4: 02 2.7; round 5: 03 2.4; old: SG-43 to SG-48, SG-52, SG-53, SG-55, SG-56
 
-### Several entities together · v2
+### Several entities together · v3
 
 - A multi-selection resizes and rotates together. Rotation turns the entities around the centre of the selection box. Resizing keeps the opposite side or corner fixed. Alt resizes from the centre. Shift keeps proportions.
 - *Why: it matches single entities and groups, so nothing changes when you group them, and it uses the same keys as the drawing tools.*
@@ -147,7 +147,7 @@ Source: scope SE3; round 5: 02 2.8; round 6: MS1; old: SG-57 to SG-61
 
 Source: scope SE4; round 1: C2, D16; round 2: O7; round 4: G2, 02 2.9; decisions: D20; old: SG-62 to SG-81, SG-87
 
-### The path bar · v2
+### The path bar · v3
 
 - A bar above the level view shows which group you are inside, such as World › Car › Wheel. Click a name to jump there. It shows only when you are inside a group.
 
@@ -181,7 +181,7 @@ Source: round 6: RP1; old: SG-135 to SG-137
 
 Source: scope SE8; round 1: C2; round 3: N1; round 4: 02 2.11, 02 2.12; round 5: FMT1; round 6: LY2; old: SG-88 to SG-107, SG-122 to SG-128
 
-### Search · v2
+### Search · v3
 
 - A search box filters rows by name as you type. Filters can be added: kind, tag, hidden, locked, has a script, has a trigger, has a warning.
 - Results stay a tree: the matches plus their dimmed parents, with a count such as "12 of 3,410". Dragging rows is off while a filter is on.
@@ -197,7 +197,7 @@ Source: scope SE9; round 4: 02 2.12; old: SG-108 to SG-110
 
 Source: scope SE10; round 1: C5; round 2: R7; round 5: 02 2.13; decisions: D7; old: SG-113, SG-115 to SG-119
 
-### Lock · v2
+### Lock · v3
 
 - The lock icon stops an entity from being grabbed in the level view. Example: lock a big background so that dragging over it draws a selection box.
 - A locked entity can still be selected from its row in the Layers panel and edited in the Inspector.
@@ -239,15 +239,15 @@ Accepted in the requirements review but never given a version. The last column i
 
 | Feature | Rule | Suggested |
 |---|---|---|
-| Dimming outside a group | While you are inside a group, the rest of the level dims to about 50%. A View menu switch turns it off | v2 |
-| Pivot marker | The selection shows the point it rotates around. Drag it to rotate around another point. It resets when the selection changes | v2 |
-| Set origin to pivot | Moves an entity's origin for good without moving it on screen. This is how a door gets its hinge point | v2 |
+| Dimming outside a group | While you are inside a group, the rest of the level dims to about 50%. A View menu switch turns it off | v3 |
+| Pivot marker | The selection shows the point it rotates around. Drag it to rotate around another point. It resets when the selection changes | v3 |
+| Set origin to pivot | Moves an entity's origin for good without moving it on screen. This is how a door gets its hinge point | v3 |
 | "Entities here" list | Right-click lists every entity under the mouse. The review kept only Alt+click for reaching entities underneath, so this may be dropped | Later |
-| Tab to the next entity | Tab and Shift+Tab select the next and previous entity in the same group | v2 |
-| Auto-pan | The view pans by itself when a drag nears the edge of the level view | v2 |
-| Solo | Alt+click an eye shows only that entity and its children until repeated. Never saved, never affects play | v2 |
-| Drag across eyes | Dragging across eye or lock icons sets every row touched to the same state | v2 |
-| Keyboard in the Layers panel | Arrows move, Right unfolds, Left folds, typing a letter jumps to a name | v2 |
-| Layers footer | Counts of selected, hidden and locked entities | v2 |
+| Tab to the next entity | Tab and Shift+Tab select the next and previous entity in the same group | v3 |
+| Auto-pan | The view pans by itself when a drag nears the edge of the level view | v3 |
+| Solo | Alt+click an eye shows only that entity and its children until repeated. Never saved, never affects play | v3 |
+| Drag across eyes | Dragging across eye or lock icons sets every row touched to the same state | v3 |
+| Keyboard in the Layers panel | Arrows move, Right unfolds, Left folds, typing a letter jumps to a name | v3 |
+| Layers footer | Counts of selected, hidden and locked entities | v3 |
 
 Source: old: SG-16 to SG-19, SG-32, SG-49 to SG-51, SG-82, SG-97, SG-111, SG-112, SG-118b, SG-120

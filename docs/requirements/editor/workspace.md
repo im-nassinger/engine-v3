@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The frame around everything: where the panels sit, the top bar and status bar, the seven tools, moving around the level view, the grid and snapping, and how the editor behaves inside a browser. **v1:** fixed panels on top of a full-window level view, seven tools on number keys, pan and zoom from 1% to 1000%, a grid you can snap to, and the searchable shortcut list. **v2:** resizing and collapsing panels, and snapping to other entities with pink guides. The shortcut table itself is in [shortcuts.md](shortcuts.md).
+The frame around everything: where the panels sit, the top bar and status bar, the seven tools, moving around the level view, the grid and snapping, and how the editor behaves inside a browser. **v1:** fixed panels on top of a full-window level view, three of the seven tools on their number keys, pan and zoom from 1% to 1000%, and a grid you can snap to. **v2:** the other four tools and the searchable shortcut list. **v3:** resizing and collapsing panels, and snapping to other entities with pink guides. The shortcut table itself is in [shortcuts.md](shortcuts.md).
 
 Sizes in pixels are starting values until tested.
 
@@ -12,6 +12,7 @@ Sizes in pixels are starting values until tested.
 
 - The level view fills the whole window. The panels sit on top of it, in fixed places. *Why: the owner's change, so the level is always as big as it can be.*
 - Left: the toolbar strip, then the Layers panel above the Assets panel. Right: the Inspector, full height. Bottom: the Console, collapsed to a strip by default. Top: the top bar. Bottom edge: the status bar.
+- **In v1 there is no Assets panel and no Console**: the Layers panel takes the whole left side. Both come in v2 with scripts. *Why: the owner's smaller v1 has no files and no scripts.*
 - Panels can't be dragged to other places or floated. *Why: fixed panels are enough for the first version, and docking is a large feature.*
 - Starting sizes: toolbar 44 px wide, left panels 260 px, Inspector 300 px, top bar 44 px, status bar 24 px, Console 220 px when open.
 - The centre has a permanent `Level` tab. A `.lua` file opens as an extra closable tab beside it, one per file. The tab strip shows only while an extra tab is open.
@@ -19,9 +20,9 @@ Sizes in pixels are starting values until tested.
 - One dark theme. *Why: art and levels read well on it.*
 - Panel sizes, folded cards and open tabs are editor settings saved in the browser. They are never in the level and never in undo.
 
-Source: round 1: D12; round 3: 01 2.1; old: WS-01 to WS-15
+Source: round 1: D12; round 3: 01 2.1; old: WS-01 to WS-15; owner: 2026-11-13
 
-### Resize and collapse the panels · v2
+### Resize and collapse the panels · v3
 
 - Drag a panel's edge to make it wider or narrower: left panels 200 to 480 px, Inspector 260 to 520 px, Console 120 px to 60% of the window.
 - Click a panel's title to fold it away. A folded side panel becomes a 28 px strip. Double-clicking an edge restores the default size.
@@ -42,7 +43,7 @@ Left to right:
 | Level name | Click to rename in place. Enter commits, Esc cancels, an empty name reverts. Renaming is an undo step |
 | Save state | `Saved`, `Saving`, `Unsaved changes` or `Save failed`. Clicking it explains the state. See [saving](../play-and-save/saving.md) |
 | Undo and Redo | Greyed when empty. The tooltip names the step, such as `Undo: Move 3 entities` |
-| Snapping | Switches for the grid, and in v2 for snapping to entities |
+| Snapping | Switches for the grid, and in v3 for snapping to entities |
 | Play | Starts test play. During play the editor's bars and panels are hidden and the Play bar takes over, see [test play](../play-and-save/test-play.md) |
 | View menu | Switches what the editor draws over the level: Grid, Joint icons, Camera frame, Physics view. Each has a shortcut. Saved in the browser, never in the level. *Why: there will be several such switches, and one menu is where most editors put them* |
 | Zoom | Shows the percentage. Click to type a value or pick: Zoom in, Zoom out, 100%, Whole level, Selection, Camera frame |
@@ -76,6 +77,7 @@ Source: round 3: 01 2.2, 2.3; round 8: WN1; round 10: EM1; old: WS-29 to WS-31
 | 7 | Trigger zone | A sensor area with a trigger | [triggers](../triggers/triggers.md) |
 
 - *Why seven: the owner wanted fewer tools. Point editing moved into Select (double-click) as in Inkscape and Figma, and panning is Space, so neither needs a tool.*
+- **v1 has three of them: Select (1), Shape (4) and Joint (6).** The Pencil, the Bézier pen, Text and Trigger zone come in v2, on the keys above, so nothing is relearned. *Why: in the smaller v1 a path is decoration only, text was for a score, and there are no triggers.*
 - Exactly one tool is active, and its button is highlighted.
 - After making something, the tool returns to Select with the new entity selected.
 - **Tool lock:** double-clicking a tool button, or pressing its number key twice, keeps the tool active until another tool is picked or Esc is pressed.
@@ -85,7 +87,7 @@ Source: round 3: 01 2.2, 2.3; round 8: WN1; round 10: EM1; old: WS-29 to WS-31
 - A button clicked with the mouse doesn't keep keyboard focus, so a later Space or Enter can't press it again.
 - A disabled button still shows a tooltip giving the reason.
 
-Source: round 3: R11, 01 2.4; round 4: TK1; round 5: TK2; decisions: D11; old: WS-32 to WS-39
+Source: round 3: R11, 01 2.4; round 4: TK1; round 5: TK2; decisions: D11; old: WS-32 to WS-39; owner: 2026-11-13
 
 ### What Esc does · v1
 
@@ -102,7 +104,7 @@ So Esc walks outward and never only deselects inside a group. During play, Esc o
 
 Source: round 2: O7; old: WS-40, SG-79
 
-### The searchable list of shortcuts · v1
+### The searchable list of shortcuts · v2
 
 - `?` opens a sheet listing every shortcut by area. It stays open while you work and can be searched.
 - Every icon button has a tooltip with its name and shortcut.
@@ -110,8 +112,9 @@ Source: round 2: O7; old: WS-40, SG-79
 - Shortcuts can't be changed by the user.
 - On a Mac, Ctrl is Cmd and Alt is Option.
 - The shortcuts themselves are in [shortcuts.md](shortcuts.md).
+- *Why v2: it was settled before the scope review, so it never went through "smallest thing that can be tested". In v1 the main menu already lists every command with its shortcut.*
 
-Source: round 3: 01 2.5; old: WS-42 to WS-44, WS-140
+Source: round 3: 01 2.5; old: WS-42 to WS-44, WS-140; owner: 2026-11-13
 
 ## Moving around the level
 
@@ -140,7 +143,7 @@ Source: scope ED1; round 3: 01 2.6; round 5: 02 2.5; old: WS-46 to WS-52, WS-56,
 
 Source: scope ED4; round 3: 01 2.6; round 5: FMT1; round 7: BND2; old: WS-53, WS-54, WS-58 to WS-62
 
-### Snapping to other entities · v2
+### Snapping to other entities · v3
 
 - With it on, the edges and centre of what you move snap to the edges and centres of other entities, to the camera frame and to the level bounds. Equal gaps between neighbours snap too.
 - Thin pink guide lines show what is aligned, with a small distance label and equal-gap marks. They disappear on release.
@@ -169,14 +172,14 @@ These were accepted in the requirements review but never given a version. The la
 | No page gestures | Page scrolling, overscroll bounce and swipe-back are off on the editor page, because they would wreck a drag. The middle mouse button never starts the browser's autoscroll, and Alt alone never opens the browser menu | v1 |
 | Losing focus mid-drag | If the window loses focus during a drag, the drag cancels and held keys count as released | v1 |
 | Browser zoom | Browser zoom scales the interface. The level view stays sharp and the mouse stays accurate at any browser zoom | v1 |
-| Small windows | Under 1280 px wide the panels get narrower. Under 1024 px the Console, then the left panels, then the Inspector fold away by themselves and come back when there is room. Under 640×480 a notice asks for a bigger window. The level is never lost | v2 |
-| Touch devices | On a touch-only device a notice says the editor needs a mouse and keyboard | v2 |
-| First-run hints | A hint card in an empty level ("Press 4 and drag to draw a shape"), then one hint pointing to Play. Hints end after the first Play | v2 |
-| Hide all panels | `Ctrl+\` hides every panel and bar, leaving the level view and a small restore button | v2 |
-| Temporary zoom tool | Hold Z: drag draws a zoom box, click zooms in, Alt+click zooms out | v2 |
-| Scroll wheel pans | A setting for trackpads: two-finger scroll pans, pinch still zooms | v2 |
-| Rulers | Rulers along the top and left in level pixels, off by default | v2 |
-| Whole pixels | A snapping switch that keeps positions on whole pixels, on by default | v2 |
-| Short motion | Animations in the editor take 150 ms or less, and are off when the system asks for reduced motion | v2 |
+| Small windows | Under 1280 px wide the panels get narrower. Under 1024 px the Console, then the left panels, then the Inspector fold away by themselves and come back when there is room. Under 640×480 a notice asks for a bigger window. The level is never lost | v3 |
+| Touch devices | On a touch-only device a notice says the editor needs a mouse and keyboard | v3 |
+| First-run hints | A hint card in an empty level ("Press 4 and drag to draw a shape"), then one hint pointing to Play. Hints end after the first Play | v3 |
+| Hide all panels | `Ctrl+\` hides every panel and bar, leaving the level view and a small restore button | v3 |
+| Temporary zoom tool | Hold Z: drag draws a zoom box, click zooms in, Alt+click zooms out | v3 |
+| Scroll wheel pans | A setting for trackpads: two-finger scroll pans, pinch still zooms | v3 |
+| Rulers | Rulers along the top and left in level pixels, off by default | v3 |
+| Whole pixels | A snapping switch that keeps positions on whole pixels, on by default | v3 |
+| Short motion | Animations in the editor take 150 ms or less, and are off when the system asks for reduced motion | v3 |
 
 Source: round 3: 01 2.13; old: WS-11, WS-36, WS-51, WS-55, WS-59, WS-137 to WS-139, WS-145 to WS-153

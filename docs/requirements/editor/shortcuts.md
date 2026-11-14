@@ -14,7 +14,7 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 
 | Keys | What it does | Works | Feature |
 |---|---|---|---|
-| 1 to 7 | Pick a tool: Select, Pencil, Bézier pen, Shape, Text, Joint, Trigger zone. Twice locks the tool | Editor | Tools, v1 |
+| 1 to 7 | Pick a tool: Select, Pencil, Bézier pen, Shape, Text, Joint, Trigger zone. Twice locks the tool | Editor | Tools, v1 (Select, Shape, Joint), v2 (the others) |
 | Space (hold) | Pan | Editor | Pan and zoom, v1 |
 | F | Zoom to the selection, or to the whole level with nothing selected | Editor | Pan and zoom, v1 |
 | + or Ctrl+=, - or Ctrl+- | Zoom in, zoom out | Editor | Pan and zoom, v1 |
@@ -41,12 +41,12 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 | Ctrl+Enter | Play, or Stop while playing. In a field it commits the field first | Everywhere | Test play, v1 |
 | F8 | Pause or resume test play | Everywhere | Pause and Step, v1 |
 | F9 | Step one tick while paused | Everywhere | Pause and Step, v1 |
-| ? | The shortcut list | Editor | Shortcut list, v1 |
-| Ctrl+J | Open or close the Console | Everywhere | Console, v1 |
-| Shift+S | Snapping to entities on or off | Editor | Snapping to entities, v2 |
-| Ctrl+Alt+C, Ctrl+Alt+V | Copy and paste the component card under the mouse | Editor | Copy values, v2 |
-| Ctrl+I | Invert the selection | Editor | Invert selection, v2 |
-| Ctrl+Shift+L | Lock or unlock the selection | Editor | Lock, v2 |
+| ? | The shortcut list | Editor | Shortcut list, v2 |
+| Ctrl+J | Open or close the Console | Everywhere | Console, v2 |
+| Shift+S | Snapping to entities on or off | Editor | Snapping to entities, v3 |
+| Ctrl+Alt+C, Ctrl+Alt+V | Copy and paste the component card under the mouse | Editor | Copy values, v3 |
+| Ctrl+I | Invert the selection | Editor | Invert selection, v3 |
+| Ctrl+Shift+L | Lock or unlock the selection | Editor | Lock, v3 |
 | Ctrl+Shift+H | Hide or show the selection | Editor | Hide, v1 |
 | Page Up, Page Down | Bring forward, send backward | Editor | Draw order commands, unscoped |
 | Home, End | Bring to front, send to back | Editor | Draw order commands, unscoped |
@@ -64,8 +64,8 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 | Shift while dragging | Lock a move to one axis, keep proportions, or snap a rotation to 15° | Handles, v1 |
 | Alt while resizing or drawing | Resize or draw from the centre | Handles, v1 |
 | Ctrl while dragging | Turn snapping off | Grid, v1 |
-| Double-click | Go into a group, edit text, edit points | v1 |
-| Alt+click | Select the next entity underneath | Next underneath, v2 |
+| Double-click | Go into a group, edit points. Edit text from v2 | v1 |
+| Alt+click | Select the next entity underneath | Next underneath, v3 |
 | Alt+drag an entity | Drag out a copy | Unscoped |
 | Right-click | Context menu | Unscoped |
 

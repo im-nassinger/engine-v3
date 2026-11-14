@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-What the game does, in eight topics: editor, drawing, assets, physics, camera, triggers, scripts, play and save. **These are functional requirements only:** what a creator or player does and sees, never how it is built. Every feature is marked v1, v2 or Later, with the reason where the review recorded one. Read a topic's TL;DR first, then its feature table, then the rules. For every feature and its version on one page, see [scope.md](../scope.md).
+What the game does, in eight topics: editor, drawing, assets, physics, camera, triggers, scripts, play and save. **These are functional requirements only:** what a creator or player does and sees, never how it is built. Every feature is marked v1, v2, v3, v4 or Later, with the reason where the review recorded one. Read a topic's TL;DR first, then its feature table, then the rules. For every feature and its version on one page, see [scope.md](../scope.md).
 
 ## Topics
 
@@ -16,7 +16,7 @@ What the game does, in eight topics: editor, drawing, assets, physics, camera, t
 | [triggers/](triggers/README.md) | Triggers (When, If, Do), events, actions, variables, inputs |
 | [scripts/](scripts/README.md) | The ScriptComponent, the Lua API, the code editor, the Console, debugging |
 | [play-and-save/](play-and-save/README.md) | Test play, the pause menu, the end window, determinism, saving, level files |
-| [later.md](later.md) | Features after v2 that aren't designed yet: a main menu, publishing, accounts, replays |
+| [later.md](later.md) | Features after v3 that aren't designed yet: a main menu, publishing, accounts, replays |
 
 A small topic is one file. A bigger one is a folder whose `README.md` lists its files and every feature with its version.
 

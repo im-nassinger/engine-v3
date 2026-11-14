@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-How entities move and collide. A **BodyComponent** says how something moves, a **SurfaceComponent** says how its shape collides. **v1:** add a body in one click, the Box2D body settings, the surface settings (density, friction, restitution, sensor), merging shapes in a group into one body, and the physics view. **v2:** one-way platforms and the warnings for setups that behave badly. Core rules: new shapes have no physics until you add it, collision always matches what you see, and touching is detected by the physics engine alone.
+How entities move and collide. A **BodyComponent** says how something moves, a **SurfaceComponent** says how its shape collides. **v1:** add a body in one click, the Box2D body settings, the surface settings (density, friction, restitution, sensor), merging shapes in a group into one body, and the physics view. **v2:** sensors and touching, for triggers and scripts. **v3:** one-way platforms and the warnings for setups that behave badly. Core rules: new shapes have no physics until you add it, collision always matches what you see, and touching is detected by the physics engine alone.
 
 Field names are Box2D's, so the Inspector, the Lua API and tutorials match. The scale is 50 px per metre and is not a setting.
 
@@ -62,12 +62,12 @@ Source: scope PH2; round 3: P1; round 7: 05 2.4; old: PH-17 to PH-19
 - **There are no material presets.** *Why: presets would be a real feature of their own (browse and save presets on any component). Not in v1.*
 - **A surface with no BodyComponent on it or above it acts as Static.** No hidden body is created. *Why: nothing happens behind the user's back, and "a surface without a body stays still" is Unity's rule.*
 - Friction, Restitution and Sensor can change during play. Density can't.
-- In v1 every solid surface hits every other one. What hits what is set in v2 by the [collision grid](world.md).
+- In v1 every solid surface hits every other one. What hits what is set in v3 by the [collision grid](world.md).
 - Only the shape collides, so a thick outline can overlap its neighbours by half its width.
 
 Source: scope PH3; round 1: C7; round 6: 05 2.5; round 7: SF1, SN1; round 8: CT1; old: PH-20, PH-21
 
-### Sensors and touching · v1
+### Sensors and touching · v2
 
 - A sensor notices things entering it but doesn't push them. Triggers and scripts decide what happens.
 - **Triggers that react to touching need a SurfaceComponent.** Without one, the trigger card shows "Needs a SurfaceComponent to notice touching. [Add SurfaceComponent as sensor]".
@@ -77,10 +77,11 @@ Source: scope PH3; round 1: C7; round 6: 05 2.5; round 7: SF1, SN1; round 8: CT1
 - Sensors add no weight.
 - Sensors check once per tick and are not protected against fast entities: something moving 600 px/s travels 10 px each tick and can skip a thin sensor.
 - The body type rule applies: a Static sensor can't notice a Kinematic body.
+- *Why v2: noticing a touch is only for triggers and scripts, which come in v2. The Sensor setting itself is in v1, because it is one Box2D setting.*
 
-Source: scope PH3; round 6: 05 2.11; round 7: SN1; old: PH-58 to PH-63
+Source: scope PH3; round 6: 05 2.11; round 7: SN1; old: PH-58 to PH-63; owner: 2026-11-13
 
-### One-way platforms · v2
+### One-way platforms · v3
 
 - One-way is a SurfaceComponent setting: a checkbox and a direction, **up by default**. No component, no script. *Why: it is about how a surface collides. It must be decided inside the physics step for every contact, where Lua would be slow and fragile for determinism.*
 - An arrow on the shape shows the direction things pass through. Up is the classic platform: jump up through it, land on top. The arrow turns with the entity.
@@ -133,7 +134,7 @@ Source: round 6: 05 2.7; old: PH-32 to PH-38
 
 Source: scope PH8; round 6: 05 2.8, 05 2.16; round 8: VW1; old: PH-39 to PH-43, PH-100, PH-101
 
-### Warnings for physics setups · v2
+### Warnings for physics setups · v3
 
 Editor messages for setups likely to behave badly. None of them stops you playing.
 
@@ -166,8 +167,8 @@ Left over from the old draft, or accepted without a version. The last column is 
 | Does one click add the surface too? | The old draft added Body and Surface together. The review says partners are never added automatically, and the scope lists them as two features | Needs a decision |
 | Start asleep, starting velocity, starting spin | Three body fields from the old draft. The reviewed field list doesn't include them | Later |
 | Physics on a group in one step | Adding physics to a group gave every shape inside a surface too | Needs a decision |
-| "New shapes: no physics, Static, Dynamic" | A Shape tool option so that laying out ground takes no extra clicks | v2 |
-| Physics view details | Colour per body, hatched fill for Static, dashed for sensors, centre of mass, contact points, a legend. v1 uses Box2D's own drawing | v2 |
-| Mass ratio hint | Stacks and joints turn wobbly past 10 to 1 in mass. The Density hint says so | v2 |
+| "New shapes: no physics, Static, Dynamic" | A Shape tool option so that laying out ground takes no extra clicks | v3 |
+| Physics view details | Colour per body, hatched fill for Static, dashed for sensors, centre of mass, contact points, a legend. v1 uses Box2D's own drawing | v3 |
+| Mass ratio hint | Stacks and joints turn wobbly past 10 to 1 in mass. The Density hint says so | v3 |
 
 Source: old: PH-02 to PH-13, PH-17, PH-22, PH-23, PH-41, PH-43

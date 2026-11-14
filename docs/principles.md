@@ -29,7 +29,7 @@ The rules every requirement follows, and the rules for proposing a change. They 
 | **There is no special player** | No feature assumes one | To start somewhere else, move the entity the camera follows |
 | **The game decides nothing the creator should** | | No lives system, no title card |
 | **Determinism is a tested requirement** | The same level, seed, inputs and clock time give the same run on any computer | Touching is detected by the physics engine, not a second system |
-| **v1 is the smallest thing that can be tested** | Versions are decided in the scope review, not inside a requirement | v1 holds one level at a time and opens straight on the editor |
+| **v1 is the smallest thing that can be tested** | Versions are decided in the scope review, not inside a requirement | v1 holds one level at a time, opens straight on the editor, and has no logic: you build a level and watch it run |
 | **Don't plan for what is certainly later** | Publishing, accounts, moderation, replays, sprite sheets, animations, parallax are not designed now | |
 
 ## Rules for proposing a change

@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Where a level lives and how it leaves the browser. **v1:** one level at a time, saved in the browser after every change, exported and imported as a project file (`.editable`); a warning when saving fails; the game asks the browser to keep its data; a second tab is read-only; every file records its file format version and its physics version; a level holds at most 100,000 entities and 256 MB. **v2:** the play file (`.playable`) with a way to run it without the editor, and the warning after 10,000 entities. Core rules: the level lives in one browser that may delete it, so the game is honest about that and only an exported file is a real backup; there is no list of levels, no level id and no version history in v1.
+Where a level lives and how it leaves the browser. **v1:** one level at a time, saved in the browser after every change, exported and imported as a project file (`.editable`); a warning when saving fails; the game asks the browser to keep its data; a second tab is read-only; every file records its file format version and its physics version; a level holds at most 100,000 entities and 256 MB. **v3:** the play file (`.playable`) with a way to run it without the editor, and the warning after 10,000 entities. Core rules: the level lives in one browser that may delete it, so the game is honest about that and only an exported file is a real backup; there is no list of levels, no level id and no version history in v1.
 
 A main menu with a list of levels, thumbnails, accounts and publishing are in [later.md](../later.md).
 
@@ -100,20 +100,20 @@ Source: owner: 2026-11-13; round 1: D8; old: SV-15
 
 Source: round 11: 12 A8; old: SV-52, SV-54
 
-### The warning after 10,000 entities · v2
+### The warning after 10,000 entities · v3
 
 - Past 10,000 entities a small warning appears, which you can dismiss.
-- *Why v2: test levels stay far below it. The 100,000 limit holds in v1 either way.*
+- *Why v3: test levels stay far below it. The 100,000 limit holds in v1 either way.*
 
 Source: scope SA6; round 11: 12 A8
 
-### The play file · v2
+### The play file · v3
 
 - **The play file, `.playable`, is made from the project file and holds only what is needed to play.** Example: `castle.playable`.
 - It drops editor-only data: the grid size, locks, folded Layers rows. Hidden is not editor-only, so it stays. *Why: the grid serves no purpose to a player.*
 - It is a package too: a `.zip` inside with the level and every file it uses. *Why: one packing idea for everything, instead of a second rule.*
-- v2 also adds a way to open a play file and run the level without the editor, see [test play](test-play.md).
-- *Why v2: before publishing, nobody else plays your levels. The project file already keeps and moves them.*
+- v3 also adds a way to open a play file and run the level without the editor, see [test play](test-play.md).
+- *Why v3: before publishing, nobody else plays your levels. The project file already keeps and moves them.*
 
 Source: scope SA4; round 5: FMT1; round 6: FMT2; round 11: 12 A10; round 12: EXT1
 
@@ -128,10 +128,10 @@ Left over from the old draft. The last column is Claude's suggestion, not a deci
 | A note after a crash | Reopening after a crash loads the last save and says: "Recovered from your last save at 14:32. The last few seconds may be missing." | v1 |
 | A saved level that won't open | It is checked like an import. If it fails, the game offers to export the raw data and never deletes it | v1 |
 | Site data cleared while the level is open | The open level is still in memory, so the game saves it again and says so | v1 |
-| Edit here instead | A button in the read-only tab that takes over editing. The other tab saves and turns read-only | v2 |
-| An Export dialog | The file name, counts of entities and files, the size and one button | v2 |
-| A note about scripts on import | "Contains 4 scripts. They can't reach your files or other levels." Never a blocking question | v2 |
-| Update available | When a new version of the game is out, an open tab offers Reload and never reloads by itself | v2 |
+| Edit here instead | A button in the read-only tab that takes over editing. The other tab saves and turns read-only | v3 |
+| An Export dialog | The file name, counts of entities and files, the size and one button | v3 |
+| A note about scripts on import | "Contains 4 scripts. They can't reach your files or other levels." Never a blocking question | v3 |
+| Update available | When a new version of the game is out, an open tab offers Reload and never reloads by itself | v3 |
 | Level details | Description, author, instructions and level tags, in a Level info window. They are for a level's page | Later |
 | Limits from the old draft | 2,000 files in a level and 250 MB unpacked. The review set only the entity and file size limits | Needs a decision |
 

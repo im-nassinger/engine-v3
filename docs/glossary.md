@@ -153,20 +153,20 @@ Component names end in `Component`. The Transform is the one name the sources wr
 | TagsComponent | The entity's tags | Any entity |
 | ShapeComponent | A rectangle, ellipse, polygon or line | Any entity |
 | PathComponent | A curved path. Read-only on Rope, Spring and Rod joints | Any entity |
-| TextComponent | Text and its font settings | Any entity |
+| TextComponent | Text and its font settings (v2) | Any entity |
 | StyleComponent | Fill, outline and opacity, for a shape, path or text | Any entity that draws |
-| EffectsComponent | Pixelate, shadow, blur (v2) | Any entity that draws |
+| EffectsComponent | Pixelate, shadow, blur (v3) | Any entity that draws |
 | BodyComponent | Body type and how it moves | Any entity |
 | SurfaceComponent | How a shape collides | Any entity with a shape |
 | JointComponent | The joint type, its two entities A and B, and its settings | A joint |
 | CameraComponent | The camera's size, mode and follow settings | The camera |
-| FlexComponent | Arranges children in a row or column (v2) | Any entity |
-| TriggerComponent | A list of triggers | Any entity, the World included |
-| ScriptComponent | A list of `.lua` files, each with its settings | Any entity |
-| AssetComponent | Marks a linked copy and records its `.entity` file (v2) | A linked copy |
+| FlexComponent | Arranges children in a row or column (v3) | Any entity |
+| TriggerComponent | A list of triggers (v2) | Any entity, the World included |
+| ScriptComponent | A list of `.lua` files, each with its settings (v2) | Any entity |
+| AssetComponent | Marks a linked copy and records its `.entity` file (v3) | A linked copy |
 | PhysicsWorldComponent | Gravity, game speed, the collision grid | The World |
-| VariablesComponent | The level's variables | The World |
-| InputComponent | The level's inputs | The World |
+| VariablesComponent | The level's variables (v2) | The World |
+| InputComponent | The level's inputs (v2) | The World |
 
 ## Dropped words
 

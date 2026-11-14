@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-What the player sees. There is exactly one camera, an entity with a CameraComponent, and the entities inside it stay fixed on the screen. **v1:** one camera in Fixed size that follows an entity with smoothing and stops at the level bounds, and entities inside the camera for a score or timer. **v2:** Fill window, the FlexComponent (the one layout system, also for placing things against the screen's edges), follow offset, dead zone and look-ahead, HUD mode, zoom during play, and camera shake. **Later:** parallax and more cameras. Core rules: there are no anchors, "HUD" is not a kind of entity, and the camera never rotates.
+What the player sees. There is exactly one camera, an entity with a CameraComponent, and the entities inside it stay fixed on the screen. **v1:** one camera in Fixed size that follows an entity with smoothing and stops at the level bounds. **v2:** entities inside the camera, for a score or timer. **v3:** Fill window, the FlexComponent (the one layout system, also for placing things against the screen's edges), follow offset, dead zone and look-ahead, HUD mode, zoom during play, and camera shake. **Later:** parallax and more cameras. Core rules: there are no anchors, "HUD" is not a kind of entity, and the camera never rotates.
 
 ## The camera
 
@@ -26,20 +26,20 @@ Source: round 1: C4; round 5: 02 2.15; round 7: 07 2.1, 07 2.7, 07 2.15, BND2; r
 
 - The camera shows exactly its own box. Every player sees the same area.
 - If the window has different proportions, **black bars** fill the rest. The view is centred and scaled to fit.
-- New levels in v1 start in Fixed size.
-- *Why v1: positions inside the camera are then always the same, so a score stays in its corner without any layout.*
+- New levels start in Fixed size until v3.
+- *Why v1: it is the only camera mode until Fill window. Positions inside the camera are then always the same, so a score stays in its corner without any layout.*
 
-Source: scope CM3; round 7: 07 2.2, 07 2.12; old: CM-11, CM-83
+Source: scope CM3; round 7: 07 2.2, 07 2.12; old: CM-11, CM-83; owner: 2026-11-13
 
-### Fill window · v2
+### Fill window · v3
 
 - The same height as the camera's box, and wider windows see more of the level sideways.
 - **There is no limit on how wide.** Black bars only appear where the view would go past the level bounds. *Why: the owner rejected a 21:9 cap.*
 - A window narrower than the camera's box keeps the whole box and gets bars above and below. Nothing the creator framed is ever cut off.
-- From v2, new levels start in Fill window. *Why: a browser window is rarely exactly 16:9, so Fixed size shows bars for most players.*
+- From v3, new levels start in Fill window. *Why: a browser window is rarely exactly 16:9, so Fixed size shows bars for most players.*
 - What is inside the camera scales with the window's height, the same as the level, so it keeps its size on every screen.
 - Scripts and triggers work only with the camera's own box, never the wider view. An enemy that wakes when it enters the camera's box behaves the same on every screen.
-- *Why v2: on a wider window a score placed in the corner would no longer be in the corner. That needs the FlexComponent, so the two go together.*
+- *Why v3: on a wider window a score placed in the corner would no longer be in the corner. That needs the FlexComponent, so the two go together.*
 
 Source: scope CM4; round 1: D48, D49, D55; round 2: O10; round 7: 07 2.2, 07 2.12; old: CM-12, CM-14, CM-16, CM-18, CM-82
 
@@ -58,7 +58,7 @@ Source: scope CM4; round 1: D48, D49, D55; round 2: O10; round 7: 07 2.2, 07 2.1
 
 Source: scope CM1; round 1: D52; round 7: 07 2.4, 07 2.5; round 9: 11 2.5; old: CM-29, CM-34, CM-39, CM-40, CM-43 to CM-48
 
-### Offset, dead zone, look-ahead · v2
+### Offset, dead zone, look-ahead · v3
 
 - **Offset:** added to the target's position, in level pixels. It doesn't turn with the target.
 - **Dead zone** (width and height): the camera stays still while the target is inside this box. A box as tall as a normal jump keeps jumps from moving the camera.
@@ -67,7 +67,7 @@ Source: scope CM1; round 1: D52; round 7: 07 2.4, 07 2.5; round 9: 11 2.5; old: 
 
 Source: scope CM2; round 1: D53; round 7: 07 2.4; old: CM-32, CM-35, CM-36, CM-24
 
-### Zoom during play · v2
+### Zoom during play · v3
 
 - Zoom goes from 0.1 to 10. Higher is closer. It can change during play, with Change value like any other value.
 - Zoom never affects what is inside the camera, and never affects physics.
@@ -75,7 +75,7 @@ Source: scope CM2; round 1: D53; round 7: 07 2.4; old: CM-32, CM-35, CM-36, CM-2
 
 Source: scope CM8; round 7: 07 2.8; old: CM-59 to CM-62
 
-### Camera control from triggers and scripts · v2
+### Camera control from triggers and scripts · v3
 
 - Triggers and scripts can make the camera follow something else, move, zoom, shake, jump to its target, or change its limits.
 - What is a value is changed with Change value: the follow target, zoom, offset, smoothing, dead zone, look-ahead. Scripts change the same values through the Lua API.
@@ -88,7 +88,7 @@ Source: scope CM9; round 7: 07 2.6; round 9: 09 2.4b; old: CM-50 to CM-57
 
 ## Inside the camera
 
-### Entities inside the camera stay on the screen · v1
+### Entities inside the camera stay on the screen · v2
 
 - **An entity inside the camera stays fixed on the screen during play.** This is how a score or a timer is made.
 - **"HUD" is not a kind of entity**, only a short name for the entities inside the camera. The editor says "inside the camera". *Why: they are regular entities. The only difference is their parent.*
@@ -97,13 +97,14 @@ Source: scope CM9; round 7: 07 2.6; round 9: 09 2.4b; old: CM-50 to CM-57
 - Triggers inside the camera work for clicks, hover, keys, timers and custom events. Touch events never fire there.
 - What is inside the camera is drawn above the level, and below the end window and pause menu.
 - Moving an entity into or out of the camera keeps it where it appears, like any move between groups.
-- In v1 you place these entities by hand. With Fixed size their positions are the same on every screen.
+- Until Flex in v3 you place these entities by hand. With Fixed size their positions are the same on every screen.
 - In the level view, single clicks pass through the entities inside the camera, so they never block the level. Double-click the camera's frame, or select them in the Layers panel, to reach them.
 - Something that moves with the view and touches the level, such as a wall that chases the player, can't be inside the camera. Make it a Kinematic body that the camera follows.
+- *Why v2: its reason is a score or a timer, which need variables.*
 
-Source: scope CM6; round 1: C4, D18; round 7: 07 2.14; round 8: HUD1, HUD2; old: CM-69, CM-70, CM-74, CM-75, CM-92 to CM-96
+Source: scope CM6; round 1: C4, D18; round 7: 07 2.14; round 8: HUD1, HUD2; old: CM-69, CM-70, CM-74, CM-75, CM-92 to CM-96; owner: 2026-11-13
 
-### The FlexComponent · v2
+### The FlexComponent · v3
 
 - **There are no anchors. Flex is the one layout system.** A FlexComponent keeps an entity's children arranged, in the editor and in play.
 - Its settings use CSS names: **direction** (row or column), **justify content**, **align items**, **gap**, **padding**.
@@ -115,12 +116,12 @@ Source: scope CM6; round 1: C4, D18; round 7: 07 2.14; round 8: HUD1, HUD2; old:
 
 Source: scope CM5; round 4: FX1; round 9: AN2; round 1: D50; round 7: TX2
 
-### HUD mode · v2
+### HUD mode · v3
 
 - Double-clicking the camera's frame goes into the camera, like going into a group. The level is dimmed, and Esc goes back.
 - While inside, drawing tools create entities inside the camera, and paste lands there.
 - Editing there is at the camera's own size, whatever the camera's zoom or the editor's zoom.
-- In v1 you still go into the camera the same way, without the dimming.
+- Before v3 you still go into the camera the same way, without the dimming.
 
 Source: scope CM7; round 7: 07 2.10; old: CM-71 to CM-73
 
@@ -147,12 +148,12 @@ Left over from the old draft and not asked about in the review. The last column 
 |---|---|---|
 | Follow by tag | The target could be a tag, so a spawned player is found without a script. The entity highest in the Layers panel would win | Needs a decision |
 | Safety margin | However soft the smoothing, the target is never allowed within 10% of the view's edge. A teleport far away becomes a cut, not a long pan | v1 |
-| Follow each direction separately | Switch following sideways or up and down off, for fixed-height side-scrollers | v2 |
+| Follow each direction separately | Switch following sideways or up and down off, for fixed-height side-scrollers | v3 |
 | Follow style presets | Platformer, Free, Vehicle, Locked. They only fill in values. The review dropped presets on other components | Later |
-| Limits other than the level bounds | A trigger or script replaces the camera's limits with the bounds of any shape, then restores them. This gives room-by-room cameras | v2 |
-| View through camera | The level view becomes a read-only preview of what players see, at a chosen window shape | v2 |
-| Bar colour | The colour of the bars, black by default | v2 |
-| View size list | A dropdown of common sizes (16:9, 16:10, 4:3, 1:1, 9:16), all 1080 high, plus custom from 160 to 7680 | v2 |
+| Limits other than the level bounds | A trigger or script replaces the camera's limits with the bounds of any shape, then restores them. This gives room-by-room cameras | v3 |
+| View through camera | The level view becomes a read-only preview of what players see, at a chosen window shape | v3 |
+| Bar colour | The colour of the bars, black by default | v3 |
+| View size list | A dropdown of common sizes (16:9, 16:10, 4:3, 1:1, 9:16), all 1080 high, plus custom from 160 to 7680 | v3 |
 | Hiding the camera's children | The camera's eye would hide everything inside it, in the editor and in play. The review says the camera has no eye | Needs a decision |
 
 Source: old: CM-13, CM-22, CM-25 to CM-28, CM-30, CM-31, CM-33, CM-37, CM-38, CM-49, CM-83

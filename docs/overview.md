@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-A 2D physics game for the browser, built around a level editor. A creator builds a level out of shapes, text, physics bodies, joints, triggers and Lua scripts, presses Play to test it, and exports it as a file. **There is no code yet.** These docs hold the functional requirements (what the game does) and the scope (which version each feature ships in). The architecture and the stack come next. v1 is the smallest thing that can be tested: build one level, play it, export it.
+A 2D physics game for the browser, built around a level editor. A creator builds a level out of shapes, text, physics bodies, joints, triggers and Lua scripts, presses Play to test it, and exports it as a file. **There is no code yet.** These docs hold the functional requirements (what the game does) and the scope (which version each feature ships in). The architecture and the stack come next. v1 is the smallest thing that can be tested: build one level, watch it run, export it. Logic, and so playing a level, comes in v2.
 
 ## What it is
 
@@ -26,11 +26,13 @@ The full list, with the review decision behind each, is in [principles.md](princ
 
 | Version | What it is | In short |
 |---|---|---|
-| **v1** | Building and local play. The smallest thing that can be tested | One level of coloured shapes and text, physics with three joints, triggers, variables, inputs, scripts, the builtin player, test play, saving in the browser, export and import |
-| **v2** | Polish and content | Images, sound, four more joints, the collision grid, Flex and Fill window, linked copies, the builtin library, remapping and gamepads, editor comforts, the play file |
-| **Later** | After v2 | A main menu with a list of levels, component presets, accounts and publishing (planned as v3), replays, sprite sheets |
+| **v1** | Build and watch. The smallest thing that can be tested | One level of coloured shapes, physics with three joints, the camera following an entity, Play, Stop, Pause and Step, the determinism test, saving in the browser, export and import. Nothing reacts to keys |
+| **v2** | Logic and play | Triggers, variables, inputs, scripts with the code editor and the Console, the Assets panel, `.entity` files and spawning, the builtin player, Win and Lose, the pause menu, text, paths, gradients |
+| **v3** | Polish and content | Images, sound, four more joints, the collision grid, Flex and Fill window, linked copies, the builtin library, remapping and gamepads, editor comforts, the play file |
+| **v4** | Accounts and publishing | Not designed yet |
+| **Later** | Not designed yet | A main menu with a list of levels, component presets, replays, sprite sheets |
 
-117 features went through the scope review: 51 in v1, 65 in v2, 1 Later. Every one is listed in [scope.md](scope.md) with its reason.
+117 features went through the scope review. The owner then made v1 smaller, so today: 31 in v1, 20 in v2, 65 in v3, 1 Later, plus the features settled outside the review. Every one is listed in [scope.md](scope.md) with its reason.
 
 ## How to read these docs
 

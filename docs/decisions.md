@@ -37,6 +37,14 @@ How the docs do it:
 
 Where this differs from the earlier plan (`docs-cleanup-plan.md` in the old project): `scope.md` was kept as the one-page list of every feature, the technical notes are one file instead of one per topic, and a small topic is a single file instead of a folder.
 
+## 2026-11-13: A smaller v1
+
+The owner found v1 too big: 107 features, some of them settled before the scope review and never put through "smallest thing that can be tested". **v1 is now a level you build and watch:** coloured shapes, bodies, three joints, Play, Stop, Pause and Step, saving and export, with no logic. The cut is "no logic" because the smallest player you can steer is the builtin player, which is a Lua script, so any logic brings Lua, the code editor and the Console with it.
+
+43 features moved to a new **v2, logic and play**: triggers, variables, inputs, scripts, the code editor and the Console, the Assets panel, `.entity` files and spawning, the builtin player, Win and Lose, the pause menu, the random seed, Panels, text, entities inside the camera, the Bézier pen and the Pencil, gradients, and the shortcut sheet. The old v2 became **v3**, and accounts and publishing became **v4**. The one rule that changed: v1 shows only three tools, Select, Shape and Joint.
+
+The trade-off the owner accepted: nobody can play a v1 level, only watch it, and the game loop is built before scripts exist. The written v2 rules are what keep the architecture planning for them.
+
 ## Still to decide
 
 - **The architecture and the stack.** Nothing is chosen. The requirements name a few things the owner did choose along the way: Box2D v3, Lua 5.4 and the Monaco editor.
