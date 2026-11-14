@@ -209,6 +209,5 @@ Left over from the old draft. The last column is Claude's suggestion, not a deci
 | Performance warnings | A note on the Play bar when the game can't keep 60 ticks per second | v3 |
 | End window extras | The old draft's end window also had the creator's own win and lose text, a score taken from a variable, the best time and an attempt count. The review kept a title, the time, Restart and Leave | Later |
 | Retry instantly | A level setting that skips the end window after Lose and restarts at once | Later |
-| Play as player | A test run with no debug tools. Play already hides the panels, and v3 runs the play file | Dropped |
 
 Source: old: PL-07, PL-08, PL-26, PL-45, PL-46, PL-48, PL-49, PL-54, PL-102 to PL-105, PL-109, PL-112

@@ -74,12 +74,12 @@ Source: round 3: 01 2.2, 2.3; round 8: WN1; round 10: EM1; old: WS-29 to WS-31
 | 4 | Shape | A rectangle, ellipse, polygon or line | [drawing](../drawing.md) |
 | 5 | Text | A text entity | [drawing](../drawing.md) |
 | 6 | Joint | A joint between two entities | [joints](../physics/joints.md) |
-| 7 | Trigger zone | A sensor area with a trigger | [triggers](../triggers/triggers.md) |
+| 7 | Trigger | A rectangle that notices touching, with a trigger | [triggers](../triggers/triggers.md) |
 
 - *Why seven: the owner wanted fewer tools. Point editing moved into Select (double-click) as in Inkscape and Figma, and panning is Space, so neither needs a tool.*
-- **v1 has three of them: Select (1), Shape (4) and Joint (6).** The Pencil, the Bézier pen, Text and Trigger zone come in v2, on the keys above, so nothing is relearned. *Why: in the smaller v1 a path is decoration only, text was for a score, and there are no triggers.*
+- **v1 has three of them: Select (1), Shape (4) and Joint (6).** The Pencil, the Bézier pen, Text and Trigger come in v2, on the keys above, so nothing is relearned. *Why: in the smaller v1 a path is decoration only, text was for a score, and there are no triggers.*
 - Exactly one tool is active, and its button is highlighted.
-- After making something, the tool returns to Select with the new entity selected.
+- **After making something, every tool returns to Select** with the new entity selected, the Joint tool included. To make many in a row, use tool lock. *Why: one rule for every tool, and tool lock already covers placing many joints (owner: 2026-11-13).*
 - **Tool lock:** double-clicking a tool button, or pressing its number key twice, keeps the tool active until another tool is picked or Esc is pressed.
 - Hold Space to pan with any tool. Releasing returns to that tool. It works between clicks of an unfinished path, and is ignored while typing.
 - Dragging with the middle mouse button pans at any time, even during a drawing drag.

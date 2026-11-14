@@ -14,7 +14,7 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 
 | Keys | What it does | Works | Feature |
 |---|---|---|---|
-| 1 to 7 | Pick a tool: Select, Pencil, Bézier pen, Shape, Text, Joint, Trigger zone. Twice locks the tool | Editor | Tools, v1 (Select, Shape, Joint), v2 (the others) |
+| 1 to 7 | Pick a tool: Select, Pencil, Bézier pen, Shape, Text, Joint, Trigger. Twice locks the tool | Editor | Tools, v1 (Select, Shape, Joint), v2 (the others) |
 | Space (hold) | Pan | Editor | Pan and zoom, v1 |
 | F | Zoom to the selection, or to the whole level with nothing selected | Editor | Pan and zoom, v1 |
 | + or Ctrl+=, - or Ctrl+- | Zoom in, zoom out | Editor | Pan and zoom, v1 |

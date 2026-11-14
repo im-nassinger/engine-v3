@@ -112,7 +112,7 @@ export class ToolController {
 
 - **Panning comes before any tool:** middle drag pans at any time, and holding Space pans with any tool and returns to it on release. `PanGesture` changes `ViewState` only, so it never makes a step.
 - **After making something the tool returns to Select** with the new entity selected, unless tool lock is on (open question 4 stays as written).
-- v1 registers three tools. v2 adds Pencil, Bézier pen, Text and Trigger zone as new classes on their keys, and nothing else changes.
+- v1 registers three tools. v2 adds Pencil, Bézier pen, Text and Trigger as new classes on their keys, and nothing else changes.
 
 ## Esc
 

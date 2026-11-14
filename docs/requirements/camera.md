@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-What the player sees. There is exactly one camera, an entity with a CameraComponent, and the entities inside it stay fixed on the screen. **v1:** one camera in Fixed size that follows an entity with smoothing and stops at the level bounds. **v2:** entities inside the camera, for a score or timer. **v3:** Fill window, the FlexComponent (the one layout system, also for placing things against the screen's edges), follow offset, dead zone and look-ahead, HUD mode, zoom during play, and camera shake. **Later:** parallax and more cameras. Core rules: there are no anchors, "HUD" is not a kind of entity, and the camera never rotates.
+What the player sees. There is exactly one camera, an entity with a CameraComponent, and the entities inside it stay fixed on the screen. **v1:** one camera in Fixed size that follows an entity with smoothing and stops at the level bounds. **v2:** following a tag, and entities inside the camera, for a score or timer. **v3:** Fill window, the FlexComponent (the one layout system, also for placing things against the screen's edges), follow offset, dead zone and look-ahead, HUD mode, zoom during play, and camera shake. **Later:** parallax and more cameras. Core rules: there are no anchors, "HUD" is not a kind of entity, and the camera never rotates.
 
 ## The camera
 
@@ -59,6 +59,15 @@ Source: scope CM4; round 1: D48, D49, D55; round 2: O10; round 7: 07 2.2, 07 2.1
 - **There is no special player.** To start a level somewhere else, move the entity the camera follows.
 
 Source: scope CM1; round 1: D52; round 7: 07 2.4, 07 2.5; round 9: 11 2.5; old: CM-29, CM-34, CM-39, CM-40, CM-43 to CM-48
+
+### Follow a tag · v2
+
+- **The follow target can be a tag instead of an entity.** The camera follows the entity with that tag that is highest in the Layers panel.
+- Example: the target is the tag `player`. When the level spawns `player.entity`, the camera finds it at once, with no script.
+- Levels saved with an entity as the target keep working.
+- *Why v2: a spawned player doesn't exist in the editor, so it can't be picked as an entity. Spawning is v2 (owner: 2026-11-13).*
+
+Source: owner: 2026-11-13
 
 ### Offset, dead zone, look-ahead · v3
 
@@ -148,7 +157,6 @@ Left over from the old draft and not asked about in the review. The last column 
 
 | Feature | Rule | Suggested |
 |---|---|---|
-| Follow by tag | The target could be a tag, so a spawned player is found without a script. The entity highest in the Layers panel would win. Not v1: in v1 the target is an entity, and a tag can be added later without changing saved levels (owner: 2026-11-13) | v2 or later |
 | Safety margin | However soft the smoothing, the target is never allowed within 10% of the view's edge. A teleport far away becomes a cut, not a long pan | v1 |
 | Follow each direction separately | Switch following sideways or up and down off, for fixed-height side-scrollers | v3 |
 | Follow style presets | Platformer, Free, Vehicle, Locked. They only fill in values. The review dropped presets on other components | Later |

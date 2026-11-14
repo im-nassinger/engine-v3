@@ -195,7 +195,7 @@ Source: round 5: 03 2.13; old: DR-117 to DR-122
 - Double-clicking a text with Select edits it again.
 - **TextComponent settings in v2:** Width, font, weight, size, alignment.
 - **Width** is "Fit to text" or "Fixed". With Fixed, the text wraps at that width. The height always fits the text, so text never spills out of its box. *Why a two-option choice: it reads better than a checkbox.*
-- Size is a whole number from 8 to 400, default 32. Weight takes any value. Alignment is left, centre or right.
+- Size is a whole number from 8 to 400, default 32. **Dragging a corner of a text changes its size**, in whole numbers. *Why: the height always follows the text, so a corner has nothing else to change (owner: 2026-11-13).* Weight takes any value. Alignment is left, centre or right.
 - One style for the whole text. No mixed bold or colours.
 - **A text entity has a rectangle ShapeComponent as its box, like an image.** The rectangle isn't drawn. It is what you click, what Flex uses, and what collides if you add physics. With Fit to text the editor sets its width and height. With Fixed you set the width and the editor sets the height. *Why: the owner's idea. Text works exactly like images, and "text doesn't collide unless you add a shape" goes away.*
 - The one font in v2 is **Inter**. Fonts come with the game, so a level looks the same on every computer. A font is never removed from the list.
@@ -234,7 +234,6 @@ Accepted in the requirements review but never given a version. The last column i
 | Convert a rectangle or ellipse to a polygon | Replaces it with a polygon. On an ellipse, the point count gives a triangle, a hexagon or any regular polygon | v3 |
 | "Out of date" after converting | When a path changes after Convert to polygon, the shape shows an "Out of date" note with a Regenerate button | v3 |
 | Polygon too thin to collide | A polygon with almost no area gets a warning and has no collision | v3 |
-| Text size by handles | Dragging a text's corner changes the font size in whole numbers. Written before the text box existed, so it needs a decision | Needs a decision |
 | Text tool remembers | The Text tool remembers the last font, size and colour. New text is dark, or light on a dark background | v3 |
 | Drawing hint line | Drawing tools show a one-line hint of what clicks and keys do right now | v3 |
 

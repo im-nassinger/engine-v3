@@ -201,6 +201,5 @@ Left over from the old draft. The last column is Claude's suggestion, not a deci
 | Which body is A | The smaller of the two becomes A, so the wheel or the door is A whatever the draw order | v1 |
 | Scaling a group with joints | Scaling a group scales its joints' distances, and mirroring it mirrors their limits and motor direction | v1 |
 | Force readout | While a Breakable joint is selected in test play, the Inspector shows the current and peak force | v3 |
-| Joints stay active in the tool | The old draft kept the Joint tool active after each joint. The review says tools return to Select | Needs a decision |
 
 Source: old: JT-12 to JT-16, JT-40, JT-68, JT-69

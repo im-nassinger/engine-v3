@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. Rounds 2 to 4 of its review are answered. **Waiting for the owner:** the 14 open questions below, asked on the [review page](proposals/architecture/review.html) as round 5, and a review of the proposal.
+The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. Rounds 2 to 5 of its review are answered. **Waiting for the owner:** three open questions below (round 6, not on the review page yet), and a review of the proposal.
 
 ## Where things stand
 
@@ -43,6 +43,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
   - **The level bounds are a rectangle ShapeComponent on the World** (the owner's change to the suggestion of fields on the PhysicsWorldComponent). Three details follow from it, below.
   - **Merge** is a checkbox on the BodyComponent. **The TagsComponent is v2.** The World's TransformComponent card isn't shown. Partner notes read "Needs a X to Y. [Add X]". Links to outside entities last one opening of the level. Changing the grid size is an undo step. TypeScript is pinned to 6.0.3.
 - **The architecture review, round 3** (owner): **the World's rectangle is centred on the level's origin**, and dragging one edge moves the opposite edge by the same amount, so the centre never moves. A new level's camera starts at the origin. Questions 26 and 27 got comments asking for plainer words, so they are asked again in round 4.
+- **The architecture review, round 5** (owner): every tool returns to Select, a text's corner changes its size, the **Trigger tool** (renamed from Trigger zone) is v2, builtin files are changed through a copy, **variables hold a number or a text** in v2, the camera follows a tag in v2, a new level starts with five inputs, Leave in test play goes back to the editor, the end window extras and the main menu stay Later, Play as player and version history stay rejected.
 - **The architecture review, round 4** (owner): **one Walls checkbox** on the PhysicsWorldComponent makes all four edges walls or all open, off by default (the owner's change to a choice per edge). **The World's rectangle is never solid:** the World can't take a BodyComponent or a SurfaceComponent.
 
 ## Next
@@ -63,36 +64,8 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 
 ## Open questions for the owner
 
-Found while rewriting. None was decided by Claude. **All of them are on the [review page](proposals/architecture/review.html) as round 5**, with background and a suggested answer. Where the docs had to say something, they say what is written after "Written as". Which parts of the architecture each one touches is in the proposal's [open questions](proposals/architecture/open-questions.md).
+Found while rewriting. None was decided by Claude. Round 5 of the review page answered the rest. **These three still need a card on the [review page](proposals/architecture/review.html) as round 6**, in plain words with an example.
 
-### Words and components
-
-3. **Can a variable hold text**, or only numbers?
-
-### Editor
-
-4. **Does the Joint tool stay active after placing a joint?** An early decision said yes. A later one says tools return to Select. Written as: all tools return, and tool lock keeps one active.
-7. **Text size by dragging a corner** was written before the text box existed. Keep?
-8. **The "entities here" right-click list:** the review kept only Alt+click. Dropped?
-9. **The Trigger zone tool** is in the tool list but has no version. Suggested v2, with triggers.
-
-### Files and limits
-
-13. **Changing a builtin file:** assumed you copy it into your own folder first.
-
-### Triggers and scripts
-
-14. **Spawn settings:** what the trigger's Spawn action offers (position, speed), now that `spawn(path)` returns an id.
-15. **Follow by tag:** can the camera's target be a tag, so a spawned player is found without a script? Not in v1 (owner, 2026-11-13). Still open for v2.
-16. **Inputs of a new level** (v2): suggested `left`, `right`, `up`, `down`, `jump`.
-
-### Test play
-
-20. **Leave on the end window, in test play:** written as "goes back to the editor".
-21. **The end window's extras** from the old draft: the creator's own win and lose text, a score from a variable, the best time, an attempt count. The review kept a title, the time, Restart and Leave. Written as Later.
-22. **Play as player** (a test run without debug tools) is written as dropped, because Play already hides the panels and v3 runs the play file. Agree?
-
-### Versions
-
-23. **Version history** was rejected in round 11, but the scope page listed it under "Not v1". Written as rejected.
-24. **A main menu, component presets, level ids, thumbnails** are "not v1" with no version. Written as Later.
+8. **The "Entities here" item in the right-click menu:** a list of every entity stacked under the mouse, to pick one hidden behind another. The owner asked for a plainer explanation. Suggested: drop it, the Layers panel and Alt+click (v3) already reach them.
+14. **Where the trigger's Spawn action puts the new entity.** The owner asked what "an offset from the target" means. Each action picks a target (`this`, `other`, an entity by name, or a tag); Spawn puts the new entity on the target's position, and an offset in px moves it from there. Example: a cannon spawns a bullet 40 px to the right of its centre.
+28. **Text variables in triggers** (raised by the owner's round 5 answer that variables hold text in v2): suggested each variable is Number or Text; Add, Subtract and "10 or more" only for numbers, text only set and checked with "is" and "is not".

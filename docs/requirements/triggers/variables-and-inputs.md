@@ -2,13 +2,14 @@
 
 ## TL;DR
 
-Two lists on the World that triggers and scripts share. **Variables** are named values during play, such as `coins = 5`. **Inputs** are names such as `jump` with keys mapped to them. **v2:** variables with a starting value, raw keys, and inputs on the World's InputComponent. **v3:** variables kept between runs, gamepads, players remapping inputs, and scripts reading the mouse. Core rules: a variable is the one concept for level values (it replaces "data" and "saved data"), and players can remap inputs but not raw keys.
+Two lists on the World that triggers and scripts share. **Variables** are named numbers or texts during play, such as `coins = 5`. **Inputs** are names such as `jump` with keys mapped to them. **v2:** variables (a number or a text) with a starting value, raw keys, and inputs on the World's InputComponent, five of them in a new level. **v3:** variables kept between runs, gamepads, players remapping inputs, and scripts reading the mouse. Core rules: a variable is the one concept for level values (it replaces "data" and "saved data"), and players can remap inputs but not raw keys.
 
 ## Variables
 
 ### Variables on the World · v2
 
 - The World has a **VariablesComponent** listing each variable: a name and a starting value. Example: `coins = 0`.
+- **A variable holds a number or a text.** Example: `coins = 0`, `player_name = "Ada"`. *Why: the owner wants text in v2 (owner: 2026-11-13).* How text works in Change value and If checks is asked in round 6 of the architecture review.
 - Triggers and scripts read and change variables. A trigger changes one with Change value: set, add or subtract.
 - A trigger can react to a variable with the event "a variable changes", and check one in an If.
 - Restarting the level puts every variable back to its starting value.
@@ -31,6 +32,7 @@ Source: scope VA2; round 2: O2; round 11: KV1
 
 - A key event can use a **raw key** ("When the Space key is pressed") or an **input** ("When the jump input is pressed").
 - An input is a name plus its keys, listed on the World's **InputComponent**. Example: `jump` on Space and W.
+- **A new level starts with five inputs:** `left` (A, Left arrow), `right` (D, Right arrow), `up` (W, Up arrow), `down` (S, Down arrow) and `jump` (Space). They can be renamed or deleted. *Why: most games need these five, and the builtin player works at once (owner: 2026-11-13).*
 - Both kinds fire on press, on release, or while held. A press shorter than one tick still counts as one press.
 - Scripts get the same two: `is_down("jump")` and `is_key_down("Space")`.
 - **Players can remap inputs but not raw keys**, so the editor suggests an input when a trigger uses a raw key.
@@ -76,8 +78,6 @@ Left over from the old draft. The last column is Claude's suggestion, not a deci
 
 | Feature | Rule | Suggested |
 |---|---|---|
-| What a variable can hold | The review compares variables with numbers. Whether a variable can also hold text was never asked | Needs a decision |
-| Inputs of a new level | The old draft had a fixed set: `left` (A, Left), `right` (D, Right), `up` (W, Up), `down` (S, Down), `jump` (Space), four action keys, and the mouse buttons. With inputs now defined per level, a new level could start with the first five | v2, needs a decision |
 | Keys that can't be bound | Esc, Tab, Ctrl, Alt and Cmd in any combination, F1 to F12, Caps Lock, Num Lock | v2 |
 | Menus without a mouse | Every built-in menu works with the keyboard, and later a gamepad | v3 |
 | Touch controls | On-screen controls mapped to inputs | Later |

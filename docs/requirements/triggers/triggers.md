@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-A trigger is no-code logic on an entity, in three parts: **When** (one event), **If** (optional checks), **Do** (a list of actions, run top to bottom). An entity's TriggerComponent holds a list of them. **v2:** the When, If, Do sentence, the events for touching, keys, timers, level start, custom events, destroyed, a variable changing and "no entity with this tag is left", three kinds of If check, nine actions, and the Repeat setting. **v3:** mouse events, "while touching" and "left the level", sound and camera shake actions, arrows to what a trigger affects, and trigger lines in the Console. Core rules: **if it's data, change it with Change value**, triggers and scripts share one list of events, and the order you see is the order things run.
+A trigger is no-code logic on an entity, in three parts: **When** (one event), **If** (optional checks), **Do** (a list of actions, run top to bottom). An entity's TriggerComponent holds a list of them. **v2:** the When, If, Do sentence, the events for touching, keys, timers, level start, custom events, destroyed, a variable changing and "no entity with this tag is left", three kinds of If check, nine actions, the Repeat setting, and the Trigger tool. **v3:** mouse events, "while touching" and "left the level", sound and camera shake actions, arrows to what a trigger affects, and trigger lines in the Console. Core rules: **if it's data, change it with Change value**, triggers and scripts share one list of events, and the order you see is the order things run.
 
 ## The trigger
 
@@ -170,20 +170,30 @@ Source: scope TR9; round 9: 09 2.15; old: TR-129 to TR-134
 
 Source: scope LU8; round 10: TL1, TL2
 
+## Making a trigger
+
+### The Trigger tool · v2
+
+- **Tool 7 draws a rectangle that notices touching.** The new entity has a TransformComponent, a rectangle ShapeComponent, a SurfaceComponent with Sensor ticked, and a TriggerComponent holding one trigger that starts "When something starts touching this".
+- It has no StyleComponent, so it isn't drawn in play, and it is selected by its edge.
+- Example: draw one over the end of a level, then add Win to its trigger.
+- *Why v2: triggers are v2. "Trigger", not "Trigger zone": the owner's shorter name.*
+
+Source: owner: 2026-11-13
+
 ## Not in the scope review
 
 Left over from the old draft, or accepted without a version. The last column is Claude's suggestion, not a decision.
 
 | Feature | Rule | Suggested |
 |---|---|---|
-| The Trigger zone tool | Tool 7 draws a rectangle that is a sensor with an empty TriggerComponent, ready for "When something starts touching this". It is in the agreed tool list, but the scope review didn't ask about it | v2 |
 | "Can't fire" explanations | The trigger card says why a touch trigger can never fire: no shape, sensors only, neither side Dynamic. v2 has only the missing SurfaceComponent note | v3 |
 | Waiting runs limit | Each trigger can hold 32 waiting runs. More are skipped with a Console warning | v2 |
 | Collision speed | A smallest impact speed for the collision event | Later |
 | "First one in", "last one out" | Touch events that count entities, such as "when the last heavy thing leaves this" | Later |
 | "On the Nth time" | A Repeat choice that fires on a set count. The review kept three choices | Dropped |
 | Trigger names | Each trigger gets a name made from its When, which can be edited | v2 |
-| Spawn settings | Where the new entity appears: at the target plus an offset, or a fixed point | Needs a decision |
+| Spawn settings | Where the new entity appears. Asked again in round 6 of the architecture review | Needs a decision |
 | Drop through | An action that drops a body through the one-way platform under it. Not in the reviewed action list, so it is script-only for now | Needs a decision |
 | Show every link | A View menu switch that shows the arrows of every entity | v3 |
 | Pause when this fires | A switch on a trigger that pauses test play when it fires | v3 |

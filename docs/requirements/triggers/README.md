@@ -21,6 +21,7 @@ Logic without code. **Nothing here is in v1.** **In v2** an entity's TriggerComp
 | If checks | v2 | triggers |
 | Actions: Change value, Spawn, Destroy, Push, Fire custom event, Wait, Win, Lose, Restart | v2 | triggers |
 | Repeat | v2 | triggers |
+| The Trigger tool | v2 | triggers |
 | Custom events | v2 | triggers |
 | Variables on the World | v2 | variables-and-inputs |
 | Raw keys and inputs | v2 | variables-and-inputs |

@@ -38,7 +38,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Top bar | The bar along the top with the menus, the tools and Play. |
 | Status bar | The bar along the bottom with the zoom, the save state and the count of editor messages. |
 | View menu | The top bar menu that switches what the editor draws over the level: Grid, Joint icons, Camera frame, Physics view. |
-| Tool | What the mouse does in the level view: Select, Pencil, Bézier pen, Shape, Text, Joint, Trigger zone. |
+| Tool | What the mouse does in the level view: Select, Pencil, Bézier pen, Shape, Text, Joint, Trigger. |
 | Selection | The entities currently selected. There is one selection, shown in the level view, the Layers panel and the Inspector. |
 | Draw order | Which entity is painted on top when entities overlap. It is the Layers panel order. |
 | Hidden | An entity whose eye icon is off. It is not drawn, in the editor or in play. It still collides and runs its triggers and scripts. |
@@ -118,7 +118,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Custom event | An event you name yourself, such as `open`. A trigger or script fires it on an entity, and that entity's triggers and scripts react. It can carry one number. |
 | Action | One step in a trigger's Do list, such as Change value or Spawn. Only ever used for triggers. |
 | `this` and `other` | In a trigger: `this` is the entity holding the trigger, `other` is the entity that caused the event, when there is one. In a script: `this` is the id of the entity the script is on, and `other` is what a handler receives. |
-| Variable | A named number during play, such as `coins = 5`, listed on the World's VariablesComponent. Whether it can also hold text is not decided yet (see the open questions in [progress.md](progress.md)). |
+| Variable | A named number or text during play, such as `coins = 5`, listed on the World's VariablesComponent. |
 | Keep between runs | A variable setting: its value is saved in the browser and the next run starts from it. |
 | Input | A name such as `jump`, with the keys and gamepad buttons mapped to it, listed on the World's InputComponent. Players can remap inputs. |
 | Raw key | A key used directly, such as Space, without going through an input. |
@@ -196,4 +196,5 @@ Don't use these. Each was replaced in the requirements review.
 | `.level` file | `.editable`, `.playable` | Names that say what each file is for |
 | `onStart`, `onUpdate`, `onEvent` | `on(name, function)` | One way to listen |
 | Hitbox | Surface on a shape | Physics is added like on any shape |
+| Trigger zone (the tool) | Trigger tool | Shorter (owner: 2026-11-13) |
 | Transform | TransformComponent | Component names end in `Component`, with no exception (owner: 2026-11-13) |
