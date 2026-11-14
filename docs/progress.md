@@ -24,6 +24,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 - **Box2D v3 and Lua run in the browser with wasm.** No proof needed. Box2D v3's own replay support is looked at later. See [tech-notes.md](tech-notes.md).
 - **Every level file records its physics version from v1** (was open question 14). Claude's call after the owner said "you decide". See [saving](requirements/play-and-save/saving.md).
 - **A smaller v1** (owner): 43 features moved to a new v2, the old v2 became v3, accounts and publishing v4. See [scope.md](scope.md).
+- **Every Lua function is top level** (owner), such as `spawn(path)`, never `world.spawn(path)`. Written into [scripts.md](requirements/scripts/scripts.md); the Lua API proposal follows it.
 - Small fixes: the glossary's Variable row no longer decides open question 3, and decisions made after the review are cited as `owner: <date>`.
 
 ## Next

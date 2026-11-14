@@ -70,7 +70,7 @@ Source: scope LU5; round 9: 10 2.5; old: LU-39 to LU-42; owner: 2026-11-13
 
 ### What the Lua API covers · v2
 
-The **Lua API** is the set of functions the game gives scripts. It uses pixels and degrees. Functions named in the review:
+The **Lua API** is the set of functions the game gives scripts. It uses pixels and degrees. **Every function is top level**, such as `spawn(path)`, never inside a table such as `world.spawn(path)`. Lua's own libraries (`string`, `table`, `math`) stay as Lua has them. *Why: the owner's rule.* Functions named in the review:
 
 | Function | Does |
 |---|---|

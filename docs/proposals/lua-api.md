@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Not decided. Waiting for the owner.** Nothing here goes into [scripts.md](../requirements/scripts/scripts.md) until the owner answers the questions at the end.
+**Not decided. Waiting for the owner**, except one rule the owner already set: **every function is top level**, such as `spawn(path)`, never `world.spawn(path)`. Nothing else here goes into [scripts.md](../requirements/scripts/scripts.md) until the owner answers the questions at the end.
 
 The old function list (sections 2.1 to 2.8 of `10-lua-and-data.md` in `ecs-game-v2`) rewritten in the style the review agreed: **plain snake_case functions that take an entity id**, pixels and degrees, the Inspector's names, and events through `on()`. The list is small on purpose: **if something is a component value, scripts change it with `set_value`**, the same way triggers use Change value, so most of the old setters (`setText`, `setMotorSpeed`, `setGravity`) disappear. Seven yes-or-no questions settle what the review never wrote.
 
@@ -10,6 +10,7 @@ Versions use the new numbering of [scope.md](../scope.md): scripts are **v2**, a
 
 ## Conventions
 
+- **Every function is top level** (decided by the owner, 2026-11-13): `number_field(...)` and `clamp(...)`, never `field.number(...)` or `math.clamp(...)`. Lua's own libraries, such as `string`, `table` and `math`, stay as Lua has them.
 - **Every function takes ids, never objects.** An entity id is a number. A destroyed entity's id simply no longer exists: functions given one do nothing, and `exists(id)` says false.
 - Positions are **level positions in pixels**, y pointing down. Angles are **degrees, clockwise on screen**. Speeds are px/s and °/s. Time is seconds of the level's time. Gravity alone is m/s², as in the Inspector.
 - **A point is two numbers:** `local x, y = get_position(id)`. See question 5.
@@ -23,8 +24,8 @@ Versions use the new numbering of [scope.md](../scope.md): scripts are **v2**, a
 ```lua
 -- coin.lua: a sensor that adds to a variable when the player touches it
 settings = {
-  amount = field.number(1, { min = 1 }),
-  variable = field.variable("coins"),
+  amount = number_field(1, { min = 1 }),
+  variable = variable_field("coins"),
 }
 
 on("touched", function(other)
@@ -132,9 +133,9 @@ The Transform's own values, measured from the parent, are read with `get_value`.
 |---|---|
 | `wait(seconds)` | Pauses this script. Counts the level's time |
 | `print(...)` | A line in the Console |
-| `math.random(...)` | As in plain Lua, from the run's seed |
-| `math.clamp(x, min, max)`, `math.lerp(a, b, t)` | Two helpers (question 5) |
-| `field.number(...)` and the other field types | Declare a setting (question 2) |
+| `math.random(...)` | Lua's own, from the run's seed |
+| `clamp(x, min, max)`, `lerp(a, b, t)` | Two helpers (question 5) |
+| `number_field(...)` and the other `_field` functions | Declare a setting (question 2) |
 
 ### Comes with v3 features · v3
 
@@ -158,8 +159,8 @@ Each is one yes or no. A "no" means the old open point stays open.
 **1. A script's own entity is `this`.**
 The problem: with ids there is no `self` object, so a script needs its entity's id. The proposal reuses the trigger word: in a script, `this` is the id of the entity the script is on, and `other` is what a handler receives. Example: `destroy(this)`. Each entity runs its own copy, so `this` is always right.
 
-**2. Settings are a `settings` table at the top, built with `field.<type>`.**
-The problem: "values the script declares at its top" was never written down. The proposal names one function per field type in the fixed list (`field.number`, `field.text`, `field.checkbox`, `field.choice`, `field.colour`, `field.vector`, `field.angle`, `field.entity`, `field.asset`, `field.variable`, `field.tags`, `field.list`). The Inspector shows them in the order written, labelled from the name (`run_speed` reads "Run speed"). The script reads the entity's values as `settings.run_speed`. Example: `speed = field.number(400, { min = 0, max = 1500, unit = "px/s" })`.
+**2. Settings are a `settings` table at the top, built with one `<type>_field` function per field type.**
+The problem: "values the script declares at its top" was never written down. The proposal names one function per field type in the fixed list (`number_field`, `text_field`, `checkbox_field`, `choice_field`, `colour_field`, `vector_field`, `angle_field`, `entity_field`, `asset_field`, `variable_field`, `tags_field`, `list_field`). They are top level, like every function. The Inspector shows them in the order written, labelled from the name (`run_speed` reads "Run speed"). The script reads the entity's values as `settings.run_speed`. Example: `speed = number_field(400, { min = 0, max = 1500, unit = "px/s" })`.
 
 **3. Values are read with `get_value` and changed with `set_value`, by their snake_case Inspector name.**
 The problem: the review named `get_component(id, name)` and `get_attribute(...)` as examples, but "attribute" isn't a glossary word, and the trigger action is Change value. The proposal keeps `get_component` and calls the other two `get_value` and `set_value`. Example: `set_value(get_component(this, "BodyComponent"), "linear_damping", 2)`.
@@ -167,7 +168,7 @@ The problem: the review named `get_component(id, name)` and `get_attribute(...)`
 **4. No new way to share values between scripts: custom events and variables cover it.**
 The problem: the old draft had a table shared by an entity's scripts, and functions other scripts could call. The proposal adds neither: to ask an entity for something, fire a custom event, and for a level-wide value, use a variable. Example: a Damage script does `fire_event(other, "damage", 1)`, and the Health script on that entity decides what it means. The trade-off: one script can't read another entity's private state, such as an enemy's health for a health bar. Since the API only grows, a function for that can come later.
 
-**5. No vector type. A point is two numbers, plus `math.clamp` and `math.lerp`.**
+**5. No vector type. A point is two numbers, plus `clamp` and `lerp`.**
 The problem: the old draft had a `vec` type with operators. A type is a concept of its own, with its own rules for printing and comparing. The proposal returns two numbers everywhere and adds only the two helpers almost every movement script writes by hand. Example: `local x, y = get_position(this)`. A vector type can still be added later without changing these functions.
 
 **6. Builtin scripts share three custom events: `damage`, `heal` and `died`.**
