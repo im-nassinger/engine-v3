@@ -72,10 +72,14 @@ The tech notes ask for keyboard layout tests (US, Brazilian ABNT2, and one AltGr
 3. Reload the page: the level is still there.
 4. Open a second tab: it says the level is open elsewhere and is read-only.
 
+## Guard tests (`tests/guards/`)
+
+Each check that keeps an architecture rule (the type check, ESLint, dependency-cruiser) is handed a small file that breaks its rule and must refuse it. They run with the unit tests. The list is in [tooling.md](tooling.md#guard-tests) (owner, 2026-11-14).
+
 ## Speed tests
 
 Described in [performance.md](performance.md#targets-and-their-tests). They run on demand and before a stage closes, not on every commit.
 
 ## In CI
 
-On every push: type checks (each part's own `tsconfig`), ESLint, Prettier's check, unit tests, the determinism test on x86 and ARM in Node, browser tests in three browsers, and the docs checks (`node tools/check-docs.js`). The journeys and the browser determinism run on the main branch.
+On every push: `npm run check` on x86 and ARM (type checks with each part's own `tsconfig`, ESLint, Prettier's check, dependency-cruiser, unit and guard tests, `node tools/check-docs.js`), and from stage 13 the determinism test in Node on both; browser tests in three browsers. The journeys and the browser determinism run on master. The jobs are in [tooling.md](tooling.md#ci).

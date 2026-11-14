@@ -49,6 +49,16 @@ The trade-off the owner accepted: nobody can play a v1 level, only watch it, and
 
 After seven rounds on the [review page](review.html), the owner approved the architecture and every open question. The proposal moved to [architecture/](architecture/README.md), its plan became [plan.md](plan.md), and its words joined the [glossary](glossary.md). In the last round the owner asked for **every open question on one page at once** instead of a few per round, so all 119 small features without a version were given one together, as Claude suggested: 14 in v1, 12 in v2, 80 in v3, 13 Later, and three dropped (see [rejected.md](rejected.md)).
 
+## 2026-11-14: The stage 0 plan is approved
+
+The owner approved the detailed plan for stage 0 and all ten places where it differed from the architecture docs. They are written into [tooling.md](architecture/tooling.md), [stack.md](architecture/stack.md), [parts-and-folders.md](architecture/parts-and-folders.md), [testing.md](architecture/testing.md), [adapters.md](architecture/adapters.md) and [plan.md](plan.md):
+
+- **Three fixes to setups that didn't work as written:** `jiti` so ESLint can read `eslint.config.ts`; test files in core may import `vitest`; the worker entry files move to `src/app/workers/` and each part's `tsconfig.json` sits inside its folder.
+- **Four gaps closed in the checks:** dependency-cruiser for module entries and circles; all 22 approximated `Math` functions, `**`, `Date` and `Intl` banned in core, and `Date` and `Math.random` in editor; ESLint reads types, so a dropped promise is an error; guard tests for every check.
+- **Three choices:** ESLint keeps the owner's TypeScript style where it has a built-in rule; **Node 26** instead of 24; each library is installed by the stage that first uses it.
+
+Every setup was first tried in a throwaway folder outside the project. The proposal was deleted once written in.
+
 ## Still to decide
 
 Nothing is open. New questions go in [progress.md](progress.md) and, when there are several, all at once on the [review page](review.html).

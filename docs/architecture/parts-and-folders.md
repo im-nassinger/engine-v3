@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The code has five parts. **core** holds the game's rules, **editor** the editing rules, **adapters** the classes that talk to libraries and the browser, **ui** the React panels, and **app** the composition roots that build and connect everything. **Imports point inward only:** app → ui and adapters → editor → core. core never imports editor, and neither of them imports a library that touches the screen, the network, storage or the clock. Two checks enforce this: core and editor compile without the browser's types, and ESLint rules refuse wrong imports and banned calls. Folders are grouped by feature, each module has one `index.ts`, and tests sit next to the file they test.
+The code has five parts. **core** holds the game's rules, **editor** the editing rules, **adapters** the classes that talk to libraries and the browser, **ui** the React panels, and **app** the composition roots that build and connect everything. **Imports point inward only:** app → ui and adapters → editor → core. core never imports editor, and neither of them imports a library that touches the screen, the network, storage or the clock. Three tools enforce this: core and editor compile without the browser's types, ESLint refuses wrong imports and banned calls, and dependency-cruiser refuses deep imports and circles. See [tooling.md](tooling.md). Folders are grouped by feature, each module has one `index.ts`, and tests sit next to the file they test.
 
 "Part" is used here instead of "layer", which already means something else in the glossary.
 
@@ -10,7 +10,7 @@ The code has five parts. **core** holds the game's rules, **editor** the editing
 
 | Part | Folder | What it holds | May import |
 |---|---|---|---|
-| core | `src/core/` | Entities, components, the level, field types, geometry, deterministic maths, the level data format, the simulation, and the contracts core needs (such as `PhysicsWorld`) | core, and `clipper2-js` (pure computation) |
+| core | `src/core/` | Entities, components, the level, field types, geometry, deterministic maths, the level data format, the simulation, and the contracts core needs (such as `PhysicsWorld`) | core, and the polygon library (pure computation). Its tests may also import `vitest` |
 | editor | `src/editor/` | Undo, selection, tools, what the Inspector and the Layers panel show, editor messages, the clipboard format, shortcuts, saving and test play as use cases, and the contracts they need (such as `LevelStore`, `GameRunner`, `Clock`) | core, editor |
 | adapters | `src/adapters/` | One class per contract, built on a library or a browser API: Box2D, PixiJS, IndexedDB, Web Locks, the keyboard and pointer, timers, workers, zips | core, editor, their library |
 | ui | `src/ui/` | React components and their CSS. They read editor and core state and call editor commands | core, editor, React. **Never adapters** |
@@ -27,8 +27,9 @@ src/
   app/                 composition roots, one file each
     main.tsx             the editor page: builds every class, renders <EditorShell>
     EditorComposition.ts the object graph of the editor page, built in one place
-    game.worker.ts       the game worker: core simulation + Box2D adapter
-    import.worker.ts     the import worker: unzips and checks a file
+    workers/             compiled with the WebWorker types, without DOM
+      game.worker.ts       the game worker: core simulation + Box2D adapter
+      import.worker.ts     the import worker: unzips and checks a file
   core/
     events/            Signal, VersionCounter: how classes announce changes
     entities/          Entity, EntityId, Level, EntityIdAllocator, LevelSignals
@@ -77,6 +78,7 @@ src/
     fields/            one component per field type: NumberField/, ColourField/, ...
     shared/            Button/, Menu/, Tooltip/, Icon/
 tests/
+  guards/              tests that prove each check still refuses what it should
   determinism/         the determinism test and its recorded hashes
   performance/         the speed tests against the requirements' targets
   e2e/                 whole-app tests with Playwright
@@ -110,28 +112,13 @@ Each component folder is named exactly like its class, as the owner's React rule
 
 | Check | Catches |
 |---|---|
-| TypeScript: `src/core` and `src/editor` compile with `lib: ["ES2023"]` and no `DOM` | Any use of `window`, `document`, `HTMLElement`, `localStorage` or `setTimeout` in the rules |
-| ESLint `no-restricted-imports`, configured per part | An import pointing outward, such as core → editor, editor → adapters or ui → adapters; any library import in core except `clipper2-js`; deep imports past another module's `index.ts` across parts |
-| ESLint `no-restricted-properties` in `src/core` | `Math.random`, `Math.sin`, `Math.cos`, `Math.tan`, `Math.atan2`, `Math.exp`, `Math.log`, `Math.pow`, `Math.hypot`, `Date.now`. They may differ between computers or break determinism. `DeterministicMath` replaces them |
-| ESLint `no-restricted-syntax` in `src/core` | `new Date()`, and `for ... in`, whose order over numeric and text keys differs from the order they were added |
+| TypeScript: core and editor compile with `lib: ["ES2023"]` and no `DOM`; the workers with `WebWorker` and no `DOM` | Any use of `window`, `document`, `HTMLElement`, `localStorage` or `setTimeout` in the rules; any use of the page in a worker or in what it imports |
+| ESLint, configured per part | An import pointing outward, such as core → editor, editor → adapters or ui → adapters; a library a part may not import; the calls that break determinism in core (22 `Math` functions, `Math.random`, `**`, `Date`, `Intl`, `for ... in`) and the clock in editor |
+| dependency-cruiser | A deep import past another module's `index.ts`, within a part or across parts; any circle of imports, between files or between modules |
 | A test in `core/components` | Every schema is valid: keys match labels, attribute names are unique, defaults sit in their range |
+| Guard tests in `tests/guards/` | A check that stopped refusing what it should |
 
-The ESLint rule for imports, in short:
-
-```typescript
-// eslint.config.ts (part of it)
-{
-    files: ['src/core/**'],
-    rules: {
-        'no-restricted-imports': ['error', {
-            patterns: [
-                { group: ['**/editor/**', '**/adapters/**', '**/ui/**', '**/app/**'], message: 'core imports only core.' },
-                { regex: '^(?!clipper2-js$)[a-z@]', message: 'core imports no library except clipper2-js.' },
-            ],
-        }],
-    },
-},
-```
+The full lists, the ESLint blocks per part and the guard tests are in [tooling.md](tooling.md) (owner, 2026-11-14).
 
 ## Where tests go
 

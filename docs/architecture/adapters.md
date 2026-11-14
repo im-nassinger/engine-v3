@@ -102,8 +102,8 @@ The editor never calls `Date.now`, `setTimeout` or `requestAnimationFrame` itsel
 
 ## Workers
 
-- `WorkerGameRunner` and `GameWorkerHost` are the two ends of the game worker. `app/game.worker.ts` builds the host with the real `Box2dPhysicsEngine`.
-- `ImportWorkerClient` and `ImportWorkerHost` are the two ends of the import worker, which unzips and checks a file away from the page, as the tech notes advise. `app/import.worker.ts` builds it.
+- `WorkerGameRunner` and `GameWorkerHost` are the two ends of the game worker. `app/workers/game.worker.ts` builds the host with the real `Box2dPhysicsEngine`.
+- `ImportWorkerClient` and `ImportWorkerHost` are the two ends of the import worker, which unzips and checks a file away from the page, as the tech notes advise. `app/workers/import.worker.ts` builds it.
 - Both protocols are plain data types in `adapters/worker/protocol/`, shared by the two ends. Large arrays are transferred, not copied.
 
 ## Lua (v2) and audio (v3)

@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed** means the owner chose it; **recommended** means the architecture chose it (all were approved in review card D11). Five things are fixed: TypeScript, Vite, React, PixiJS 8 and Box2D v3. Beside them: Vitest and Playwright for tests, ESLint and Prettier for code quality, `box2d3-wasm` for Box2D, `clipper2-js` for polygons, `fflate` for zips, `idb` for browser storage, TanStack Virtual for the Layers panel, and the React Compiler. Lua and Monaco come with v2 and aren't installed in v1. **TypeScript is 6.0, not 7**, because the ESLint TypeScript tools don't support 7 yet.
+Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed** means the owner chose it; **recommended** means the architecture chose it (all were approved in review card D11). Five things are fixed: TypeScript, Vite, React, PixiJS 8 and Box2D v3. Beside them: Vitest and Playwright for tests, ESLint and Prettier for code quality, `box2d3-wasm` for Box2D, `clipper2-js` for polygons, `fflate` for zips, `idb` for browser storage, TanStack Virtual for the Layers panel, and the React Compiler, with `jiti` and `dependency-cruiser` for the checks in [tooling.md](tooling.md). **Node.js 26** runs the tools. **Each library is installed by the stage that first uses it**, at the version here, checked again on that day. Lua and Monaco come with v2 and aren't installed in v1. **TypeScript is 6.0, not 7**, because the ESLint TypeScript tools don't support 7 yet.
 
 ## Fixed
 
@@ -38,13 +38,17 @@ Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed*
 | `typescript-eslint` | 8.72.2 | TypeScript rules for ESLint | |
 | `eslint-plugin-react-hooks` | 7.1.1 | Hook rules and the React Compiler's checks | |
 | `prettier` | 3.10.1 | One code format | Formatting is never a review topic. Settings: 4 spaces, single quotes, 120 columns, matching the owner's TypeScript style |
-| `clipper2-js` | 1.2.4 | Cuts self-crossing polygons, triangulates | Integer arithmetic inside, so its results are the same on every computer. See [geometry](core-model/geometry.md) |
+| `clipper2-js` | 1.2.4 | Cuts self-crossing polygons, triangulates | Integer arithmetic inside, so its results are the same on every computer. See [geometry](core-model/geometry.md). **Open question:** 1.2.4 has no triangulation, see [progress.md](../progress.md#open-questions-for-the-owner) |
 | `fflate` | 0.8.3 | Makes and reads the `.editable` zip | Small, fast, and can stop unpacking at a size limit |
 | `idb` | 8.0.4 | A thin promise layer over IndexedDB | IndexedDB's own API is callback-based. `idb` adds no storage logic of its own |
 | `@tanstack/react-virtual` | 3.14.26 | Builds only the visible Layers rows | Fixed row height, no styling of its own, so drag and drop stays ours |
-| `@types/node` | 24.19.2 | Types for the Node tools and tests | |
+| `@types/node` | 26.6.6 | Types for the Node tools and tests | Matches Node 26 |
+| `jiti` | 2.7.0 | Lets ESLint read `eslint.config.ts` | ESLint 10 refuses a TypeScript config without it (owner, 2026-11-14) |
+| `dependency-cruiser` | 18.7.2 | Checks the import graph: module entries and circles | ESLint reads one import at a time and can't see a circle between modules. See [tooling.md](tooling.md#dependency-cruiser) (owner, 2026-11-14) |
 
-Node.js 24 runs the tools (Vitest 5 needs Node 22.12 or later).
+**Node.js 26** runs the tools, the version on the owner's laptop, so a CI failure can be repeated there (owner, 2026-11-14). Every package accepts it. `.node-version` holds the number, and CI reads it.
+
+**Installed when its stage comes** (owner, 2026-11-14): stage 0 installs the tools plus `react` and `react-dom`. `clipper2-js` waits for stage 3, `pixi.js` for stage 4, `@tanstack/react-virtual` for stage 7, `fflate` and `idb` for stage 12, `box2d3-wasm` for stage 13. *Why: `package.json` lists only what the code uses, and each library gets a real look when a stage starts using it.* The whole v1 stack was checked to install together with no conflict on 2026-11-14.
 
 ### Not installed until v2
 
@@ -69,7 +73,7 @@ Their versions are checked again when v2 starts.
 
 ## Settings that matter
 
-**TypeScript** (`tsconfig.json` and one config per part):
+**TypeScript** (`tsconfig.base.json`, and one config inside each part's folder, see [tooling.md](tooling.md#typescript)):
 
 | Setting | Value | Why |
 |---|---|---|
@@ -79,8 +83,8 @@ Their versions are checked again when v2 starts.
 | `allowImportingTsExtensions`, `noEmit` | true | Imports end in `.ts` and `.tsx`, Vite compiles |
 | `noUncheckedIndexedAccess` | true | `array[i]` may be `undefined` |
 | `lib` for `src/core` and `src/editor` | `["ES2023"]`, no `DOM` | **The compiler itself refuses `window`, `document` or `HTMLElement` in the rules** |
-| `lib` for the game worker | `["ES2023", "WebWorker"]` | |
-| `lib` for `src/ui`, `src/adapters`, `src/app` | `["ES2023", "DOM", "DOM.Iterable"]` | |
+| `lib` for `src/app/workers` (the game worker and the import worker) | `["ES2023", "WebWorker"]` | No `DOM`, so nothing a worker imports can need the page |
+| `lib` for `src/ui`, `src/adapters`, `src/app` (without `workers/`) | `["ES2023", "DOM", "DOM.Iterable"]` | |
 
 **Vite:** `react()` plus `babel({ presets: [reactCompilerPreset()] })`. Workers are built with Vite's `new Worker(new URL(...), { type: 'module' })`. The `.wasm` file is served as an asset and fetched on editor open, see [simulation.md](simulation.md).
 

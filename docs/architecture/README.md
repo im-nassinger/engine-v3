@@ -13,7 +13,7 @@ How engine-v3 is built: the stack, the five parts of the code and their folders,
 5. [ui.md](ui.md): how React reads the core, and how the PixiJS level view fits
 6. [simulation.md](simulation.md): ticks, determinism, the game worker, Play and Stop
 7. [adapters.md](adapters.md): the contracts and the classes that fulfil them
-8. [performance.md](performance.md), [persistence.md](persistence.md), [errors.md](errors.md), [testing.md](testing.md)
+8. [performance.md](performance.md), [persistence.md](persistence.md), [errors.md](errors.md), [testing.md](testing.md), [tooling.md](tooling.md)
 9. [plan.md](../plan.md): the v1 stages
 
 ## Files
@@ -38,13 +38,14 @@ How engine-v3 is built: the stack, the five parts of the code and their folders,
 | [persistence.md](persistence.md) | `level.json`, the reader and writer, the project file, autosave, opening the editor |
 | [errors.md](errors.md) | Kinds of problem, where the user sees each, bugs |
 | [testing.md](testing.md) | Unit, browser and whole-game tests; the determinism test |
+| [tooling.md](tooling.md) | The configs, the scripts, `npm run check`, which tool keeps which rule, the guard tests, CI |
 | [plan.md](../plan.md) | The 18 v1 stages, each with the docs it implements |
 
 ## The decisions in one table
 
 | Area | Decision |
 |---|---|
-| Parts | core → editor → adapters and ui → app. core and editor compile without the browser's types |
+| Parts | core → editor → adapters and ui → app. core and editor compile without the browser's types. TypeScript, ESLint and dependency-cruiser enforce it, and guard tests check them |
 | Model | `Level` owns the tree, `Entity` its components, a schema per component type drives everything generic |
 | Ids | Whole numbers, never reused, kept by the play copy |
 | Undo | Changes in edit transactions, 512 history steps, drags as one step |

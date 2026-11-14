@@ -160,6 +160,7 @@ Words for how the game is built, used in [architecture/](architecture/README.md)
 | Current group | The group you are inside: double-click goes in, Esc goes up. |
 | Part (of the code) | One of the five top folders of `src`: core, editor, adapters, ui, app. Used instead of "layer". |
 | Module | A folder directly under a part, with one `index.ts` that other modules import from. |
+| Guard test | A test that hands one of the code checks (the type check, ESLint, dependency-cruiser) a small file breaking its rule, and expects the check to refuse it. Proves a check still works. |
 | Composition root | The one place that builds the concrete classes and connects them: the editor page, the game worker, the import worker. |
 | Open level | The level open in the editor, together with its history, selection, current group and caches. New and Import replace it. |
 | Game worker | The worker that runs the play copy during test play. |

@@ -14,7 +14,7 @@ v1 in **18 small stages**, each tested on its own before the next starts. The or
 
 | # | Stage | Builds | Implements | Done when |
 |---|---|---|---|---|
-| 0 | **Project setup** | Vite, TypeScript with one config per part, ESLint with the import and banned-call rules, Prettier, Vitest (Node and browser), Playwright, CI on x86 and ARM, `src/` folders with empty `index.ts` files | [stack](architecture/stack.md), [parts-and-folders](architecture/parts-and-folders.md) | A wrong import fails ESLint, a `window` in core fails the type check, an empty page builds |
+| 0 | **Project setup** | Vite, TypeScript with one config inside each part's folder, ESLint with the import, banned-call and style rules, dependency-cruiser, Prettier, Vitest (Node and browser), Playwright, the guard tests, `npm run check`, CI on x86 and ARM, `src/` folders with empty `index.ts` files, an empty page. Steps below | [stack](architecture/stack.md), [parts-and-folders](architecture/parts-and-folders.md), [tooling](architecture/tooling.md) | Each proven by a guard test: a wrong import fails ESLint; a `window` in core fails the type check; a deep import and a circle between modules fail `npm run check`; `Math.sin`, `**` and `Date` in core fail ESLint. An empty page builds. `npm run check` passes on a clean tree, and so does CI on x86 and ARM |
 | 1 | **The model** | `Signal`, `VersionCounter`, `Entity`, `Level`, `EntityIdAllocator`, `LevelSignals`, `Matrix2D`, the derived caches (matrices, hidden), the v1 field types, `ComponentSchema`, `Component`, TransformComponent, NameComponent | [core model](architecture/core-model/README.md); [selection](requirements/editor/selection.md) (the World and the camera, groups 256 deep) | Unit tests for the tree's rules, ids, signals and matrices, including moving between parents with skew |
 | 2 | **The v1 components and the file format** | ShapeComponent, PathComponent, StyleComponent, BodyComponent, SurfaceComponent, JointComponent, CameraComponent, PhysicsWorldComponent, the registry, `LevelWriter`, `LevelReader`, limits, `FormatUpgrader` (empty), physics version table | [components](architecture/core-model/components-and-fields.md), [persistence](architecture/persistence.md); [saving](requirements/play-and-save/saving.md) (format and physics versions, limits, the level's name) | Round trips of every component; schema tests; the reader refuses each bad case |
 | 3 | **Geometry** | `DeterministicMath`, `Units`, the polygon pipeline with `clipper2-js`, ellipses, lines, `BoundsCache`, `PiecesCache`, mass | [geometry](architecture/core-model/geometry.md); [drawing](requirements/drawing.md) (self-crossing polygons); [bodies](requirements/physics/bodies.md) (mass) | A figure-of-eight and a star give the expected pieces; no piece over 8 points; mass of a 100 px square at density 1 is 4 kg; `DeterministicMath` within 1e-12 |
@@ -32,6 +32,21 @@ v1 in **18 small stages**, each tested on its own before the next starts. The or
 | 15 | **The camera** | `CameraPhase`: following with smoothing, stopping at the bounds, the safety margin, Fixed size drawing with bars | [camera](requirements/camera.md) | A followed body stays in view; the camera never leaves the bounds; determinism levels include it |
 | 16 | **Test play** | `PlaySession`, `TickPacer`, `Watchdog`, `PlayMirror`, `WorkerGameRunner`, `GameWorkerHost`, preloading, the Play bar, Play, Stop, Pause, Step, switching tabs pauses | [simulation](architecture/simulation.md); [test play](requirements/play-and-save/test-play.md) | Stop puts the editor back exactly; a hung worker ends the run with a message; Step runs one tick; a hidden tab adds no ticks |
 | 17 | **The speed pass and the browser checks** | The speed tests at 10,000 and 100,000 entities, the journeys, the layout and phone checks by hand | [performance](architecture/performance.md), [testing](architecture/testing.md) | Every target met on the owner's laptop, or a decision recorded to build a place left in [performance.md](architecture/performance.md) |
+
+## Stage 0 in steps
+
+Approved by the owner on 2026-11-14. Each step ends with its checks passing and a commit.
+
+| # | Step | Ends with |
+|---|---|---|
+| 1 | `package.json`, `.npmrc`, `.node-version`, `.gitignore`, the TypeScript configs, the folders with their `index.ts` | `npm run typecheck` passes |
+| 2 | The empty page: `index.html`, `vite.config.ts`, `src/app/main.tsx` | `npm run build` and `npm run dev` work |
+| 3 | ESLint and Prettier | `npm run lint` and `npm run format:check` pass |
+| 4 | dependency-cruiser | `npm run deps` passes |
+| 5 | Vitest in Node, and the guard tests | `npm test` passes, every guard test sees its check refuse |
+| 6 | Vitest in three browsers, Playwright with one whole-app test. Downloads Playwright's browsers, and may need the owner's password for WebKit's system packages | `npm run test:browser` and `npm run test:e2e` pass |
+| 7 | The CI workflow | Green on x86 and ARM. Needs a push, which waits for the owner to ask |
+| 8 | The docs: anything the build showed differs from [tooling.md](architecture/tooling.md), `progress.md`, and `CLAUDE.md` (no longer "no code yet", and `npm run check` before every commit) | `node tools/check-docs.js` passes |
 
 ## After v1
 
