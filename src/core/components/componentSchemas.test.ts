@@ -3,10 +3,19 @@ import { describe, expect, test } from 'vitest';
 import type { AnyComponentSchema } from './AnyComponent.ts';
 import { camelCaseOfLabel, snakeCaseOfLabel } from './attributeNames.ts';
 import { NameComponent } from './NameComponent/NameComponent.ts';
+import { PathComponent } from './PathComponent/PathComponent.ts';
+import { ShapeComponent } from './ShapeComponent/ShapeComponent.ts';
+import { StyleComponent } from './StyleComponent/StyleComponent.ts';
 import { TransformComponent } from './TransformComponent/TransformComponent.ts';
 
-// Every component class goes in this list. The registry replaces it in stage 2.
-const SCHEMAS: readonly AnyComponentSchema[] = [TransformComponent.schema, NameComponent.schema];
+// Every component class goes in this list. The registry replaces it later in stage 2.
+const SCHEMAS: readonly AnyComponentSchema[] = [
+    TransformComponent.schema,
+    NameComponent.schema,
+    ShapeComponent.schema,
+    PathComponent.schema,
+    StyleComponent.schema,
+];
 
 describe.each(SCHEMAS)('the $typeName schema', (schema) => {
     test('each key is the camelCase of its label', () => {
@@ -22,20 +31,34 @@ describe.each(SCHEMAS)('the $typeName schema', (schema) => {
         expect(uniqueAttributes.size).toBe(attributes.length);
     });
 
-    test('each default parses and sits in its range', () => {
-        for (const field of schema.fields) {
-            const saved = field.type.serialize(field.defaultValue);
-            const parsed = field.type.parse(saved);
-            const normalized = field.type.normalize(field.defaultValue);
+    test('no two values share a key in level.json', () => {
+        const fileKeys = schema.entries.map((entry) => schema.fileKeyOf(entry));
+        const uniqueFileKeys = new Set(fileKeys);
+
+        expect(uniqueFileKeys.size).toBe(fileKeys.length);
+    });
+
+    test('each default, stored values included, parses and sits in its range', () => {
+        for (const entry of schema.entries) {
+            const saved = entry.type.serialize(entry.defaultValue);
+            const parsed = entry.type.parse(saved);
+            const normalized = entry.type.normalize(entry.defaultValue);
 
             expect(parsed.ok).toBe(true);
-            expect(field.type.equals(normalized, field.defaultValue)).toBe(true);
+            expect(entry.type.equals(normalized, entry.defaultValue)).toBe(true);
         }
     });
 
-    test('each field has a description', () => {
-        for (const field of schema.fields) {
+    test('each field and derived field has a description', () => {
+        for (const field of [...schema.fields, ...schema.derivedFields]) {
             expect(field.description.length).toBeGreaterThan(0);
+        }
+    });
+
+    test("each derived field's key is the camelCase of its label, and is no stored key", () => {
+        for (const derived of schema.derivedFields) {
+            expect(derived.key).toBe(camelCaseOfLabel(derived.label));
+            expect(schema.findEntry(derived.key)).toBeUndefined();
         }
     });
 });

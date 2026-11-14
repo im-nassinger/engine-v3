@@ -8,6 +8,8 @@ export type DerivedFieldDefinition<Values extends object, T> = {
     readonly description: string;
     readonly unit?: Unit;
     read(values: Values): T;
+    // Hidden when false: a rectangle has no Points row.
+    appliesWhen?(values: Values): boolean;
     // The stored values that change, or a reason it can't be written. No write: the field is read-only.
     write?(values: Values, value: T): ParseOutcome<Partial<Values>>;
 };
