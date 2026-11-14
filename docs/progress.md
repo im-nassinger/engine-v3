@@ -86,6 +86,10 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 - What the build showed differs from the plan is written into [tooling.md](architecture/tooling.md): `Math.f16round` (new in Node 26) is allowed in core, the ESLint guards switch off the type-aware rules, the circle between modules is a folder-scope rule in dependency-cruiser, and `tools/package.json` keeps the two doc tools CommonJS.
 - WebKit needed three system packages on the laptop, installed with apt.
 
+## Waiting for the owner
+
+- **Pushing is refused** (2026-11-14): GitHub rejects `git push origin master` because the token can't change `.github/workflows/ci.yml` without the `workflow` scope. The commits stay local until the owner runs `gh auth refresh -s workflow` (or pushes with a token that has it). CI can't run its first time until then.
+
 ## Next
 
 1. **Push** so CI runs for the first time on x86 and ARM (step 7 of stage 0). The [runner](runner.md) does it after its first step.
