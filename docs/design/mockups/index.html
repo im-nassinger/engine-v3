@@ -429,8 +429,8 @@ const MOMENTS = [
       <div class="playbar"><span class="state"><i></i>PLAYING</span><span class="ib">${ic('pause')}Pause <span class="k">F8</span></span><span class="ib dim">${ic('step')}Step <span class="k">F9</span></span><span class="ib">${ic('stop')}Stop <span class="k">Ctrl+Enter</span></span></div>`]
 ];
 // The states sheet: every control in each state, and the level view's overlays.
-function mini(content, w = 132, h = 90) {
-  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="${BG}"/>${content}</svg>`;
+function mini(content) {
+  return `<svg width="132" height="79" viewBox="0 0 150 90"><rect width="150" height="90" fill="${BG}"/>${content}</svg>`;
 }
 const A = 'var(--accent)';
 const H = (x, y) => `<rect x="${x - 4}" y="${y - 4}" width="8" height="8" fill="#fff" stroke="${A}" stroke-width="1.5"/>`;
