@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Every agreed word, one line each, grouped by subject: the basics, the editor, drawing, physics, files, logic, play, and the words for the code. Then the list of components, and the words we dropped with what to say instead. **One word, one meaning:** a word from this file must mean exactly what it says here, everywhere in the docs and in the game's own text. Don't invent shorthand. If a new word is needed, add it here first.
+Every agreed word, one line each, grouped by subject: the basics, the editor, drawing, physics, files, logic, play, the words for the code, and the words for the look. Then the list of components, and the words we dropped with what to say instead. **One word, one meaning:** a word from this file must mean exactly what it says here, everywhere in the docs and in the game's own text. Don't invent shorthand. If a new word is needed, add it here first.
 
 ## The basics
 
@@ -173,6 +173,17 @@ Words for how the game is built, used in [architecture/](architecture/README.md)
 | Status text | The short result the status bar's left slot shows for 4 seconds, such as "Undid: Move 3 entities". |
 | Browser event | Something the browser reports to the page, such as a key press or a paste. Never a game event. |
 | Body pose | A body's position and angle during play, as the physics engine reports it. |
+
+## The look
+
+Words for how the editor looks, used while the design is settled (owner, 2026-11-14). Never shown to players or creators.
+
+| Word | Meaning |
+|---|---|
+| Mockup | A static page that shows how a screen of the editor will look, with made-up content and nothing working behind it. |
+| Design system | The written rules of the editor's look: its design tokens, how each control looks in each state, its icons, and the colours the level view draws with. |
+| Design token | One named value of the design system, such as the panel background colour or the space between two rows. In the code it is a CSS custom property in `theme.css`. |
+| Accent colour | The one colour that marks what is active or selected: the active tool, a selected row, the selection outline in the level view, the focused field. |
 
 ## Components
 

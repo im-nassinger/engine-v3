@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Architecture Review</title>
+<title>Design Review</title>
 <style>
   :root {
     --bg: #f6f6f4; --card: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --line: #e2e2de;
@@ -34,20 +34,26 @@
   dt { font-weight: 600; margin-top: 8px; }
   dd { margin: 2px 0 0; color: var(--muted); }
   .q { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 8px 0; }
-  .q.yes { border-color: var(--yes); }
+  .q.yes, .q.picked { border-color: var(--yes); }
   .q.no { border-color: var(--no); }
   .row { display: flex; gap: 12px; align-items: flex-start; }
   .tag { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 52px; padding-top: 2px; }
   .text { flex: 1; }
   .detail { margin: 8px 0 0 64px; color: var(--muted); }
   .take { margin: 8px 0 0 64px; padding: 6px 10px; border-left: 3px solid var(--accent); background: var(--bg); border-radius: 0 6px 6px 0; }
-  .take b { font-style: normal; }
   .term { color: var(--term); text-decoration: underline dotted; cursor: help; }
   .btns { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }
   button { font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 4px 12px; }
   button.y[aria-pressed="true"] { background: var(--yes-bg); border-color: var(--yes); color: var(--yes); font-weight: 600; }
   button.n[aria-pressed="true"] { background: var(--no-bg); border-color: var(--no); color: var(--no); font-weight: 600; }
   button.c, button.m { color: var(--muted); }
+  .opts { margin: 10px 0 0 64px; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+  .opt { text-align: left; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .opt[aria-pressed="true"] { background: var(--yes-bg); border-color: var(--yes); }
+  .opt .lbl { font-weight: 600; font-size: 14px; }
+  .opt .pick { font-size: 12px; color: var(--accent); font-weight: 600; }
+  .opt .sub { font-size: 12px; color: var(--muted); }
+  .pv { border-radius: 6px; overflow: hidden; }
   textarea { width: 100%; margin-top: 10px; min-height: 56px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px; resize: vertical; }
   .copy { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; padding: 8px 16px; }
   .footer { margin-top: 32px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
@@ -56,14 +62,14 @@
   @media (max-width: 560px) {
     .row { flex-wrap: wrap; }
     .btns { width: 100%; }
-    .detail, .take { margin-left: 0; }
+    .detail, .take, .opts { margin-left: 0; }
   }
 </style>
 </head>
 <body>
 <header>
   <div class="bar">
-    <h1>Architecture review</h1>
+    <h1>Design review</h1>
     <span class="progress" id="progress"></span>
     <label class="filter"><input type="checkbox" id="onlyOpen"> Unanswered only</label>
     <button class="copy" id="copyTop">Copy answers</button>
@@ -71,7 +77,7 @@
   <div class="pbar"><i id="pfill"></i></div>
 </header>
 <main>
-  <p class="intro">Round 7: <b>everything still open, on one page.</b> Three questions from your round 6 answers, the approval of the architecture proposal, 14 new words, and every feature from the old review that never got a version, each with my suggested version. Versions: <b>v1</b> build and watch a level, <b>v2</b> logic and play (triggers, scripts, files), <b>v3</b> polish, <b>Later</b> after v3, not designed now. Each card is one question, with my view under it. <b>Yes</b> means you agree with my view, <b>No</b> means you don't, and a comment says what you'd change, such as another version. "More" explains the card with an example. Underlined words are explained when you hover them. Answers are kept in this browser, so you can stop and come back. When you're done, press Copy answers and paste the text into the chat.</p>
+  <p class="intro">Round 8: <b>how the editor should look</b>, before any mockup is drawn. Already decided and not asked again: one dark theme (a light theme is in rejected.md), the places and starting sizes of the panels, Inter as the font of texts in levels, a yellow icon for warnings and a blue one for tips, and the default look of a new shape (fill #4A90D9 on a soft light blue background). Most cards here are a choice: pick one option (or several, where it says so), and my pick is marked. The last cards are Yes or No. A comment can say anything, such as “like Figma, but darker”. Small previews are only sketches, the mockups will show the real thing. Answers are kept in this browser. When you're done, press Copy answers and paste the text into the chat.</p>
   <details class="glossary"><summary>Glossary</summary><dl id="glossary"></dl></details>
   <div id="list"></div>
   <div class="footer">
@@ -80,227 +86,109 @@
   </div>
 </main>
 <script>
-// Glossary: [term, meaning, words that link to it]. Agreed words first, then the new architecture words.
+// Glossary: [term, meaning, words that link to it].
 const GLOSSARY = [
-["Entity","Any single thing in a level: a rectangle, a joint, the camera. On its own an entity is just an id. What it is comes from its components.",["entity","entities"]],
-["Component","A piece of data attached to an entity, such as BodyComponent. The Inspector shows each one as a card.",["component","components"]],
-["Field","One editable value on a card. Fields come from one fixed list of field types: number, text, checkbox, choice, colour, vector, angle, entity, asset, variable, tags, or a list of these.",["field","fields","field type","field types"]],
-["Attribute","One value of a component, as the Lua API names it: the field Linear damping is the attribute linear_damping.",["attribute","attributes"]],
-["Inspector","The panel on the right showing the components of what is selected.",["Inspector"]],
-["Card","One component as the Inspector shows it: a title and its fields.",["card","cards"]],
-["Layers panel","The panel listing every entity as a tree. One row is one entity. The top row is drawn in front.",["Layers panel","Layers"]],
 ["Level view","Where you see and edit the level. It fills the whole window, with the panels on top.",["level view"]],
-["Physics view","A debug view in the editor and test play that draws every physics shape, even hidden ones.",["physics view"]],
-["Fill","What paints the inside of a shape: nothing, a solid colour, a gradient (v2) or an image (v3).",["fill","fills"]],
-["Merge","When shapes inside a group with a body become part of that one body.",["merge","merged","merging"]],
-["Level bounds","The rectangle around the level that marks where it ends: the World's rectangle ShapeComponent. Each edge is a wall or open.",["level bounds","bounds"]],
-["World","The top entity of every level. Everything else sits inside it. It holds the level-wide settings.",["World"]],
-["Tag","A text label on an entity, such as player or enemy, that triggers and scripts look for.",["tag","tags"]],
-["Trigger","No-code logic on an entity: When (one event), If (optional checks), Do (actions in order).",["trigger","triggers"]],
-["Sensor","A surface that notices what touches it but pushes nothing. Used for coins and finish zones.",["sensor"]],
-["Variable","A named number during play, such as coins = 5, listed on the World.",["variable","variables"]],
-["Input","A name such as jump, with the keys mapped to it, listed on the World. Players can remap inputs.",["input","inputs"]],
-["Script","A .lua file attached to an entity, to control it during play.",["script","scripts"]],
-["Spawn","Creating new entities during play from an .entity file, such as bullets.",["spawn","spawned","spawns"]],
-["Builtin folder","A read-only folder in the Assets panel with the ready-made files that come with the game.",["builtin folder","builtin"]],
-["End window","The window shown when a run is won or lost: a title, the time, Restart and Leave.",["end window"]],
-["Tool lock","Double-clicking a tool, or pressing its number key twice, keeps it active until Esc.",["tool lock","lock the tool"]],
-["Play file","The .playable file: made from the project file, with only what is needed to play.",["play file"]],
-["ShapeComponent","The geometry of an entity: a rectangle, ellipse, polygon or line. On the World, a rectangle: the level bounds.",["ShapeComponent"]],
-["StyleComponent","How a shape is painted: fill, outline, opacity. On the World, its fill is the background colour.",["StyleComponent"]],
-["BodyComponent","Makes an entity take part in physics: Static, Dynamic or Kinematic.",["BodyComponent"]],
-["SurfaceComponent","Makes an entity's shape something others bump into, with friction and bounce.",["SurfaceComponent"]],
-["PhysicsWorldComponent","The World's physics card: gravity, and in v3 game speed and the collision grid.",["PhysicsWorldComponent"]],
-["Test play","Pressing Play in the editor. It runs a copy of the level, and Stop returns to the editor with nothing changed.",["test play"]],
-["Tick","One step of the game. The game runs 60 ticks per second.",["tick","ticks"]],
-["Seed","The number all random values in a run come from.",["seed"]],
-["Project file","The .editable file: the level as you edit it, including editor-only data such as the grid size and locks.",["project file",".editable"]],
-["Editor message","A short note on the card it is about, never blocking, maybe with a fix button. Two kinds: warning and tip.",["editor message","editor messages","note"]],
-["Determinism","The requirement that the same level, seed, inputs and clock time give the same run on any computer.",["determinism","deterministic"]],
-["Command (new word)","What a menu entry or a shortcut runs, such as Group or Delete. The requirements already use the word this way.",["command","commands"]],
-["Change (new word)","One undoable edit to the level, with a way to apply it and a way to revert it. A command makes one or more changes.",["change","changes"]],
-["History step (new word)","One entry in the undo history: the changes one command made, with a label such as 'Move 3 entities'.",["history step","step","steps"]],
-["Contract (new word)","A small TypeScript type that the game's rules declare and some other class fulfils. Example: the rules declare a PhysicsWorld contract, and the Box2D adapter fulfils it.",["contract","contracts"]],
-["Adapter (new word)","A class that fulfils a contract using a library or the browser, such as the Box2D adapter or the browser storage adapter.",["adapter","adapters"]],
-["Worker (new word)","A browser thread that runs code away from the page, so a long computation never freezes the editor.",["worker","workers"]],
-["Play copy (new word)","The copy of the level that test play runs. Stop throws it away.",["play copy"]],
-["Schema (new word)","The list of fields a component declares once: each field's type, label, unit, range, default and whether it can change during play.",["schema","schemas"]],
-["Current group (new word)","The group you are inside: double-click goes in, Esc goes up.",["current group"]],
-["Culling","Drawing only what is on screen, and skipping the rest.",["culling"]],
-["Version","When a feature is built. v1: build and watch a level. v2: logic and play (triggers, scripts, files). v3: polish. Later: after v3, not designed now.",["version","versions"]],
-[".entity file","A saved entity, such as bullet.entity, that can be placed in the level or spawned during play. v2.",[".entity file",".entity files"]],
-["Spawn","Creating a new entity from an .entity file during play, such as a bullet.",["Spawn","spawn","spawned","spawning"]],
-["Boolean","A variable type that is true or false, such as door_open.",["boolean","booleans"]],
-["String","A variable type that holds text, such as player_name = \"Ada\".",["string","strings"]],
-["Lint rule","An automatic check on the code (ESLint) that fails the build when a rule is broken, such as an import pointing the wrong way.",["lint rule"]]
+["Layers panel","The panel on the left listing every entity as a tree. One row is one entity.",["Layers panel","Layers"]],
+["Inspector","The panel on the right showing the components of what is selected, as cards.",["Inspector"]],
+["Card","One component as the Inspector shows it: a title and its fields.",["card","cards"]],
+["Field","One editable value on a card, such as Density.",["field","fields"]],
+["Top bar","The bar along the top with the menus, the tools and Play.",["top bar"]],
+["Status bar","The bar along the bottom with the zoom, the save state and the count of editor messages.",["status bar"]],
+["Play bar","The small bar shown during test play, with Stop, Pause, Step and Panels.",["Play bar"]],
+["Editor message","A short note on the card it is about, maybe with a fix button. A warning has a yellow icon, a tip a blue one.",["editor message","editor messages"]],
+["Mockup (new word)","A static page that shows how a screen of the editor will look, with made-up content and nothing working behind it.",["mockup","mockups"]],
+["Design system (new word)","The written rules of the editor's look: its design tokens, how each control looks in each state, its icons, and the colours the level view draws with.",["design system"]],
+["Design token (new word)","One named value of the design system, such as the panel background colour or the space between two rows.",["design token","design tokens"]],
+["Accent colour (new word)","The one colour that marks what is active or selected: the active tool, a selected row, the selection outline in the level view, the focused field.",["accent colour","accent"]]
 ];
 
-// Groups: [title, note, [[id, short, detail, myView], ...]]. Yes = you agree with my view.
+// Small sketches for the options. Static content written for this page.
+const swatch = (app, panel, line, text) =>
+  `<div class="pv" style="display:flex;height:54px;background:${app};border:1px solid ${line}">
+     <div style="width:38%;background:${panel};border-right:1px solid ${line};padding:6px;font:11px system-ui;color:${text};white-space:nowrap;overflow:hidden">Layers<br><span style="opacity:.6">Rectangle 1</span></div>
+     <div style="flex:1"></div></div>`;
+const sel = (accent) =>
+  `<div class="pv" style="height:64px;background:#d6ebf7;position:relative">
+     <div style="position:absolute;left:30%;top:16px;width:40%;height:32px;background:#4A90D9;border:2px solid #1F3552"></div>
+     <div style="position:absolute;left:calc(30% - 3px);top:13px;width:calc(40% + 6px);height:38px;border:1.5px solid ${accent}"></div>
+     ${[[0,0],[1,0],[0,1],[1,1]].map(([x,y]) => `<div style="position:absolute;left:calc(30% - 6px + ${x} * (40% + 6px));top:${10 + y * 38}px;width:7px;height:7px;background:#fff;border:1.5px solid ${accent}"></div>`).join("")}
+   </div>`;
+const rows = (h, size) =>
+  `<div class="pv" style="background:#2c2c2c;padding:2px 0">${["Density","Friction","Bounce"].map((l, i) =>
+     `<div style="height:${h}px;display:flex;align-items:center;justify-content:space-between;padding:0 8px;font:${size}px system-ui;color:#ddd">${l}<span style="background:#1e1e1e;padding:1px 6px;border-radius:3px">${["1.00","0.60","0.00"][i]}</span></div>`).join("")}</div>`;
+const corners = (r) =>
+  `<div class="pv" style="background:#2c2c2c;padding:10px;display:flex;gap:8px;align-items:center">
+     <span style="background:#4c4c4c;color:#eee;font:12px system-ui;padding:4px 10px;border-radius:${r}px">Button</span>
+     <span style="background:#1e1e1e;color:#ccc;font:12px system-ui;padding:4px 10px;border-radius:${r}px;border:1px solid #444">120</span></div>`;
+const layout = (floating) => floating
+  ? `<div class="pv" style="height:64px;background:#d6ebf7;position:relative">
+       <div style="position:absolute;left:6px;top:6px;bottom:6px;width:22%;background:#2c2c2c;border-radius:8px"></div>
+       <div style="position:absolute;right:6px;top:6px;bottom:6px;width:26%;background:#2c2c2c;border-radius:8px"></div></div>`
+  : `<div class="pv" style="height:64px;background:#d6ebf7;position:relative;border-top:10px solid #2c2c2c;border-bottom:5px solid #2c2c2c">
+       <div style="position:absolute;left:0;top:0;bottom:0;width:22%;background:#2c2c2c;border-right:1px solid #444"></div>
+       <div style="position:absolute;right:0;top:0;bottom:0;width:26%;background:#2c2c2c;border-left:1px solid #444"></div></div>`;
+const icons = (filled) => {
+  const s = filled ? 'fill="#ddd" stroke="none"' : 'fill="none" stroke="#ddd" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"';
+  return `<div class="pv" style="background:#2c2c2c;padding:8px;display:flex;gap:12px">
+    <svg width="22" height="22" viewBox="0 0 24 24"><path ${s} d="M5 3l13 8-6 1.5L9 19z"/></svg>
+    <svg width="22" height="22" viewBox="0 0 24 24"><rect ${s} x="4" y="6" width="16" height="12" rx="1.5"/></svg>
+    <svg width="22" height="22" viewBox="0 0 24 24"><circle ${s} cx="12" cy="12" r="8"/></svg>
+    <svg width="22" height="22" viewBox="0 0 24 24"><path ${s} d="M8 5v14l11-7z"/></svg></div>`;
+};
+
+// Groups: [title, note, cards]. A card: [id, short, detail, myView, options, pick, multi].
+// options: [[label, sub, previewHtml]]; pick: index of my pick. No options: a Yes/No card.
 const GROUPS = [
-["Spawn and variables", "Three questions that came out of your round 6 answers. Spawn and variables are v2.", [
-["Q29","A spawned entity's position and rotation are measured from the entity the trigger is on, not from the level's origin.",
- "Background: in round 6 you said Spawn asks for TransformComponent values (position, rotation, scale, skew). Those numbers need a starting point. Example: a cannon that drives around has the trigger “When the key fire is pressed, Spawn bullet.entity” at position 40, 0. Measured from the cannon, the bullet always appears 40 px to the right of the cannon, wherever it has driven, and if the cannon is tilted 30°, the bullet is tilted 30° too. Measured from the level's origin, the bullet always appears at the same spot near the middle of the level, even when the cannon is far away. Either way, this only decides where the bullet appears: after that it moves on its own.",
- "From the trigger's entity: a moving cannon, a gun or an enemy dropping a coin then work without a script. For a fixed spot, put the trigger on the World, whose position is the level's origin."],
-["Q30","Spawn's values replace the position, rotation, scale and skew saved in the .entity file.",
- "Background: an .entity file is a saved entity, such as bullet.entity. It already has its own TransformComponent from when you saved it. Spawn now asks for TransformComponent values too, so one of the two has to win. Example: bullet.entity was saved at scale 2, and the Spawn action says scale 1. With this rule, the bullet appears at scale 1, exactly what the trigger shows.",
- "Yes: what you read on the trigger is what you get."],
-["Q31","Triggers can flip a true-or-false variable: true becomes false, and false becomes true. (Asked again in plainer words.)",
- "Example: a light switch. The variable lamp_on is false. Each time the player touches the switch, lamp_on should flip: off to on, on to off. With Flip, that is one trigger: “When touched, Flip lamp_on”. Without Flip, triggers can only set it to true or set it to false, so you need two triggers, and both fire on the same touch: the first turns the lamp on, the second sees it on and turns it off again.",
- "Yes: without it a simple light switch doesn't work."]
+["The feel", "What the editor should remind you of. This steers everything below.", [
+["D1","Which editors should it feel like? Pick any number.",
+ "Background: each of these has a dark editor with panels around a work area, but they feel different. Figma: calm, flat, lots of grey, small text, made for drawing shapes, with a Layers panel and a properties panel like ours. Godot: a game editor, blue-grey, denser, many small icons. Unity: grey, dense, boxy, an Inspector with cards like ours. Blender: very dense, orange selection, many controls. Affinity or Photoshop: drawing tools, dark grey, a tool strip on the left. VS Code: plain, flat, made for text. A comment can name others.",
+ "Figma: the closest to what v1 does (draw shapes, arrange them in a Layers panel, edit values on the right), and calm enough that the level stays the brightest thing on screen.",
+ [["Figma","Calm, flat, drawing"],["Godot","Game editor, blue-grey"],["Unity","Dense, boxy cards"],["Blender","Very dense, orange selection"],["Affinity or Photoshop","Drawing, tool strip"],["VS Code","Plain, flat"]], 0, true]
 ]],
-["The architecture proposal", "How the game is built, in docs/proposals/architecture/. You approved its outline and 24 cards in round 1; rounds 2 to 6 changed details.", [
-["AP1","The architecture proposal is approved. Its files move into the main docs, plan.md becomes the project's plan, and coding starts at stage 1.",
- "Background: the proposal says which libraries we use, how the code is split into five parts (core, editor, adapters, ui, app), how the editor, saving and test play work, and the 18 stages to build v1. Its README lists the files in reading order. A No, or a comment naming a file, keeps it a proposal until that part is fixed.",
- "Approve: every open question that touches v1 is answered, and the rest are v2 or later."]
+["Colours", "The panels' greys and the one accent colour.", [
+["D2","Which grey should the panels be?",
+ "Background: the panels sit on top of the level view, so their grey is next to the level's colours all the time. A tinted grey shifts how the level's colours look a little. Example: a blue-grey panel makes the default blue shapes look slightly greyer.",
+ "Neutral grey: it doesn't change how the level's own colours look, which matters in an editor where you pick colours.",
+ [["Neutral grey","Figma, Blender",swatch("#1e1e1e","#2c2c2c","#3a3a3a","#ddd")],["Cool blue-grey","Godot, VS Code",swatch("#1b1e24","#262b33","#353b45","#d8dde6")],["Warm grey","Affinity",swatch("#1f1d1b","#2c2926","#3b3733","#e2ddd6")]], 0, false],
+["D3","Which accent colour?",
+ "Background: the accent colour marks what is selected or active: the active tool, the selected rows in the Layers panel, the focused field, and the outline and handles around the selection in the level view. The level view is the hard place: a new shape is blue (#4A90D9) on a soft light blue background, so a blue selection outline is hard to see on it. Example: each preview shows a new rectangle, selected. Tips already use a blue icon and warnings a yellow one.",
+ "Orange: it stands out on the default blue shapes and the light blue background, the way Blender's orange selection does, and it is far enough from the warning yellow.",
+ [["Orange","Stands out on blue",sel("#ff8a3d")],["Blue","Figma's choice",sel("#2f7cf6")],["Violet","",sel("#9b6bff")],["Magenta","",sel("#ff3fa4")]], 0, false]
 ]],
-["New words", "Words the proposal uses that aren't in the glossary yet. Yes adds the word with this meaning. The nine words you approved in round 1 move in too.", [
-["GL1","Part (of the code): one of the five top folders of src: core, editor, adapters, ui, app. Used instead of “layer”.","Example: “the editor part may import core, never ui.” “Layer” isn't used because the Layers panel already owns it.","Yes."],
-["GL2","Module: a folder directly under a part, with one index.ts that other modules import from.","Example: core/geometry is a module. Other code imports from core/geometry, never from a file deep inside it.","Yes."],
-["GL3","Composition root: the one place that builds the real classes and connects them.","Example: the editor page creates the Box2D adapter and hands it to the code that needs physics. There are three: the editor page, the game worker, the import worker.","Yes."],
-["GL4","Open level: the level open in the editor, together with its history, selection, current group and caches. New and Import replace it.","Example: pressing New throws away the open level, its undo history included, and makes a fresh one.","Yes."],
-["GL5","Game worker: the worker that runs the play copy during test play.","Example: while you test play, the physics runs in the game worker, so a heavy level never freezes the editor's buttons.","Yes."],
-["GL6","Play mirror: the editor page's own copy of the running level, updated from tick reports and drawn by the level view.","Example: the game worker moves a crate; the play mirror gets the crate's new position and the level view draws it there.","Yes."],
-["GL7","Tick report: what the game worker sends back after running ticks: the bodies that moved, entities removed, the camera's position.","Example: “crate 12 is now at 300, 140; coin 7 was removed; the camera is at 250, 0.”","Yes."],
-["GL8","Collision piece: one convex part of a shape, at most 8 points, as handed to the physics engine and drawn by the physics view.","Example: an L-shaped polygon is split into two rectangles, two collision pieces, because Box2D only takes convex shapes.","Yes."],
-["GL9","Value type: a class that knows how to check, store, copy and compare one kind of value. Every field type is a value type the Inspector can show.","Example: the colour value type checks that “#ff0000” is a colour, copies it, and tells whether two colours are equal.","Yes."],
-["GL10","Change signal: the notice a class sends when its state changed, so caches, the level view and panels can update. Not a game event.","Example: you rename a box; a change signal tells the Layers panel to redraw that row.","Yes."],
-["GL11","Derived cache: a value worked out from the level and kept until something it depends on changes.","Example: a group's bounds are computed once and kept until one of its children moves.","Yes."],
-["GL12","Status text: the short result the status bar's left slot shows for 4 seconds.","Example: “Undid: Move 3 entities”.","Yes."],
-["GL13","Browser event: something the browser reports to the page, such as a key press or a paste. Never a game event.","Example: pressing Space is a browser event; the trigger “When the jump input is pressed” is a game event made from it.","Yes."],
-["GL14","Body pose: a body's position and angle during play, as the physics engine reports it.","Example: “x 300, y 140, angle 12°”. Tick reports carry body poses.","Yes."]
+["Shape and size", "How tight and how round.", [
+["D4","How dense should the panels be?",
+ "Background: the panel widths are fixed by the requirements (Layers 260 px, Inspector 300 px), so density decides how many rows and fields fit. Example: a BodyComponent card has about ten fields. Compact shows all of them and the next card; roomy needs scrolling sooner but is easier to read.",
+ "Medium: like Figma. The Inspector fits a whole card, and 12 px text stays easy to read at 300 px wide.",
+ [["Compact","22 px rows, 11 px text (Blender, Unity)",rows(22,11)],["Medium","28 px rows, 12 px text (Figma)",rows(28,12)],["Roomy","32 px rows, 13 px text",rows(32,13)]], 1, false],
+["D5","How round should corners be?",
+ "Background: buttons, fields, menus and cards all share one corner size.",
+ "Slightly rounded, 4 px: soft without looking like a phone app, and small fields stay tidy.",
+ [["Square","0 to 2 px",corners(1)],["Slightly rounded","4 px",corners(4)],["Rounded","8 px",corners(8)]], 1, false],
+["D6","Should the panels touch the window's edges, or float with a gap?",
+ "Background: the requirements put the panels on top of a level view that fills the window. They can sit flush against the edges with a thin line, or float as rounded boxes with a small gap, so the level shows around them (Figma's newer look).",
+ "Flush: every pixel of the 260 px and 300 px goes to content, and the edge of the level view is clear.",
+ [["Flush","Thin line between panel and level",layout(false)],["Floating","Gap and rounded corners",layout(true)]], 0, false]
 ]],
-["Suggested v1", "Features accepted in the old review that never got a version. I suggested v1 for these, and the proposal already builds them, marked “waiting for the owner”. Yes keeps them in v1.", [
-["WS1","v1: closing or reloading the tab while a change isn't saved yet asks “Leave site?” first.","Background: the level saves itself 2 seconds after your last change, so a close in those 2 seconds would lose it. The prompt only shows while something is unsaved, and a waiting save is written as soon as you switch tabs. Example: you move a box and press Ctrl+W at once: the browser asks before closing.","v1: losing work is the worst thing v1 can do, and it is small."],
-["WS2","v1: the browser's own page scrolling, bounce, swipe-back, middle-click autoscroll and Alt menu are off on the editor page.","Background: these browser habits fight the editor. Example: on a trackpad, a two-finger swipe while panning would go back a page and leave the editor; on Windows, pressing Alt alone opens the browser's menu bar.","v1: each one can break a drag or leave the page by accident."],
-["WS3","v1: if the window loses focus during a drag, the drag cancels and held keys count as released.","Example: you are dragging a box and Alt+Tab or a popup steals focus. Without this rule, the box stays stuck to the mouse when you come back, or Shift stays “held” because the browser never said it was released.","v1: it prevents stuck keys at almost no cost."],
-["WS4","v1: browser zoom (Ctrl and + or −) makes the panels bigger or smaller, while the level view stays sharp and clicks stay accurate.","Example: a laptop set to 125% zoom. Without this, the level view is blurry and clicks land a few pixels off.","v1: many laptops run at 125% or 150% by default."],
-["IN1","v1: with several entities selected, the Inspector shows the components they all have. Different values show “Mixed”, and typing a value sets it on all.","Example: select 5 crates and type Density 2: all five get 2. If their frictions differ, the Friction field shows Mixed until you type one.","v1: it is the only way to change many things at once in v1."],
-["WO2","v1: any body more than 100,000 px from the level's origin is removed, with a warning.","Background: far from the origin, numbers lose precision and physics goes wrong. Open edges already remove what leaves the level, so this is a safety net for bugs. In v1 the warning is the status text; the Console comes in v2.","v1: one check per tick, and it stops a broken level from going haywire."],
-["WO3","v1: a level is at most 200,000 × 200,000 px.","Example: that is about 100 screens wide. The World's rectangle can't be made bigger.","v1: it keeps everything inside the safety net above."],
-["JO4","v1: when a joint connects two bodies, the smaller one becomes body A.","Background: a joint connects body A to body B, and settings such as a motor's direction depend on which is which. Example: a wheel hinged to a car is always A, whichever you drew first, so its motor turns the same way in every car you build.","v1: the result never depends on draw order."],
-["JO5","v1: scaling a group with joints scales the joints too, and mirroring it mirrors their limits and motor direction.","Example: a car group with wheel hinges. Scale it to 2 and the wheel joints move with the wheels. Mirror it and the motors turn the other way, so the mirrored car still drives forward.","v1: without it, scaling or mirroring a car breaks it."],
-["CA1","v1: however soft the camera's smoothing, the followed entity never gets within 10% of the screen's edge. A far teleport becomes a cut, not a long slide.","Example: with very soft smoothing, a fast player would run off screen while the camera lags. With this rule the camera speeds up at the margin. If the player teleports across the level, the camera jumps there at once.","v1: it keeps the player visible with any smoothing."],
-["SV1","v1: dropping a level file on the editor imports it, after the same question Import asks.","Example: drag mylevel.editable from your Downloads folder onto the editor; it asks whether to replace the open level, then imports.","v1: it is the import you already have, with a shortcut people expect."],
-["SV2","v1: after a crash, reopening the editor loads the last save and says “Recovered from your last save at 14:32. The last few seconds may be missing.”","Example: the browser crashes while you edit. You reopen the tab and the note tells you what you got back.","v1: it tells you what you may have lost."],
-["SV3","v1: if the saved level won't open, the editor offers to export its raw data and never deletes it.","Example: a bug writes a broken level. Instead of an empty editor and a lost level, you get a button to save the data so it can be fixed.","v1: it turns a lost level into a bug report."],
-["SV4","v1: if the browser's site data is cleared while the level is open, the editor saves it again and says so.","Example: you clear browsing data in another tab. The open level is still in memory, so it is written back and nothing is lost.","v1: small, and it prevents a silent loss."]
+["Icons and text", "", [
+["D7","Which icon style?",
+ "Background: the tools, the eye and lock in the Layers panel, the menus and the Play bar all need icons. Outline icons are thin lines, filled ones are solid. Example: the four previews are the Select tool, a rectangle, an ellipse and Play.",
+ "Outline icons, from one free open set such as Lucide (ISC licence, over 1,500 icons), so every icon matches. The package itself would be proposed in stage 6, when the first icon is drawn.",
+ [["Outline","Thin lines (Figma, Lucide)",icons(false)],["Filled","Solid shapes",icons(true)]], 0, false],
+["D8","The editor's own text uses Inter too.",
+ "Background: Inter is already the font of texts in levels, and it has numbers of equal width, so values in the Inspector line up. The other choice is the computer's own font (Segoe UI on Windows, SF on a Mac), which looks different on each computer. Fonts are hosted with the game, as the tech notes say.",
+ "Yes: one font for everything, the same on every computer."]
 ]],
-["Suggested v2", "These come with something that is v2 anyway. Yes keeps them in v2.", [
-["EF1","v2: an .entity file has an origin: the point that lands on the mouse when you place it, and on the Spawn position when it is spawned. By default, the centre of what you saved.","Example: tree.entity has its origin at the bottom of the trunk, so placing it puts the roots on the mouse, and spawning it at 0, 0 puts the roots there.","v2, with .entity files."],
-["EF2","v2: a spawned entity goes at the top of the Layers tree, unless a parent is given. It never merges into a body above it.","Example: a cannon inside a tank group spawns a bullet. The bullet goes to the top level, not into the tank group, so it isn't glued to the tank's body and flies on its own.","v2, with Spawn."],
-["TP1","v2: while test play is paused, clicking the game selects an entity and the Inspector shows its live values.","Example: pause, click the falling crate, read its speed. The old review accepted “inspect things while paused” without a version.","v2, with the pause menu."],
-["TP2","v2: after Stop, the entities you selected during the run stay selected if they exist in the level.","Example: during the run you click a crate to inspect it, press Stop, and the crate is still selected in the editor to fix it.","v2, with selecting during play."],
-["TP3","v2: if the selected entity is destroyed during play, the Inspector says so and greys out its last values.","Example: you are watching a coin's values and the player picks it up: the card stays, greyed, with “Destroyed”.","v2, with Destroy."],
-["TP4","v2: after a run is won or lost, the panels and View menu switches still work.","Example: the level ends with “You lost”. You can still open the physics view to see why the player fell through.","v2, with Win and Lose."],
-["SC2","v2: the same script listed twice on one entity runs twice, each with its own settings.","Example: two copies of Spin.lua on a gear, one at speed 1 and one at speed 3.","v2, with scripts."],
-["CE4","v2: the code editor keeps a draft of unsaved text every few seconds, so a crash loses seconds at most.","Example: you write 40 lines, the browser crashes, and when you reopen the script the 40 lines are still there.","v2, with the code editor."],
-["CE5","v2: the Console has a Clear button, and clears itself when Play starts.","Example: each run starts with an empty Console, so you only see this run's print() lines.","v2, with the Console."],
-["VI1","v2: some keys can't be used in inputs: Esc, Tab, Ctrl, Alt and Cmd in any combination, F1 to F12, Caps Lock and Num Lock.","Background: these belong to the browser, the system or the editor. Example: F5 reloads the page, so jump on F5 would reload the game.","v2, with inputs."],
-["TG2","v2: each trigger can hold at most 32 runs waiting on a Wait. More are skipped with a Console warning.","Example: a trigger fires every tick and waits 10 seconds each time. Without a limit, it would pile up 600 waiting runs in 10 seconds and slow the game.","v2, with Wait."],
-["TG6","v2: each trigger gets a name made from its When, which you can edit.","Example: “When the key fire is pressed” is named “fire pressed”, and you can rename it “Shoot”. The name shows on the card and in the Console.","v2, with triggers."]
-]],
-["Suggested v3: editor", "Polish for the editor. v3 is the polish version. Yes keeps them in v3.", [
-["WS5","v3: in a small window the panels get narrower, then fold away one by one. Under 640 × 480 a notice asks for a bigger window.","Example: a 1024 px wide window folds the Console first, then the left panels, then the Inspector, so the level view stays usable.","v3: v1 targets a normal desktop window."],
-["WS6","v3: on a phone or tablet, a notice says the editor needs a mouse and keyboard.","Example: someone opens the editor on an iPad and sees the notice instead of a broken editor.","v3: nobody else uses the editor before then."],
-["WS7","v3: a new, empty level shows a hint card (“Press 4 and drag to draw a shape”), then a hint pointing to Play. Hints end after the first Play.","Example: a first-time user sees how to draw, draws, then sees where Play is.","v3: it helps people who aren't you."],
-["WS8","v3: Ctrl+\\ hides every panel and bar, leaving the level view and a small button to bring them back.","Example: a clean screenshot of your level.","v3."],
-["WS9","v3: hold Z for a zoom tool: drag a box to zoom to it, click to zoom in, Alt+click to zoom out.","Example: hold Z and drag a box around a small gear; the view fills with the gear.","v3: the scroll wheel already zooms."],
-["WS10","v3: a setting for trackpads: two-finger scrolling pans the view, pinch zooms.","Example: on a laptop trackpad you move around the level the way you scroll a web page.","v3."],
-["WS11","v3: rulers along the top and left of the level view, in level pixels, off by default.","Example: checking that a platform is 64 px above the floor without reading the Inspector.","v3: the grid and the Inspector already give numbers."],
-["WS12","v3: a snapping switch that keeps positions on whole pixels, on by default.","Example: a box dragged by the mouse lands at 120, not 120.37.","v3."],
-["WS13","v3: editor animations take 150 ms or less, and are off when your system asks for reduced motion.","Example: a panel folding open.","v3."],
-["SL1","v3: while you are inside a group, the rest of the level dims to about half. A View menu switch turns it off.","Example: you double-click into the car to edit a wheel; everything outside the car fades, so you see where you are.","v3."],
-["SL2","v3: the selection shows the point it rotates around, and you can drag that point.","Example: drag the point to the end of a plank, then rotate: the plank swings around that end.","v3."],
-["SL3","v3: Set origin to pivot moves an entity's origin for good, without moving it on screen.","Example: a door rotates around its centre. Move the pivot to its edge and Set origin to pivot: now rotation 90 swings it like a door.","v3."],
-["SL4","v3: Tab and Shift+Tab select the next and previous entity in the same group.","Example: select one of ten coins in a group, press Tab to step through the others.","v3."],
-["SL5","v3: the view pans by itself when a drag gets near the edge of the level view.","Example: you drag a box to the right edge of the screen and the view scrolls so you can keep going.","v3."],
-["SL6","v3: Alt+click an eye shows only that entity and its children, until you Alt+click again. Never saved, never affects play.","Example: Alt+click the player's eye to see only the player.","v3."],
-["SL7","v3: dragging across eye or lock icons sets every row you touch the same way.","Example: press on the first eye and drag down over five rows: all five hide.","v3."],
-["SL8","v3: the Layers panel works with the keyboard: arrows move, Right unfolds, Left folds, typing a letter jumps to a name.","Example: type “c” to jump to the camera row.","v3."],
-["SL9","v3: the bottom of the Layers panel counts selected, hidden and locked entities.","Example: “3 selected · 2 hidden · 1 locked”.","v3."],
-["IN2","v3: in a field showing Mixed, +=10, -=, *= and /= change each entity from its own value.","Example: five platforms at different heights; type +=10 in Y and each moves 10 px from where it is.","v3."],
-["IN3","v3: number fields accept sums such as 100/2+8.","Example: type 100/2+8 in Width and get 58.","v3."],
-["IN4","v3: dragging a number field's label changes the value live: 1 per pixel, Shift 10, Alt 0.1. One undo step. Up and Down in the field do the same.","Example: drag the word Rotation left and right to turn a box while you watch.","v3."],
-["IN5","v3: right-click a field: Reset to default.","Example: you changed a body's Friction and want it back to what a new body has.","v3."],
-["IN6","v3: align and distribute buttons in the Inspector and the Arrange menu. A group counts as one entity.","Example: select five coins and press Distribute horizontally: the gaps between them become equal.","v3."],
-["IN7","v3: Bring forward, Send backward, Bring to front and Send to back, within the same group.","Example: send a tree to the back so the player walks in front of it.","v3: dragging rows in the Layers panel already does it in v1."],
-["IN8","v3: Ctrl+Shift+V pastes at the original position. “Paste here” in the right-click menu pastes where you clicked.","Example: copy a platform, scroll away, Ctrl+Shift+V puts the copy exactly on top of the original.","v3."],
-["IN9","v3: move a duplicate and press Ctrl+D again: the next copy repeats the same move.","Example: duplicate a step, move it up and right, press Ctrl+D three times: a staircase.","v3."],
-["IN10","v3: Alt+drag an entity drags out a copy, as one undo step.","Example: Alt+drag a coin to the right to make a second one.","v3: Ctrl+D does the same in v1."],
-["IN11","v3: copied entities paste into another level or tab, bringing the files they use. Text or an image on the clipboard pastes as a text entity or a new image file.","Example: copy the car from one level and paste it in another, with its scripts.","v3."],
-["IN12","v3: the editor's right-click menus show every entry's shortcut and keep disabled entries visible; text fields and the code editor keep the browser's menu.","Example: right-click a box: “Duplicate  Ctrl+D”, with “Paste” greyed out when the clipboard is empty.","v3."],
-["IN13","v3: an arrow beside Undo lists the last 50 steps; click one to go back to it.","Example: “Move 3 entities”, “Delete box”, “Change Density”: click the third to undo all three.","v3."],
-["DR1","v3: a rectangle has a corner radius, set by a dot on the level or typed. Rounded corners are part of what collides.","Example: a rounded platform; a ball rolls off its round corners.","v3."],
-["DR2","v3: outline caps and joins, under “More” on the StyleComponent.","Example: an outline whose ends are round instead of square, and whose corners are rounded.","v3."],
-["DR3","v3: Apply scale folds a shape's scale into its size and sets scale back to 1.","Example: a 100 × 50 rectangle at scale 2 becomes 200 × 100 at scale 1. It looks the same.","v3."],
-["DR4","v3: Break opens a closed path at a point, or splits an open path in two. Join closes an open path.","Example: break a circle's outline to make an arc.","v3."],
-["DR5","v3: Create path from shape adds a path that exactly matches a shape.","Example: make a box's art curvy with a path, without changing what collides.","v3."],
-["DR6","v3: Convert a rectangle or ellipse to a polygon. On an ellipse, you pick the point count.","Example: an ellipse with 6 points becomes a hexagon you can edit point by point.","v3."],
-["DR7","v3: after Convert to polygon, if the path changes, the shape shows “Out of date” with a Regenerate button.","Example: you reshape the curvy path; the polygon made from it says it no longer matches.","v3."],
-["DR8","v3: a polygon with almost no area gets a warning and has no collision.","Example: a polygon whose points are nearly in one line. In v1 it simply has no collision, without the warning.","v3 for the warning."],
-["DR9","v3: the Text tool remembers the last font, size and colour. New text is dark, or light on a dark background.","Example: the second label you type looks like the first.","v3 (texts are v2)."],
-["DR10","v3: drawing tools show a one-line hint of what clicks and keys do right now.","Example: “Click to add a point. Enter to finish. Esc to cancel.”","v3."],
-["JO1","v3: press on one body and drag to another to join two bodies that don't overlap.","Example: a hinge between a lamp and a ceiling that don't touch.","v3."],
-["JO2","v3: holding Alt pins a joint to the background, even with another body under the mouse.","Example: pin a sign to the background even though a wall shape is behind it.","v3."],
-["JO3","v3: with three or more bodies under the mouse, Tab steps through the pairs a joint could connect.","Example: three planks overlap; Tab until the two you want are highlighted.","v3."],
-["SV5","v3: when the level is open in two tabs, the read-only tab has an “Edit here instead” button.","Example: you left the editor open in one tab and opened it again in another; one click moves editing to the tab you are in.","v3."],
-["SV6","v3: Export shows a window with the file name, the counts of entities and files, the size, and one button.","Example: “mylevel.editable · 214 entities · 12 files · 3.1 MB · Export”.","v3: v1 exports at once."],
-["SV7","v3: importing a level with scripts says “Contains 4 scripts. They can't reach your files or other levels.” It never asks a blocking question.","Example: you import a friend's level and know what the scripts can and can't do.","v3."],
-["SV8","v3: when a new version of the game is out, an open tab offers Reload and never reloads by itself.","Example: a small bar: “A new version is ready. Reload.”","v3."]
-]],
-["Suggested v3: play, physics, scripts", "Polish for playing, physics, the camera, files and scripts. Yes keeps them in v3.", [
-["WO4","v3: a hint under Gravity: “490 px/s². An entity falls 245 px in the first second.”","Example: you see what the number means without doing the maths.","v3."],
-["WO5","v3: a background image can fill the screen or tile, and scroll from 0% to 100% with the camera.","Example: a sky that tiles and moves at 20% of the camera's speed, so it looks far away.","v3, with images."],
-["WO6","v3: the collision grid window gets a colour per tag, painting by dragging across cells, and “Collide with all” and “Collide with none” per row.","Example: drag across a row of cells to turn them all off.","v3."],
-["WO7","v3: the Console says “Crate left the level and was removed.”","Example: you wonder where a crate went; the Console tells you.","v3."],
-["BO2","v3: a Shape tool option for new shapes: no physics, Static or Dynamic.","Example: set it to Static and draw ten platforms without adding a body to each.","v3."],
-["BO3","v3: the physics view gets a colour per body, hatching for Static, dashes for sensors, the centre of mass, contact points and a legend.","Example: you see at once which shapes belong to one body.","v3: v1 draws the plain collision pieces."],
-["BO4","v3: the Density field's hint warns that stacks and joints get wobbly past a 10 to 1 mass difference.","Example: a box 20 times heavier than the plank under it jitters.","v3."],
-["JO6","v3: while a Breakable joint is selected in test play, the Inspector shows its current and highest force.","Example: you see the bridge joint reach 900 of its 1000 limit, and raise the limit.","v3."],
-["CA2","v3: following can be switched off sideways or up and down.","Example: a side-scroller where the camera follows left and right but stays at one height.","v3."],
-["CA4","v3: a trigger or script can limit the camera to the bounds of any shape, then restore the level bounds.","Example: rooms in a dungeon; entering a room limits the camera to that room.","v3."],
-["CA5","v3: View through camera turns the level view into a read-only preview of what players see.","Example: check that the whole first screen fits at 16:9.","v3."],
-["CA6","v3: the colour of the bars when the window's shape differs from the view, black by default.","Example: dark blue bars beside a 4:3 level on a wide screen.","v3."],
-["CA7","v3: a list of common view sizes (16:9, 16:10, 4:3, 1:1, 9:16), all 1080 high, plus custom from 160 to 7680.","Example: pick 9:16 for a phone-shaped level.","v3."],
-["MU1","v3: a mute switch on the Play bar, saved in the browser, which doesn't change the level's own volume settings.","Example: you test a level 50 times and stop hearing the music.","v3, with sound."],
-["FS2","v3: one sound file starts at most 3 times per tick.","Example: 20 coins picked up at once play the coin sound 3 times, not 20 times at full volume.","v3, with sound."],
-["FS3","v3: the Assets panel shows how much of the 64 MB is used, and turns amber at 80%.","Example: “23.4 of 64 MB”.","v3, with imported files."],
-["FS4","v3: Remove unused lists files nothing uses, and removes the ones you tick.","Example: clean out five old images you replaced.","v3."],
-["FS5","v3: Swap with another file points every use of one file to another of the same kind.","Example: replace grass.png with grass2.png on all 40 platforms at once.","v3."],
-["TP6","v3: during test play you can pan and zoom freely without moving the level's camera.","Example: zoom out to see the whole level while the game runs.","v3."],
-["TP7","v3: preview the run as a 16:9, 21:9 or 4:3 window would see it, with Fill window.","Example: check that a wide screen doesn't show beyond the level's edge.","v3."],
-["TP8","v3: a note on the Play bar when the game can't keep 60 ticks per second.","Example: “Running slow: 42 ticks per second” while 2,000 crates fall.","v3."],
-["SC1","v3: more ways to wait in scripts: a number of ticks, until something is true, or running a function later or every N seconds.","Example: “every 2 seconds, spawn an enemy” in one line. v2 has wait(seconds), and timer triggers.","v3."],
-["SC3","v3: a checkbox to switch a script off without removing it.","Example: switch off the enemy's AI script to test the level without it.","v3."],
-["SC4","v3: when a script removes a setting, its value is kept under “Unused settings”. A renamed setting can say its old name.","Example: you rename speed to jump_speed in the script; the value 300 moves over instead of being lost.","v3."],
-["CE1","v3: the code editor underlines syntax errors shortly after you stop typing, and warns about unknown function and event names.","Example: you type is_dwn(\"jump\") and it is underlined before you press Play.","v3."],
-["CE2","v3: inside quotes, the code editor suggests the level's inputs, tags, variables and file paths.","Example: type is_down(\" and get left, right, up, down, jump.","v3."],
-["CE3","v3: search every .lua file of the level.","Example: find every script that uses coins.","v3."],
-["CE6","v3: hints and help for Lua's surprises: lists start at 1, ~= means “not equal”, .. joins text.","Example: you write != and the hint says Lua uses ~=.","v3."],
-["VI2","v3: every built-in menu works with the keyboard, and later a gamepad.","Example: the pause menu: arrows to move, Enter to pick.","v3."],
-["TG1","v3: the trigger card says why a touch trigger can never fire: no shape, only sensors, neither side Dynamic.","Example: “This can't fire: nothing that touches it can move.”","v3: v2 shows only the missing SurfaceComponent note."],
-["TG8","v3: a View menu switch shows every entity's arrows at once.","Example: see every lever-to-door connection in the level.","v3."],
-["TG9","v3: a switch on a trigger that pauses test play when it fires.","Example: pause the moment the player touches the spikes, to see why.","v3."]
-]],
-["Later or dropped", "Later means after v3 and not designed now. Dropped means never.", [
-["WO1","Later: a setting to keep entities that leave through an open edge, instead of removing them.","Example: a rocket that flies off the top of the level and comes back.","Later: you only kept removal in review."],
-["BO1","Later: Start asleep, a starting speed and a starting spin on the BodyComponent.","Example: a ball that starts rolling at 200 px/s. In v2, a Level start trigger with Push does it.","Later."],
-["CA3","Later: camera follow presets (Platformer, Free, Vehicle, Locked) that fill in the follow values.","Example: pick Platformer and the smoothing and margins are set for you.","Later: presets were dropped on other components too."],
-["EF3","Later: Replace selection with an .entity file, keeping each one's place.","Example: replace 30 placeholder boxes with tree.entity.","Later: linked copies (v3) cover most of it."],
-["EF4","Dropped: the notice when you place a second entity tagged player.","Background: it assumed one special player, which the review dropped.","Dropped."],
-["BC1","Later: a builtin script that plays animations from movement (walking, jumping).","Background: animations aren't designed yet.","Later."],
-["BC2","Later: a script declaring what it needs (such as a Dynamic body), shown as a checklist with Fix buttons.","Example: you put the platformer player script on a shape with no body, and the card says “Needs a Dynamic body. [Fix]”.","Later: v2 has few builtin scripts, and their help says what they need."],
-["FS1","Later: more Play sound settings: pitch, random pitch, fade in, and what to do if it is already playing.","Example: a coin sound with a slightly random pitch each time.","Later: you kept volume, loop, start and end in review."],
-["TP10","Later: a level setting that skips the end window after Lose and restarts at once.","Example: a hard platformer where you retry instantly.","Later."],
-["SV9","Later: a description, author, instructions and tags for a level, in a Level info window.","Background: they are for a level's page, which comes with publishing.","Later."],
-["VI3","Later: on-screen touch controls mapped to inputs.","Example: arrow buttons on a phone screen.","Later."],
-["TG3","Later: a smallest impact speed for the collision event.","Example: a vase that breaks only when hit hard.","Later: a script can check the speed."],
-["TG4","Later: touch events that count entities, such as “when the last heavy thing leaves this”.","Example: a pressure plate that closes the door only when every crate is off it.","Later."],
-["TG5","Dropped: a Repeat choice that fires on the Nth time.","Background: the review kept three Repeat choices. A variable counting up does the same.","Dropped."],
-["TG7","No trigger action for dropping through a one-way platform; scripts call drop_through().","Example: the player presses down on a one-way platform and falls through it. The Lua API already has drop_through(id).","Script-only: it is one line in the player's script."]
+["The mockups", "What I build after this round.", [
+["D9","The mockups show five moments of v1: the empty editor with a new level, a selected shape with its cards in the Inspector, the Shape tool while drawing, the main menu open with a dialog, and test play with the Play bar.",
+ "Background: each mockup is one HTML page in docs/design/mockups/ that you open in the browser like this one. They use a small sample level: a few platforms, a car with hinged wheels, crates. Nothing in them works. A comment can add a moment, such as an editor message on a card.",
+ "Yes: together they show every v1 panel and the level view's own drawing (grid, selection, camera frame, joint icons)."],
+["D10","I build two directions: one exactly from your picks here, and one that changes the picks you commented on or that I was least sure of.",
+ "Background: seeing two side by side makes it easier to say what you like. Example: if you pick Figma and Orange, the second direction might try Blue with a different selection style. You then pick one, or mix them, and I refine it in a round or two.",
+ "Yes: two is enough to compare, and quick to build."]
 ]]
 ];
-const KEY = "engine-v3-architecture-review-7";
+const KEY = "engine-v3-design-review-8";
 let answers = {};
 try { answers = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { answers = {}; }
 function persist() { try { localStorage.setItem(KEY, JSON.stringify(answers)); } catch (e) {} }
@@ -314,7 +202,6 @@ function el(tag, cls, text) {
   return e;
 }
 
-// Glossary lookup: alias (lower case) -> [term, meaning]
 const aliasMap = new Map();
 for (const [term, meaning, aliases] of GLOSSARY) {
   for (const a of aliases) aliasMap.set(a.toLowerCase(), [term, meaning]);
@@ -323,7 +210,6 @@ const aliasList = [...aliasMap.keys()].sort((a, b) => b.length - a.length)
   .map(a => a.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
 const termRe = new RegExp("(?<![\\w.])(" + aliasList.join("|") + ")(?![\\w])", "gi");
 
-// Fill a node with text, underlining the first use of each glossary term.
 function fillWithTerms(node, text) {
   const seen = new Set();
   let last = 0;
@@ -348,7 +234,7 @@ function renderGlossary() {
   }
 }
 
-function renderQuestion(section, id, short, detail, take) {
+function renderQuestion(section, [id, short, detail, take, options, pick, multi]) {
   const card = el("div", "q");
   card.dataset.id = id;
   const row = el("div", "row");
@@ -357,11 +243,15 @@ function renderQuestion(section, id, short, detail, take) {
   fillWithTerms(text, short);
   row.appendChild(text);
   const btns = el("div", "btns");
-  const yes = el("button", "y", "Yes");
-  const no = el("button", "n", "No");
+  let yes = null, no = null;
+  if (!options) {
+    yes = el("button", "y", "Yes");
+    no = el("button", "n", "No");
+    btns.append(yes, no);
+  }
   const cbtn = el("button", "c", "Comment");
   const more = el("button", "m", "More");
-  btns.append(yes, no, cbtn, more);
+  btns.append(cbtn, more);
   row.appendChild(btns);
   card.appendChild(row);
 
@@ -376,6 +266,22 @@ function renderQuestion(section, id, short, detail, take) {
   fillWithTerms(det, detail);
   card.appendChild(det);
 
+  const optButtons = [];
+  if (options) {
+    const box = el("div", "opts");
+    options.forEach(([label, sub, preview], i) => {
+      const b = el("button", "opt");
+      if (preview) { const pv = el("div"); pv.innerHTML = preview; b.appendChild(pv); }
+      b.appendChild(el("span", "lbl", label));
+      if (sub) b.appendChild(el("span", "sub", sub));
+      if (i === pick) b.appendChild(el("span", "pick", "My pick"));
+      b.onclick = () => togglePick(label);
+      optButtons.push([label, b]);
+      box.appendChild(b);
+    });
+    card.appendChild(box);
+  }
+
   const a = answers[id] || {};
   const ta = el("textarea", a.comment ? "" : "hidden");
   ta.placeholder = "Your comment";
@@ -384,10 +290,15 @@ function renderQuestion(section, id, short, detail, take) {
 
   function sync() {
     const cur = answers[id] || {};
-    yes.setAttribute("aria-pressed", cur.v === "yes");
-    no.setAttribute("aria-pressed", cur.v === "no");
+    const picks = cur.picks || [];
+    if (yes) {
+      yes.setAttribute("aria-pressed", cur.v === "yes");
+      no.setAttribute("aria-pressed", cur.v === "no");
+    }
+    for (const [label, b] of optButtons) b.setAttribute("aria-pressed", picks.includes(label));
     card.classList.toggle("yes", cur.v === "yes");
     card.classList.toggle("no", cur.v === "no");
+    card.classList.toggle("picked", picks.length > 0);
   }
   function touch() {
     const cur = answers[id] || {};
@@ -400,8 +311,17 @@ function renderQuestion(section, id, short, detail, take) {
     cur.v = cur.v === v ? undefined : v;
     persist(); sync(); update();
   }
-  yes.onclick = () => setVote("yes");
-  no.onclick = () => setVote("no");
+  function togglePick(label) {
+    const cur = touch();
+    const picks = cur.picks || [];
+    if (picks.includes(label)) cur.picks = picks.filter(p => p !== label);
+    else cur.picks = multi ? picks.concat(label) : [label];
+    persist(); sync(); update();
+  }
+  if (yes) {
+    yes.onclick = () => setVote("yes");
+    no.onclick = () => setVote("no");
+  }
   cbtn.onclick = () => { touch(); persist(); update(); ta.classList.remove("hidden"); ta.focus(); };
   more.onclick = () => {
     touch(); persist(); update();
@@ -422,15 +342,15 @@ function render() {
   for (const [group, note, items] of GROUPS) {
     const section = el("section");
     section.appendChild(el("h2", "", group));
-    section.appendChild(el("p", "group-note", note));
-    for (const [id, short, detail, take] of items) renderQuestion(section, id, short, detail, take);
+    if (note) section.appendChild(el("p", "group-note", note));
+    for (const item of items) renderQuestion(section, item);
     list.appendChild(section);
   }
 }
 
 function isAnswered(id) {
   const a = answers[id];
-  return !!(a && (a.t || a.v || (a.comment && a.comment.trim())));
+  return !!(a && (a.v || (a.picks && a.picks.length) || (a.comment && a.comment.trim())));
 }
 
 function update() {
@@ -456,28 +376,22 @@ function applyFilter() {
 function buildText() {
   const lines = [];
   const open = [];
-  let yes = 0, no = 0;
   for (const [group, , items] of GROUPS) {
     const groupLines = [];
     for (const [id, short] of items) {
       const a = answers[id] || {};
       const c = (a.comment || "").trim();
-      if (!a.v && !c && !a.t) { open.push(id); continue; }
-      if (a.v === "yes") yes++;
-      if (a.v === "no") no++;
-      let verdict = "OPENED ONLY";
-      if (a.v) verdict = a.v.toUpperCase();
-      else if (c) verdict = "NO ANSWER";
+      const picks = a.picks || [];
+      if (!a.v && !c && !picks.length) { open.push(id); continue; }
+      let verdict = "NO ANSWER";
+      if (picks.length) verdict = "PICKED " + picks.join(", ");
+      else if (a.v) verdict = a.v.toUpperCase();
       groupLines.push("[" + id + "] " + verdict + " | " + short);
       if (c) groupLines.push("    comment: " + c.replace(/\s*\n\s*/g, " / "));
     }
     if (groupLines.length) lines.push("## " + group, ...groupLines, "");
   }
-  const head = [
-    "Architecture review answers, round 7",
-    "Answered " + (total - open.length) + " of " + total + " (" + yes + " yes, " + no + " no)",
-    ""
-  ];
+  const head = ["Design review answers, round 8", "Answered " + (total - open.length) + " of " + total, ""];
   const tail = open.length ? ["Unanswered: " + open.join(", ")] : ["All questions answered."];
   return head.concat(lines, tail).join("\n");
 }

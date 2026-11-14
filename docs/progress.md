@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **Next: stage 0 of [plan.md](plan.md), project setup.** Its detailed plan was approved on 2026-11-14 and is written into [tooling.md](architecture/tooling.md) and the [plan's stage 0 steps](plan.md#stage-0-in-steps). One question is open, about the polygon library, needed by stage 3. No code exists yet.
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **Next: the editor's look, before any code** (owner, 2026-11-14): round 8 on the [review page](review.html) asks ten questions about it, then come mockups and a design system. **Then stage 0 of [plan.md](plan.md), project setup.** Its detailed plan was approved on 2026-11-14 and is written into [tooling.md](architecture/tooling.md) and the [plan's stage 0 steps](plan.md#stage-0-in-steps). One question is open, about the polygon library, needed by stage 3. No code exists yet.
 
 ## Where things stand
 
@@ -55,8 +55,13 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 ## Next
 
-1. **Stage 0 of [plan.md](plan.md): project setup**, in the [eight steps](plan.md#stage-0-in-steps). Waits for the owner to say start. Step 6 may need the owner's password, step 7 needs a push.
-2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
+1. **The editor's look** (owner, 2026-11-14), in four steps:
+   1. **Round 8 on the [review page](review.html):** ten questions on the feel, the greys, the accent colour, density, corners, panels, icons, the font and the mockups. Waits for the owner's answers.
+   2. **Two directions as mockups:** static HTML pages in `docs/design/mockups/` showing five moments of v1 with a sample level.
+   3. **Refine the one the owner picks**, in a round or two.
+   4. **Write the design system** in `docs/design/`: design tokens, each control's states, icons, the level view's colours. The tokens become `ui/theme.css` in stage 6.
+2. **Stage 0 of [plan.md](plan.md): project setup**, in the [eight steps](plan.md#stage-0-in-steps). Waits for the owner to say start. Step 6 may need the owner's password, step 7 needs a push.
+3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
 
