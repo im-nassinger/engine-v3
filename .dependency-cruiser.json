@@ -1,0 +1,45 @@
+{
+    "$schema": "https://raw.githubusercontent.com/sverweij/dependency-cruiser/main/src/schema/configuration.schema.json",
+    "forbidden": [
+        {
+            "name": "module-entry",
+            "comment": "Another module is entered only through its index.ts.",
+            "severity": "error",
+            "from": { "path": "^src/([^/]+)/([^/]+)", "pathNot": "\\.test\\.tsx?$" },
+            "to": {
+                "path": "^src/[^/]+/[^/]+/",
+                "pathNot": ["^src/$1/$2/", "^src/[^/]+/[^/]+/index\\.tsx?$"]
+            }
+        },
+        {
+            "name": "module-entry-in-tests",
+            "comment": "A test may also import another module's testing/ fakes, and nothing else past its index.ts.",
+            "severity": "error",
+            "from": { "path": "^src/([^/]+)/([^/]+)/.+\\.test\\.tsx?$" },
+            "to": {
+                "path": "^src/[^/]+/[^/]+/",
+                "pathNot": ["^src/$1/$2/", "^src/[^/]+/[^/]+/index\\.tsx?$", "/testing/"]
+            }
+        },
+        {
+            "name": "no-circle-between-files",
+            "comment": "No circle of imports between files, however long the chain.",
+            "severity": "error",
+            "from": {},
+            "to": { "circular": true }
+        },
+        {
+            "name": "no-circle-between-modules",
+            "comment": "No circle between folders, which catches a circle between two modules that has no circle between single files.",
+            "scope": "folder",
+            "severity": "error",
+            "from": {},
+            "to": { "circular": true }
+        }
+    ],
+    "options": {
+        "includeOnly": "^src/",
+        "tsPreCompilationDeps": true,
+        "doNotFollow": { "path": "node_modules" }
+    }
+}
