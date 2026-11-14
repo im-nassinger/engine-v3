@@ -144,9 +144,9 @@ const GROUPS = [
 ["Q30","Spawn's values replace the position, rotation, scale and skew saved in the .entity file.",
  "Background: an .entity file is a saved entity, such as bullet.entity. It already has its own TransformComponent from when you saved it. Spawn now asks for TransformComponent values too, so one of the two has to win. Example: bullet.entity was saved at scale 2, and the Spawn action says scale 1. With this rule, the bullet appears at scale 1, exactly what the trigger shows.",
  "Yes: what you read on the trigger is what you get."],
-["Q31","In v2, Change value has a Toggle choice for boolean variables: true becomes false, and false becomes true.",
- "Background: in round 6 you made boolean a variable type. Change value can only set a boolean, so flipping one takes two triggers. Example: a lever opens and closes a door. With Toggle it is one trigger: “When something starts touching this, Toggle door_open”. Without it, you need “If door_open is true, Set door_open to false” and a second trigger for the other way.",
- "Yes: a switch is the most common use of a boolean, and this makes it one trigger."]
+["Q31","Triggers can flip a true-or-false variable: true becomes false, and false becomes true. (Asked again in plainer words.)",
+ "Example: a light switch. The variable lamp_on is false. Each time the player touches the switch, lamp_on should flip: off to on, on to off. With Flip, that is one trigger: “When touched, Flip lamp_on”. Without Flip, triggers can only set it to true or set it to false, so you need two triggers, and both fire on the same touch: the first turns the lamp on, the second sees it on and turns it off again.",
+ "Yes: without it a simple light switch doesn't work."]
 ]],
 ["The architecture proposal", "How the game is built, in docs/proposals/architecture/. You approved its outline and 24 cards in round 1; rounds 2 to 6 changed details.", [
 ["AP1","The architecture proposal is approved. Its files move into the main docs, plan.md becomes the project's plan, and coding starts at stage 1.",

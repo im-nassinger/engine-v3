@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Round 2 answered the eight questions that came out of writing this proposal** (owner, 2026-11-13). Seven took the suggested answer; one, the level bounds, was changed by the owner: **the World has a rectangle ShapeComponent that is the level bounds.** That answer raised three smaller questions about the World's rectangle, numbered 25 to 27 in [progress.md](../../progress.md). **Round 3 answered 25 and round 4 answered 26 and 27** (owner, 2026-11-13): the rectangle is centred on the level's origin and resizes from its centre, one Walls checkbox makes all four edges walls or all open, and the World can never be solid. Nothing blocks plan stage 2 any more. Rounds 5 and 6 answered the open questions in `progress.md`; the three left, 29 to 31, are about v2.
+**Round 2 answered the eight questions that came out of writing this proposal** (owner, 2026-11-13). Seven took the suggested answer; one, the level bounds, was changed by the owner: **the World has a rectangle ShapeComponent that is the level bounds.** That answer raised three smaller questions about the World's rectangle, numbered 25 to 27 in [progress.md](../../progress.md). **Round 3 answered 25 and round 4 answered 26 and 27** (owner, 2026-11-13): the rectangle is centred on the level's origin and resizes from its centre, one Walls checkbox makes all four edges walls or all open, and the World can never be solid. Nothing blocks plan stage 2 any more. Rounds 5 and 6 answered the open questions in `progress.md`; round 7 answered 29 and 30; 31 is about v2.
 
 ## Answered in round 2
 
@@ -28,10 +28,8 @@
 
 ## The open questions in progress.md
 
-**Rounds 5 and 6 answered every one** (owner, 2026-11-13 and 2026-11-14); the answers are written into the requirements. None changed this design's parts. Three new questions came out of round 6, asked in round 7:
+**Rounds 5 and 6 answered every one** (owner, 2026-11-13 and 2026-11-14); the answers are written into the requirements. None changed this design's parts. Three new questions came out of round 6. Round 7 answered 29 and 30 (owner, 2026-11-14): Spawn measures from the trigger's entity, and its values replace the `.entity` file's. One is left:
 
 | # | Question | Touches | Blocks v1? |
 |---|---|---|---|
-| 29 | Is the Spawn action's position measured from the level's origin or from the trigger's own entity? | The trigger's Spawn action, `SpawnPhase` | No, v2 |
-| 30 | Does Spawn's TransformComponent replace the `.entity` file's own? | `SpawnPhase` | No, v2 |
-| 31 | A Toggle choice for boolean variables | Change value, the VariablesComponent | No, v2 |
+| 31 | A Flip choice for boolean variables | Change value, the VariablesComponent | No, v2 |
