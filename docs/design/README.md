@@ -42,14 +42,14 @@ Everything else is the same in both.
 ## The five moments
 
 1. **A new level:** the empty editor, the World and the camera in the Layers panel, the World's cards in the Inspector.
-2. **A selected shape:** a crate in the sample level, its cards in the Inspector, its row selected in the Layers panel.
+2. **A selected shape:** a new shape in the default blue look, selected on the light blue background, its cards in the Inspector, its row selected in the Layers panel.
 3. **Drawing:** the Shape tool drawing a polygon, its options strip, the faded preview.
 4. **The main menu and a dialog:** the main menu open on Edit, and the "Replace the open level?" question before New.
 5. **Test play:** the panels hidden, the camera's box with black bars, the Play bar.
 
 ## Found while drawing the mockups
 
-Three places where the requirements disagree with each other. The mockups follow [workspace.md](../requirements/editor/workspace.md), the topic file for the layout. Both are open questions in [progress.md](../progress.md#open-questions-for-the-owner).
+Three places where the requirements disagree with each other. The mockups follow [workspace.md](../requirements/editor/workspace.md), the topic file for the layout. All three are open questions in [progress.md](../progress.md#open-questions-for-the-owner).
 
 - **Where the save state and the zoom sit.** workspace.md puts both in the top bar. The glossary's "Status bar" and [saving.md](../requirements/play-and-save/saving.md) put the save state in the status bar.
 - **Where the tools sit.** workspace.md puts them in the toolbar strip on the left. The glossary's "Top bar" says the top bar holds the tools.
