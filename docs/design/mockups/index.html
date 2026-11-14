@@ -33,11 +33,6 @@
     position: relative; width: 1440px; height: 900px; overflow: hidden;
     background: var(--app); color: var(--text); font-family: var(--font-ui); font-size: var(--text-size);
   }
-  .ed.dir-b {
-    --app: #1a1a1a; --panel: #2a2a2a; --field: #1f1f1f; --hover: #353535; --line: #3a3a3a;
-    --text: #e2e2e2; --muted: #9b9b9b; --faint: #666666;
-    --font-ui: "Inter", system-ui, sans-serif;
-  }
   .ed svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
   .num { font-family: var(--font-num); }
 
@@ -133,6 +128,27 @@
   .btn { height: 28px; padding: 0 14px; border-radius: var(--radius); display: inline-flex; align-items: center; border: 1px solid var(--line); }
   .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
 
+  .sheet { position: absolute; inset: 0; background: var(--app); padding: 20px; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: min-content; gap: 14px; overflow: hidden; }
+  .box { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding-bottom: 8px; }
+  .box h4 { margin: 0; padding: 8px 12px; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--line); margin-bottom: 6px; }
+  .box .line { display: flex; align-items: center; gap: 8px; padding: 4px 12px; flex-wrap: wrap; }
+  .box .cap { color: var(--faint); font-size: 11px; width: 100%; padding: 0 12px; }
+  .inp.err { border-color: var(--danger); }
+  .msg { padding: 0 12px 4px 148px; font-size: 11px; color: var(--muted); }
+  .msg.err { color: var(--danger); }
+  .note { margin: 4px 12px; padding: 6px 8px; border-radius: var(--radius); background: var(--field); display: flex; gap: 8px; align-items: flex-start; line-height: 1.45; }
+  .note .fix { color: var(--accent); white-space: nowrap; }
+  .dropline { height: 2px; background: var(--accent); margin-left: 40px; position: relative; }
+  .dropline::before { content: ""; position: absolute; left: -4px; top: -3px; width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--accent); background: var(--panel); box-sizing: border-box; }
+  .ib.dis { color: var(--faint); }
+  .btn.dis { color: var(--faint); }
+  .tool.locked::after { content: ""; position: absolute; right: 3px; bottom: 3px; width: 5px; height: 5px; border-radius: 50%; background: var(--on-accent); }
+  .tip-box.static { position: static; display: inline-flex; }
+  .playbar.static { position: static; transform: none; display: inline-flex; box-shadow: none; }
+  .playbar.paused { border-color: var(--paused); }
+  .playbar.paused .state { color: var(--paused); }
+  .playbar.paused .state i { background: var(--paused); }
+  .mini svg { display: block; border-radius: 3px; }
   .game { position: absolute; inset: 0; background: #000; }
   .playbar { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 4px; padding: 4px; background: var(--panel); border: 1.5px solid var(--playing); border-radius: var(--radius); box-shadow: 0 4px 16px rgba(0,0,0,.4); }
   .playbar .state { display: flex; align-items: center; gap: 6px; padding: 0 10px 0 8px; font-weight: 600; color: var(--playing); letter-spacing: .04em; }
@@ -144,7 +160,6 @@
 <body>
 <div class="controls">
   <b>Editor mockups · v1</b>
-  <div class="seg" id="dirs"><span>Direction</span></div>
   <div class="seg" id="moments"><span>Moment</span></div>
   <div class="caption" id="caption"></div>
 </div>
@@ -178,7 +193,10 @@ const ICON = {
   check: '<path d="M5 12l5 5 9-10"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   dots: '<path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"/>',
-  saved: '<path d="M5 12l5 5 9-10"/>'
+  saved: '<path d="M5 12l5 5 9-10"/>',
+  eyeoff: '<path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.7 8.4 2 12 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+  target: '<circle cx="12" cy="12" r="8"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/>'
 };
 const ic = (name, extra = '') => `<svg class="i" viewBox="0 0 24 24" ${extra}>${ICON[name]}</svg>`;
 
@@ -250,8 +268,7 @@ function scene(w, h, z, cx, cy, opts) {
   if (opts.selected) {
     const r = LEVEL.find((e) => e.id === opts.selected);
     const x = X(r.x), y = Y(r.y), rw = r.w * z, rh = r.h * z;
-    const halo = opts.halo ? `<rect x="${x}" y="${y}" width="${rw}" height="${rh}" fill="none" stroke="#fff" stroke-width="4"/>` : '';
-    s += halo + `<rect x="${x}" y="${y}" width="${rw}" height="${rh}" fill="none" stroke="${acc}" stroke-width="1.5"/>`;
+    s += `<rect x="${x}" y="${y}" width="${rw}" height="${rh}" fill="none" stroke="${acc}" stroke-width="1.5"/>`;
     for (const [hx, hy] of [[0, 0], [.5, 0], [1, 0], [0, .5], [1, .5], [0, 1], [.5, 1], [1, 1]]) {
       s += `<rect x="${x + hx * rw - 4}" y="${y + hy * rh - 4}" width="8" height="8" fill="#fff" stroke="${acc}" stroke-width="1.5"/>`;
     }
@@ -395,14 +412,14 @@ const MOMENTS = [
       hint: 'Select · click to select, drag to move', pos: 'x 412, y −96', sel: 'Nothing selected' })],
   ['2', 'A selected shape', 'A new shape in the default look, selected: its row in the Layers panel, its cards in the Inspector with the Height field focused, the outline and handles in the level view.',
     (d) => editor({ rows: ROWS_LEVEL, selectedRow: 'Rectangle 1', hoverRow: 'Crate 2', inspector: 'rect',
-      scene: Object.assign({ selected: 'rect1', halo: d === 'b' }, LEVEL_SCENE), top: { name: 'Car test', canUndo: true },
+      scene: Object.assign({ selected: 'rect1' }, LEVEL_SCENE), top: { name: 'Car test', canUndo: true },
       hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Rectangle 1', warnings: 1 })],
   ['3', 'Drawing', 'The Shape tool drawing a polygon: the options strip over the level view, four points placed, the faded preview following the mouse, the first point ringed to close it.',
     (d) => editor({ rows: ROWS_LEVEL, tool: 'shape', scene: Object.assign({ drawing: true }, LEVEL_SCENE), top: { name: 'Car test', canUndo: true },
       hint: 'Shape · click to add a point, click the first point or press Enter to close', pos: 'x −640, y −40', sel: 'Nothing selected', warnings: 1,
       extra: `<div class="opts"><span class="ib">${ic('rect')}Rectangle</span><span class="ib">${ic('ellipse')}Ellipse</span><span class="ib on">${ic('polygon')}Polygon</span><span class="ib">${ic('line')}Line</span></div>` })],
   ['4a', 'The main menu', 'The main menu open on Edit. Every command is listed with its shortcut. Redo is greyed because there is nothing to redo.',
-    (d) => editor({ rows: ROWS_LEVEL, selectedRow: 'Rectangle 1', inspector: 'rect', scene: Object.assign({ selected: 'rect1', halo: d === 'b' }, LEVEL_SCENE),
+    (d) => editor({ rows: ROWS_LEVEL, selectedRow: 'Rectangle 1', inspector: 'rect', scene: Object.assign({ selected: 'rect1' }, LEVEL_SCENE),
       top: { name: 'Car test', canUndo: true, menuOpen: true }, hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Rectangle 1', warnings: 1, extra: MENU })],
   ['4b', 'A dialog', 'The question New asks before it replaces the open level.',
     (d) => editor({ rows: ROWS_LEVEL, scene: LEVEL_SCENE, top: { name: 'Car test', canUndo: true },
@@ -411,23 +428,71 @@ const MOMENTS = [
     (d) => `<div class="game"><div style="position:absolute;left:0;top:45px">${scene(1440, 810, 0.75, 720, 405, { play: true })}</div></div>
       <div class="playbar"><span class="state"><i></i>PLAYING</span><span class="ib">${ic('pause')}Pause <span class="k">F8</span></span><span class="ib dim">${ic('step')}Step <span class="k">F9</span></span><span class="ib">${ic('stop')}Stop <span class="k">Ctrl+Enter</span></span></div>`]
 ];
-const DIRS = [['a', 'A: your picks', 'Cool blue-grey, JetBrains Mono everywhere, a plain blue selection.'],
-              ['b', 'B: to compare', 'Neutral grey, Inter for labels with JetBrains Mono for values, a blue selection with a white edge.']];
+// The states sheet: every control in each state, and the level view's overlays.
+function mini(content, w = 132, h = 90) {
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="${BG}"/>${content}</svg>`;
+}
+const A = 'var(--accent)';
+const H = (x, y) => `<rect x="${x - 4}" y="${y - 4}" width="8" height="8" fill="#fff" stroke="${A}" stroke-width="1.5"/>`;
+const handles = (x, y, w, h) => [[0, 0], [.5, 0], [1, 0], [0, .5], [1, .5], [0, 1], [.5, 1], [1, 1]].map(([a, b]) => H(x + a * w, y + b * h)).join('');
+const blue = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#4a90d9" stroke="#1f3552" stroke-width="1"/>`;
+const OVERLAYS = [
+  ['One shape', mini(blue(45, 30, 60, 30) + `<rect x="45" y="30" width="60" height="30" fill="none" stroke="${A}" stroke-width="1.5"/>` + handles(45, 30, 60, 30))],
+  ['Several', mini(blue(25, 35, 40, 26) + blue(85, 25, 40, 40) + `<rect x="25" y="35" width="40" height="26" fill="none" stroke="${A}" stroke-width="1"/><rect x="85" y="25" width="40" height="40" fill="none" stroke="${A}" stroke-width="1"/><rect x="21" y="21" width="108" height="48" fill="none" stroke="${A}" stroke-width="1.5"/>` + handles(21, 21, 108, 48))],
+  ['A group: box only', mini(blue(30, 40, 40, 26) + blue(78, 26, 40, 40) + `<rect x="26" y="22" width="96" height="48" fill="none" stroke="${A}" stroke-width="1.5"/>` + handles(26, 22, 96, 48))],
+  ['A joint: a ring', mini(`<circle cx="75" cy="45" r="7" fill="#fff" stroke="#1d2430" stroke-width="1.5"/><circle cx="75" cy="45" r="2" fill="#1d2430"/><circle cx="75" cy="45" r="12" fill="none" stroke="${A}" stroke-width="2"/>`)],
+  ['The camera: heavier frame', mini(`<rect x="20" y="18" width="110" height="62" fill="none" stroke="${A}" stroke-width="3"/>` + H(20, 18) + H(130, 18) + H(20, 80) + H(130, 80))],
+  ['Hidden, from its row', mini(`<rect x="45" y="30" width="60" height="30" fill="none" stroke="${A}" stroke-width="1.5" stroke-dasharray="4 3"/>`)],
+  ['Physics view', mini(blue(30, 30, 50, 30) + `<rect x="30" y="30" width="50" height="30" fill="rgba(255,138,61,.15)" stroke="#ff8a3d" stroke-width="1.5"/><circle cx="108" cy="45" r="16" fill="rgba(255,138,61,.15)" stroke="#ff8a3d" stroke-width="1.5"/>`)],
+  ['Outside the level bounds', mini(`<rect x="0" y="0" width="150" height="90" fill="rgba(10,20,35,.35)"/><rect x="40" y="0" width="110" height="90" fill="${BG}"/><path d="M40 0 V90" stroke="rgba(20,28,40,.5)" stroke-width="1"/>`)],
+  ['A drag readout', mini(blue(30, 30, 70, 34) + `<rect x="30" y="30" width="70" height="34" fill="none" stroke="${A}" stroke-width="1.5"/><rect x="80" y="70" width="64" height="16" rx="3" fill="#0b0d10"/><text x="112" y="81.5" text-anchor="middle" font-size="9" fill="#e8ebf0" font-family="JetBrains Mono, monospace">175 × 85</text>`)]
+];
+function statesSheet() {
+  const box = (title, body) => `<div class="box"><h4>${title}</h4>${body}</div>`;
+  const line = (body, cap = '') => `<div class="line">${body}</div>${cap ? `<div class="cap">${cap}</div>` : ''}`;
+  const row = (name, icon, cls = '', eye = 'eye', d = 1) => `<div class="lrow ${cls}" style="padding-left:${8 + d * 16}px"><span style="width:16px"></span><span class="kind">${ic(icon)}</span><span class="name">${name}</span><span class="eye"${eye === 'dim' ? ' style="opacity:.45"' : ''}>${ic(eye === 'off' ? 'eyeoff' : 'eye')}</span></div>`;
+  return `<div class="sheet">
+    ${box('Buttons', line(`<span class="ib">${ic('undo')}</span><span class="ib hover">${ic('undo')}</span><span class="ib on">${ic('magnet')}</span><span class="ib dis">${ic('redo')}</span>`, 'Icon button: normal, hover, switched on, disabled') +
+      line(`<span class="btn">Cancel</span><span class="btn primary">Replace</span><span class="btn dis">Export</span>`, 'Button, primary button, disabled') +
+      line(`<span class="play">${ic('play')}Play</span>`, 'Play, the one primary button of the top bar'))}
+    ${box('Tools', line(`<span class="tool">${ic('select')}</span><span class="tool hover">${ic('select')}</span><span class="tool on">${ic('shape')}</span><span class="tool on locked">${ic('joint')}</span>`, 'Normal, hover, active, active with tool lock (the dot)') +
+      line(`<span class="tip-box static">Shape<span class="k">4</span></span><span class="tip-box static">Nothing to paste</span>`, 'Tooltips: a name and its key; a disabled button\'s reason'))}
+    ${box('Layers rows', row('Crate 1', 'rect') + row('Crate 2', 'rect', 'hover') + row('Rectangle 1', 'rect', 'sel') +
+      `<div class="dropline"></div>` + row('Ball', 'ellipse', '', 'off') + row('Wheel 1', 'ellipse', '', 'dim', 2) +
+      `<div class="cap" style="padding-top:4px">Normal, hover, selected, drop line, hidden, hidden by its parent (dimmed eye)</div>`)}
+    ${box('Editor messages', `<div class="note">${ic('warning', 'style="color:var(--warning);margin-top:1px"')}<span>Needs a SurfaceComponent to collide. <span class="fix">Add SurfaceComponent</span></span></div>
+      <div class="note">${ic('info', 'style="color:var(--tip);margin-top:1px"')}<span>A tip reads the same, with a blue icon.</span></div>` +
+      line(`<span class="warn" style="display:flex;gap:4px;align-items:center;color:var(--muted)">${ic('warning', 'style="color:var(--warning);width:13px;height:13px"')}<span class="num">2</span></span><span style="color:var(--text);font-size:11px">Undid: Move 3 entities</span>`, 'In the status bar: the count, and a status text'))}
+    ${box('Number fields', F.num('Width', '160', 'px') + F.num('Height', '80.25', 'px', { focus: true }) +
+      `<div class="f"><label>Friction</label><div class="vals"><div class="inp err">abc</div></div></div><div class="msg err">Can't read this as a number</div>` +
+      `<div class="f"><label>Density</label><div class="vals"><div class="inp">100</div></div></div><div class="msg">Max is 100</div>` +
+      `<div class="cap" style="padding-top:2px">Normal, focused (full value), refused, clamped</div>`)}
+    ${box('Other fields', F.vec('Position', '20', '340', 'px') + F.num('Mass', '5.12', 'kg', { ro: true }) +
+      `<div class="f"><label>Density</label><div class="vals"><div class="inp" style="color:var(--muted);font-style:italic">Mixed</div></div></div>` +
+      F.num('Gravity angle', '90', '°', { off: true }) + `<div class="cap" style="padding-top:2px">Vector, read-only, Mixed, disabled</div>`)}
+    ${box('Choices and switches', F.choice('Type', 'Dynamic') + F.colour('Fill', '#4a90d9') +
+      `<div class="f"><label>Fill</label><div class="vals"><div class="inp"><span class="sw" style="background:linear-gradient(135deg,transparent 45%,var(--danger) 45%,var(--danger) 55%,transparent 55%)"></span><span style="color:var(--muted)">None</span></div></div></div>` +
+      F.check('Merge', true) + F.check('Bullet', false) + F.check('Fixed rotation', false, { off: true }) + F.num('Opacity', '100', '%', { slider: 1 }) +
+      `<div class="f"><label>Follow</label><div class="vals"><div class="inp">${ic('rect', 'style="width:13px;height:13px;color:var(--muted)"')}Car${ic('target', 'class="i chev"')}</div></div></div>` +
+      `<div class="f"><label>A</label><div class="vals"><div class="inp" style="color:var(--warning)">${ic('warning', 'style="width:13px;height:13px"')}missing entity</div></div></div>`)}
+    ${box('Play bar', `<div class="line"><span class="playbar static"><span class="state"><i></i>PLAYING</span><span class="ib">${ic('pause')}Pause</span><span class="ib dim">${ic('step')}Step</span><span class="ib">${ic('stop')}Stop</span></span></div>
+      <div class="line"><span class="playbar static paused"><span class="state"><i></i>PAUSED</span><span class="ib">${ic('play')}Resume</span><span class="ib">${ic('step')}Step</span><span class="ib">${ic('stop')}Stop</span></span></div><div class="cap">Running, and paused with Step enabled</div>`)}
+    <div class="box" style="grid-column: span 4"><h4>The level view's overlays</h4><div class="line mini" style="gap:14px">${OVERLAYS.map(([cap, svg]) => `<div>${svg}<div class="cap" style="padding:4px 0 0">${cap}</div></div>`).join('')}</div></div>
+  </div>`;
+}
+MOMENTS.push(['6', 'States', 'Every control in each state, and how the level view draws selections and its other overlays. Some states are Claude\'s proposals, not shown in the moments: see docs/design/controls.md.', () => statesSheet()]);
 
-let dir = 'a', moment = '1';
-try { const saved = JSON.parse(localStorage.getItem('engine-v3-mockups') || '{}'); dir = saved.dir || dir; moment = saved.moment || moment; } catch (e) {}
-// A link such as index.html#b-3 opens direction B on moment 3.
-const fromHash = location.hash.slice(1).split('-');
-if (fromHash.length === 2) { dir = fromHash[0]; moment = fromHash[1]; }
+let moment = '1';
+try { const saved = JSON.parse(localStorage.getItem('engine-v3-mockups') || '{}'); moment = saved.moment || moment; } catch (e) {}
+// A link such as index.html#3 opens moment 3.
+if (location.hash.length > 1) moment = location.hash.slice(1);
 
 function render() {
   const m = MOMENTS.find((x) => x[0] === moment) || MOMENTS[0];
-  const dd = DIRS.find((x) => x[0] === dir);
-  document.getElementById('frame').innerHTML = `<div class="ed dir-${dir}">${m[3](dir)}</div>`;
-  document.getElementById('caption').textContent = `${dd[2]} ${m[2]}`;
-  for (const b of document.querySelectorAll('#dirs button')) b.classList.toggle('on', b.dataset.v === dir);
+  document.getElementById('frame').innerHTML = `<div class="ed">${m[3]()}</div>`;
+  document.getElementById('caption').textContent = m[2];
   for (const b of document.querySelectorAll('#moments button')) b.classList.toggle('on', b.dataset.v === moment);
-  try { localStorage.setItem('engine-v3-mockups', JSON.stringify({ dir, moment })); } catch (e) {}
+  try { localStorage.setItem('engine-v3-mockups', JSON.stringify({ moment })); } catch (e) {}
   fit();
 }
 function fit() {
@@ -437,10 +502,6 @@ function fit() {
   frame.style.transform = `scale(${k})`;
   frame.style.marginBottom = `${-900 * (1 - k)}px`;
 }
-for (const [v, label] of DIRS) {
-  const b = document.createElement('button'); b.textContent = label; b.dataset.v = v;
-  b.onclick = () => { dir = v; render(); }; document.getElementById('dirs').appendChild(b);
-}
 for (const [v, label] of MOMENTS) {
   const b = document.createElement('button'); b.textContent = `${v} ${label}`; b.dataset.v = v;
   b.onclick = () => { moment = v; render(); }; document.getElementById('moments').appendChild(b);
@@ -449,7 +510,6 @@ document.addEventListener('keydown', (e) => {
   const i = MOMENTS.findIndex((x) => x[0] === moment);
   if (e.key === 'ArrowRight') { moment = MOMENTS[Math.min(i + 1, MOMENTS.length - 1)][0]; render(); }
   if (e.key === 'ArrowLeft') { moment = MOMENTS[Math.max(i - 1, 0)][0]; render(); }
-  if (e.key === 'a' || e.key === 'b') { dir = e.key; render(); }
 });
 window.addEventListener('resize', fit);
 render();

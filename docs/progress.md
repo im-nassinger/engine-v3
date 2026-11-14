@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **Next: the editor's look, before any code** (owner, 2026-11-14). Round 8 is answered and written in [design/](design/README.md). The two directions are drawn as [mockups](design/mockups/index.html) and **wait for the owner's pick** of direction A or B. **Then stage 0 of [plan.md](plan.md), project setup.** Its detailed plan was approved on 2026-11-14 and is written into [tooling.md](architecture/tooling.md) and the [plan's stage 0 steps](plan.md#stage-0-in-steps). One question is open, about the polygon library, needed by stage 3. No code exists yet.
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Next: stage 0, waiting for the owner to say start.** **Then stage 0 of [plan.md](plan.md), project setup.** Its detailed plan was approved on 2026-11-14 and is written into [tooling.md](architecture/tooling.md) and the [plan's stage 0 steps](plan.md#stage-0-in-steps). One question is open, about the polygon library, needed by stage 3. No code exists yet.
 
 ## Where things stand
 
@@ -15,6 +15,7 @@
 | The smaller v1: v1 build and watch, v2 logic and play, v3 polish, v4 accounts and publishing | Done, applied everywhere. See [decisions.md](decisions.md) |
 | The Lua API: [lua-api.md](requirements/scripts/lua-api.md), [lua-examples.md](requirements/scripts/lua-examples.md) | Done, approved by the owner |
 | The [architecture](architecture/README.md) and the [plan](plan.md) | Done, approved by the owner on 2026-11-14 |
+| The editor's look: [design/](design/README.md) | Done, approved by the owner on 2026-11-14 |
 | The stage 0 plan | Done, approved by the owner on 2026-11-14, written into [tooling.md](architecture/tooling.md) |
 | Small features without a version | Done: all given a version in round 7 |
 | Code | Not started. Next: stage 0 |
@@ -53,17 +54,13 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 - **The architecture review, round 7** (owner): everything still open, on one page at once, as the owner asked. **The architecture is approved**: it moved to [architecture/](architecture/README.md), its plan to [plan.md](plan.md), its words to the [glossary](glossary.md). Spawn measures position and rotation from the trigger's entity, and its values replace the `.entity` file's. A boolean variable can be **flipped** by a trigger. All 119 small features got the version Claude suggested (14 v1, 12 v2, 80 v3, 13 Later), and three were dropped. See [decisions.md](decisions.md).
 - **Round 8, the editor's look** (owner): a Figma-like feel, cool blue-grey panels, a blue accent colour, medium density, 4 px corners, flush panels, outline icons, and **JetBrains Mono for the whole editor**. See [design/](design/README.md).
 - **After the mockups** (owner): **the Inspector moves to the left and the Layers panel to the right.** The save state and the zoom are in the top bar, the tools in the toolbar strip, and v1 rows have no lock icon. See [design/](design/README.md).
+- **Direction A is picked** (owner): the design system is written in [design/](design/README.md): [tokens](design/tokens.md), [controls](design/controls.md), [the level view's colours](design/level-view.md). Direction B was dropped. Some states are Claude's proposals, marked there.
 - **The stage 0 plan is approved** (owner): all ten changes to the architecture docs, including **Node 26** instead of 24, `jiti`, dependency-cruiser, the guard tests and the worker files in `src/app/workers/`. See [decisions.md](decisions.md).
 
 ## Next
 
-1. **The editor's look** (owner, 2026-11-14), in four steps:
-   1. **Round 8 on the [review page](review.html):** done. The answers are in [design/](design/README.md).
-   2. **Two directions as mockups:** done, in [design/mockups/](design/mockups/index.html). Waits for the owner to pick one, or mix them.
-   3. **Refine the one the owner picks**, in a round or two.
-   4. **Write the design system** in `docs/design/`: design tokens, each control's states, icons, the level view's colours. The tokens become `ui/theme.css` in stage 6.
-2. **Stage 0 of [plan.md](plan.md): project setup**, in the [eight steps](plan.md#stage-0-in-steps). Waits for the owner to say start. Step 6 may need the owner's password, step 7 needs a push.
-3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
+1. **Stage 0 of [plan.md](plan.md): project setup**, in the [eight steps](plan.md#stage-0-in-steps). Waits for the owner to say start. Step 6 may need the owner's password, step 7 needs a push.
+2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
 
