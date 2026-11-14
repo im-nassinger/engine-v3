@@ -11,17 +11,26 @@
         "docs:check": "node tools/check-docs.js",
         "dev": "vite",
         "build": "tsc -b && vite build",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "lint": "eslint .",
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
     },
     "devDependencies": {
         "@babel/core": "8.1.2",
+        "@eslint/js": "10.0.1",
         "@rolldown/plugin-babel": "0.3.1",
         "@types/node": "26.6.6",
         "@types/react": "19.3.0",
         "@types/react-dom": "19.3.0",
         "@vitejs/plugin-react": "6.3.0",
         "babel-plugin-react-compiler": "1.0.0",
+        "eslint": "10.15.0",
+        "eslint-plugin-react-hooks": "7.1.1",
+        "jiti": "2.7.0",
+        "prettier": "3.10.1",
         "typescript": "6.0.3",
+        "typescript-eslint": "8.72.2",
         "vite": "8.3.8"
     },
     "dependencies": {
