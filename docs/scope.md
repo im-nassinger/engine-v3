@@ -137,7 +137,7 @@ Rules: [requirements/physics](requirements/physics/README.md)
 | PH9 | Gravity strength and direction, and the background colour, on the World. | v1 | Basic level settings. |
 | PH10 | Buttons for gravity: Earth, Moon, Arcade, None. | v3 | Typing a number works. |
 | PH11 | Game speed on the World, so triggers and scripts can slow the whole level down. Example: slow motion for 2 seconds after the player hits a bomb. | v3 | An effect, not something a test needs. |
-| PH12 | Level bounds: each edge a wall or open, and entities past an open edge are removed. | v1 | Without them a fallen crate falls forever, and the camera has no edge to stop at. |
+| PH12 | Level bounds: the edges all walls or all open, and entities past an open edge are removed. | v1 | Without them a fallen crate falls forever, and the camera has no edge to stop at. |
 
 ## Joints
 

@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The level-wide physics settings, all on the World entity. **v1:** gravity strength and direction, the background colour (the World's StyleComponent), and level bounds (the World's rectangle ShapeComponent) whose edges are walls or open. **v3:** the collision grid (which tags hit which), the Collision check, gravity buttons, game speed, and a background image. Core rule: **the collision grid on the World is the one place that decides what hits what.** There is no second system beside it.
+The level-wide physics settings, all on the World entity. **v1:** gravity strength and direction, the background colour (the World's StyleComponent), and level bounds (the World's rectangle ShapeComponent) whose edges are all walls or all open. **v3:** the collision grid (which tags hit which), the Collision check, gravity buttons, game speed, and a background image. Core rule: **the collision grid on the World is the one place that decides what hits what.** There is no second system beside it.
 
 ## World settings
 
@@ -84,9 +84,9 @@ Source: scope PH7; round 6: 05 2.13; round 8: CF4; old: PH-80, PH-81
 - Default size: **20000×10000 px**. The default camera is 1920×1080.
 - **The World's rectangle is centred on the level's origin**, and stays there. *Why: the World never moves, so its rectangle can't be moved either, and a centred rectangle needs no offset setting (owner: 2026-11-13).*
 - The bounds show as a thin frame in the editor. Resize them by dragging their handles with the World selected, or by typing the rectangle's width and height. **Dragging one edge moves the opposite edge by the same amount**, so the centre never moves. Example: bounds 20000 wide run from −10000 to 10000; dragging the right edge out by 1000 makes them 22000 wide, from −11000 to 11000.
-- Where the four edge settings live, and whether the World's rectangle can collide, are open questions, see [progress](../../progress.md).
 - The camera stops at the bounds.
-- **Each edge is a wall or open.** All four are open by default. A wall blocks everything that collides.
+- **The edges are all walls or all open**, set by one checkbox, **Walls**, on the PhysicsWorldComponent. Off by default, so all four edges are open. A wall blocks everything that collides. *Why: one toggle is enough; a choice per edge is more than a level needs (owner: 2026-11-13).*
+- **The World's rectangle is never solid.** The World can't take a BodyComponent or a SurfaceComponent: the Add Component menu shows both greyed out, with the reason "The World can't collide. To block the edges of the level, turn on Walls on the PhysicsWorldComponent." The only walls are the ones Walls makes. *Why: a solid rectangle the size of the level would trap every entity inside it (owner: 2026-11-13).*
 - **An entity that is fully outside an open edge is removed**, where it can no longer be seen. That is all the game does: it decides nothing about lives or falling.
 - An entity that starts or spawns outside is left alone until it has been inside once.
 - The bounds don't change during play.

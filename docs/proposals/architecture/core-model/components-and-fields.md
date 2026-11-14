@@ -183,12 +183,12 @@ export function createV1Registry(): ComponentRegistry;
 | SurfaceComponent | 7 | Density 0 to 100, 1. Friction 0 to 5, 0.3. Restitution 0 to 2, 0. Sensor: checkbox | | ShapeComponent |
 | JointComponent | 8 | Type: choice Hinge, Rope, Spring. A, B: entity. Let connected objects collide. Hinge: Limit rotation, Min angle, Max angle, Motor, Motor speed, Motor strength, Resistance. Rope: Match drawn distance, Length. Spring: Match drawn distance, Rest length, Stiffness, Damping. Ranges and defaults as in [joints](../../../requirements/physics/joints.md) | The two ends, in the joint's own space | |
 | CameraComponent | 9 | Width, Height: number px, 1920 × 1080. Follow: entity. Smoothing: number s | Mode, `fixedSize` until v3 | |
-| PhysicsWorldComponent | World | Gravity strength: number m/s², 0 to 100, 9.8. Gravity direction: choice Down, Up, Left, Right, Custom. Gravity angle: angle, applies when Custom. The four edges, Wall or Open, if open question 26 lands here | | |
+| PhysicsWorldComponent | World | Gravity strength: number m/s², 0 to 100, 9.8. Gravity direction: choice Down, Up, Left, Right, Custom. Gravity angle: angle, applies when Custom. Walls: checkbox, off (all four edges of the level bounds walls, or all open) | | |
 
 - Every setting of every joint type is stored, whatever the current type, so switching type in v3 keeps them, as the joints rules ask.
 - **Merge** is a checkbox on the BodyComponent, on by default (owner, 2026-11-13).
 - **The TagsComponent is v2** (owner, 2026-11-13): nothing in v1 reads tags.
-- **The World has a ShapeComponent and a StyleComponent** (owner, 2026-11-13). The rectangle's width and height are the level bounds, 20000 × 10000 by default; the fill is the background colour. Both are World components: they can't be removed, and the shape's kind is always rectangle. The rectangle is centred on the level's origin, and a resize changes both opposite edges by the same amount, so the centre never moves (owner, 2026-11-13).
+- **The World has a ShapeComponent and a StyleComponent** (owner, 2026-11-13). The rectangle's width and height are the level bounds, 20000 × 10000 by default; the fill is the background colour. Both are World components: they can't be removed, and the shape's kind is always rectangle. The World can't take a BodyComponent or a SurfaceComponent: the Add Component menu shows them disabled, with the reason. The rectangle is centred on the level's origin, and a resize changes both opposite edges by the same amount, so the centre never moves (owner, 2026-11-13).
 
 ## v2 and v3 seams
 

@@ -92,6 +92,7 @@ What we decided against, and why. **Check here before proposing something**: an 
 | One click adds a BodyComponent and a SurfaceComponent together, or surfaces to every shape in a group | Only the BodyComponent, with a note and a button for the SurfaceComponent | Nothing happens behind the user's back | owner: 2026-11-13 |
 | The physics view drawn by Box2D | The game draws its own collision pieces, in the editor and in test play | The editor has no Box2D world, and one way to draw is enough | owner: 2026-11-13 |
 | Level bounds as fields on the PhysicsWorldComponent | A rectangle ShapeComponent on the World | A rectangle already has a size, a card and handles | owner: 2026-11-13 |
+| A Wall or Open choice for each edge of the level bounds | One Walls checkbox: all four edges walls, or all open | One toggle is enough | owner: 2026-11-13 |
 | "Transform" as the component's name | TransformComponent | Component names end in `Component`, with no exception | owner: 2026-11-13 |
 | An import that compares level ids and asks Keep both or Replace | Import replaces the open level after asking | v1 keeps no list of levels, so there is nothing to compare against | round 11: 12 A11; round 12: LV1 |
 | CodeMirror | Monaco | The owner's choice | round 9: 10 2.13 |

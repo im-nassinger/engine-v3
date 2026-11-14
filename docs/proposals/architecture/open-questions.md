@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Round 2 answered the eight questions that came out of writing this proposal** (owner, 2026-11-13). Seven took the suggested answer; one, the level bounds, was changed by the owner: **the World has a rectangle ShapeComponent that is the level bounds.** That answer raised three smaller questions about the World's rectangle, numbered 25 to 27 in [progress.md](../../progress.md). **Round 3 answered 25:** the rectangle is centred on the level's origin and resizes from its centre. The owner asked for 26 and 27 to be explained more plainly, so they are asked again on the [review page](review.html) as round 4. They must be answered before plan stage 2. The second table says which open questions in `progress.md` touch which part of this design.
+**Round 2 answered the eight questions that came out of writing this proposal** (owner, 2026-11-13). Seven took the suggested answer; one, the level bounds, was changed by the owner: **the World has a rectangle ShapeComponent that is the level bounds.** That answer raised three smaller questions about the World's rectangle, numbered 25 to 27 in [progress.md](../../progress.md). **Round 3 answered 25 and round 4 answered 26 and 27** (owner, 2026-11-13): the rectangle is centred on the level's origin and resizes from its centre, one Walls checkbox makes all four edges walls or all open, and the World can never be solid. Nothing blocks plan stage 2 any more. The second table says which open questions in `progress.md` touch which part of this design.
 
 ## Answered in round 2
 
@@ -18,18 +18,13 @@
 | A8 | Is changing the grid size a step? | Yes. Showing the grid isn't | [workspace](../../requirements/editor/workspace.md), [inspector and undo](../../requirements/editor/inspector-and-undo.md) |
 | S1 | TypeScript 6.0 or 7? | 6.0.3, until `typescript-eslint` supports 7 | [stack](stack.md) |
 
-## Raised by A2, answered in round 3
+## Raised by A2, answered in rounds 3 and 4
 
 | # | Question | Answer | Written into |
 |---|---|---|---|
 | 25 | Where does the World's rectangle sit, and how do its handles resize it? | Centred on the level's origin. Dragging one edge moves the opposite edge by the same amount. A new level's camera starts at the origin | [world](../../requirements/physics/world.md), [camera](../../requirements/camera.md), [components](core-model/components-and-fields.md), [selection and tools](editor/selection-and-tools.md) |
-
-## Raised by A2, asked again in round 4
-
-| # | Question | Touches | Suggested answer |
-|---|---|---|---|
-| 26 | Where do the four edge settings (wall or open) live? A ShapeComponent has no such setting | The PhysicsWorldComponent's schema, `LevelBoundsPhase`, the walls in `PhysicsSceneBuilder` | Four choices on the PhysicsWorldComponent: Top edge, Bottom edge, Left edge, Right edge, each Wall or Open, all Open |
-| 27 | Can the World's rectangle collide? | The Add Component menu on the World | No: the World can't take a BodyComponent or a SurfaceComponent, so the background never collides. Walls come only from the edge settings |
+| 26 | Where do you choose Wall or Open for the edges? | **Changed by the owner:** one Walls checkbox on the PhysicsWorldComponent, off by default. All four edges are walls, or all open | [world](../../requirements/physics/world.md), [components](core-model/components-and-fields.md), [simulation](simulation.md) |
+| 27 | Can the World's rectangle be solid? | No. The World can't take a BodyComponent or a SurfaceComponent; the Add Component menu shows them disabled with the reason | [world](../../requirements/physics/world.md), [components](core-model/components-and-fields.md) |
 
 ## The open questions in progress.md, and what they touch
 
@@ -48,4 +43,3 @@
 | 21 | The end window's extras | The end window | No, Later |
 | 22 | Play as player | `PlaySession` | No |
 | 23, 24 | Version history; the main menu and others | Nothing in this design | No |
-| 26, 27 | The edges of the level | See above | **Yes, before plan stage 2** |

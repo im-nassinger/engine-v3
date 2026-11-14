@@ -92,7 +92,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Physics view | A debug view in the editor and test play that draws every physics shape, even hidden ones. |
 | Collision check | Right-click two entities, "Why do these collide?": explains why they do or don't. |
 | Joint | An entity with a JointComponent, connecting two bodies: Hinge, Rope, Spring, Weld, Rod, Slider, Wheel. |
-| Level bounds | The rectangle around the level that marks where it ends: the World's rectangle ShapeComponent. Each edge is a wall or open. |
+| Level bounds | The rectangle around the level that marks where it ends: the World's rectangle ShapeComponent. Its edges are all walls or all open. |
 | Game speed | A World setting that slows or speeds the whole level. Different from the test speed menu. |
 
 ## Files

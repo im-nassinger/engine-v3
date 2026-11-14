@@ -127,7 +127,7 @@ v1 phases, in order:
 - **Each body's level matrix is split once at the start** into its pose (position and angle) and the rest (scale and skew). During play, `WorldMatrixCache` in the play copy and in the mirror computes `pose · rest` for the body's entity, and children follow through the tree as usual.
 - **Body poses are the simulation's state.** A body entity's TransformComponent values during play are derived from its pose when someone asks (v2 live values, `get_position`), not written every tick.
 - **Joints:** limits and lengths are measured from how the joint was built, so the reference angle is read from the editor's level at the start. An empty B is attached to a static ground body. A joint with both ends on one body, or neither end able to move, is skipped, as the tech notes advise.
-- **Level bounds** come from the World's rectangle. Edges set to Wall become static surfaces that collide with everything. **Gravity** is the World's strength and direction, and changing it wakes every body.
+- **Level bounds** come from the World's rectangle. With Walls on, its four edges become static surfaces that collide with everything. **Gravity** is the World's strength and direction, and changing it wakes every body.
 
 ## Determinism
 

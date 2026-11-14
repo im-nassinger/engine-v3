@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. Rounds 2 and 3 of its review are answered. **Waiting for the owner:** questions 26 and 27 about the edges of the level (round 4 of the review page, asked again in plainer words), a review of the proposal, and the other open questions below.
+The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. Rounds 2 to 4 of its review are answered. **Waiting for the owner:** a review of the proposal, and the other open questions below.
 
 ## Where things stand
 
@@ -43,6 +43,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
   - **The level bounds are a rectangle ShapeComponent on the World** (the owner's change to the suggestion of fields on the PhysicsWorldComponent). Three details follow from it, below.
   - **Merge** is a checkbox on the BodyComponent. **The TagsComponent is v2.** The World's TransformComponent card isn't shown. Partner notes read "Needs a X to Y. [Add X]". Links to outside entities last one opening of the level. Changing the grid size is an undo step. TypeScript is pinned to 6.0.3.
 - **The architecture review, round 3** (owner): **the World's rectangle is centred on the level's origin**, and dragging one edge moves the opposite edge by the same amount, so the centre never moves. A new level's camera starts at the origin. Questions 26 and 27 got comments asking for plainer words, so they are asked again in round 4.
+- **The architecture review, round 4** (owner): **one Walls checkbox** on the PhysicsWorldComponent makes all four edges walls or all open, off by default (the owner's change to a choice per edge). **The World's rectangle is never solid:** the World can't take a BodyComponent or a SurfaceComponent.
 
 ## Next
 
@@ -63,11 +64,6 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 ## Open questions for the owner
 
 Found while rewriting. None was decided by Claude. Where the docs had to say something, they say what is written after "Written as". Which parts of the architecture each one touches is in the proposal's [open questions](proposals/architecture/open-questions.md).
-
-### The edges of the level (from round 2, asked again in round 4)
-
-26. **Where you choose Wall or Open for each edge.** The ShapeComponent card is shared by every rectangle, so it can't hold them. Suggested: four choices on the World's PhysicsWorldComponent card, under gravity.
-27. **Whether the World's rectangle can be solid.** Suggested: the World can't take a BodyComponent or a SurfaceComponent, so the whole level never becomes one solid block. The only walls are the edges set to Wall.
 
 ### Words and components
 
