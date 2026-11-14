@@ -173,10 +173,12 @@ Source: round 6: RP1; old: SG-135 to SG-137
 - Click selects a row, Ctrl+click adds or removes one, Shift+click selects a range.
 - **Drag rows** to reorder them or move them into a group. A line shows where the row will land, and its indent shows the depth. Dragging a selected row drags the whole selection. A drop is one undo step.
 - Can't drop: into itself or its own children, or above the World.
-- **F2** or a double-click on the name renames in place. Names are trimmed, up to 64 characters, and don't have to be unique. Renaming can be undone.
+- **F2** or a double-click on the name renames in place. Names are trimmed, 1 to 64 characters, and don't have to be unique. Typing an empty name restores the old one. Renaming can be undone.
 - Selecting in the level view unfolds the groups above the row and scrolls it into view.
 - Which rows are folded is saved in the project file, not in the play file.
 - Every entity has a name, filled automatically, such as "Rectangle 1". A name is not a tag.
+- **A name is never empty.** A level file with an empty entity name, or one of only spaces, is damaged. A name missing from the file reads as `Entity`, like any missing value reads as its default. *Why: the Entities panel never shows an empty row, and every file stays readable (owner: 2026-11-14).*
+- **A name can't change during play.** *Why: a lookup by name stays the same for the whole run (owner: 2026-11-14).*
 - During play the panel is read-only.
 
 Source: scope SE8; round 1: C2; round 3: N1; round 4: 02 2.11, 02 2.12; round 5: FMT1; round 6: LY2; old: SG-88 to SG-107, SG-122 to SG-128; owner: 2026-11-14

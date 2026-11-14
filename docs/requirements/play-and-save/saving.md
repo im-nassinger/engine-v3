@@ -58,10 +58,11 @@ Source: scope SA1; round 11: 12 A7; round 12: TB1; old: SV-47
 ### The level's name · v1
 
 - A level has a name of 1 to 60 characters, `Untitled level` at first.
+- **A longer name is refused, not cut:** the old name stays and the status text says why. *Why: losing the end of a name quietly is worse than being told (owner: 2026-11-14).*
 - It is shown and edited in the top bar, see [the workspace](../editor/workspace.md), and saved in the project file. Renaming is an undo step.
 - It is the default file name on export, with characters no file system allows replaced.
 
-Source: owner: 2026-11-13
+Source: owner: 2026-11-13, 2026-11-14
 
 ## Level files
 

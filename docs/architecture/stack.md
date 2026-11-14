@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed** means the owner chose it; **recommended** means the architecture chose it (all were approved in review card D11). Five things are fixed: TypeScript, Vite, React, PixiJS 8 and Box2D v3. Beside them: Vitest and Playwright for tests, ESLint and Prettier for code quality, `box2d3-wasm` for Box2D, `clipper2-js` for polygons, `fflate` for zips, `idb` for browser storage, TanStack Virtual for the Entities panel, and the React Compiler, with `jiti` and `dependency-cruiser` for the checks in [tooling.md](tooling.md). **Node.js 26** runs the tools. **Each library is installed by the stage that first uses it**, at the version here, checked again on that day. Lua and Monaco come with v2 and aren't installed in v1. **TypeScript is 6.0, not 7**, because the ESLint TypeScript tools don't support 7 yet.
+Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed** means the owner chose it; **recommended** means the architecture chose it (all were approved in review card D11). Five things are fixed: TypeScript, Vite, React, PixiJS 8 and Box2D v3. Beside them: Vitest and Playwright for tests, ESLint and Prettier for code quality, `box2d3-wasm` for Box2D, `clipper2-ts` for polygons (tried in stage 3), `fflate` for zips, `idb` for browser storage, TanStack Virtual for the Entities panel, and the React Compiler, with `jiti` and `dependency-cruiser` for the checks in [tooling.md](tooling.md). **Node.js 26** runs the tools. **Each library is installed by the stage that first uses it**, at the version here, checked again on that day. Lua and Monaco come with v2 and aren't installed in v1. **TypeScript is 6.0, not 7**, because the ESLint TypeScript tools don't support 7 yet.
 
 ## Fixed
 
@@ -38,7 +38,7 @@ Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed*
 | `typescript-eslint` | 8.72.2 | TypeScript rules for ESLint | |
 | `eslint-plugin-react-hooks` | 7.1.1 | Hook rules and the React Compiler's checks | |
 | `prettier` | 3.10.1 | One code format | Formatting is never a review topic. Settings: 4 spaces, single quotes, 120 columns, matching the owner's TypeScript style |
-| `clipper2-js` | 1.2.4 | Cuts self-crossing polygons, triangulates | Integer arithmetic inside, so its results are the same on every computer. See [geometry](core-model/geometry.md). **Open question:** 1.2.4 has no triangulation, see [progress.md](../progress.md#open-questions-for-the-owner) |
+| `clipper2-ts` | 2.0.1-19, untried | Cuts self-crossing polygons, triangulates | Integer arithmetic inside, so its results are the same on every computer. **Tried first in stage 3** (owner, 2026-11-14), because `clipper2-js` 1.2.4 has no triangulation and brings Angular 15. See [geometry](core-model/geometry.md) |
 | `fflate` | 0.8.3 | Makes and reads the `.editable` zip | Small, fast, and can stop unpacking at a size limit |
 | `idb` | 8.0.4 | A thin promise layer over IndexedDB | IndexedDB's own API is callback-based. `idb` adds no storage logic of its own |
 | `@tanstack/react-virtual` | 3.14.26 | Builds only the visible Entities panel rows | Fixed row height, no styling of its own, so drag and drop stays ours |
@@ -48,7 +48,7 @@ Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed*
 
 **Node.js 26** runs the tools, the version on the owner's laptop, so a CI failure can be repeated there (owner, 2026-11-14). Every package accepts it. `.node-version` holds the number, and CI reads it.
 
-**Installed when its stage comes** (owner, 2026-11-14): stage 0 installs the tools plus `react` and `react-dom`. `clipper2-js` waits for stage 3, `pixi.js` for stage 4, `@tanstack/react-virtual` for stage 7, `fflate` and `idb` for stage 12, `box2d3-wasm` for stage 13. *Why: `package.json` lists only what the code uses, and each library gets a real look when a stage starts using it.* The whole v1 stack was checked to install together with no conflict on 2026-11-14.
+**Installed when its stage comes** (owner, 2026-11-14): stage 0 installs the tools plus `react` and `react-dom`. `clipper2-ts` waits for stage 3, `pixi.js` for stage 4, `@tanstack/react-virtual` for stage 7, `fflate` and `idb` for stage 12, `box2d3-wasm` for stage 13. *Why: `package.json` lists only what the code uses, and each library gets a real look when a stage starts using it.* The whole v1 stack was checked to install together with no conflict on 2026-11-14.
 
 ### Not installed until v2
 
@@ -67,7 +67,7 @@ Their versions are checked again when v2 starts.
 | A CSS framework, CSS-in-JS, CSS Modules | Each React component has its own plain `.css` file scoped under its root class, as the owner's component rules say |
 | A UI component library | The editor needs a few plain controls (buttons, menus, number fields), and how each one works is in the requirements |
 | An ECS library | Entities and components are the game's own model with the owner's rules (one of each type, a tree, Entities panel order). A library would bring its own rules |
-| `poly-decomp`, `earcut` | `clipper2-js` already triangulates. One polygon library |
+| `poly-decomp`, `earcut` | `clipper2-ts` already triangulates. One polygon library |
 | Box2D's debug draw | The physics view draws the game's own collision pieces (owner, 2026-11-13) |
 | `fake-indexeddb` and other browser imitations | Browser storage is tested in real browsers, see [testing.md](testing.md) |
 

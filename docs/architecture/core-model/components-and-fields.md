@@ -36,7 +36,7 @@ export type FieldType<T> = ValueType<T> & {
 | Field type class | Value | Options | v1 uses it for |
 |---|---|---|---|
 | `NumberFieldType` | `number` | `min`, `max`, `wholeNumber` | Densities, dampings, sizes, speeds |
-| `TextFieldType` | `string` | `maxLength`, `trimmed` | The name (64 characters) |
+| `TextFieldType` | `string` | `minLength`, `maxLength`, `trimmed` | The name (1 to 64 characters) |
 | `CheckboxFieldType` | `boolean` | | Sensor, Bullet, Motor |
 | `ChoiceFieldType<T extends string>` | one of a union | the options and their labels | Body type, joint type, gravity direction |
 | `ColourFieldType` | `#RRGGBBAA` text | | Outline colour |
@@ -192,7 +192,7 @@ export function createV1Registry(): ComponentRegistry;
 | Component | Card | Fields (label: type, range, default) | Stored, not shown | Partners |
 |---|---|---|---|---|
 | TransformComponent | 1 | Position: vector px. Rotation: angle °. Scale: vector, not 0, (1, 1). Skew: angle °, strictly between −90° and 90° | | |
-| NameComponent | none | Name: text, 1 to 64, trimmed, filled automatically | | |
+| NameComponent | none | Name: text, 1 to 64, trimmed, filled automatically. `Entity` when missing from a file; `parse` refuses an empty name, counted after trimming (owner, 2026-11-14) | | |
 | ShapeComponent | 2 | Kind: choice, read-only. Width, Height: derived px, at least 1. Points: derived, read-only | The geometry: rectangle and ellipse sizes, or polygon and line points (up to 1,000) | |
 | PathComponent | 3 | Points: derived, read-only. v1 only has the read-only path a Rope or Spring keeps | The path's points and handles | |
 | StyleComponent | 5 | Fill: colour that can be emptied, `#4A90D9`. Outline colour: colour, `#1F3552`. Outline width: number px, 0 to 200, 2. Opacity: number, 0 to 1 shown as %, 1 | | ShapeComponent or PathComponent: "Needs a ShapeComponent to draw anything." |
@@ -205,6 +205,8 @@ export function createV1Registry(): ComponentRegistry;
 - **Mass isn't a field of the BodyComponent**, because it adds up the shapes of other entities merged into the body. `BodyMass.of(entity, caches)` in `core/physics`, which knows which shapes merge, works it out from [geometry](geometry.md#mass), and the Inspector shows it as a read-only row at the end of the BodyComponent's card. It looks exactly as the requirement says.
 - Every setting of every joint type is stored, whatever the current type, so switching type in v3 keeps them, as the joints rules ask.
 - **Merge** is a checkbox on the BodyComponent, on by default (owner, 2026-11-13).
+- **Which values change during play** (owner, 2026-11-14): the TransformComponent's position and rotation; not its scale or skew, and not the name. **The hover descriptions** of these five fields are in the [Inspector's requirements](../../requirements/editor/inspector-and-undo.md#cards-for-the-selection--v1).
+- **A new level names its World `World` and its camera `Camera`**, the names the round 9 cards used.
 - **The TagsComponent is v2** (owner, 2026-11-13): nothing in v1 reads tags.
 - **The World has a ShapeComponent and a StyleComponent** (owner, 2026-11-13). The rectangle's width and height are the level bounds, 20000 × 10000 by default; the fill is the background colour. Both are World components: they can't be removed, and the shape's kind is always rectangle. The World can't take a BodyComponent or a SurfaceComponent: the Add Component menu shows them disabled, with the reason. The rectangle is centred on the level's origin, and a resize changes both opposite edges by the same amount, so the centre never moves (owner, 2026-11-13).
 

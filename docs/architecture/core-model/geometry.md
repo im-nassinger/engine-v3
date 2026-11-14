@@ -63,8 +63,10 @@ export class Matrix2D {
 Polygon steps:
 
 1. **Clean.** Merge points closer than 0.25 px, drop points lying on the straight line between their neighbours. The tech notes warn that such points break convex splitting.
-2. **Fill every enclosed area.** `clipper2-js` unions the outline with itself (non-zero rule), which cuts it at its crossings. Every outer outline it returns is kept; every hole it returns is dropped, because the requirement fills every enclosed area and polygons have no holes. A figure-of-eight gives two outlines; a star drawn in one stroke gives its outline with the middle filled.
-3. **Triangulate** each outline with `clipper2-js`.
+2. **Fill every enclosed area.** The polygon library unions the outline with itself (non-zero rule), which cuts it at its crossings. Every outer outline it returns is kept; every hole it returns is dropped, because the requirement fills every enclosed area and polygons have no holes. A figure-of-eight gives two outlines; a star drawn in one stroke gives its outline with the middle filled.
+3. **Triangulate** each outline with the polygon library.
+
+**The polygon library** (owner, 2026-11-14): stage 3 tries `clipper2-ts` first, because `clipper2-js` 1.2.4 has no triangulation. It must triangulate, pass the determinism tests, and never reach a banned `Math` function from the functions core calls. If it fails, the owner is asked again.
 4. **Merge triangles into convex pieces** of at most 8 points (Hertel-Mehlhorn: remove a shared edge whenever the result stays convex and has 8 points or fewer).
 5. **Drop pieces too small to collide**: under 1 px on their short side, the requirement's limit.
 

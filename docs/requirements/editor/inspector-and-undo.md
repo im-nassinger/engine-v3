@@ -16,7 +16,17 @@ How values are edited and how mistakes are reversed. **v1:** the Inspector shows
 - Cards appear in one fixed order, the same on every entity: TransformComponent, shape, path, text, style, body, surface, joint, camera, tags, scripts, triggers. Users can't reorder them.
 - Clicking a card's title folds it. The folded state is remembered per component type, in the browser.
 - TransformComponent fields are measured from the parent, and the tooltip says so. The level position of the selection is in the status bar.
-- Hovering a field's label shows its description.
+- Hovering a field's label shows its description. The TransformComponent's and the name's (owner: 2026-11-14):
+
+| Field | Description |
+|---|---|
+| Position | Where the entity sits, in pixels, measured from its parent. |
+| Rotation | How far the entity is turned clockwise, in degrees, measured from its parent. |
+| Scale | How much the entity is stretched across and down, measured from its parent. Can't be 0. |
+| Skew | How far the entity is slanted, in degrees, measured from its parent. Between −90° and 90°. |
+| Name | The entity's name. It doesn't have to be unique. |
+
+- **Position and rotation can change during play. Scale and skew can't.** *Why: the physics rules already keep scale, and skew changes the shape the same way (owner: 2026-11-14).*
 - During play the Inspector is read-only, and shows live values when brought back with Panels.
 
 Source: round 1: C1, C10; round 3: R15; round 4: H2, SEL1; decisions: D14, D15; old: WS-84 to WS-89, WS-124; owner: 2026-11-13, 2026-11-14

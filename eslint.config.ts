@@ -5,7 +5,7 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 
 // The one place the polygon library is named. See the open question in docs/progress.md.
-const POLYGON_LIBRARY = 'clipper2-js';
+const POLYGON_LIBRARY = 'clipper2-ts';
 
 // The Math functions the JavaScript standard lets a browser approximate, plus random.
 export const BANNED_MATH_IN_CORE = [
