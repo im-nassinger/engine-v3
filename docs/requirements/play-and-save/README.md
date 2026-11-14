@@ -9,7 +9,7 @@ Running a level and keeping it. **In v1** Play runs a copy of the level with the
 | File | Covers |
 |---|---|
 | [test-play.md](test-play.md) | Play and Stop, the Play bar, Pause and Step, Panels, the end window, the pause menu, ticks and time, focus, the seed, determinism, test tools, what players see |
-| [saving.md](saving.md) | The saved level, autosave, failed saves, tabs, the project file, the play file, the file format version, limits |
+| [saving.md](saving.md) | The saved level, autosave, failed saves, tabs, the project file, the play file, the file format version, the physics version, limits |
 
 ## Features and versions
 
@@ -30,6 +30,7 @@ Running a level and keeping it. **In v1** Play runs a copy of the level with the
 | A second tab is read-only | v1 | saving |
 | The project file: Export, Import, Ctrl+S | v1 | saving |
 | The file format version | v1 | saving |
+| The physics version | v1 | saving |
 | Limits: 100,000 entities, 256 MB | v1 | saving |
 | The pause menu's Controls and Settings pages | v2 | test-play |
 | Pin the seed | v2 | test-play |

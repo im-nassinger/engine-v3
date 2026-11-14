@@ -59,7 +59,6 @@ Found while rewriting. None was decided by Claude. Where the docs had to say som
 11. **50 MB of files per level** (round 6) and a **256 MB level file** (round 11): do both stand?
 12. **The old draft's other limits:** 2,000 files in a level and 250 MB unpacked. Keep, change or drop?
 13. **Changing a builtin file:** assumed you copy it into your own folder first.
-14. **A physics version in the level file.** Round 1 said each level stores its physics version. Round 11 said no version numbers besides the file format version, to be decided with publishing. Written as Later.
 
 ### Triggers and scripts
 

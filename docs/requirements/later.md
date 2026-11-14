@@ -20,10 +20,11 @@ Source: round 3: 01 2.12; round 11: 12 A1, 12 A11; old: SV-01 to SV-09, SV-12, S
 
 ### Level ids and other version numbers · Later
 
-- v1 has no permanent level id and no version numbers besides the file format version. To be decided with publishing.
-- The old draft stored a permanent id, the game version, the Lua API version and a physics version in every level. The physics version let old levels keep their old physics after a game update, until the creator chose to move on.
+- v1 has no permanent level id. Its only version numbers are the file format version and the physics version, see [saving](play-and-save/saving.md).
+- **v1 only records the physics version.** What to do with it is decided later: the old draft let old levels keep their old physics after a game update, until the creator chose to move on. *Why record it from v1: Claude's call, after the owner said "you decide". Without it, the first update of the physics engine changes how old levels play with no way back.*
+- The other numbers are still to be decided with publishing. The old draft also stored a permanent id, the game version and the Lua API version in every level.
 
-Source: round 1: D8; round 11: 12 A2; old: SV-13, SV-15, SV-92
+Source: round 1: D8; round 11: 12 A2; owner: 2026-11-13; old: SV-13, SV-15, SV-92
 
 ### Level thumbnails · Later
 

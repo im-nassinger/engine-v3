@@ -247,4 +247,5 @@ Rules: [requirements/play-and-save](requirements/play-and-save/README.md)
 | SA3 | A warning when saving in the browser fails. | v1 | Otherwise you'd find out you lost work only after a reload. |
 | SA4 | The play file (.playable), and a way to open one and run the level without the editor. | v2 | Before publishing, nobody else plays your levels. The project file already keeps and moves them. |
 | SA5 | Every level file records its file format version. Upgrading old files is written when the format first changes. | v1 | One field now. Without it, files saved by v1 can't be upgraded safely later. |
+| — | Every level file also records its physics version. What to do with it is Later. Decided after the scope review (owner: 2026-11-13). | v1 | One field. Without it, the first physics engine update changes how old levels play. |
 | SA6 | The warning after 10,000 entities. The 100,000 limit holds in v1 either way. | v2 | Test levels stay far below it. |

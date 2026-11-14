@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Where a level lives and how it leaves the browser. **v1:** one level at a time, saved in the browser after every change, exported and imported as a project file (`.editable`); a warning when saving fails; the game asks the browser to keep its data; a second tab is read-only; every file records its file format version; a level holds at most 100,000 entities and 256 MB. **v2:** the play file (`.playable`) with a way to run it without the editor, and the warning after 10,000 entities. Core rules: the level lives in one browser that may delete it, so the game is honest about that and only an exported file is a real backup; there is no list of levels, no level id and no version history in v1.
+Where a level lives and how it leaves the browser. **v1:** one level at a time, saved in the browser after every change, exported and imported as a project file (`.editable`); a warning when saving fails; the game asks the browser to keep its data; a second tab is read-only; every file records its file format version and its physics version; a level holds at most 100,000 entities and 256 MB. **v2:** the play file (`.playable`) with a way to run it without the editor, and the warning after 10,000 entities. Core rules: the level lives in one browser that may delete it, so the game is honest about that and only an exported file is a real backup; there is no list of levels, no level id and no version history in v1.
 
 A main menu with a list of levels, thumbnails, accounts and publishing are in [later.md](../later.md).
 
@@ -82,6 +82,14 @@ Source: round 1: D30; round 3: D79; round 5: FMT1; round 11: 12 A10; round 12: S
 - *Why v1: one field now. Without it, files saved by v1 can't be upgraded safely later.*
 
 Source: scope SA5; round 10: API1; round 11: 12 A12; old: SV-13, SV-85, SV-90, SV-91
+
+### The physics version · v1
+
+- **Every level file also records the physics version it was saved with**, next to the file format version: which version of the game's physics the level was built and tested on.
+- v1 only records it. What the game does with it, such as letting an old level keep its old physics after an update, is [Later](../later.md#level-ids-and-other-version-numbers-later).
+- *Why: "game updates never change how a level plays" breaks on the first update of the physics engine unless each level says which physics it was made with. It is one field. This was Claude's call, after the owner said "you decide".*
+
+Source: owner: 2026-11-13; round 1: D8; old: SV-15
 
 ### Limits · v1
 
