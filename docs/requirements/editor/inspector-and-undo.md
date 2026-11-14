@@ -46,8 +46,11 @@ Source: round 3: S2; round 4: FT1
 | A fraction in a whole-number field | Rounded |
 | Empty | Restores the old value, or clears an optional field |
 | Scale of 0 | Refused: `Scale can't be 0` |
+| Skew of 90° or −90°, or past them | Refused: `Skew must be between −90° and 90°` |
 
-Source: round 3: 01 2.5; old: WS-114, WS-115, WS-119 to WS-122, WS-125, WS-126
+- *Why the skew limit: at 90° the entity would be slanted flat, which no shape can be drawn or undone from, and a skew past 90° looks the same as a smaller one with the scale flipped, so two values would mean one look. It is refused, not clamped, because clamping would quietly change the shape (owner: 2026-11-14).*
+
+Source: round 3: 01 2.5; old: WS-114, WS-115, WS-119 to WS-122, WS-125, WS-126; owner: 2026-11-14
 
 ### Adding and removing components · v1
 

@@ -59,6 +59,10 @@ The owner approved the detailed plan for stage 0 and all ten places where it dif
 
 Every setup was first tried in a throwaway folder outside the project. The proposal was deleted once written in.
 
+## 2026-11-14: The stage 1 plan is approved
+
+The owner approved the three places where the stage 1 plan differs from the architecture docs. **Imports in core go one way**, entities → components → fields → events. **`DeterministicMath`'s `sin`, `cos`, `atan2` and `sinCos` are built in stage 1**, because `Matrix2D` needs them and core bans `Math.sin`. **Skew is strictly between −90° and 90°.** They are written into [core-model/](architecture/core-model/README.md), [plan.md](plan.md) and [inspector-and-undo.md](requirements/editor/inspector-and-undo.md).
+
 ## Still to decide
 
 Nothing is open. New questions go in [progress.md](progress.md) and, when there are several, all at once on the [review page](review.html).

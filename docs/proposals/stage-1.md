@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**A proposal, waiting for the owner's answer. Nothing here is built.** Stage 1 builds the classes in `src/core` that hold a level: signals, ids, `Entity`, `Level`, the field types, `ComponentSchema`, `Component`, TransformComponent, NameComponent, `Matrix2D`, and the matrix and hidden caches. It follows [core-model/](../architecture/core-model/README.md) except in **three places**, where the approved docs couldn't be built as written. **Change 1 is settled** (owner, 2026-11-14) and written into the architecture. **Change 2 must be answered before the work starts; change 3 can wait until step 4.**
+**Approved by the owner on 2026-11-14; being built.** Stage 1 builds the classes in `src/core` that hold a level: signals, ids, `Entity`, `Level`, the field types, `ComponentSchema`, `Component`, TransformComponent, NameComponent, `Matrix2D`, and the matrix and hidden caches. It follows [core-model/](../architecture/core-model/README.md) except in **three places**, where the approved docs couldn't be built as written. **All three changes are settled** (owner, 2026-11-14) and written into the architecture and the requirements. This file is deleted at step 8.
 
 ## Where the plan differs from the docs
 
@@ -18,13 +18,17 @@
 
 See [components-and-fields.md](../architecture/core-model/components-and-fields.md#componentschema-and-component).
 
-### 2. Part of `DeterministicMath` moves from stage 3 to stage 1
+### 2. Part of `DeterministicMath` moves from stage 3 to stage 1: settled
+
+**Settled by the owner on 2026-11-14 and written into [geometry.md](../architecture/core-model/geometry.md) and [plan.md](../plan.md).**
 
 **The problem.** `Matrix2D.fromTransform` needs sine, cosine and tangent, and `decompose` needs arctangent. ESLint refuses `Math.sin`, `Math.tan` and `Math.atan2` in core. [geometry.md](../architecture/core-model/geometry.md) says "the editor may use `Math` in `decompose()`", but `decompose` lives in core, so the rule refuses it.
 
 **Recommendation.** Stage 1 builds `DeterministicMath.sin`, `cos`, `atan2` and `sinCos`, with the 1e-12 accuracy test. `exp` stays in stage 3. Tangent is `sin ÷ cos` inside `Matrix2D`, so `DeterministicMath` gets no new function. `decompose` uses `DeterministicMath` like everything else in core, and the sentence about the editor using `Math` is removed.
 
-### 3. The skew's range
+### 3. The skew's range: settled
+
+**Settled by the owner on 2026-11-14 and written into [components-and-fields.md](../architecture/core-model/components-and-fields.md), [geometry.md](../architecture/core-model/geometry.md) and the [Inspector's typing table](../requirements/editor/inspector-and-undo.md#typing-values--v1).**
 
 **The problem.** The TransformComponent's Skew field has no range in the docs. A skew of exactly 90° or −90° has no tangent: the matrix would hold an infinite number and could never be inverted. A skew past 90° is the same slant as a smaller one with the scale flipped, so two Inspector values would mean one look.
 
@@ -52,7 +56,7 @@ Each step ends with its tests, `npm run check` and a commit.
 | 5 | `ComponentSchema`, `PartnerRule`, `DerivedFieldDefinition`, `Component` with its `changed` signal, TransformComponent, NameComponent | `core/components` | The schema test: keys are the camelCase of labels, no two attributes clash, defaults sit in range; `set` returns the stored value and signals only on a change; `copy` shares nothing |
 | 6 | `EntityIdAllocator`, `LevelSignals`, `EntityVersions`, `LevelTree`, `Entity`, `Level` (with `rename`) | `core/entities` | The tree's rules below; a removed component's changes no longer reach the level |
 | 7 | `WorldMatrixCache`, `HiddenCache` | `core/derived` | Marking a parent marks the subtree; values are computed only when asked |
-| 8 | The docs: changes 2 and 3 written into the architecture, `progress.md`, this file deleted | `docs/` | `node tools/check-docs.js` passes |
+| 8 | The docs: `progress.md`, what the build showed differs from the plan, this file deleted | `docs/` | `node tools/check-docs.js` passes |
 
 ### The tree's rules, as tests
 
@@ -67,11 +71,3 @@ Each step ends with its tests, `npm run check` and a commit.
 ## Done when
 
 The plan's own: unit tests for the tree's rules, ids, signals and matrices, including moving between parents with skew. Plus `npm run check` passes and the docs say what was built.
-
-## Docs that change if you say yes
-
-| Doc | Change |
-|---|---|
-| [components-and-fields.md](../architecture/core-model/components-and-fields.md) | Skew's range |
-| [geometry.md](../architecture/core-model/geometry.md) | `decompose` uses `DeterministicMath`; skew strictly between −90° and 90° |
-| [plan.md](../plan.md) | `DeterministicMath`'s `sin`, `cos`, `atan2` in stage 1; `exp` stays in stage 3 |

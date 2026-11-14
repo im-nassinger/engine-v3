@@ -36,7 +36,7 @@ export type FieldType<T> = ValueType<T> & {
 | `ChoiceFieldType<T extends string>` | one of a union | the options and their labels | Body type, joint type, gravity direction |
 | `ColourFieldType` | `#RRGGBBAA` text | `canBeEmpty` | Outline colour; the fill in v1 |
 | `VectorFieldType` | `{ x, y }` | `min`, `max`, `refuseZero` | Position, scale (scale can't be 0) |
-| `AngleFieldType` | degrees | `min`, `max` | Rotation, hinge limits |
+| `AngleFieldType` | degrees | `min`, `max`, `refuseLimits` | Rotation, hinge limits, skew (refuses −90° and 90°) |
 | `EntityFieldType` | `EntityId \| null` | | Joint A and B, the camera's follow target |
 
 - **The fixed list is v1, but each field type is built when the first component needs it.** v1 builds the eight above. Asset, variable, tags and list come with the v2 components that use them, and the fill field type comes with gradients (owner, 2026-11-13).
@@ -177,7 +177,7 @@ export function createV1Registry(): ComponentRegistry;
 
 | Component | Card | Fields (label: type, range, default) | Stored, not shown | Partners |
 |---|---|---|---|---|
-| TransformComponent | 1 | Position: vector px. Rotation: angle °. Scale: vector, not 0, (1, 1). Skew: angle ° | | |
+| TransformComponent | 1 | Position: vector px. Rotation: angle °. Scale: vector, not 0, (1, 1). Skew: angle °, strictly between −90° and 90° | | |
 | NameComponent | none | Name: text, 1 to 64, trimmed, filled automatically | | |
 | ShapeComponent | 2 | Kind: choice, read-only. Width, Height: derived px, at least 1. Points: derived, read-only | The geometry: rectangle and ellipse sizes, or polygon and line points (up to 1,000) | |
 | PathComponent | 3 | Points: derived, read-only. v1 only has the read-only path a Rope or Spring keeps | The path's points and handles | |
