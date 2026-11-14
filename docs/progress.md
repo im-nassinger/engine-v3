@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The docs rewrite is finished and both checks pass. No code exists. **v1 is now a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The Lua API is approved** and written into the scripts topic. **Waiting for the owner:** the open questions below. Then we talk through what went wrong in the first attempt's code, and plan the architecture and the stack.
+The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. **Waiting for the owner:** a review of the proposal, its eight new questions (A1 to A8), and the open questions below.
 
 ## Where things stand
 
@@ -14,27 +14,36 @@ The docs rewrite is finished and both checks pass. No code exists. **v1 is now a
 | `tools/check-docs.js`, `tools/check-sources.js` | Done, both pass |
 | The smaller v1: v1 build and watch, v2 logic and play, v3 polish, v4 accounts and publishing | Done, applied everywhere. See [decisions.md](decisions.md) |
 | The Lua API: [lua-api.md](requirements/scripts/lua-api.md), [lua-examples.md](requirements/scripts/lua-examples.md) | Done, approved by the owner |
+| The architecture proposal: [proposals/architecture/](proposals/architecture/README.md) | Written. Waiting for the owner's review |
 | Open questions below | Waiting for the owner |
-| Architecture, stack, `plan.md`, code | Not started |
+| Code | Not started |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
 ### Settled on 2026-11-13
 
-- **Box2D v3 and Lua run in the browser with wasm.** No proof needed. Box2D v3's own replay support is looked at later. See [tech-notes.md](tech-notes.md).
-- **Every level file records its physics version from v1** (was open question 14). Claude's call after the owner said "you decide". See [saving](requirements/play-and-save/saving.md).
+- **Box2D v3 and Lua run in the browser with wasm.** No proof needed. See [tech-notes.md](tech-notes.md).
+- **Every level file records its physics version from v1.** Claude's call after the owner said "you decide". See [saving](requirements/play-and-save/saving.md).
 - **A smaller v1** (owner): 43 features moved to a new v2, the old v2 became v3, accounts and publishing v4. See [scope.md](scope.md).
-- **Every Lua function is top level** (owner), such as `spawn(path)`, never `world.spawn(path)`. Written into [scripts.md](requirements/scripts/scripts.md).
-- **A component value is changed with `set_attribute`** (owner), next to the review's `get_attribute`. The full function list is in [the Lua API](requirements/scripts/lua-api.md), with [example scripts](requirements/scripts/lua-examples.md).
-- **The Lua API proposal is approved** (owner), all seven answers yes: a script's own entity is `this`; settings are a `settings` table built with `<type>_field` functions; scripts share values only through custom events and variables; no vector type, plus `clamp` and `lerp`; builtin scripts share `damage`, `heal` and `died`; script events are the trigger events in snake_case; and the rest of the function list stands as written. See [scripts.md](requirements/scripts/scripts.md), [lua-api.md](requirements/scripts/lua-api.md) and [builtin content](requirements/assets/builtin-content.md). The proposal file is deleted.
-- Small fixes: the glossary's Variable row no longer decides open question 3, and decisions made after the review are cited as `owner: <date>`.
+- **The Lua API is approved** (owner): every function is top level, `this` is the script's entity, settings are a `settings` table, and component values change with `set_attribute`. See [scripts.md](requirements/scripts/scripts.md) and [lua-api.md](requirements/scripts/lua-api.md).
+- **The architecture review, round 1** (owner): all 24 cards answered yes. Its decisions are in the [architecture proposal](proposals/architecture/README.md). The ones that changed requirements:
+  - The component is called **TransformComponent** everywhere, also on its card and in Lua (was open question 1).
+  - **The camera has an eye** like every row, hiding everything inside it (was open question 2).
+  - **Removing a component removes only that one**, and the cards left show their partner note (was open question 5).
+  - **Adding physics adds only the BodyComponent**, with a note and a button for the SurfaceComponent (was open question 6).
+  - **The level's name** is v1, shown and edited in the top bar, saved in the project file (was open question 10).
+  - **Limits:** 64 MB of imported files per level (v3), and one 256 MB limit counted unpacked. The old 2,000 files and 250 MB limits are dropped (were open questions 11 and 12).
+  - **The camera follows an entity in v1.** Following by tag can come later (open question 15 stays open for v2).
+  - **Undo keeps 512 steps**, not 500.
+  - **In v1 a fill is a colour field that can be emptied.** Gradients add a fill field type in v2.
+  - **The physics view draws the game's own collision pieces**, not Box2D's drawing.
+  - **The "Suggested v1" rows** in the "Not in the scope review" tables are built in v1, each marked as waiting for the owner until confirmed.
 
 ## Next
 
-1. **The owner goes through the open questions** below. Each answer is written into its topic file, and the question is removed from this list.
-2. **One pass over the features without a version.** Each topic file ends with a "Not in the scope review" table with Claude's suggested version. The owner confirms or changes them, and each becomes a normal feature section or a row in [rejected.md](rejected.md).
-3. **Talk through what went wrong in the first attempt's code**, so the new design avoids it.
-4. **Plan the architecture and the stack**, then write `plan.md`. [tech-notes.md](tech-notes.md) has what the old research learned.
+1. **The owner reviews the architecture proposal.** Once approved, its files move into the main docs, and `plan.md` becomes the project's plan.
+2. **The owner goes through the open questions** below. Each answer is written into its topic file, and the question is removed from this list.
+3. **One pass over the features without a version.** Each topic file ends with a "Not in the scope review" table with Claude's suggested version.
 
 ## How to change a requirement
 
@@ -48,34 +57,27 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 
 ## Open questions for the owner
 
-Found while rewriting. None was decided by Claude. Where the docs had to say something, they say what is written after "Written as".
+Found while rewriting. None was decided by Claude. Where the docs had to say something, they say what is written after "Written as". Which parts of the architecture each one touches is in the proposal's [open questions](proposals/architecture/open-questions.md).
 
 ### Words and components
 
-1. **Transform or TransformComponent?** The principle says component names end in `Component`, but every source writes "Transform". Also assumed: `TagsComponent`.
-2. **Does the camera have an eye?** The review says no, but the old draft used it to hide everything inside the camera.
 3. **Can a variable hold text**, or only numbers?
 
 ### Editor
 
 4. **Does the Joint tool stay active after placing a joint?** An early decision said yes. A later one says tools return to Select. Written as: all tools return, and tool lock keeps one active.
-5. **Removing a component that others need.** The old rule removed the dependants too. With "nothing behind the user's back", suggested: remove only that one and let the other cards show their note.
-6. **Adding physics in one click:** does it add the SurfaceComponent together with the BodyComponent?
 7. **Text size by dragging a corner** was written before the text box existed. Keep?
 8. **The "entities here" right-click list:** the review kept only Alt+click. Dropped?
 9. **The Trigger zone tool** is in the tool list but has no version. Suggested v2, with triggers.
-10. **The level's name:** where is it shown and edited in v1? Written as: in the top bar, suggested v1.
 
 ### Files and limits
 
-11. **50 MB of files per level** (round 6) and a **256 MB level file** (round 11): do both stand?
-12. **The old draft's other limits:** 2,000 files in a level and 250 MB unpacked. Keep, change or drop?
 13. **Changing a builtin file:** assumed you copy it into your own folder first.
 
 ### Triggers and scripts
 
 14. **Spawn settings:** what the trigger's Spawn action offers (position, speed), now that `spawn(path)` returns an id.
-15. **Follow by tag:** can the camera's target be a tag, so a spawned player is found without a script?
+15. **Follow by tag:** can the camera's target be a tag, so a spawned player is found without a script? Not in v1 (owner, 2026-11-13). Still open for v2.
 16. **Inputs of a new level** (v2): suggested `left`, `right`, `up`, `down`, `jump`.
 
 ### Test play

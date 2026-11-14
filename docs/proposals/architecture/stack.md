@@ -1,0 +1,87 @@
+# Stack
+
+## TL;DR
+
+Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed** means the owner chose it; **recommended** means this proposal does, and the owner can refuse it (all were approved in review card D11). Five things are fixed: TypeScript, Vite, React, PixiJS 8 and Box2D v3. Beside them: Vitest and Playwright for tests, ESLint and Prettier for code quality, `box2d3-wasm` for Box2D, `clipper2-js` for polygons, `fflate` for zips, `idb` for browser storage, TanStack Virtual for the Layers panel, and the React Compiler. Lua and Monaco come with v2 and aren't installed in v1. **TypeScript is 6.0, not 7**, because the ESLint TypeScript tools don't support 7 yet.
+
+## Fixed
+
+| Package | Version | Note |
+|---|---|---|
+| `typescript` | 6.0.3 | 7.0 is out, but `typescript-eslint` 8.72 requires `<6.1.0`. Move to 7 when it supports it |
+| `vite` | 8.3.8 | Dev server and build |
+| `react`, `react-dom` | 19.3.1 | The panels only. React never holds the level, see [ui.md](ui.md) |
+| `@types/react`, `@types/react-dom` | 19.3.0 | |
+| `pixi.js` | 8.23.0 | Draws the level view, see [adapters.md](adapters.md) |
+| `box2d3-wasm` | 6.0.0 | Box2D v3.2 built to wasm. **Always imported as `box2d3-wasm/compat`**, see below |
+
+### Why `box2d3-wasm/compat`
+
+- The package's default import picks its SIMD and multi-threaded build when the page allows it, and its plain build otherwise. Two builds could give two results, which breaks [determinism](../../requirements/play-and-save/test-play.md#the-determinism-test--v1).
+- `compat` is the same build everywhere: the browser, the game worker and Node (where the determinism test runs). It needs no cross-origin isolation headers, so any static host works.
+- It is single precision. That is enough: the level ends 100,000 px (2,000 m) from the origin at most, which the package says is fine "within a few kilometres".
+- *Why not our own Emscripten build:* it adds a C toolchain to the project for no gain in v1. If the package stops being kept up, building it ourselves from the same Box2D commit is the fallback, and the physics version marks the change.
+
+## Recommended
+
+| Package | Version | Job | Why this one |
+|---|---|---|---|
+| `@vitejs/plugin-react` | 6.3.0 | React in Vite | The official plugin for Vite 8 |
+| `babel-plugin-react-compiler` | 1.0.0 | The React Compiler | Panels stay fast without hand-written `useMemo` and `memo`. The stable Babel version, not the experimental Rust one |
+| `@rolldown/plugin-babel` | 0.3.1 | Runs Babel inside Vite 8 | Required by the plugin for the compiler |
+| `@babel/core` | 8.1.2 | Babel itself | Same reason |
+| `vitest` | 5.1.0 | Unit tests | Uses the Vite config, so tests see the same code as the app |
+| `@vitest/browser-playwright` | 5.1.0 | Tests that need a real browser | Runs Vitest tests in Chromium, Firefox and WebKit |
+| `playwright`, `@playwright/test` | 1.65.1 | Browsers for tests, whole-app tests | One tool for both |
+| `eslint` | 10.15.0 | Checks the code | The import direction and banned calls are ESLint rules, see [parts-and-folders.md](parts-and-folders.md) |
+| `@eslint/js` | 10.0.1 | ESLint's base rules | |
+| `typescript-eslint` | 8.72.2 | TypeScript rules for ESLint | |
+| `eslint-plugin-react-hooks` | 7.1.1 | Hook rules and the React Compiler's checks | |
+| `prettier` | 3.10.1 | One code format | Formatting is never a review topic. Settings: 4 spaces, single quotes, 120 columns, matching the owner's TypeScript style |
+| `clipper2-js` | 1.2.4 | Cuts self-crossing polygons, triangulates | Integer arithmetic inside, so its results are the same on every computer. See [geometry](core-model/geometry.md) |
+| `fflate` | 0.8.3 | Makes and reads the `.editable` zip | Small, fast, and can stop unpacking at a size limit |
+| `idb` | 8.0.4 | A thin promise layer over IndexedDB | IndexedDB's own API is callback-based. `idb` adds no storage logic of its own |
+| `@tanstack/react-virtual` | 3.14.26 | Builds only the visible Layers rows | Fixed row height, no styling of its own, so drag and drop stays ours |
+| `@types/node` | 24.19.2 | Types for the Node tools and tests | |
+
+Node.js 24 runs the tools (Vitest 5 needs Node 22.12 or later).
+
+### Not installed until v2
+
+| Package | Version today | Job |
+|---|---|---|
+| `wasmoon` | 1.16.0 | Lua 5.4 in wasm, for scripts and for reading a script's settings |
+| `monaco-editor` | 0.57.0 | The code editor |
+
+Their versions are checked again when v2 starts.
+
+### Left out on purpose
+
+| Not used | Why |
+|---|---|
+| A state library (Redux, Zustand, MobX) | The core classes own their state and send change signals. React reads them through `useSyncExternalStore`, see [ui.md](ui.md) |
+| A CSS framework, CSS-in-JS, CSS Modules | Each React component has its own plain `.css` file scoped under its root class, as the owner's component rules say |
+| A UI component library | The editor needs a few plain controls (buttons, menus, number fields), and how each one works is in the requirements |
+| An ECS library | Entities and components are the game's own model with the owner's rules (one of each type, a tree, Layers order). A library would bring its own rules |
+| `poly-decomp`, `earcut` | `clipper2-js` already triangulates. One polygon library |
+| Box2D's debug draw | The physics view draws the game's own collision pieces (owner, 2026-11-13) |
+| `fake-indexeddb` and other browser imitations | Browser storage is tested in real browsers, see [testing.md](testing.md) |
+
+## Settings that matter
+
+**TypeScript** (`tsconfig.json` and one config per part):
+
+| Setting | Value | Why |
+|---|---|---|
+| `strict` | true | |
+| `erasableSyntaxOnly` | true | The owner's style: no `enum`, no parameter properties |
+| `verbatimModuleSyntax` | true | Forces `import type` |
+| `allowImportingTsExtensions`, `noEmit` | true | Imports end in `.ts` and `.tsx`, Vite compiles |
+| `noUncheckedIndexedAccess` | true | `array[i]` may be `undefined` |
+| `lib` for `src/core` and `src/editor` | `["ES2023"]`, no `DOM` | **The compiler itself refuses `window`, `document` or `HTMLElement` in the rules** |
+| `lib` for the game worker | `["ES2023", "WebWorker"]` | |
+| `lib` for `src/ui`, `src/adapters`, `src/app` | `["ES2023", "DOM", "DOM.Iterable"]` | |
+
+**Vite:** `react()` plus `babel({ presets: [reactCompilerPreset()] })`. Workers are built with Vite's `new Worker(new URL(...), { type: 'module' })`. The `.wasm` file is served as an asset and fetched on editor open, see [simulation.md](simulation.md).
+
+**Hosting** isn't decided by this proposal. The `compat` build needs no special headers, so any static host works in v1. The tech notes' reason for Cloudflare (headers by path) only matters if a later version needs cross-origin isolation.
