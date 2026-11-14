@@ -28,9 +28,10 @@ Source: round 1: D39; round 5: 03 2.1; old: DR-01 to DR-09
 - **Line:** an open chain of straight segments, 2 points or more. Each click adds a point, and Enter, Esc or double-click finishes. A single segment is a line with 2 points. Curved lines are paths. *Why a line is its own kind: Box2D calls it a chain and it is the usual way to make platformer ground.*
 - The size in px shows beside the mouse during a drag.
 - A rectangle or ellipse is at least 1 px on each side.
+- **A line drawn perfectly flat has a height of 0**, and typing a height for it is refused with a status text, because points all on one row can't be spread. To slope it, move a point. The same goes for its width when drawn perfectly upright (standing yes, 2026-11-14).
 - Limits: 1,000 points in a polygon or line. Above 200 a note says "High detail may slow physics".
 
-Source: scope DR1; round 5: TK2; round 7: SH1; old: DR-10 to DR-16
+Source: scope DR1; round 5: TK2; round 7: SH1; old: DR-10 to DR-16; owner: 2026-11-14
 
 ### W, A, S, D set the preview size · v3
 
@@ -124,8 +125,9 @@ Source: scope DR5; round 1: D22, D58; round 5: 03 2.8; old: DR-64 to DR-79
 - The plain colour picker: a colour square, a hue slider, a see-through slider, a colour code field and a fixed palette. One drag in the picker is one undo step.
 - In v1 new shapes start with one default look: fill `#4A90D9`, outline `#1F3552`, width 2.
 - **In v1 the fill is a colour field that can be emptied.** An empty fill paints nothing. *Why: v1 has only solid colours, so the fixed list of field types needs nothing new yet (owner: 2026-11-13).*
+- **Every StyleComponent value can change during play.** *Why: they only change the look, and the background colour, the World's fill, already changes during play (standing yes, 2026-11-14).*
 
-Source: round 1: D23; round 6: ST2; old: DR-90 to DR-94; owner: 2026-11-13
+Source: round 1: D23; round 6: ST2; old: DR-90 to DR-94; owner: 2026-11-13, 2026-11-14
 
 ### Gradients · v2
 

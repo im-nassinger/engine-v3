@@ -74,11 +74,12 @@ Source: owner: 2026-11-13, 2026-11-14
 - In the file: the level, its files (also unused ones), and editor-only data such as the grid size, locks and folded Entities panel rows.
 - Not in the file: undo history, and what stays in the browser: the view position, the zoom, the pinned seed and the values of kept variables.
 - **Import checks a file before loading it**, and is all or nothing: a file with a problem changes nothing and gets a plain message. The cases: not a level file, too big, damaged, made by a newer version of the game, missing a file it lists, over a limit.
+- **A value missing from a file reads as its default, and so does a whole TransformComponent or NameComponent**, which every entity has. A file without exactly one World and one camera is damaged: their components and children are the level, so they can't be made up (standing yes, 2026-11-14).
 - A level file that lists a file it doesn't contain is refused. A use of a file that doesn't exist is only a warning.
 - **A level from someone else is untrusted.** Its scripts get the same safe set of functions as any script, see [scripts](../scripts/scripts.md). Importing never starts play.
 - *Why v1: with one level in the browser, the project file is how you keep and move levels.*
 
-Source: round 1: D30; round 3: D79; round 5: FMT1; round 11: 12 A10; round 12: SV1, EXT1; old: SV-61, SV-64, SV-65, SV-68, SV-72, SV-82, SV-83
+Source: round 1: D30; round 3: D79; round 5: FMT1; round 11: 12 A10; round 12: SV1, EXT1; old: SV-61, SV-64, SV-65, SV-68, SV-72, SV-82, SV-83; owner: 2026-11-14
 
 ### The file format version · v1
 

@@ -8,7 +8,7 @@ v1 in **18 small stages**, each tested on its own before the next starts. The or
 
 - A stage starts by reading its docs and ends with its tests passing, ESLint and the type checks clean, its speed numbers (if any) written down, `docs/progress.md` updated, and a commit.
 - A stage never builds something a later stage owns. If it needs a piece early, it builds the smallest version and says so in progress.
-- Anything the requirements don't answer becomes an open question, not a silent decision.
+- Anything the requirements don't answer is decided by Claude under the owner's standing yes (2026-11-14), never silently: the decision is written into the docs with its reason and listed in [decisions.md](decisions.md). A stage's plan is written into the architecture docs as the stage is built, not proposed first.
 
 ## Stages
 

@@ -12,7 +12,8 @@ What the player sees. There is exactly one camera, an entity with a CameraCompon
 - It can't be deleted or duplicated, and a second one can't be added. It always sits directly inside the World.
 - In the Entities panel it is an ordinary row. Where it sits changes nothing, because what is inside the camera is always drawn over the level.
 - The editor's own view is separate. Panning or zooming the editor never changes the camera.
-- The camera's position is the centre of what it shows. The default camera is **1920×1080**.
+- The camera's position is the centre of what it shows. The default camera is **1920×1080**. **Width and height each go from 160 to 7,680 px**, the range v3's custom View size already allows, so v3 never refuses a saved level. *Why: the one range already in the requirements (standing yes, 2026-11-14).*
+- **The camera's width and height can't change during play.** It is the area every player sees; zoom in v3 is the way to change it (standing yes, 2026-11-14).
 - A new level's camera starts at the level's origin, which is the middle of the level bounds. *Why: the World's rectangle is centred on the origin (owner: 2026-11-13).*
 - In the level view the camera shows as a frame of what players will see. Clicking inside the frame goes through to the level behind it. Clicking its edge selects the camera.
 - **Dragging a corner of the frame keeps its proportions, so it only zooms.** Width and height are typed in the CameraComponent. *Why: a corner drag that changed the shape would quietly change what players see.*
@@ -22,7 +23,7 @@ What the player sees. There is exactly one camera, an entity with a CameraCompon
 - The window's size never reaches the game, and scripts can't read it. Camera modes only change what is visible.
 - "Camera frame" in the View menu hides the frame.
 
-Source: round 1: C4; round 5: 02 2.15; round 7: 07 2.1, 07 2.7, 07 2.15, BND2; round 8: CA1, VW1; old: CM-01 to CM-10, CM-17 to CM-21, CM-58, CM-97; owner: 2026-11-13
+Source: round 1: C4; round 5: 02 2.15; round 7: 07 2.1, 07 2.7, 07 2.15, BND2; round 8: CA1, VW1; old: CM-01 to CM-10, CM-17 to CM-21, CM-58, CM-97; owner: 2026-11-13, 2026-11-14
 
 ### Fixed size · v1
 
@@ -48,7 +49,7 @@ Source: scope CM4; round 1: D48, D49, D55; round 2: O10; round 7: 07 2.2, 07 2.1
 ### Follow an entity · v1
 
 - The CameraComponent has a follow target: an entity, picked like any entity field.
-- **Smoothing** is one value for both directions: roughly how long the camera takes to catch up, in seconds. 0 locks the camera to the target. *Why one value: the owner rejected separate values per direction.*
+- **Smoothing** is one value for both directions: roughly how long the camera takes to catch up, in seconds. 0 locks the camera to the target. It goes from 0 to 5 s and **starts at 0.3 s**. *Why one value: the owner rejected separate values per direction. Why 0.3 s: soft enough that a jump doesn't jerk the view, quick enough that a running player stays near the centre (standing yes, 2026-11-14).*
 - When play starts the camera is already on its target, with no opening pan.
 - **The camera stops at the level bounds, slowing down gently.** It always ends up inside. Moves made by scripts are limited too.
 - The limit uses the view the player really has, so a wide window never sees past the bounds.
@@ -58,7 +59,7 @@ Source: scope CM4; round 1: D48, D49, D55; round 2: O10; round 7: 07 2.2, 07 2.1
 - Deleting the target in the editor shows the `missing entity` warning on the field.
 - **There is no special player.** To start a level somewhere else, move the entity the camera follows.
 
-Source: scope CM1; round 1: D52; round 7: 07 2.4, 07 2.5; round 9: 11 2.5; old: CM-29, CM-34, CM-39, CM-40, CM-43 to CM-48
+Source: scope CM1; round 1: D52; round 7: 07 2.4, 07 2.5; round 9: 11 2.5; old: CM-29, CM-34, CM-39, CM-40, CM-43 to CM-48; owner: 2026-11-14
 
 ### Follow a tag · v2
 

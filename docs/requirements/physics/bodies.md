@@ -102,7 +102,7 @@ Source: scope PH5; round 6: 05 2.10; round 7: OW1; old: PH-47 to PH-57
 
 - **A shape inside a group with a body merges into the group's body, unless merging is unticked.** A car body made of three shapes moves as one piece.
 - It merges into the nearest group above it that has a body. Groups without a body in between are skipped.
-- **Whether a child merges is the Merge checkbox on its BodyComponent**, on by default. A shape with a SurfaceComponent and no BodyComponent always merges into the body above it; to give it a body of its own, add a BodyComponent and untick Merge. *Why: it belongs with the body settings it greys out (owner: 2026-11-13).*
+- **Whether a child merges is the Merge checkbox on its BodyComponent**, on by default. A shape with a SurfaceComponent and no BodyComponent always merges into the body above it; to give it a body of its own, add a BodyComponent and untick Merge. *Why: it belongs with the body settings it greys out (owner: 2026-11-13).* **Merge can't change during play**, because play builds the bodies once at the start (standing yes, 2026-11-14).
 - **Nothing is lost when it changes.** A merged shape keeps its own body settings, greyed, and gets them back when unmerged. Grouping, ungrouping, adding and removing bodies and dragging out never destroy data.
 - The body decides how everything moves. Each surface keeps its own density, friction, restitution and sensor, so one body can mix them.
 - A child with no physics inside a group with a body follows the body and doesn't collide.
@@ -110,7 +110,7 @@ Source: scope PH5; round 6: 05 2.10; round 7: OW1; old: PH-47 to PH-57
 - A merged shape's own body type doesn't matter: the group's wins.
 - Bodies that overlap at the start of play are pushed apart. Not an error.
 
-Source: scope PH4; round 1: C8; round 6: 05 2.6; old: PH-24 to PH-31; owner: 2026-11-13
+Source: scope PH4; round 1: C8; round 6: 05 2.6; old: PH-24 to PH-31; owner: 2026-11-13, 2026-11-14
 
 ### Scale, rotate and skew freely · v1
 

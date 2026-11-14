@@ -9,15 +9,15 @@ The level-wide physics settings, all on the World entity. **v1:** gravity streng
 ### Gravity and background colour · v1
 
 - The World has a **PhysicsWorldComponent** holding gravity, game speed and the collision grid. *Why one component: all world physics settings in one place.*
-- **Gravity** is a strength and a direction. Strength is in m/s², from 0 to 100, **default 9.8**. Direction is Down, Up, Left, Right or a custom angle, default Down.
+- **Gravity** is a strength and a direction. Strength is in m/s², from 0 to 100, **default 9.8**. Direction is Down, Up, Left, Right or a custom angle, default Down. **The custom angle starts at 90°**, which is down, and takes any angle, like Rotation, so picking Custom never flips gravity by surprise (standing yes, 2026-11-14).
 - Gravity is stored as strength and direction, so zero gravity keeps its direction for when the strength returns.
 - Sizes and speeds are in pixels. Gravity is in m/s², like real life, and mass is in kg. These are the only physical units.
 - The 9.8 default feels floaty for a platformer. The fix is the player's Gravity scale, not the world's gravity: the builtin platformer script sets it from its jump settings.
-- **The background colour is the fill of the World's StyleComponent**, which paints the World's rectangle, the level bounds. A soft light blue by default. *Why: a StyleComponent already holds a fill, so the background needs no setting of its own, and in v3 an image fill becomes the background image (owner: 2026-11-13).*
-- Triggers and scripts can change gravity and the background colour during play. Changing gravity wakes every sleeping body, so nothing hangs in mid-air.
+- **The background colour is the fill of the World's StyleComponent**, which paints the World's rectangle, the level bounds. A soft light blue by default, **`#BFE3F5`**, with no outline, because the editor already draws the bounds as a thin frame. *Why: a StyleComponent already holds a fill, so the background needs no setting of its own, and in v3 an image fill becomes the background image (owner: 2026-11-13). Why this blue: every default shape colour stands out on it (standing yes, 2026-11-14).*
+- Triggers and scripts can change gravity and the World's whole StyleComponent during play, the background colour included. **Walls can't change during play**, because the bounds don't (standing yes, 2026-11-14). Changing gravity wakes every sleeping body, so nothing hangs in mid-air.
 - The World's settings are edited in the Inspector, like any entity's.
 
-Source: scope PH9; round 1: C3, D6, D38; round 3: D75, R15; round 6: 05 2.14; round 7: CF1; old: PH-82 to PH-84, PH-88, PH-89; owner: 2026-11-13
+Source: scope PH9; round 1: C3, D6, D38; round 3: D75, R15; round 6: 05 2.14; round 7: CF1; old: PH-82 to PH-84, PH-88, PH-89; owner: 2026-11-13, 2026-11-14
 
 ### Buttons for gravity · v3
 

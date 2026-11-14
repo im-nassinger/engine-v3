@@ -1,6 +1,6 @@
 # engine-v3
 
-A 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved (2026-11-14). Stages 0 (project setup) and 1 (the model) of `docs/plan.md` are done; the work goes stage by stage from there.
+A 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved (2026-11-14). The work goes stage by stage through `docs/plan.md`; `docs/progress.md` says which stage is current.
 
 Start at `docs/README.md`, then `docs/progress.md`.
 
@@ -8,7 +8,7 @@ Start at `docs/README.md`, then `docs/progress.md`.
 
 - **Use the glossary's words exactly** (`docs/glossary.md`), and never a dropped word. One word, one meaning. If a new word is needed, add it to the glossary first.
 - **Before proposing anything**, read `docs/principles.md` and check `docs/rejected.md`.
-- **Never invent a requirement, a version or a reason.** What the owner hasn't decided goes in the open questions of `docs/progress.md`, and several at once go on the review page `docs/review.html`.
+- **The owner's standing yes (2026-11-14):** the important decisions are made, so Claude decides the smaller questions itself and keeps building without waiting. Each such decision is written where it belongs, with its reason, marked `(standing yes, <date>)`, and listed in `docs/decisions.md` so the owner can review it later. Never invent a reason, and never silently override an owner decision: if one can't be built as written, pick the closest fix, record it the same way, and say so in `docs/progress.md`.
 - **Requirements say what the game does, not how it is built.** Notes on how go in `docs/tech-notes.md`.
 - A requirement file follows the format in `docs/requirements/README.md`: a version on every feature heading, a `Source:` line under every feature.
 - **Run `npm run check` before every commit.** It runs the type checks, ESLint, Prettier's check, dependency-cruiser, the unit and guard tests, and `tools/check-docs.js`. See `docs/architecture/tooling.md`.

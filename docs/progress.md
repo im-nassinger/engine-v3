@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**, which waits for the owner. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **Stage 2's plan waits for the owner:** [proposals/stage-2.md](proposals/stage-2.md) and round 10 on the [review page](review.html) (2026-11-14). Nothing of stage 2 is built.
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**, which waits for the owner. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **The owner gave a standing yes** (2026-11-14): Claude decides the smaller questions and keeps building without waiting, listing each decision in [decisions.md](decisions.md). Round 10 was settled that way. **Stage 2 is being built** from [proposals/stage-2.md](proposals/stage-2.md).
 
 ## Where things stand
 
@@ -20,8 +20,8 @@
 | Small features without a version | Done: all given a version in round 7 |
 | Stage 0, project setup | Done, except the first CI run, which needs a push. See below |
 | Stage 1, the model | Done on 2026-11-14. See below |
-| The stage 2 plan | Proposed on 2026-11-14, waiting for the owner: [proposals/stage-2.md](proposals/stage-2.md), round 10 |
-| Code | Stages 0 and 1 done. Next: stage 2 of [plan.md](plan.md), once its plan is answered |
+| The stage 2 plan | Approved under the standing yes on 2026-11-14, with round 10: [proposals/stage-2.md](proposals/stage-2.md) |
+| Code | Stages 0 and 1 done. Stage 2 in progress |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -65,6 +65,10 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 - **Round 9** (owner): a name is never empty (an empty one in a file makes it damaged) and reads as `Entity` when missing; names can't change during play; only position and rotation change during play; the five hover descriptions as proposed; a level name past 60 characters is refused, not cut; **stage 3 tries `clipper2-ts` first**. See [selection.md](requirements/editor/selection.md), [inspector-and-undo.md](requirements/editor/inspector-and-undo.md), [saving.md](requirements/play-and-save/saving.md) and [geometry.md](architecture/core-model/geometry.md).
 
+### Settled under the standing yes, 2026-11-14
+
+- **Round 10**, every card at Claude's pick: see [decisions.md](decisions.md#decided-under-the-standing-yes).
+
 ### Stage 1, built on 2026-11-14
 
 - All eight steps of the approved plan are done, one commit each, and the plan file is deleted. Its decisions are in [core-model/](architecture/core-model/README.md); what stays for later is in [plan.md](plan.md).
@@ -83,7 +87,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 ## Next
 
 1. **Push, when the owner asks,** so CI runs for the first time on x86 and ARM (step 7 of stage 0).
-2. **Stage 2 of [plan.md](plan.md): the v1 components and the file format.** Its plan is [proposals/stage-2.md](proposals/stage-2.md); the work starts when the owner answers round 10.
+2. **Stage 2 of [plan.md](plan.md): the v1 components and the file format**, following [proposals/stage-2.md](proposals/stage-2.md).
 3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
@@ -98,6 +102,4 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 
 ## Open questions for the owner
 
-**Round 10** on the [review page](review.html) (2026-11-14): the stage 2 plan, the background colour, custom gravity's angle, the grid size's range, the camera's size range and smoothing, three joint gaps, a flat line's height, which values change during play, files missing a TransformComponent or NameComponent, and the new fields' descriptions.
-
-When several come up, they go on the [review page](review.html) all at once, not a few per round (owner, 2026-11-14).
+None waiting. Under the owner's standing yes (2026-11-14), Claude decides what the docs don't answer and lists it in [decisions.md](decisions.md#decided-under-the-standing-yes) for the owner to review whenever they like. The [review page](review.html) holds only round 10's record.

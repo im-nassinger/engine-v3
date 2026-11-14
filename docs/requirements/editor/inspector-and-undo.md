@@ -67,11 +67,11 @@ Source: round 3: 01 2.5; old: WS-114, WS-115, WS-119 to WS-122, WS-125, WS-126; 
 - `Add Component` sits at the bottom of the cards and opens a searchable menu. Components the entity already has are not listed, because an entity has one of each type.
 - **Adding a component that needs a partner doesn't add the partner.** The card shows a note with a button, such as "Needs a ShapeComponent to draw anything. [Add ShapeComponent]". *Why: adding the partner automatically surprises you, and refusing is annoying when you were about to add it next. A note with a one-click fix is clear and never in the way.*
 - **Every partner note reads "Needs a X to Y. [Add X]"**, such as "Needs a SurfaceComponent to collide. [Add SurfaceComponent]". *Why: one pattern, so every note reads the same (owner: 2026-11-13).*
-- The TransformComponent, the camera's CameraComponent and the World's own components can't be added or removed by hand. The menu entry is disabled and says why.
+- The TransformComponent, the camera's CameraComponent and the World's own components can't be added or removed by hand, and neither can a JointComponent, which only the [Joint tool](../physics/joints.md#the-joint-tool--v1) adds. The menu entry is disabled and says why.
 - With several entities selected, Add Component adds to every entity that lacks it, and Remove removes from all.
 - **Removing a component that others need removes only that one.** The cards left without their partner show their note. Example: removing a crate's ShapeComponent leaves its SurfaceComponent, whose card then shows its note with an [Add ShapeComponent] button. *Why: nothing happens behind the user's back, and undo brings the component back.*
 
-Source: round 5: AD2; old: WS-101, WS-102, WS-106, WS-112; owner: 2026-11-13
+Source: round 5: AD2; old: WS-101, WS-102, WS-106, WS-112; owner: 2026-11-13, 2026-11-14
 
 ### Copy values and components · v3
 

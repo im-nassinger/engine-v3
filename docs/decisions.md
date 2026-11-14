@@ -63,6 +63,16 @@ Every setup was first tried in a throwaway folder outside the project. The propo
 
 The owner approved the three places where the stage 1 plan differs from the architecture docs. **Imports in core go one way**, entities → components → fields → events. **`DeterministicMath`'s `sin`, `cos`, `atan2` and `sinCos` are built in stage 1**, because `Matrix2D` needs them and core bans `Math.sin`. **Skew is strictly between −90° and 90°.** They are written into [core-model/](architecture/core-model/README.md), [plan.md](plan.md) and [inspector-and-undo.md](requirements/editor/inspector-and-undo.md).
 
+## 2026-11-14: The owner's standing yes
+
+The owner: "from now on, I agree with all your decisions, since they are minor decisions (the important ones are already decided). so you can just implement the project without waiting for me." So **Claude decides what the docs don't answer and keeps building.** A stage's plan is no longer proposed first: its decisions are written into the architecture docs as the stage is built. Each decision made this way is written where it belongs, with its reason, marked *(standing yes, date)* or cited `owner: <date>` on a `Source:` line, and listed below so the owner can review them in one place and overturn any.
+
+### Decided under the standing yes
+
+| Date | Decision | Written in |
+|---|---|---|
+| 2026-11-14 | Round 10 took every pick: the stage 2 plan with its eight changes; background `#BFE3F5` with no outline; custom gravity angle starts at 90°; grid size 5 to 1,000 px, whole; camera 160 to 7,680 px each way; Smoothing 0 to 5 s, starting at 0.3 s; joints only from the Joint tool; one shared Match drawn distance; Length and Rest length 100 px when missing; a flat line has height 0; StyleComponent values change in play, the camera's size, Walls and Merge don't; a missing TransformComponent or NameComponent reads as defaults; the descriptions as proposed | [world](requirements/physics/world.md), [workspace](requirements/editor/workspace.md), [camera](requirements/camera.md), [joints](requirements/physics/joints.md), [drawing](requirements/drawing.md), [bodies](requirements/physics/bodies.md), [saving](requirements/play-and-save/saving.md), [inspector](requirements/editor/inspector-and-undo.md), [components](architecture/core-model/components-and-fields.md), [persistence](architecture/persistence.md) |
+
 ## Still to decide
 
-Nothing is open. New questions go in [progress.md](progress.md) and, when there are several, all at once on the [review page](review.html).
+Nothing waits for the owner. Under the standing yes, new questions are decided and listed above instead of asked.

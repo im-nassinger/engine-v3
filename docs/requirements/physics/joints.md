@@ -62,8 +62,9 @@ Source: round 1: D41, D42; round 6: 06 2.1; round 8: JV2; decisions: D46; old: J
 - A preview shows what will be connected before you click, with a label such as "Hinge: Wheel to Car".
 - Clicking with no physics entity under the mouse does nothing and shows a hint.
 - Making a joint is one undo step. The new joint is selected.
+- **Joints come only from the Joint tool.** The JointComponent is in the Add Component menu, disabled, with "Use the Joint tool to place a joint." *Why: added by hand, a joint would have no ends and no A, and would do nothing until deleted and placed again, since re-attaching an end is v3 (standing yes, 2026-11-14).*
 
-Source: round 6: 06 2.2; round 7: 06 2.3; round 5: TK2; old: JT-04 to JT-25
+Source: round 6: 06 2.2; round 7: 06 2.3; round 5: TK2; old: JT-04 to JT-25; owner: 2026-11-14
 
 ### Settings of each joint · v1
 
@@ -100,6 +101,8 @@ Spring:
 | Stiffness | Bounces per second. Higher is firmer | 0.1 to 15 | 2 |
 | Damping | How fast the bouncing dies out. 0 keeps bouncing, 1 settles at once | 0 to 1 | 0.3 |
 
+- **Rope and Spring share one Match drawn distance setting**, so switching a Rope to a Spring in v3 keeps it, and Lua has one `match_drawn_distance` (standing yes, 2026-11-14).
+- **Length and Rest length read as 100 px when a file leaves them out.** The Joint tool always sets them from the drawn gap, so only a file edited by hand can leave one out (standing yes, 2026-11-14).
 - Limits always include the placed position: Min can't go above 0 and Max can't go below 0.
 - Limits are measured from how the joint was built, so turning things in the editor never makes them wrong.
 - **Triggers and scripts can drive a joint's motor or destroy it, and react when it is destroyed.** The trigger or script doesn't have to sit on the joint.
@@ -107,7 +110,7 @@ Spring:
 - These can change during play: motor on or off, motor speed and strength, limits, resistance, length, rest length, stiffness, damping. The type, the two entities and the ends can't.
 - A motor pushing against a limit holds there.
 
-Source: scope JO1; round 7: 06 2.5, 06 2.14, 06 2.15; old: JT-36 to JT-38, JT-79, JT-81 to JT-84
+Source: scope JO1; round 7: 06 2.5, 06 2.14, 06 2.15; old: JT-36 to JT-38, JT-79, JT-81 to JT-84; owner: 2026-11-14
 
 ### Settings of the v3 joints · v3
 
