@@ -22,6 +22,8 @@ Source: scope LU1; round 1: C12; round 3: S2; round 4: FT1; round 5: R45; round 
 
 ## How a script works
 
+The examples below use only functions the review named. How a script names its own entity, declares its settings and reads or changes values is still open, see [the Lua API proposal](../../proposals/lua-api.md), so the examples don't use them yet.
+
 ### Events with `on()` · v2
 
 - **Scripts and triggers share one list of events, with the same names.** A script listens with `on(name, function)`.
@@ -33,6 +35,26 @@ Source: scope LU1; round 1: C12; round 3: S2; round 4: FT1; round 5: R45; round 
 - A touch event fires once per pair of entities, even when a polygon is split into pieces. Both sides get it.
 - The game runs 60 ticks per second.
 
+```lua
+-- button.lua: a trigger on the button fires "pressed" on it,
+-- and this script passes it on to the door as "open"
+on("pressed", function()
+  fire_event(get_entity_by_name("Door"), "open")
+end)
+
+-- door.lua: reacts to the custom event "open"
+on("open", function()
+  print("The door opens")
+end)
+
+-- runs 60 times a second
+on("tick", function()
+  if is_down("jump") then
+    print("jump is held")
+  end
+end)
+```
+
 Source: scope LU1; round 9: 10 2.3; round 10: EV1; round 1: D4; old: LU-22, LU-23, LU-25, LU-27; owner: 2026-11-13
 
 ### Handles, not references · v2
@@ -41,6 +63,12 @@ Source: scope LU1; round 9: 10 2.3; round 10: EV1; round 1: D4; old: LU-22, LU-2
 - **A destroyed id simply no longer exists.** There are no object references to keep alive. *Why: the owner rejected an object-style API.*
 - Scripts find entities three ways: by name, by tag, or through an entity setting the script declares, picked in the Inspector.
 - An id is never reused during a run, so a stored id can never point at a newer entity.
+
+```lua
+local car = get_entity_by_name("Car")             -- an id, which is a number
+local body = get_component(car, "BodyComponent")  -- the id of the car's BodyComponent
+destroy(car)                                      -- from now on the car's id no longer exists
+```
 
 Source: round 3: D66; round 9: 10 2.2; old: LU-13, LU-18; owner: 2026-11-13
 
@@ -57,6 +85,13 @@ Source: round 1: D3; round 9: 10 2.7, 10 2.8; old: LU-57 to LU-62; owner: 2026-1
 - `spawn(path)` takes the path of an `.entity` file and **returns the new entity's id, which can be used straight away**, such as to set its speed. *Why: it fits handles, not references.*
 - The rules for spawned entities are in [entity files](../assets/entity-files.md).
 
+```lua
+on("fire", function()
+  local bolt = spawn("projectiles/bolt.entity")  -- the new entity's id, usable at once
+  print("Fired bolt", bolt)
+end)
+```
+
 Source: scope TR7; round 3: D67; round 9: 10 2.4; old: LU-33 to LU-38; owner: 2026-11-13
 
 ### `wait(2)` · v2
@@ -65,6 +100,15 @@ Source: scope TR7; round 3: D67; round 9: 10 2.4; old: LU-33 to LU-38; owner: 20
 - Destroying the entity cancels its waits. Code after the wait then never runs.
 - Waits count game time, so they slow down with the game speed.
 - *Why v2: small, and scripts without it get clumsy fast.*
+
+```lua
+-- door.lua
+on("open", function()
+  print("The door opens")
+  wait(2)                               -- the rest of the game keeps going
+  destroy(get_entity_by_name("Door"))   -- 2 seconds later, unless the door was destroyed first
+end)
+```
 
 Source: scope LU5; round 9: 10 2.5; old: LU-39 to LU-42; owner: 2026-11-13
 
@@ -104,6 +148,15 @@ The areas the API covers:
 - **Scripts can read the real date and time.** *Why: the owner said reading the clock is fine. The determinism test fixes the clock the same way it fixes the seed.*
 - The v3 features bring their functions with them: sound, the mouse (`is_mouse_down("left")`, `mouse_position()`, `mouse_screen_position()`, `level_to_screen(x, y)`, `screen_to_level(x, y)`), game speed, camera shake.
 
+```lua
+-- v3: the mouse
+on("tick", function()
+  if is_mouse_down("left") then
+    print(mouse_position())
+  end
+end)
+```
+
 Source: round 9: 10 2.7; round 10: API1, 11 2.18; round 11: CL1; round 12: MS2; old: section 2.7 of 10; owner: 2026-11-13
 
 ### The API only grows · v2
@@ -125,12 +178,21 @@ Source: round 9: 10 2.19; round 10: API1; round 11: 12 A12; old: LU-143, LU-151;
 - `math.random` uses the run's seed.
 - The library tables are read-only, so one script can't change `math` for every other script.
 
+```lua
+local roll = math.random(1, 6)  -- from the run's seed: the same seed gives the same rolls
+print(io)                       -- nil: io isn't there
+```
+
 Source: round 3: D78; round 9: 10 2.17; round 10: SB1; old: LU-03, section 2.17 of 10; owner: 2026-11-13
 
 ### Scripts can't freeze the editor · v2
 
 - **The game runs separately from the editor**, so an endless loop never freezes the editor, and Stop always works.
 - **There is no limit on how much work a script does per tick.** *Why: the owner rejected per-script work limits.*
+
+```lua
+while true do end  -- the run hangs, but the editor doesn't, and Stop still works
+```
 
 Source: round 9: 10 2.11; round 10: LP1; old: LU-88; owner: 2026-11-13
 
@@ -141,6 +203,15 @@ Source: round 9: 10 2.11; round 10: LP1; old: LU-88; owner: 2026-11-13
 - **Test play pauses at the first error**, and the Console opens by itself.
 - Players only see a small notice when a script stops.
 - A script with a mistake that stops it from loading doesn't start. The level still plays.
+
+```lua
+on("tick", function()
+  local door = get_entity_by_name("Door")
+  print(door.name)  -- error: an id is a number, not an object
+end)
+-- The Console shows the error with the file, line, entity and time.
+-- Test play pauses, this script stops, and the rest of the level carries on.
+```
 
 Source: round 3: D68; round 9: 10 2.12; round 10: 11 2.9, UI1; old: LU-95 to LU-97; owner: 2026-11-13
 
