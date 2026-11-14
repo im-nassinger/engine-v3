@@ -155,10 +155,10 @@ Source: scope SE5; round 2: O7; old: SG-85
 
 ### Moving between groups keeps the place on screen · v1
 
-- Moving an entity into or out of a group keeps it exactly where it is on screen. The editor works out its new Transform from the group's, including rotation, scale and **skew**. Its Inspector values change, because they are measured from the new parent.
+- Moving an entity into or out of a group keeps it exactly where it is on screen. The editor works out its new TransformComponent from the group's, including rotation, scale and **skew**. Its Inspector values change, because they are measured from the new parent.
 - If the move changes which body the entity belongs to, the editor warns first.
 - Undo restores the old numbers.
-- *Why skew: a Transform is measured from the parent. Position, rotation, scale and skew together describe any mix of moves, turns and stretches, so the result is always exact. Without skew, a rotated entity inside a stretched group would have to change shape.*
+- *Why skew: a TransformComponent is measured from the parent. Position, rotation, scale and skew together describe any mix of moves, turns and stretches, so the result is always exact. Without skew, a rotated entity inside a stretched group would have to change shape.*
 
 Source: round 6: RP1; old: SG-135 to SG-137
 
@@ -214,7 +214,7 @@ Source: scope SE11; round 1: C5; round 3: R17; round 5: 02 2.13, FMT1; decisions
 |---|---|---|
 | Select | From its row, alone. Clicking empty space shows it in the Inspector | From its row, or by the edge of its frame |
 | Move | No | Yes |
-| Rename, hide | No | Rename yes. It has no eye |
+| Rename, hide | No | Yes. Hiding it hides everything inside the camera |
 | Reorder in the Layers panel | No, it is the root | Yes, but always directly inside the World |
 | Delete, duplicate, copy, group | No | No |
 | Hold children | Yes | Yes |
@@ -222,7 +222,7 @@ Source: scope SE11; round 1: C5; round 3: R17; round 5: 02 2.13, FMT1; decisions
 - There is exactly one World and exactly one camera. A second camera can't be added.
 - Entities inside the camera are ordinary entities. Single clicks in the level view pass through them, so they never block the level. Double-clicking the camera frame goes into the camera. See [camera](../camera.md).
 
-Source: round 1: C3, C4; round 5: 02 2.15; round 7: 07 2.1; round 8: HUD1; old: SG-129 to SG-134
+Source: round 1: C3, C4; round 5: 02 2.15; round 7: 07 2.1; round 8: HUD1; old: SG-129 to SG-134; owner: 2026-11-13
 
 ## Speed targets
 

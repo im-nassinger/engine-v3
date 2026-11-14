@@ -25,6 +25,7 @@ Running a level and keeping it. **In v1** Play runs a copy of the level with the
 | The determinism test | v1 | test-play |
 | The random seed | v2 | test-play |
 | One level, saved in the browser | v1 | saving |
+| The level's name | v1 | saving |
 | The level saves itself | v1 | saving |
 | A warning when saving fails | v1 | saving |
 | Ask the browser to keep the saved level | v1 | saving |

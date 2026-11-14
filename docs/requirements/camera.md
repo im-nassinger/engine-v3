@@ -8,7 +8,7 @@ What the player sees. There is exactly one camera, an entity with a CameraCompon
 
 ### One camera · v1
 
-- A level has exactly one camera: an entity with a Transform and a CameraComponent. New levels start with it.
+- A level has exactly one camera: an entity with a TransformComponent and a CameraComponent. New levels start with it.
 - It can't be deleted or duplicated, and a second one can't be added. It always sits directly inside the World.
 - In the Layers panel it is an ordinary row. Where it sits changes nothing, because what is inside the camera is always drawn over the level.
 - The editor's own view is separate. Panning or zooming the editor never changes the camera.
@@ -17,10 +17,11 @@ What the player sees. There is exactly one camera, an entity with a CameraCompon
 - **Dragging a corner of the frame keeps its proportions, so it only zooms.** Width and height are typed in the CameraComponent. *Why: a corner drag that changed the shape would quietly change what players see.*
 - **The camera never rotates**, in the editor or in play, and doesn't turn with what it follows.
 - The camera can hold tags, triggers and scripts.
+- **The camera has an eye icon like every row.** Hiding it hides everything inside the camera, in the editor and in play. *Why: hiding applies to children for every entity, so the camera is not a special case.*
 - The window's size never reaches the game, and scripts can't read it. Camera modes only change what is visible.
 - "Camera frame" in the View menu hides the frame.
 
-Source: round 1: C4; round 5: 02 2.15; round 7: 07 2.1, 07 2.7, 07 2.15, BND2; round 8: CA1, VW1; old: CM-01 to CM-10, CM-17 to CM-21, CM-58, CM-97
+Source: round 1: C4; round 5: 02 2.15; round 7: 07 2.1, 07 2.7, 07 2.15, BND2; round 8: CA1, VW1; old: CM-01 to CM-10, CM-17 to CM-21, CM-58, CM-97; owner: 2026-11-13
 
 ### Fixed size · v1
 
@@ -146,7 +147,7 @@ Left over from the old draft and not asked about in the review. The last column 
 
 | Feature | Rule | Suggested |
 |---|---|---|
-| Follow by tag | The target could be a tag, so a spawned player is found without a script. The entity highest in the Layers panel would win | Needs a decision |
+| Follow by tag | The target could be a tag, so a spawned player is found without a script. The entity highest in the Layers panel would win. Not v1: in v1 the target is an entity, and a tag can be added later without changing saved levels (owner: 2026-11-13) | v2 or later |
 | Safety margin | However soft the smoothing, the target is never allowed within 10% of the view's edge. A teleport far away becomes a cut, not a long pan | v1 |
 | Follow each direction separately | Switch following sideways or up and down off, for fixed-height side-scrollers | v3 |
 | Follow style presets | Platformer, Free, Vehicle, Locked. They only fill in values. The review dropped presets on other components | Later |
@@ -154,6 +155,5 @@ Left over from the old draft and not asked about in the review. The last column 
 | View through camera | The level view becomes a read-only preview of what players see, at a chosen window shape | v3 |
 | Bar colour | The colour of the bars, black by default | v3 |
 | View size list | A dropdown of common sizes (16:9, 16:10, 4:3, 1:1, 9:16), all 1080 high, plus custom from 160 to 7680 | v3 |
-| Hiding the camera's children | The camera's eye would hide everything inside it, in the editor and in play. The review says the camera has no eye | Needs a decision |
 
 Source: old: CM-13, CM-22, CM-25 to CM-28, CM-30, CM-31, CM-33, CM-37, CM-38, CM-49, CM-83

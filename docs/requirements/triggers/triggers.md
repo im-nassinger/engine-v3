@@ -100,7 +100,7 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27; owner: 2026-11-13
 | Win, Lose | Ends the run as won or lost |
 | Restart | Restarts the level |
 
-- **If it's data, change it with Change value.** One action covers teleporting (the Transform's position), variables (on the World's VariablesComponent), tags, switching triggers on or off, a joint's motor, the camera's zoom and follow target, gravity. *Why: the owner pointed out that teleporting is just changing a component value. What is left on the list does something no value can.*
+- **If it's data, change it with Change value.** One action covers teleporting (the TransformComponent's position), variables (on the World's VariablesComponent), tags, switching triggers on or off, a joint's motor, the camera's zoom and follow target, gravity. *Why: the owner pointed out that teleporting is just changing a component value. What is left on the list does something no value can.*
 - Change value only offers values that are allowed to change during play.
 - **A destroyed entity disappears at the end of the tick**, so the actions after Destroy in the list still run.
 - **Wait** is one action in the list. A trigger that fires again during a wait gets its own run, so two enemies in a "wait, then destroy other" trigger both die. Destroying the entity, or switching the trigger off, cancels what is still waiting. *Why a list with Wait: without a list, "add a coin, play a sound, destroy this" needs three triggers with the same When.*

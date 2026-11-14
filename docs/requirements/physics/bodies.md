@@ -12,6 +12,7 @@ Field names are Box2D's, so the Inspector, the Lua API and tutorials match. The 
 
 - The editor says **Body** for how something moves and **Surface** for how it collides. A Surface is what Box2D calls a shape, and older Box2D a "fixture". *Why not "shape": it would clash with ShapeComponent.*
 - One click adds a BodyComponent as **Static**, **Dynamic** or **Kinematic**.
+- **The click adds only the BodyComponent.** If the entity has a ShapeComponent but no SurfaceComponent, the BodyComponent's card shows a note with an [Add SurfaceComponent] button. Adding a body to a group adds nothing to the shapes inside it. *Why: nothing happens behind the user's back. A body on a group whose shapes already have surfaces needs nothing more, so adding surfaces automatically would often be wrong.*
 - Adding a body to an entity with children makes them one solid thing: the shapes inside merge into that body.
 - New shapes have no physics until you add it.
 - The type is a three-way switch with a plain line under it, and a hint saying what collides with what.
@@ -26,7 +27,7 @@ Field names are Box2D's, so the Inspector, the Lua API and tutorials match. The 
 - **A line can't go on a Dynamic body.** The Dynamic option is greyed out with the reason, and the shape shows a red badge. A line on a Static or Kinematic body is fine.
 - Lines collide from both sides, whichever way they were drawn. A line never collides with another line.
 
-Source: scope PH1; round 1: C6, D36, D39; round 2: O8; round 6: 05 2.1, 05 2.2, 05 2.3; decisions: D35; old: PH-01 to PH-16
+Source: scope PH1; round 1: C6, D36, D39; round 2: O8; round 6: 05 2.1, 05 2.2, 05 2.3; decisions: D35; old: PH-01 to PH-16; owner: 2026-11-13
 
 ### Body settings · v1
 
@@ -128,11 +129,12 @@ Source: round 6: 05 2.7; old: PH-32 to PH-38
 
 - A debug view that draws every physics shape on top of the level, whatever the drawing settings say: the eye, opacity, a parent's opacity.
 - Off by default. Available in the editor and in test play, never in a published level. It is a View menu switch.
-- *Why v1: a sensor with no StyleComponent is invisible, and this is the only way to see it. Box2D draws it for us.*
+- It draws the same collision pieces the game gives the physics engine, so it shows exactly what collides, and looks the same in the editor, where no physics runs, and in test play.
+- *Why v1: a sensor with no StyleComponent is invisible, and this is the only way to see it.*
 - Even with the view off, selecting anything with physics outlines its whole body.
 - **There is no physics preview in the editor.** Press Play to see physics. *Why: test play already runs a copy that can't harm the level, with Pause and Step.*
 
-Source: scope PH8; round 6: 05 2.8, 05 2.16; round 8: VW1; old: PH-39 to PH-43, PH-100, PH-101
+Source: scope PH8; round 6: 05 2.8, 05 2.16; round 8: VW1; old: PH-39 to PH-43, PH-100, PH-101; owner: 2026-11-13
 
 ### Warnings for physics setups · v3
 
@@ -164,11 +166,9 @@ Left over from the old draft, or accepted without a version. The last column is 
 
 | Feature | Rule | Suggested |
 |---|---|---|
-| Does one click add the surface too? | The old draft added Body and Surface together. The review says partners are never added automatically, and the scope lists them as two features | Needs a decision |
 | Start asleep, starting velocity, starting spin | Three body fields from the old draft. The reviewed field list doesn't include them | Later |
-| Physics on a group in one step | Adding physics to a group gave every shape inside a surface too | Needs a decision |
 | "New shapes: no physics, Static, Dynamic" | A Shape tool option so that laying out ground takes no extra clicks | v3 |
-| Physics view details | Colour per body, hatched fill for Static, dashed for sensors, centre of mass, contact points, a legend. v1 uses Box2D's own drawing | v3 |
+| Physics view details | Colour per body, hatched fill for Static, dashed for sensors, centre of mass, contact points, a legend. v1 draws the pieces without these details | v3 |
 | Mass ratio hint | Stacks and joints turn wobbly past 10 to 1 in mass. The Density hint says so | v3 |
 
 Source: old: PH-02 to PH-13, PH-17, PH-22, PH-23, PH-41, PH-43

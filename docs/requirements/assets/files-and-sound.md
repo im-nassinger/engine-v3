@@ -113,11 +113,11 @@ Source: scope AS6; round 6: SND1
 
 ### Limits per level · v3
 
-They matter once images and sounds exist. All are starting values.
+They matter once images and sounds exist. All are starting values. The 64 MB total is the owner's number (owner: 2026-11-13).
 
 | Limit | Value |
 |---|---|
-| Imported files per level, in total | 50 MB |
+| Imported files per level, in total | 64 MB |
 | Files per level | 500 |
 | One sound | 10 MB and 10 minutes |
 | One image | 8 MB, and 4096 px on its longest side |
@@ -126,7 +126,7 @@ They matter once images and sounds exist. All are starting values.
 - Limits never block saving, playing or exporting a level that already exists.
 - Builtin files don't count.
 
-Source: round 1: D34; round 6: 04 2.15; old: AS-128 to AS-130
+Source: round 1: D34; round 6: 04 2.15; old: AS-128 to AS-130; owner: 2026-11-13
 
 ## Not in the scope review
 
@@ -136,7 +136,7 @@ Accepted in the requirements review but never given a version, or left over from
 |---|---|---|
 | Extra "Play sound" settings | The old draft had pitch, random pitch, fade in, and "if already playing: play another, restart, keep playing". The review kept only volume, loop, and start and end times | Later |
 | Too many of one sound | One file starts at most 3 times per tick, so 20 coins picked up together don't spike the volume | v3 |
-| Usage bar | The panel shows "23.4 of 50 MB, 142 of 500 files", and turns amber at 80% | v3 |
+| Usage bar | The panel shows "23.4 of 64 MB, 142 of 500 files", and turns amber at 80% | v3 |
 | Remove unused | Lists files with no uses and removes the ticked ones | v3 |
 | Swap with another file | Points every use of one file to another of the same kind | v3 |
 | Mute in test play | A mute switch on the Play bar, saved in the browser | v3 |

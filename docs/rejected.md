@@ -84,6 +84,14 @@ What we decided against, and why. **Check here before proposing something**: an 
 | Ctrl+S saves a version | Ctrl+S exports the project file | Version history was dropped, and a Ctrl+S that did nothing would look like a save | round 12: SV1 |
 | One `.level` file | `.editable` to keep editing, `.playable` to play | The owner's names: they say what each file is for | round 11: 12 A10; round 12: EXT1 |
 | Limits of 10,000 entities and a 100 MB file | 100,000 entities and 256 MB | The owner's numbers | round 11: 12 A8 |
+| 2,000 files in a level and 250 MB unpacked, beside the 256 MB file limit | One 256 MB limit counted unpacked, and 500 files per level from v3 | One number covers both, and 500 files already limits the count | owner: 2026-11-13 |
+| 50 MB of imported files per level | 64 MB | The owner's number | owner: 2026-11-13 |
+| 500 undo steps | 512 steps | The owner's number | owner: 2026-11-13 |
+| A camera with no eye icon | An eye like every row, hiding everything inside the camera | No special cases | owner: 2026-11-13 |
+| Removing a component also removes the ones that need it (`Remove Shape and Surface`) | Remove only that one, and the cards left show their partner note | Nothing happens behind the user's back | owner: 2026-11-13 |
+| One click adds a BodyComponent and a SurfaceComponent together, or surfaces to every shape in a group | Only the BodyComponent, with a note and a button for the SurfaceComponent | Nothing happens behind the user's back | owner: 2026-11-13 |
+| The physics view drawn by Box2D | The game draws its own collision pieces, in the editor and in test play | The editor has no Box2D world, and one way to draw is enough | owner: 2026-11-13 |
+| "Transform" as the component's name | TransformComponent | Component names end in `Component`, with no exception | owner: 2026-11-13 |
 | An import that compares level ids and asks Keep both or Replace | Import replaces the open level after asking | v1 keeps no list of levels, so there is nothing to compare against | round 11: 12 A11; round 12: LV1 |
 | CodeMirror | Monaco | The owner's choice | round 9: 10 2.13 |
 | A 12-font list | Inter, then Lora, JetBrains Mono and Roboto Mono | The owner's list | decisions: D26; round 3: F1 |

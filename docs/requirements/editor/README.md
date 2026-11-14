@@ -27,7 +27,7 @@ Everything about the editor that isn't specific to one kind of entity: the works
 | Partner notes when adding a component | v1 | inspector-and-undo |
 | Warnings (missing partner, failed save) | v1 | inspector-and-undo |
 | Copy, paste, duplicate, delete | v1 | inspector-and-undo |
-| Undo and redo, 500 steps | v1 | inspector-and-undo |
+| Undo and redo, 512 steps | v1 | inspector-and-undo |
 | Click, drag-box, Shift+click, Select all | v1 | selection |
 | Handles and arrow keys | v1 | selection |
 | Group, ungroup, go in, go out | v1 | selection |

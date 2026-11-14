@@ -17,7 +17,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Key and wheel handlers** must run early and be non-passive to stop browser defaults. Alt key-up and middle-button down need their own handling. Whether Alt+drag is safe on Linux window managers is untested.
 - **Clipboard.** Prefer the `copy`, `cut` and `paste` events, which need no permission. The async clipboard read is permission-based and differs by browser. Custom clipboard formats vary, so carry the data as tagged text as a fallback. Treat pasted data as untrusted.
 - **Leave prompt.** Add the `beforeunload` listener only while something is unsaved, and write on `visibilitychange`. A browser storage write may not finish during unload, which is why the prompt still matters.
-- **Undo history.** Steps need a label, a key for joining runs (arrow moves, field edits), and the group the user was inside. Deleted files stay in memory while history can restore them, so history may need a byte limit as well as the 500-step limit.
+- **Undo history.** Steps need a label, a key for joining runs (arrow moves, field edits), and the group the user was inside. Deleted files stay in memory while history can restore them, so history may need a byte limit as well as the 512-step limit.
 - **Field metadata.** Each field needs a unit, a display scale (such as radians to degrees), precision, a slider range, a description, and its component's menu section.
 - **Scrubbing.** Pointer capture is enough. Pointer Lock would allow endless scrubbing but shows a browser banner.
 - **Cursors.** Rotated resize cursors must be generated, because CSS has only eight fixed directions.
@@ -107,7 +107,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 
 - **Two camera positions.** The game keeps a logical camera, limited using the camera's own box. This is what scripts read, so it is the same on every computer. The drawing side derives the shown camera by limiting again to the real window and adding shake. The shown view always contains the camera's own box.
 - **Follow runs with the game**, after physics, so scripts read a deterministic position. Draw the camera interpolated the same way as entities, or a followed body jitters.
-- **Entities inside the camera** need their own drawing layer outside the level's transform, drawn last.
+- **Entities inside the camera** need their own drawing layer outside the level view's pan and zoom, drawn last.
 - **Mouse input.** Level positions of the mouse use the real window and are recorded as input. A player with a wide window can click things outside the camera's own box. It is an input, so it doesn't break determinism.
 - **Time.** Camera moves count ticks, not scaled time. Shake runs on the drawing side, so it must stop on Pause.
 - **Sharpness.** Level and screen content scale with the window. Text and vectors should be redrawn at the final size after a resize or a big zoom.
@@ -176,7 +176,7 @@ Browser storage as checked in October 2026:
 - **Reading script settings** means running the top of a script in a throwaway Lua state on load. That state needs the same safety as play, which is why importing a level counts as running untrusted code.
 - **Never roll back a shipped file format version.** Saved levels would become unreadable. Roll forward.
 - **Offline.** An editor that opens offline needs a service worker. That brings old open tabs after an update: a tab that finds a level saved by a newer version should offer Reload, not an error.
-- **The old limits, as starting values:** 2,000 files in a level, 250 MB unpacked, and a level's data read with a memory bound.
+- **Read a level with a memory bound.** The 256 MB limit counts the unpacked size, so import stops unpacking as soon as it passes the limit.
 - **A content security policy for the game's worker** was planned for the first release, as a backstop if a script ever escapes.
 
 ## From the first attempt's code

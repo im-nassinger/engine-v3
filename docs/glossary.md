@@ -10,7 +10,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 |---|---|
 | Level | What a creator builds and a player plays: one tree of entities under the World. |
 | Entity | Any single thing in a level: a rectangle, a piece of text, a joint, the camera. On its own an entity is just an id. What it is comes from its components. Say "entity", never "item" or "object". |
-| Component | A piece of data attached to an entity, such as Transform or BodyComponent. The Inspector shows each one as a card. An entity has at most one component of each type. |
+| Component | A piece of data attached to an entity, such as TransformComponent or BodyComponent. The Inspector shows each one as a card. An entity has at most one component of each type. |
 | Group | An entity whose job is to hold other entities as its children, so they move together. Every entity can hold children. |
 | World | The top entity of every level. Everything else sits inside it. It holds the level-wide settings: gravity, background colour, level bounds, variables, inputs. |
 | Camera | The one entity that decides which part of the level the player sees during play. In the editor it shows as a frame. |
@@ -65,7 +65,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Outline | The line drawn around a shape, path or text: a colour and a width. |
 | Image | Not a kind of entity: a shape whose fill is an image file. |
 | Text | An entity with a TextComponent, typed on the level. |
-| Transform | The component holding an entity's position, rotation, scale and skew, measured from its parent. |
+| TransformComponent | The component holding an entity's position, rotation, scale and skew, measured from its parent. |
 | Skew | Slanting an entity sideways, so a rectangle becomes a parallelogram. |
 | Line height | The space between the rows of a text. |
 
@@ -145,11 +145,11 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 
 ## Components
 
-Component names end in `Component`. The Transform is the one name the sources write without it (see the open questions in [progress.md](progress.md)).
+Component names end in `Component`, the TransformComponent included (owner: 2026-11-13).
 
 | Component | What it holds | On |
 |---|---|---|
-| Transform | Position, rotation, scale, skew, measured from the parent | Every entity |
+| TransformComponent | Position, rotation, scale, skew, measured from the parent | Every entity |
 | NameComponent | The entity's name, filled automatically ("Rectangle 1"). Not unique | Every entity |
 | TagsComponent | The entity's tags | Any entity |
 | ShapeComponent | A rectangle, ellipse, polygon or line | Any entity |
@@ -196,3 +196,4 @@ Don't use these. Each was replaced in the requirements review.
 | `.level` file | `.editable`, `.playable` | Names that say what each file is for |
 | `onStart`, `onUpdate`, `onEvent` | `on(name, function)` | One way to listen |
 | Hitbox | Surface on a shape | Physics is added like on any shape |
+| Transform | TransformComponent | Component names end in `Component`, with no exception (owner: 2026-11-13) |

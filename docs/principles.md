@@ -20,7 +20,7 @@ The rules every requirement follows, and the rules for proposing a change. They 
 | **The order you see is the order things run** | Triggers and scripts run in Layers panel order | Drag a row to change when it runs |
 | **Assets are raw files** | Settings never live on the asset. They live where it is used | Volume is on the "Play sound" action, tiling on the image fill |
 | **One place decides what hits what** | The collision grid on the World. No second collision system beside it | Nothing extra for ragdolls: give the parts the right tags |
-| **If it's data, change it with Change value** | Trigger actions only exist for what no component value can do | Teleporting is changing the Transform |
+| **If it's data, change it with Change value** | Trigger actions only exist for what no component value can do | Teleporting is changing the TransformComponent |
 | **One layout system** | Flex places things, also against the screen | No anchors. The 3×3 picker only sets Flex values |
 | **Triggers and scripts share one list of events** | Same names in both. Scripts listen with `on()` | `on("touched", ...)` matches "When touched" |
 | **Handles, not references, in Lua** | Scripts work with entity and component ids through functions | `spawn(path)` returns an id |

@@ -14,7 +14,7 @@ How shapes, paths and text are made and how they look. **v1:** the Shape tool (r
 - Choosing another tool, or pressing Play, finishes and keeps the drawing.
 - Pan and zoom work during a multi-click drawing and don't end it.
 - A new entity goes inside the group you are inside, on top, named after what it is ("Rectangle 1", "Path 2"), and is selected.
-- New shapes have a Transform, a ShapeComponent and a StyleComponent. **They have no physics until you add it.**
+- New shapes have a TransformComponent, a ShapeComponent and a StyleComponent. **They have no physics until you add it.**
 - A press that moves less than 4 px is a click.
 - Drawing while inside a locked group is refused: "This group is locked".
 
@@ -60,7 +60,7 @@ It works like Illustrator's pen.
 - Enter, Esc, double-click, right-click or choosing another tool finishes an open path.
 - With an open path selected, clicking either end continues drawing from it. With nothing selected, the pen always starts a new path.
 - A path is one continuous line: no branches, no separate parts. It is open or closed. Only a closed path can be filled.
-- The result is an entity with a Transform, a PathComponent and a StyleComponent.
+- The result is an entity with a TransformComponent, a PathComponent and a StyleComponent.
 - Limit: 2,000 points in a path.
 - *Why v2: a path never collides, and Convert to polygon is v3, so in v1 a path would be decoration only. It was settled before the scope review.*
 
@@ -123,12 +123,14 @@ Source: scope DR5; round 1: D22, D58; round 5: 03 2.8; old: DR-64 to DR-79
 - **A shape or path with no StyleComponent is invisible in play.** The editor still shows it as a thin outline. Text always shows.
 - The plain colour picker: a colour square, a hue slider, a see-through slider, a colour code field and a fixed palette. One drag in the picker is one undo step.
 - In v1 new shapes start with one default look: fill `#4A90D9`, outline `#1F3552`, width 2.
+- **In v1 the fill is a colour field that can be emptied.** An empty fill paints nothing. *Why: v1 has only solid colours, so the fixed list of field types needs nothing new yet (owner: 2026-11-13).*
 
-Source: round 1: D23; round 6: ST2; old: DR-90 to DR-94
+Source: round 1: D23; round 6: ST2; old: DR-90 to DR-94; owner: 2026-11-13
 
 ### Gradients · v2
 
 - A fill can be a linear or a radial gradient.
+- Gradients add a **fill** field type to the fixed list of field types: nothing, a solid colour or a gradient, and from v3 an image. *Why: a new need adds a type to the list, never a special field on one component (owner: 2026-11-13).*
 - *Why: the owner changed this from "solid colours first". Why v2: it is decoration, and solid colours are enough to test a v1 level. It was settled before the scope review.*
 
 Source: round 1: D25; round 6: ST2; owner: 2026-11-13
@@ -150,7 +152,7 @@ Source: scope DR7; round 5: 03 2.3; old: DR-18 to DR-20
 ### Images · v3
 
 - **An image is not its own kind of entity. It is a shape whose fill is the image.** There is no `ImageComponent`.
-- Dropping a PNG, JPEG, WebP or GIF on the level makes an entity with a Transform, a rectangle ShapeComponent the image's size, and a StyleComponent with that image as its fill. 1 image pixel is 1 level pixel.
+- Dropping a PNG, JPEG, WebP or GIF on the level makes an entity with a TransformComponent, a rectangle ShapeComponent the image's size, and a StyleComponent with that image as its fill. 1 image pixel is 1 level pixel.
 - The image's size is the rectangle's width and height, with a proportions lock.
 - An ellipse with an image fill shows the image cut to a circle.
 - Settings that belong only to an image live on the image fill: **stretch or tile**, and **smooth or sharp** scaling. *Why: an asset is just a raw file, so its display settings can't live on it.*
@@ -165,7 +167,7 @@ Source: scope DR11; round 5: 04 2.3, 04 2.6, 04 2.7, 04 2.8; round 6: ST1, ST3
 
 ### Flip · v3
 
-- A Flip button sets the Transform's scale to −1, for any entity. Typing −1 does the same.
+- A Flip button sets the TransformComponent's scale to −1, for any entity. Typing −1 does the same.
 
 Source: scope DR12; round 6: ST3
 

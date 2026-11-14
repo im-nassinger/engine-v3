@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-How values are edited and how mistakes are reversed. **v1:** the Inspector shows each component as a card, built from one fixed list of field types; a component that needs a partner shows a note with a button instead of adding it; warnings sit on the card they are about; copy, paste, duplicate and delete; undo with 500 steps. **v3:** copying values and whole components between entities, tips, the physics and joint warnings, and the Used by list.
+How values are edited and how mistakes are reversed. **v1:** the Inspector shows each component as a card, built from one fixed list of field types; a component that needs a partner shows a note with a button instead of adding it; warnings sit on the card they are about; copy, paste, duplicate and delete; undo with 512 steps. **v3:** copying values and whole components between entities, tips, the physics and joint warnings, and the Used by list.
 
 ## The Inspector
 
@@ -12,9 +12,9 @@ How values are edited and how mistakes are reversed. **v1:** the Inspector shows
 - **Clicking empty space shows the World's components.** There is no settings window. *Why: the World is an entity like any other, so its settings are its components.*
 - The header shows the entity's name (editable), and its hide and lock switches. With several selected it reads `3 entities`.
 - The Inspector doesn't show the parent. The Layers panel tree does.
-- Cards appear in one fixed order, the same on every entity: Transform, shape, path, text, style, body, surface, joint, camera, tags, scripts, triggers. Users can't reorder them.
+- Cards appear in one fixed order, the same on every entity: TransformComponent, shape, path, text, style, body, surface, joint, camera, tags, scripts, triggers. Users can't reorder them.
 - Clicking a card's title folds it. The folded state is remembered per component type, in the browser.
-- Transform fields are measured from the parent, and the tooltip says so. The level position of the selection is in the status bar.
+- TransformComponent fields are measured from the parent, and the tooltip says so. The level position of the selection is in the status bar.
 - Hovering a field's label shows its description.
 - During play the Inspector is read-only, and shows live values when brought back with Panels.
 
@@ -52,10 +52,11 @@ Source: round 3: 01 2.5; old: WS-114, WS-115, WS-119 to WS-122, WS-125, WS-126
 
 - `Add Component` sits at the bottom of the cards and opens a searchable menu. Components the entity already has are not listed, because an entity has one of each type.
 - **Adding a component that needs a partner doesn't add the partner.** The card shows a note with a button, such as "Needs a ShapeComponent to draw anything. [Add ShapeComponent]". *Why: adding the partner automatically surprises you, and refusing is annoying when you were about to add it next. A note with a one-click fix is clear and never in the way.*
-- The Transform, the camera's CameraComponent and the World's own components can't be added or removed by hand. The menu entry is disabled and says why.
+- The TransformComponent, the camera's CameraComponent and the World's own components can't be added or removed by hand. The menu entry is disabled and says why.
 - With several entities selected, Add Component adds to every entity that lacks it, and Remove removes from all.
+- **Removing a component that others need removes only that one.** The cards left without their partner show their note. Example: removing a crate's ShapeComponent leaves its SurfaceComponent, whose card then shows its note with an [Add ShapeComponent] button. *Why: nothing happens behind the user's back, and undo brings the component back.*
 
-Source: round 5: AD2; old: WS-101, WS-102, WS-106, WS-112
+Source: round 5: AD2; old: WS-101, WS-102, WS-106, WS-112; owner: 2026-11-13
 
 ### Copy values and components · v3
 
@@ -125,7 +126,7 @@ Source: round 7: 06 2.11; old: WS-80, WS-81
 
 ### Undo and redo · v1
 
-- Ctrl+Z undoes and Ctrl+Shift+Z redoes, up to **500 steps**. The oldest step drops silently.
+- Ctrl+Z undoes and Ctrl+Shift+Z redoes, up to **512 steps**. The oldest step drops silently. *Why 512: the owner's number.*
 - Every change to the level can be undone, including changes to files in the Assets panel and to scripts.
 - A whole drag is one step. So is a run of arrow-key moves that ends after 1 second idle.
 - Undo also restores the selection and the group you were inside. If that group no longer exists, you land in the nearest one above it that does.
@@ -154,7 +155,7 @@ Text and code:
 - Ctrl+Z is ignored while a mouse button is held in a drag. Esc cancels the drag.
 - Undo or redo that removes a tab's file closes that tab.
 
-Source: scope ED2; round 3: 01 2.11; round 5: FMT1; old: WS-90 to WS-100, WS-127 to WS-133, SG-03, SG-04
+Source: scope ED2; round 3: 01 2.11; round 5: FMT1; old: WS-90 to WS-100, WS-127 to WS-133, SG-03, SG-04; owner: 2026-11-13
 
 ## Not in the scope review
 
@@ -167,7 +168,6 @@ Accepted in the requirements review but never given a version. The last column i
 | Arithmetic in fields | Number fields accept `100/2+8` | v3 |
 | Scrubbing | Dragging a number field's label changes it live: 1 per pixel, Shift 10, Alt 0.1. One undo step. Up and Down in a focused field do the same | v3 |
 | Reset to default | Right-click a field: Reset to default | v3 |
-| Removing a component others need | The old rule removed the dependants too and named them in the menu entry (`Remove Shape and Surface`). It was written before "nothing happens behind the user's back". Suggested now: remove only that component, and let the cards left without a partner show their note | v1, needs a decision |
 | Align and distribute | Buttons at the top of the Inspector and in the Arrange menu: align left, centre, right, top, middle, bottom, and spread evenly. A group counts as one entity. One-off moves, unlike Flex | v3 |
 | Draw order commands | Bring forward, send backward, to front, to back, within the same group. Dragging rows in the Layers panel already does this | v3 |
 | Paste in place | Ctrl+Shift+V pastes at the original level position. `Paste here` in the context menu uses the right-click position | v3 |

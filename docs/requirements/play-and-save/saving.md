@@ -55,6 +55,14 @@ Source: scope SA2; round 11: 12 A6; round 12: ST1; old: SV-38
 
 Source: scope SA1; round 11: 12 A7; round 12: TB1; old: SV-47
 
+### The level's name · v1
+
+- A level has a name of 1 to 60 characters, `Untitled level` at first.
+- It is shown and edited in the top bar, see [the workspace](../editor/workspace.md), and saved in the project file. Renaming is an undo step.
+- It is the default file name on export, with characters no file system allows replaced.
+
+Source: owner: 2026-11-13
+
 ## Level files
 
 ### The project file: Export and Import · v1
@@ -93,12 +101,14 @@ Source: owner: 2026-11-13; round 1: D8; old: SV-15
 
 ### Limits · v1
 
-- A level holds at most **100,000 entities**, and a level file at most **256 MB**. *Why: the owner's numbers.*
+- A level holds at most **100,000 entities**, and at most **256 MB**. *Why: the owner's numbers.*
+- **The 256 MB counts the unpacked size:** the level and every file it holds, before zipping. *Why: import needs a limit on the unpacked size anyway, to refuse a file that unpacks into far more than it looks. Files are never smaller unpacked, so one number covers both, and the editor can check it without zipping (owner: 2026-11-13).*
+- There is no separate limit on the number of files in v1. From v3, a level holds at most 500 files, see [files and sound](../assets/files-and-sound.md).
 - **The editor and Import use the same limits**, so anything the editor can save, the same version can import.
 - An action that would pass a limit is refused with a message that names the limit. The level stays valid and saved.
 - Limits on a level's own files are in [files and sound](../assets/files-and-sound.md).
 
-Source: round 11: 12 A8; old: SV-52, SV-54
+Source: round 11: 12 A8; old: SV-52, SV-54; owner: 2026-11-13
 
 ### The warning after 10,000 entities · v3
 
@@ -123,7 +133,6 @@ Left over from the old draft. The last column is Claude's suggestion, not a deci
 
 | Feature | Rule | Suggested |
 |---|---|---|
-| The level's name | 1 to 60 characters, `Untitled level` at first, edited in the top bar. It is the default file name on export, with characters no file system allows replaced | v1 |
 | Import by dropping | Dropping a level file on the editor imports it, after the same question as Import | v1 |
 | A note after a crash | Reopening after a crash loads the last save and says: "Recovered from your last save at 14:32. The last few seconds may be missing." | v1 |
 | A saved level that won't open | It is checked like an import. If it fails, the game offers to export the raw data and never deletes it | v1 |
@@ -133,6 +142,5 @@ Left over from the old draft. The last column is Claude's suggestion, not a deci
 | A note about scripts on import | "Contains 4 scripts. They can't reach your files or other levels." Never a blocking question | v3 |
 | Update available | When a new version of the game is out, an open tab offers Reload and never reloads by itself | v3 |
 | Level details | Description, author, instructions and level tags, in a Level info window. They are for a level's page | Later |
-| Limits from the old draft | 2,000 files in a level and 250 MB unpacked. The review set only the entity and file size limits | Needs a decision |
 
 Source: old: SV-10, SV-11, SV-14, SV-33, SV-48, SV-62, SV-63, SV-69, SV-84, SV-93

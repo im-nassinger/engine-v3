@@ -24,7 +24,7 @@ Source: scope EF1; round 1: C14; round 6: E4; round 7: 08 2.1, 08 2.3; round 8: 
 ### Linked copies · v3
 
 - Dragging an `.entity` file into the level creates a **linked copy**, marked by an **AssetComponent** that records which file it came from.
-- In a linked copy, only the Transform, the name and the tags can be edited. Everything else is read-only.
+- In a linked copy, only the TransformComponent, the name and the tags can be edited. Everything else is read-only.
 - Editing the `.entity` file in its own tab and saving updates every copy.
 - **Make unique** removes the AssetComponent, and that is all it does. The copy is then a plain entity.
 - *Why v3: linking needs a second editing tab and read-only fields. Plain copies are enough to test spawning.*

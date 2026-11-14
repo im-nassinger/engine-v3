@@ -10,7 +10,7 @@ All lengths are pixels and all angles are degrees. Positive angles and speeds ar
 
 ### A joint is an ordinary entity · v1
 
-- A joint is an entity with a Transform and a JointComponent. It has its own row in the Layers panel, and can be renamed and hidden like any entity.
+- A joint is an entity with a TransformComponent and a JointComponent. It has its own row in the Layers panel, and can be renamed and hidden like any entity.
 - It can hold children, triggers and scripts, like any entity. *Why: one rule for every entity. Treating joints as special was left over from an earlier design.*
 - The JointComponent names its two entities in fields **A** and **B**. Clicking a field selects that entity. An empty B pins A to the background.
 - Joints connect bodies. A sensor or a line can be an end.

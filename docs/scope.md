@@ -30,6 +30,7 @@ These versions were decided during the requirements review, or by the owner afte
 | Three joints: Hinge, Rope and Spring, with the Joint tool | v1 | Each does something the others can't |
 | Only three tools in v1: Select, Shape and Joint | v1 | The other tools make paths, text and triggers, which are v2 (owner: 2026-11-13) |
 | Pause and Step | v1 | To watch a collision tick by tick (owner: 2026-11-13) |
+| The level's name, shown and edited in the top bar | v1 | It names the exported file. It was in no scope list (owner: 2026-11-13) |
 | The Bézier pen and the Pencil tool | v2 | A path never collides, and Convert to polygon is v3, so in v1 a path is decoration only. Was v1, decided before versions were split (owner: 2026-11-13) |
 | Gradients | v2 | Decoration. Solid colours are enough to test. The owner had changed it from "not in the first version" (owner: 2026-11-13) |
 | The searchable list of shortcuts | v2 | It never went through "smallest thing that can be tested". The main menu lists every command with its shortcut (owner: 2026-11-13) |
@@ -54,7 +55,7 @@ Rules: [requirements/editor](requirements/editor/README.md)
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
 | ED1 | Pan and zoom the level view, from 1% to 1000%. F zooms to the selection. Space and drag pans, the mouse wheel zooms. | v1 | You can't build a level you can't move around in. |
-| ED2 | Undo and redo, 500 steps. Ctrl+Z and Ctrl+Shift+Z. The history is lost on reload. | v1 | Mistakes happen all the time while building. Testing the editor without undo is painful. |
+| ED2 | Undo and redo, 512 steps (owner: 2026-11-13). Ctrl+Z and Ctrl+Shift+Z. The history is lost on reload. | v1 | Mistakes happen all the time while building. Testing the editor without undo is painful. |
 | ED3 | Copy, paste and duplicate entities. Ctrl+C, Ctrl+V, Ctrl+D. Duplicate puts the copy on top of the original. | v1 | Building a level is mostly copying platforms. |
 | ED4 | A grid you can show, set the size of, and snap to. Example: with the 50 px grid on, a dragged platform jumps to the nearest grid point. | v1 | It's the simplest way to make platforms meet. |
 | ED5 | Snapping to other entities, with pink guides showing what is aligned. Example: you drag a platform, and a pink guide appears when its top edge is level with the next platform's. | v3 | The grid already aligns things. Guides are a comfort, not a need. |
@@ -101,7 +102,7 @@ Rules: [requirements/drawing](requirements/drawing.md)
 | DR9 | Line height and letter spacing for text. | v3 | The defaults read fine for a score or a title. |
 | DR10 | Lora, JetBrains Mono and Roboto Mono, beside Inter. | v3 | One font is enough to test, and every font adds download size. |
 | DR11 | Images: drop a PNG, JPEG, WebP or GIF to make a rectangle with that image as its fill, set to stretch or tile, smooth or sharp. Images also bring the builtin Kenney art, licences, and a background image on the World. | v3 | Coloured shapes are enough to build and test a level. Leaving images out also leaves out importing, licences and the builtin art. The builtin player would be coloured shapes in v1. |
-| DR12 | The Flip button, which sets the scale to −1. | v3 | Typing −1 in the Transform's scale does the same. |
+| DR12 | The Flip button, which sets the scale to −1. | v3 | Typing −1 in the TransformComponent's scale does the same. |
 
 ## Assets
 
@@ -132,7 +133,7 @@ Rules: [requirements/physics](requirements/physics/README.md)
 | PH5 | One-way platforms you can jump up through, set on the SurfaceComponent. | v3 | A platformer can be tested with solid platforms. |
 | PH6 | The collision grid: pick which tags hit which. Example: enemies pass through each other but still hit the player. | v3 | In v1 every solid surface hits every other, and sensors cover coins and finish zones. |
 | PH7 | The Collision check: right-click two entities, 'Why do these collide?'. | v3 | Comes with the collision grid. |
-| PH8 | The physics view: draws every physics shape on top of the level. | v1 | A sensor with no StyleComponent is invisible, and this is the only way to see it. Box2D draws it for us. |
+| PH8 | The physics view: draws every physics shape on top of the level. | v1 | A sensor with no StyleComponent is invisible, and this is the only way to see it. |
 | PH9 | Gravity strength and direction, and the background colour, on the World. | v1 | Basic level settings. |
 | PH10 | Buttons for gravity: Earth, Moon, Arcade, None. | v3 | Typing a number works. |
 | PH11 | Game speed on the World, so triggers and scripts can slow the whole level down. Example: slow motion for 2 seconds after the player hits a bomb. | v3 | An effect, not something a test needs. |
