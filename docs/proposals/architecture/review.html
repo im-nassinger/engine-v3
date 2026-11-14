@@ -71,7 +71,7 @@
   <div class="pbar"><i id="pfill"></i></div>
 </header>
 <main>
-  <p class="intro">Round 5: the 14 open questions left from writing the requirements. Rounds 1 to 4 are answered and written into the docs. None of these blocks v1; most are about v2. Each card is one question, with my view under it. <b>Yes</b> means you agree with my view, <b>No</b> means you don't, and a comment says what you'd change. "More" explains the card with an example. Any click on a card counts it as answered. Underlined words are explained when you hover them. Answers are kept in this browser. When you're done, press Copy answers and paste the text into the chat.</p>
+  <p class="intro">Round 6: the last three open questions. Two were asked in round 5 and need plainer words; one is new, from your round 5 answer that variables can hold text. Rounds 1 to 5 are answered and written into the docs. None of these blocks v1. Each card is one question, with my view under it. <b>Yes</b> means you agree with my view, <b>No</b> means you don't, and a comment says what you'd change. "More" explains the card with an example. Any click on a card counts it as answered. Underlined words are explained when you hover them. Answers are kept in this browser. When you're done, press Copy answers and paste the text into the chat.</p>
   <details class="glossary"><summary>Glossary</summary><dl id="glossary"></dl></details>
   <div id="list"></div>
   <div class="footer">
@@ -132,61 +132,22 @@ const GLOSSARY = [
 
 // Groups: [title, note, [[id, short, detail, myView], ...]]. Yes = you agree with my view.
 const GROUPS = [
-["Editor", "How a few editor tools behave. None of these blocks v1.", [
-["Q4","After you place a joint, the Joint tool goes back to Select, like every other tool. To place many joints in a row, you lock the tool.",
- "Background: in v1 every tool returns to Select after it makes something, so you can move what you just made. Tool lock keeps a tool active: double-click its button, or press its number key twice (6 for the Joint tool), and it stays until Esc. An early decision said the Joint tool should always stay active, which conflicts with that rule. Example: to hinge four wheels to a car, press 6 twice, click the four wheels, press Esc.",
- "Yes: same rule for every tool, and tool lock already covers placing many joints."],
-["Q7","In v2, dragging a corner of a text changes its font size, in whole numbers.",
- "Background: a text (v2) sits in an invisible rectangle, its box. Its Width is \"Fit to text\" (the box hugs the words) or \"Fixed\" (the words wrap at that width). The box's height always follows the text, so a corner handle has nothing else to change. The rule about corners was written before the box existed, so it needs a yes or no. Example: a title at size 32; drag its corner outward and it grows to 40, 41, 42 as you drag.",
- "Keep it: it gives the corner handles a clear job, and it is how most drawing tools resize text."],
-["Q8","Drop the right-click list of every entity under the mouse. Alt+click (v3) and the Layers panel already reach anything hidden underneath.",
- "Background: the old draft had a right-click list, \"Entities here\", naming every entity under the mouse so you could pick a covered one. The review later kept only Alt+click: each Alt+click on the same spot selects the next entity underneath. Example: a coin hidden behind a big background shape. Alt+click once picks the background, again picks the coin. Or click the coin's row in the Layers panel.",
- "Drop it: two ways already exist, and a third adds nothing."],
-["Q9","The Trigger zone tool (tool 7) comes in v2, together with triggers.",
- "Background: the Trigger zone tool draws a rectangle that is a sensor (it notices what touches it but pushes nothing) with an empty trigger ready for \"When something starts touching this\". Example: draw a zone at the end of a level, then add \"Win\" to its trigger. It is in the agreed tool list but never got a version. Triggers are v2, so the tool is useless before then.",
- "v2, with triggers."]
+["Editor", "How you pick things in the level view.", [
+["Q8","Remove \"Entities here\" from the right-click menu. It is a list of everything under the mouse, used to pick something hidden behind something else.",
+ "Background: when shapes overlap, a click selects the one in front. Sometimes you want the one behind it. Example: a coin is hidden behind a big background rectangle. With \"Entities here\", you right-click that spot, the menu lists \"Background\" and \"Coin\", and you click Coin to select it. Two other ways already do the same: click the coin's row in the Layers panel (v1), or Alt+click the spot twice (v3), where the first Alt+click picks the background and the second picks the coin.",
+ "Drop it: the Layers panel already does this in v1, and Alt+click does it in v3."]
 ]],
-["Files", "The Assets panel and its files come in v2.", [
-["Q13","A builtin file can't be changed. To change one, you duplicate it into one of your own folders and edit the copy.",
- "Background: the builtin folder holds the files that come with the game, such as the platformer player's script. Builtin files never change once released, so a game update never changes how an existing level plays. That makes the folder read-only. Example: you want the player to jump higher than the builtin script allows. Duplicate the script into your folder, edit the copy, and put the copy on your player.",
- "Yes: read-only builtin files, and a copy when you want your own version."]
-]],
-["Triggers and scripts", "Triggers are no-code logic (When, If, Do). Scripts are Lua. Both come in v2.", [
-["Q3","A variable holds only a number, not text.",
- "Background: variables live on the World, such as coins = 5 or lives = 3, and triggers and scripts read and change them. Show Variable displays one in a text, such as \"Coins: 5\". What a variable can hold was never asked. With text, a variable could hold a player's name or a line of dialogue. Numbers cover a score, lives, a timer and switches (0 or 1). A script can still keep its own text inside the script.",
- "Numbers only for now: every example in the requirements is a number, and text can be added later without changing saved levels."],
-["Q14","The trigger's Spawn action has one setting besides the file: where the new entity appears, as an offset from the trigger's target. Anything else is set by a script.",
- "Background: the Spawn action creates an entity from an .entity file during play, such as a bullet. The old draft let one spawn also set rotation, speed, parent and other values at once. Example: a cannon's trigger \"When the key fire is pressed, Spawn bullet.entity\" with offset 40, 0, so the bullet appears at the cannon's mouth instead of its centre. To give the bullet a speed, the bullet's own .entity file carries what it needs, or a script calls spawn() and sets the values on the id it gets back.",
- "Offset only: it covers the common case, and a script covers the rest."],
-["Q15","In v2, the camera can follow a tag instead of one entity. If several entities have the tag, it follows the one highest in the Layers panel.",
- "Background: in v1 the camera follows one entity you pick. If the player is spawned during play, it doesn't exist in the editor, so you can't pick it, and only a script could point the camera at it. Following a tag fixes that. Example: the camera follows the tag player; when the level spawns player.entity, the camera finds it at once. Saved levels don't change, because the target just gains a second kind of value.",
- "Yes, in v2: it is what makes spawned players work without code."],
-["Q16","A new level starts with five inputs: left (A, Left arrow), right (D, Right arrow), up (W, Up arrow), down (S, Down arrow) and jump (Space).",
- "Background: an input is a name such as jump, with the keys mapped to it, listed on the World. Triggers and scripts listen for the name, never a key, so players can remap keys. Inputs are v2. Starting empty means every creator types the same five first. Example: you add the builtin platformer player to a new level and it moves at once, because left, right and jump already exist.",
- "Yes: the five most games need, nothing more. You can rename or delete them."]
-]],
-["Test play", "The end window is v2: it appears when a trigger or script wins or loses the level.", [
-["Q20","In test play, Leave on the end window goes back to the editor.",
- "Background: the end window shows a title (won or lost), the time, and two buttons, Restart and Leave. For a player of the finished game, Leave will go somewhere later (a main menu). While you test from the editor, the only sensible place is back to the editor, like pressing Stop.",
- "Yes: Leave in test play is the same as Stop."],
-["Q21","The end window stays as it is (title, time, Restart, Leave). The old draft's extras wait until Later.",
- "Background: the old draft's end window also had the creator's own win and lose text, a score from a variable, the best time and an attempt count. The review kept only the title, the time and the two buttons. A creator who wants a custom ending builds it in the level, then calls Win when it finishes.",
- "Later: none of them is needed to test levels, and the best time needs saved records the game doesn't have yet."],
-["Q22","No separate \"Play as player\" mode. Play already hides the panels.",
- "Background: the old draft had a second Play button that ran the level with no debug tools, exactly as a player would see it. Play already hides the panels and shows only a small Play bar, and in v3 the game runs the play file, which is exactly what players get.",
- "Drop it: Play already shows what players see."]
-]],
-["Versions", "Two things the docs had in two places with different answers.", [
-["Q23","Version history (named saved versions of a level) stays rejected.",
- "Background: version history was rejected in review round 11, and Ctrl+S exports the project file instead, so pressing it out of habit still saves something. The old scope page still listed it under \"not v1\", which looked like \"later\". Example of what it would be: a list of saved versions such as \"before the boss room\" that you can go back to.",
- "Rejected: you already decided it, and an exported project file is a saved version you keep yourself."],
-["Q24","A main menu, component presets, level ids and level thumbnails are Later: after v3, not designed now.",
- "Background: these were marked \"not v1\" with no version. A main menu would list your levels. Component presets would save a card's values to reuse. Level ids and thumbnails only matter once there is a list of levels. v1 to v3 open one level at a time, straight on the editor.",
- "Later: none of them is needed while there is only one level at a time."]
+["Triggers", "Triggers are no-code logic (When, If, Do). They come in v2.", [
+["Q14","When a trigger's Spawn action creates an entity, the entity appears where the action's target is, moved by an offset in px that you type. Anything else about it comes from its .entity file or a script.",
+ "Background: Spawn creates an entity from an .entity file during play, such as a bullet. Every trigger action has a target: this (the entity the trigger is on), other (the thing that touched it), an entity by name, or a tag. Spawn puts the new entity on its target's position, and the offset moves it from there by x and y px. Example: a cannon has the trigger \"When the key fire is pressed, Spawn bullet.entity\", target this, offset 40, 0. The bullet appears 40 px to the right of the cannon's centre, at its mouth. With offset 0, 0 it would appear inside the cannon, at its centre. The bullet's speed is in bullet.entity, or a script sets it.",
+ "Yes: the target plus an offset covers where things appear, and the rest belongs in the .entity file or a script."],
+["Q28","In v2, each variable is either a Number or a Text, chosen when you create it. Add, Subtract and checks like \"10 or more\" only work on Number variables. A Text variable can only be set, and checked with \"is\" and \"is not\".",
+ "Background: in round 5 you said variables can hold text in v2. Variables live on the World, and triggers read and change them. Adding 1 to a text, or asking whether a name is \"10 or more\", means nothing, so each variable needs to say what it holds. Example: coins is a Number. A coin's trigger does \"Add 1 to coins\", and a door checks \"If coins is 10 or more\". door_colour is a Text. A switch does \"Set door_colour to red\", and the door checks \"If door_colour is red\".",
+ "Yes: one kind per variable means a trigger only offers the actions that fit it."]
 ]]
 ];
 
-const KEY = "engine-v3-architecture-review-5";
+const KEY = "engine-v3-architecture-review-6";
 let answers = {};
 try { answers = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { answers = {}; }
 function persist() { try { localStorage.setItem(KEY, JSON.stringify(answers)); } catch (e) {} }
@@ -360,7 +321,7 @@ function buildText() {
     if (groupLines.length) lines.push("## " + group, ...groupLines, "");
   }
   const head = [
-    "Architecture review answers, round 5",
+    "Architecture review answers, round 6",
     "Answered " + (total - open.length) + " of " + total + " (" + yes + " yes, " + no + " no)",
     ""
   ];

@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. Rounds 2 to 5 of its review are answered. **Waiting for the owner:** three open questions below (round 6, not on the review page yet), and a review of the proposal.
+The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. Rounds 2 to 5 of its review are answered. **Waiting for the owner:** three open questions below (round 6, on the review page), and a review of the proposal.
 
 ## Where things stand
 
@@ -64,7 +64,7 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 
 ## Open questions for the owner
 
-Found while rewriting. None was decided by Claude. Round 5 of the review page answered the rest. **These three still need a card on the [review page](proposals/architecture/review.html) as round 6**, in plain words with an example.
+Found while rewriting. None was decided by Claude. Round 5 of the review page answered the rest. **These three are on the [review page](proposals/architecture/review.html) as round 6.**
 
 8. **The "Entities here" item in the right-click menu:** a list of every entity stacked under the mouse, to pick one hidden behind another. The owner asked for a plainer explanation. Suggested: drop it, the Layers panel and Alt+click (v3) already reach them.
 14. **Where the trigger's Spawn action puts the new entity.** The owner asked what "an offset from the target" means. Each action picks a target (`this`, `other`, an entity by name, or a tag); Spawn puts the new entity on the target's position, and an offset in px moves it from there. Example: a cannon spawns a bullet 40 px to the right of its centre.
