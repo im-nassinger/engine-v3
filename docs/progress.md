@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**, which waits for the owner. **Next: stage 1 of [plan.md](plan.md), the model.** One question is open, about the polygon library, needed by stage 3.
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**, which waits for the owner. **Next: stage 1 of [plan.md](plan.md), the model. Its plan is [proposed](proposals/stage-1.md) and waits for the owner**: three places where the approved docs can't be built as written. One question is open, about the polygon library, needed by stage 3.
 
 ## Where things stand
 
@@ -68,7 +68,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 ## Next
 
 1. **Push, when the owner asks,** so CI runs for the first time on x86 and ARM (step 7 of stage 0).
-2. **Stage 1 of [plan.md](plan.md): the model.**
+2. **Stage 1 of [plan.md](plan.md): the model.** The owner answers the three changes in [proposals/stage-1.md](proposals/stage-1.md), then the work follows its eight steps.
 3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
