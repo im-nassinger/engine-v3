@@ -62,20 +62,20 @@ Found while rewriting. None was decided by Claude. Where the docs had to say som
 
 ### Triggers and scripts
 
-15. **Spawn settings:** what the trigger's Spawn action offers (position, speed), now that `spawn(path)` returns an id.
-16. **Follow by tag:** can the camera's target be a tag, so a spawned player is found without a script?
-17. **Inputs of a new level:** suggested `left`, `right`, `up`, `down`, `jump`.
-18. **The Lua function list** has to be rewritten as functions that take ids. The old one used an object style the review rejected.
-19. **How a script declares its settings, and how it names its own entity**, were never written.
-20. **Events between builtin scripts** (`damage`, `heal` and so on) were never reviewed.
+14. **Spawn settings:** what the trigger's Spawn action offers (position, speed), now that `spawn(path)` returns an id.
+15. **Follow by tag:** can the camera's target be a tag, so a spawned player is found without a script?
+16. **Inputs of a new level:** suggested `left`, `right`, `up`, `down`, `jump`.
+17. **The Lua function list** has to be rewritten as functions that take ids. The old one used an object style the review rejected.
+18. **How a script declares its settings, and how it names its own entity**, were never written.
+19. **Events between builtin scripts** (`damage`, `heal` and so on) were never reviewed.
 
 ### Test play
 
-21. **Leave on the end window, in test play:** written as "goes back to the editor".
-22. **The end window's extras** from the old draft: the creator's own win and lose text, a score from a variable, the best time, an attempt count. The review kept a title, the time, Restart and Leave. Written as Later.
-23. **Play as player** (a test run without debug tools) is written as dropped, because Play already hides the panels and v2 runs the play file. Agree?
+20. **Leave on the end window, in test play:** written as "goes back to the editor".
+21. **The end window's extras** from the old draft: the creator's own win and lose text, a score from a variable, the best time, an attempt count. The review kept a title, the time, Restart and Leave. Written as Later.
+22. **Play as player** (a test run without debug tools) is written as dropped, because Play already hides the panels and v2 runs the play file. Agree?
 
 ### Versions
 
-24. **Version history** was rejected in round 11, but the scope page listed it under "Not v1". Written as rejected.
-25. **A main menu, component presets, level ids, thumbnails** are "not v1" with no version. Written as Later.
+23. **Version history** was rejected in round 11, but the scope page listed it under "Not v1". Written as rejected.
+24. **A main menu, component presets, level ids, thumbnails** are "not v1" with no version. Written as Later.

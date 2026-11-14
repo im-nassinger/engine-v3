@@ -14,6 +14,7 @@ Everything known about the project: a 2D physics game with a level editor, for t
 | [principles.md](principles.md) | The rules every requirement follows, and the rules for proposing a change |
 | [scope.md](scope.md) | Every feature in one line, with its version and why |
 | [requirements/](requirements/README.md) | The exact rules, in eight topics, plus the features not designed yet |
+| [proposals/](proposals/README.md) | Proposals waiting for the owner's answer. Nothing there is decided |
 | [rejected.md](rejected.md) | What we decided against, and why. Check it before proposing something |
 | [decisions.md](decisions.md) | Project-level choices: starting over, the reviews, how these docs are organised |
 | [tech-notes.md](tech-notes.md) | Facts and warnings for the architecture work. Not requirements |
