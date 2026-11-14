@@ -68,6 +68,7 @@ tests/
 | `module`, `moduleResolution` | `ESNext`, `bundler` | Vite compiles |
 | `moduleDetection` | `force` | An `index.ts` that exports nothing yet is still a module |
 | `jsx` | `react-jsx` | |
+| `resolveJsonModule` | true | A test compares with a recorded `level.json`, imported as JSON *(standing yes, 2026-11-14)* |
 | `skipLibCheck` | true | Don't type-check the packages' own files |
 | `types` | `[]` | No package's global types reach a part unless its config names them. Only `tests/tsconfig.json` and `tsconfig.node.json` name `node` |
 

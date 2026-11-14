@@ -16,11 +16,11 @@
   "entities": [
     { "id": 1, "parent": null, "hidden": false, "locked": false,
       "components": {
-        "TransformComponent": { "position": { "x": 0, "y": 0 }, "rotation": 0, "scale": { "x": 1, "y": 1 }, "skew": 0 },
         "NameComponent": { "name": "World" },
-        "ShapeComponent": { "kind": "rectangle", "geometry": { "width": 20000, "height": 10000 } },
-        "StyleComponent": { "fill": { "kind": "solid", "colour": "#BFE3F5FF" }, "outline_width": 0, "opacity": 1 },
-        "PhysicsWorldComponent": { "gravity_strength": 9.8, "gravity_direction": "down", "gravity_angle": 90 }
+        "TransformComponent": { "position": { "x": 0, "y": 0 }, "rotation": 0, "scale": { "x": 1, "y": 1 }, "skew": 0 },
+        "ShapeComponent": { "geometry": { "kind": "rectangle", "width": 20000, "height": 10000 } },
+        "StyleComponent": { "fill": { "kind": "solid", "colour": "#BFE3F5FF" }, "outline_colour": "#1F3552FF", "outline_width": 0, "opacity": 1 },
+        "PhysicsWorldComponent": { "gravity_strength": 9.8, "gravity_direction": "down", "gravity_angle": 90, "walls": false }
       } },
     { "id": 2, "parent": 1, "hidden": false, "locked": false,
       "components": { "...": {} } },
@@ -33,14 +33,17 @@
 }
 ```
 
-- The values in the example are illustrations. The requirements give the background as "a soft light blue" with no exact colour, which is picked in plan stage 2.
+- The World and the camera of a new level are written exactly as in `src/core/level-data/LevelWriter.newLevel.json`, which a test compares with the writer's output. Entity 7 is an illustration, with some values left out.
 - **Entities are a flat list in Entities panel order** (pre-order, top row first). Each names its parent, which must appear before it; the order of the list is the order of each parent's children. A flat list is easy to check for cycles and depth, and reads well in a diff.
-- **Component values are keyed by attribute name** (the field's label in snake_case), the same names Lua uses. Values are written by each field type's `serialize`.
+- **Components are keyed by type name, in card order. Their values are keyed by attribute name** (the field's label in snake_case), the same names Lua uses, then the stored values under their key in snake_case (a shape's `geometry`). Values are written by each type's `serialize`.
+- **The writer writes every value, defaults included** *(standing yes, 2026-11-14)*: the file says exactly what the level held, and a later change of a default can't change an old level.
 - **Editor-only data** is `editor` (grid size, folded rows) and each entity's `locked`. The v3 play file drops them; `hidden` stays.
 - **A missing value reads as its default**, so a field added to a component later needs no upgrade code. An unknown component type or an unknown value makes the file "damaged".
 - **The physics version** is a whole number that goes up whenever the game's Box2D build changes. A table in `core/level-data/PhysicsVersions.ts` names the build for each number (1: `box2d3-wasm` 6.0.0, Box2D 3.2). v1 only records it, as the requirement says.
 
 ## Reading and writing
+
+`core/level-data` holds the types (`LevelData`, `EntityData`, `ComponentData`, `EditorData`), `LEVEL_FORMAT` and `CURRENT_FORMAT_VERSION`, `LevelLimits` with `V1_LEVEL_LIMITS` (100,000 entities, 256 deep, 1,000 points, 256 MB), `PhysicsVersions`, `FormatUpgrader` and the writer and reader. Limits are a plain object passed in, so a test can use small ones.
 
 ```typescript
 export class LevelWriter {
@@ -65,7 +68,7 @@ export type ReadRefusal =
 ```
 
 - **Parse at the boundary:** `raw` is `unknown` until `LevelReader` has checked every entity, parent, component and value with its field type. After that, the rules trust the types.
-- **Upgrading:** `FormatUpgrader` holds a list of steps, each turning version N's JSON into N+1's. v1 has none. A file with a higher `formatVersion` than the game knows is refused with "made by a newer version of the game". Versions are never rolled back, as the tech notes warn.
+- **Upgrading:** `FormatUpgrader` holds a list of steps, each turning version N's JSON into N+1's, so the latest version is one more than the number of steps. v1 has none. A file with a higher `formatVersion` than the game knows is refused with "made by a newer version of the game". Versions are never rolled back, as the tech notes warn.
 - **The same reader** reads imports, the browser's saved level, the clipboard, the play copy in the worker and (v2) `.entity` files. So a damaged saved level and a damaged import fail the same way.
 
 ## The project file
