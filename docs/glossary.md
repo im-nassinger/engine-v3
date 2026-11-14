@@ -117,7 +117,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Custom event | An event you name yourself, such as `open`. A trigger or script fires it on an entity, and that entity's triggers and scripts react. It can carry one number. |
 | Action | One step in a trigger's Do list, such as Change value or Spawn. Only ever used for triggers. |
 | `this` and `other` | In a trigger: `this` is the entity holding the trigger, `other` is the entity that caused the event, when there is one. |
-| Variable | A named number or text during play, such as `coins = 5`, listed on the World's VariablesComponent. |
+| Variable | A named number during play, such as `coins = 5`, listed on the World's VariablesComponent. Whether it can also hold text is not decided yet (see the open questions in [progress.md](progress.md)). |
 | Keep between runs | A variable setting: its value is saved in the browser and the next run starts from it. |
 | Input | A name such as `jump`, with the keys and gamepad buttons mapped to it, listed on the World's InputComponent. Players can remap inputs. |
 | Raw key | A key used directly, such as Space, without going through an input. |

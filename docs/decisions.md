@@ -33,7 +33,7 @@ How the docs do it:
 - **Every feature heading carries its version**, and every feature ends in a `Source:` line, so a rule can be traced back to the review.
 - **One place per fact.** Other files link to a rule instead of repeating it.
 - **What isn't a requirement has its own file:** [rejected.md](rejected.md) for what was decided against, [requirements/later.md](requirements/later.md) for features not designed yet, [tech-notes.md](tech-notes.md) for what the old research learned about browsers, Box2D and Lua.
-- **Two scripts check the docs.** `tools/check-docs.js` checks the form. `tools/check-sources.js` proves that every review decision and scope id is cited somewhere, so nothing was lost in the rewrite.
+- **Two scripts check the docs.** `tools/check-docs.js` checks the form. `tools/check-sources.js` proves that every review decision and scope id is cited somewhere, so nothing was lost in the rewrite. That proof is finished: it keeps running only so a citation isn't deleted by accident. Decisions made after the review are cited as `owner: <date>`, which it doesn't read.
 
 Where this differs from the earlier plan (`docs-cleanup-plan.md` in the old project): `scope.md` was kept as the one-page list of every feature, the technical notes are one file instead of one per topic, and a small topic is a single file instead of a folder.
 

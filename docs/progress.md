@@ -15,7 +15,7 @@
 | Open questions below | Waiting for the owner |
 | Architecture, stack, `plan.md`, code | Not started |
 
-The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists.
+The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
 ## Next
 

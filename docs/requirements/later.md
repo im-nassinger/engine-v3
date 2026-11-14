@@ -85,6 +85,7 @@ Source: round 1: D33, D34, D65; round 3: D78, D79, D81, D82; old: AS-131 to AS-1
 
 - **v1 has no replay feature.** Study Box2D v3's determinism and replay support before designing one.
 - Box2D v3 makes physics give the same result on every computer, but it doesn't record inputs. The game still has to record keys and clicks to replay a run.
+- Box2D v3 also has its own built-in recording and replay support. The owner said to look at it later and decide then whether it helps. Not now.
 - Cheap tools a recorded run would give, to look at after the first release: run the last test again exactly, run to a chosen tick and pause, copy a run report for a bug, and draw the path of the last run in the editor.
 - Leaderboards: whether a wider window is fair is decided when publishing is built. Runs would have to be played again on a server, or scores can be faked.
 

@@ -35,6 +35,9 @@ A small topic is one file. A bigger one is a folder whose `README.md` lists its 
   | `round 3: 01 2.6` | A row in `docs/requirements/review-decisions/round-3.md` |
   | `decisions: D12` | A row in `docs/requirements/00-decisions.md` that no round repeated |
   | `old: WS-53` | A requirement id in the old topic file |
+  | `owner: 2026-11-13` | A decision the owner made after the review, on that date. It is recorded in this repo's history, not in `ecs-game-v2` |
+
+  A decision that is Claude's call after the owner said "you decide" also uses `owner:`, and its rules say so in the `*Why: ...*` line.
 
 - Each file ends with a **Not in the scope review** table: small features from the old draft that were accepted but never given a version. The last column is Claude's suggestion, not a decision.
 - What was decided against goes to [rejected.md](../rejected.md). Notes on how to build something go to [tech-notes.md](../tech-notes.md).
@@ -44,4 +47,4 @@ A small topic is one file. A bigger one is a folder whose `README.md` lists its 
 Run both from the project root after changing a requirement:
 
 - `node tools/check-docs.js`: every doc has a TL;DR and stays under 300 lines, links resolve, every feature heading has a version and a `Source:` line, and no dropped word is used.
-- `node tools/check-sources.js`: every decision of the review and every scope id is cited somewhere. It reads `../ecs-game-v2`.
+- `node tools/check-sources.js`: every decision of the review and every scope id is cited somewhere. It reads `../ecs-game-v2`. **It is a finished one-time proof** that nothing was lost in the rewrite. It still runs, so a citation can't be deleted by accident, but it doesn't read `owner:` sources and new decisions don't need it.

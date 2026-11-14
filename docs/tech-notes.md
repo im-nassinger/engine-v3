@@ -2,7 +2,13 @@
 
 ## TL;DR
 
-Facts and warnings for the architecture work, collected from the old research. **These are not requirements and not decisions.** They are what the earlier attempt learned about browsers, Box2D and Lua that the new design should know. Grouped by topic, plus the first attempt's implementation choices at the end. Notes that named the old code's own parts were dropped, and anything a later decision made untrue was removed.
+Facts and warnings for the architecture work, collected from the old research. **These are not requirements and not decisions.** They are what the earlier attempt learned about browsers, Box2D and Lua that the new design should know. First a few facts the owner settled, then notes grouped by topic, then the first attempt's implementation choices at the end. Notes that named the old code's own parts were dropped, and anything a later decision made untrue was removed.
+
+## Settled by the owner
+
+- **Box2D v3 and Lua both run in the browser with wasm.** No proof is needed. (owner, 2026-11-13)
+- **The first attempt used box2d-wasm 7.0.0, which is Box2D v2.4.1.** That is why the physics notes below are still against v2.4.
+- **Box2D v3 has its own recording and replay support.** Whether it helps the game is looked at later, not now. See replays in [later.md](requirements/later.md).
 
 ## Editor
 
