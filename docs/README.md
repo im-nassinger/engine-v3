@@ -15,6 +15,7 @@ Everything known about the project: a 2D physics game with a level editor, for t
 | [scope.md](scope.md) | Every feature in one line, with its version and why |
 | [requirements/](requirements/README.md) | The exact rules, in eight topics, plus the features not designed yet |
 | [architecture/](architecture/README.md) | How the game is built: the stack, the parts of the code, the classes, saving, test play, tests, the tooling and checks |
+| [design/](design/README.md) | How the editor looks: the round 8 answers, the mockups, and later the design system |
 | [plan.md](plan.md) | The v1 plan in 18 stages, each with the docs it implements |
 | [review.html](review.html) | The review page where the owner answers questions in the browser. Earlier rounds are in git history |
 | [proposals/](proposals/README.md) | Proposals waiting for the owner's answer. None open now |

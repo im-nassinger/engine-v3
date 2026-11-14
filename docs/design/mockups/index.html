@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor Mockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* The page around the mockup */
+  :root { --page: #0e0f12; --page-text: #c9ced8; --page-muted: #7d8492; --page-line: #2a2e36; --page-on: #3b82f6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--page); color: var(--page-text); font: 13px/1.4 system-ui, sans-serif; }
+  .controls { height: 84px; display: flex; align-items: center; align-content: center; gap: 6px 16px; padding: 0 16px; border-bottom: 1px solid var(--page-line); flex-wrap: wrap; }
+  .controls b { font-weight: 600; }
+  .seg { display: flex; gap: 4px; align-items: center; }
+  .seg span { color: var(--page-muted); margin-right: 4px; }
+  .seg button { font: inherit; color: var(--page-text); background: transparent; border: 1px solid var(--page-line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  .seg button.on { background: var(--page-on); border-color: var(--page-on); color: #fff; }
+  .caption { color: var(--page-muted); flex: 1 0 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stage { position: absolute; top: 84px; left: 0; right: 0; bottom: 0; display: flex; align-items: flex-start; justify-content: center; padding: 12px; overflow: hidden; }
+  .frame { width: 1440px; height: 900px; transform-origin: top center; box-shadow: 0 8px 40px rgba(0, 0, 0, .5); flex-shrink: 0; }
+
+  /* The editor. Design tokens per direction. */
+  .ed {
+    --app: #16191e; --panel: #21252c; --field: #191c22; --hover: #2b3039; --line: #323843;
+    --text: #d5dbe5; --muted: #8a93a3; --faint: #5d6574;
+    --accent: #3b82f6; --accent-soft: rgba(59, 130, 246, .24); --on-accent: #ffffff;
+    --warning: #e5b931; --tip: #5aa9f0; --danger: #e5534b; --playing: #3fb27f; --paused: #e5b931;
+    --radius: 4px; --row: 28px; --text-size: 12px;
+    --font-ui: "JetBrains Mono", ui-monospace, monospace; --font-num: "JetBrains Mono", ui-monospace, monospace;
+    position: relative; width: 1440px; height: 900px; overflow: hidden;
+    background: var(--app); color: var(--text); font-family: var(--font-ui); font-size: var(--text-size);
+  }
+  .ed.dir-b {
+    --app: #1a1a1a; --panel: #2a2a2a; --field: #1f1f1f; --hover: #353535; --line: #3a3a3a;
+    --text: #e2e2e2; --muted: #9b9b9b; --faint: #666666;
+    --font-ui: "Inter", system-ui, sans-serif;
+  }
+  .ed svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+  .num { font-family: var(--font-num); }
+
+  .top { position: absolute; left: 0; top: 0; right: 0; height: 44px; background: var(--panel); border-bottom: 1px solid var(--line); display: flex; align-items: center; padding: 0 8px; gap: 4px; z-index: 3; }
+  .top .grow { flex: 1; }
+  .ib { height: 28px; min-width: 28px; padding: 0 6px; border-radius: var(--radius); display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: var(--text); }
+  .ib.hover { background: var(--hover); }
+  .ib.dim { color: var(--faint); }
+  .ib.on { background: var(--accent-soft); color: var(--text); }
+  .ib .chev { width: 12px; height: 12px; color: var(--muted); }
+  .levelname { padding: 0 8px; height: 28px; display: flex; align-items: center; font-weight: 500; }
+  .savestate { color: var(--muted); display: flex; align-items: center; gap: 4px; padding-right: 8px; }
+  .sep { width: 1px; height: 20px; background: var(--line); margin: 0 4px; }
+  .play { height: 28px; padding: 0 12px; border-radius: var(--radius); background: var(--accent); color: var(--on-accent); display: inline-flex; align-items: center; gap: 6px; font-weight: 600; margin: 0 6px; }
+  .play svg.i { fill: currentColor; stroke: none; width: 12px; height: 12px; }
+
+  .view { position: absolute; left: 0; top: 44px; right: 0; bottom: 24px; }
+  .view svg { display: block; }
+
+  .tools { position: absolute; left: 0; top: 44px; bottom: 24px; width: 44px; background: var(--panel); border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; padding-top: 8px; gap: 4px; z-index: 2; }
+  .tool { width: 32px; height: 32px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: var(--text); position: relative; }
+  .tool.on { background: var(--accent); color: var(--on-accent); }
+  .tool.hover { background: var(--hover); }
+  .tip-box { position: absolute; left: 40px; top: 4px; white-space: nowrap; background: #0b0d10; color: #e8ebf0; border-radius: var(--radius); padding: 4px 8px; font-size: 11px; display: flex; gap: 10px; z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,.4); }
+  .tip-box .k { color: #8a93a3; }
+
+  .panel { position: absolute; top: 44px; bottom: 24px; background: var(--panel); z-index: 2; display: flex; flex-direction: column; }
+  .layers { left: 44px; width: 260px; border-right: 1px solid var(--line); }
+  .insp { right: 0; width: 300px; border-left: 1px solid var(--line); overflow: hidden; }
+  .ph { height: 36px; display: flex; align-items: center; padding: 0 12px; font-weight: 600; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+
+  .lrow { height: var(--row); display: flex; align-items: center; gap: 6px; padding-right: 8px; color: var(--text); }
+  .lrow .fold { width: 14px; height: 14px; color: var(--muted); }
+  .lrow .kind { color: var(--muted); }
+  .lrow .name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lrow .eye { color: var(--faint); }
+  .lrow.sel { background: var(--accent-soft); }
+  .lrow.sel .kind { color: var(--text); }
+  .lrow.hover { background: var(--hover); }
+  .lrow.hover .eye { color: var(--muted); }
+
+  .ihead { height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+  .ihead .nm { flex: 1; height: 26px; display: flex; align-items: center; padding: 0 6px; border-radius: var(--radius); background: var(--field); font-weight: 500; }
+  .ihead .nm.plain { background: none; padding: 0; }
+  .card { border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+  .chead { height: 32px; display: flex; align-items: center; gap: 6px; padding: 0 8px 0 10px; font-weight: 600; }
+  .chead .t { flex: 1; }
+  .chead svg.i { width: 14px; height: 14px; color: var(--muted); }
+  .f { height: var(--row); display: flex; align-items: center; gap: 8px; padding: 0 12px; }
+  .f > label { width: 128px; color: var(--muted); flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .f.off > label, .f.off .inp { color: var(--faint); }
+  .f .vals { flex: 1; display: flex; gap: 6px; min-width: 0; align-items: center; }
+  .inp { flex: 1; min-width: 0; height: 22px; background: var(--field); border: 1px solid transparent; border-radius: var(--radius); padding: 0 6px; display: flex; align-items: center; gap: 4px; font-family: var(--font-num); white-space: nowrap; overflow: hidden; }
+  .inp.ro { background: transparent; padding-left: 0; }
+  .inp.focus { border-color: var(--accent); }
+  .inp .ax { color: var(--muted); }
+  .inp .unit { color: var(--muted); opacity: .75; margin-left: auto; }
+  .inp .chev { margin-left: auto; width: 12px; height: 12px; color: var(--muted); }
+  .inp.short { flex: 0 0 58px; }
+  .slider { flex: 1; height: 3px; background: var(--line); border-radius: 2px; position: relative; }
+  .slider i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--muted); border-radius: 2px; }
+  .slider b { position: absolute; top: -4px; width: 11px; height: 11px; margin-left: -5px; border-radius: 50%; background: var(--text); }
+  .cb { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--muted); display: inline-flex; align-items: center; justify-content: center; }
+  .cb.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .cb.on svg.i { width: 11px; height: 11px; stroke-width: 2.4; }
+  .sw { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(255,255,255,.25); flex-shrink: 0; }
+  .addc { margin: 12px; height: 28px; border: 1px solid var(--line); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--text); }
+
+  .status { position: absolute; left: 0; right: 0; bottom: 0; height: 24px; background: var(--panel); border-top: 1px solid var(--line); display: flex; align-items: center; gap: 20px; padding: 0 10px; color: var(--muted); font-size: 11px; z-index: 3; }
+  .status .hint { flex: 1; color: var(--text); }
+  .status .warn { display: flex; align-items: center; gap: 4px; }
+  .status svg.i { width: 13px; height: 13px; }
+
+  .opts { position: absolute; left: 312px; top: 52px; z-index: 2; display: flex; gap: 2px; padding: 3px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 2px 10px rgba(0,0,0,.25); }
+  .opts .ib { gap: 6px; padding: 0 8px; }
+
+  .menu { position: absolute; z-index: 6; min-width: 200px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,.45); padding: 4px; }
+  .mi { height: 26px; display: flex; align-items: center; padding: 0 8px; border-radius: 3px; gap: 12px; }
+  .mi .l { flex: 1; }
+  .mi .k { color: var(--muted); font-family: var(--font-num); font-size: 11px; }
+  .mi.hover { background: var(--accent); color: var(--on-accent); }
+  .mi.hover .k { color: var(--on-accent); opacity: .8; }
+  .mi.dis { color: var(--faint); }
+  .mi.dis .k { color: var(--faint); }
+  .mi .chev { width: 12px; height: 12px; }
+  .msep { height: 1px; background: var(--line); margin: 4px 6px; }
+
+  .scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, .45); z-index: 7; }
+  .dialog { position: absolute; z-index: 8; left: 50%; top: 260px; width: 400px; margin-left: -200px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 16px 48px rgba(0,0,0,.5); }
+  .dialog h3 { margin: 0; padding: 16px 16px 6px; font-size: 13px; font-weight: 600; }
+  .dialog p { margin: 0; padding: 0 16px 16px; color: var(--muted); line-height: 1.5; }
+  .dialog .row { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--line); }
+  .btn { height: 28px; padding: 0 14px; border-radius: var(--radius); display: inline-flex; align-items: center; border: 1px solid var(--line); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
+
+  .game { position: absolute; inset: 0; background: #000; }
+  .playbar { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 4px; padding: 4px; background: var(--panel); border: 1.5px solid var(--playing); border-radius: var(--radius); box-shadow: 0 4px 16px rgba(0,0,0,.4); }
+  .playbar .state { display: flex; align-items: center; gap: 6px; padding: 0 10px 0 8px; font-weight: 600; color: var(--playing); letter-spacing: .04em; }
+  .playbar .state i { width: 8px; height: 8px; border-radius: 50%; background: var(--playing); }
+  .playbar .ib { padding: 0 8px; }
+  .playbar .k { color: var(--muted); font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="controls">
+  <b>Editor mockups</b>
+  <div class="seg" id="dirs"><span>Direction</span></div>
+  <div class="seg" id="moments"><span>Moment</span></div>
+  <div class="caption" id="caption"></div>
+</div>
+<div class="stage" id="stage"><div class="frame" id="frame"></div></div>
+<script>
+// Outline icons, drawn for this mockup in the style of an open icon set.
+const ICON = {
+  menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  select: '<path d="M6 3l12 8-5.5 1.5L10 19z"/>',
+  shape: '<rect x="3" y="3" width="10" height="10" rx="1"/><circle cx="15.5" cy="15.5" r="5.5"/>',
+  joint: '<circle cx="7" cy="17" r="3"/><circle cx="17" cy="7" r="3"/><path d="M9.2 14.8l5.6-5.6"/>',
+  eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  right: '<path d="M9 6l6 6-6 6"/>',
+  down: '<path d="M6 9l6 6 6-6"/>',
+  undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
+  redo: '<path d="M15 14l5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h3"/>',
+  magnet: '<path d="M6 4v7a6 6 0 0 0 12 0V4"/><path d="M6 8h4M14 8h4M10 4v4M14 4v4"/>',
+  play: '<path d="M7 4v16l13-8z"/>',
+  pause: '<path d="M8 5v14M16 5v14"/>',
+  step: '<path d="M5 5l10 7-10 7z"/><path d="M19 5v14"/>',
+  stop: '<rect x="6" y="6" width="12" height="12" rx="1"/>',
+  help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 5 0c0 1.8-2.5 2-2.5 4"/><path d="M12 17h.01"/>',
+  world: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/>',
+  camera: '<rect x="3" y="7" width="13" height="10" rx="1"/><path d="M16 10.5l5-3v9l-5-3"/>',
+  rect: '<rect x="4" y="6" width="16" height="12" rx="1"/>',
+  ellipse: '<ellipse cx="12" cy="12" rx="9" ry="6.5"/>',
+  polygon: '<path d="M12 3l9 7-3.5 10h-11L3 10z"/>',
+  line: '<path d="M3 18l6-8 5 4 7-9"/>',
+  group: '<path d="M3 6.5h6l2 2h10V19H3z"/>',
+  warning: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>',
+  check: '<path d="M5 12l5 5 9-10"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  dots: '<path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"/>',
+  saved: '<path d="M5 12l5 5 9-10"/>'
+};
+const ic = (name, extra = '') => `<svg class="i" viewBox="0 0 24 24" ${extra}>${ICON[name]}</svg>`;
+
+// The sample level, in level pixels. The origin is the middle of the level, y points down.
+const BG = '#cde3f2';
+const LEVEL = [
+  { id: 'ground', t: 'rect', x: -1100, y: 380, w: 2200, h: 260, fill: '#6ba368', line: '#2f5130' },
+  { id: 'ramp', t: 'poly', p: [[-1000, 380], [-560, 380], [-1000, 170]], fill: '#7db37a', line: '#2f5130' },
+  { id: 'platform', t: 'rect', x: 250, y: 60, w: 420, h: 40, fill: '#8a6b4e', line: '#4a3626' },
+  { id: 'crate1', t: 'rect', x: 290, y: -40, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
+  { id: 'crate2', t: 'rect', x: 410, y: -40, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
+  { id: 'crate3', t: 'rect', x: 350, y: -140, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
+  { id: 'ball', t: 'circle', cx: 140, cy: 180, r: 40, fill: '#f0c419', line: '#8a6d00' },
+  { id: 'carbody', t: 'rect', x: -440, y: 250, w: 320, h: 60, fill: '#d9534f', line: '#7a2522' },
+  { id: 'cabin', t: 'poly', p: [[-380, 250], [-340, 190], [-230, 190], [-190, 250]], fill: '#e8807c', line: '#7a2522' },
+  { id: 'wheel1', t: 'circle', cx: -370, cy: 338, r: 42, fill: '#3a3a3a', line: '#111111' },
+  { id: 'wheel2', t: 'circle', cx: -190, cy: 338, r: 42, fill: '#3a3a3a', line: '#111111' },
+  { id: 'rect1', t: 'rect', x: -60, y: 300, w: 160, h: 80, fill: '#4a90d9', line: '#1f3552' }
+];
+const HINGES = [[-370, 338], [-190, 338]];
+
+// Where things are during test play, a moment after Play.
+const PLAYED = {
+  crate3: { dx: 320, dy: 60, rot: 28 }, ball: { dy: 100 }, carbody: { dx: 50 }, cabin: { dx: 50 },
+  wheel1: { dx: 50 }, wheel2: { dx: 50 }
+};
+
+function drawShape(s, X, Y, z, opts) {
+  const sw = Math.max(0.6, 2 * z);
+  const style = `fill="${s.fill}" stroke="${s.line}" stroke-width="${sw}" stroke-linejoin="round"`;
+  const move = opts.play && PLAYED[s.id] || {};
+  const dx = (move.dx || 0), dy = (move.dy || 0);
+  let out = '';
+  if (s.t === 'rect') {
+    const [x, y] = [X(s.x + dx), Y(s.y + dy)];
+    const cx = x + s.w * z / 2, cy = y + s.h * z / 2;
+    out = `<rect x="${x}" y="${y}" width="${s.w * z}" height="${s.h * z}" ${style} transform="rotate(${move.rot || 0} ${cx} ${cy})"/>`;
+  } else if (s.t === 'circle') {
+    out = `<circle cx="${X(s.cx + dx)}" cy="${Y(s.cy + dy)}" r="${s.r * z}" ${style}/>`;
+  } else {
+    out = `<polygon points="${s.p.map(([a, b]) => X(a + dx) + ',' + Y(b + dy)).join(' ')}" ${style}/>`;
+  }
+  return out;
+}
+
+// One SVG of the level view. Overlays are drawn in screen pixels, so they keep their size at any zoom.
+function scene(w, h, z, cx, cy, opts) {
+  const X = (x) => +(cx + x * z).toFixed(2), Y = (y) => +(cy + y * z).toFixed(2);
+  const acc = 'var(--accent)';
+  let s = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`;
+  s += `<rect width="${w}" height="${h}" fill="${BG}"/>`;
+  if (opts.grid) {
+    const step = 50 * z;
+    const ox = ((cx % step) + step) % step, oy = ((cy % step) + step) % step;
+    s += `<defs><pattern id="g" width="${step}" height="${step}" patternUnits="userSpaceOnUse" x="${ox}" y="${oy}"><path d="M ${step} 0 L 0 0 0 ${step}" fill="none" stroke="rgba(30,60,95,.13)" stroke-width="1"/></pattern></defs>`;
+    s += `<rect width="${w}" height="${h}" fill="url(#g)"/>`;
+    s += `<path d="M ${cx} 0 V ${h} M 0 ${cy} H ${w}" stroke="rgba(30,60,95,.32)" stroke-width="1"/>`;
+  }
+  for (const shape of (opts.empty ? [] : LEVEL)) s += drawShape(shape, X, Y, z, opts);
+  if (opts.joints && !opts.empty) {
+    for (const [a, b] of HINGES) {
+      s += `<circle cx="${X(a)}" cy="${Y(b)}" r="7" fill="#fff" stroke="#1d2430" stroke-width="1.5"/><circle cx="${X(a)}" cy="${Y(b)}" r="2" fill="#1d2430"/>`;
+    }
+  }
+  if (opts.cameraFrame) {
+    s += `<rect x="${X(-960)}" y="${Y(-540)}" width="${1920 * z}" height="${1080 * z}" fill="none" stroke="rgba(20,28,40,.7)" stroke-width="1.5"/>`;
+    s += `<text x="${X(-960)}" y="${Y(-540) - 6}" font-size="11" fill="rgba(20,28,40,.8)" font-family="var(--font-ui)">Camera 1920 × 1080</text>`;
+  }
+  if (opts.selected) {
+    const r = LEVEL.find((e) => e.id === opts.selected);
+    const x = X(r.x), y = Y(r.y), rw = r.w * z, rh = r.h * z;
+    const halo = opts.halo ? `<rect x="${x}" y="${y}" width="${rw}" height="${rh}" fill="none" stroke="#fff" stroke-width="4"/>` : '';
+    s += halo + `<rect x="${x}" y="${y}" width="${rw}" height="${rh}" fill="none" stroke="${acc}" stroke-width="1.5"/>`;
+    for (const [hx, hy] of [[0, 0], [.5, 0], [1, 0], [0, .5], [1, .5], [0, 1], [.5, 1], [1, 1]]) {
+      s += `<rect x="${x + hx * rw - 4}" y="${y + hy * rh - 4}" width="8" height="8" fill="#fff" stroke="${acc}" stroke-width="1.5"/>`;
+    }
+  }
+  if (opts.drawing) {
+    const pts = [[-760, -250], [-560, -390], [-330, -300], [-380, -90]];
+    const mouse = [-640, -40];
+    const all = pts.concat([mouse]);
+    s += `<polygon points="${all.map(([a, b]) => X(a) + ',' + Y(b)).join(' ')}" fill="#4a90d9" fill-opacity=".35" stroke="none"/>`;
+    s += `<polyline points="${pts.map(([a, b]) => X(a) + ',' + Y(b)).join(' ')}" fill="none" stroke="#1f3552" stroke-width="1.5"/>`;
+    s += `<polyline points="${X(pts[3][0])},${Y(pts[3][1])} ${X(mouse[0])},${Y(mouse[1])} ${X(pts[0][0])},${Y(pts[0][1])}" fill="none" stroke="#1f3552" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+    pts.forEach(([a, b], i) => {
+      s += i === 0
+        ? `<circle cx="${X(a)}" cy="${Y(b)}" r="6" fill="#fff" stroke="${acc}" stroke-width="2"/>`
+        : `<rect x="${X(a) - 4}" y="${Y(b) - 4}" width="8" height="8" fill="#fff" stroke="${acc}" stroke-width="1.5"/>`;
+    });
+    const [mx, my] = [X(mouse[0]), Y(mouse[1])];
+    s += `<path d="M ${mx - 9} ${my} H ${mx + 9} M ${mx} ${my - 9} V ${my + 9}" stroke="#0b0d10" stroke-width="1.5"/>`;
+  }
+  return s + '</svg>';
+}
+
+// Layers rows: [depth, icon, name, folded state, row state]. The top row is drawn in front.
+const ROWS_NEW = [[0, 'world', 'World', 'open'], [1, 'camera', 'Camera']];
+const ROWS_LEVEL = [
+  [0, 'world', 'World', 'open'], [1, 'camera', 'Camera'], [1, 'rect', 'Rectangle 1'], [1, 'ellipse', 'Ball'],
+  [1, 'rect', 'Crate 3'], [1, 'rect', 'Crate 2'], [1, 'rect', 'Crate 1'], [1, 'rect', 'Platform'],
+  [1, 'group', 'Car', 'open'], [2, 'joint', 'Hinge 2'], [2, 'joint', 'Hinge 1'], [2, 'ellipse', 'Wheel 2'],
+  [2, 'ellipse', 'Wheel 1'], [2, 'polygon', 'Cabin'], [2, 'rect', 'Body'],
+  [1, 'polygon', 'Ramp'], [1, 'rect', 'Ground']
+];
+function layers(rows, selected, hover) {
+  let s = `<div class="panel layers"><div class="ph">Layers</div><div>`;
+  for (const [d, icon, name, fold] of rows) {
+    const state = name === selected ? ' sel' : name === hover ? ' hover' : '';
+    const arrow = fold ? ic(fold === 'open' ? 'down' : 'right', 'style="width:14px;height:14px;color:var(--muted)"') : '<span style="width:16px"></span>';
+    const eye = name === 'World' ? '' : `<span class="eye">${ic('eye')}</span>`;
+    s += `<div class="lrow${state}" style="padding-left:${8 + d * 16}px">${arrow}<span class="kind">${ic(icon)}</span><span class="name">${name}</span>${eye}</div>`;
+  }
+  return s + '</div></div>';
+}
+
+// Inspector fields
+const F = {
+  num: (l, v, u = '', o = {}) => `<div class="f${o.off ? ' off' : ''}"><label>${l}</label><div class="vals">${o.slider !== undefined
+    ? `<div class="inp short">${v}<span class="unit">${u}</span></div><div class="slider"><i style="width:${o.slider * 100}%"></i><b style="left:${o.slider * 100}%"></b></div>`
+    : `<div class="inp${o.ro ? ' ro' : ''}${o.focus ? ' focus' : ''}">${v}<span class="unit">${u}</span></div>`}</div></div>`,
+  vec: (l, a, b, u = '') => `<div class="f"><label>${l}</label><div class="vals"><div class="inp"><span class="ax">X</span>${a}<span class="unit">${u}</span></div><div class="inp"><span class="ax">Y</span>${b}<span class="unit">${u}</span></div></div></div>`,
+  choice: (l, v, o = {}) => `<div class="f${o.off ? ' off' : ''}"><label>${l}</label><div class="vals"><div class="inp${o.ro ? ' ro' : ''}">${v}${o.ro ? '' : ic('down', 'class="i chev"')}</div></div></div>`,
+  colour: (l, hex) => `<div class="f"><label>${l}</label><div class="vals"><div class="inp"><span class="sw" style="background:${hex}"></span>${hex.toUpperCase()}</div></div></div>`,
+  check: (l, on, o = {}) => `<div class="f${o.off ? ' off' : ''}"><label>${l}</label><div class="vals"><span class="cb${on ? ' on' : ''}">${on ? ic('check') : ''}</span></div></div>`
+};
+const card = (title, body) => `<div class="card"><div class="chead">${ic('down')}<span class="t">${title}</span>${ic('dots')}</div>${body}</div>`;
+
+function inspectorWorld() {
+  return `<div class="panel insp"><div class="ph">Inspector</div>
+    <div class="ihead">${ic('world')}<div class="nm plain">World</div></div>
+    ${card('ShapeComponent', F.choice('Kind', 'Rectangle', { ro: true }) + F.num('Width', '20000', 'px') + F.num('Height', '10000', 'px'))}
+    ${card('StyleComponent', F.colour('Fill', BG) + F.colour('Outline colour', '#1f3552') + F.num('Outline width', '0', 'px') + F.num('Opacity', '100', '%', { slider: 1 }))}
+    ${card('PhysicsWorldComponent', F.num('Gravity strength', '9.8', 'm/s²') + F.choice('Gravity direction', 'Down') + F.num('Gravity angle', '90', '°', { off: true }) + F.check('Walls', false))}
+  </div>`;
+}
+function inspectorRect() {
+  return `<div class="panel insp"><div class="ph">Inspector</div>
+    <div class="ihead">${ic('rect')}<div class="nm">Rectangle 1</div><span class="ib">${ic('eye')}</span></div>
+    <div style="overflow:hidden">
+    ${card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°') + F.vec('Scale', '1', '1') + F.num('Skew', '0', '°'))}
+    ${card('ShapeComponent', F.choice('Kind', 'Rectangle', { ro: true }) + F.num('Width', '160', 'px') + F.num('Height', '80', 'px', { focus: true }))}
+    ${card('StyleComponent', F.colour('Fill', '#4a90d9') + F.colour('Outline colour', '#1f3552') + F.num('Outline width', '2', 'px') + F.num('Opacity', '100', '%', { slider: 1 }))}
+    ${card('BodyComponent', F.choice('Type', 'Dynamic') + F.num('Gravity scale', '1', '', { slider: .55 }) + F.num('Linear damping', '0', '', { slider: 0 }) + F.num('Angular damping', '0', '', { slider: 0 }) + F.check('Fixed rotation', false) + F.check('Bullet', false) + F.check('Merge', true) + F.num('Mass', '5.12', 'kg', { ro: true }))}
+    ${card('SurfaceComponent', F.num('Density', '1', '', { slider: .01 }) + F.num('Friction', '0.3', '', { slider: .06 }) + F.num('Restitution', '0', '', { slider: 0 }) + F.check('Sensor', false))}
+    </div>
+  </div>`;
+}
+
+function topbar(o = {}) {
+  return `<div class="top">
+    <span class="ib${o.menuOpen ? ' on' : ''}">${ic('menu')}</span>
+    <span class="levelname">${o.name || 'Untitled level'}</span>
+    <span class="savestate">${ic('saved', 'style="width:13px;height:13px"')}Saved</span>
+    <span class="sep"></span>
+    <span class="ib${o.canUndo ? '' : ' dim'}">${ic('undo')}</span><span class="ib dim">${ic('redo')}</span>
+    <span class="ib on">${ic('magnet')}</span>
+    <span class="grow"></span>
+    <span class="play">${ic('play')}Play</span>
+    <span class="grow"></span>
+    <span class="ib">View${ic('down', 'class="i chev"')}</span>
+    <span class="ib num">${o.zoom || '40%'}${ic('down', 'class="i chev"')}</span>
+    <span class="ib">${ic('help')}</span>
+  </div>`;
+}
+function toolstrip(active, tooltip) {
+  const tools = [['select', 'Select', '1'], ['shape', 'Shape', '4'], ['joint', 'Joint', '6']];
+  return `<div class="tools">${tools.map(([icon, name, key]) => `<span class="tool${icon === active ? ' on' : ''}${tooltip === icon ? ' hover' : ''}">${ic(icon)}${tooltip === icon ? `<span class="tip-box">${name}<span class="k">${key}</span></span>` : ''}</span>`).join('')}</div>`;
+}
+function statusbar(hint, pos, sel, warnings) {
+  return `<div class="status"><span class="hint">${hint}</span><span class="num">${pos}</span><span>${sel}</span>
+    <span class="warn">${ic('warning', `style="color:${warnings ? 'var(--warning)' : 'var(--faint)'}"`)}<span class="num">${warnings}</span></span></div>`;
+}
+
+const VIEW_W = 1440, VIEW_H = 832, Z = 0.4, CX = 722, CY = 416;
+function editor(o) {
+  return topbar(o.top) +
+    `<div class="view">${scene(VIEW_W, VIEW_H, o.zoom || Z, CX, CY, o.scene)}</div>` +
+    toolstrip(o.tool || 'select', o.tooltip) + layers(o.rows, o.selectedRow, o.hoverRow) +
+    (o.inspector === 'rect' ? inspectorRect() : inspectorWorld()) +
+    statusbar(o.hint, o.pos, o.sel, o.warnings || 0) + (o.extra || '');
+}
+
+const MENU = `<div class="menu" style="left:8px;top:40px">
+    <div class="mi"><span class="l">File</span>${ic('right', 'class="i chev"')}</div>
+    <div class="mi hover"><span class="l">Edit</span>${ic('right', 'class="i chev"')}</div>
+    <div class="mi"><span class="l">Arrange</span>${ic('right', 'class="i chev"')}</div>
+    <div class="mi"><span class="l">View</span>${ic('right', 'class="i chev"')}</div>
+    <div class="mi"><span class="l">Help</span>${ic('right', 'class="i chev"')}</div>
+  </div>
+  <div class="menu" style="left:212px;top:70px;min-width:240px">
+    <div class="mi"><span class="l">Undo Move 1 entity</span><span class="k">Ctrl+Z</span></div>
+    <div class="mi dis"><span class="l">Redo</span><span class="k">Ctrl+Shift+Z</span></div>
+    <div class="msep"></div>
+    <div class="mi"><span class="l">Cut</span><span class="k">Ctrl+X</span></div>
+    <div class="mi"><span class="l">Copy</span><span class="k">Ctrl+C</span></div>
+    <div class="mi hover"><span class="l">Paste</span><span class="k">Ctrl+V</span></div>
+    <div class="mi"><span class="l">Duplicate</span><span class="k">Ctrl+D</span></div>
+    <div class="mi"><span class="l">Delete</span><span class="k">Del</span></div>
+    <div class="msep"></div>
+    <div class="mi"><span class="l">Select all</span><span class="k">Ctrl+A</span></div>
+    <div class="mi"><span class="l">Rename</span><span class="k">F2</span></div>
+    <div class="mi"><span class="l">Hide or show</span><span class="k">Ctrl+Shift+H</span></div>
+  </div>`;
+const DIALOG = `<div class="scrim"></div><div class="dialog">
+    <h3>Replace the open level?</h3>
+    <p>Export it first if you want to keep it.</p>
+    <div class="row"><span class="btn">Cancel</span><span class="btn primary">Replace</span></div>
+  </div>`;
+
+const LEVEL_SCENE = { grid: true, cameraFrame: true, joints: true };
+const MOMENTS = [
+  ['1', 'A new level', 'The empty editor right after New: the World and the camera in the Layers panel, the World\'s cards in the Inspector (nothing is selected). The mouse rests on the Shape tool, showing its tooltip.',
+    (d) => editor({ rows: ROWS_NEW, scene: { grid: true, cameraFrame: true, empty: true }, tooltip: 'shape',
+      hint: 'Select · click to select, drag to move', pos: 'x 412, y −96', sel: 'Nothing selected' })],
+  ['2', 'A selected shape', 'A new shape in the default look, selected: its row in the Layers panel, its cards in the Inspector with the Height field focused, the outline and handles in the level view.',
+    (d) => editor({ rows: ROWS_LEVEL, selectedRow: 'Rectangle 1', hoverRow: 'Crate 2', inspector: 'rect',
+      scene: Object.assign({ selected: 'rect1', halo: d === 'b' }, LEVEL_SCENE), top: { name: 'Car test', canUndo: true },
+      hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Rectangle 1', warnings: 1 })],
+  ['3', 'Drawing', 'The Shape tool drawing a polygon: the options strip over the level view, four points placed, the faded preview following the mouse, the first point ringed to close it.',
+    (d) => editor({ rows: ROWS_LEVEL, tool: 'shape', scene: Object.assign({ drawing: true }, LEVEL_SCENE), top: { name: 'Car test', canUndo: true },
+      hint: 'Shape · click to add a point, click the first point or press Enter to close', pos: 'x −640, y −40', sel: 'Nothing selected', warnings: 1,
+      extra: `<div class="opts"><span class="ib">${ic('rect')}Rectangle</span><span class="ib">${ic('ellipse')}Ellipse</span><span class="ib on">${ic('polygon')}Polygon</span><span class="ib">${ic('line')}Line</span></div>` })],
+  ['4a', 'The main menu', 'The main menu open on Edit. Every command is listed with its shortcut. Redo is greyed because there is nothing to redo.',
+    (d) => editor({ rows: ROWS_LEVEL, selectedRow: 'Rectangle 1', inspector: 'rect', scene: Object.assign({ selected: 'rect1', halo: d === 'b' }, LEVEL_SCENE),
+      top: { name: 'Car test', canUndo: true, menuOpen: true }, hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Rectangle 1', warnings: 1, extra: MENU })],
+  ['4b', 'A dialog', 'The question New asks before it replaces the open level.',
+    (d) => editor({ rows: ROWS_LEVEL, scene: LEVEL_SCENE, top: { name: 'Car test', canUndo: true },
+      hint: 'Select · click to select, drag to move', pos: 'x 412, y −96', sel: 'Nothing selected', warnings: 1, extra: DIALOG })],
+  ['5', 'Test play', 'Play hides every panel. The camera\'s box fills the window with black bars, editor-only drawing is hidden, and the Play bar sits on top with its coloured frame.',
+    (d) => `<div class="game"><div style="position:absolute;left:0;top:45px">${scene(1440, 810, 0.75, 720, 405, { play: true })}</div></div>
+      <div class="playbar"><span class="state"><i></i>PLAYING</span><span class="ib">${ic('pause')}Pause <span class="k">F8</span></span><span class="ib dim">${ic('step')}Step <span class="k">F9</span></span><span class="ib">${ic('stop')}Stop <span class="k">Ctrl+Enter</span></span></div>`]
+];
+const DIRS = [['a', 'A: your picks', 'Cool blue-grey, JetBrains Mono everywhere, a plain blue selection.'],
+              ['b', 'B: to compare', 'Neutral grey, Inter for labels with JetBrains Mono for values, a blue selection with a white edge.']];
+
+let dir = 'a', moment = '1';
+try { const saved = JSON.parse(localStorage.getItem('engine-v3-mockups') || '{}'); dir = saved.dir || dir; moment = saved.moment || moment; } catch (e) {}
+// A link such as index.html#b-3 opens direction B on moment 3.
+const fromHash = location.hash.slice(1).split('-');
+if (fromHash.length === 2) { dir = fromHash[0]; moment = fromHash[1]; }
+
+function render() {
+  const m = MOMENTS.find((x) => x[0] === moment) || MOMENTS[0];
+  const dd = DIRS.find((x) => x[0] === dir);
+  document.getElementById('frame').innerHTML = `<div class="ed dir-${dir}">${m[3](dir)}</div>`;
+  document.getElementById('caption').textContent = `${dd[2]} ${m[2]}`;
+  for (const b of document.querySelectorAll('#dirs button')) b.classList.toggle('on', b.dataset.v === dir);
+  for (const b of document.querySelectorAll('#moments button')) b.classList.toggle('on', b.dataset.v === moment);
+  try { localStorage.setItem('engine-v3-mockups', JSON.stringify({ dir, moment })); } catch (e) {}
+  fit();
+}
+function fit() {
+  const stage = document.getElementById('stage');
+  const k = Math.min((stage.clientWidth - 24) / 1440, (stage.clientHeight - 24) / 900, 1);
+  const frame = document.getElementById('frame');
+  frame.style.transform = `scale(${k})`;
+  frame.style.marginBottom = `${-900 * (1 - k)}px`;
+}
+for (const [v, label] of DIRS) {
+  const b = document.createElement('button'); b.textContent = label; b.dataset.v = v;
+  b.onclick = () => { dir = v; render(); }; document.getElementById('dirs').appendChild(b);
+}
+for (const [v, label] of MOMENTS) {
+  const b = document.createElement('button'); b.textContent = `${v} ${label}`; b.dataset.v = v;
+  b.onclick = () => { moment = v; render(); }; document.getElementById('moments').appendChild(b);
+}
+document.addEventListener('keydown', (e) => {
+  const i = MOMENTS.findIndex((x) => x[0] === moment);
+  if (e.key === 'ArrowRight') { moment = MOMENTS[Math.min(i + 1, MOMENTS.length - 1)][0]; render(); }
+  if (e.key === 'ArrowLeft') { moment = MOMENTS[Math.max(i - 1, 0)][0]; render(); }
+  if (e.key === 'a' || e.key === 'b') { dir = e.key; render(); }
+});
+window.addEventListener('resize', fit);
+render();
+</script>
+</body>
+</html>
