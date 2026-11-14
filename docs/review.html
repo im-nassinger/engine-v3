@@ -77,7 +77,7 @@
   <div class="pbar"><i id="pfill"></i></div>
 </header>
 <main>
-  <p class="intro">Round 9: <b>what stage 1 needs to finish the TransformComponent and the NameComponent</b>, plus the one question already open. The rest of stage 1 is built and follows the approved docs. Most cards are Yes or No; one is a choice, with my pick marked. A comment can say anything. Answers are kept in this browser. When you’re done, press Copy answers and paste the text into the chat.</p>
+  <p class="intro">Round 9: <b>what stage 1 needs to finish the TransformComponent and the NameComponent</b>, plus one question about the level's name found while building, and the one question already open. The rest of stage 1 is built and follows the approved docs. Most cards are Yes or No; one is a choice, with my pick marked. A comment can say anything. Answers are kept in this browser. When you’re done, press Copy answers and paste the text into the chat.</p>
   <details class="glossary"><summary>Glossary</summary><dl id="glossary"></dl></details>
   <div id="list"></div>
   <div class="footer">
@@ -118,6 +118,12 @@ const GROUPS = [
 ["T2","The descriptions shown when hovering each label are: <b>Position</b>: \"Where the entity sits, in pixels, measured from its parent.\" <b>Rotation</b>: \"How far the entity is turned clockwise, in degrees, measured from its parent.\" <b>Scale</b>: \"How much the entity is stretched across and down, measured from its parent. Can't be 0.\" <b>Skew</b>: \"How far the entity is slanted, in degrees, measured from its parent. Between −90° and 90°.\" <b>Name</b>: \"The entity's name. It doesn't have to be unique.\"",
  "Background: every field has a description, shown when hovering its label, and the requirements say the TransformComponent's must say its values are measured from the parent. These are the first descriptions; the other components' come in stage 2. A comment can rewrite any of them.",
  "Yes: short, plain, and each says what the limit is."]
+]],
+["The level's name", "Found while building Level in stage 1. The rule says a level's name is 1 to 60 characters.", [
+["L1","A level name longer than 60 characters is refused, not cut.",
+ "Background: the top bar's name field can stop typing at 60 characters, so this only matters for a pasted name or a level.json with a longer name. Refusing keeps the old name and shows why; cutting keeps the first 60 characters without saying so. An entity's name (N1) is cut at 64 by the text field type, so the two would differ.",
+ "Refuse: the owner sees the name was too long instead of losing its end quietly.",
+ [["Refuse","The old name stays, with a status text"],["Cut to 60","Like an entity's name at 64"]], 0, false]
 ]],
 ["The polygon library", "Already open in progress.md, asked here so every open question is on one page.", [
 ["P1","Stage 3 tries clipper2-ts first. If it fails the checks, I ask again.",

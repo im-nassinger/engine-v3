@@ -136,10 +136,11 @@ export type ComponentClass<T extends Component> = {
 };
 ```
 
-- **As built (2026-11-14), four details differ from the code above:**
+- **As built (2026-11-14), five details differ from the code above:**
   - **Generic code holds an `AnyComponent`**, not a `Component`: a plain contract with the schema, `changed`, `readValue`, `writeValue`, `copy` and `resetToDefaults`, which every `Component<Values>` implements. TypeScript can't widen `Component<BodyValues>` to one type for all components, because a schema typed by its own keys never widens to all keys. `Entity`'s map, `ComponentChange` and the registry use `AnyComponent`.
   - **`Values extends ComponentValues`** (`Record<string, unknown>`), not `object`, so a values `type` widens to that contract. A values `interface` doesn't, so values are always a `type`.
   - **`addMenuSection` is optional:** the TransformComponent and the NameComponent are on every entity, so the Add Component menu never lists them.
+  - **`ComponentClass<T extends AnyComponent>`** has `schema: AnyComponentSchema` and `new (...args: never[]): T`. Test components for code that holds components are in `core/components/testing/`.
   - **`storedValues` comes with the ShapeComponent** in stage 2, the first component that has one, together with `StoredValueDefinition`, which these docs don't describe yet.
 - Code that knows the component uses the typed `get` and `set` (`body.get('gravityScale')`). Generic code (the Inspector, undo, the reader, Lua) uses `readValue` and `writeValue` by key, which go through the same field type.
 - `set` returns the value actually stored, after clamping, so the Inspector can show "Max is 1500" when it differs from what was typed.

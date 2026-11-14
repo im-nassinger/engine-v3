@@ -48,6 +48,10 @@ export class Entity {
 }
 ```
 
+- **As built (2026-11-14), the entity differs from the code above in three details:**
+  - **`Entity` raises its own `changed` signal** (`EntityChange`: a component added, removed or changed, a switch changed), and `Level` listens and forwards it as a `LevelUpdate` with the entity added. Its constructor is `(id, tree)`, without `LevelSignals`. *Why: `LevelUpdate` names `Entity`, so an entity that imports `LevelSignals` makes a circle of imports, which dependency-cruiser refuses. It is the same pattern as `Component`.*
+  - **`LevelTree<Node>` is generic over its node**, for the same reason: it never imports `Entity`.
+  - **Component lookups and the map use `AnyComponent`**, and `ComponentClass<T extends AnyComponent>` lives in `core/components`, see [components-and-fields.md](components-and-fields.md#componentschema-and-component).
 - `addComponent` subscribes to the component's `changed` signal and raises `valueChanged` for it; `removeComponent` unsubscribes. The component itself never knows its entity, see [components-and-fields.md](components-and-fields.md#componentschema-and-component).
 - An entity on its own is just an id. What it is comes from its components, as the glossary says. There are no subclasses such as `JointEntity`.
 - Whether the World, the camera or a joint allows a command is read from its components (the World's PhysicsWorldComponent, the CameraComponent, the JointComponent), never from a kind field.
@@ -86,6 +90,11 @@ export class Level {
 ```
 
 - `MoveOutcome` is `{ moved: true } | { moved: false, reason: 'cycle' | 'tooDeep' | 'world' | 'cameraOutsideWorld' }`. The command turns a reason into the status text, see [errors.md](../errors.md).
+- **Depth counts the parents above an entity:** the World is 0 deep, an entity directly inside it 1, and nothing goes past 256. A move is refused when the deepest entity of the moved subtree would end up past 256. `createEntity` and `restoreEntity` past 256 throw, because every command checks the limit first.
+- The `index` of `moveEntity` is the entity's position among its new siblings once it has moved.
+- `RenameOutcome` is `{ renamed: true, name } | { renamed: false, reason: 'empty' | 'tooLong' }`, counting characters (code points) after trimming.
+- **Removing the World or the camera throws**, and so does `restoreEntity` with an id already in the level: commands never ask for either.
+- **As built (2026-11-14), `Level.createNew` takes no registry yet** and makes a bare World and camera. Their TransformComponent and NameComponent are added when those classes are built (round 9), and the `registry` parameter in stage 2.
 - `Level` changes only the tree. **Keeping an entity in place on screen when it changes parent is the command's job** (it rewrites the TransformComponent with the maths in [geometry.md](geometry.md)), because the rule is an editor rule.
 - What other entities a removal affects (joints attached to a deleted entity) is also the command's job. `Level.removeEntity` removes exactly the subtree it is given.
 - `LevelTree` is a small internal class holding the parent of each entity and the ordered children of each entity. It isn't exported from the module.
@@ -93,7 +102,7 @@ export class Level {
 ### Order
 
 - **Children are a plain ordered array per entity**, top row first. Inserting at an index is an array splice. There are no fractional order keys, so nothing ever needs rebalancing.
-- **Run order** (v2: triggers and scripts) is the pre-order walk, top row first. **Draw order** is the same walk read backwards, so the top row ends up in front.
+- **Run order** (v2: triggers and scripts) is the pre-order walk, top row first. **Draw order** is the World first, because its fill is the background, then the same walk read backwards, so the top row ends up in front.
 - The Entities panel's visible rows and the run order are both cached and rebuilt only when the tree version changes, see [performance.md](../performance.md).
 
 ### The World and the camera
@@ -142,6 +151,8 @@ export class LevelSignals {
 
 - Signals are synchronous. Listeners must not change the level while handling one. A listener that needs to react marks itself dirty and does its work later (on the next frame, or when asked).
 - `EntityVersions` keeps listeners per entity id, so a change to one crate wakes only that crate's row and card, never all 10,000 rows.
+- **Removing a subtree raises one `entityRemoved` per entity, children first**, each with the parent it had, so every listener can drop what it keeps per entity while the parent still exists.
+- **Which entity versions move on:** the entity itself for any change, and for an add, remove or move also the parents it joined or left, whose rows show the change.
 - `LevelUpdate` is only a notice that something changed. The undoable edit is a **change**, class `LevelChange`, see [history](../editor/history.md). Every `LevelChange` causes `LevelUpdate`s, never the other way round.
 
 ## Derived caches

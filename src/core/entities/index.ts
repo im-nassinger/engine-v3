@@ -1,1 +1,11 @@
-export {};
+export type { AddComponentOutcome } from './AddComponentOutcome.ts';
+export { Entity } from './Entity.ts';
+export type { EntityChange, SwitchName } from './EntityChange.ts';
+export { EntityIdAllocator } from './EntityIdAllocator.ts';
+export { EntityVersions } from './EntityVersions.ts';
+export { Level } from './Level.ts';
+export { LevelSignals } from './LevelSignals.ts';
+export type { LevelUpdate } from './LevelUpdate.ts';
+export type { MoveOutcome, MoveRefusal } from './MoveOutcome.ts';
+export type { RenameOutcome } from './RenameOutcome.ts';
+export type { EntityId } from '../fields/index.ts';
