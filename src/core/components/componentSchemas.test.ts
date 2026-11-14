@@ -2,6 +2,9 @@ import { describe, expect, test } from 'vitest';
 
 import type { AnyComponentSchema } from './AnyComponent.ts';
 import { camelCaseOfLabel, snakeCaseOfLabel } from './attributeNames.ts';
+import { BodyComponent } from './BodyComponent/BodyComponent.ts';
+import { JointComponent } from './JointComponent/JointComponent.ts';
+import { SurfaceComponent } from './SurfaceComponent/SurfaceComponent.ts';
 import { NameComponent } from './NameComponent/NameComponent.ts';
 import { PathComponent } from './PathComponent/PathComponent.ts';
 import { ShapeComponent } from './ShapeComponent/ShapeComponent.ts';
@@ -15,6 +18,9 @@ const SCHEMAS: readonly AnyComponentSchema[] = [
     ShapeComponent.schema,
     PathComponent.schema,
     StyleComponent.schema,
+    BodyComponent.schema,
+    SurfaceComponent.schema,
+    JointComponent.schema,
 ];
 
 describe.each(SCHEMAS)('the $typeName schema', (schema) => {
