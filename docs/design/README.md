@@ -26,6 +26,8 @@ All from the owner, 2026-11-14, on the [review page](../review.html).
 | Font | **JetBrains Mono for the whole editor** (the owner's change to Inter) | Texts in levels keep their own fonts: Inter by default, see [drawing](../requirements/drawing.md) |
 | Mockups | **Five moments of v1, in two directions** | See below |
 
+**After the mockups** (owner, 2026-11-14): **the Inspector is on the left and the Layers panel on the right**, a change to [workspace.md](../requirements/editor/workspace.md). The three conflicts below were settled as Claude suggested.
+
 Already decided before round 8 and not asked again: one dark theme ([rejected.md](../rejected.md) lists a light theme), the panels' places and starting sizes, a yellow icon for a warning and a blue one for a tip, and the default look of a new shape and of the background.
 
 ## The two directions
@@ -49,8 +51,8 @@ Everything else is the same in both.
 
 ## Found while drawing the mockups
 
-Three places where the requirements disagree with each other. The mockups follow [workspace.md](../requirements/editor/workspace.md), the topic file for the layout. All three are open questions in [progress.md](../progress.md#open-questions-for-the-owner).
+Three places where the requirements disagreed. All settled by the owner on 2026-11-14 and written into the requirements and the glossary:
 
-- **Where the save state and the zoom sit.** workspace.md puts both in the top bar. The glossary's "Status bar" and [saving.md](../requirements/play-and-save/saving.md) put the save state in the status bar.
-- **Where the tools sit.** workspace.md puts them in the toolbar strip on the left. The glossary's "Top bar" says the top bar holds the tools.
-- **The lock icon on a row.** [selection.md](../requirements/editor/selection.md) says a v1 row has "an eye and a lock", and the Inspector's header "its hide and lock switches", but Lock is v3. The mockups show only the eye.
+- **The save state and the zoom are in the top bar.** The glossary's "Status bar" and [saving.md](../requirements/play-and-save/saving.md) used to say the status bar.
+- **The tools are in the toolbar strip on the left**, as [workspace.md](../requirements/editor/workspace.md) says. The glossary's "Top bar" used to list them.
+- **v1 has no lock icon.** Lock is v3, so a row and the Inspector's header show only the eye until then.

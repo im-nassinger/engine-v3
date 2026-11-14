@@ -11,7 +11,7 @@ How values are edited and how mistakes are reversed. **v1:** the Inspector shows
 - The Inspector shows every component of the selected entity as a card: a title, its fields, and a menu with Remove and Reset to defaults.
 - **Clicking empty space shows the World's components.** There is no settings window. *Why: the World is an entity like any other, so its settings are its components.*
 - The World's TransformComponent is fixed at zero and its card isn't shown, because the World never moves (owner: 2026-11-13).
-- The header shows the entity's name (editable), and its hide and lock switches. With several selected it reads `3 entities`.
+- The header shows the entity's name (editable), and its hide switch, and from v3 its lock switch. With several selected it reads `3 entities`.
 - The Inspector doesn't show the parent. The Layers panel tree does.
 - Cards appear in one fixed order, the same on every entity: TransformComponent, shape, path, text, style, body, surface, joint, camera, tags, scripts, triggers. Users can't reorder them.
 - Clicking a card's title folds it. The folded state is remembered per component type, in the browser.
@@ -19,7 +19,7 @@ How values are edited and how mistakes are reversed. **v1:** the Inspector shows
 - Hovering a field's label shows its description.
 - During play the Inspector is read-only, and shows live values when brought back with Panels.
 
-Source: round 1: C1, C10; round 3: R15; round 4: H2, SEL1; decisions: D14, D15; old: WS-84 to WS-89, WS-124; owner: 2026-11-13
+Source: round 1: C1, C10; round 3: R15; round 4: H2, SEL1; decisions: D14, D15; old: WS-84 to WS-89, WS-124; owner: 2026-11-13, 2026-11-14
 
 ### One fixed list of field types · v1
 

@@ -65,8 +65,8 @@
   .tip-box .k { color: #8a93a3; }
 
   .panel { position: absolute; top: 44px; bottom: 24px; background: var(--panel); z-index: 2; display: flex; flex-direction: column; }
-  .layers { left: 44px; width: 260px; border-right: 1px solid var(--line); }
-  .insp { right: 0; width: 300px; border-left: 1px solid var(--line); overflow: hidden; }
+  .layers { right: 0; width: 260px; border-left: 1px solid var(--line); }
+  .insp { left: 44px; width: 300px; border-right: 1px solid var(--line); overflow: hidden; }
   .ph { height: 36px; display: flex; align-items: center; padding: 0 12px; font-weight: 600; border-bottom: 1px solid var(--line); flex-shrink: 0; }
 
   .lrow { height: var(--row); display: flex; align-items: center; gap: 6px; padding-right: 8px; color: var(--text); }
@@ -111,7 +111,7 @@
   .status .warn { display: flex; align-items: center; gap: 4px; }
   .status svg.i { width: 13px; height: 13px; }
 
-  .opts { position: absolute; left: 312px; top: 52px; z-index: 2; display: flex; gap: 2px; padding: 3px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 2px 10px rgba(0,0,0,.25); }
+  .opts { position: absolute; left: 352px; top: 52px; z-index: 2; display: flex; gap: 2px; padding: 3px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 2px 10px rgba(0,0,0,.25); }
   .opts .ib { gap: 6px; padding: 0 8px; }
 
   .menu { position: absolute; z-index: 6; min-width: 200px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,.45); padding: 4px; }
@@ -143,7 +143,7 @@
 </head>
 <body>
 <div class="controls">
-  <b>Editor mockups</b>
+  <b>Editor mockups · v1</b>
   <div class="seg" id="dirs"><span>Direction</span></div>
   <div class="seg" id="moments"><span>Moment</span></div>
   <div class="caption" id="caption"></div>
@@ -352,7 +352,7 @@ function statusbar(hint, pos, sel, warnings) {
     <span class="warn">${ic('warning', `style="color:${warnings ? 'var(--warning)' : 'var(--faint)'}"`)}<span class="num">${warnings}</span></span></div>`;
 }
 
-const VIEW_W = 1440, VIEW_H = 832, Z = 0.4, CX = 722, CY = 416;
+const VIEW_W = 1440, VIEW_H = 832, Z = 0.4, CX = 762, CY = 416;
 function editor(o) {
   return topbar(o.top) +
     `<div class="view">${scene(VIEW_W, VIEW_H, o.zoom || Z, CX, CY, o.scene)}</div>` +

@@ -29,14 +29,14 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Level view | Where you see and edit the level. It fills the whole window, with the panels on top. Older docs say "viewport". |
 | Panel | A fixed area on top of the level view: Layers, Inspector, Assets, Console. |
 | Layers panel | The panel listing every entity as a tree: groups with their children inside. One row is one entity. The top row is drawn in front. |
-| Inspector | The panel on the right showing the components of what is selected, so you can edit their values. |
+| Inspector | The panel on the left showing the components of what is selected, so you can edit their values. |
 | Card | One component as the Inspector shows it: a title and its fields. |
 | Field | One editable value on a card. Fields come from one fixed list of field types. |
 | Attribute | One value of a component, as the Lua API names it: the Inspector field "Linear damping" is the attribute `linear_damping`. Scripts read it with `get_attribute` and change it with `set_attribute`. |
 | Assets panel | The panel listing the level's files in folders, like a small file system. |
 | Console | The panel at the bottom showing errors, `print()` messages and trigger lines from test play. |
-| Top bar | The bar along the top with the menus, the tools and Play. |
-| Status bar | The bar along the bottom with the zoom, the save state and the count of editor messages. |
+| Top bar | The bar along the top with the main menu, the level's name, the save state, Undo and Redo, Play, the View menu and the zoom. |
+| Status bar | The bar along the bottom with the tool's hint, the mouse position, the selection and the count of editor messages. |
 | View menu | The top bar menu that switches what the editor draws over the level: Grid, Joint icons, Camera frame, Physics view. |
 | Tool | What the mouse does in the level view: Select, Pencil, Bézier pen, Shape, Text, Joint, Trigger. |
 | Selection | The entities currently selected. There is one selection, shown in the level view, the Layers panel and the Inspector. |

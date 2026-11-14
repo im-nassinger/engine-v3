@@ -167,7 +167,7 @@ Source: round 6: RP1; old: SG-135 to SG-137
 ### The tree of entities · v1
 
 - The Layers panel shows the real tree of entities. There is no separate layer system.
-- **One row is one entity.** A row has an arrow to fold it, an icon for its kind, its name, an eye and a lock. Nothing else. *Why: joints are their own rows, so showing them inside another row breaks the picture.*
+- **One row is one entity.** A row has an arrow to fold it, an icon for its kind, its name and an eye, and from v3 a lock. Nothing else. *Why the lock waits: Lock is v3 (owner: 2026-11-14).* *Why: joints are their own rows, so showing them inside another row breaks the picture.*
 - **The top row is drawn in front.** The World is the top row, because it is the root. A new entity appears at the top of the group you are inside.
 - The camera is an ordinary row that can be moved up and down. Where it sits changes nothing, because what is inside the camera is always drawn over the level.
 - Click selects a row, Ctrl+click adds or removes one, Shift+click selects a range.
@@ -179,7 +179,7 @@ Source: round 6: RP1; old: SG-135 to SG-137
 - Every entity has a name, filled automatically, such as "Rectangle 1". A name is not a tag.
 - During play the panel is read-only.
 
-Source: scope SE8; round 1: C2; round 3: N1; round 4: 02 2.11, 02 2.12; round 5: FMT1; round 6: LY2; old: SG-88 to SG-107, SG-122 to SG-128
+Source: scope SE8; round 1: C2; round 3: N1; round 4: 02 2.11, 02 2.12; round 5: FMT1; round 6: LY2; old: SG-88 to SG-107, SG-122 to SG-128; owner: 2026-11-14
 
 ### Search · v3
 

@@ -27,9 +27,9 @@ Source: round 11: 12 A1, 12 A11; round 12: LV1; old: SV-16, SV-32
 - Saving never needs the internet.
 - **Undo history is not saved.** Reopening the level starts a fresh history. *Why: every past change would have to load forever, making files big and fragile across versions.*
 - Test play never saves its own state and never changes the saved level.
-- The status bar shows the save state, see [the workspace](../editor/workspace.md).
+- The top bar shows the save state, see [the workspace](../editor/workspace.md) (owner: 2026-11-14).
 
-Source: round 5: FMT1; round 11: 12 A3; old: SV-17 to SV-19, SV-22, SV-23, SV-31
+Source: round 5: FMT1; round 11: 12 A3; old: SV-17 to SV-19, SV-22, SV-23, SV-31; owner: 2026-11-14
 
 ### A warning when saving fails · v1
 

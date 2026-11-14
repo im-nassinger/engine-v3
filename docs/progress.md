@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **Next: the editor's look, before any code** (owner, 2026-11-14). Round 8 is answered and written in [design/](design/README.md). The two directions are drawn as [mockups](design/mockups/index.html) and **wait for the owner's pick**. **Then stage 0 of [plan.md](plan.md), project setup.** Its detailed plan was approved on 2026-11-14 and is written into [tooling.md](architecture/tooling.md) and the [plan's stage 0 steps](plan.md#stage-0-in-steps). One question is open, about the polygon library, needed by stage 3. No code exists yet.
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **Next: the editor's look, before any code** (owner, 2026-11-14). Round 8 is answered and written in [design/](design/README.md). The two directions are drawn as [mockups](design/mockups/index.html) and **wait for the owner's pick** of direction A or B. **Then stage 0 of [plan.md](plan.md), project setup.** Its detailed plan was approved on 2026-11-14 and is written into [tooling.md](architecture/tooling.md) and the [plan's stage 0 steps](plan.md#stage-0-in-steps). One question is open, about the polygon library, needed by stage 3. No code exists yet.
 
 ## Where things stand
 
@@ -52,6 +52,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 - **The architecture review, round 7** (owner): everything still open, on one page at once, as the owner asked. **The architecture is approved**: it moved to [architecture/](architecture/README.md), its plan to [plan.md](plan.md), its words to the [glossary](glossary.md). Spawn measures position and rotation from the trigger's entity, and its values replace the `.entity` file's. A boolean variable can be **flipped** by a trigger. All 119 small features got the version Claude suggested (14 v1, 12 v2, 80 v3, 13 Later), and three were dropped. See [decisions.md](decisions.md).
 - **Round 8, the editor's look** (owner): a Figma-like feel, cool blue-grey panels, a blue accent colour, medium density, 4 px corners, flush panels, outline icons, and **JetBrains Mono for the whole editor**. See [design/](design/README.md).
+- **After the mockups** (owner): **the Inspector moves to the left and the Layers panel to the right.** The save state and the zoom are in the top bar, the tools in the toolbar strip, and v1 rows have no lock icon. See [design/](design/README.md).
 - **The stage 0 plan is approved** (owner): all ten changes to the architecture docs, including **Node 26** instead of 24, `jiti`, dependency-cruiser, the guard tests and the worker files in `src/app/workers/`. See [decisions.md](decisions.md).
 
 ## Next
@@ -79,6 +80,3 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 When several come up, they go on the [review page](review.html) all at once, not a few per round (owner, 2026-11-14).
 
 1. **Which polygon library does core use?** (found 2026-11-14, needed by stage 3) [geometry.md](architecture/core-model/geometry.md) has `clipper2-js` cut self-crossing polygons and triangulate them. `clipper2-js` 1.2.4 has no triangulation, was last published on 2024-01-01, and brings Angular 15 into the project when installed. A candidate is `clipper2-ts` 2.0.1-19 (published 2026-11-07, has triangulation, needs no other package), not tried yet. Both call `Math.sin` and others somewhere inside, so stage 3 must check the functions it uses never reach them. Stage 0 keeps the library's name in one constant of the ESLint config, so the answer changes one line.
-2. **Where do the save state and the zoom sit?** (found 2026-11-14 while drawing the mockups) [workspace.md](requirements/editor/workspace.md) puts both in the top bar. The glossary's "Status bar" and [saving.md](requirements/play-and-save/saving.md) put the save state in the status bar. The mockups follow workspace.md.
-3. **Does the top bar hold the tools?** (found 2026-11-14) The glossary's "Top bar" says so. workspace.md puts them in the toolbar strip on the left, and the mockups follow it.
-4. **Is there a lock icon in v1?** (found 2026-11-14) [selection.md](requirements/editor/selection.md) gives a v1 row "an eye and a lock" and the Inspector's header lock switches, but Lock is v3. The mockups show only the eye.

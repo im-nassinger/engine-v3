@@ -63,7 +63,7 @@ export function useEditorSession() {
 ```
 ┌ TopBar ────────────────────────────────────────────────────┐
 ├──┬──────────────┬──────────────────────────┬──────────────┤
-│T │ LayersPanel  │                          │  Inspector   │
+│T │ Inspector    │                          │ LayersPanel  │
 │o │              │   LevelViewHost          │              │
 │o │              │   (PixiJS canvas, fills  │              │
 │l │              │    the whole window,     │              │
@@ -123,7 +123,7 @@ export function LevelViewHost() {
 
 **Fields:** `ui/fields/` has one component per field type (`NumberField`, `TextField`, `CheckboxField`, `ChoiceField`, `ColourField`, `VectorField`, `AngleField`, `EntityField`). `Card` picks the component from `FieldModel.definition.type.kind` through a lookup table, so a new field type adds one entry and one component. `NumberField` uses `ValueInput` from the editor for parsing and formatting.
 
-**The Layers panel** uses `@tanstack/react-virtual` with a fixed row height of 24 px, so only the rows on screen exist. Drag and drop is the panel's own pointer handling: it asks `LayersDrop` for the target on each move and draws the line it returns. The tech notes warn that virtual lists and drag and drop break together, so the plan builds both at once and tests them at 10,000 rows.
+**The Layers panel** uses `@tanstack/react-virtual` with a fixed row height, the row design token (28 px, see [design](../design/README.md)), so only the rows on screen exist. Drag and drop is the panel's own pointer handling: it asks `LayersDrop` for the target on each move and draws the line it returns. The tech notes warn that virtual lists and drag and drop break together, so the plan builds both at once and tests them at 10,000 rows.
 
 ## Styles
 

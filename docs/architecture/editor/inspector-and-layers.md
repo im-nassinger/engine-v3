@@ -12,7 +12,7 @@ export class InspectorModel {
 
     constructor(openLevel: OpenLevel, registry: ComponentRegistry, viewSettings: ViewSettings);
 
-    get header(): InspectorHeader;         // the name (or "3 entities"), hide and lock switches
+    get header(): InspectorHeader;         // the name (or "3 entities"), the hide switch (lock from v3)
     get cards(): readonly CardModel[];     // in the fixed card order
     get addableComponents(): readonly AddableComponent[];   // the Add Component menu
     get isReadOnly(): boolean;             // during play
