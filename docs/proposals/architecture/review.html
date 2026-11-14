@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecture Review</title>
+<style>
+  :root {
+    --bg: #f6f6f4; --card: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --line: #e2e2de;
+    --yes: #1f8a4c; --yes-bg: #e3f4ea; --no: #c0392b; --no-bg: #fbe6e3; --accent: #2f5fd0; --term: #2f5fd0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151517; --card: #1f1f22; --text: #ececee; --muted: #9a9aa2; --line: #333338;
+      --yes: #4cc27e; --yes-bg: #1c3527; --no: #ee6b5c; --no-bg: #3d2220; --accent: #7c9cf0; --term: #9db4f5;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .bar { max-width: 860px; margin: 0 auto; padding: 12px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  h1 { font-size: 18px; margin: 0; flex: 1 1 auto; }
+  .progress { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .pbar { height: 6px; background: var(--line); }
+  .pbar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+  label.filter { color: var(--muted); display: flex; gap: 6px; align-items: center; cursor: pointer; }
+  main { max-width: 860px; margin: 0 auto; padding: 8px 16px 64px; }
+  .intro { color: var(--muted); margin: 12px 0 4px; }
+  h2 { font-size: 16px; margin: 28px 0 4px; padding-top: 8px; }
+  .group-note { color: var(--muted); margin: 0 0 8px; }
+  details.glossary { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin: 12px 0; }
+  details.glossary summary { cursor: pointer; font-weight: 600; }
+  dl { margin: 8px 0 0; }
+  dt { font-weight: 600; margin-top: 8px; }
+  dd { margin: 2px 0 0; color: var(--muted); }
+  .q { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 8px 0; }
+  .q.yes { border-color: var(--yes); }
+  .q.no { border-color: var(--no); }
+  .row { display: flex; gap: 12px; align-items: flex-start; }
+  .tag { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 52px; padding-top: 2px; }
+  .text { flex: 1; }
+  .detail { margin: 8px 0 0 64px; color: var(--muted); }
+  .take { margin: 8px 0 0 64px; padding: 6px 10px; border-left: 3px solid var(--accent); background: var(--bg); border-radius: 0 6px 6px 0; }
+  .take b { font-style: normal; }
+  .term { color: var(--term); text-decoration: underline dotted; cursor: help; }
+  .btns { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }
+  button { font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 4px 12px; }
+  button.y[aria-pressed="true"] { background: var(--yes-bg); border-color: var(--yes); color: var(--yes); font-weight: 600; }
+  button.n[aria-pressed="true"] { background: var(--no-bg); border-color: var(--no); color: var(--no); font-weight: 600; }
+  button.c, button.m { color: var(--muted); }
+  textarea { width: 100%; margin-top: 10px; min-height: 56px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px; resize: vertical; }
+  .copy { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; padding: 8px 16px; }
+  .footer { margin-top: 32px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .status { color: var(--muted); }
+  .hidden { display: none; }
+  @media (max-width: 560px) {
+    .row { flex-wrap: wrap; }
+    .btns { width: 100%; }
+    .detail, .take { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <h1>Architecture review</h1>
+    <span class="progress" id="progress"></span>
+    <label class="filter"><input type="checkbox" id="onlyOpen"> Unanswered only</label>
+    <button class="copy" id="copyTop">Copy answers</button>
+  </div>
+  <div class="pbar"><i id="pfill"></i></div>
+</header>
+<main>
+  <p class="intro">Round 1 of the architecture proposal. Each card is one question or one decision, with my view under it. <b>Yes</b> means you agree with my view, <b>No</b> means you don't, and a comment says what you'd change. "More" explains the card with an example. Any click on a card counts it as answered. Underlined words are explained when you hover them. Answers are kept in this browser. When you're done, press Copy answers and paste the text into the chat.</p>
+  <details class="glossary"><summary>Glossary</summary><dl id="glossary"></dl></details>
+  <div id="list"></div>
+  <div class="footer">
+    <button class="copy" id="copyBottom">Copy answers</button>
+    <span class="status" id="status"></span>
+  </div>
+</main>
+<script>
+// Glossary: [term, meaning, words that link to it]. Agreed words first, then the new architecture words.
+const GLOSSARY = [
+["Entity","Any single thing in a level: a rectangle, a joint, the camera. On its own an entity is just an id. What it is comes from its components.",["entity","entities"]],
+["Component","A piece of data attached to an entity, such as BodyComponent. The Inspector shows each one as a card.",["component","components"]],
+["Field","One editable value on a card. Fields come from one fixed list of field types: number, text, checkbox, choice, colour, vector, angle, entity, asset, variable, tags, or a list of these.",["field","fields","field type","field types"]],
+["Attribute","One value of a component, as the Lua API names it: the field Linear damping is the attribute linear_damping.",["attribute","attributes"]],
+["Inspector","The panel on the right showing the components of what is selected.",["Inspector"]],
+["Card","One component as the Inspector shows it: a title and its fields.",["card","cards"]],
+["Layers panel","The panel listing every entity as a tree. One row is one entity. The top row is drawn in front.",["Layers panel","Layers"]],
+["Level view","Where you see and edit the level. It fills the whole window, with the panels on top.",["level view"]],
+["Physics view","A debug view in the editor and test play that draws every physics shape, even hidden ones.",["physics view"]],
+["Fill","What paints the inside of a shape: nothing, a solid colour, a gradient (v2) or an image (v3).",["fill","fills"]],
+["Merge","When shapes inside a group with a body become part of that one body.",["merge","merged","merging"]],
+["Test play","Pressing Play in the editor. It runs a copy of the level, and Stop returns to the editor with nothing changed.",["test play"]],
+["Tick","One step of the game. The game runs 60 ticks per second.",["tick","ticks"]],
+["Seed","The number all random values in a run come from.",["seed"]],
+["Project file","The .editable file: the level as you edit it, including editor-only data such as the grid size and locks.",["project file",".editable"]],
+["Editor message","A short note on the card it is about, never blocking, maybe with a fix button. Two kinds: warning and tip.",["editor message","editor messages","note"]],
+["Determinism","The requirement that the same level, seed, inputs and clock time give the same run on any computer.",["determinism","deterministic"]],
+["Command (new word)","What a menu entry or a shortcut runs, such as Group or Delete. The requirements already use the word this way.",["command","commands"]],
+["Change (new word)","One undoable edit to the level, with a way to apply it and a way to revert it. A command makes one or more changes.",["change","changes"]],
+["History step (new word)","One entry in the undo history: the changes one command made, with a label such as 'Move 3 entities'.",["history step","step","steps"]],
+["Contract (new word)","A small TypeScript type that the game's rules declare and some other class fulfils. Example: the rules declare a PhysicsWorld contract, and the Box2D adapter fulfils it.",["contract","contracts"]],
+["Adapter (new word)","A class that fulfils a contract using a library or the browser, such as the Box2D adapter or the browser storage adapter.",["adapter","adapters"]],
+["Worker (new word)","A browser thread that runs code away from the page, so a long computation never freezes the editor.",["worker","workers"]],
+["Play copy (new word)","The copy of the level that test play runs. Stop throws it away.",["play copy"]],
+["Schema (new word)","The list of fields a component declares once: each field's type, label, unit, range, default and whether it can change during play.",["schema","schemas"]],
+["Current group (new word)","The group you are inside: double-click goes in, Esc goes up.",["current group"]],
+["Culling","Drawing only what is on screen, and skipping the rest.",["culling"]],
+["Lint rule","An automatic check on the code (ESLint) that fails the build when a rule is broken, such as an import pointing the wrong way.",["lint rule"]]
+];
+
+// Groups: [title, note, [[id, short, detail, myView], ...]]. Yes = you agree with my view.
+const GROUPS = [
+["Questions only you can answer", "New questions from the architecture work.", [
+["AR1","The Transform component is called TransformComponent everywhere: in the code, in the level file, on its card and in Lua.",
+ "This is open question 1. The principle says component names end in Component, but every source writes Transform. The name goes into every saved project file and into Lua's get_component(id, \"TransformComponent\"), so it has to be fixed before the first file is saved. Renaming it later means upgrading every saved file.",
+ "One rule with no exception is easier to learn and to code. Use TransformComponent everywhere. Its card stays first, as today."],
+["AR2","In v1 a fill is a colour field that you can empty. Gradients in v2 add one new field type, \"fill\", to the fixed list.",
+ "The fixed list of field types has nothing for a fill, which can be nothing, a solid colour, a gradient or an image. v1 only has nothing and solid colours, so a colour field you can empty covers it: clear the field and the shape has no fill. The file stores it from the first day as a tagged value such as { kind: \"solid\", colour: \"#4A90D9\" }, so gradients and images never change saved levels. The rule \"a new need adds a type to the list\" then adds \"fill\" in v2.",
+ "Agree with this. It keeps v1 small and the file format ready."],
+["AR3","The physics view draws the game's own collision pieces, in the editor and in test play, instead of asking Box2D to draw them.",
+ "The physics view also works in the editor, where no Box2D world exists, because there is no physics preview. The game already cuts every shape into the exact pieces it hands to Box2D: a self-crossing polygon into simple convex pieces, an ellipse that isn't a circle into a many-sided shape. Drawing those same pieces shows exactly what collides, looks the same in both places, and needs nothing extra sent from the running game. Only the requirement's reason (\"Box2D draws it for us\") would change, not what you see.",
+ "Draw our own pieces. One way to draw the physics view instead of two."],
+["AR4","The v1 plan builds the small features marked \"Suggested v1\" in the \"Not in the scope review\" tables, each labelled \"waiting for the owner\" until you confirm it.",
+ "They are: editing several entities at once with Mixed values, the leave prompt, no page gestures, losing focus mid-drag, browser zoom staying sharp, which body is A in a joint, scaling a group with joints, the camera's safety margin, the hard limit at 100,000 px, the maximum level size, the level's name, import by dropping a file, the note after a crash, a saved level that won't open, and site data cleared while open. Most are a few lines of code. Some are hard to add later, such as browser zoom and no page gestures. If you answer No, the design only leaves room for them.",
+ "Build them in v1, labelled as waiting, so nothing has to be reworked later."],
+["AR5","Each test file sits next to the file it tests: Level.ts and Level.test.ts in the same folder.",
+ "The other common layout is a separate tests folder that copies the source tree. Tests that need a real browser (drawing, browser storage, the clipboard) end in .browser.test.ts, so the fast tests can run alone. The determinism test and the speed tests get their own folder, because they test the whole game, not one file.",
+ "Next to the file: you see at once what is tested, and moving a file moves its test."],
+["AR6","New words for the architecture docs: command, change, history step, contract, adapter, worker, play copy, schema, current group.",
+ "Each one is explained in the glossary at the top of this page (hover it). They go in glossary-additions.md, not in the glossary, until you approve them. \"Action\" and \"message\" are avoided, because they already mean trigger actions and custom events.",
+ "Each is needed to describe the code, and none clashes with an agreed word."]
+]],
+["The big decisions", "Yes means go ahead and write it this way.", [
+["D1","The code is split into five parts, and the game's rules never import a library, React or the browser.",
+ "core: the game's rules (entities, components, the level, geometry, the simulation). editor: the editing rules (undo, selection, tools, what the Inspector shows), with no web page code. adapters: the classes that talk to Box2D, PixiJS, browser storage, the keyboard and the clock. ui: the React panels. app: the one place that builds everything and connects it. Imports only point inward: ui and adapters may use editor and core, never the other way. A lint rule fails the build when an import points the wrong way. Example: the code that decides how merging works is in core and is tested without a browser; Box2D is reached only through a contract that core declares.",
+ "This is the main fix for the first attempt: rules that can't reach a detail can't get tangled with it."],
+["D2","Each component declares its fields once, in a schema, and that one list drives the Inspector, undo, saving, copy and paste, and later Lua and Change value.",
+ "Each field names its field type and its details: label, unit, range, precision, display scale (radians shown as degrees), description, and whether it can change during play. Example: BodyComponent declares Linear damping as a number from 0 to 100, default 0, changeable in play. From that alone the Inspector shows a number field with a slider, typing 150 clamps to 100, the file stores it, and in v2 Lua reads it as the attribute linear_damping. Each field type is a class that reads a value from a file, writes it, clamps it and compares it, so a damaged file is caught in one place.",
+ "Without it every component needs its own Inspector, save and Lua code, and they drift apart."],
+["D3","Entity ids are whole numbers handed out by the level and never reused. Test play keeps the editor's ids.",
+ "Joints, the camera's follow target and other entity fields store ids. A pasted or duplicated entity gets new ids, and links between the copies are rewired. Because the play copy keeps the same ids, live values and the selection map straight across. Spawned entities (v2) get ids above the highest one. Each entity keeps its children in a plain ordered list, in Layers panel order, so draw order and run order come straight from the tree.",
+ "Simple and enough for every rule in the requirements, Lua's \"an id is a number\" included."],
+["D4","Every edit is a change that can be applied and reverted. The undo history keeps 500 steps and restores the selection and the current group.",
+ "Example: Group makes three changes (add the group, move the entities into it, select it), which become one history step named \"Group 3 entities\". Arrow-key moves within 1 second join into one step. A drag makes one step on release. Deleting keeps a full copy of what was removed, so undo brings it back with the same ids. Nothing outside the level (the view, the tool, panel sizes) is ever a change.",
+ "This is how most editors do undo (the Command pattern). It is exact without copying the whole level each time."],
+["D5","React draws the panels but never holds the level. The level view is drawn by PixiJS, outside React.",
+ "The level, the selection and the history are classes. When one changes, it raises a version number and tells whoever listens. A React panel watches that number and draws again only when it moves (React's useSyncExternalStore). There is no state library. The level view is one empty box that React places on the page; a separate class draws the level into it with PixiJS and updates only what changed. Example: dragging a crate updates its drawing every frame and the Inspector shows the new position, while the Layers panel doesn't redraw at all.",
+ "One owner for the level, and no second copy to keep in sync."],
+["D6","From v1, test play runs in a worker. The editor page keeps drawing and can always stop it.",
+ "The rule \"the game runs separately from the editor\" is already v1 (\"When something goes wrong in a run\"). The page decides when ticks are due and asks the worker to run them, sending the keys held for each tick. The worker answers with what moved. If it doesn't answer for 5 seconds, the page ends the run with a message and starts a fresh worker. In a hidden tab the page stops asking, so the game pauses by itself. On a slow computer the page asks for fewer ticks, so the game slows down rather than skipping. The page draws between two ticks, so a 144 Hz screen stays smooth.",
+ "It is what the requirements need, and building it in v1 means scripts in v2 slot in without moving anything."],
+["D7","Play makes its copy of the level the same way saving does: it writes the level out as file data, and the worker reads it back.",
+ "So the play copy can never share anything with the editor's level, and Stop just throws it away. Hidden entities, ids and every value come along, because the file has them. In v2 Restart rebuilds from the same data with a fresh physics world, a fresh Lua state and a new seed.",
+ "One way to copy a level, and it is tested every time you save."],
+["D8","One geometry module cuts every shape into the exact pieces that are drawn and collide, and the game's rules use only maths that gives the same answer on every computer.",
+ "A self-crossing polygon is cut at its crossings and every enclosed area is filled, then it is split into convex pieces of at most 8 points, Box2D's limit. Drawing, Box2D, clicking and the read-only Mass all use those same pieces, so what you see is what collides. The browser's Math.sin and Math.random can differ between computers, so the rules use the game's own sine and cosine and random numbers from the seed, and a lint rule bans the browser's versions there.",
+ "Both come straight from the determinism requirement and the tech notes."],
+["D9","v1 builds culling, cached positions and bounds, a virtual Layers panel, and redraws a shape only when it changes. A faster index for clicking waits until a speed test shows it is needed.",
+ "Culling: only what is on screen is drawn. Each entity's level position, bounds and hidden state are worked out once and kept until it or a parent changes. The Layers panel only builds the rows you can see, so 10,000 rows open in under 0.2 s; its own drag and drop is built together with it. Clicking checks each entity's cached bounds, well under a millisecond for 10,000 entities. A speed test in the plan checks the requirement's targets, and a grid index is built only if it fails. Physics always runs every body, because skipping bodies off screen would break determinism.",
+ "Build what the speed targets clearly need, and measure before building the rest."],
+["D10","The level saves itself in the browser's database (IndexedDB), and exports as an .editable file: a zip holding level.json and, from v2, the level's files.",
+ "level.json starts with the file format version and the physics version, both whole numbers starting at 1. The physics version goes up whenever the game's Box2D build changes. Then come the level's name, the editor-only data (grid size, locks, folded rows) and every entity with its components. A save writes everything at once, so it either fully happens or not at all. Import runs in a worker: it checks the size, unpacks with a limit so a \"zip bomb\" can't fill memory, checks every value, and only then replaces the level. Small editor settings (panel sizes, the view, grid shown) go in the browser's simpler storage (localStorage), because they are needed before the first draw. A second tab is detected with the browser's Web Locks.",
+ "Each part follows a saving requirement or a tech note."],
+["D11","Fixed: TypeScript, Vite, React, PixiJS 8 and Box2D v3. Recommended: Vitest, Playwright, ESLint, box2d3-wasm, Clipper2, fflate, idb, TanStack Virtual and the React Compiler. Lua (wasmoon) and Monaco come with v2.",
+ "Vitest runs the tests, and Playwright runs the ones that need a browser, in Chromium, Firefox and WebKit. box2d3-wasm is Box2D v3 already built for the browser; its single-thread build needs no special server headers. Clipper2 cuts self-crossing polygons. fflate makes and reads zips. idb is a thin helper for browser storage. TanStack Virtual builds only the visible Layers rows. The React Compiler keeps panels fast without hand-written memo code. No state library and no CSS framework: each React component has its own CSS file. Exact versions are pinned in stack.md after checking they work together.",
+ "Each library does one job the requirements need. Each is a recommendation you can refuse on its own in a comment."]
+]],
+["Open questions that change the v1 design", "From the open questions in progress.md. The number is the same as there.", [
+["Q2","The camera gets an eye icon like every other row. Hiding it hides everything inside the camera.",
+ "The review said the camera has no eye. The old draft used it to hide everything inside the camera at once. The camera itself is never drawn in play, so its eye would only affect what is inside it.",
+ "Give it an eye. \"Hiding applies to children\" then works for the camera like for any row, and one special case goes away."],
+["Q5","Removing a component that others need removes only that one. The cards left without their partner show their note.",
+ "Example: removing the ShapeComponent from a crate leaves its SurfaceComponent, whose card then shows \"Needs a ShapeComponent to collide. [Add ShapeComponent]\". The old rule removed the dependants too, before \"nothing happens behind the user's back\" existed.",
+ "Remove only that one. It follows the principle, and undo brings it back anyway."],
+["Q6","Adding physics in one click adds only the BodyComponent. If nothing in it collides, its card shows a note with [Add SurfaceComponent].",
+ "A body on a group whose children already have surfaces needs no surface of its own, so adding one automatically would often be wrong. The note appears only when the body has nothing that collides.",
+ "Body only, with the note. It is the same rule as every other partner."],
+["Q10","The level's name is shown and edited in the top bar in v1, and saved in the project file.",
+ "1 to 60 characters, \"Untitled level\" at first. It is the default file name on export and appears in the browser tab title. Renaming is an undo step.",
+ "v1, as written in the top bar section."],
+["Q11","Both limits stand: 50 MB of imported files per level (v3) and a level file of at most 256 MB (v1).",
+ "They measure different things: one counts the images and sounds you import, the other the whole file. v1 only checks the 256 MB, because v1 has no imported files.",
+ "Keep both."],
+["Q12","Drop the old 2,000 files limit, and count the 256 MB level limit on the unpacked size.",
+ "The v3 limit of 500 files per level already replaces 2,000 files. Import needs some limit on the unpacked size anyway, to refuse a zip bomb. Images and sounds are already compressed and level.json only gets smaller when zipped, so a level's unpacked size is always at least its file size. One number, 256 MB unpacked, then covers both, and the editor can check it without zipping first.",
+ "One limit: 256 MB unpacked."],
+["Q15","The camera follows an entity in v1. Following by tag can be added later without changing saved levels.",
+ "Following by tag finds a spawned player without a script, which matters once spawning exists in v2. The file stores the follow target as a tagged value, such as { kind: \"entity\", id: 12 }, so a later { kind: \"tag\", tag: \"player\" } fits beside it.",
+ "Entity only in v1, with room left for tags."]
+]]
+];
+
+const KEY = "engine-v3-architecture-review-1";
+let answers = {};
+try { answers = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { answers = {}; }
+function persist() { try { localStorage.setItem(KEY, JSON.stringify(answers)); } catch (e) {} }
+
+const total = GROUPS.reduce((n, g) => n + g[2].length, 0);
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+// Glossary lookup: alias (lower case) -> [term, meaning]
+const aliasMap = new Map();
+for (const [term, meaning, aliases] of GLOSSARY) {
+  for (const a of aliases) aliasMap.set(a.toLowerCase(), [term, meaning]);
+}
+const aliasList = [...aliasMap.keys()].sort((a, b) => b.length - a.length)
+  .map(a => a.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+const termRe = new RegExp("(?<![\\w.])(" + aliasList.join("|") + ")(?![\\w])", "gi");
+
+// Fill a node with text, underlining the first use of each glossary term.
+function fillWithTerms(node, text) {
+  const seen = new Set();
+  let last = 0;
+  for (const m of text.matchAll(termRe)) {
+    const hit = aliasMap.get(m[0].toLowerCase());
+    if (!hit || seen.has(hit[0])) continue;
+    seen.add(hit[0]);
+    node.appendChild(document.createTextNode(text.slice(last, m.index)));
+    const span = el("span", "term", m[0]);
+    span.title = hit[0] + ": " + hit[1];
+    node.appendChild(span);
+    last = m.index + m[0].length;
+  }
+  node.appendChild(document.createTextNode(text.slice(last)));
+}
+
+function renderGlossary() {
+  const dl = document.getElementById("glossary");
+  for (const [term, meaning] of GLOSSARY) {
+    dl.appendChild(el("dt", "", term));
+    dl.appendChild(el("dd", "", meaning));
+  }
+}
+
+function renderQuestion(section, id, short, detail, take) {
+  const card = el("div", "q");
+  card.dataset.id = id;
+  const row = el("div", "row");
+  row.appendChild(el("span", "tag", id));
+  const text = el("span", "text");
+  fillWithTerms(text, short);
+  row.appendChild(text);
+  const btns = el("div", "btns");
+  const yes = el("button", "y", "Yes");
+  const no = el("button", "n", "No");
+  const cbtn = el("button", "c", "Comment");
+  const more = el("button", "m", "More");
+  btns.append(yes, no, cbtn, more);
+  row.appendChild(btns);
+  card.appendChild(row);
+
+  const view = el("div", "take");
+  view.appendChild(el("b", "", "My view: "));
+  const viewText = el("span");
+  fillWithTerms(viewText, take);
+  view.appendChild(viewText);
+  card.appendChild(view);
+
+  const det = el("div", "detail hidden");
+  fillWithTerms(det, detail);
+  card.appendChild(det);
+
+  const a = answers[id] || {};
+  const ta = el("textarea", a.comment ? "" : "hidden");
+  ta.placeholder = "Your comment";
+  ta.value = a.comment || "";
+  card.appendChild(ta);
+
+  function sync() {
+    const cur = answers[id] || {};
+    yes.setAttribute("aria-pressed", cur.v === "yes");
+    no.setAttribute("aria-pressed", cur.v === "no");
+    card.classList.toggle("yes", cur.v === "yes");
+    card.classList.toggle("no", cur.v === "no");
+  }
+  function touch() {
+    const cur = answers[id] || {};
+    if (!cur.t) cur.t = Date.now();
+    answers[id] = cur;
+    return cur;
+  }
+  function setVote(v) {
+    const cur = touch();
+    cur.v = cur.v === v ? undefined : v;
+    persist(); sync(); update();
+  }
+  yes.onclick = () => setVote("yes");
+  no.onclick = () => setVote("no");
+  cbtn.onclick = () => { touch(); persist(); update(); ta.classList.remove("hidden"); ta.focus(); };
+  more.onclick = () => {
+    touch(); persist(); update();
+    const open = det.classList.toggle("hidden") === false;
+    more.textContent = open ? "Less" : "More";
+  };
+  ta.oninput = () => {
+    const cur = touch();
+    cur.comment = ta.value;
+    persist(); update();
+  };
+  sync();
+  section.appendChild(card);
+}
+
+function render() {
+  const list = document.getElementById("list");
+  for (const [group, note, items] of GROUPS) {
+    const section = el("section");
+    section.appendChild(el("h2", "", group));
+    section.appendChild(el("p", "group-note", note));
+    for (const [id, short, detail, take] of items) renderQuestion(section, id, short, detail, take);
+    list.appendChild(section);
+  }
+}
+
+function isAnswered(id) {
+  const a = answers[id];
+  return !!(a && (a.t || a.v || (a.comment && a.comment.trim())));
+}
+
+function update() {
+  let done = 0;
+  for (const [, , items] of GROUPS) for (const [id] of items) if (isAnswered(id)) done++;
+  document.getElementById("progress").textContent = done + " / " + total + " answered";
+  document.getElementById("pfill").style.width = (100 * done / total) + "%";
+  applyFilter();
+}
+
+function applyFilter() {
+  const only = document.getElementById("onlyOpen").checked;
+  const active = document.activeElement && document.activeElement.closest(".q");
+  document.querySelectorAll(".q").forEach(c => {
+    c.style.display = only && isAnswered(c.dataset.id) && active !== c ? "none" : "";
+  });
+  document.querySelectorAll("section").forEach(s => {
+    const any = [...s.querySelectorAll(".q")].some(c => c.style.display !== "none");
+    s.style.display = any ? "" : "none";
+  });
+}
+
+function buildText() {
+  const lines = [];
+  const open = [];
+  let yes = 0, no = 0;
+  for (const [group, , items] of GROUPS) {
+    const groupLines = [];
+    for (const [id, short] of items) {
+      const a = answers[id] || {};
+      const c = (a.comment || "").trim();
+      if (!a.v && !c && !a.t) { open.push(id); continue; }
+      if (a.v === "yes") yes++;
+      if (a.v === "no") no++;
+      let verdict = "OPENED ONLY";
+      if (a.v) verdict = a.v.toUpperCase();
+      else if (c) verdict = "NO ANSWER";
+      groupLines.push("[" + id + "] " + verdict + " | " + short);
+      if (c) groupLines.push("    comment: " + c.replace(/\s*\n\s*/g, " / "));
+    }
+    if (groupLines.length) lines.push("## " + group, ...groupLines, "");
+  }
+  const head = [
+    "Architecture review answers, round 1",
+    "Answered " + (total - open.length) + " of " + total + " (" + yes + " yes, " + no + " no)",
+    ""
+  ];
+  const tail = open.length ? ["Unanswered: " + open.join(", ")] : ["All questions answered."];
+  return head.concat(lines, tail).join("\n");
+}
+
+async function copy() {
+  const text = buildText();
+  const status = document.getElementById("status");
+  try {
+    await navigator.clipboard.writeText(text);
+    status.textContent = "Copied. Paste it into the chat.";
+  } catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (e2) {}
+    ta.remove();
+    status.textContent = ok ? "Copied. Paste it into the chat." : "Copy failed. Your browser blocked the clipboard.";
+  }
+}
+
+document.getElementById("copyTop").onclick = copy;
+document.getElementById("copyBottom").onclick = copy;
+document.getElementById("onlyOpen").onchange = applyFilter;
+renderGlossary();
+render();
+update();
+</script>
+</body>
+</html>
