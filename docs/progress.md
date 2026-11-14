@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**, which waits for the owner. **Now: stage 1 of [plan.md](plan.md), the model**, following its [approved plan](proposals/stage-1.md): imports in core go one way, `DeterministicMath` (without `exp`) is built now, and skew is strictly between −90° and 90°. One question is open, about the polygon library, needed by stage 3.
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**, which waits for the owner. **Now: stage 1 of [plan.md](plan.md), the model**, following its [approved plan](proposals/stage-1.md): imports in core go one way, `DeterministicMath` (without `exp`) is built now, and skew is strictly between −90° and 90°. **Round 9 is on the [review page](review.html)**: five questions the TransformComponent and NameComponent need, plus the polygon library.
 
 ## Where things stand
 
@@ -19,7 +19,7 @@
 | The stage 0 plan | Done, approved by the owner on 2026-11-14, written into [tooling.md](architecture/tooling.md) |
 | Small features without a version | Done: all given a version in round 7 |
 | Stage 0, project setup | Done, except the first CI run, which needs a push. See below |
-| Code | Stage 1, the model: steps 1 to 4 of 8 done (signals, `DeterministicMath`, `Matrix2D`, the field types). Next is step 5, `ComponentSchema`, `Component`, TransformComponent and NameComponent. See [proposals/stage-1.md](proposals/stage-1.md) |
+| Code | Stage 1, the model: steps 1 to 4 of 8 done (signals, `DeterministicMath`, `Matrix2D`, the field types), and step 5 up to `ComponentSchema` and `Component`. TransformComponent and NameComponent wait for round 9. Step 6 can go ahead meanwhile. See [proposals/stage-1.md](proposals/stage-1.md) |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -85,6 +85,8 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 The original text of any review question can be found with `git log -p -S'"ID"' -- review/open.js` in `ecs-game-v2`.
 
 ## Open questions for the owner
+
+**Round 9 on the [review page](review.html) asks these (2026-11-14):** N1 a name can't be empty; N2 what a name missing from `level.json` reads as; N3 the name can't change during play; T1 only position and rotation change during play; T2 the hover descriptions of the five fields; P1 below.
 
 When several come up, they go on the [review page](review.html) all at once, not a few per round (owner, 2026-11-14).
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design Review</title>
+<title>Engine Review</title>
 <style>
   :root {
     --bg: #f6f6f4; --card: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --line: #e2e2de;
@@ -69,7 +69,7 @@
 <body>
 <header>
   <div class="bar">
-    <h1>Design review</h1>
+    <h1>Review, round 9</h1>
     <span class="progress" id="progress"></span>
     <label class="filter"><input type="checkbox" id="onlyOpen"> Unanswered only</label>
     <button class="copy" id="copyTop">Copy answers</button>
@@ -77,7 +77,7 @@
   <div class="pbar"><i id="pfill"></i></div>
 </header>
 <main>
-  <p class="intro">Round 8: <b>how the editor should look</b>, before any mockup is drawn. Already decided and not asked again: one dark theme (a light theme is in rejected.md), the places and starting sizes of the panels, Inter as the font of texts in levels, a yellow icon for warnings and a blue one for tips, and the default look of a new shape (fill #4A90D9 on a soft light blue background). Most cards here are a choice: pick one option (or several, where it says so), and my pick is marked. The last cards are Yes or No. A comment can say anything, such as “like Figma, but darker”. Small previews are only sketches, the mockups will show the real thing. Answers are kept in this browser. When you're done, press Copy answers and paste the text into the chat.</p>
+  <p class="intro">Round 9: <b>what stage 1 needs to finish the TransformComponent and the NameComponent</b>, plus the one question already open. The rest of stage 1 is built and follows the approved docs. Most cards are Yes or No; one is a choice, with my pick marked. A comment can say anything. Answers are kept in this browser. When you’re done, press Copy answers and paste the text into the chat.</p>
   <details class="glossary"><summary>Glossary</summary><dl id="glossary"></dl></details>
   <div id="list"></div>
   <div class="footer">
@@ -88,107 +88,44 @@
 <script>
 // Glossary: [term, meaning, words that link to it].
 const GLOSSARY = [
-["Level view","Where you see and edit the level. It fills the whole window, with the panels on top.",["level view"]],
-["Entities panel","The panel on the left listing every entity as a tree. One row is one entity.",["Entities panel","Entities"]],
-["Inspector","The panel on the right showing the components of what is selected, as cards.",["Inspector"]],
-["Card","One component as the Inspector shows it: a title and its fields.",["card","cards"]],
-["Field","One editable value on a card, such as Density.",["field","fields"]],
-["Top bar","The bar along the top with the menus, the tools and Play.",["top bar"]],
-["Status bar","The bar along the bottom with the zoom, the save state and the count of editor messages.",["status bar"]],
-["Play bar","The small bar shown during test play, with Stop, Pause, Step and Panels.",["Play bar"]],
-["Editor message","A short note on the card it is about, maybe with a fix button. A warning has a yellow icon, a tip a blue one.",["editor message","editor messages"]],
-["Mockup (new word)","A static page that shows how a screen of the editor will look, with made-up content and nothing working behind it.",["mockup","mockups"]],
-["Design system (new word)","The written rules of the editor's look: its design tokens, how each control looks in each state, its icons, and the colours the level view draws with.",["design system"]],
-["Design token (new word)","One named value of the design system, such as the panel background colour or the space between two rows.",["design token","design tokens"]],
-["Accent colour (new word)","The one colour that marks what is active or selected: the active tool, a selected row, the selection outline in the level view, the focused field.",["accent colour","accent"]]
+["Attribute","One value of a component, as the Lua API names it: the Inspector field \"Linear damping\" is the attribute linear_damping. Scripts change it with set_attribute.",["attribute","attributes","set_attribute"]],
+["Change value","The trigger action that sets a component value during play, from v2.",["Change value"]],
+["TransformComponent","The component holding an entity's position, rotation, scale and skew, measured from its parent.",["TransformComponent"]],
+["NameComponent","The entity's name, filled automatically (\"Rectangle 1\"). Not unique. The Inspector's header edits it.",["NameComponent"]],
+["level.json","The level as text, inside the project file and in the browser's storage. A value missing from it reads as its default.",["level.json"]],
+["Description","The text shown when hovering a field's label.",["description","descriptions"]]
 ];
-
-// Small sketches for the options. Static content written for this page.
-const swatch = (app, panel, line, text) =>
-  `<div class="pv" style="display:flex;height:54px;background:${app};border:1px solid ${line}">
-     <div style="width:38%;background:${panel};border-right:1px solid ${line};padding:6px;font:11px system-ui;color:${text};white-space:nowrap;overflow:hidden">Entities<br><span style="opacity:.6">Rectangle 1</span></div>
-     <div style="flex:1"></div></div>`;
-const sel = (accent) =>
-  `<div class="pv" style="height:64px;background:#d6ebf7;position:relative">
-     <div style="position:absolute;left:30%;top:16px;width:40%;height:32px;background:#4A90D9;border:2px solid #1F3552"></div>
-     <div style="position:absolute;left:calc(30% - 3px);top:13px;width:calc(40% + 6px);height:38px;border:1.5px solid ${accent}"></div>
-     ${[[0,0],[1,0],[0,1],[1,1]].map(([x,y]) => `<div style="position:absolute;left:calc(30% - 6px + ${x} * (40% + 6px));top:${10 + y * 38}px;width:7px;height:7px;background:#fff;border:1.5px solid ${accent}"></div>`).join("")}
-   </div>`;
-const rows = (h, size) =>
-  `<div class="pv" style="background:#2c2c2c;padding:2px 0">${["Density","Friction","Bounce"].map((l, i) =>
-     `<div style="height:${h}px;display:flex;align-items:center;justify-content:space-between;padding:0 8px;font:${size}px system-ui;color:#ddd">${l}<span style="background:#1e1e1e;padding:1px 6px;border-radius:3px">${["1.00","0.60","0.00"][i]}</span></div>`).join("")}</div>`;
-const corners = (r) =>
-  `<div class="pv" style="background:#2c2c2c;padding:10px;display:flex;gap:8px;align-items:center">
-     <span style="background:#4c4c4c;color:#eee;font:12px system-ui;padding:4px 10px;border-radius:${r}px">Button</span>
-     <span style="background:#1e1e1e;color:#ccc;font:12px system-ui;padding:4px 10px;border-radius:${r}px;border:1px solid #444">120</span></div>`;
-const layout = (floating) => floating
-  ? `<div class="pv" style="height:64px;background:#d6ebf7;position:relative">
-       <div style="position:absolute;left:6px;top:6px;bottom:6px;width:22%;background:#2c2c2c;border-radius:8px"></div>
-       <div style="position:absolute;right:6px;top:6px;bottom:6px;width:26%;background:#2c2c2c;border-radius:8px"></div></div>`
-  : `<div class="pv" style="height:64px;background:#d6ebf7;position:relative;border-top:10px solid #2c2c2c;border-bottom:5px solid #2c2c2c">
-       <div style="position:absolute;left:0;top:0;bottom:0;width:22%;background:#2c2c2c;border-right:1px solid #444"></div>
-       <div style="position:absolute;right:0;top:0;bottom:0;width:26%;background:#2c2c2c;border-left:1px solid #444"></div></div>`;
-const icons = (filled) => {
-  const s = filled ? 'fill="#ddd" stroke="none"' : 'fill="none" stroke="#ddd" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"';
-  return `<div class="pv" style="background:#2c2c2c;padding:8px;display:flex;gap:12px">
-    <svg width="22" height="22" viewBox="0 0 24 24"><path ${s} d="M5 3l13 8-6 1.5L9 19z"/></svg>
-    <svg width="22" height="22" viewBox="0 0 24 24"><rect ${s} x="4" y="6" width="16" height="12" rx="1.5"/></svg>
-    <svg width="22" height="22" viewBox="0 0 24 24"><circle ${s} cx="12" cy="12" r="8"/></svg>
-    <svg width="22" height="22" viewBox="0 0 24 24"><path ${s} d="M8 5v14l11-7z"/></svg></div>`;
-};
 
 // Groups: [title, note, cards]. A card: [id, short, detail, myView, options, pick, multi].
 // options: [[label, sub, previewHtml]]; pick: index of my pick. No options: a Yes/No card.
 const GROUPS = [
-["The feel", "What the editor should remind you of. This steers everything below.", [
-["D1","Which editors should it feel like? Pick any number.",
- "Background: each of these has a dark editor with panels around a work area, but they feel different. Figma: calm, flat, lots of grey, small text, made for drawing shapes, with a Layers panel and a properties panel like ours. Godot: a game editor, blue-grey, denser, many small icons. Unity: grey, dense, boxy, an Inspector with cards like ours. Blender: very dense, orange selection, many controls. Affinity or Photoshop: drawing tools, dark grey, a tool strip on the left. VS Code: plain, flat, made for text. A comment can name others.",
- "Figma: the closest to what v1 does (draw shapes, arrange them in a Layers panel, edit values on the right), and calm enough that the level stays the brightest thing on screen.",
- [["Figma","Calm, flat, drawing"],["Godot","Game editor, blue-grey"],["Unity","Dense, boxy cards"],["Blender","Very dense, orange selection"],["Affinity or Photoshop","Drawing, tool strip"],["VS Code","Plain, flat"]], 0, true]
+["The NameComponent", "Stage 1 builds it now. The docs say \"Name: text, 1 to 64, trimmed, filled automatically\", which leaves two gaps.", [
+["N1","A name can't be empty: an empty name in a file makes the file damaged, and typing an empty name in the Inspector restores the old one.",
+ "Background: the docs give the name a range of 1 to 64 characters, but the text field type only had a maximum. Typing an empty value already restores the old one, as the Inspector's typing table says. What's missing is a file or (in v2) a script giving an empty name, or one that is only spaces. Example: \"name\": \"   \" in level.json.",
+ "Yes: it keeps the 1 in \"1 to 64\", and the Entities panel never shows an empty row. The text field type gets a minimum length, and refuses a name that is empty after trimming."],
+["N2","What does a name missing from level.json read as?",
+ "Background: a value missing from level.json reads as its default, so a field added later needs no upgrade code. So the NameComponent needs a default. The editor never uses it: every way of making an entity names it (\"Rectangle 1\", \"World\", \"Camera\"), and the NameComponent has no card, so it has no Reset to defaults either. Only a file without a name reaches it.",
+ "\"Entity\": every file reads, and the row is easy to rename. Refusing the file would make the name the only value that can't be left out.",
+ [["\"Entity\"","The default, like every other value"],["Refuse the file","A level without a name is damaged"]], 0, false],
+["N3","The name can't change during play.",
+ "Background: each field says whether Lua's set_attribute and the trigger's Change value may set it (both v2). Nothing in the requirements renames an entity during play, and get_entity_by_name looks entities up by name.",
+ "Yes: a lookup by name stays the same for the whole run. It can be allowed later without changing saved levels."]
 ]],
-["Colours", "The panels' greys and the one accent colour.", [
-["D2","Which grey should the panels be?",
- "Background: the panels sit on top of the level view, so their grey is next to the level's colours all the time. A tinted grey shifts how the level's colours look a little. Example: a blue-grey panel makes the default blue shapes look slightly greyer.",
- "Neutral grey: it doesn't change how the level's own colours look, which matters in an editor where you pick colours.",
- [["Neutral grey","Figma, Blender",swatch("#1e1e1e","#2c2c2c","#3a3a3a","#ddd")],["Cool blue-grey","Godot, VS Code",swatch("#1b1e24","#262b33","#353b45","#d8dde6")],["Warm grey","Affinity",swatch("#1f1d1b","#2c2926","#3b3733","#e2ddd6")]], 0, false],
-["D3","Which accent colour?",
- "Background: the accent colour marks what is selected or active: the active tool, the selected rows in the Entities panel, the focused field, and the outline and handles around the selection in the level view. The level view is the hard place: a new shape is blue (#4A90D9) on a soft light blue background, so a blue selection outline is hard to see on it. Example: each preview shows a new rectangle, selected. Tips already use a blue icon and warnings a yellow one.",
- "Orange: it stands out on the default blue shapes and the light blue background, the way Blender's orange selection does, and it is far enough from the warning yellow.",
- [["Orange","Stands out on blue",sel("#ff8a3d")],["Blue","Figma's choice",sel("#2f7cf6")],["Violet","",sel("#9b6bff")],["Magenta","",sel("#ff3fa4")]], 0, false]
+["The TransformComponent", "Its four fields are built now: Position, Rotation, Scale and Skew.", [
+["T1","Position and rotation can change during play. Scale and skew can't.",
+ "Background: the physics rules already say scale doesn't change during play. Skew changes the shape the same way. Lua already has set_position and set_rotation, so position and rotation change during play anyway. This decides which TransformComponent attributes set_attribute and Change value offer.",
+ "Yes: it follows the physics rule for scale, and skew is the same kind of change."],
+["T2","The descriptions shown when hovering each label are: <b>Position</b>: \"Where the entity sits, in pixels, measured from its parent.\" <b>Rotation</b>: \"How far the entity is turned clockwise, in degrees, measured from its parent.\" <b>Scale</b>: \"How much the entity is stretched across and down, measured from its parent. Can't be 0.\" <b>Skew</b>: \"How far the entity is slanted, in degrees, measured from its parent. Between −90° and 90°.\" <b>Name</b>: \"The entity's name. It doesn't have to be unique.\"",
+ "Background: every field has a description, shown when hovering its label, and the requirements say the TransformComponent's must say its values are measured from the parent. These are the first descriptions; the other components' come in stage 2. A comment can rewrite any of them.",
+ "Yes: short, plain, and each says what the limit is."]
 ]],
-["Shape and size", "How tight and how round.", [
-["D4","How dense should the panels be?",
- "Background: the panel widths are fixed by the requirements (Entities panel 260 px, Inspector 300 px), so density decides how many rows and fields fit. Example: a BodyComponent card has about ten fields. Compact shows all of them and the next card; roomy needs scrolling sooner but is easier to read.",
- "Medium: like Figma. The Inspector fits a whole card, and 12 px text stays easy to read at 300 px wide.",
- [["Compact","22 px rows, 11 px text (Blender, Unity)",rows(22,11)],["Medium","28 px rows, 12 px text (Figma)",rows(28,12)],["Roomy","32 px rows, 13 px text",rows(32,13)]], 1, false],
-["D5","How round should corners be?",
- "Background: buttons, fields, menus and cards all share one corner size.",
- "Slightly rounded, 4 px: soft without looking like a phone app, and small fields stay tidy.",
- [["Square","0 to 2 px",corners(1)],["Slightly rounded","4 px",corners(4)],["Rounded","8 px",corners(8)]], 1, false],
-["D6","Should the panels touch the window's edges, or float with a gap?",
- "Background: the requirements put the panels on top of a level view that fills the window. They can sit flush against the edges with a thin line, or float as rounded boxes with a small gap, so the level shows around them (Figma's newer look).",
- "Flush: every pixel of the 260 px and 300 px goes to content, and the edge of the level view is clear.",
- [["Flush","Thin line between panel and level",layout(false)],["Floating","Gap and rounded corners",layout(true)]], 0, false]
-]],
-["Icons and text", "", [
-["D7","Which icon style?",
- "Background: the tools, the eye and lock in the Entities panel, the menus and the Play bar all need icons. Outline icons are thin lines, filled ones are solid. Example: the four previews are the Select tool, a rectangle, an ellipse and Play.",
- "Outline icons, from one free open set such as Lucide (ISC licence, over 1,500 icons), so every icon matches. The package itself would be proposed in stage 6, when the first icon is drawn.",
- [["Outline","Thin lines (Figma, Lucide)",icons(false)],["Filled","Solid shapes",icons(true)]], 0, false],
-["D8","The editor's own text uses Inter too.",
- "Background: Inter is already the font of texts in levels, and it has numbers of equal width, so values in the Inspector line up. The other choice is the computer's own font (Segoe UI on Windows, SF on a Mac), which looks different on each computer. Fonts are hosted with the game, as the tech notes say.",
- "Yes: one font for everything, the same on every computer."]
-]],
-["The mockups", "What I build after this round.", [
-["D9","The mockups show five moments of v1: the empty editor with a new level, a selected shape with its cards in the Inspector, the Shape tool while drawing, the main menu open with a dialog, and test play with the Play bar.",
- "Background: each mockup is one HTML page in docs/design/mockups/ that you open in the browser like this one. They use a small sample level: a few platforms, a car with hinged wheels, crates. Nothing in them works. A comment can add a moment, such as an editor message on a card.",
- "Yes: together they show every v1 panel and the level view's own drawing (grid, selection, camera frame, joint icons)."],
-["D10","I build two directions: one exactly from your picks here, and one that changes the picks you commented on or that I was least sure of.",
- "Background: seeing two side by side makes it easier to say what you like. Example: if you pick Figma and Orange, the second direction might try Blue with a different selection style. You then pick one, or mix them, and I refine it in a round or two.",
- "Yes: two is enough to compare, and quick to build."]
+["The polygon library", "Already open in progress.md, asked here so every open question is on one page.", [
+["P1","Stage 3 tries clipper2-ts first. If it fails the checks, I ask again.",
+ "Background: the docs name clipper2-js to cut self-crossing polygons and triangulate them. clipper2-js 1.2.4 has no triangulation, was last published on 2024-01-01, and brings Angular 15 into the project when installed. clipper2-ts 2.0.1-19 (published 2026-11-07) has triangulation and needs no other package, but is untried. The checks: it triangulates, it passes the determinism tests, and the functions core calls never reach a banned Math function such as Math.sin.",
+ "Yes: clipper2-ts is the only candidate that does what the docs ask, and trying it costs little because the library's name is one constant in the ESLint config."]
 ]]
 ];
-const KEY = "engine-v3-design-review-8";
+const KEY = "engine-v3-review-9";
 let answers = {};
 try { answers = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { answers = {}; }
 function persist() { try { localStorage.setItem(KEY, JSON.stringify(answers)); } catch (e) {} }
@@ -391,7 +328,7 @@ function buildText() {
     }
     if (groupLines.length) lines.push("## " + group, ...groupLines, "");
   }
-  const head = ["Design review answers, round 8", "Answered " + (total - open.length) + " of " + total, ""];
+  const head = ["Review answers, round 9", "Answered " + (total - open.length) + " of " + total, ""];
   const tail = open.length ? ["Unanswered: " + open.join(", ")] : ["All questions answered."];
   return head.concat(lines, tail).join("\n");
 }
