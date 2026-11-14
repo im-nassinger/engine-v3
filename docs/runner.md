@@ -13,7 +13,6 @@
 | 🛑 Usage limit reached, resuming at a time | When the limit is hit. A ▶️ follows when it resumes |
 | 🔑 Needs your password | When something needs `sudo`. The work goes on without it |
 | ⏸️ Paused | When Claude is blocked, or three sessions in a row fail. Nothing runs until you resume |
-| ⏳ Another Claude session is open | The runner waits while you have a session open in this project |
 | 🎉 v1 is finished | The end. The runner stops |
 
 ## How it knows

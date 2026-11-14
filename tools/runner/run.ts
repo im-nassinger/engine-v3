@@ -7,7 +7,6 @@ import path from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { runClaudeSession } from './ClaudeSession.ts';
 import { DiscordNotifier } from './DiscordNotifier.ts';
-import { findOtherClaudeSessions } from './findOtherClaudeSessions.ts';
 import { RateLimitTracker } from './RateLimitTracker.ts';
 import { parseStatusReport, percentComplete } from './StatusReport.ts';
 import type { StatusReport } from './StatusReport.ts';
@@ -15,7 +14,6 @@ import type { StatusReport } from './StatusReport.ts';
 const MINUTE_MS = 60 * 1000;
 const LIMIT_RETRY_MS = 30 * MINUTE_MS;
 const FAILURE_RETRY_MS = 5 * MINUTE_MS;
-const OTHER_SESSION_RETRY_MS = 5 * MINUTE_MS;
 const MAX_FAILURES_IN_A_ROW = 3;
 
 const projectFolder = path.resolve(import.meta.dirname, '../..');
@@ -51,18 +49,6 @@ async function pause(reason: string) {
 async function waitWhilePaused() {
     while (fs.existsSync(pauseFile)) {
         await sleep(MINUTE_MS);
-    }
-}
-
-async function waitForOtherSessions() {
-    let warned = false;
-
-    while (findOtherClaudeSessions(projectFolder).length > 0) {
-        if (!warned) {
-            await discord.send('⏳ Another Claude session is open in engine-v3. Waiting until it closes.');
-            warned = true;
-        }
-        await sleep(OTHER_SESSION_RETRY_MS);
     }
 }
 
@@ -144,7 +130,6 @@ async function main() {
 
     while (true) {
         await waitWhilePaused();
-        await waitForOtherSessions();
 
         const outcome = await runOneStep();
 
