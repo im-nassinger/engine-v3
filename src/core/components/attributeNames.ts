@@ -12,6 +12,11 @@ export function camelCaseOfLabel(label: string) {
     return firstWord + capitalizedLaterWords.join('');
 }
 
+// "fixedSize" is fixed_size: the key in level.json of a stored value, which has no label.
+export function snakeCaseOfKey(key: string) {
+    return key.replace(/[A-Z]/g, (capital) => '_' + capital.toLowerCase());
+}
+
 // "Linear damping" is linear_damping: the attribute Lua uses and the key in level.json.
 export function snakeCaseOfLabel(label: string) {
     const words = labelWords(label);

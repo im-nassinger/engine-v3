@@ -1,11 +1,12 @@
 import { describe, expect, test } from 'vitest';
 
-import { NumberFieldType, VectorFieldType } from '../fields/index.ts';
+import { NumberFieldType, TextFieldType, VectorFieldType } from '../fields/index.ts';
 import type { Point } from '../geometry/index.ts';
 
 import { Component } from './Component.ts';
 import type { ComponentChange } from './AnyComponent.ts';
 import { ComponentSchema } from './ComponentSchema.ts';
+import { derivedField } from './DerivedFieldDefinition.ts';
 
 type CrateValues = {
     size: Point;
@@ -157,5 +158,127 @@ describe('Component', () => {
 
         expect(crate.get('weight')).toBe(10);
         expect(changes).toEqual([{ component: crate, key: 'weight' }]);
+    });
+});
+
+type LabelValues = {
+    text: string;
+    // Stored, never shown: what the Width field reads and writes.
+    widthInLetters: number;
+};
+
+const labelSchema = new ComponentSchema<LabelValues>({
+    typeName: 'LabelComponent',
+    cardOrder: 2,
+    hasCard: true,
+    addableByHand: true,
+    fields: [
+        {
+            key: 'text',
+            label: 'Text',
+            type: new TextFieldType(),
+            defaultValue: 'Hello',
+            description: 'What the label says.',
+            changeableInPlay: true,
+        },
+    ],
+    storedValues: [
+        { key: 'widthInLetters', type: new NumberFieldType({ min: 1, wholeNumber: true }), defaultValue: 5 },
+    ],
+    derivedFields: [
+        derivedField<LabelValues, number>({
+            key: 'width',
+            label: 'Width',
+            type: new NumberFieldType({ min: 0 }),
+            description: 'How wide the label is, in pixels.',
+            read: (values) => values.widthInLetters * 10,
+            write: (_values, width) => {
+                if (width === 0) return { ok: false, problem: { reason: 'flatShape' } };
+
+                return { ok: true, value: { widthInLetters: width / 10 } };
+            },
+        }),
+        derivedField<LabelValues, number>({
+            key: 'length',
+            label: 'Length',
+            type: new NumberFieldType(),
+            description: 'How many characters the text has.',
+            read: (values) => values.text.length,
+        }),
+    ],
+});
+
+class LabelComponent extends Component<LabelValues> {
+    static readonly schema = labelSchema;
+
+    constructor(values: LabelValues = labelSchema.defaults()) {
+        super(labelSchema, values);
+    }
+}
+
+describe('stored values', () => {
+    test('a stored value has a default, is normalized and is reached by key like a field', () => {
+        const label = new LabelComponent({ text: 'Hi', widthInLetters: 3.4 });
+
+        expect(labelSchema.defaults()).toEqual({ text: 'Hello', widthInLetters: 5 });
+        expect(label.readValue('widthInLetters')).toBe(3);
+        expect(label.writeValue('widthInLetters', 8)).toEqual({ ok: true, value: 8 });
+        expect(label.writeValue('widthInLetters', 'wide')).toEqual({ ok: false, problem: { reason: 'wrongType' } });
+    });
+
+    test('a stored value is saved under its key in snake_case, a field under its attribute', () => {
+        const textEntry = labelSchema.findEntry('text');
+        const widthEntry = labelSchema.findEntry('widthInLetters');
+        if (textEntry === undefined || widthEntry === undefined) throw new Error('Both entries should exist.');
+
+        expect(labelSchema.fileKeyOf(textEntry)).toBe('text');
+        expect(labelSchema.fileKeyOf(widthEntry)).toBe('width_in_letters');
+        expect(labelSchema.findEntryByFileKey('width_in_letters')).toBe(widthEntry);
+        expect(labelSchema.findFieldByAttribute('width_in_letters')).toBeUndefined();
+    });
+
+    test('reset to defaults resets the fields and leaves the stored values', () => {
+        const label = new LabelComponent({ text: 'Hi', widthInLetters: 9 });
+
+        label.resetToDefaults();
+
+        expect(label.get('text')).toBe('Hello');
+        expect(label.get('widthInLetters')).toBe(9);
+    });
+});
+
+describe('derived fields', () => {
+    test('read works the value out of the stored values', () => {
+        const label = new LabelComponent();
+
+        expect(label.readDerived('width')).toBe(50);
+        expect(label.readDerived('length')).toBe(5);
+    });
+
+    test('write changes the stored values and signals each one', () => {
+        const label = new LabelComponent();
+        const changes: ComponentChange[] = [];
+        label.changed.subscribe((change) => changes.push(change));
+
+        const outcome = label.writeDerived('width', 120);
+
+        expect(outcome).toEqual({ ok: true, value: 120 });
+        expect(label.get('widthInLetters')).toBe(12);
+        expect(changes).toEqual([{ component: label, key: 'widthInLetters' }]);
+    });
+
+    test('write passes on a refusal and changes nothing', () => {
+        const label = new LabelComponent();
+
+        expect(label.writeDerived('width', 0)).toEqual({ ok: false, problem: { reason: 'flatShape' } });
+        expect(label.writeDerived('width', 'wide')).toEqual({ ok: false, problem: { reason: 'wrongType' } });
+        expect(label.get('widthInLetters')).toBe(5);
+    });
+
+    test('a derived field without write is read-only', () => {
+        const label = new LabelComponent();
+
+        expect(() => label.writeDerived('length', 3)).toThrow();
+        expect(() => label.readDerived('height')).toThrow();
     });
 });

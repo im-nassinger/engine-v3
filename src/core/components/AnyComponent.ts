@@ -1,5 +1,5 @@
 import type { Signal } from '../events/index.ts';
-import type { FieldDefinition, ParseOutcome } from '../fields/index.ts';
+import type { FieldDefinition, ParseOutcome, ValueType } from '../fields/index.ts';
 
 import type { ComponentTypeName } from './ComponentTypeName.ts';
 import type { ComponentValues } from './ComponentValues.ts';
@@ -8,6 +8,13 @@ import type { PartnerRule } from './PartnerRule.ts';
 
 export type AnyFieldDefinition = FieldDefinition<ComponentValues, string>;
 
+// A field or a stored value of any component.
+export type AnyValueEntry = {
+    readonly key: string;
+    readonly type: ValueType<unknown>;
+    readonly defaultValue: unknown;
+};
+
 export type AnyComponentSchema = {
     readonly typeName: ComponentTypeName;
     readonly cardOrder: number;
@@ -15,10 +22,16 @@ export type AnyComponentSchema = {
     readonly addMenuSection: string | undefined;
     readonly addableByHand: boolean;
     readonly fields: readonly AnyFieldDefinition[];
+    readonly storedValues: readonly AnyValueEntry[];
     readonly derivedFields: readonly DerivedFieldDefinition<ComponentValues, unknown>[];
     readonly partners: readonly PartnerRule[];
+    readonly entries: readonly AnyValueEntry[];
     findField(key: string): AnyFieldDefinition | undefined;
     findFieldByAttribute(attribute: string): AnyFieldDefinition | undefined;
+    findEntry(key: string): AnyValueEntry | undefined;
+    findDerivedField(key: string): DerivedFieldDefinition<ComponentValues, unknown> | undefined;
+    fileKeyOf(entry: AnyValueEntry): string;
+    findEntryByFileKey(fileKey: string): AnyValueEntry | undefined;
 };
 
 export type ComponentChange = {
@@ -33,6 +46,8 @@ export type AnyComponent = {
     readonly changed: Signal<ComponentChange>;
     readValue(key: string): unknown;
     writeValue(key: string, raw: unknown): ParseOutcome<unknown>;
+    readDerived(key: string): unknown;
+    writeDerived(key: string, raw: unknown): ParseOutcome<unknown>;
     copy(): AnyComponent;
     resetToDefaults(): void;
 };

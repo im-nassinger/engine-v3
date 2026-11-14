@@ -1,13 +1,15 @@
 import { Signal } from '../events/index.ts';
-import type { FieldDefinition, ParseOutcome } from '../fields/index.ts';
+import type { ParseOutcome } from '../fields/index.ts';
 
 import type { AnyComponent, ComponentChange } from './AnyComponent.ts';
 import type { ComponentSchema } from './ComponentSchema.ts';
 import type { ComponentValues } from './ComponentValues.ts';
+import type { StoredValueDefinition } from './StoredValueDefinition.ts';
 
 type ComponentConstructor<Values extends ComponentValues> = new (values: Values) => Component<Values>;
 
-// Holds one component's values. It never knows which entity holds it: the entity listens to `changed`.
+// Holds one component's values: its fields and its stored values. It never knows which entity holds it:
+// the entity listens to `changed`.
 export abstract class Component<Values extends ComponentValues> implements AnyComponent {
     readonly schema: ComponentSchema<Values>;
     readonly changed = new Signal<ComponentChange>();
@@ -17,9 +19,9 @@ export abstract class Component<Values extends ComponentValues> implements AnyCo
         this.schema = schema;
         this.values = { ...values };
 
-        for (const field of schema.fields) {
-            const normalized = field.type.normalize(values[field.key]);
-            this.values[field.key] = field.type.clone(normalized);
+        for (const entry of schema.entries) {
+            const normalized = entry.type.normalize(values[entry.key]);
+            this.values[entry.key] = entry.type.clone(normalized);
         }
     }
 
@@ -29,31 +31,64 @@ export abstract class Component<Values extends ComponentValues> implements AnyCo
 
     // Returns the value actually stored, after clamping, and signals only when it changed.
     set<Key extends keyof Values>(key: Key, value: Values[Key]) {
-        const field = this.requireField(key);
-        const normalized = field.type.normalize(value);
+        const entry = this.requireEntry(key);
+        const normalized = entry.type.normalize(value);
         const current = this.values[key];
 
-        if (field.type.equals(current, normalized)) return current;
+        if (entry.type.equals(current, normalized)) return current;
 
-        this.values[key] = field.type.clone(normalized);
+        this.values[key] = entry.type.clone(normalized);
         this.changed.emit({ component: this, key: String(key) });
 
         return this.values[key];
     }
 
-    // By key, for generic code: the Inspector, undo, the reader.
+    // By key, for generic code: the Inspector, undo, the reader. Reaches fields and stored values alike.
     readValue(key: string): unknown {
-        const field = this.requireFieldByName(key);
+        const entry = this.requireEntryByName(key);
 
-        return this.values[field.key];
+        return this.values[entry.key];
     }
 
     writeValue(key: string, raw: unknown): ParseOutcome<unknown> {
-        const field = this.requireFieldByName(key);
-        const parsed = field.type.parse(raw);
+        const entry = this.requireEntryByName(key);
+        const parsed = entry.type.parse(raw);
         if (!parsed.ok) return parsed;
 
-        const stored = this.set(field.key, parsed.value);
+        const stored = this.set(entry.key, parsed.value);
+        return { ok: true, value: stored };
+    }
+
+    // A derived field, such as a shape's Width, worked out from the stored values.
+    readDerived(key: string): unknown {
+        const derived = this.requireDerived(key);
+
+        return derived.read(this.values);
+    }
+
+    // Parsed through the derived field's type, then written back as the stored values it changes.
+    writeDerived(key: string, raw: unknown): ParseOutcome<unknown> {
+        const derived = this.requireDerived(key);
+        if (derived.write === undefined) {
+            throw new Error(`${this.schema.typeName}'s ${key} is read-only.`);
+        }
+
+        const parsed = derived.type.parse(raw);
+        if (!parsed.ok) return parsed;
+
+        const normalized = derived.type.normalize(parsed.value);
+        const written = derived.write(this.values, normalized);
+        if (!written.ok) return written;
+
+        for (const entry of this.schema.entries) {
+            const hasNewValue = Object.hasOwn(written.value, entry.key);
+            if (!hasNewValue) continue;
+
+            const newValue = written.value[entry.key] as Values[typeof entry.key];
+            this.set(entry.key, newValue);
+        }
+
+        const stored = derived.read(this.values);
         return { ok: true, value: stored };
     }
 
@@ -64,6 +99,7 @@ export abstract class Component<Values extends ComponentValues> implements AnyCo
         return new ComponentType(this.values);
     }
 
+    // The fields only. A stored value, such as a polygon's points, is what the entity is, not a setting.
     resetToDefaults() {
         const defaults = this.schema.defaults();
 
@@ -72,22 +108,31 @@ export abstract class Component<Values extends ComponentValues> implements AnyCo
         }
     }
 
-    private requireField<Key extends keyof Values>(key: Key) {
-        const field = this.schema.fields.find((candidate) => candidate.key === key);
-        if (field === undefined) {
-            throw new Error(`${this.schema.typeName} has no field ${String(key)}.`);
+    private requireEntry<Key extends keyof Values>(key: Key) {
+        const entry = this.schema.entries.find((candidate) => candidate.key === key);
+        if (entry === undefined) {
+            throw new Error(`${this.schema.typeName} has no value ${String(key)}.`);
         }
 
-        // The schema's fields are typed per key, so the field found for this key holds this key's type.
-        return field as FieldDefinition<Values, Key>;
+        // The schema's entries are typed per key, so the entry found for this key holds this key's type.
+        return entry as StoredValueDefinition<Values, Key>;
     }
 
-    private requireFieldByName(key: string) {
-        const field = this.schema.findField(key);
-        if (field === undefined) {
-            throw new Error(`${this.schema.typeName} has no field ${key}.`);
+    private requireEntryByName(key: string) {
+        const entry = this.schema.findEntry(key);
+        if (entry === undefined) {
+            throw new Error(`${this.schema.typeName} has no value ${key}.`);
         }
 
-        return field;
+        return entry;
+    }
+
+    private requireDerived(key: string) {
+        const derived = this.schema.findDerivedField(key);
+        if (derived === undefined) {
+            throw new Error(`${this.schema.typeName} has no derived field ${key}.`);
+        }
+
+        return derived;
     }
 }

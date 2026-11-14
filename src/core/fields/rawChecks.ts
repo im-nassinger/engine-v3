@@ -1,3 +1,5 @@
+import type { Point } from '../geometry/index.ts';
+
 import type { ParseOutcome, ParseProblem } from './ParseOutcome.ts';
 
 export function accept<T>(value: T): ParseOutcome<T> {
@@ -29,6 +31,45 @@ export function parseFiniteNumber(raw: unknown): ParseOutcome<number> {
     if (!Number.isFinite(raw)) return refuse({ reason: 'notFinite' });
 
     return accept(raw);
+}
+
+// A point from untrusted data: exactly x and y, both finite.
+export function parsePoint(raw: unknown): ParseOutcome<{ x: number; y: number }> {
+    if (!isPlainObject(raw)) return refuse({ reason: 'wrongType' });
+    if (!hasExactlyKeys(raw, ['x', 'y'])) return refuse({ reason: 'wrongType' });
+
+    const parsedX = parseFiniteNumber(raw['x']);
+    if (!parsedX.ok) return parsedX;
+
+    const parsedY = parseFiniteNumber(raw['y']);
+    if (!parsedY.ok) return parsedY;
+
+    return accept({ x: parsedX.value, y: parsedY.value });
+}
+
+// A list of points from untrusted data, refused whole when one point is wrong.
+export function parsePointList(raw: unknown, minCount: number): ParseOutcome<{ x: number; y: number }[]> {
+    if (!Array.isArray(raw)) return refuse({ reason: 'wrongType' });
+    if (raw.length < minCount) return refuse({ reason: 'tooFewPoints', minCount });
+
+    const points: { x: number; y: number }[] = [];
+    for (const rawPoint of raw) {
+        const parsed = parsePoint(rawPoint);
+        if (!parsed.ok) return parsed;
+
+        points.push(parsed.value);
+    }
+
+    return accept(points);
+}
+
+export function pointsEqual(first: readonly Point[], second: readonly Point[]) {
+    if (first.length !== second.length) return false;
+
+    return first.every((point, index) => {
+        const other = second[index];
+        return other !== undefined && point.x === other.x && point.y === other.y;
+    });
 }
 
 export function clamp(value: number, min: number, max: number) {

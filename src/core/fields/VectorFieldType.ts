@@ -2,7 +2,7 @@ import type { Point } from '../geometry/index.ts';
 
 import type { FieldType } from './FieldType.ts';
 import type { ParseOutcome } from './ParseOutcome.ts';
-import { accept, clamp, hasExactlyKeys, isPlainObject, parseFiniteNumber, refuse } from './rawChecks.ts';
+import { accept, clamp, parsePoint, refuse } from './rawChecks.ts';
 
 export type VectorFieldOptions = {
     // Each applies to x and y alike.
@@ -25,19 +25,13 @@ export class VectorFieldType implements FieldType<Point> {
     }
 
     parse(raw: unknown): ParseOutcome<Point> {
-        if (!isPlainObject(raw)) return refuse({ reason: 'wrongType' });
-        if (!hasExactlyKeys(raw, ['x', 'y'])) return refuse({ reason: 'wrongType' });
+        const parsed = parsePoint(raw);
+        if (!parsed.ok) return parsed;
 
-        const parsedX = parseFiniteNumber(raw['x']);
-        if (!parsedX.ok) return parsedX;
-
-        const parsedY = parseFiniteNumber(raw['y']);
-        if (!parsedY.ok) return parsedY;
-
-        const hasZero = parsedX.value === 0 || parsedY.value === 0;
+        const hasZero = parsed.value.x === 0 || parsed.value.y === 0;
         if (this.refuseZero && hasZero) return refuse({ reason: 'zero' });
 
-        return accept({ x: parsedX.value, y: parsedY.value });
+        return accept(parsed.value);
     }
 
     serialize(value: Point) {
