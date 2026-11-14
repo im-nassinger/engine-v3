@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version and no question is open. **v1 is a level you build and watch**, with all logic in v2. **Next: stage 0 of [plan.md](plan.md), project setup.** No code exists yet.
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **Next: stage 0 of [plan.md](plan.md), project setup.** Its detailed plan is written and **waits for the owner's answer** in [proposals/stage-0/](proposals/stage-0/README.md). One question is open, about the polygon library. No code exists yet.
 
 ## Where things stand
 
@@ -53,8 +53,9 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 ## Next
 
-1. **Stage 0 of [plan.md](plan.md): project setup.** Vite, TypeScript with one config per part, ESLint, Prettier, Vitest, Playwright, CI, and the empty `src/` folders.
-2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
+1. **The owner answers the [stage 0 plan](proposals/stage-0/README.md)** (written 2026-11-14). It differs from the architecture docs in ten places, listed in its [changes.md](proposals/stage-0/changes.md).
+2. **Stage 0 of [plan.md](plan.md): project setup.** Vite, TypeScript with one config per part, ESLint, Prettier, Vitest, Playwright, CI, and the empty `src/` folders.
+3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
 
@@ -68,4 +69,6 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 
 ## Open questions for the owner
 
-None. When several come up, they go on the [review page](review.html) all at once, not a few per round (owner, 2026-11-14).
+When several come up, they go on the [review page](review.html) all at once, not a few per round (owner, 2026-11-14).
+
+1. **Which polygon library does core use?** (found 2026-11-14, needed by stage 3) [geometry.md](architecture/core-model/geometry.md) has `clipper2-js` cut self-crossing polygons and triangulate them. `clipper2-js` 1.2.4 has no triangulation, was last published on 2024-01-01, and brings Angular 15 into the project when installed. A candidate is `clipper2-ts` 2.0.1-19 (published 2026-11-07, has triangulation, needs no other package), not tried yet. Both call `Math.sin` and others somewhere inside, so stage 3 must check the functions it uses never reach them. Details in the [stage 0 plan](proposals/stage-0/changes.md#found-on-the-way-clipper2-js).
