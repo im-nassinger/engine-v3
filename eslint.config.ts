@@ -46,6 +46,7 @@ export const ALLOWED_MATH_IN_CORE = [
     'trunc',
     'sqrt',
     'fround',
+    'f16round',
     'imul',
     'clz32',
     'E',
