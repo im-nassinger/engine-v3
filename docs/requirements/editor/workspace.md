@@ -139,9 +139,9 @@ Source: scope ED1; round 3: 01 2.6; round 5: 02 2.5; old: WS-46 to WS-52, WS-56,
 - Snap distance is 6 screen pixels at every zoom.
 - Holding Ctrl during a drag turns snapping off until released.
 - Typed values and arrow-key moves are never snapped. Ctrl+Shift+arrow moves one grid step.
-- The grid size is saved in the project file. Whether the grid is shown is saved in the browser.
+- The grid size is saved in the project file, and changing it is an undo step (owner: 2026-11-13). Whether the grid is shown is saved in the browser.
 
-Source: scope ED4; round 3: 01 2.6; round 5: FMT1; round 7: BND2; old: WS-53, WS-54, WS-58 to WS-62
+Source: scope ED4; round 3: 01 2.6; round 5: FMT1; round 7: BND2; old: WS-53, WS-54, WS-58 to WS-62; owner: 2026-11-13
 
 ### Snapping to other entities · v3
 

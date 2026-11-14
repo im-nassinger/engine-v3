@@ -10,6 +10,7 @@ How values are edited and how mistakes are reversed. **v1:** the Inspector shows
 
 - The Inspector shows every component of the selected entity as a card: a title, its fields, and a menu with Remove and Reset to defaults.
 - **Clicking empty space shows the World's components.** There is no settings window. *Why: the World is an entity like any other, so its settings are its components.*
+- The World's TransformComponent is fixed at zero and its card isn't shown, because the World never moves (owner: 2026-11-13).
 - The header shows the entity's name (editable), and its hide and lock switches. With several selected it reads `3 entities`.
 - The Inspector doesn't show the parent. The Layers panel tree does.
 - Cards appear in one fixed order, the same on every entity: TransformComponent, shape, path, text, style, body, surface, joint, camera, tags, scripts, triggers. Users can't reorder them.
@@ -18,7 +19,7 @@ How values are edited and how mistakes are reversed. **v1:** the Inspector shows
 - Hovering a field's label shows its description.
 - During play the Inspector is read-only, and shows live values when brought back with Panels.
 
-Source: round 1: C1, C10; round 3: R15; round 4: H2, SEL1; decisions: D14, D15; old: WS-84 to WS-89, WS-124
+Source: round 1: C1, C10; round 3: R15; round 4: H2, SEL1; decisions: D14, D15; old: WS-84 to WS-89, WS-124; owner: 2026-11-13
 
 ### One fixed list of field types · v1
 
@@ -52,6 +53,7 @@ Source: round 3: 01 2.5; old: WS-114, WS-115, WS-119 to WS-122, WS-125, WS-126
 
 - `Add Component` sits at the bottom of the cards and opens a searchable menu. Components the entity already has are not listed, because an entity has one of each type.
 - **Adding a component that needs a partner doesn't add the partner.** The card shows a note with a button, such as "Needs a ShapeComponent to draw anything. [Add ShapeComponent]". *Why: adding the partner automatically surprises you, and refusing is annoying when you were about to add it next. A note with a one-click fix is clear and never in the way.*
+- **Every partner note reads "Needs a X to Y. [Add X]"**, such as "Needs a SurfaceComponent to collide. [Add SurfaceComponent]". *Why: one pattern, so every note reads the same (owner: 2026-11-13).*
 - The TransformComponent, the camera's CameraComponent and the World's own components can't be added or removed by hand. The menu entry is disabled and says why.
 - With several entities selected, Add Component adds to every entity that lacks it, and Remove removes from all.
 - **Removing a component that others need removes only that one.** The cards left without their partner show their note. Example: removing a crate's ShapeComponent leaves its SurfaceComponent, whose card then shows its note with an [Add ShapeComponent] button. *Why: nothing happens behind the user's back, and undo brings the component back.*
@@ -107,13 +109,13 @@ Source: scope ED10; round 6: 05 2.9; round 7: 06 2.13
 - **Duplicate puts the copy on top of the original, in the same group, with no offset.** The copy becomes the selection. *Why: the owner's change.*
 - Paste puts the copy centred on the mouse when it is over the level view, otherwise at the centre of the view. Pasted entities go into the group you are inside, on top, and become the selection.
 - **Only what is selected is copied.** Nothing comes along because it is connected. A joint is copied only when the joint itself is selected.
-- Links between the copies are kept: a copied joint connects the copies of its entities if they were copied too. A link to something outside the copied set stays pointed at the original in the same level, and becomes `missing` in another level.
+- Links between the copies are kept: a copied joint connects the copies of its entities if they were copied too. A link to something outside the copied set stays pointed at the original in the same level, and becomes `missing` in another level. **"The same level" means the same opening of it:** after a reload, New or Import, such links become `missing`. *Why: v1 has no level id, so the editor can only recognise the level it has open (owner: 2026-11-13).*
 - The World and the camera are skipped by copy, cut, duplicate and delete. If anything else was selected the command goes ahead, otherwise the status bar says why.
 - Pasted data is checked like an imported file. Bad data is refused, with a status message, and nothing changes.
 - A paste that would pass a limit is refused whole, naming the limit.
 - With nothing to paste: `Nothing to paste` in the status bar.
 
-Source: scope ED3; round 3: 01 2.9; round 7: 06 2.10; round 8: JC1; round 9: 09 2.18; old: WS-71 to WS-83
+Source: scope ED3; round 3: 01 2.9; round 7: 06 2.10; round 8: JC1; round 9: 09 2.18; old: WS-71 to WS-83; owner: 2026-11-13
 
 ### Delete · v1
 
@@ -143,7 +145,7 @@ Source: round 7: 06 2.11; old: WS-80, WS-81
 | A committed Inspector value | The view, zoom, grid display |
 | Adding or removing a component | The active tool, tool lock |
 | Group, ungroup, reorder, move between groups, rename, hide, lock | Panel sizes, folded cards, tabs, folded Layers rows |
-| World settings, level rename | Snapping switches |
+| World settings, level rename, the grid size | Snapping switches |
 | Importing, renaming or deleting a file. Several files at once is one step | Test play, Console contents |
 | A committed script edit | Keystrokes in the code editor before commit |
 

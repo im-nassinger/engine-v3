@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. **Waiting for the owner:** a review of the proposal, its eight new questions (A1 to A8), and the open questions below.
+The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. Round 2 of its review is answered. **Waiting for the owner:** questions 25 to 27 about the World's rectangle (round 3 of the review page), a review of the proposal, and the other open questions below.
 
 ## Where things stand
 
@@ -38,6 +38,10 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
   - **In v1 a fill is a colour field that can be emptied.** Gradients add a fill field type in v2.
   - **The physics view draws the game's own collision pieces**, not Box2D's drawing.
   - **The "Suggested v1" rows** in the "Not in the scope review" tables are built in v1, each marked as waiting for the owner until confirmed.
+- **The architecture review, round 2** (owner): eight yes, one changed.
+  - **The background colour is the World's StyleComponent fill.** In v3 an image fill is the background image.
+  - **The level bounds are a rectangle ShapeComponent on the World** (the owner's change to the suggestion of fields on the PhysicsWorldComponent). Three details follow from it, below.
+  - **Merge** is a checkbox on the BodyComponent. **The TagsComponent is v2.** The World's TransformComponent card isn't shown. Partner notes read "Needs a X to Y. [Add X]". Links to outside entities last one opening of the level. Changing the grid size is an undo step. TypeScript is pinned to 6.0.3.
 
 ## Next
 
@@ -58,6 +62,12 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 ## Open questions for the owner
 
 Found while rewriting. None was decided by Claude. Where the docs had to say something, they say what is written after "Written as". Which parts of the architecture each one touches is in the proposal's [open questions](proposals/architecture/open-questions.md).
+
+### The World's rectangle (from round 2)
+
+25. **Where the World's rectangle sits, and how its handles resize it.** The World never moves, so its rectangle can't move either. Suggested: centred on the level's origin, and dragging one side moves the opposite side by the same amount.
+26. **Where the four edge settings (wall or open) live.** A ShapeComponent has no such settings. Suggested: four choices on the PhysicsWorldComponent.
+27. **Physics on the World's rectangle.** Suggested: the World can't take a BodyComponent or a SurfaceComponent, so the background never collides.
 
 ### Words and components
 

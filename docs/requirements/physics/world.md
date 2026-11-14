@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The level-wide physics settings, all on the World entity. **v1:** gravity strength and direction, the background colour, and level bounds whose edges are walls or open. **v3:** the collision grid (which tags hit which), the Collision check, gravity buttons, game speed, and a background image. Core rule: **the collision grid on the World is the one place that decides what hits what.** There is no second system beside it.
+The level-wide physics settings, all on the World entity. **v1:** gravity strength and direction, the background colour (the World's StyleComponent), and level bounds (the World's rectangle ShapeComponent) whose edges are walls or open. **v3:** the collision grid (which tags hit which), the Collision check, gravity buttons, game speed, and a background image. Core rule: **the collision grid on the World is the one place that decides what hits what.** There is no second system beside it.
 
 ## World settings
 
@@ -13,11 +13,11 @@ The level-wide physics settings, all on the World entity. **v1:** gravity streng
 - Gravity is stored as strength and direction, so zero gravity keeps its direction for when the strength returns.
 - Sizes and speeds are in pixels. Gravity is in m/s², like real life, and mass is in kg. These are the only physical units.
 - The 9.8 default feels floaty for a platformer. The fix is the player's Gravity scale, not the world's gravity: the builtin platformer script sets it from its jump settings.
-- **Background colour** of the level, a soft light blue by default.
+- **The background colour is the fill of the World's StyleComponent**, which paints the World's rectangle, the level bounds. A soft light blue by default. *Why: a StyleComponent already holds a fill, so the background needs no setting of its own, and in v3 an image fill becomes the background image (owner: 2026-11-13).*
 - Triggers and scripts can change gravity and the background colour during play. Changing gravity wakes every sleeping body, so nothing hangs in mid-air.
 - The World's settings are edited in the Inspector, like any entity's.
 
-Source: scope PH9; round 1: C3, D6, D38; round 3: D75, R15; round 6: 05 2.14; round 7: CF1; old: PH-82 to PH-84, PH-88, PH-89
+Source: scope PH9; round 1: C3, D6, D38; round 3: D75, R15; round 6: 05 2.14; round 7: CF1; old: PH-82 to PH-84, PH-88, PH-89; owner: 2026-11-13
 
 ### Buttons for gravity · v3
 
@@ -36,7 +36,7 @@ Source: scope PH11; round 3: D75; round 6: 05 2.14; round 9: 09 2.10; old: PH-87
 
 ### Background image · v3
 
-- The background can be an image instead of a colour. It comes with images.
+- The background can be an image instead of a colour: the World's StyleComponent gets an image fill. It comes with images.
 - A missing image falls back to the colour.
 
 Source: scope DR11; round 6: 05 2.14; old: PH-88
@@ -80,15 +80,17 @@ Source: scope PH7; round 6: 05 2.13; round 8: CF4; old: PH-80, PH-81
 ### Level bounds · v1
 
 - **A level has a fixed size.** Every level has a bounds rectangle, always. *Why: a physics world needs an edge, otherwise lost entities cost time forever and the camera has nothing to stop at.*
+- **The level bounds are the World's rectangle:** the World has a ShapeComponent holding a rectangle, and its width and height are the bounds' size. It is always a rectangle and can't be removed. *Why: the owner's change. A rectangle already has a size, a card and handles, so the bounds need no settings of their own (owner: 2026-11-13).*
 - Default size: **20000×10000 px**. The default camera is 1920×1080.
-- The bounds show as a thin frame in the editor. Resize them by dragging their handles with the World selected, or by typing.
+- The bounds show as a thin frame in the editor. Resize them by dragging their handles with the World selected, or by typing the rectangle's width and height.
+- Where the rectangle sits around the level's origin, how its handles resize it while the World itself never moves, and where the four edge settings live are open questions, see [progress](../../progress.md).
 - The camera stops at the bounds.
 - **Each edge is a wall or open.** All four are open by default. A wall blocks everything that collides.
 - **An entity that is fully outside an open edge is removed**, where it can no longer be seen. That is all the game does: it decides nothing about lives or falling.
 - An entity that starts or spawns outside is left alone until it has been inside once.
 - The bounds don't change during play.
 
-Source: scope PH12; round 1: D5, D40; round 6: 05 2.15; round 7: BND2; round 10: 11 2.16; old: PH-91 to PH-99
+Source: scope PH12; round 1: D5, D40; round 6: 05 2.15; round 7: BND2; round 10: 11 2.16; old: PH-91 to PH-99; owner: 2026-11-13
 
 ## Not in the scope review
 

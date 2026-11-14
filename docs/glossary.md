@@ -92,7 +92,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Physics view | A debug view in the editor and test play that draws every physics shape, even hidden ones. |
 | Collision check | Right-click two entities, "Why do these collide?": explains why they do or don't. |
 | Joint | An entity with a JointComponent, connecting two bodies: Hinge, Rope, Spring, Weld, Rod, Slider, Wheel. |
-| Level bounds | The rectangle around the level that marks where it ends. Each edge is a wall or open. |
+| Level bounds | The rectangle around the level that marks where it ends: the World's rectangle ShapeComponent. Each edge is a wall or open. |
 | Game speed | A World setting that slows or speeds the whole level. Different from the test speed menu. |
 
 ## Files
@@ -151,11 +151,11 @@ Component names end in `Component`, the TransformComponent included (owner: 2026
 |---|---|---|
 | TransformComponent | Position, rotation, scale, skew, measured from the parent | Every entity |
 | NameComponent | The entity's name, filled automatically ("Rectangle 1"). Not unique | Every entity |
-| TagsComponent | The entity's tags | Any entity |
-| ShapeComponent | A rectangle, ellipse, polygon or line | Any entity |
+| TagsComponent | The entity's tags (v2) | Any entity |
+| ShapeComponent | A rectangle, ellipse, polygon or line. On the World, a rectangle: the level bounds | Any entity, the World included |
 | PathComponent | A curved path. Read-only on Rope, Spring and Rod joints | Any entity |
 | TextComponent | Text and its font settings (v2) | Any entity |
-| StyleComponent | Fill, outline and opacity, for a shape, path or text | Any entity that draws |
+| StyleComponent | Fill, outline and opacity, for a shape, path or text. On the World, its fill is the background | Any entity that draws, the World included |
 | EffectsComponent | Pixelate, shadow, blur (v3) | Any entity that draws |
 | BodyComponent | Body type and how it moves | Any entity |
 | SurfaceComponent | How a shape collides | Any entity with a shape |
