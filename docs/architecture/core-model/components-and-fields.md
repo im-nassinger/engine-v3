@@ -9,10 +9,15 @@
 A **value type** knows how to check, store and compare one kind of value. A **field type** is a value type the Inspector can show. Both are classes, one per kind.
 
 ```typescript
-export type ParseOutcome<T> = { ok: true; value: T } | { ok: false; problem: string };
+export type ParseProblem =                  // reasons, never sentences: the editor writes those
+    | { reason: 'wrongType' } | { reason: 'notFinite' } | { reason: 'zero' }
+    | { reason: 'outsideLimits'; min: number; max: number }
+    | { reason: 'unknownChoice' } | { reason: 'badColour' } | { reason: 'badEntityId' };
+
+export type ParseOutcome<T> = { ok: true; value: T } | { ok: false; problem: ParseProblem };
 
 export type ValueType<T> = {
-    parse(raw: unknown): ParseOutcome<T>;   // untrusted data: a file, the clipboard, a script
+    parse(raw: unknown): ParseOutcome<T>;   // untrusted data: a file, the clipboard, a script. Checks the shape only
     serialize(value: T): JsonValue;
     normalize(value: T): T;                 // clamp to the range, round whole numbers
     clone(value: T): T;
@@ -34,11 +39,14 @@ export type FieldType<T> = ValueType<T> & {
 | `TextFieldType` | `string` | `maxLength`, `trimmed` | The name (64 characters) |
 | `CheckboxFieldType` | `boolean` | | Sensor, Bullet, Motor |
 | `ChoiceFieldType<T extends string>` | one of a union | the options and their labels | Body type, joint type, gravity direction |
-| `ColourFieldType` | `#RRGGBBAA` text | `canBeEmpty` | Outline colour; the fill in v1 |
+| `ColourFieldType` | `#RRGGBBAA` text | | Outline colour |
 | `VectorFieldType` | `{ x, y }` | `min`, `max`, `refuseZero` | Position, scale (scale can't be 0) |
 | `AngleFieldType` | degrees | `min`, `max`, `refuseLimits` | Rotation, hinge limits, skew (refuses −90° and 90°) |
 | `EntityFieldType` | `EntityId \| null` | | Joint A and B, the camera's follow target |
 
+- **`parse` checks the shape, `normalize` clamps** (as built, 2026-11-14): `parse` refuses the wrong type, a number that isn't finite, an unknown choice, a colour not written `#RRGGBBAA`, and the two values a field refuses (`refuseZero`, `refuseLimits`). A value out of range parses, and `normalize` clamps it, which is what import does with a joint limit past its range. A field that refuses its limits never clamps. `ParseProblem` is a code with data, not the sentence the first draft had, because [core returns reasons, never sentences](../errors.md#where-the-sentences-come-from).
+- **A colour** is read in either case and stored uppercase, so two equal colours compare equal. **A text's length** counts characters (code points), so a character outside the basic plane is never cut in half. **A vector** is geometry's `Point`; `refuseZero` refuses 0 in x or in y, since either makes a matrix that can't be inverted. `JsonValue` is declared in `core/fields` with `EntityId`.
+- **`ColourFieldType` has no `canBeEmpty`** (as built, 2026-11-14): the only colour that could be emptied was the fill, which uses `SolidFillFieldType`, so nothing in v1 needs it.
 - **The fixed list is v1, but each field type is built when the first component needs it.** v1 builds the eight above. Asset, variable, tags and list come with the v2 components that use them, and the fill field type comes with gradients (owner, 2026-11-13).
 - **The fill in v1** (owner, 2026-11-13): the StyleComponent's fill uses `SolidFillFieldType`, which the Inspector shows as a colour field that can be emptied, but whose value is already the tagged value `{ kind: 'none' } | { kind: 'solid', colour }`. In v2 it is replaced by `FillFieldType` (kind `'fill'`) with the same stored shape plus gradients, and in v3 images. Saved levels never change.
 - **An entity field is stored as `{ "entity": 12 }`**, not a bare number, so a later "follow by tag" (open question 15) can store `{ "tag": "player" }` beside it without changing saved levels.
