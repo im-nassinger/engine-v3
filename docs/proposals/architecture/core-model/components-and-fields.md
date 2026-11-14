@@ -128,7 +128,7 @@ export type ComponentClass<T extends Component> = {
 - Code that knows the component uses the typed `get` and `set` (`body.get('gravityScale')`). Generic code (the Inspector, undo, the reader, Lua) uses `readValue` and `writeValue` by key, which go through the same field type.
 - `set` returns the value actually stored, after clamping, so the Inspector can show "Max is 1500" when it differs from what was typed.
 - **Partner notes come from the schema** (Q5 and Q6, owner 2026-11-13): a component lists the partners it needs and when they are missing. The editor's `MissingPartnerRule` turns them into editor messages with an [Add ...] button. Removing a component removes only that one, so the cards left behind show their notes.
-- The exact note texts the requirements don't give are [open question A6](../open-questions.md).
+- **Every note reads "Needs a X to Y. [Add X]"** (owner, 2026-11-13), with Y written per partner in the schema: "to draw anything" for a StyleComponent, "to collide" for a SurfaceComponent and a BodyComponent.
 
 A component class is short. Example:
 
@@ -183,12 +183,12 @@ export function createV1Registry(): ComponentRegistry;
 | SurfaceComponent | 7 | Density 0 to 100, 1. Friction 0 to 5, 0.3. Restitution 0 to 2, 0. Sensor: checkbox | | ShapeComponent |
 | JointComponent | 8 | Type: choice Hinge, Rope, Spring. A, B: entity. Let connected objects collide. Hinge: Limit rotation, Min angle, Max angle, Motor, Motor speed, Motor strength, Resistance. Rope: Match drawn distance, Length. Spring: Match drawn distance, Rest length, Stiffness, Damping. Ranges and defaults as in [joints](../../../requirements/physics/joints.md) | The two ends, in the joint's own space | |
 | CameraComponent | 9 | Width, Height: number px, 1920 × 1080. Follow: entity. Smoothing: number s | Mode, `fixedSize` until v3 | |
-| PhysicsWorldComponent | World | Gravity strength: number m/s², 0 to 100, 9.8. Gravity direction: choice Down, Up, Left, Right, Custom. Gravity angle: angle, applies when Custom. Level bounds, see open question A2 | | |
+| PhysicsWorldComponent | World | Gravity strength: number m/s², 0 to 100, 9.8. Gravity direction: choice Down, Up, Left, Right, Custom. Gravity angle: angle, applies when Custom. The four edges, Wall or Open, if open question 26 lands here | | |
 
 - Every setting of every joint type is stored, whatever the current type, so switching type in v3 keeps them, as the joints rules ask.
-- **Merge** on BodyComponent is [open question A3](../open-questions.md): the requirements say merging "is a setting on a component" without naming it.
-- **TagsComponent is v2** in this proposal, because nothing in v1 reads tags: [open question A4](../open-questions.md).
-- The World's background colour is [open question A1](../open-questions.md), with the suggestion of a StyleComponent on the World.
+- **Merge** is a checkbox on the BodyComponent, on by default (owner, 2026-11-13).
+- **The TagsComponent is v2** (owner, 2026-11-13): nothing in v1 reads tags.
+- **The World has a ShapeComponent and a StyleComponent** (owner, 2026-11-13). The rectangle's width and height are the level bounds, 20000 × 10000 by default; the fill is the background colour. Both are World components: they can't be removed, and the shape's kind is always rectangle. Where the rectangle sits and how its handles resize it while the World never moves is [open question 25](../open-questions.md).
 
 ## v2 and v3 seams
 

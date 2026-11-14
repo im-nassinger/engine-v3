@@ -71,7 +71,7 @@
   <div class="pbar"><i id="pfill"></i></div>
 </header>
 <main>
-  <p class="intro">Round 2 of the architecture proposal: the questions that came up while writing it (docs/proposals/architecture/). Round 1's 24 cards were all answered yes. Each card is one question or one decision, with my view under it. <b>Yes</b> means you agree with my view, <b>No</b> means you don't, and a comment says what you'd change. "More" explains the card with an example. Any click on a card counts it as answered. Underlined words are explained when you hover them. Answers are kept in this browser. When you're done, press Copy answers and paste the text into the chat.</p>
+  <p class="intro">Round 3 of the architecture proposal: three details about the World's rectangle. Rounds 1 and 2 are answered and written into the docs. Each card is one question, with my view under it. <b>Yes</b> means you agree with my view, <b>No</b> means you don't, and a comment says what you'd change. "More" explains the card with an example. Any click on a card counts it as answered. Underlined words are explained when you hover them. Answers are kept in this browser. When you're done, press Copy answers and paste the text into the chat.</p>
   <details class="glossary"><summary>Glossary</summary><dl id="glossary"></dl></details>
   <div id="list"></div>
   <div class="footer">
@@ -93,6 +93,8 @@ const GLOSSARY = [
 ["Physics view","A debug view in the editor and test play that draws every physics shape, even hidden ones.",["physics view"]],
 ["Fill","What paints the inside of a shape: nothing, a solid colour, a gradient (v2) or an image (v3).",["fill","fills"]],
 ["Merge","When shapes inside a group with a body become part of that one body.",["merge","merged","merging"]],
+["Level bounds","The rectangle around the level that marks where it ends: the World's rectangle ShapeComponent. Each edge is a wall or open.",["level bounds","bounds"]],
+["World","The top entity of every level. Everything else sits inside it. It holds the level-wide settings.",["World"]],
 ["Test play","Pressing Play in the editor. It runs a copy of the level, and Stop returns to the editor with nothing changed.",["test play"]],
 ["Tick","One step of the game. The game runs 60 ticks per second.",["tick","ticks"]],
 ["Seed","The number all random values in a run come from.",["seed"]],
@@ -114,38 +116,20 @@ const GLOSSARY = [
 
 // Groups: [title, note, [[id, short, detail, myView], ...]]. Yes = you agree with my view.
 const GROUPS = [
-["Questions from writing the proposal", "The requirements don't settle these. Each has a suggested answer; the proposal is written so any answer fits. The full list is in open-questions.md.", [
-["A1","The World's background colour lives in a StyleComponent on the World: its fill is the background.",
- "The requirements say the background colour is on the World but name no component, and the PhysicsWorldComponent is for physics. A StyleComponent already holds a fill. In v3 an image fill then becomes the background image with no new setting, and a missing image falls back to the colour, as the requirement says.",
- "Reuse before adding: no new component and no special background setting."],
-["A2","The level bounds are fields on the PhysicsWorldComponent: Bounds position (top-left corner, default 0, 0), Bounds size (20000 × 10000), and Top, Bottom, Left and Right edge, each Wall or Open (all Open).",
- "The requirements give the size, the four edges and the handles, but no component and no position. The bounds are there because a physics world needs an edge, so the physics settings are their home. With the corner at (0, 0), a new level's camera sits at (960, 540), in the top-left corner of the bounds.",
- "Physics settings stay in one component, and the numbers stay positive and easy to read."],
-["A3","\"Merge\" is a checkbox on the BodyComponent, on by default.",
- "The requirements say whether a child merges \"is a setting on a component, on by default\", without naming the component. A shape with a SurfaceComponent and no BodyComponent always merges into the body above it. To give it its own body, add a BodyComponent and untick Merge. This matches \"a merged shape keeps its own body settings, greyed\".",
- "It belongs with the body settings it greys out."],
-["A4","The TagsComponent comes in v2, not v1.",
- "It is in the glossary with no version. Nothing in v1 reads tags: triggers and scripts (v2) and the collision grid (v3) are the first to use them.",
- "v1 is the smallest thing that can be tested, and tags do nothing in it."],
-["A5","The World keeps a TransformComponent fixed at zero, and its card isn't shown in the Inspector.",
- "The glossary says every entity has a TransformComponent, but the World can't move, so a card full of values you can't change would only be noise when you click empty space.",
- "Keep the rule, hide the useless card."],
-["A6","Partner notes follow one pattern: \"Needs a X to Y. [Add X]\".",
- "The requirements give two notes word for word (\"Needs a ShapeComponent to draw anything\", \"Needs a SurfaceComponent to notice touching\"). The others would read: a StyleComponent without a shape \"Needs a ShapeComponent to draw anything\", a SurfaceComponent without a shape \"Needs a ShapeComponent to collide\", a BodyComponent on a shape with no surface \"Needs a SurfaceComponent to collide\".",
- "One pattern, so every note reads the same."],
-["A7","A pasted entity keeps a link to an entity outside the copied set only within one opening of the level. After a reload, New or Import, such links become missing.",
- "The rule says the link stays \"in the same level\" and becomes missing \"in another level\". v1 has no level id (that is Later), so the editor can only tell the level it has open right now. Example: copy a joint without its wheel, reload, paste: the joint's end on the wheel is missing.",
- "Safe and simple until level ids exist."],
-["A8","Changing the grid size is an undo step. Showing or hiding the grid isn't.",
- "The grid size is saved in the project file, but the requirement's table of what is and isn't a step lists neither way. Every other value saved in the level is a step.",
- "Treat it like every other value saved in the level."],
-["S1","TypeScript is pinned to 6.0.3, not 7.0.",
- "TypeScript 7.0 is out, but typescript-eslint (8.72.2), which runs the import-direction rules, only supports TypeScript below 6.1. Moving to 7 is one version change once it does.",
- "Use 6.0 now, so the ESLint rules that protect the architecture work from the first day."]
+["The World's rectangle", "Your round 2 answer: the level bounds are a rectangle ShapeComponent on the World. These three details follow from it. The numbers match the open questions in progress.md.", [
+["Q25","The World's rectangle is centred on the level's origin. Dragging one of its sides moves the opposite side by the same amount, so the centre never moves.",
+ "The World never moves (its TransformComponent is fixed at zero), so its rectangle can't be moved by moving the World. A normal shape's resize keeps the opposite side still, which moves the shape's centre, and the World can't do that. Example: the bounds are 20000 × 10000, from −10000 to 10000 sideways. Dragging the right side out by 1000 makes them 22000 wide, from −11000 to 11000. Typing the width does the same. A new level's camera then starts at the origin, in the middle of the level.",
+ "Centred and resized from both sides: the World stays fixed and the bounds stay one simple rectangle. The other way would need a new \"offset\" setting on every rectangle."],
+["Q26","The four edge settings live on the PhysicsWorldComponent: Top edge, Bottom edge, Left edge and Right edge, each Wall or Open, all Open by default.",
+ "A ShapeComponent has no setting for its edges, and adding one there would put a physics setting on every shape for the World's sake. Walls are physics: they block everything that collides, and an open edge removes entities that leave. The PhysicsWorldComponent already holds the World's physics settings.",
+ "Physics settings stay together, and the ShapeComponent stays the same on every entity."],
+["Q27","The World's rectangle never collides: the World can't take a BodyComponent or a SurfaceComponent. Walls come only from the edge settings.",
+ "With a SurfaceComponent, the World's rectangle would act as one Static surface covering the whole level, and everything would start stuck inside it. The Add Component menu on the World shows both as disabled, with the reason.",
+ "Refuse them on the World, with a reason in the menu, so nobody builds a level that can't move."]
 ]]
 ];
 
-const KEY = "engine-v3-architecture-review-2";
+const KEY = "engine-v3-architecture-review-3";
 let answers = {};
 try { answers = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { answers = {}; }
 function persist() { try { localStorage.setItem(KEY, JSON.stringify(answers)); } catch (e) {} }
@@ -319,7 +303,7 @@ function buildText() {
     if (groupLines.length) lines.push("## " + group, ...groupLines, "");
   }
   const head = [
-    "Architecture review answers, round 2",
+    "Architecture review answers, round 3",
     "Answered " + (total - open.length) + " of " + total + " (" + yes + " yes, " + no + " no)",
     ""
   ];

@@ -62,7 +62,7 @@ export type PhysicsWorld = {
 | `LevelDisplay` | One `EntityNode` per entity, nested like the entity tree, so children follow parents and the draw order comes from the tree |
 | `EntityNode` | A PixiJS `Container` for the entity (its matrix, its hidden state) and one `Graphics` for what it draws |
 | `EntityDrawing` | Builds the `Graphics` content from the ShapeComponent's outlines or the PathComponent, and the StyleComponent. Rebuilt only when one of them changes |
-| `overlays/` | `GridOverlay`, `BoundsOverlay` (dims outside the level bounds), `CameraFrameOverlay`, `JointIconOverlay`, `SelectionOverlay` (outlines, handles, the selection box), `ToolPreviewOverlay`, `PhysicsViewOverlay` |
+| `overlays/` | `GridOverlay`, `BoundsOverlay` (dims outside the World's rectangle), `CameraFrameOverlay`, `JointIconOverlay`, `SelectionOverlay` (outlines, handles, the selection box), `ToolPreviewOverlay`, `PhysicsViewOverlay` |
 
 - **Drawing only when something changed.** The PixiJS ticker is off. A dirty flag set by level updates, the selection, the tools' previews, `ViewState` and the play session's frames triggers one render on the next animation frame. An idle editor draws nothing.
 - **Drawing order:** the level (back to front), then the grid, then the editor overlays. Overlays live in a container with no zoom, so handles, icons and outlines keep their size on screen.

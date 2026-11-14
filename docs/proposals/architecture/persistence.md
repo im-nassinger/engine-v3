@@ -18,6 +18,8 @@
       "components": {
         "TransformComponent": { "position": { "x": 0, "y": 0 }, "rotation": 0, "scale": { "x": 1, "y": 1 }, "skew": 0 },
         "NameComponent": { "name": "World" },
+        "ShapeComponent": { "kind": "rectangle", "geometry": { "width": 20000, "height": 10000 } },
+        "StyleComponent": { "fill": { "kind": "solid", "colour": "#BFE3F5FF" }, "outline_width": 0, "opacity": 1 },
         "PhysicsWorldComponent": { "gravity_strength": 9.8, "gravity_direction": "down", "gravity_angle": 90 }
       } },
     { "id": 2, "parent": 1, "hidden": false, "locked": false,
@@ -31,6 +33,7 @@
 }
 ```
 
+- The values in the example are illustrations. The requirements give the background as "a soft light blue" with no exact colour, which is picked in plan stage 2.
 - **Entities are a flat list in Layers panel order** (pre-order, top row first). Each names its parent, which must appear before it; the order of the list is the order of each parent's children. A flat list is easy to check for cycles and depth, and reads well in a diff.
 - **Component values are keyed by attribute name** (the field's label in snake_case), the same names Lua uses. Values are written by each field type's `serialize`.
 - **Editor-only data** is `editor` (grid size, folded rows) and each entity's `locked`. The v3 play file drops them; `hidden` stays.

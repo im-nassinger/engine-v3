@@ -100,11 +100,11 @@ export class Level {
 | | World | Camera |
 |---|---|---|
 | Made by | `Level.createNew`, or the reader from the file | The same |
-| Components | TransformComponent (fixed at zero), NameComponent, PhysicsWorldComponent, and in v2 VariablesComponent, InputComponent and its triggers and scripts | TransformComponent, NameComponent, CameraComponent |
+| Components | TransformComponent (fixed at zero, no card), NameComponent, ShapeComponent (a rectangle: the level bounds), StyleComponent (its fill: the background), PhysicsWorldComponent, and in v2 VariablesComponent, InputComponent and its triggers and scripts | TransformComponent, NameComponent, CameraComponent |
 | Protected by | `Level`: can't be moved, removed or put under a parent | `Level`: always directly inside the World, can't be removed |
 | Commands that skip it | Copy, cut, duplicate, delete, group, hide, rename | Copy, cut, duplicate, delete, group |
 
-Where the background colour and the level bounds live is [open question A1 and A2](../open-questions.md).
+The World draws its rectangle with its fill, which is the background. Clicks never hit it: clicking empty space already shows the World in the Inspector.
 
 ## Change signals
 

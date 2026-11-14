@@ -21,7 +21,7 @@ How engine-v3 is built: the stack, the five parts of the code and their folders,
 
 | File | What it decides |
 |---|---|
-| [review.html](review.html) | The review page. Round 1 (24 cards, all yes) is in git history; round 2 asks A1 to A8 and the TypeScript version |
+| [review.html](review.html) | The review page. Round 1 (24 cards, all yes) is in git history; round 2 (A1 to A8, the TypeScript version) is in git history; round 3 asks about the World's rectangle |
 | [stack.md](stack.md) | Exact versions; TypeScript 6.0 rather than 7; `box2d3-wasm/compat`; what is left out on purpose |
 | [parts-and-folders.md](parts-and-folders.md) | core, editor, adapters, ui, app; what may import what; how ESLint and TypeScript enforce it; where tests go |
 | [core-model/README.md](core-model/README.md) | The model in one picture and the rules it keeps |
@@ -42,7 +42,7 @@ How engine-v3 is built: the stack, the five parts of the code and their folders,
 | [testing.md](testing.md) | Unit, browser and whole-game tests; the determinism test |
 | [plan.md](plan.md) | The 18 v1 stages, each with the docs it implements |
 | [glossary-additions.md](glossary-additions.md) | New words: approved in review, and proposed while writing |
-| [open-questions.md](open-questions.md) | A1 to A8, and which progress questions touch the design |
+| [open-questions.md](open-questions.md) | What round 2 answered, and which open questions in progress touch the design |
 
 ## The decisions in one table
 
