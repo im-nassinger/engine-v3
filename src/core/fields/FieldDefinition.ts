@@ -17,5 +17,5 @@ export type FieldDefinition<Values, Key extends keyof Values> = {
     // What Lua and Change value may set.
     readonly changeableInPlay: boolean;
     // Greyed when false, with the value kept.
-    readonly appliesWhen?: (values: Values) => boolean;
+    appliesWhen?(values: Values): boolean;
 };
