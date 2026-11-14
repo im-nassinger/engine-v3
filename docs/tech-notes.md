@@ -135,7 +135,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 ## Test play
 
 - **Messages between the editor and the game.** Beyond pause, step and stop, the editor needs to send: speed, restart, which View menu switches are on, which entity the Inspector watches, and a click to resolve into an entity. The game sends back: numbers for the performance view, shapes for the debug views, the watched entity's values, variable values and "the run ended".
-- **Clock.** The speed menu and the player's game speed scale how often ticks run, never the tick itself. Stamp each input with the tick it applied to: that log is the record of a run. How timers behave in a hidden tab's worker is undocumented, so pause when hidden and don't depend on it.
+- **Clock.** The speed menu and a player slowing the game scale how often ticks run, never the tick itself. Stamp each input with the tick it applied to: that log is the record of a run. How timers behave in a hidden tab's worker is undocumented, so pause when hidden and don't depend on it.
 - **Restart.** Rebuild from the prepared copy with a fresh Lua state, physics world, id counter and random stream. Resetting in place risks leaking state into a run. Keeping the prepared level and a spare worker ready makes Restart fast.
 - **First Play.** Loading the Lua and Box2D wasm files on the first Play is slow. Preload them when the editor opens.
 - **A hung game.** The watchdog must be off during pause and while the tab is hidden, and must ignore a late heartbeat when the page itself was asleep (a laptop waking up). Naming the script that hung needs shared memory, which needs cross-origin isolation headers (to verify). The old draft ended a run after 5 seconds without a response, with a note after 2.

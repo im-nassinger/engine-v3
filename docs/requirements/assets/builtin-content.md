@@ -8,7 +8,7 @@ What comes with the game, in the read-only `builtin` folder: plain `.lua` and `.
 
 ### Plain files, no private powers · v1
 
-- **There are no behaviours.** A ready-made script is a plain `.lua` file in the read-only `builtin` folder. You drag one onto an entity's ScriptComponent.
+- **There is no "behaviour".** A ready-made script is a plain `.lua` file in the read-only `builtin` folder. You drag one onto an entity's ScriptComponent.
 - Builtin entities are plain `.entity` files in the same folder. A builtin `.entity` file can hold scripts and art like any other.
 - **The game has no built-in player.** A player is an ordinary group of entities with a body and a script, tagged `player`.
 - **Builtin content has no private powers.** If it needs something a creator doesn't have, the Lua API grows for everyone. The test: rebuild the builtin player in an empty level using only what a creator has, and compare it with the builtin one.

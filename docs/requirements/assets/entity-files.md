@@ -2,13 +2,13 @@
 
 ## TL;DR
 
-An `.entity` file is a saved entity with its children and components, as a text file in the Assets panel. There are no prefabs: it is just a file. **v1:** save a selection as an `.entity` file, drag one into the level to place a plain copy, and spawn from one during play. **v2:** linked copies that update when the file changes, and placing several copies in a row. Core rules: files are found by path, never by name, and a spawned entity lasts one run.
+An `.entity` file is a saved entity with its children and components, as a text file in the Assets panel. There is no "prefab": it is just a file. **v1:** save a selection as an `.entity` file, drag one into the level to place a plain copy, and spawn from one during play. **v2:** linked copies that update when the file changes, and placing several copies in a row. Core rules: files are found by path, never by name, and a spawned entity lasts one run.
 
 ## .entity files
 
 ### Save and place · v1
 
-- **There are no prefabs.** A saved entity is a text file with the `.entity` extension, kept in the Assets panel. *Why: if something is just a file, it stays a file.*
+- **There is no "prefab".** A saved entity is a text file with the `.entity` extension, kept in the Assets panel. *Why: if something is just a file, it stays a file.*
 - **Save as .entity file** saves the selection: the entity with its children and all their components, triggers, script settings and tags. Several selected entities are wrapped in a new group. The World and the camera can't be saved this way.
 - **Overwrite file** replaces an `.entity` file's contents with the selection.
 - Saving warns about links to things outside the selection, listing each one. Those links become missing in the file. A joint keeps the rule for copying: an end that points outside the selection becomes missing.

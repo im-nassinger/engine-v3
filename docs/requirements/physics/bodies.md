@@ -10,7 +10,7 @@ Field names are Box2D's, so the Inspector, the Lua API and tutorials match. The 
 
 ### Add a body in one click · v1
 
-- The editor says **Body** for how something moves and **Surface** for how it collides. A Surface is what Box2D calls a shape, and older Box2D a fixture. *Why not "shape": it would clash with ShapeComponent.*
+- The editor says **Body** for how something moves and **Surface** for how it collides. A Surface is what Box2D calls a shape, and older Box2D a "fixture". *Why not "shape": it would clash with ShapeComponent.*
 - One click adds a BodyComponent as **Static**, **Dynamic** or **Kinematic**.
 - Adding a body to an entity with children makes them one solid thing: the shapes inside merge into that body.
 - New shapes have no physics until you add it.

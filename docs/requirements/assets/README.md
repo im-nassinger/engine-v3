@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The files a level uses and what comes with the game. **In v1** the Assets panel holds `.lua` and `.entity` files in folders, paths update themselves, you can save and place `.entity` files and spawn from them, and the `builtin` folder has one platformer player with its script. **In v2** come images and sounds, safe replace and delete, search, packages, My files, linked copies, and the full builtin library. Core rules: an asset is only the raw file, there are no prefabs and no behaviours, and builtin content has no private powers.
+The files a level uses and what comes with the game. **In v1** the Assets panel holds `.lua` and `.entity` files in folders, paths update themselves, you can save and place `.entity` files and spawn from them, and the `builtin` folder has one platformer player with its script. **In v2** come images and sounds, safe replace and delete, search, packages, My files, linked copies, and the full builtin library. Core rules: an asset is only the raw file, there is no "prefab" and no "behaviour", only files, and builtin content has no private powers.
 
 ## Files
 

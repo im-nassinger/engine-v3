@@ -42,7 +42,7 @@ Source: scope SA3; round 12: SV2; old: SV-28, SV-29, SV-46
 
 ### Ask the browser to keep the saved level · v1
 
-- The game asks the browser once to keep its saved data (`navigator.storage.persist()`). Some browsers ask the user with a popup, others decide alone.
+- The game asks the browser once to keep what it has saved (`navigator.storage.persist()`). Some browsers ask the user with a popup, others decide alone.
 - **No backup reminders.** *Why: the owner doesn't want them.*
 - *Why ask: otherwise a browser may delete the data on its own, such as when the disk is nearly full, or Safari after 7 days without a visit. It is one call.*
 

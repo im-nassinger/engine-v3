@@ -147,7 +147,7 @@ Source: scope DR7; round 5: 03 2.3; old: DR-18 to DR-20
 
 ### Images · v2
 
-- **An image is not its own kind of entity. It is a shape whose fill is the image.** There is no ImageComponent.
+- **An image is not its own kind of entity. It is a shape whose fill is the image.** There is no `ImageComponent`.
 - Dropping a PNG, JPEG, WebP or GIF on the level makes an entity with a Transform, a rectangle ShapeComponent the image's size, and a StyleComponent with that image as its fill. 1 image pixel is 1 level pixel.
 - The image's size is the rectangle's width and height, with a proportions lock.
 - An ellipse with an image fill shows the image cut to a circle.
@@ -157,7 +157,7 @@ Source: scope DR7; round 5: 03 2.3; old: DR-18 to DR-20
 - The World's background can be an image.
 - Tint is an effect and waits for the EffectsComponent.
 - *Why a fill: proposed by the owner and extended the way Figma does it. Everything known about shapes (size, outline, opacity, physics, clicking) works on images for free, and three concepts disappear: image size, image opacity, hitboxes.*
-- Images bring importing, licences and the builtin Kenney art with them, see [assets](assets.md).
+- Images bring importing, licences and the builtin Kenney art with them, see [assets](assets/README.md).
 
 Source: scope DR11; round 5: 04 2.3, 04 2.6, 04 2.7, 04 2.8; round 6: ST1, ST3
 

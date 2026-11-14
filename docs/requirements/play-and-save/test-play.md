@@ -85,7 +85,7 @@ Source: scope PL3; round 10: 11 2.13; round 11: RS2; round 12: PM1; old: PL-34, 
 ### The pause menu's Controls and Settings pages · v2
 
 - **Controls:** players remap the level's inputs, see [variables and inputs](../triggers/variables-and-inputs.md).
-- **Settings:** one Volume slider and Mute, the player's game speed, and full screen.
+- **Settings:** one Volume slider and Mute, the setting that slows the game for a player, and full screen.
 - The menu also gets **Quit**, for playing outside the editor.
 - Settings are remembered in the browser.
 - *Why v2: it comes with remapping and sound.*
@@ -136,7 +136,7 @@ Source: scope PL7; round 3: D73; round 4: SD1; old: PL-39
 - **Determinism is a requirement with a test: the same level, seed, inputs and clock time give the same run on any computer.**
 - What makes it hold: every random value comes from one seed, Box2D v3 gives the same result everywhere, and triggers and scripts run in Layers panel order.
 - **Scripts may read the real date and time.** The test fixes the clock the same way it fixes the seed. Timing during play should still use the level's time. *Why: the owner's rule that reading the clock is fine. Fixing it in the test keeps determinism without blocking anything.*
-- Pausing, the speed menu and the player's game speed change no tick, so they can't break it.
+- Pausing, the speed menu and a player slowing the game change no tick, so they can't break it.
 - *Why v1: it is far cheaper to keep determinism from the first day than to find what broke it later. The test catches the moment something breaks it.*
 
 Source: scope PL11; round 5: SD2; round 10: SB1; round 11: CL1; old: PL-127
