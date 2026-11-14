@@ -150,7 +150,7 @@ The Select tool holds one **drag state** at a time (the State pattern):
 - The joint type comes from its options strip, Hinge by default.
 - Under the mouse it looks for entities with physics, skipping hidden and locked ones. Shapes merged into one body count as one, through `BodyMembership` from [the physics module](../simulation.md#bodies-and-their-entities).
 - **One-point joints** (Hinge) take one click: two bodies under the mouse are A and B; one body pins it to the background (B empty). **Two-ended joints** (Rope, Spring) take two clicks, one per entity, each end exactly where clicked.
-- **Which body is A** (Suggested v1, waiting for the owner): the smaller of the two.
+- **Which body is A:** the smaller of the two.
 - Ends snap to the centres and corners of the entities under the mouse, through a `PointSnapper` that v3's snapping to entities extends.
 - Finishing runs `CreateJointCommand`: a TransformComponent at the hinge point (or between the two ends), a JointComponent with the type's defaults ("Let connected objects collide" off for Hinge, on for Rope and Spring) and its two ends in its own space, and for Rope and Spring the read-only PathComponent.
 

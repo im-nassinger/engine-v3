@@ -189,11 +189,11 @@ Editor messages on the JointComponent's card. None of them stops you playing.
 
 Source: scope ED10; round 7: 06 2.13; round 8: JM1, WN1; old: JT-74 to JT-74m
 
-## Not in the scope review
+## Small features
 
-Left over from the old draft. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Feature | Rule | Suggested |
+| Feature | Rule | Version |
 |---|---|---|
 | Connecting bodies that don't overlap | Press on one body and drag to another, for one-point joints | v3 |
 | Pin on purpose | Alt pins to the background even with a second body under the mouse | v3 |
@@ -202,4 +202,4 @@ Left over from the old draft. The last column is Claude's suggestion, not a deci
 | Scaling a group with joints | Scaling a group scales its joints' distances, and mirroring it mirrors their limits and motor direction | v1 |
 | Force readout | While a Breakable joint is selected in test play, the Inspector shows the current and peak force | v3 |
 
-Source: old: JT-12 to JT-16, JT-40, JT-68, JT-69
+Source: old: JT-12 to JT-16, JT-40, JT-68, JT-69; owner: 2026-11-14

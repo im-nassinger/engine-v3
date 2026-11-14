@@ -39,7 +39,7 @@ A small topic is one file. A bigger one is a folder whose `README.md` lists its 
 
   A decision that is Claude's call after the owner said "you decide" also uses `owner:`, and its rules say so in the `*Why: ...*` line.
 
-- Each file ends with a **Not in the scope review** table: small features from the old draft that were accepted but never given a version. The last column is Claude's suggestion, not a decision.
+- Each file ends with a **Small features** table: small features from the old draft that the scope review never asked about, each with the version the owner gave it in round 7 (owner, 2026-11-14). They are listed in [scope.md](../scope.md) only as a count.
 - What was decided against goes to [rejected.md](../rejected.md). Notes on how to build something go to [tech-notes.md](../tech-notes.md).
 
 ## Checks

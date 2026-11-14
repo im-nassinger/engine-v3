@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The requirements are finished and both checks pass. No code exists. **v1 is a level you build and watch**, with all logic in v2 (owner, 2026-11-13). **The architecture proposal is written** in [proposals/architecture/](proposals/architecture/README.md), after the owner approved its outline and its 24 review cards on 2026-11-13. Rounds 2 to 6 of its review are answered. **Waiting for the owner:** round 7 on the review page, which holds everything still open.
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version and no question is open. **v1 is a level you build and watch**, with all logic in v2. **Next: stage 0 of [plan.md](plan.md), project setup.** No code exists yet.
 
 ## Where things stand
 
@@ -14,9 +14,9 @@ The requirements are finished and both checks pass. No code exists. **v1 is a le
 | `tools/check-docs.js`, `tools/check-sources.js` | Done, both pass |
 | The smaller v1: v1 build and watch, v2 logic and play, v3 polish, v4 accounts and publishing | Done, applied everywhere. See [decisions.md](decisions.md) |
 | The Lua API: [lua-api.md](requirements/scripts/lua-api.md), [lua-examples.md](requirements/scripts/lua-examples.md) | Done, approved by the owner |
-| The architecture proposal: [proposals/architecture/](proposals/architecture/README.md) | Written. Waiting for the owner's review |
-| Open questions below | Waiting for the owner |
-| Code | Not started |
+| The [architecture](architecture/README.md) and the [plan](plan.md) | Done, approved by the owner on 2026-11-14 |
+| Small features without a version | Done: all given a version in round 7 |
+| Code | Not started. Next: stage 0 |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -26,7 +26,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 - **Every level file records its physics version from v1.** Claude's call after the owner said "you decide". See [saving](requirements/play-and-save/saving.md).
 - **A smaller v1** (owner): 43 features moved to a new v2, the old v2 became v3, accounts and publishing v4. See [scope.md](scope.md).
 - **The Lua API is approved** (owner): every function is top level, `this` is the script's entity, settings are a `settings` table, and component values change with `set_attribute`. See [scripts.md](requirements/scripts/scripts.md) and [lua-api.md](requirements/scripts/lua-api.md).
-- **The architecture review, round 1** (owner): all 24 cards answered yes. Its decisions are in the [architecture proposal](proposals/architecture/README.md). The ones that changed requirements:
+- **The architecture review, round 1** (owner): all 24 cards answered yes. Its decisions are in the [architecture](architecture/README.md). The ones that changed requirements:
   - The component is called **TransformComponent** everywhere, also on its card and in Lua (was open question 1).
   - **The camera has an eye** like every row, hiding everything inside it (was open question 2).
   - **Removing a component removes only that one**, and the cards left show their partner note (was open question 5).
@@ -37,21 +37,24 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
   - **Undo keeps 512 steps**, not 500.
   - **In v1 a fill is a colour field that can be emptied.** Gradients add a fill field type in v2.
   - **The physics view draws the game's own collision pieces**, not Box2D's drawing.
-  - **The "Suggested v1" rows** in the "Not in the scope review" tables are built in v1, each marked as waiting for the owner until confirmed.
+  - **The small features Claude suggested for v1** are built in v1 (confirmed in round 7).
 - **The architecture review, round 2** (owner): eight yes, one changed.
   - **The background colour is the World's StyleComponent fill.** In v3 an image fill is the background image.
   - **The level bounds are a rectangle ShapeComponent on the World** (the owner's change to the suggestion of fields on the PhysicsWorldComponent). Three details follow from it, below.
   - **Merge** is a checkbox on the BodyComponent. **The TagsComponent is v2.** The World's TransformComponent card isn't shown. Partner notes read "Needs a X to Y. [Add X]". Links to outside entities last one opening of the level. Changing the grid size is an undo step. TypeScript is pinned to 6.0.3.
 - **The architecture review, round 3** (owner): **the World's rectangle is centred on the level's origin**, and dragging one edge moves the opposite edge by the same amount, so the centre never moves. A new level's camera starts at the origin. Questions 26 and 27 got comments asking for plainer words, so they are asked again in round 4.
-- **The architecture review, round 5** (owner): every tool returns to Select, a text's corner changes its size, the **Trigger tool** (renamed from Trigger zone) is v2, builtin files are changed through a copy, **variables hold a number or a text** in v2, the camera follows a tag in v2, a new level starts with five inputs, Leave in test play goes back to the editor, the end window extras and the main menu stay Later, Play as player and version history stay rejected.
-- **The architecture review, round 6** (owner, 2026-11-14): the right-click "Entities here" list is dropped. **Spawn asks for TransformComponent values** (position, rotation, scale, skew) instead of using a target and an offset. **A variable's type is number, string or boolean**: only numbers are added to and compared, strings and booleans are set and checked with "is" or "is not".
 - **The architecture review, round 4** (owner): **one Walls checkbox** on the PhysicsWorldComponent makes all four edges walls or all open, off by default (the owner's change to a choice per edge). **The World's rectangle is never solid:** the World can't take a BodyComponent or a SurfaceComponent.
+- **The architecture review, round 5** (owner): every tool returns to Select, a text's corner changes its size, the **Trigger tool** (renamed from Trigger zone) is v2, builtin files are changed through a copy, **variables hold a number or a text** in v2, the camera follows a tag in v2, a new level starts with five inputs, Leave in test play goes back to the editor, the end window extras and the main menu stay Later, Play as player and version history stay rejected.
+### Settled on 2026-11-14
+
+- **The architecture review, round 6** (owner): the right-click "Entities here" list is dropped. **Spawn asks for TransformComponent values** (position, rotation, scale, skew) instead of using a target and an offset. **A variable's type is number, string or boolean**: only numbers are added to and compared, strings and booleans are set and checked with "is" or "is not".
+
+- **The architecture review, round 7** (owner): everything still open, on one page at once, as the owner asked. **The architecture is approved**: it moved to [architecture/](architecture/README.md), its plan to [plan.md](plan.md), its words to the [glossary](glossary.md). Spawn measures position and rotation from the trigger's entity, and its values replace the `.entity` file's. A boolean variable can be **flipped** by a trigger. All 119 small features got the version Claude suggested (14 v1, 12 v2, 80 v3, 13 Later), and three were dropped. See [decisions.md](decisions.md).
 
 ## Next
 
-1. **The owner answers round 7 on the [review page](proposals/architecture/review.html).** It holds everything still open, so no more rounds should be needed: question 31, the approval of the architecture proposal (AP1), the 14 proposed glossary words, and every open row of the "Not in the scope review" tables (120 cards), each with Claude's suggested version. *Why one page: the owner asked for every open question at once instead of a few per round (owner, 2026-11-14).*
-2. **Write the answers in.** Each version goes into its feature heading, the topic's README and [scope.md](scope.md), and the row leaves its "Not in the scope review" table. If AP1 is yes, the proposal's files move into the main docs and `plan.md` becomes the project's plan.
-3. **Start coding at stage 1** of the plan.
+1. **Stage 0 of [plan.md](plan.md): project setup.** Vite, TypeScript with one config per part, ESLint, Prettier, Vitest, Playwright, CI, and the empty `src/` folders.
+2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
 
@@ -65,6 +68,4 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 
 ## Open questions for the owner
 
-One question from round 6, on the review page as round 7 with the rest. Not decided by Claude.
-
-31. **A Flip choice for true-or-false variables in triggers** (v2): true becomes false, false becomes true. Asked again in plainer words after the owner's comment in round 7. Suggested: yes, a light switch then takes one trigger.
+None. When several come up, they go on the [review page](review.html) all at once, not a few per round (owner, 2026-11-14).

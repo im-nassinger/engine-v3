@@ -57,15 +57,14 @@ Source: scope EF3; round 7: 08 2.2; old: PP-17, PP-18
 
 Source: scope TR7; round 3: D67; round 7: 08 2.11; round 9: 10 2.4; round 10: OR1; old: PP-78 to PP-89; owner: 2026-11-13
 
-## Not in the scope review
+## Small features
 
-Left over from the old draft and not asked about in the review. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Feature | Rule | Suggested |
+| Feature | Rule | Version |
 |---|---|---|
 | Origin of an .entity file | The point that lands on the mouse when placed, and on the given position when spawned. Default: the centre of the selection | v2 |
 | Where a spawned entity sits | At the top level of the tree, above the level's entities, unless a parent is given. A spawned entity never merges into a body above it, so a bullet never becomes part of its shooter | v2 |
 | Replace selection with an .entity file | Swaps selected entities for a chosen file, keeping each one's place. Linked copies cover most of the need | Later |
-| Player notice | Placing a second entity tagged `player` showed a notice offering to replace the first. It assumes a special player, which the review dropped | Dropped |
 
-Source: old: PP-20, PP-22, PP-28, PP-80 to PP-84
+Source: old: PP-20, PP-22, PP-28, PP-80 to PP-84; owner: 2026-11-14

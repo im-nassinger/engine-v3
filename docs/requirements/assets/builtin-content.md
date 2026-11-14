@@ -123,11 +123,13 @@ Scripts for movement, enemies, health, pickups, the camera and showing variables
 
 Source: scope EF6; round 1: D58; round 2: R2; round 7: 08 2.6, 08 2.8; round 9: MSG2; old: PP-45, PP-57 to PP-71; owner: 2026-11-13
 
-## Not in the scope review
+## Small features
 
-| Feature | Rule | Suggested |
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
+
+| Feature | Rule | Version |
 |---|---|---|
 | Character animation script | Played animations from movement states. It needs animations, which are not designed yet | Later |
-| What a script needs | The old draft let a script declare needs such as "a Dynamic body", shown as a checklist with Fix buttons. The partner note on a card covers the same ground | Needs a decision |
+| What a script needs | The old draft let a script declare needs such as "a Dynamic body", shown as a checklist with Fix buttons. The partner note on a card covers the same ground | Later |
 
-Source: old: PP-42, PP-55, PP-70
+Source: old: PP-42, PP-55, PP-70; owner: 2026-11-14

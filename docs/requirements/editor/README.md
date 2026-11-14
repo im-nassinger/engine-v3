@@ -47,4 +47,4 @@ Everything about the editor that isn't specific to one kind of entity: the works
 | Lock | v3 | selection |
 | Invert selection | v3 | selection |
 
-Each file ends with a "Not in the scope review" table: small features that were accepted but never given a version.
+Each file ends with a Small features table: small features with the version the owner gave them in round 7.

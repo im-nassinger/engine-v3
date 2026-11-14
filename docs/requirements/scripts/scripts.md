@@ -143,15 +143,15 @@ Source: round 3: D68; round 9: 10 2.12; round 10: 11 2.9, UI1; old: LU-95 to LU-
 
 Source: scope LU9; round 9: 10 2.12; old: LU-98
 
-## Not in the scope review
+## Small features
 
-The review settled the shape of the API, not every detail. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Open point | What is known | Suggested |
+| Open point | What is known | Version |
 |---|---|---|
 | More ways to wait | Waiting a number of ticks, waiting until something is true, running a function later or every N seconds | v3 |
 | Running a script once more for each list entry | The same file listed twice on one entity runs twice | v2 |
 | Switching a script off | A checkbox on each file in the list | v3 |
 | Old settings after a script changes | A removed setting keeps its value under "Unused settings". A renamed one can say what it was called before | v3 |
 
-Source: old: LU-05 to LU-12, LU-43 to LU-49, LU-51 to LU-56
+Source: old: LU-05 to LU-12, LU-43 to LU-49, LU-51 to LU-56; owner: 2026-11-14

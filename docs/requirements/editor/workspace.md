@@ -162,11 +162,11 @@ Source: scope ED5; round 3: 01 2.7; old: WS-58 to WS-64
 
 Source: round 3: 01 2.12; round 11: 12 A1; old: WS-135, WS-136
 
-## Not in the scope review
+## Small features
 
-These were accepted in the requirements review but never given a version. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Feature | Rule | Suggested |
+| Feature | Rule | Version |
 |---|---|---|
 | Leaving with unsaved changes | Closing or reloading while a change is not yet saved shows the browser's own leave prompt. It is armed only while something is unsaved. A waiting save is written as soon as the tab is hidden | v1 |
 | No page gestures | Page scrolling, overscroll bounce and swipe-back are off on the editor page, because they would wreck a drag. The middle mouse button never starts the browser's autoscroll, and Alt alone never opens the browser menu | v1 |
@@ -182,4 +182,4 @@ These were accepted in the requirements review but never given a version. The la
 | Whole pixels | A snapping switch that keeps positions on whole pixels, on by default | v3 |
 | Short motion | Animations in the editor take 150 ms or less, and are off when the system asks for reduced motion | v3 |
 
-Source: round 3: 01 2.13; old: WS-11, WS-36, WS-51, WS-55, WS-59, WS-137 to WS-139, WS-145 to WS-153
+Source: round 3: 01 2.13; old: WS-11, WS-36, WS-51, WS-55, WS-59, WS-137 to WS-139, WS-145 to WS-153; owner: 2026-11-14

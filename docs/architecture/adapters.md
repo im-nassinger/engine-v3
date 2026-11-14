@@ -87,7 +87,7 @@ Details of what is saved and when are in [persistence.md](persistence.md). Stora
 
 - **`KeyboardInput`** listens on the window in the capture phase, not passive. It builds a `KeyboardInputData` (code, key, modifiers, AltGr state, repeat), asks `ShortcutDispatcher`, and stops the browser's default only when the editor used the key. It tracks which part of the page has focus (`FocusPlace`) from `focusin`. On `blur` it releases every held key.
 - **`PointerInput`** listens on the canvas, converts positions with `ViewState`, captures the pointer during a drag, cancels a drag when the window loses focus, and turns the wheel into zoom (Ctrl+wheel too, for pinch) and Shift+wheel into a sideways pan. It stops the middle button's autoscroll.
-- **No page gestures:** `overscroll-behavior: none` and `touch-action: none` on the editor page, as the Suggested v1 row asks (waiting for the owner).
+- **No page gestures:** `overscroll-behavior: none` and `touch-action: none` on the editor page, as the workspace's small features ask.
 - **During play** (v2), `KeyboardInput` also feeds held keys to `TickPacer`, which stamps them with the tick they apply to.
 
 ## Time

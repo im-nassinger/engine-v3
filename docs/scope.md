@@ -39,6 +39,7 @@ These versions were decided during the requirements review, or by the owner afte
 | The camera follows a tag | v2 | A spawned player can't be picked in the editor, so following its tag finds it without a script (owner: 2026-11-13) |
 | A new level starts with the inputs left, right, up, down and jump | v2 | Inputs are v2, and most games need these five (owner: 2026-11-13) |
 | Variables are a number, a string or a boolean | v2 | Variables are v2. The owner wants text too (owner: 2026-11-13) and named the three types (owner: 2026-11-14) |
+| Flip a boolean variable in a trigger | v2 | A light switch is then one trigger (owner: 2026-11-14) |
 | Sensors noticing touches, the random seed | v2 | Only triggers and scripts use them (owner: 2026-11-13) |
 | Weld, Rod, Slider and Wheel joints | v3 | Merging shapes into one body already glues them, and Rod is Rope that can't go slack |
 | The EffectsComponent: pixelate, shadow, blur | v3 | Each effect needs a shader pass per entity |
@@ -51,6 +52,8 @@ Trigger templates were folded into component presets. Version history was reject
 ## Counts
 
 117 features went through the scope review: 51 in v1, 65 in v2, 1 Later. After the owner made v1 smaller, 20 of those 51 moved to v2, and the 65 became v3: **31 in v1, 20 in v2, 65 in v3, 1 Later.**
+
+**The small features** at the end of each topic file never went through the scope review. The owner gave all 119 their version in round 7 of the architecture review (owner, 2026-11-14): **14 in v1, 12 in v2, 80 in v3, 13 Later.** They are listed only in their topic files.
 
 ## Editor
 

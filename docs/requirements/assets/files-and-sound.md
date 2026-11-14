@@ -129,11 +129,11 @@ They matter once images and sounds exist. All are starting values. The 64 MB tot
 
 Source: round 1: D34; round 6: 04 2.15; old: AS-128 to AS-130; owner: 2026-11-13
 
-## Not in the scope review
+## Small features
 
-Accepted in the requirements review but never given a version, or left over from the old draft. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Feature | Rule | Suggested |
+| Feature | Rule | Version |
 |---|---|---|
 | Extra "Play sound" settings | The old draft had pitch, random pitch, fade in, and "if already playing: play another, restart, keep playing". The review kept only volume, loop, and start and end times | Later |
 | Too many of one sound | One file starts at most 3 times per tick, so 20 coins picked up together don't spike the volume | v3 |
@@ -142,4 +142,4 @@ Accepted in the requirements review but never given a version, or left over from
 | Swap with another file | Points every use of one file to another of the same kind | v3 |
 | Mute in test play | A mute switch on the Play bar, saved in the browser | v3 |
 
-Source: old: AS-28, AS-32, AS-112, AS-118, AS-126, AS-129
+Source: old: AS-28, AS-32, AS-112, AS-118, AS-126, AS-129; owner: 2026-11-14

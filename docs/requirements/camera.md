@@ -151,11 +151,11 @@ Source: round 7: 07 2.9; decisions: D56; old: CM-63 to CM-68
 
 Source: round 7: 07 2.15; old: CM-97
 
-## Not in the scope review
+## Small features
 
-Left over from the old draft and not asked about in the review. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Feature | Rule | Suggested |
+| Feature | Rule | Version |
 |---|---|---|
 | Safety margin | However soft the smoothing, the target is never allowed within 10% of the view's edge. A teleport far away becomes a cut, not a long pan | v1 |
 | Follow each direction separately | Switch following sideways or up and down off, for fixed-height side-scrollers | v3 |
@@ -165,4 +165,4 @@ Left over from the old draft and not asked about in the review. The last column 
 | Bar colour | The colour of the bars, black by default | v3 |
 | View size list | A dropdown of common sizes (16:9, 16:10, 4:3, 1:1, 9:16), all 1080 high, plus custom from 160 to 7680 | v3 |
 
-Source: old: CM-13, CM-22, CM-25 to CM-28, CM-30, CM-31, CM-33, CM-37, CM-38, CM-49, CM-83
+Source: old: CM-13, CM-22, CM-25 to CM-28, CM-30, CM-31, CM-33, CM-37, CM-38, CM-49, CM-83; owner: 2026-11-14

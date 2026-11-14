@@ -220,11 +220,11 @@ Source: scope DR9; round 6: TX1
 
 Source: scope DR10; round 3: F1
 
-## Not in the scope review
+## Small features
 
-Accepted in the requirements review but never given a version. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Feature | Rule | Suggested |
+| Feature | Rule | Version |
 |---|---|---|
 | Corner radius | A rectangle has one corner radius, set by a dot on the level or typed. A free resize keeps it. Rounded corners are part of what collides | v3 |
 | Line caps and joins | Cap, join and miter limit for outlines, under "More" on the StyleComponent | v3 |
@@ -237,4 +237,4 @@ Accepted in the requirements review but never given a version. The last column i
 | Text tool remembers | The Text tool remembers the last font, size and colour. New text is dark, or light on a dark background | v3 |
 | Drawing hint line | Drawing tools show a one-line hint of what clicks and keys do right now | v3 |
 
-Source: old: DR-03, DR-29, DR-31, DR-32, DR-61, DR-66, DR-67, DR-77, DR-86, DR-91, DR-110, DR-115
+Source: old: DR-03, DR-29, DR-31, DR-32, DR-61, DR-66, DR-67, DR-77, DR-86, DR-91, DR-110, DR-115; owner: 2026-11-14

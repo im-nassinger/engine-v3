@@ -90,7 +90,7 @@ export class ProjectFile {
   2. Unpack with a running count, stopping the moment it passes 256 MB, whatever the directory said. This stops zip bombs without freezing the page.
   3. Check that `level.json` exists and parses, then run `LevelReader.read`.
   4. Answer with the `LevelData` or a refusal. The page then replaces the open level, all or nothing.
-- **Dropping** an `.editable` file on the editor imports it after the same question (Suggested v1, waiting for the owner).
+- **Dropping** an `.editable` file on the editor imports it after the same question.
 - **The editor checks the same limits** before any change, so anything the editor can save, the same version can import.
 
 ## In the browser
@@ -125,8 +125,8 @@ export class Autosave {
 
 1. `WebLockTabGuard` asks for the level's lock. Without it, the tab says the level is open elsewhere and stays read-only.
 2. `IndexedDbLevelStore.load()` reads the record. If storage can't be opened at all, the editor runs on a new level and says nothing will be saved.
-3. `LevelReader.read()` checks it like an import. If it fails, the editor offers to export the raw data, starts a new level, and never deletes the saved record (Suggested v1, waiting for the owner).
+3. `LevelReader.read()` checks it like an import. If it fails, the editor offers to export the raw data, starts a new level, and never deletes the saved record.
 4. With no saved level, a new one is made with the World and the camera, and the view fits the camera frame.
-5. After a crash (the last session didn't close cleanly, noted in `localStorage`), the status text says when the level was last saved (Suggested v1, waiting for the owner).
+5. After a crash (the last session didn't close cleanly, noted in `localStorage`), the status text says when the level was last saved.
 
-**Site data cleared while open** (Suggested v1, waiting): the next save finds the store empty, writes the level again, and says so.
+**Site data cleared while open:** the next save finds the store empty, writes the level again, and says so.

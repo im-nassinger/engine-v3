@@ -233,11 +233,11 @@ Source: round 1: C3, C4; round 5: 02 2.15; round 7: 07 2.1; round 8: HUD1; old: 
 
 Source: round 5: 02 2.17; old: SG-140 to SG-145
 
-## Not in the scope review
+## Small features
 
-Accepted in the requirements review but never given a version. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Feature | Rule | Suggested |
+| Feature | Rule | Version |
 |---|---|---|
 | Dimming outside a group | While you are inside a group, the rest of the level dims to about 50%. A View menu switch turns it off | v3 |
 | Pivot marker | The selection shows the point it rotates around. Drag it to rotate around another point. It resets when the selection changes | v3 |
@@ -249,4 +249,4 @@ Accepted in the requirements review but never given a version. The last column i
 | Keyboard in the Layers panel | Arrows move, Right unfolds, Left folds, typing a letter jumps to a name | v3 |
 | Layers footer | Counts of selected, hidden and locked entities | v3 |
 
-Source: old: SG-16 to SG-19, SG-32, SG-49 to SG-51, SG-82, SG-97, SG-111, SG-112, SG-118b, SG-120
+Source: old: SG-16 to SG-19, SG-32, SG-49 to SG-51, SG-82, SG-97, SG-111, SG-112, SG-118b, SG-120; owner: 2026-11-14

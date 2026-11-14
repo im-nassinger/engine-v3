@@ -91,7 +91,7 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27; owner: 2026-11-13
 
 | Action | What it does |
 |---|---|
-| Change value | Sets, adds to or subtracts from any component value on the target |
+| Change value | Sets, adds to or subtracts from any component value on the target. A boolean variable can also be flipped |
 | Spawn | Creates an entity from an `.entity` file, picked by path, with the TransformComponent values you type: position, rotation, scale and skew |
 | Destroy | Removes the target and its children |
 | Push | Gives a body a kick: a fixed direction, away from `this` or towards `this`, and a strength. By default it ignores mass, so a jump pad feels the same for everything |
@@ -184,20 +184,18 @@ Source: scope LU8; round 10: TL1, TL2
 
 Source: owner: 2026-11-13
 
-## Not in the scope review
+## Small features
 
-Left over from the old draft, or accepted without a version. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Feature | Rule | Suggested |
+| Feature | Rule | Version |
 |---|---|---|
 | "Can't fire" explanations | The trigger card says why a touch trigger can never fire: no shape, sensors only, neither side Dynamic. v2 has only the missing SurfaceComponent note | v3 |
 | Waiting runs limit | Each trigger can hold 32 waiting runs. More are skipped with a Console warning | v2 |
 | Collision speed | A smallest impact speed for the collision event | Later |
 | "First one in", "last one out" | Touch events that count entities, such as "when the last heavy thing leaves this" | Later |
-| "On the Nth time" | A Repeat choice that fires on a set count. The review kept three choices | Dropped |
 | Trigger names | Each trigger gets a name made from its When, which can be edited | v2 |
-| Drop through | An action that drops a body through the one-way platform under it. Not in the reviewed action list, so it is script-only for now | Needs a decision |
 | Show every link | A View menu switch that shows the arrows of every entity | v3 |
 | Pause when this fires | A switch on a trigger that pauses test play when it fires | v3 |
 
-Source: round 5: TK2; old: TR-13, TR-29, TR-58, TR-63, TR-81, TR-134, TR-146
+Source: round 5: TK2; old: TR-13, TR-29, TR-58, TR-63, TR-81, TR-134, TR-146; owner: 2026-11-14

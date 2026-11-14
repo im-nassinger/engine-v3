@@ -45,7 +45,10 @@ The owner found v1 too big: 107 features, some of them settled before the scope 
 
 The trade-off the owner accepted: nobody can play a v1 level, only watch it, and the game loop is built before scripts exist. The written v2 rules are what keep the architecture planning for them.
 
+## 2026-11-14: The architecture is approved
+
+After seven rounds on the [review page](review.html), the owner approved the architecture and every open question. The proposal moved to [architecture/](architecture/README.md), its plan became [plan.md](plan.md), and its words joined the [glossary](glossary.md). In the last round the owner asked for **every open question on one page at once** instead of a few per round, so all 119 small features without a version were given one together, as Claude suggested: 14 in v1, 12 in v2, 80 in v3, 13 Later, and three dropped (see [rejected.md](rejected.md)).
+
 ## Still to decide
 
-- **The architecture and the stack.** Nothing is chosen. The requirements name a few things the owner did choose along the way: Box2D v3, Lua 5.4 and the Monaco editor.
-- **The features without a version** and the other open questions, listed in [progress.md](progress.md).
+Nothing is open. New questions go in [progress.md](progress.md) and, when there are several, all at once on the [review page](review.html).

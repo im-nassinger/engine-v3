@@ -19,6 +19,9 @@ What we decided against, and why. **Check here before proposing something**: an 
 | Original hero art | Kenney art | Free to use, so no trademark check of our own | round 1: D32, D60; round 7: 08 2.12 |
 | Spawning by name | Spawning by path | Two files can hold entities with the same name. No two files share a path | round 3: D67; round 7: 08 2.11 |
 | Spawning at the action's target, moved by an offset | Spawn asks for TransformComponent values | Plainer, and it sets rotation and scale too | owner: 2026-11-14 |
+| A notice when a second entity tagged `player` is placed | Nothing | It assumed one special player, which the review dropped | owner: 2026-11-14 |
+| A Repeat choice "On the Nth time" | A variable that counts | The review kept three Repeat choices | owner: 2026-11-14 |
+| A Drop through trigger action | `drop_through(id)` in a script | One line in the player's script | owner: 2026-11-14 |
 | Music and Sound effects groups, base volume on the asset | One kind of audio, settings on each "Play sound" | Simpler, and assets are raw files | round 6: SND1; round 8: FX3 |
 | An ImageComponent, image opacity, "Add hitbox" | A shape with an image fill | Everything known about shapes works on images for free | round 1: D31; round 5: 04 2.8; round 6: ST1 |
 | A separate tool for editing points, and tools for each shape | Double-click with Select, one Shape tool | The owner wanted fewer tools | round 4: TK1; round 5: TK2 |

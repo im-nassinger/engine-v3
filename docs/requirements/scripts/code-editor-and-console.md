@@ -81,11 +81,11 @@ Source: scope LU8; round 9: 09 2.17; round 10: TL1, TL2; round 11: PN1; old: TR-
 
 Source: round 10: DB1, PS1; round 11: DB2, PN1; old: LU-133, LU-134; owner: 2026-11-13
 
-## Not in the scope review
+## Small features
 
-Left over from the old draft. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Feature | Rule | Suggested |
+| Feature | Rule | Version |
 |---|---|---|
 | Mistake warnings while typing | Syntax errors are underlined shortly after you stop typing. Unknown function names and misspelled event names get a warning. The review accepted "mistake warnings" without a version | v3 |
 | Suggestions from the level | Inside quotes, the editor suggests the level's inputs, tags, variables and file paths | v3 |
@@ -94,4 +94,4 @@ Left over from the old draft. The last column is Claude's suggestion, not a deci
 | Clear the Console | A Clear button, and clearing when Play starts | v2 |
 | Pitfalls for newcomers to Lua | Lists start at 1, `~=` for "not equal", `..` joins text. Taught through hints and help | v3 |
 
-Source: old: LU-107, LU-109, LU-110, LU-112, LU-116, LU-129, LU-141, LU-142
+Source: old: LU-107, LU-109, LU-110, LU-112, LU-116, LU-129, LU-141, LU-142; owner: 2026-11-14

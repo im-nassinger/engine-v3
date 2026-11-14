@@ -30,7 +30,7 @@ The requirements set speed targets for a level of 10,000 entities on a mid-range
 | Optimisation | The place left for it | Built when |
 |---|---|---|
 | **A spatial index for clicking and the selection box** | The `SpatialIndex` contract. v1's `LinearSpatialIndex` checks every entity's cached bounds, well under a millisecond at 10,000 | The selection speed test fails, or v3's hover outlines and snapping to entities need more queries per frame |
-| **Saving only what changed** | `LevelStore.save` takes the whole level today. A changed-entities list is already known from level updates | A save of a 10,000-entity level takes over 50 ms on the owner's laptop (this proposal's threshold for the tech notes' "if full saves make the editor stutter") |
+| **Saving only what changed** | `LevelStore.save` takes the whole level today. A changed-entities list is already known from level updates | A save of a 10,000-entity level takes over 50 ms on the owner's laptop (the architecture's threshold for the tech notes' "if full saves make the editor stutter") |
 | **Shared drawings for identical shapes** | `EntityDrawing` builds each `Graphics` from values; equal values could share one PixiJS `GraphicsContext` | Drawing time grows with copies of one platform |
 | **Off-screen bodies updated less often in drawing** | The mirror applies every pose today | Test play drops frames with many off-screen bodies. Physics itself always runs every body: skipping any would break determinism |
 | **A byte limit on history** | `HistoryStep` sizes can be measured | Files in the Assets panel (v2) make steps large |

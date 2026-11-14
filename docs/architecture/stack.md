@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed** means the owner chose it; **recommended** means this proposal does, and the owner can refuse it (all were approved in review card D11). Five things are fixed: TypeScript, Vite, React, PixiJS 8 and Box2D v3. Beside them: Vitest and Playwright for tests, ESLint and Prettier for code quality, `box2d3-wasm` for Box2D, `clipper2-js` for polygons, `fflate` for zips, `idb` for browser storage, TanStack Virtual for the Layers panel, and the React Compiler. Lua and Monaco come with v2 and aren't installed in v1. **TypeScript is 6.0, not 7**, because the ESLint TypeScript tools don't support 7 yet.
+Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed** means the owner chose it; **recommended** means the architecture chose it (all were approved in review card D11). Five things are fixed: TypeScript, Vite, React, PixiJS 8 and Box2D v3. Beside them: Vitest and Playwright for tests, ESLint and Prettier for code quality, `box2d3-wasm` for Box2D, `clipper2-js` for polygons, `fflate` for zips, `idb` for browser storage, TanStack Virtual for the Layers panel, and the React Compiler. Lua and Monaco come with v2 and aren't installed in v1. **TypeScript is 6.0, not 7**, because the ESLint TypeScript tools don't support 7 yet.
 
 ## Fixed
 
@@ -17,7 +17,7 @@ Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed*
 
 ### Why `box2d3-wasm/compat`
 
-- The package's default import picks its SIMD and multi-threaded build when the page allows it, and its plain build otherwise. Two builds could give two results, which breaks [determinism](../../requirements/play-and-save/test-play.md#the-determinism-test--v1).
+- The package's default import picks its SIMD and multi-threaded build when the page allows it, and its plain build otherwise. Two builds could give two results, which breaks [determinism](../requirements/play-and-save/test-play.md#the-determinism-test--v1).
 - `compat` is the same build everywhere: the browser, the game worker and Node (where the determinism test runs). It needs no cross-origin isolation headers, so any static host works.
 - It is single precision. That is enough: the level ends 100,000 px (2,000 m) from the origin at most, which the package says is fine "within a few kilometres".
 - *Why not our own Emscripten build:* it adds a C toolchain to the project for no gain in v1. If the package stops being kept up, building it ourselves from the same Box2D commit is the fallback, and the physics version marks the change.
@@ -84,4 +84,4 @@ Their versions are checked again when v2 starts.
 
 **Vite:** `react()` plus `babel({ presets: [reactCompilerPreset()] })`. Workers are built with Vite's `new Worker(new URL(...), { type: 'module' })`. The `.wasm` file is served as an asset and fetched on editor open, see [simulation.md](simulation.md).
 
-**Hosting** isn't decided by this proposal. The `compat` build needs no special headers, so any static host works in v1. The tech notes' reason for Cloudflare (headers by path) only matters if a later version needs cross-origin isolation.
+**Hosting** isn't decided yet. The `compat` build needs no special headers, so any static host works in v1. The tech notes' reason for Cloudflare (headers by path) only matters if a later version needs cross-origin isolation.

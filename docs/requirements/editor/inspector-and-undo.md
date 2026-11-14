@@ -159,11 +159,11 @@ Text and code:
 
 Source: scope ED2; round 3: 01 2.11; round 5: FMT1; old: WS-90 to WS-100, WS-127 to WS-133, SG-03, SG-04; owner: 2026-11-13
 
-## Not in the scope review
+## Small features
 
-Accepted in the requirements review but never given a version. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Feature | Rule | Suggested |
+| Feature | Rule | Version |
 |---|---|---|
 | Editing several entities at once | Only components present on every selected entity appear. Different values show as `Mixed`. Typing a value sets it on all | v1 |
 | Relative edits | In a mixed number field, `+=10`, `-=`, `*=`, `/=` change each entity from its own value | v3 |
@@ -179,4 +179,4 @@ Accepted in the requirements review but never given a version. The last column i
 | Context menus | The editor replaces the browser's right-click menu, except in text fields and the code editor. Every entry shows its shortcut, and disabled entries stay visible | v3 |
 | Undo list | An arrow beside Undo lists the last 50 steps. Clicking one goes back to it | v3 |
 
-Source: round 4: FX1; old: WS-66 to WS-70, WS-73 to WS-79, WS-83, WS-105, WS-108 to WS-111, WS-116 to WS-118, WS-123, WS-134, WS-144
+Source: round 4: FX1; old: WS-66 to WS-70, WS-73 to WS-79, WS-83, WS-105, WS-108 to WS-111, WS-116 to WS-118, WS-123, WS-134, WS-144; owner: 2026-11-14

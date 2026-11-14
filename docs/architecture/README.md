@@ -1,8 +1,8 @@
-# Architecture proposal
+# Architecture
 
 ## TL;DR
 
-How engine-v3 is built: the stack, the five parts of the code and their folders, the model as classes, the editor, React's place, the simulation and test play, the adapters, performance, saving, errors, tests, and a v1 plan in 18 stages. **Nothing here is decided until the owner approves it.** Its outline and 24 review cards were approved on 2026-11-13 ([review page](review.html)); this folder writes those decisions out in full. The core idea: **the game's rules never import a detail.** core and editor hold every rule and are tested without a browser; Box2D, PixiJS, React, storage and the clock sit behind small contracts. Test play runs in a worker from v1, and one data format serves saving, undo, the clipboard and the play copy.
+How engine-v3 is built: the stack, the five parts of the code and their folders, the model as classes, the editor, React's place, the simulation and test play, the adapters, performance, saving, errors, tests, and a v1 plan in 18 stages. **Approved by the owner on 2026-11-14** after seven review rounds on the [review page](../review.html). Code follows it; a change to it is proposed and approved like any other decision. The core idea: **the game's rules never import a detail.** core and editor hold every rule and are tested without a browser; Box2D, PixiJS, React, storage and the clock sit behind small contracts. Test play runs in a worker from v1, and one data format serves saving, undo, the clipboard and the play copy.
 
 ## Reading order
 
@@ -14,14 +14,12 @@ How engine-v3 is built: the stack, the five parts of the code and their folders,
 6. [simulation.md](simulation.md): ticks, determinism, the game worker, Play and Stop
 7. [adapters.md](adapters.md): the contracts and the classes that fulfil them
 8. [performance.md](performance.md), [persistence.md](persistence.md), [errors.md](errors.md), [testing.md](testing.md)
-9. [plan.md](plan.md): the v1 stages
-10. [open-questions.md](open-questions.md), [glossary-additions.md](glossary-additions.md): what waits for the owner
+9. [plan.md](../plan.md): the v1 stages
 
 ## Files
 
 | File | What it decides |
 |---|---|
-| [review.html](review.html) | The review page. Round 1 (24 cards, all yes) is in git history; round 2 (A1 to A8, the TypeScript version) is in git history; rounds 3 and 4 (the World's rectangle and the edges of the level) and round 5 (14 open questions) are in git history; round 6 (three open questions) is in git history; round 7 asks everything still open, the approval of this proposal included |
 | [stack.md](stack.md) | Exact versions; TypeScript 6.0 rather than 7; `box2d3-wasm/compat`; what is left out on purpose |
 | [parts-and-folders.md](parts-and-folders.md) | core, editor, adapters, ui, app; what may import what; how ESLint and TypeScript enforce it; where tests go |
 | [core-model/README.md](core-model/README.md) | The model in one picture and the rules it keeps |
@@ -40,9 +38,7 @@ How engine-v3 is built: the stack, the five parts of the code and their folders,
 | [persistence.md](persistence.md) | `level.json`, the reader and writer, the project file, autosave, opening the editor |
 | [errors.md](errors.md) | Kinds of problem, where the user sees each, bugs |
 | [testing.md](testing.md) | Unit, browser and whole-game tests; the determinism test |
-| [plan.md](plan.md) | The 18 v1 stages, each with the docs it implements |
-| [glossary-additions.md](glossary-additions.md) | New words: approved in review, and proposed while writing |
-| [open-questions.md](open-questions.md) | What round 2 answered, and which open questions in progress touch the design |
+| [plan.md](../plan.md) | The 18 v1 stages, each with the docs it implements |
 
 ## The decisions in one table
 
@@ -59,8 +55,4 @@ How engine-v3 is built: the stack, the five parts of the code and their folders,
 | Saving | `level.json` in a zip; IndexedDB for the level, `localStorage` for settings; import in a worker |
 | Performance | Caches, culling, drawing on change, a virtual Layers panel in v1; a spatial index only if a test needs it |
 
-## Where it goes after approval
-
-- `plan.md` becomes `docs/plan.md`, and its stages drive `docs/progress.md`.
-- The other files move to `docs/architecture/`, the glossary additions into [glossary.md](../../glossary.md), and the answered open questions into their topic files.
-- This folder is then deleted, as [the proposals README](../README.md) says.
+Its words for the code are in the [glossary](../glossary.md), under "The code".

@@ -127,11 +127,11 @@ Source: scope SA6; round 11: 12 A8
 
 Source: scope SA4; round 5: FMT1; round 6: FMT2; round 11: 12 A10; round 12: EXT1
 
-## Not in the scope review
+## Small features
 
-Left over from the old draft. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Feature | Rule | Suggested |
+| Feature | Rule | Version |
 |---|---|---|
 | Import by dropping | Dropping a level file on the editor imports it, after the same question as Import | v1 |
 | A note after a crash | Reopening after a crash loads the last save and says: "Recovered from your last save at 14:32. The last few seconds may be missing." | v1 |
@@ -143,4 +143,4 @@ Left over from the old draft. The last column is Claude's suggestion, not a deci
 | Update available | When a new version of the game is out, an open tab offers Reload and never reloads by itself | v3 |
 | Level details | Description, author, instructions and level tags, in a Level info window. They are for a level's page | Later |
 
-Source: old: SV-10, SV-11, SV-14, SV-33, SV-48, SV-62, SV-63, SV-69, SV-84, SV-93
+Source: old: SV-10, SV-11, SV-14, SV-33, SV-48, SV-62, SV-63, SV-69, SV-84, SV-93; owner: 2026-11-14

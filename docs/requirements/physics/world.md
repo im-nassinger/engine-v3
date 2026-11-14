@@ -93,18 +93,18 @@ Source: scope PH7; round 6: 05 2.13; round 8: CF4; old: PH-80, PH-81
 
 Source: scope PH12; round 1: D5, D40; round 6: 05 2.15; round 7: BND2; round 10: 11 2.16; old: PH-91 to PH-99; owner: 2026-11-13
 
-## Not in the scope review
+## Small features
 
-Left over from the old draft. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Feature | Rule | Suggested |
+| Feature | Rule | Version |
 |---|---|---|
 | "Keep going" past an open edge | A setting to keep entities instead of removing them. The review only kept removal | Later |
-| Hard limit | Any body 100,000 px from the origin is removed, with a Console warning | v1 |
+| Hard limit | Any body 100,000 px from the origin is removed, with a warning: the status text in v1, the Console from v2 | v1 |
 | Maximum level size | 200,000×200,000 px | v1 |
 | Gravity in pixels hint | Under Gravity: "490 px/s². An entity falls 245 px in the first second." | v3 |
 | Background image layout | Fill the screen or tile, and how much it scrolls with the camera, from 0% to 100% | v3 |
 | Grid window details | Colours per tag, drag across cells to paint, "Collide with all" and "Collide with none" per row | v3 |
 | Removal line in the Console | "Crate left the level and was removed." | v3 |
 
-Source: old: PH-73, PH-74, PH-86, PH-88, PH-93, PH-95, PH-96, PH-99
+Source: old: PH-73, PH-74, PH-86, PH-88, PH-93, PH-95, PH-96, PH-99; owner: 2026-11-14

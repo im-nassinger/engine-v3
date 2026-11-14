@@ -12,9 +12,10 @@ Two lists on the World that triggers and scripts share. **Variables** are named 
 - **Each variable has one type, picked when you create it: number, string or boolean.** Example: `coins = 0`, `player_name = "Ada"`, `door_open = false`. *Why: the owner wants text in v2 (owner: 2026-11-13), and named the three types (owner: 2026-11-14).*
 - **What a trigger can do with each type:**
   - **number:** Change value sets, adds or subtracts. An If compares it, such as "If coins is 10 or more".
-  - **string** and **boolean:** Change value only sets it. An If only checks "is" or "is not", such as "If door_open is true".
+  - **string:** Change value only sets it. An If only checks "is" or "is not".
+  - **boolean:** Change value sets it or **flips** it: true becomes false, false becomes true. An If only checks "is" or "is not", such as "If lamp_on is true". Example: a light switch is one trigger, "When something starts touching this, Flip lamp_on". *Why: with only Set, a switch needs two triggers that both fire on the same touch and undo each other (owner: 2026-11-14).*
   - *Why: adding 1 to a string or asking whether a boolean is "10 or more" means nothing.*
-- Triggers and scripts read and change variables. A trigger changes one with Change value: set, add or subtract.
+- Triggers and scripts read and change variables. A trigger changes one with Change value: set, add, subtract or flip, as its type allows.
 - A trigger can react to a variable with the event "a variable changes", and check one in an If.
 - Restarting the level puts every variable back to its starting value.
 - *Why: variables replace the older "data" and "saved data", which were two concepts for one thing. A score needs one.*
@@ -76,14 +77,14 @@ Source: scope IN3; round 10: 11 2.12; old: PL-76, PL-77
 
 Source: scope IN4; round 3: D70; round 10: 11 2.11; round 11: MS1; round 12: MS2; old: PL-69, PL-74
 
-## Not in the scope review
+## Small features
 
-Left over from the old draft. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Feature | Rule | Suggested |
+| Feature | Rule | Version |
 |---|---|---|
 | Keys that can't be bound | Esc, Tab, Ctrl, Alt and Cmd in any combination, F1 to F12, Caps Lock, Num Lock | v2 |
 | Menus without a mouse | Every built-in menu works with the keyboard, and later a gamepad | v3 |
 | Touch controls | On-screen controls mapped to inputs | Later |
 
-Source: old: PL-65, PL-72, PL-80, PL-81
+Source: old: PL-65, PL-72, PL-80, PL-81; owner: 2026-11-14

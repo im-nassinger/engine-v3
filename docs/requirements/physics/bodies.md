@@ -160,15 +160,15 @@ The sizes come from Box2D's advice at 50 px per metre: moving shapes from 5 to 5
 
 Source: scope ED10; round 6: 05 2.9; round 10: EM1; old: PH-44 to PH-46
 
-## Not in the scope review
+## Small features
 
-Left over from the old draft, or accepted without a version. The last column is Claude's suggestion, not a decision.
+Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
 
-| Feature | Rule | Suggested |
+| Feature | Rule | Version |
 |---|---|---|
 | Start asleep, starting velocity, starting spin | Three body fields from the old draft. The reviewed field list doesn't include them | Later |
 | "New shapes: no physics, Static, Dynamic" | A Shape tool option so that laying out ground takes no extra clicks | v3 |
 | Physics view details | Colour per body, hatched fill for Static, dashed for sensors, centre of mass, contact points, a legend. v1 draws the pieces without these details | v3 |
 | Mass ratio hint | Stacks and joints turn wobbly past 10 to 1 in mass. The Density hint says so | v3 |
 
-Source: old: PH-02 to PH-13, PH-17, PH-22, PH-23, PH-41, PH-43
+Source: old: PH-02 to PH-13, PH-17, PH-22, PH-23, PH-41, PH-43; owner: 2026-11-14

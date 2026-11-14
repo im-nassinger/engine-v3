@@ -34,7 +34,7 @@ export type FieldModel = {
 };
 ```
 
-- **What is shown:** with nothing selected, the World's components. With one entity, its components. With several (Suggested v1, waiting for the owner), only the components every selected entity has, and a field whose values differ shows `Mixed`.
+- **What is shown:** with nothing selected, the World's components. With one entity, its components. With several, only the components every selected entity has, and a field whose values differ shows `Mixed`.
 - **Mass and other derived fields** are read when the card is built, so they update as shapes and density change.
 - **During play** the same model reads the [`PlayMirror`](../simulation.md#the-page-side) level instead of the editor's, with `isReadOnly` set. That is how the v2 Panels button shows live values without new Inspector code.
 - **Add Component** lists every registered component the entity lacks and can take by hand, with disabled entries and their reason for the others. With several selected, it adds to every one that lacks it.
