@@ -27,7 +27,7 @@ export type CardModel = {
 };
 
 export type FieldModel = {
-    readonly definition: FieldDefinition<object, never> | DerivedFieldDefinition<unknown>;
+    readonly definition: FieldDefinition<object, never> | DerivedFieldDefinition<object, unknown> | ReadOnlyRow;
     readonly value: unknown | typeof MIXED;
     readonly isEnabled: boolean;           // appliesWhen; greyed values are kept
     readonly isReadOnly: boolean;          // derived without write, or during play
@@ -35,9 +35,9 @@ export type FieldModel = {
 ```
 
 - **What is shown:** with nothing selected, the World's components. With one entity, its components. With several, only the components every selected entity has, and a field whose values differ shows `Mixed`.
-- **Mass and other derived fields** are read when the card is built, so they update as shapes and density change.
+- **Derived fields** (Width, Height, Points) and **read-only rows** are read when the card is built, so they update as shapes and density change. A `ReadOnlyRow` is a value the Inspector adds to a card that isn't the component's own: v1 has one, the BodyComponent's Mass, from `BodyMass` in `core/physics`.
 - **During play** the same model reads the [`PlayMirror`](../simulation.md#the-page-side) level instead of the editor's, with `isReadOnly` set. That is how the v2 Panels button shows live values without new Inspector code.
-- **Add Component** lists every registered component the entity lacks and can take by hand, with disabled entries and their reason for the others. With several selected, it adds to every one that lacks it.
+- **Add Component** is worked out here, not in the registry: it lists every registered component the entity lacks and can take by hand, with disabled entries and their reason for the others. With several selected, it adds to every one that lacks it.
 
 ## Typing a value
 
@@ -89,7 +89,7 @@ export class EditorMessages {
 
 | v1 rule | Reads | Example |
 |---|---|---|
-| `MissingPartnerRule` | Each component's `partners` in its schema | "Needs a ShapeComponent to draw anything. [Add ShapeComponent]" |
+| `MissingPartnerRule` | Each component's `partners` in its schema, checked against the entity's components | "Needs a ShapeComponent to draw anything. [Add ShapeComponent]" |
 | `MissingEntityRule` | Every entity field | `missing entity` on a joint's B after its entity was deleted |
 | Failed save (level-wide, set by saving) | `SaveState` | "Saving in the browser failed. Your work is still here; export it to keep a copy." |
 

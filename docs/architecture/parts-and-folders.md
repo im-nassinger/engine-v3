@@ -33,15 +33,15 @@ src/
   core/
     events/            Signal, VersionCounter: how classes announce changes
     entities/          Entity, EntityId, Level, EntityIdAllocator, LevelSignals
-    fields/            value types, the field types, FieldDefinition, ComponentSchema
-    components/        Component, ComponentRegistry, then one folder per component
+    fields/            value types, the field types, FieldDefinition, EntityId
+    components/        Component, ComponentSchema, ComponentRegistry, then one folder per component
       TransformComponent/ NameComponent/ ShapeComponent/ PathComponent/ StyleComponent/
       BodyComponent/ SurfaceComponent/ JointComponent/ CameraComponent/ PhysicsWorldComponent/
     geometry/          Matrix2D, Point, Bounds, the polygon pipeline, mass
     math/              DeterministicMath, units (px and metres, degrees and radians)
     derived/           WorldMatrixCache, BoundsCache, HiddenCache
     level-data/        LevelData types, LevelWriter, LevelReader, FormatUpgrader, limits
-    physics/           PhysicsWorld contract, PhysicsSceneBuilder (merging), JointEnds
+    physics/           PhysicsWorld contract, PhysicsSceneBuilder (merging), BodyMass, JointEnds
     simulation/        Simulation, the tick phases, BodyPoses, CameraFollow, TickReport
   editor/
     session/           EditorSession (the editor's root object), CurrentGroup

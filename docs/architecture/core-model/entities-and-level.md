@@ -6,7 +6,7 @@
 
 ## Ids
 
-- `type EntityId = number`. Whole numbers starting at 1. A new level's World is 1 and its camera 2.
+- `type EntityId = number`, declared in `core/fields` beside `EntityFieldType`, the lowest code that needs it, and exported again by `core/entities`. Whole numbers starting at 1. A new level's World is 1 and its camera 2.
 - `EntityIdAllocator.next()` returns the highest id ever seen plus one. Loading a level, or restoring an entity on undo, calls `reserve(id)`, which only raises the highest.
 - **Never reused in a session:** a deleted entity's id stays free, so undo brings the entity back with the same id and every link to it works again. After a reload the history is gone, so reusing a deleted id is harmless.
 - **The play copy keeps the editor's ids** (owner, 2026-11-13). Spawned entities (v2) get ids from the run's own allocator, which starts above the level's highest id.
@@ -48,6 +48,7 @@ export class Entity {
 }
 ```
 
+- `addComponent` subscribes to the component's `changed` signal and raises `valueChanged` for it; `removeComponent` unsubscribes. The component itself never knows its entity, see [components-and-fields.md](components-and-fields.md#componentschema-and-component).
 - An entity on its own is just an id. What it is comes from its components, as the glossary says. There are no subclasses such as `JointEntity`.
 - Whether the World, the camera or a joint allows a command is read from its components (the World's PhysicsWorldComponent, the CameraComponent, the JointComponent), never from a kind field.
 - `name` lives in the NameComponent like any other value. `entity.requireComponent(NameComponent).get('name')` is wrapped by a small helper, `entityName(entity)`.

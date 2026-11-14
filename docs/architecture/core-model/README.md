@@ -29,6 +29,8 @@ Component ──owns──> its values, validated by its ComponentSchema
 ComponentSchema ──lists──> FieldDefinitions ──use──> FieldTypes
 ```
 
+**Imports go one way:** `core/entities` → `core/components` → `core/fields` → `core/events`. An entity knows its components; a component never knows its entity.
+
 ## Rules the model keeps
 
 | Rule (from the requirements) | Kept by |
