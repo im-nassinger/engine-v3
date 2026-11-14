@@ -118,15 +118,15 @@ Scripts for movement, enemies, health, pickups, the camera and showing variables
 - **Moving platforms** are Kinematic bodies with Move Along Path. Riders move along. A path never collides, and scripts can read its points.
 - **Showing a variable on screen with no code:** a text entity plus Show Variable.
 - Builtin scripts talk to each other through custom events fired on an entity, such as `damage` with an amount. The entity that receives it decides what happens: a crate with no Health script ignores `damage`.
+- **Builtin scripts share three custom events: `damage`, `heal` and `died`.** `damage` and `heal` carry an amount. The Health script fires `died` on its own entity at zero, so a trigger there can Destroy or Lose. Each builtin script's help lists the events it fires and hears. *Why: these are the ones the builtin scripts need. More come only when a builtin file needs one.*
 - A kinematic platform can push a player into a wall. There is no crush rule.
 
-Source: scope EF6; round 1: D58; round 2: R2; round 7: 08 2.6, 08 2.8; round 9: MSG2; old: PP-45, PP-57 to PP-71
+Source: scope EF6; round 1: D58; round 2: R2; round 7: 08 2.6, 08 2.8; round 9: MSG2; old: PP-45, PP-57 to PP-71; owner: 2026-11-13
 
 ## Not in the scope review
 
 | Feature | Rule | Suggested |
 |---|---|---|
-| Events between builtin scripts | The old draft listed a shared set: `damage`, `heal`, `hurt`, `died`, `stun`, `activate`, `deactivate`, and movement states such as `move.run`. With custom events the idea still works, but the list was never reviewed | v3, needs a review |
 | Character animation script | Played animations from movement states. It needs animations, which are not designed yet | Later |
 | What a script needs | The old draft let a script declare needs such as "a Dynamic body", shown as a checklist with Fix buttons. The partner note on a card covers the same ground | Needs a decision |
 

@@ -11,7 +11,8 @@ A script is a `.lua` file from the Assets panel, attached to an entity through i
 - **An entity has one ScriptComponent, holding a list of `.lua` files** from the Assets panel. *Why one: an entity has at most one component of each type, so "its ScriptComponent" always means one thing, in the Inspector and in Lua.*
 - The `.lua` files are plain assets the component points to. Fixing a file fixes every entity that uses it.
 - **Each file shows its own settings as fields:** values the script declares at its top, such as a speed or an entity. The fields come from the same fixed list of field types as components: number, text, checkbox, choice, colour, vector, angle, entity, asset, variable, tags, and lists of these.
-- Each entity keeps its own values for those settings.
+- **Settings are a `settings` table at the top of the file, built with one `<type>_field` function per field type**, such as `speed = number_field(400, { min = 0, max = 1500, unit = "px/s" })`. The Inspector shows them in the order written, labelled from the name: `run_speed` reads "Run speed".
+- Each entity keeps its own values for those settings, and the script reads them from the same table, such as `settings.run_speed`.
 - Each entity runs its own copy of a script, so twenty enemies never share state by accident.
 - Any entity can have scripts, joints and the camera included.
 - Scripts in the list run top to bottom. Across entities they run in Layers panel order, see [triggers](../triggers/triggers.md).
@@ -27,8 +28,10 @@ Source: scope LU1; round 1: C12; round 3: S2; round 4: FT1; round 5: R45; round 
 - **Scripts and triggers share one list of events, with the same names.** A script listens with `on(name, function)`.
 - `on("touched", ...)` matches the trigger sentence "When touched". `on("tick", ...)` runs every tick. `on("open", ...)` listens for a custom event.
 - There are no separate callbacks such as `onStart` or `onUpdate`. *Why: the owner wanted it unified. One pattern, read like the trigger sentence, and a new event later is just a new name.*
+- **Script event names are the trigger events in snake_case**, such as `on("no_longer_touched", ...)`. A handler gets `other` and the event's number. The list is in [lua-api.md](lua-api.md).
 - A custom event can't reuse a builtin event's name.
 - A trigger calls a script by firing a custom event.
+- **Scripts share values through custom events and variables, and nothing else.** To ask an entity for something, fire a custom event, such as `fire_event(other, "damage", 1)`, and the scripts on that entity decide what it means. For a level-wide value, use a variable. *Why: reuse before adding. The trade-off is that a script can't read another entity's private state, such as an enemy's health for a health bar. Since the API only grows, a function for that can come later.*
 - Events from touching are delivered after the physics step, never during it, so every function can be called from every handler.
 - A touch event fires once per pair of entities, even when a polygon is split into pieces. Both sides get it.
 - The game runs 60 ticks per second.
@@ -41,6 +44,7 @@ Source: scope LU1; round 9: 10 2.3; round 10: EV1; round 1: D4; old: LU-22, LU-2
 - **A destroyed id simply no longer exists.** There are no object references to keep alive. *Why: the owner rejected an object-style API.*
 - Scripts find entities three ways: by name, by tag, or through an entity setting the script declares, picked in the Inspector.
 - An id is never reused during a run, so a stored id can never point at a newer entity.
+- **A script's own entity is `this`**, the id of the entity the script is on, such as `destroy(this)`. A handler receives `other`. *Why: the same words as triggers, and each entity runs its own copy, so `this` is always right.*
 
 Source: round 3: D66; round 9: 10 2.2; old: LU-13, LU-18; owner: 2026-11-13
 
@@ -145,12 +149,7 @@ The review settled the shape of the API, not every detail. The last column is Cl
 
 | Open point | What is known | Suggested |
 |---|---|---|
-| The full list of functions | Rewritten as functions that take ids in [lua-api.md](lua-api.md). Most of it waits for the owner | Proposed |
-| How a script declares its settings | "Values the script declares at its top." The exact form was never written | Needs a decision |
-| How a script names its own entity | With handles there is no `self` object. The function that gives a script its entity's id was never named | Needs a decision |
-| Sharing values between scripts | The old draft had a table shared by the scripts of one entity, and functions another script could call. Custom events and variables may cover it | Needs a decision |
 | More ways to wait | Waiting a number of ticks, waiting until something is true, running a function later or every N seconds | v3 |
-| Vectors and math helpers | A vector type, and helpers such as clamp and lerp | v2 |
 | Running a script once more for each list entry | The same file listed twice on one entity runs twice | v2 |
 | Switching a script off | A checkbox on each file in the list | v3 |
 | Old settings after a script changes | A removed setting keeps its value under "Unused settings". A renamed one can say what it was called before | v3 |

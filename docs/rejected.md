@@ -60,6 +60,10 @@ What we decided against, and why. **Check here before proposing something**: an 
 | Trigger templates | Component presets, not in v1 | A preset works the same on every component | round 9: 09 2.14; round 10: CP1 |
 | An object-style Lua API (`self:setText`) | Ids and functions | Handles, not references | round 3: D66 |
 | Lua functions inside tables (`world.spawn`, `input.isDown`, `math.clamp`) | Top-level functions: `spawn`, `is_down`, `clamp` | The owner's rule | owner: 2026-11-13 |
+| A `self` object for a script's own entity | `this`, the entity's id | The same word as triggers, and handles, not references | owner: 2026-11-13 |
+| A table shared by an entity's scripts, functions other scripts can call | Custom events and variables | Reuse before adding. A function to read another entity's state can come later | owner: 2026-11-13 |
+| A `vec` type with operators | Two numbers, plus `clamp` and `lerp` | A type is a concept of its own. It can come later without changing any function | owner: 2026-11-13 |
+| A shared set of builtin script events (`hurt`, `stun`, `activate`, `deactivate`, movement states) | Three events: `damage`, `heal`, `died` | Only what the builtin scripts need | owner: 2026-11-13 |
 | `onStart`, `onUpdate` and other callbacks | `on(name, function)` | One list of events for triggers and scripts | round 1: D4; round 10: EV1 |
 | A limit on script work per tick | No limit. The game runs separately from the editor | Rejected by the owner | round 3: D72; round 9: 10 2.11; round 10: LP1 |
 | Scripts blocked from reading the clock | Scripts may read the date and time | The determinism test fixes the clock | round 10: SB1; round 11: CL1 |

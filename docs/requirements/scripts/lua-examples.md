@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Whole `.lua` files that show how the [Lua API](lua-api.md) reads in practice: a coin, a button and a door, walking, a turret, a score, health, and dragging with the mouse. Each is attached to an entity through its ScriptComponent. **They use proposed functions**, such as `this`, `settings` and `set_attribute`, so they change if the owner answers no to a question in [the Lua API proposal](../../proposals/lua-api.md).
+Whole `.lua` files that show how the [Lua API](lua-api.md) reads in practice: a coin, a button and a door, walking, a turret, a score, health, and dragging with the mouse. Each is attached to an entity through its ScriptComponent.
 
 ## A coin
 
