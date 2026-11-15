@@ -1,4 +1,4 @@
-import type { EntityId } from '../../core/entities/index.ts';
+import type { EntityId } from '../../core/level/index.ts';
 
 // An entity a command left out because it doesn't allow the command: "Camera kept" in the status bar.
 export type SkippedEntity = {

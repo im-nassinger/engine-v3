@@ -8,10 +8,10 @@ import {
     SurfaceComponent,
     TransformComponent,
 } from '../../core/components/index.ts';
-import type { Entity } from '../../core/entities/index.ts';
+import type { Entity } from '../../core/level/index.ts';
 import type { ShapeGeometry } from '../../core/geometry/index.ts';
 import { BoundsCache, PiecesCache, WorldMatrixCache } from '../../core/derived/index.ts';
-import { Level } from '../../core/entities/index.ts';
+import { Level } from '../../core/level/index.ts';
 import { Signal } from '../../core/events/index.ts';
 import { ManualFrames } from '../../editor/time/testing/index.ts';
 import { ViewSettings, ViewState } from '../../editor/view/index.ts';

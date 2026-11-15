@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest';
 
 import { CameraComponent, createV1Registry, NameComponent, TransformComponent } from '../../components/index.ts';
-import { Level } from '../../entities/index.ts';
-import type { Entity } from '../../entities/index.ts';
+import { Level } from '../../level/index.ts';
+import type { Entity } from '../../level/index.ts';
 
 import { FormatUpgrader } from '../versions/FormatUpgrader.ts';
 import type { LevelLimits } from '../LevelLimits.ts';

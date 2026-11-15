@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import { ShapeComponent } from '../components/index.ts';
-import { Level } from '../entities/index.ts';
+import { Level } from '../level/index.ts';
 import { Bounds } from '../geometry/index.ts';
 
 import { levelBoundsOf } from './levelBoundsOf.ts';

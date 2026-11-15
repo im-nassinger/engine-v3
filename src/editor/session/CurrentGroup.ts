@@ -1,4 +1,4 @@
-import type { Entity, EntityId, Level, LevelUpdate } from '../../core/entities/index.ts';
+import type { Entity, EntityId, Level, LevelUpdate } from '../../core/level/index.ts';
 import { VersionCounter } from '../../core/events/index.ts';
 import type { Unsubscribe } from '../../core/events/index.ts';
 

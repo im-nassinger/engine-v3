@@ -1,4 +1,4 @@
-import type { Entity, Level } from '../../../core/entities/index.ts';
+import type { Entity, Level } from '../../../core/level/index.ts';
 import { LevelWriter } from '../../../core/level-data/index.ts';
 import type { LevelReader } from '../../../core/level-data/index.ts';
 

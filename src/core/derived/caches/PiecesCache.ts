@@ -1,5 +1,5 @@
 import { ShapeComponent } from '../../components/index.ts';
-import type { Entity, Level, LevelUpdate } from '../../entities/index.ts';
+import type { Entity, Level, LevelUpdate } from '../../level/index.ts';
 import type { Unsubscribe } from '../../events/index.ts';
 import type { ShapePiecesResult } from '../../geometry/index.ts';
 import { ShapePieces } from '../../geometry/index.ts';

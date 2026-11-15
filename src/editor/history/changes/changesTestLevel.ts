@@ -1,5 +1,5 @@
 import { JointComponent, NameComponent, PathComponent, TransformComponent } from '../../../core/components/index.ts';
-import { Level } from '../../../core/entities/index.ts';
+import { Level } from '../../../core/level/index.ts';
 import { LevelWriter } from '../../../core/level-data/index.ts';
 
 // A World with a group holding a skewed child, a square beside it, and a rope joining the two.

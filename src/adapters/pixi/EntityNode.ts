@@ -1,6 +1,6 @@
 import { Container, Graphics, Matrix } from 'pixi.js';
 import { TransformComponent } from '../../core/components/index.ts';
-import type { Entity } from '../../core/entities/index.ts';
+import type { Entity } from '../../core/level/index.ts';
 import { Matrix2D } from '../../core/geometry/index.ts';
 
 // One entity on screen: a Container that carries its matrix from its parent and its own hidden switch,

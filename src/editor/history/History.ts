@@ -1,4 +1,4 @@
-import type { Level } from '../../core/entities/index.ts';
+import type { Level } from '../../core/level/index.ts';
 import { VersionCounter } from '../../core/events/index.ts';
 import type { Clock } from '../time/index.ts';
 

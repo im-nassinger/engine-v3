@@ -1,7 +1,7 @@
 import { Graphics } from 'pixi.js';
 import type { StrokeStyle } from 'pixi.js';
 import { StyleComponent } from '../../../../core/components/index.ts';
-import type { Level } from '../../../../core/entities/index.ts';
+import type { Level } from '../../../../core/level/index.ts';
 import { gridColourFor } from './gridColour.ts';
 import { planGrid } from './GridPlan.ts';
 import type { GridLine, GridLineStrength, GridPlan } from './GridPlan.ts';

@@ -98,7 +98,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 ### Stage 1, built on 2026-11-14
 
 - All eight steps of the approved plan are done, one commit each, and the plan file is deleted. Its decisions are in [core-model/](architecture/core-model/README.md); what stays for later is in [plan.md](plan.md).
-- `core/entities` holds `EntityIdAllocator`, `EntityVersions`, `LevelSignals`, `LevelTree`, `Entity` and `Level`, with the tree's rules as tests. What differs from the docs is written into [entities-and-level.md](architecture/core-model/entities-and-level.md): an entity raises its own signal, which `Level` forwards, to keep imports one way.
+- `core/level` holds `EntityIdAllocator`, `EntityVersions`, `LevelSignals`, `LevelTree`, `Entity` and `Level`, with the tree's rules as tests. What differs from the docs is written into [entities-and-level.md](architecture/core-model/entities-and-level.md): an entity raises its own signal, which `Level` forwards, to keep imports one way.
 - **Draw order puts the World first**, because its fill is the background; the docs had the whole walk backwards, which drew the World in front of everything.
 - `core/derived` holds `WorldMatrixCache` and `HiddenCache`. Moving an entity between parents with skew in both keeps its level matrix to within 1e-9.
 - `TextFieldType` has a `minLength`, so `parse` refuses an empty name. Test components for code that holds components are in `core/components/testing/`.

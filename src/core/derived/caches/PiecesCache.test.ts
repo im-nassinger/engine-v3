@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import { ShapeComponent, TransformComponent } from '../../components/index.ts';
-import { Level } from '../../entities/index.ts';
+import { Level } from '../../level/index.ts';
 import { PiecesCache } from './PiecesCache.ts';
 
 function buildSquare() {

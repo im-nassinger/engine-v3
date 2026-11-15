@@ -2,7 +2,7 @@ import { Graphics } from 'pixi.js';
 import type { StrokeStyle } from 'pixi.js';
 import { JointComponent } from '../../../core/components/index.ts';
 import type { JointType } from '../../../core/components/index.ts';
-import type { Entity } from '../../../core/entities/index.ts';
+import type { Entity } from '../../../core/level/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
 import type { OverlayScene } from './OverlayScene.ts';
 

@@ -5,7 +5,7 @@ import {
     ShapeComponent,
     StyleComponent,
 } from '../../components/index.ts';
-import type { Entity } from '../../entities/index.ts';
+import type { Entity } from '../../level/index.ts';
 import type { Matrix2D, PathGeometry, Point, ShapeGeometry } from '../../geometry/index.ts';
 import { Bounds } from '../../geometry/index.ts';
 

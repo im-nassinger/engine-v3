@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import { TransformComponent } from '../../core/components/index.ts';
-import type { Level } from '../../core/entities/index.ts';
+import type { Level } from '../../core/level/index.ts';
 import { ManualClock } from '../time/testing/index.ts';
 
 import { buildChangesTestLevel, snapshotOf } from './changes/changesTestLevel.ts';

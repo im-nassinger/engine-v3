@@ -1,5 +1,5 @@
 import { ShapeComponent } from '../components/index.ts';
-import type { Level } from '../entities/index.ts';
+import type { Level } from '../level/index.ts';
 import { Bounds } from '../geometry/index.ts';
 
 // The level bounds: the World's rectangle, centred on the level's origin. The World's TransformComponent is

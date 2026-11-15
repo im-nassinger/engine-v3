@@ -1,5 +1,5 @@
 import type { AnyComponentSchema, AnyValueEntry, ComponentTypeName } from '../../../core/components/index.ts';
-import type { EntityId, Level } from '../../../core/entities/index.ts';
+import type { EntityId, Level } from '../../../core/level/index.ts';
 
 import type { LevelChange } from './LevelChange.ts';
 import { requireComponentByType } from './requireComponentByType.ts';

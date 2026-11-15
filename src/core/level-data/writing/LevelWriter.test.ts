@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest';
 
 import { BodyComponent, NameComponent, ShapeComponent, TransformComponent } from '../../components/index.ts';
-import { Level } from '../../entities/index.ts';
-import type { Entity } from '../../entities/index.ts';
+import { Level } from '../../level/index.ts';
+import type { Entity } from '../../level/index.ts';
 
 import { LevelWriter } from './LevelWriter.ts';
 import recordedNewLevel from './LevelWriter.newLevel.json' with { type: 'json' };

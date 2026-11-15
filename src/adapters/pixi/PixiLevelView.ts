@@ -1,6 +1,6 @@
 import { autoDetectRenderer, Container, Matrix } from 'pixi.js';
 import type { Renderer } from 'pixi.js';
-import type { Level } from '../../core/entities/index.ts';
+import type { Level } from '../../core/level/index.ts';
 import type { Unsubscribe } from '../../core/events/index.ts';
 import type { ViewSettings, ViewState } from '../../editor/view/index.ts';
 import type { Cancel, FrameScheduler } from '../../editor/time/index.ts';

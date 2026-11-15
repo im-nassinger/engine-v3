@@ -1,4 +1,4 @@
-import type { Entity } from '../../entities/index.ts';
+import type { Entity } from '../../level/index.ts';
 
 // Values worked out per entity from the entity and its parents, kept until marked stale.
 // A value is only ever stored after its parent's, so an entity without a value has no

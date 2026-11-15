@@ -2,7 +2,7 @@ import { Graphics } from 'pixi.js';
 import type { FillStyle, StrokeStyle } from 'pixi.js';
 import { PhysicsWorldComponent, ShapeComponent, SurfaceComponent } from '../../../core/components/index.ts';
 import { levelBoundsOf } from '../../../core/derived/index.ts';
-import type { Entity } from '../../../core/entities/index.ts';
+import type { Entity } from '../../../core/level/index.ts';
 import { LineChains, ShapePieces } from '../../../core/geometry/index.ts';
 import type { CollisionPiece, Matrix2D, Point, ShapeGeometry } from '../../../core/geometry/index.ts';
 import type { OverlayCaches, OverlayScene } from './OverlayScene.ts';

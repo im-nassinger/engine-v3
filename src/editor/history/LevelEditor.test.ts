@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import { createV1Registry } from '../../core/components/index.ts';
-import type { EntityId } from '../../core/entities/index.ts';
+import type { EntityId } from '../../core/level/index.ts';
 import { FormatUpgrader, LevelReader, V1_LEVEL_LIMITS } from '../../core/level-data/index.ts';
 import { Selection } from '../selection/index.ts';
 import { ManualClock } from '../time/testing/index.ts';

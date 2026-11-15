@@ -32,7 +32,7 @@ src/
       import.worker.ts     the import worker: unzips and checks a file
   core/
     events/            Signal, VersionCounter: how classes announce changes
-    entities/          Entity, EntityId, Level, LevelTree, LevelUpdate, LevelEditorData
+    level/             Level, Entity, EntityId, LevelTree, LevelUpdate, LevelEditorData
       bookkeeping/       EntityIdAllocator, EntityVersions, LevelSignals
       outcomes/          what adding a component, moving and renaming return
     fields/            FieldType, ValueType, FieldDefinition, EntityId, Unit

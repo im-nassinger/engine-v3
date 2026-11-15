@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { Level } from '../../core/entities/index.ts';
+import { Level } from '../../core/level/index.ts';
 
 import { Selection } from './Selection.ts';
 

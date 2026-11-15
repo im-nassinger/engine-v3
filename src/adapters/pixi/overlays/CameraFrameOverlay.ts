@@ -1,7 +1,7 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import type { StrokeStyle } from 'pixi.js';
 import { CameraComponent } from '../../../core/components/index.ts';
-import type { Level } from '../../../core/entities/index.ts';
+import type { Level } from '../../../core/level/index.ts';
 import type { OverlayScene } from './OverlayScene.ts';
 import { screenRectangleOf } from './screenPixels.ts';
 

@@ -1,4 +1,4 @@
-import type { EntityId, Level, SwitchName } from '../../../core/entities/index.ts';
+import type { EntityId, Level, SwitchName } from '../../../core/level/index.ts';
 
 import type { LevelChange } from './LevelChange.ts';
 

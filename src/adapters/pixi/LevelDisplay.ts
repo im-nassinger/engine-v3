@@ -1,7 +1,7 @@
 import { PathComponent, ShapeComponent, StyleComponent, TransformComponent } from '../../core/components/index.ts';
 import type { AnyComponent } from '../../core/components/index.ts';
 import type { BoundsCache, PiecesCache, WorldMatrixCache } from '../../core/derived/index.ts';
-import type { Entity, Level, LevelUpdate } from '../../core/entities/index.ts';
+import type { Entity, Level, LevelUpdate } from '../../core/level/index.ts';
 import type { Unsubscribe } from '../../core/events/index.ts';
 import type { Bounds } from '../../core/geometry/index.ts';
 import { EntityDrawing } from './EntityDrawing.ts';

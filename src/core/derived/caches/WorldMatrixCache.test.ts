@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest';
 
 import { TransformComponent } from '../../components/index.ts';
-import type { Entity } from '../../entities/index.ts';
-import { Level } from '../../entities/index.ts';
+import type { Entity } from '../../level/index.ts';
+import { Level } from '../../level/index.ts';
 import type { Matrix2D, TransformValues } from '../../geometry/index.ts';
 
 import { WorldMatrixCache } from './WorldMatrixCache.ts';

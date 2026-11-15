@@ -169,7 +169,7 @@ One file, `.dependency-cruiser.json`, with three rules:
 |---|---|
 | Modules through `index.ts` | An import from one module into a file of another module that isn't its `index.ts`. Within a part and across parts |
 | No circles between files | `A.ts` → `B.ts` → `A.ts`, however long the chain |
-| No circles between modules | `core/entities` → `core/components` → `core/entities`, even when no single file is in a circle |
+| No circles between modules | `core/level` → `core/components` → `core/level`, even when no single file is in a circle |
 
 - **Why a second tool:** ESLint reads one import's text, so it can't know what a path leads to or follow a chain. `eslint-plugin-import-x` finds circles between files only, and a trial showed a circle between two modules with no circle between single files (module A's file imports B's `index.ts`, another of B's files imports A). That case is the likely one here: entities and components will want to know each other.
 - **How the circle between modules is found:** a rule with `"scope": "folder"`. Folder dependencies roll up from subfolders, so `core/components/BodyComponent/` reaching another module counts as `core/components` reaching it, and a module and its own subfolders are never reported as a circle. Two subfolders of one module that import each other are reported, so files that need each other, tests included, share a folder. `--collapse` was tried first and doesn't work: it only changes the report, the rules still run on files (stage 0).

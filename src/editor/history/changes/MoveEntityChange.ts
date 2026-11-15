@@ -1,5 +1,5 @@
 import { TransformComponent } from '../../../core/components/index.ts';
-import type { EntityId, Level } from '../../../core/entities/index.ts';
+import type { EntityId, Level } from '../../../core/level/index.ts';
 import type { TransformValues } from '../../../core/geometry/index.ts';
 
 import type { LevelChange } from './LevelChange.ts';

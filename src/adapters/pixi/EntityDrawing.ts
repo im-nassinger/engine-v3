@@ -1,6 +1,6 @@
 import type { Graphics, StrokeStyle } from 'pixi.js';
 import { PathComponent, ShapeComponent, StyleComponent } from '../../core/components/index.ts';
-import type { Entity } from '../../core/entities/index.ts';
+import type { Entity } from '../../core/level/index.ts';
 import type { PathGeometry, PathPoint, Point, ShapeGeometry, ShapePiecesResult } from '../../core/geometry/index.ts';
 import type { PiecesCache } from '../../core/derived/index.ts';
 import { toPixiColour } from './PixiColour.ts';

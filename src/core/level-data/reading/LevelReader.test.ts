@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import { BodyComponent, createV1Registry, JointComponent, NameComponent } from '../../components/index.ts';
-import type { Level } from '../../entities/index.ts';
+import type { Level } from '../../level/index.ts';
 
 import { FormatUpgrader } from '../versions/FormatUpgrader.ts';
 import type { LevelLimits } from '../LevelLimits.ts';

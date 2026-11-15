@@ -1,5 +1,5 @@
 import type { AnyComponent } from '../../components/index.ts';
-import type { Entity, Level } from '../../entities/index.ts';
+import type { Entity, Level } from '../../level/index.ts';
 import type { JsonValue } from '../../fields/index.ts';
 
 import { CURRENT_FORMAT_VERSION, LEVEL_FORMAT } from '../LevelData.ts';

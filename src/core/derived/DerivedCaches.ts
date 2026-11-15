@@ -1,4 +1,4 @@
-import type { Level } from '../entities/index.ts';
+import type { Level } from '../level/index.ts';
 
 import { BoundsCache } from './caches/BoundsCache.ts';
 import { HiddenCache } from './caches/HiddenCache.ts';

@@ -1,7 +1,7 @@
 import { AnimationFrames, DevicePixelRatio } from '../adapters/browser/index.ts';
 import { PixiLevelView } from '../adapters/pixi/index.ts';
 import { DerivedCaches, levelBoundsOf } from '../core/derived/index.ts';
-import type { Level } from '../core/entities/index.ts';
+import type { Level } from '../core/level/index.ts';
 import { ViewSettings, ViewState } from '../editor/view/index.ts';
 
 // The smallest wiring that draws a level on the page, until stage 6's editor page builds an EditorSession,

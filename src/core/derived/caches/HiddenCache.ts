@@ -1,4 +1,4 @@
-import type { Entity, Level, LevelUpdate } from '../../entities/index.ts';
+import type { Entity, Level, LevelUpdate } from '../../level/index.ts';
 import type { Unsubscribe } from '../../events/index.ts';
 
 import { PerEntityValues } from './PerEntityValues.ts';

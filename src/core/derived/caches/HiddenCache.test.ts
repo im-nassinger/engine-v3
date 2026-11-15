@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { Level } from '../../entities/index.ts';
+import { Level } from '../../level/index.ts';
 
 import { HiddenCache } from './HiddenCache.ts';
 

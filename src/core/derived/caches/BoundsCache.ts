@@ -7,7 +7,7 @@ import {
     TransformComponent,
 } from '../../components/index.ts';
 import type { AnyComponentSchema } from '../../components/index.ts';
-import type { Entity, Level, LevelUpdate } from '../../entities/index.ts';
+import type { Entity, Level, LevelUpdate } from '../../level/index.ts';
 import type { Unsubscribe } from '../../events/index.ts';
 import type { Bounds } from '../../geometry/index.ts';
 import { OwnBounds } from './OwnBounds.ts';

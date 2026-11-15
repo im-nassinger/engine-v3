@@ -10,8 +10,8 @@ import {
     TransformComponent,
 } from '../../components/index.ts';
 import type { AnyComponent, ComponentClass, ComponentRegistry } from '../../components/index.ts';
-import { Level } from '../../entities/index.ts';
-import type { Entity } from '../../entities/index.ts';
+import { Level } from '../../level/index.ts';
+import type { Entity } from '../../level/index.ts';
 import { isPlainObject } from '../../fields/index.ts';
 import type { EntityId } from '../../fields/index.ts';
 

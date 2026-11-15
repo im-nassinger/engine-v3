@@ -1,6 +1,6 @@
 import { ShapeComponent, StyleComponent, TransformComponent } from '../core/components/index.ts';
-import { Level } from '../core/entities/index.ts';
-import type { Entity } from '../core/entities/index.ts';
+import { Level } from '../core/level/index.ts';
+import type { Entity } from '../core/level/index.ts';
 import type { ShapeGeometry } from '../core/geometry/index.ts';
 
 // Stage 4's page draws this level until stage 5 brings the editor and its own new level. It sits

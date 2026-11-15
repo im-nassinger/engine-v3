@@ -7,8 +7,8 @@ import {
     StyleComponent,
     TransformComponent,
 } from '../../components/index.ts';
-import type { Entity } from '../../entities/index.ts';
-import { Level } from '../../entities/index.ts';
+import type { Entity } from '../../level/index.ts';
+import { Level } from '../../level/index.ts';
 import type { Bounds, ShapeGeometry } from '../../geometry/index.ts';
 import { BoundsCache } from './BoundsCache.ts';
 import { WorldMatrixCache } from './WorldMatrixCache.ts';

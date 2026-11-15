@@ -1,4 +1,4 @@
-import type { Entity, EntityId, Level } from '../../../core/entities/index.ts';
+import type { Entity, EntityId, Level } from '../../../core/level/index.ts';
 import type { EntityData, LevelReader } from '../../../core/level-data/index.ts';
 
 import type { TreePlace } from './MoveEntityChange.ts';
