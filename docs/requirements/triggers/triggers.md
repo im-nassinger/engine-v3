@@ -94,7 +94,7 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27; owner: 2026-11-13
 | Change value | Sets, adds to or subtracts from any component value on the target. A boolean variable can also be flipped |
 | Spawn | Creates an entity from an `.entity` file, picked by path, with the TransformComponent values you type: position, rotation, scale and skew |
 | Destroy | Removes the target and its children |
-| Push | Gives a body a kick: a fixed direction, away from `this` or towards `this`, and a strength. By default it ignores mass, so a jump pad feels the same for everything |
+| Push | Gives a body a kick: a fixed vector, or a strength away from `this` or towards `this`. By default it ignores mass, so a jump pad feels the same for everything |
 | Fire custom event | Fires a named event on the target, with an optional number |
 | Wait | Delays the actions after it |
 | Win, Lose | Ends the run as won or lost |
@@ -105,6 +105,7 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27; owner: 2026-11-13
 - **Spawn asks for TransformComponent values and has no target.** *Why: you say exactly where the new entity appears and how it is turned and sized (owner: 2026-11-14).*
   - **Position and rotation are measured from the entity the trigger is on.** Example: a cannon tilted 30° spawns a bullet at 40, 0: the bullet appears 40 px along the cannon, tilted 30°, wherever the cannon is. A trigger on the World measures from the level's origin. *Why: a moving cannon then works without a script (owner: 2026-11-14).*
   - **Spawn's values replace the TransformComponent saved in the `.entity` file.** *Why: what the trigger shows is what you get (owner: 2026-11-14).*
+- **Push's fixed kick is a vector, x and y**, in px/s: the change in velocity, like `push(id, x, y)` in Lua. Away from or towards `this` takes one strength in px/s instead, since the direction comes from where the two entities are. *Why: a kick is a direction and a size, which one vector holds (owner: 2026-11-15).*
 - **A destroyed entity disappears at the end of the tick**, so the actions after Destroy in the list still run.
 - **Wait** is one action in the list. A trigger that fires again during a wait gets its own run, so two enemies in a "wait, then destroy other" trigger both die. Destroying the entity, or switching the trigger off, cancels what is still waiting. *Why a list with Wait: without a list, "add a coin, play a sound, destroy this" needs three triggers with the same When.*
 - **Restart is guarded against abuse**, such as a restart loop that could freeze the player's computer.
@@ -113,7 +114,7 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27; owner: 2026-11-13
 - Actions on a group use the group's own components. Body actions go to the body the entity belongs to.
 - *Why v2: the full set except sound and camera shake.*
 
-Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b, 09 2.9; round 10: WT1; round 11: WT2; round 8: 09 2.4; old: TR-30 to TR-53, TR-78 to TR-84; owner: 2026-11-13; owner: 2026-11-14
+Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b, 09 2.9; round 10: WT1; round 11: WT2; round 8: 09 2.4; old: TR-30 to TR-53, TR-78 to TR-84; owner: 2026-11-13; owner: 2026-11-14; owner: 2026-11-15
 
 ### Play sound, Stop sound, Camera shake · v3
 
