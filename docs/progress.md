@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 9, step 5 of 16 is done: `GridSnapper` snaps a move's edges and centre, or a point, to the grid within 6 screen px, off with Ctrl or the new Grid snapping switch (Shift+G), with 1036 tests in Node. Next is step 6: the tool contract, `ToolController`, `PanGesture` and `EscapeChain`. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 9, step 6 of 16 is done: the tool contract, `ToolController` with tool lock and returning to Select, `PanGesture` (Space held, middle drag), `EscapeChain` in the requirement's order, and `ShortcutDispatcher` taking Esc, the tools' number keys and Space, with 1068 tests in Node; the page wiring waits for step 12. Next is step 7: the Select tool's `IdleState`, `PressState` and `BoxSelectState`. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
