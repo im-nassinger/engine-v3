@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 7, step 12 of 12: stage 7 is done and written up. Next is stage 8, the Inspector, whose first step writes its steps into [plan.md](plan.md). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 8, step 1 of 14: the steps of stage 8, the Inspector, are written into [plan.md](plan.md#stage-8-in-steps), with their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-8s-choices). Next is step 2, `ListFieldType`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
