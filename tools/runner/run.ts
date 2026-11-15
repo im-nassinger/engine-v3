@@ -8,6 +8,7 @@ import { setTimeout as sleepFor } from 'node:timers/promises';
 import { runClaudeSession } from './ClaudeSession.ts';
 import { DiscordNotifier } from './DiscordNotifier.ts';
 import { RateLimitTracker } from './RateLimitTracker.ts';
+import { StatusFile } from './StatusFile.ts';
 import { parseStatusReport, percentComplete } from './StatusReport.ts';
 import type { StatusReport } from './StatusReport.ts';
 
@@ -22,6 +23,7 @@ const logFolder = path.join(stateFolder, 'sessions');
 const pauseFile = path.join(stateFolder, 'paused');
 const promptFile = path.join(import.meta.dirname, 'prompt.md');
 const planFile = path.join(projectFolder, 'docs/plan.md');
+const statusFilePath = path.join(projectFolder, 'docs/runner/status.md');
 const RESTART_EXIT_CODE = 75;
 
 const webhookUrl = process.env.DISCORD_WEBHOOK_URL ?? '';
@@ -33,6 +35,15 @@ if (webhookUrl === '') {
 const discord = new DiscordNotifier(webhookUrl);
 const rateLimits = new RateLimitTracker();
 const sentNeeds = new Set<string>();
+
+fs.mkdirSync(stateFolder, { recursive: true });
+const statusFile = new StatusFile(statusFilePath, path.join(stateFolder, 'status.json'));
+
+// Every message goes both to Discord and to the status file.
+async function announce(message: string) {
+    statusFile.addEvent(formatTime(Date.now()), message);
+    await discord.send(message);
+}
 
 function git(...args: string[]) {
     return execFileSync('git', args, { cwd: projectFolder, encoding: 'utf8' }).trim();
@@ -58,7 +69,8 @@ function formatTime(timeMs: number) {
 
 async function pause(reason: string) {
     fs.writeFileSync(pauseFile, `${reason}\n`);
-    await discord.send(`⏸️ **Paused:** ${reason}\nTo resume: \`rm ${pauseFile}\``);
+    statusFile.setState(`Paused: ${reason} To resume: \`rm ${pauseFile}\`.`);
+    await announce(`⏸️ **Paused:** ${reason}\nTo resume: \`rm ${pauseFile}\``);
 }
 
 async function waitWhilePaused() {
@@ -70,7 +82,7 @@ async function waitWhilePaused() {
 async function sendLimitWarnings() {
     for (const warning of rateLimits.takeNewWarnings()) {
         const resetText = formatTime(warning.resetsAtMs);
-        await discord.send(
+        await announce(
             `⚠️ ${warning.percentUsed}% of the ${warning.windowName} usage limit used. Resets ${resetText}.`,
         );
     }
@@ -81,11 +93,12 @@ async function waitForLimitReset() {
     const waitMs = Math.max(MINUTE_MS, resumeTimeMs - Date.now() + MINUTE_MS);
     const resumeText = formatTime(Date.now() + waitMs);
 
-    await discord.send(`🛑 **Usage limit reached.** Resuming at ${resumeText}.`);
+    await announce(`🛑 **Usage limit reached.** Resuming at ${resumeText}.`);
+    statusFile.setState(`Waiting for the usage limit to reset, until ${resumeText}.`);
     await sleep(waitMs);
 
     rateLimits.clearAfterReset();
-    await discord.send('▶️ Limit reset, resuming.');
+    await announce('▶️ Limit reset, resuming.');
 }
 
 // Reads the stage names from the plan's table, such as "The model" for stage 1.
@@ -111,7 +124,8 @@ async function reportStep(report: StatusReport, newCommits: string) {
         summary += ' (nothing committed)';
     }
 
-    await discord.send(`✅ **v1: ${percent}%** · ${stageText}\n${summary}`);
+    statusFile.setProgress(`**${percent}%** · ${stageText}.`);
+    await announce(`✅ **v1: ${percent}%** · ${stageText}\n${summary}`);
 }
 
 // The runner's own code changes when a session or the owner edits it. Restarting between
@@ -127,7 +141,7 @@ async function reportNeeds(report: StatusReport) {
     if (sentNeeds.has(report.needs)) return;
     sentNeeds.add(report.needs);
 
-    await discord.send(
+    await announce(
         `🔑 **Needs your password.** Run this, then the runner picks it up on its own:\n\`\`\`\n${report.needs}\n\`\`\``,
     );
 }
@@ -139,12 +153,16 @@ async function runOneStep() {
     const logFile = path.join(logFolder, `${startedAt}.jsonl`);
 
     console.log(`Session started, log in ${logFile}`);
+    statusFile.setState(`Running a session, started ${formatTime(Date.now())}. Its full output: \`${logFile}\`.`);
     const result = await runClaudeSession({
         projectFolder,
         prompt,
         logFile,
         rateLimits,
-        onRateLimitEvent: () => void sendLimitWarnings(),
+        onRateLimitEvent: () => {
+            statusFile.setUsage(rateLimits.describeUsage(formatTime));
+            void sendLimitWarnings();
+        },
     });
     console.log(`Session ended with code ${result.exitCode}`);
 
@@ -190,7 +208,7 @@ async function main() {
                 ? 'no output for 30 minutes'
                 : `exit code ${outcome.result.exitCode}`;
             const lastWords = outcome.result.finalText.slice(-600);
-            await discord.send(
+            await announce(
                 `❌ Session ended without a status (${reason}). Log: \`${outcome.logFile}\`\n\`\`\`\n${lastWords}\n\`\`\``,
             );
 
@@ -200,6 +218,7 @@ async function main() {
                 continue;
             }
 
+            statusFile.setState('Waiting 5 minutes after a session that ended without a status, then trying again.');
             await sleep(FAILURE_RETRY_MS);
             continue;
         }
@@ -217,7 +236,8 @@ async function main() {
         }
 
         if (report.status === 'finished') {
-            await discord.send('🎉 **v1 is finished.** Every stage of the plan is done. The runner stops.');
+            statusFile.setState('Finished: v1 is done, and the runner has stopped.');
+            await announce('🎉 **v1 is finished.** Every stage of the plan is done. The runner stops.');
             return;
         }
     }

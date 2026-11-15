@@ -40,6 +40,18 @@ export class RateLimitTracker {
         return Math.max(...resetTimes);
     }
 
+    describeUsage(formatTime: (timeMs: number) => string) {
+        const parts: string[] = [];
+
+        for (const window of this.windows) {
+            const percentUsed = Math.round(window.utilization * 100);
+            const resetText = formatTime(window.resetsAtMs);
+            parts.push(`${window.name}: ${percentUsed}% used, resets ${resetText}`);
+        }
+
+        return parts.join('; ');
+    }
+
     clearAfterReset() {
         this.windows = [];
     }

@@ -2,7 +2,7 @@
 
 A 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved (2026-11-14). The work goes stage by stage through `docs/plan.md`; `docs/progress.md` says which stage is current.
 
-Start at `docs/README.md`, then `docs/progress.md`.
+Start at `docs/README.md`, then `docs/progress.md`. To look after the runner, which builds the plan without the owner, start at `docs/runner/README.md` instead.
 
 ## Rules for working here
 

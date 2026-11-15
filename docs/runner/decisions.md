@@ -16,4 +16,5 @@ What the owner decided about the runner, newest last. The changes the runner mad
 | 2026-11-14 | Discord messages are one line of % and stage, then one plain sentence on what the step did | The owner wants them short and clear |
 | 2026-11-15 | The runner blocks the computer's idle sleep while it runs, and waits by the wall clock | The laptop slept through the night and the limit's reset, and the runner's timer didn't count the time asleep |
 | 2026-11-15 | The runner's docs live in `docs/runner/` in this repo, not in a project of its own | The owner's choice |
+| 2026-11-15 | The runner writes its own state into `docs/runner/status.md`, not in git | A session looking after the runner should learn everything from the docs, not from the journal, the logs and git |
 | 2026-11-15 | Keep the webhook for now; the Discord bot comes later | The owner's choice. The bot's open questions are in [progress.md](progress.md) |
