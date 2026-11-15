@@ -8,7 +8,7 @@ import { EntityDrawing } from './EntityDrawing.ts';
 import type { EntityDrawingOptions } from './EntityDrawing.ts';
 import { EntityNode } from './EntityNode.ts';
 
-// The level's caches the display reads. The editor's full set comes with EditorSession in stage 5.
+// The level's caches the display reads. DerivedCaches has them all.
 export type LevelDisplayCaches = {
     readonly pieces: PiecesCache;
     // Must follow the same level. Culling reads it.

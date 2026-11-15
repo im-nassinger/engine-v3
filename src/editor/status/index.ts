@@ -1,1 +1,1 @@
-export {};
+export { StatusText } from './StatusText.ts';

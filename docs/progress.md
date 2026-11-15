@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 5, step 1 of 11: stage 5's [steps](plan.md#stage-5-in-steps) and [choices](architecture/editor/README.md#stage-5s-choices) are written. Next is step 2, `Clock`, `Timer`, `StatusText` and `DerivedCaches`. The [runner](runner.md) keeps this line up to date.
+**Runner:** stage 5, step 2 of 11: `Clock`, `Timer`, `ManualClock`, `ManualTimer`, `StatusText` and `DerivedCaches` are built, and `app/startLevelView.ts` uses `DerivedCaches`. Next is step 3, `Selection` and `CurrentGroup`. The [runner](runner.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -117,7 +117,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 ## Next
 
 1. **Push** so CI runs for the first time on x86 and ARM (step 7 of stage 0). The [runner](runner.md) does it after its first step.
-2. **Stage 5 of [plan.md](plan.md#stage-5-in-steps): editing without a mouse.** Step 1 is done; each further step is built in one commit.
+2. **Stage 5 of [plan.md](plan.md#stage-5-in-steps): editing without a mouse.** Steps 1 and 2 are done; each further step is built in one commit.
 3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
