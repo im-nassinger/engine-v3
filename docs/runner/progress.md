@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**The runner is built and running** (since 2026-11-14) as the systemd user service `engine-v3-runner`. **Pushing fails** until the owner gives the GitHub login the `workflow` scope. **Next for the runner: a Discord bot** to replace the webhook, waiting for the owner's answers below.
+**The runner is built and running** (since 2026-11-14) as the systemd user service `engine-v3-runner`. **Pushing works** since 2026-11-15, after the owner gave the GitHub login the `workflow` scope. **Next for the runner: a Discord bot** to replace the webhook, waiting for the owner's answers below.
 
 ## Where it stands
 
@@ -11,11 +11,10 @@
 | The loop, the prompt, the Discord webhook messages | Done, running |
 | Detecting the usage limit and waiting for the reset | Built; not yet seen hitting a real limit |
 | Restarting itself when its own code changes | Done |
-| Pushing after each step | Fails, see below |
+| Pushing after each step | Works since 2026-11-15. The first push started CI |
 
 ## Known issues
 
-- **Push is refused:** the commits include `.github/workflows/`, and the GitHub token has no `workflow` scope. Fix, by the owner: `gh auth refresh -h github.com -s workflow`. Each session's push then sends every waiting commit.
 - **The laptop must stay awake.** On 2026-11-15 it went to sleep on battery at 00:23 and woke at 10:19, so nothing ran overnight. The runner now blocks sleep when the computer is idle, but closing the lid still sleeps it, and on battery it can run flat. Keep it plugged in with the lid open.
 - **The systemd unit names Node 26.13.0 from nvm.** After a Node upgrade, update `tools/runner/engine-v3-runner.service` and run `systemctl --user daemon-reload`.
 
