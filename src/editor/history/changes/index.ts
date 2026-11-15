@@ -8,3 +8,6 @@ export type { SetValueChangeOptions } from './SetValueChange.ts';
 export { AddEntitiesChange } from './AddEntitiesChange.ts';
 export { RemoveEntitiesChange } from './RemoveEntitiesChange.ts';
 export type { SubtreeCopyOptions } from './SubtreeCopy.ts';
+export { AddComponentChange } from './AddComponentChange.ts';
+export { RemoveComponentChange } from './RemoveComponentChange.ts';
+export type { ComponentChangeOptions } from './componentOnEntity.ts';

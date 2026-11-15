@@ -1,12 +1,15 @@
 export {
+    AddComponentChange,
     AddEntitiesChange,
     MoveEntityChange,
+    RemoveComponentChange,
     RemoveEntitiesChange,
     RenameLevelChange,
     SetSwitchChange,
     SetValueChange,
 } from './changes/index.ts';
 export type {
+    ComponentChangeOptions,
     LevelChange,
     MoveEntityChangeOptions,
     SetValueChangeOptions,
