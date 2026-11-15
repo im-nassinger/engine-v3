@@ -152,6 +152,12 @@ The Select tool holds one **drag state** at a time (the State pattern):
 | `BoxSelectState` | Pressing empty space and moving | Selects everything the box touches |
 | `PointEditState` | Double-clicking a polygon or line | Esc. Each point drag, add or delete is one step |
 
+- **`IdleState`, `PressState` and `BoxSelectState` as built** (standing yes, 2026-11-15):
+  - **An unselected entity is selected on the press**, so the drag that follows moves it; a selected one narrows on release, as the press table says. Shift waits for the release and toggles; Shift+click on empty space changes nothing. *Why: the table selects an unselected entity for both a click and a drag, so doing it at once makes the Inspector follow at once.*
+  - **The selection box selects on release**, not while dragged: Shift is read at the press (it decides a box over a move), Ctrl at the release. The box is published as `selectionBox` for the overlay. *Why: one selection change per box, and step 15's speed test drags at 10,000 entities.*
+  - `SelectionPicker` asks the `HitTester` with the zoom and the current group at that moment; **`OpenLevel` holds the `HitTester`**, built on `LinearSpatialIndex` with the session's `ViewSettings`, so a replaced level gets its own.
+  - **A double-click goes into what it selects when the hit lies deeper** (a group, hit through a child) **or when it is the camera**, and then selects the child under the mouse. A double-click outside the current group, or on empty space inside it, goes up one group and selects the group left, as Esc does. The first click of the two has already selected. *Why: groups are hit only through their children, so "deeper than what it selects" is exactly "a group".*
+  - A drag on an entity only selects it until step 8's `MoveState`. Esc during a press or a box goes back to idle and the release is ignored. Only the left button selects.
 - **The handles' frame** (`SelectionFrame`) follows a single entity's rotation and is axis-aligned for several. Handles stay the same size on screen, and hide during a drag while a readout shows the distance, size or angle.
 - **In v1 several entities only move together**; their frame shows no resize or rotate handles (v3 adds them).
 - Resizing never rests at zero: on release each side is at least 1 px. Dragging past the opposite side mirrors the entity.

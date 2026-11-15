@@ -52,6 +52,7 @@ export class EditorSession {
             frames: options.frames,
             registry: this.registry,
             cardFolds: this.cardFolds,
+            viewSettings: this.viewSettings,
         };
         this.current = new OpenLevel(options.level, this.services);
     }

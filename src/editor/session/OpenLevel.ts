@@ -3,11 +3,13 @@ import { DerivedCaches } from '../../core/derived/index.ts';
 import type { Level } from '../../core/level/index.ts';
 import { EntitiesRows, RenameRequest, RowClicks, SelectionReveal } from '../entities-panel/index.ts';
 import { History, LevelEditor, LiveEdit } from '../history/index.ts';
+import { HitTester, LinearSpatialIndex } from '../hit-testing/index.ts';
 import { InspectorModel } from '../inspector/index.ts';
 import type { CardFolds } from '../inspector/index.ts';
 import { createV1Rules, EditorMessages } from '../messages/index.ts';
 import { Selection } from '../selection/index.ts';
 import type { Clock, FrameScheduler } from '../time/index.ts';
+import type { ViewSettings } from '../view/index.ts';
 
 import { CurrentGroup } from './CurrentGroup.ts';
 
@@ -18,6 +20,8 @@ export type OpenLevelServices = {
     readonly frames: FrameScheduler;
     readonly registry: ComponentRegistry;
     readonly cardFolds: CardFolds;
+    // The hit tester reads whether the camera frame and joint icons are shown.
+    readonly viewSettings: ViewSettings;
 };
 
 // The level open in the editor with everything that belongs to it. New and Import replace it as one
@@ -39,6 +43,8 @@ export class OpenLevel {
     readonly liveEdit: LiveEdit;
     readonly messages: EditorMessages;
     readonly inspector: InspectorModel;
+    // What is under the mouse, for the tools.
+    readonly hitTester: HitTester;
 
     constructor(level: Level, services: OpenLevelServices) {
         this.level = level;
@@ -66,6 +72,8 @@ export class OpenLevel {
             folds: services.cardFolds,
             messages: this.messages,
         });
+        const index = new LinearSpatialIndex(level);
+        this.hitTester = new HitTester(level, this.caches, index, services.viewSettings);
     }
 
     // Stops everything here following the level.

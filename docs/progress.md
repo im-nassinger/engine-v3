@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 9, step 6 of 16 is done: the tool contract, `ToolController` with tool lock and returning to Select, `PanGesture` (Space held, middle drag), `EscapeChain` in the requirement's order, and `ShortcutDispatcher` taking Esc, the tools' number keys and Space, with 1068 tests in Node; the page wiring waits for step 12. Next is step 7: the Select tool's `IdleState`, `PressState` and `BoxSelectState`. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 9, step 7 of 16 is done: the Select tool's `IdleState`, `PressState` and `BoxSelectState`: the press table, Shift, Ctrl's box inside groups and the double-click table, through `SelectionPicker` and the `HitTester` now on `OpenLevel`, with 1094 tests in Node. Next is step 8: `MoveState` and nudges. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
