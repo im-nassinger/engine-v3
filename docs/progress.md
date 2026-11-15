@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 3, step 0 of 0: its steps aren't written yet, and writing them is the next step. The [runner](runner.md) keeps this line up to date.
+**Runner:** stage 3, step 1 of 8: its [steps](plan.md#stage-3-in-steps) are written; `DeterministicMath.exp` and `Units` are next. The [runner](runner.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -99,7 +99,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 ## Next
 
 1. **Push** so CI runs for the first time on x86 and ARM (step 7 of stage 0). The [runner](runner.md) does it after its first step.
-2. **Stage 3 of [plan.md](plan.md): geometry.** Its steps are written into the docs first, then built one per commit.
+2. **Stage 3 of [plan.md](plan.md): geometry.** Its [steps](plan.md#stage-3-in-steps) are written; they are built one per commit.
 3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

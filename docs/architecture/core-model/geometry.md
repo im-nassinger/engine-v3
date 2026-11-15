@@ -45,7 +45,7 @@ export class Matrix2D {
 ## Bounds
 
 - `Bounds` is an axis-aligned rectangle in level positions.
-- **An entity's own bounds** cover what it draws, its outline included (half the outline width beyond the shape), or, with no StyleComponent, its shape's edge. A joint's bounds are its icon's, the camera's its frame's.
+- **An entity's own bounds** cover what it draws, its outline included (half the outline width beyond the shape), or, with no StyleComponent, its shape's edge. A joint's bounds are its icon's, the camera's its frame's. Stage 3 builds every kind but the joint's, which comes with the joint icons in stage 4, because the icon's size is a drawing choice (standing yes, 2026-11-14).
 - **Subtree bounds** are the union of its own and its children's. Hit testing, the selection box, culling and F (zoom to selection) all read `BoundsCache`.
 
 ## The polygon pipeline
@@ -55,7 +55,7 @@ export class Matrix2D {
 | Shape | Pieces |
 |---|---|
 | Rectangle | One 4-point piece |
-| Ellipse with equal width and height | One circle. It stays a circle in play only if the entity's level matrix scales it evenly with no skew; otherwise the many-sided polygon below |
+| Ellipse with equal width and height | One circle. It stays a circle in play only if the entity's level matrix scales it evenly with no skew; otherwise the many-sided polygon below, which the play copy asks `ShapePieces` for (standing yes, 2026-11-14: the cache keeps only the circle, because whether the matrix is even is known only in play) |
 | Any other ellipse | A polygon of **32 points**, a fixed count because it affects determinism, then the polygon steps below |
 | Polygon (closed, may cross itself) | Steps 1 to 5 below |
 | Line (open) | A cleaned chain, see below. Never pieces |
@@ -65,11 +65,13 @@ Polygon steps:
 1. **Clean.** Merge points closer than 0.25 px, drop points lying on the straight line between their neighbours. The tech notes warn that such points break convex splitting.
 2. **Fill every enclosed area.** The polygon library unions the outline with itself (non-zero rule), which cuts it at its crossings. Every outer outline it returns is kept; every hole it returns is dropped, because the requirement fills every enclosed area and polygons have no holes. A figure-of-eight gives two outlines; a star drawn in one stroke gives its outline with the middle filled.
 3. **Triangulate** each outline with the polygon library.
-
-**The polygon library** (owner, 2026-11-14): stage 3 tries `clipper2-ts` first, because `clipper2-js` 1.2.4 has no triangulation. It must triangulate, pass the determinism tests, and never reach a banned `Math` function from the functions core calls. If it fails, the owner is asked again.
 4. **Merge triangles into convex pieces** of at most 8 points (Hertel-Mehlhorn: remove a shared edge whenever the result stays convex and has 8 points or fewer).
 5. **Drop pieces too small to collide**: under 1 px on their short side, the requirement's limit.
 
+**The polygon library** (owner, 2026-11-14): stage 3 tries `clipper2-ts` first, because `clipper2-js` 1.2.4 has no triangulation. It must triangulate, pass the determinism tests, and never reach a banned `Math` function from the functions core calls. If it fails, the owner is asked again.
+
+- **`PolygonLibrary` is the only file that imports it** (standing yes, 2026-11-14), in `core/geometry`, with two functions: fill every enclosed area, and triangulate. It uses only the whole-number functions (`union` and `triangulate` on `Paths64`), never the `D` ones, which call `Math.pow`. *Why: one file to change if the library is swapped, and the whole-number path is the one that is the same on every computer.*
+- **A first look at `clipper2-ts` 2.0.1-19** (2026-11-14): its triangulation calls `Math.atan2` once, in `getLocMinAngle`, and only compares the result with 0. That comparison depends only on the signs of its two whole-number inputs, which IEEE 754 fixes on every computer, so it doesn't break determinism. Step 3 of [stage 3](../../plan.md#stage-3-in-steps) checks this with a test before the library is accepted. Its triangulation is marked beta.
 - Clipper2 works in whole numbers internally (coordinates scaled by 1,000), so steps 2 and 3 give the same result on every computer. Steps 1, 4 and 5 use only `+ − × ÷` and comparisons.
 - **Drawing uses step 2's outlines** for the fill, which avoids the self-crossing fill artefacts the tech notes warn about, and the original outline for the outline. **Box2D and the physics view use step 5's pieces.** Hit testing uses step 2's outlines.
 - In play, each piece is moved into its body's space by one matrix. A matrix keeps a convex piece convex. A mirrored matrix flips the order of the points, so the pieces are reversed to keep the order Box2D expects.
@@ -81,7 +83,7 @@ Polygon steps:
 ## Mass
 
 - `MassProperties.of(pieces, density)` returns area, mass and centre of mass. Mass is area in square metres times density: a 100 px square at density 1 is 2 m × 2 m = 4 kg, as the requirement's example says.
-- The BodyComponent's read-only Mass adds up every surface that belongs to the body, merged shapes included. The tech notes require editor mass to come from shared geometry code, not from the physics engine, so it matches play.
+- The BodyComponent's read-only Mass adds up every surface that belongs to the body, merged shapes included. Stage 3 builds `MassProperties.combine`, which adds several up; which surfaces belong to a body is `BodyMass` in `core/physics`, built by the first stage that shows Mass, the Inspector's (standing yes, 2026-11-14: the merging rules it follows belong to `core/physics`). The tech notes require editor mass to come from shared geometry code, not from the physics engine, so it matches play.
 - A Dynamic body whose surfaces add up to 0 kg is given 1 kg when the body is built, as the tech notes advise.
 
 ## DeterministicMath
@@ -99,5 +101,5 @@ export class DeterministicMath {
 - Built only from `+ − × ÷` and `Math.sqrt`, which IEEE 754 defines exactly, so every computer gives the same bits. `Math.sin` and friends are not exactly defined and may differ between browsers and processors.
 - Used by everything that runs during a tick and by everything that builds the play copy: ellipse points, the matrices of bodies, camera smoothing (`exp`), joint angles. An ESLint rule bans `Math.sin`, `Math.cos`, `Math.atan2`, `Math.exp`, `Math.pow` and `Math.random` in `src/core`, see [parts-and-folders.md](../parts-and-folders.md).
 - Box2D does its own trigonometry inside the wasm build, which is the same everywhere.
-- Accuracy target: within 1e-12 of `Math` over the range the game uses, checked by a test. Exactness matters less than sameness.
+- Accuracy target: within 1e-12 of `Math` over the range the game uses, checked by a test. For `exp` that is relative, over −700 to 700, where the result neither overflows nor reaches 0 (standing yes, 2026-11-14). Exactness matters less than sameness.
 - Random numbers (v2) come from `SeededRandom` in the same module: a small integer generator (xoshiro128**) seeded from the run's seed.
