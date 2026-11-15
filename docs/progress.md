@@ -2,11 +2,11 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**; the [runner](runner.md) pushes after each step. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **The owner gave a standing yes** (2026-11-14): Claude decides the smaller questions and keeps building without waiting, listing each decision in [decisions.md](decisions.md). Round 10 was settled that way. **Stage 2, the v1 components and the file format, is built** (2026-11-14): all ten v1 components, the registry, `level.json` with `LevelWriter` and `LevelReader`, with 418 tests. **Stage 3, geometry, is built** (2026-11-14): `exp`, `Units`, the polygon pipeline with `clipper2-ts` filling and the game's own `EarClipping` triangulating, lines, mass and the two caches, with 512 tests. **Stage 4, drawing a level, is built** (2026-11-15): `ViewState`, `ViewSettings`, `PixiLevelView` with PixiJS 8, `LevelDisplay`, culling and all five overlays (grid, bounds, camera frame, joint icons, physics view), and the page draws a test level, with 564 unit tests, 126 browser tests in three browsers and 3 Playwright tests. **Stage 5, editing without a mouse, is next.**
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**; the [runner](runner.md) pushes after each step. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **The owner gave a standing yes** (2026-11-14): Claude decides the smaller questions and keeps building without waiting, listing each decision in [decisions.md](decisions.md). Round 10 was settled that way. **Stage 2, the v1 components and the file format, is built** (2026-11-14): all ten v1 components, the registry, `level.json` with `LevelWriter` and `LevelReader`, with 418 tests. **Stage 3, geometry, is built** (2026-11-14): `exp`, `Units`, the polygon pipeline with `clipper2-ts` filling and the game's own `EarClipping` triangulating, lines, mass and the two caches, with 512 tests. **Stage 4, drawing a level, is built** (2026-11-15): `ViewState`, `ViewSettings`, `PixiLevelView` with PixiJS 8, `LevelDisplay`, culling and all five overlays (grid, bounds, camera frame, joint icons, physics view), and the page draws a test level, with 564 unit tests, 126 browser tests in three browsers and 3 Playwright tests. **Stage 5, editing without a mouse, is under way:** its eleven steps are written into [plan.md](plan.md#stage-5-in-steps).
 
 ## Where things stand
 
-**Runner:** stage 4, step 9 of 9: stage 4 is done and written up. Next is stage 5, whose first step writes its steps into [plan.md](plan.md). The [runner](runner.md) keeps this line up to date.
+**Runner:** stage 5, step 1 of 11: stage 5's [steps](plan.md#stage-5-in-steps) and [choices](architecture/editor/README.md#stage-5s-choices) are written. Next is step 2, `Clock`, `Timer`, `StatusText` and `DerivedCaches`. The [runner](runner.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -25,7 +25,7 @@
 | The stage 2 plan | Approved under the standing yes on 2026-11-14, with round 10, and written into the [architecture](architecture/README.md) |
 | Stage 3, geometry | Done on 2026-11-14. See below |
 | Stage 4, drawing a level | Done on 2026-11-15. See below |
-| Code | Stages 0 to 4 done. Stage 5, editing without a mouse, is next |
+| Code | Stages 0 to 4 done. Stage 5, editing without a mouse, is under way |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -117,7 +117,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 ## Next
 
 1. **Push** so CI runs for the first time on x86 and ARM (step 7 of stage 0). The [runner](runner.md) does it after its first step.
-2. **Stage 5 of [plan.md](plan.md): editing without a mouse.** Its first step writes its steps into the plan; each step is then built in one commit.
+2. **Stage 5 of [plan.md](plan.md#stage-5-in-steps): editing without a mouse.** Step 1 is done; each further step is built in one commit.
 3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
