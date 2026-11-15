@@ -38,7 +38,8 @@ export class OpenLevel {
     readonly currentGroup: CurrentGroup;
     readonly history: History;
     readonly editor: LevelEditor;           // runs edit transactions, see history.md
-    // later: messages: EditorMessages (stage 8), hitTester: HitTester (stage 9)
+    readonly messages: EditorMessages;      // see inspector-and-entities.md
+    // later: hitTester: HitTester (stage 9)
 }
 
 // The commands are built on top of the session, not held by it (see "As built, step 7" below).

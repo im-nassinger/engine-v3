@@ -2,13 +2,13 @@ import { JointComponent, NameComponent, PathComponent, TransformComponent } from
 import { Level } from '../../../core/level/index.ts';
 import { LevelWriter } from '../../../core/level-data/index.ts';
 import { EditorSession } from '../../session/index.ts';
-import type { Clock, Timer } from '../../time/index.ts';
+import type { Clock, FrameScheduler, Timer } from '../../time/index.ts';
 import { createCommandRegistry } from '../createCommandRegistry.ts';
 import type { EditorCommand } from '../EditorCommand.ts';
 
 // A group holding a skewed child, a square, and a rope from the child to the square, top row first:
 // rope, square, group. The test passes in editor/time's fakes, which only tests may import.
-export function buildCommandTestSession(clock: Clock, timer: Timer) {
+export function buildCommandTestSession(clock: Clock, timer: Timer, frames: FrameScheduler) {
     const level = Level.createNew();
 
     const group = level.createEntity(level.world, 0);
@@ -33,7 +33,7 @@ export function buildCommandTestSession(clock: Clock, timer: Timer) {
     rope.addComponent(new JointComponent({ ...JointComponent.schema.defaults(), a: child.id, b: square.id }));
     rope.addComponent(new PathComponent());
 
-    const session = new EditorSession({ level, clock, timer });
+    const session = new EditorSession({ level, clock, timer, frames });
     const registry = createCommandRegistry(session);
 
     function requireCommand(id: string): EditorCommand {

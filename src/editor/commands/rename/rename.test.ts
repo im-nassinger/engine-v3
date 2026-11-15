@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import { NameComponent } from '../../../core/components/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
-import { ManualTimer } from '../../time/testing/index.ts';
+import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { buildCommandTestSession, expectRoundTrip } from '../testing/commandTestSession.ts';
 
 import { renameEntity } from './renameEntity.ts';
@@ -11,7 +11,7 @@ import { renameLevel } from './renameLevel.ts';
 function buildSession() {
     const timer = new ManualTimer();
 
-    return buildCommandTestSession(timer.clock, timer);
+    return buildCommandTestSession(timer.clock, timer, new ManualFrames());
 }
 
 function nameOf(entity: Entity) {

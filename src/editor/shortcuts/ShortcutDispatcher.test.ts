@@ -5,7 +5,7 @@ import { CommandRegistry, CommandRunner, createCommandRegistry } from '../comman
 import type { Availability, EditorCommand, ShortcutScope } from '../commands/index.ts';
 import { EditorSession } from '../session/index.ts';
 import { StatusText } from '../status/index.ts';
-import { ManualTimer } from '../time/testing/index.ts';
+import { ManualFrames, ManualTimer } from '../time/testing/index.ts';
 
 import type { KeyboardInputData } from './KeyboardInputData.ts';
 import { ShortcutDispatcher } from './ShortcutDispatcher.ts';
@@ -208,7 +208,7 @@ describe('ShortcutDispatcher', () => {
     test("the editor's own keys work through the registry: holding + zooms in again", () => {
         const timer = new ManualTimer();
         const level = Level.createNew();
-        const session = new EditorSession({ level, clock: timer.clock, timer });
+        const session = new EditorSession({ level, clock: timer.clock, timer, frames: new ManualFrames() });
         const registry = createCommandRegistry(session);
         const runner = new CommandRunner(session.status);
         const dispatcher = new ShortcutDispatcher(registry, runner, 'other');

@@ -5,7 +5,7 @@ import { Level } from '../../../core/level/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { buildCommandTestSession, expectRoundTrip } from '../testing/commandTestSession.ts';
 import { labelName } from '../../../core/level/index.ts';
-import { ManualTimer } from '../../time/testing/index.ts';
+import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { levelMatrixOf, matrixDifference } from '../testing/levelMatrices.ts';
 
 function addBox(level: Level, x: number, y: number) {
@@ -20,7 +20,7 @@ function addBox(level: Level, x: number, y: number) {
 function buildSession() {
     const timer = new ManualTimer();
 
-    return buildCommandTestSession(timer.clock, timer);
+    return buildCommandTestSession(timer.clock, timer, new ManualFrames());
 }
 
 describe('Group', () => {

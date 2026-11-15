@@ -4,7 +4,7 @@ import { Level } from '../../core/level/index.ts';
 import { CommandRegistry, createCommandRegistry } from '../commands/index.ts';
 import type { EditorCommand, ShortcutScope } from '../commands/index.ts';
 import { EditorSession } from '../session/index.ts';
-import { ManualTimer } from '../time/testing/index.ts';
+import { ManualFrames, ManualTimer } from '../time/testing/index.ts';
 
 import { BROWSER_KEYS, CTRL_ALT_ALLOWED } from './browserKeys.ts';
 import { KeyChord } from './KeyChord.ts';
@@ -15,7 +15,7 @@ import { US_KEYS } from './testing/recordedKeys.ts';
 function editorShortcutMap() {
     const timer = new ManualTimer();
     const level = Level.createNew();
-    const session = new EditorSession({ level, clock: timer.clock, timer });
+    const session = new EditorSession({ level, clock: timer.clock, timer, frames: new ManualFrames() });
     const registry = createCommandRegistry(session);
 
     return ShortcutMap.fromRegistry(registry);

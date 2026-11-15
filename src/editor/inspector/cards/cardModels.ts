@@ -2,12 +2,14 @@ import { TransformComponent } from '../../../core/components/index.ts';
 import type { AnyComponent, ComponentTypeName } from '../../../core/components/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import type { BodyMassCaches } from '../../../core/physics/index.ts';
+import type { EditorMessages } from '../../messages/index.ts';
 
 import type { CardFolds } from '../folds/CardFolds.ts';
 import { firstRefusal } from '../model/Availability.ts';
 import type { CardModel } from '../model/CardModel.ts';
 import { isWorld, removeAvailability, resetAvailability } from '../rules/componentRules.ts';
 
+import { cardNotes } from './cardNotes.ts';
 import { componentOfType } from './componentValues.ts';
 import { fieldModels } from './fieldModels.ts';
 import type { HeldComponents } from './fieldModels.ts';
@@ -15,6 +17,7 @@ import type { HeldComponents } from './fieldModels.ts';
 export type CardSources = {
     readonly folds: CardFolds;
     readonly caches: BodyMassCaches;
+    readonly messages: EditorMessages;
 };
 
 // A card for each component every shown entity has, in the fixed card order. The World's
@@ -66,6 +69,7 @@ function cardModel(held: HeldComponents, sources: CardSources): CardModel {
     const canRemove = firstRefusal(removals);
     const canReset = resetAvailability(held.schema);
     const isFolded = sources.folds.isFolded(held.schema.typeName);
+    const notes = cardNotes(held.entities, held.schema.typeName, sources.messages);
 
-    return { typeName: held.schema.typeName, isFolded, fields, canRemove, canReset };
+    return { typeName: held.schema.typeName, isFolded, fields, canRemove, canReset, notes };
 }

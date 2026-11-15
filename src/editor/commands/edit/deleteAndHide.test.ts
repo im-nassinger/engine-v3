@@ -1,13 +1,13 @@
 import { describe, expect, test } from 'vitest';
 
 import { JointComponent, NameComponent, TransformComponent } from '../../../core/components/index.ts';
-import { ManualTimer } from '../../time/testing/index.ts';
+import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { buildCommandTestSession, expectRoundTrip } from '../testing/commandTestSession.ts';
 
 function buildSession() {
     const timer = new ManualTimer();
 
-    return buildCommandTestSession(timer.clock, timer);
+    return buildCommandTestSession(timer.clock, timer, new ManualFrames());
 }
 
 describe('Delete', () => {

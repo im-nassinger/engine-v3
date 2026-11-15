@@ -4,7 +4,7 @@ import { NameComponent, TransformComponent } from '../../../core/components/inde
 import { Level } from '../../../core/level/index.ts';
 import { SetSwitchChange } from '../../history/index.ts';
 import { EditorSession } from '../../session/index.ts';
-import { ManualTimer } from '../../time/testing/index.ts';
+import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { createCommandRegistry } from '../createCommandRegistry.ts';
 
 function buildSession() {
@@ -21,7 +21,7 @@ function buildSession() {
     square.addComponent(new TransformComponent());
     square.addComponent(new NameComponent({ name: 'Square' }));
 
-    const session = new EditorSession({ level, clock: timer.clock, timer });
+    const session = new EditorSession({ level, clock: timer.clock, timer, frames: new ManualFrames() });
     const registry = createCommandRegistry(session);
 
     return { session, registry, level, group, child, square };
@@ -122,7 +122,12 @@ describe('Select all', () => {
 
     test('is disabled with nothing to select', () => {
         const timer = new ManualTimer();
-        const session = new EditorSession({ level: Level.createNew(), clock: timer.clock, timer });
+        const session = new EditorSession({
+            level: Level.createNew(),
+            clock: timer.clock,
+            timer,
+            frames: new ManualFrames(),
+        });
         const selectAll = requireCommand(createCommandRegistry(session), 'edit.selectAll');
 
         expect(selectAll.availability()).toEqual({ enabled: false, reason: 'Nothing to select' });

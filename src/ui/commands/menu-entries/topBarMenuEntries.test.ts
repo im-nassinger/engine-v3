@@ -2,14 +2,19 @@ import { describe, expect, test } from 'vitest';
 import { Level } from '../../../core/level/index.ts';
 import { CommandRunner, createCommandRegistry } from '../../../editor/commands/index.ts';
 import { EditorSession } from '../../../editor/session/index.ts';
-import { ManualClock, ManualTimer } from '../../../editor/time/testing/index.ts';
+import { ManualClock, ManualFrames, ManualTimer } from '../../../editor/time/testing/index.ts';
 import type { MenuItem } from '../../shared/index.ts';
 import type { EditorCommands } from '../context/EditorCommands.ts';
 
 import { helpMenuEntries, viewMenuEntries, zoomMenuEntries } from './topBarMenuEntries.ts';
 
 function editorCommands() {
-    const session = new EditorSession({ level: Level.createNew(), clock: new ManualClock(), timer: new ManualTimer() });
+    const session = new EditorSession({
+        level: Level.createNew(),
+        clock: new ManualClock(),
+        timer: new ManualTimer(),
+        frames: new ManualFrames(),
+    });
     const registry = createCommandRegistry(session);
     const runner = new CommandRunner(session.status);
     const commands: EditorCommands = { registry, runner, platform: 'other' };

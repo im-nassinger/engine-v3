@@ -7,6 +7,7 @@ import type {
 import type { Unit } from '../../../core/fields/index.ts';
 
 import type { Availability } from './Availability.ts';
+import type { CardNote } from './CardNote.ts';
 
 // A value the Inspector adds to a card that isn't the component's own. v1 has one: the BodyComponent's Mass.
 export type ReadOnlyRow = {
@@ -48,4 +49,6 @@ export type CardModel = {
     readonly fields: readonly FieldModel[];
     readonly canRemove: Availability;
     readonly canReset: Availability;
+    // The editor messages about this component, such as a missing partner's note with its fix.
+    readonly notes: readonly CardNote[];
 };

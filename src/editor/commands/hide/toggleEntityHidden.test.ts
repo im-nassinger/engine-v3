@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { ManualTimer } from '../../time/testing/index.ts';
+import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { buildCommandTestSession, expectRoundTrip } from '../testing/commandTestSession.ts';
 
 import { toggleEntityHidden } from './toggleEntityHidden.ts';
@@ -8,7 +8,7 @@ import { toggleEntityHidden } from './toggleEntityHidden.ts';
 function buildSession() {
     const timer = new ManualTimer();
 
-    return buildCommandTestSession(timer.clock, timer);
+    return buildCommandTestSession(timer.clock, timer, new ManualFrames());
 }
 
 describe('toggleEntityHidden', () => {

@@ -13,7 +13,9 @@ import {
 import { DerivedCaches } from '../../../core/derived/index.ts';
 import { Level } from '../../../core/level/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
+import { createV1Rules, EditorMessages } from '../../messages/index.ts';
 import { Selection } from '../../selection/index.ts';
+import { ManualFrames } from '../../time/testing/index.ts';
 
 import { CardFolds } from '../folds/CardFolds.ts';
 import type { CardModel, FieldModel } from '../model/CardModel.ts';
@@ -39,9 +41,11 @@ function buildModel() {
     const selection = new Selection(level);
     const caches = new DerivedCaches(level);
     const folds = new CardFolds();
-    const model = new InspectorModel({ level, selection, caches, registry: createV1Registry(), folds });
+    const frames = new ManualFrames();
+    const messages = new EditorMessages(level, createV1Rules(), frames);
+    const model = new InspectorModel({ level, selection, caches, registry: createV1Registry(), folds, messages });
 
-    return { level, crate, other, selection, folds, model };
+    return { level, crate, other, selection, folds, frames, model };
 }
 
 function cardTypes(model: InspectorModel) {
@@ -333,6 +337,55 @@ describe('InspectorModel: version', () => {
 
         selection.replace([crate.id]);
 
+        expect(model.version.version).toBe(before);
+    });
+});
+
+describe('InspectorModel: notes', () => {
+    test("removing a crate's ShapeComponent puts its note on the SurfaceComponent card, with its fix", () => {
+        const { crate, selection, frames, model } = buildModel();
+        selection.replace([crate.id]);
+        crate.removeComponent(ShapeComponent);
+        const before = model.version.version;
+
+        frames.runFrame();
+
+        expect(model.version.version).toBeGreaterThan(before);
+        expect(requireCard(model, 'SurfaceComponent').notes).toEqual([
+            {
+                kind: 'warning',
+                text: 'Needs a ShapeComponent to collide.',
+                fieldKey: undefined,
+                fix: { kind: 'addComponent', label: 'Add ShapeComponent', componentType: 'ShapeComponent' },
+                entityIds: [crate.id],
+            },
+        ]);
+        expect(requireCard(model, 'BodyComponent').notes).toEqual([]);
+    });
+
+    test('the same note on several selected entities is one note for all of them', () => {
+        const { crate, other, selection, frames, model } = buildModel();
+        crate.removeComponent(ShapeComponent);
+        other.removeComponent(ShapeComponent);
+        frames.runFrame();
+
+        selection.replace([crate.id, other.id]);
+
+        const notes = requireCard(model, 'SurfaceComponent').notes;
+        expect(notes).toHaveLength(1);
+        expect(notes[0]?.entityIds).toEqual([crate.id, other.id]);
+    });
+
+    test("another entity's messages leave the version alone", () => {
+        const { crate, other, selection, frames, model } = buildModel();
+        selection.replace([crate.id]);
+        const before = model.version.version;
+
+        other.removeComponent(ShapeComponent);
+        const afterEdit = model.version.version;
+        frames.runFrame();
+
+        expect(afterEdit).toBe(before);
         expect(model.version.version).toBe(before);
     });
 });

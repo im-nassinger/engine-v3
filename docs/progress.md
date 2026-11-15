@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 8, step 7 of 14: `CardFolds` and `InspectorModel` are built: the header, the cards with `Mixed`, greyed and hidden fields, Mass, and Add Component's and Remove's reasons. Next is step 8, `EditorMessages`, `MissingPartnerRule` and `MissingEntityRule`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 8, step 8 of 14: `EditorMessages`, `MissingPartnerRule` and `MissingEntityRule` are built, with the cards' notes and their fix. Next is step 9, the `Inspector` in `ui/inspector`: the header, `Card` with its fold and `…` menu, the notes with their fix link, and Add Component's menu. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

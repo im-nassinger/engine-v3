@@ -6,7 +6,7 @@ import { Level } from '../../../../core/level/index.ts';
 import type { Entity } from '../../../../core/level/index.ts';
 import { CommandRunner, createCommandRegistry } from '../../../../editor/commands/index.ts';
 import { EditorSession } from '../../../../editor/session/index.ts';
-import { ManualClock, ManualTimer } from '../../../../editor/time/testing/index.ts';
+import { ManualClock, ManualFrames, ManualTimer } from '../../../../editor/time/testing/index.ts';
 import { CommandsContext } from '../../../commands/index.ts';
 import type { EditorCommands } from '../../../commands/index.ts';
 import { EditorContext } from '../../../EditorContext.tsx';
@@ -68,7 +68,7 @@ export function showPanel(level: Level) {
 export function createSession(level: Level) {
     const timer = new ManualTimer();
 
-    return new EditorSession({ level, clock: new ManualClock(), timer });
+    return new EditorSession({ level, clock: new ManualClock(), timer, frames: new ManualFrames() });
 }
 
 export function mountPanel(session: EditorSession) {

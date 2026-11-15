@@ -46,10 +46,12 @@ export class EditorComposition {
     }
 
     static async create() {
+        const frames = new AnimationFrames();
         const session = new EditorSession({
             level: Level.createNew(),
             clock: new SystemClock(),
             timer: new BrowserTimer(),
+            frames,
         });
         const commands = createCommandRegistry(session);
         const runner = new CommandRunner(session.status);
@@ -57,7 +59,7 @@ export class EditorComposition {
         const levelView = await PixiLevelView.create({
             view: session.view,
             settings: session.viewSettings,
-            frames: new AnimationFrames(),
+            frames,
             pixelRatio: new DevicePixelRatio(),
             drawing: { showUnstyled: true },
         });

@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest';
 import { NameComponent, TransformComponent } from '../../core/components/index.ts';
 import { Level } from '../../core/level/index.ts';
 import { SetSwitchChange } from '../history/index.ts';
-import { ManualTimer } from '../time/testing/index.ts';
+import { ManualFrames, ManualTimer } from '../time/testing/index.ts';
 
 import { EditorSession } from './EditorSession.ts';
 
@@ -14,7 +14,7 @@ function buildSession() {
     square.addComponent(new TransformComponent());
     square.addComponent(new NameComponent({ name: 'Square' }));
 
-    const session = new EditorSession({ level, clock: timer.clock, timer });
+    const session = new EditorSession({ level, clock: timer.clock, timer, frames: new ManualFrames() });
 
     return { session, level, square };
 }

@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'vitest';
 
-import { ManualTimer } from '../../time/testing/index.ts';
+import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { buildCommandTestSession } from '../testing/commandTestSession.ts';
 
 function buildSession() {
     const timer = new ManualTimer();
-    const built = buildCommandTestSession(timer.clock, timer);
+    const built = buildCommandTestSession(timer.clock, timer, new ManualFrames());
     const rename = built.requireCommand('edit.rename');
 
     return { ...built, rename };

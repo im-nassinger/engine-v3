@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import { BodyComponent, ShapeComponent, SurfaceComponent, TransformComponent } from '../../../core/components/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
-import { ManualTimer } from '../../time/testing/index.ts';
+import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { buildCommandTestSession, expectRoundTrip } from '../testing/commandTestSession.ts';
 
 import { addComponent } from './addComponent.ts';
@@ -13,7 +13,7 @@ import { setFieldValue } from './setFieldValue.ts';
 // The square and the child as crates: a shape, a body and a surface each.
 function buildSession() {
     const timer = new ManualTimer();
-    const built = buildCommandTestSession(timer.clock, timer);
+    const built = buildCommandTestSession(timer.clock, timer, new ManualFrames());
 
     for (const crate of [built.square, built.child]) {
         crate.addComponent(new ShapeComponent());

@@ -6,7 +6,7 @@ import { VersionCounter } from '../../core/events/index.ts';
 import { CardFolds } from '../inspector/index.ts';
 import type { FoldStore } from '../inspector/index.ts';
 import { StatusText } from '../status/index.ts';
-import type { Clock, Timer } from '../time/index.ts';
+import type { Clock, FrameScheduler, Timer } from '../time/index.ts';
 import { ViewSettings, ViewState } from '../view/index.ts';
 
 import { OpenLevel } from './OpenLevel.ts';
@@ -16,6 +16,7 @@ export type EditorSessionOptions = {
     readonly level: Level;
     readonly clock: Clock;
     readonly timer: Timer;
+    readonly frames: FrameScheduler;
     readonly viewSettings?: ViewSettings;
     // The v1 components when left out.
     readonly registry?: ComponentRegistry;
@@ -45,7 +46,12 @@ export class EditorSession {
         this.reader = options.reader ?? createV1Reader(this.registry);
         this.status = new StatusText(options.timer);
         this.cardFolds = new CardFolds(options.foldStore);
-        this.services = { clock: options.clock, registry: this.registry, cardFolds: this.cardFolds };
+        this.services = {
+            clock: options.clock,
+            frames: options.frames,
+            registry: this.registry,
+            cardFolds: this.cardFolds,
+        };
         this.current = new OpenLevel(options.level, this.services);
     }
 

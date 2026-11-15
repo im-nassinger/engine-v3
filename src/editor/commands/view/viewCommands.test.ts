@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest';
 import { CameraComponent, NameComponent, ShapeComponent, TransformComponent } from '../../../core/components/index.ts';
 import { levelBoundsOf } from '../../../core/derived/index.ts';
 import type { Level } from '../../../core/level/index.ts';
-import { ManualTimer } from '../../time/testing/index.ts';
+import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { FIT_MARGIN_PX, MAX_ZOOM, MIN_ZOOM } from '../../view/index.ts';
 import type { ViewState } from '../../view/index.ts';
 import { buildCommandTestSession } from '../testing/commandTestSession.ts';
@@ -13,7 +13,7 @@ const VIEW_HEIGHT = 600;
 
 function buildSession() {
     const timer = new ManualTimer();
-    const built = buildCommandTestSession(timer.clock, timer);
+    const built = buildCommandTestSession(timer.clock, timer, new ManualFrames());
     built.session.view.setSize(VIEW_WIDTH, VIEW_HEIGHT);
 
     return built;

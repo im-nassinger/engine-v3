@@ -3,7 +3,8 @@ import type { ComponentRegistry } from '../../../core/components/index.ts';
 import type { DerivedCaches } from '../../../core/derived/index.ts';
 import { VersionCounter } from '../../../core/events/index.ts';
 import type { Unsubscribe } from '../../../core/events/index.ts';
-import type { Entity, Level, LevelUpdate } from '../../../core/level/index.ts';
+import type { Entity, EntityId, Level, LevelUpdate } from '../../../core/level/index.ts';
+import type { EditorMessages } from '../../messages/index.ts';
 import type { Selection } from '../../selection/index.ts';
 
 import { addableComponents } from '../cards/addableComponents.ts';
@@ -20,6 +21,7 @@ export type InspectorModelSources = {
     readonly caches: DerivedCaches;
     readonly registry: ComponentRegistry;
     readonly folds: CardFolds;
+    readonly messages: EditorMessages;
 };
 
 type Built = {
@@ -32,7 +34,8 @@ type Built = {
 // What the Inspector shows: the selected entities, or the World when nothing is selected. Worked out only
 // from the field schemas, so a new component needs no Inspector code. Built when read after a change.
 export class InspectorModel {
-    // Moves with the selection, the folds, and any change that can alter what is shown.
+    // Moves with the selection, the folds, the shown entities' messages, and any change that can alter what
+    // is shown.
     readonly version = new VersionCounter();
     private readonly sources: InspectorModelSources;
     private readonly unsubscribers: readonly Unsubscribe[];
@@ -51,7 +54,8 @@ export class InspectorModel {
         const unsubscribeSelection = sources.selection.version.subscribe(markChanged);
         const unsubscribeFolds = sources.folds.version.subscribe(markChanged);
         const unsubscribeUpdates = sources.level.signals.updated.subscribe((update) => this.follow(update));
-        this.unsubscribers = [unsubscribeSelection, unsubscribeFolds, unsubscribeUpdates];
+        const unsubscribeMessages = sources.messages.changed.subscribe((ids) => this.followMessages(ids));
+        this.unsubscribers = [unsubscribeSelection, unsubscribeFolds, unsubscribeUpdates, unsubscribeMessages];
     }
 
     get shownEntities(): readonly Entity[] {
@@ -85,9 +89,9 @@ export class InspectorModel {
         if (this.built?.atVersion === atVersion) return this.built;
 
         const entities = this.shownEntities;
-        const { folds, caches, registry } = this.sources;
+        const { folds, caches, registry, messages } = this.sources;
         const header = inspectorHeader(entities);
-        const cards = cardModels(entities, { folds, caches });
+        const cards = cardModels(entities, { folds, caches, messages });
         const addable = addableComponents(entities, registry);
         this.built = { atVersion, header, cards, addable };
 
@@ -130,6 +134,14 @@ export class InspectorModel {
                 return;
             case 'levelRenamed':
                 return;
+        }
+    }
+
+    // Only the shown entities' own messages are on their cards.
+    private followMessages(ids: ReadonlySet<EntityId>) {
+        const touchesShown = this.shownEntities.some((entity) => ids.has(entity.id));
+        if (touchesShown) {
+            this.version.increment();
         }
     }
 

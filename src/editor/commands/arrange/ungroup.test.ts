@@ -2,13 +2,13 @@ import { describe, expect, test } from 'vitest';
 
 import { BodyComponent, JointComponent, NameComponent, TransformComponent } from '../../../core/components/index.ts';
 import { buildCommandTestSession, expectRoundTrip } from '../testing/commandTestSession.ts';
-import { ManualTimer } from '../../time/testing/index.ts';
+import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { levelMatrixOf, matrixDifference } from '../testing/levelMatrices.ts';
 
 function buildSession() {
     const timer = new ManualTimer();
 
-    return buildCommandTestSession(timer.clock, timer);
+    return buildCommandTestSession(timer.clock, timer, new ManualFrames());
 }
 
 describe('Ungroup', () => {

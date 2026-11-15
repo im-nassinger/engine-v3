@@ -5,14 +5,17 @@ import { EntitiesRows, RenameRequest, RowClicks, SelectionReveal } from '../enti
 import { History, LevelEditor } from '../history/index.ts';
 import { InspectorModel } from '../inspector/index.ts';
 import type { CardFolds } from '../inspector/index.ts';
+import { createV1Rules, EditorMessages } from '../messages/index.ts';
 import { Selection } from '../selection/index.ts';
-import type { Clock } from '../time/index.ts';
+import type { Clock, FrameScheduler } from '../time/index.ts';
 
 import { CurrentGroup } from './CurrentGroup.ts';
 
 // What an open level is built with besides the level: the session's, shared by every level opened.
 export type OpenLevelServices = {
     readonly clock: Clock;
+    // The editor messages are checked once per frame.
+    readonly frames: FrameScheduler;
     readonly registry: ComponentRegistry;
     readonly cardFolds: CardFolds;
 };
@@ -21,6 +24,8 @@ export type OpenLevelServices = {
 // piece, so nothing can keep pointing at the old level's selection or history by mistake.
 export class OpenLevel {
     readonly level: Level;
+    // The session's, for a message's fix that adds a component by its type name.
+    readonly registry: ComponentRegistry;
     readonly caches: DerivedCaches;
     readonly selection: Selection;
     readonly currentGroup: CurrentGroup;
@@ -30,10 +35,12 @@ export class OpenLevel {
     readonly renameRequest = new RenameRequest();
     readonly history: History;
     readonly editor: LevelEditor;
+    readonly messages: EditorMessages;
     readonly inspector: InspectorModel;
 
     constructor(level: Level, services: OpenLevelServices) {
         this.level = level;
+        this.registry = services.registry;
         this.caches = new DerivedCaches(level);
         this.selection = new Selection(level);
         this.currentGroup = new CurrentGroup(level);
@@ -47,18 +54,21 @@ export class OpenLevel {
             selection: this.selection,
             currentGroup: this.currentGroup,
         });
+        this.messages = new EditorMessages(level, createV1Rules(), services.frames);
         this.inspector = new InspectorModel({
             level,
             selection: this.selection,
             caches: this.caches,
             registry: services.registry,
             folds: services.cardFolds,
+            messages: this.messages,
         });
     }
 
     // Stops everything here following the level.
     dispose() {
         this.inspector.dispose();
+        this.messages.dispose();
         this.selectionReveal.dispose();
         this.entitiesRows.dispose();
         this.currentGroup.dispose();
