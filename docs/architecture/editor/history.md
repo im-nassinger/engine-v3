@@ -25,6 +25,7 @@ Changes point at entities by id, never by object, because undo of a delete creat
 | `SetSwitchChange` | Entity id, `hidden` or `locked`, old and new | The eye and the lock |
 | `RenameLevelChange` | Old and new name | The top bar |
 
+- **As built (standing yes, 2026-11-15):** a change writes a value back through its file form, the value type's `serialize` then the component's `writeValue`, the one path that parses every value type, entity links and paths included. A change refused on apply or revert was built wrong, so it throws instead of returning an outcome; the command checked the edit before building it. `MoveEntityChange` moves first and then writes all four TransformComponent values.
 - A `RemoveEntitiesChange` keeps the whole subtree as `EntityData`, the same shape as the file, and its revert reads it back with `Level.restoreEntity`. One copy format, tested by every save.
 - New change classes come with new kinds of data in v2 (files in the Assets panel, script edits). The tech notes' byte limit on history only matters once files exist; `History` measures each step's size from v2 on.
 

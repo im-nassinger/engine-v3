@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 5, step 3 of 11: `Selection` (in `editor/selection`) and `CurrentGroup` (in `editor/session`) are built and follow the level. Next is step 4, `SetValueChange`, `SetSwitchChange`, `RenameLevelChange` and `MoveEntityChange`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 5, step 4 of 11: the first four changes, `SetValueChange`, `SetSwitchChange`, `RenameLevelChange` and `MoveEntityChange` (in `editor/history/changes`), apply and revert exactly. Next is step 5, `LevelReader.readSubtree` with `AddEntitiesChange` and `RemoveEntitiesChange`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -117,7 +117,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 ## Next
 
 1. **Push** so CI runs for the first time on x86 and ARM (step 7 of stage 0). The [runner](runner/README.md) does it after its first step.
-2. **Stage 5 of [plan.md](plan.md#stage-5-in-steps): editing without a mouse.** Steps 1 and 2 are done; each further step is built in one commit.
+2. **Stage 5 of [plan.md](plan.md#stage-5-in-steps): editing without a mouse.** Steps 1 to 4 are done; each further step is built in one commit.
 3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
