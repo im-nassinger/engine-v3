@@ -1,6 +1,6 @@
 import { PathComponent, ShapeComponent, StyleComponent, TransformComponent } from '../../core/components/index.ts';
 import type { AnyComponent } from '../../core/components/index.ts';
-import type { BoundsCache, PiecesCache } from '../../core/derived/index.ts';
+import type { BoundsCache, PiecesCache, WorldMatrixCache } from '../../core/derived/index.ts';
 import type { Entity, Level, LevelUpdate } from '../../core/entities/index.ts';
 import type { Unsubscribe } from '../../core/events/index.ts';
 import type { Bounds } from '../../core/geometry/index.ts';
@@ -13,6 +13,8 @@ export type LevelDisplayCaches = {
     readonly pieces: PiecesCache;
     // Must follow the same level. Culling reads it.
     readonly bounds: BoundsCache;
+    // The one the BoundsCache reads. The joint icons and the physics view place themselves with it.
+    readonly worldMatrices: WorldMatrixCache;
 };
 
 export type LevelDisplayParts = {

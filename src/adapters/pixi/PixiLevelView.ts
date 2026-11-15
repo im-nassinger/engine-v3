@@ -7,7 +7,13 @@ import type { Cancel, FrameScheduler } from '../../editor/time/index.ts';
 import type { EntityDrawingOptions } from './EntityDrawing.ts';
 import { LevelDisplay } from './LevelDisplay.ts';
 import type { LevelDisplayCaches } from './LevelDisplay.ts';
-import { BoundsOverlay, CameraFrameOverlay, GridOverlay } from './overlays/index.ts';
+import {
+    BoundsOverlay,
+    CameraFrameOverlay,
+    GridOverlay,
+    JointIconOverlay,
+    PhysicsViewOverlay,
+} from './overlays/index.ts';
 import type { OverlayScene } from './overlays/index.ts';
 
 // Culling grows the visible area by this many screen pixels, so the editor's 1 px line around an unstyled
@@ -42,6 +48,9 @@ export class PixiLevelView {
     private readonly gridOverlay = new GridOverlay();
     private readonly boundsOverlay = new BoundsOverlay();
     private readonly cameraFrameOverlay = new CameraFrameOverlay();
+    // On top of everything, since it shows what collides whatever the drawing hides.
+    private readonly physicsViewOverlay = new PhysicsViewOverlay();
+    private readonly jointIconOverlay = new JointIconOverlay();
     private readonly stopListening: Unsubscribe[] = [];
     private stopListeningToLevel: Unsubscribe | undefined;
     private shownLevel: Level | undefined;
@@ -56,7 +65,13 @@ export class PixiLevelView {
         this.parts = parts;
         this.renderer = renderer;
         this.stage.addChild(this.levelLayer);
-        this.stage.addChild(this.gridOverlay.graphics, this.boundsOverlay.graphics, this.cameraFrameOverlay.container);
+        this.stage.addChild(
+            this.gridOverlay.graphics,
+            this.boundsOverlay.graphics,
+            this.cameraFrameOverlay.container,
+            this.physicsViewOverlay.graphics,
+            this.jointIconOverlay.graphics,
+        );
         this.applyViewMatrix();
 
         this.stopListening.push(parts.view.version.subscribe(() => this.handleViewChange()));
@@ -94,7 +109,13 @@ export class PixiLevelView {
 
     // What the editor draws over the level, for tests.
     get overlays() {
-        return { grid: this.gridOverlay, bounds: this.boundsOverlay, cameraFrame: this.cameraFrameOverlay };
+        return {
+            grid: this.gridOverlay,
+            bounds: this.boundsOverlay,
+            cameraFrame: this.cameraFrameOverlay,
+            physicsView: this.physicsViewOverlay,
+            jointIcons: this.jointIconOverlay,
+        };
     }
 
     // How many times the view has drawn, for tests and the performance numbers.
@@ -223,12 +244,14 @@ export class PixiLevelView {
             view: this.parts.view,
             settings: this.parts.settings,
             level: this.shownLevel,
-            bounds: this.caches?.bounds,
+            caches: this.caches,
         };
 
         this.gridOverlay.update(scene);
         this.boundsOverlay.update(scene);
         this.cameraFrameOverlay.update(scene);
+        this.physicsViewOverlay.update(scene);
+        this.jointIconOverlay.update(scene);
     }
 
     private render() {

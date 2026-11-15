@@ -24,7 +24,7 @@ function makeDisplay(level: Level, showUnstyled = true) {
     let changeCount = 0;
     const display = new LevelDisplay({
         level,
-        caches: { pieces, bounds },
+        caches: { pieces, bounds, worldMatrices },
         options: { showUnstyled },
         onChange: () => {
             changeCount += 1;

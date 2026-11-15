@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'vitest';
 
-import { PathComponent, ShapeComponent, StyleComponent, TransformComponent } from '../components/index.ts';
+import {
+    JointComponent,
+    PathComponent,
+    ShapeComponent,
+    StyleComponent,
+    TransformComponent,
+} from '../components/index.ts';
 import type { Entity } from '../entities/index.ts';
 import { Level } from '../entities/index.ts';
 import type { Bounds, ShapeGeometry } from '../geometry/index.ts';
@@ -122,6 +128,34 @@ describe('BoundsCache own bounds', () => {
         const cache = buildCache(level);
 
         expect(sidesOf(cache.ownBoundsOf(level.camera))).toEqual([-960, -540, 960, 540]);
+    });
+
+    test("a joint's bounds are the point at its position", () => {
+        const level = Level.createNew();
+        const joint = placeAt(level, level.world, 30, -20);
+        const cache = buildCache(level);
+        expect(cache.ownBoundsOf(joint)).toBeUndefined();
+
+        joint.addComponent(new JointComponent());
+
+        expect(sidesOf(cache.ownBoundsOf(joint))).toEqual([30, -20, 30, -20]);
+    });
+
+    test("a rope's bounds cover its path and its position", () => {
+        const level = Level.createNew();
+        const rope = placeAt(level, level.world, 10, 10);
+        rope.addComponent(new JointComponent());
+        const path = {
+            closed: false,
+            points: [
+                { x: 20, y: 0, handleIn: null, handleOut: null, corner: 'sharp' as const },
+                { x: 100, y: 40, handleIn: null, handleOut: null, corner: 'sharp' as const },
+            ],
+        };
+        rope.addComponent(new PathComponent({ path }));
+        const cache = buildCache(level);
+
+        expect(sidesOf(cache.ownBoundsOf(rope))).toEqual([10, 10, 110, 50]);
     });
 
     test('a group draws nothing', () => {

@@ -1,4 +1,4 @@
-import { CameraComponent, PathComponent, ShapeComponent, StyleComponent } from '../components/index.ts';
+import { CameraComponent, JointComponent, PathComponent, ShapeComponent, StyleComponent } from '../components/index.ts';
 import type { Entity } from '../entities/index.ts';
 import type { Matrix2D, PathGeometry, Point, ShapeGeometry } from '../geometry/index.ts';
 import { Bounds } from '../geometry/index.ts';
@@ -91,8 +91,20 @@ function withOutline(edgeBounds: Bounds, entity: Entity, matrix: Matrix2D) {
 
 // What an entity draws, in level positions: a path, else a shape, else a camera's frame, the order in
 // which an entity picks the one thing it draws. undefined when it draws nothing, like a group.
+// A joint also covers the point at its position, where its icon sits; the icon's size on screen is added
+// by whoever knows the zoom.
 export class OwnBounds {
     static of(entity: Entity, matrix: Matrix2D) {
+        const drawnBounds = OwnBounds.drawnBoundsOf(entity, matrix);
+        if (!entity.hasComponent(JointComponent)) return drawnBounds;
+
+        const position = new Bounds(matrix.tx, matrix.ty, matrix.tx, matrix.ty);
+        if (drawnBounds === undefined) return position;
+
+        return drawnBounds.union(position);
+    }
+
+    private static drawnBoundsOf(entity: Entity, matrix: Matrix2D) {
         const edgeBounds = OwnBounds.edgeBoundsOf(entity, matrix);
         if (edgeBounds === undefined) return undefined;
 

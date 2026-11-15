@@ -1,5 +1,6 @@
 import {
     CameraComponent,
+    JointComponent,
     PathComponent,
     ShapeComponent,
     StyleComponent,
@@ -22,6 +23,7 @@ const SCHEMAS_OF_WHAT_IS_DRAWN: readonly AnyComponentSchema[] = [
     PathComponent.schema,
     StyleComponent.schema,
     CameraComponent.schema,
+    JointComponent.schema,
 ];
 
 // Each entity's own bounds in level positions, and the bounds of its subtree: its own and all its

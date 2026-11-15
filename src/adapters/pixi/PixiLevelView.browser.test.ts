@@ -1,5 +1,15 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { CameraComponent, ShapeComponent, StyleComponent, TransformComponent } from '../../core/components/index.ts';
+import {
+    CameraComponent,
+    JointComponent,
+    PhysicsWorldComponent,
+    ShapeComponent,
+    StyleComponent,
+    SurfaceComponent,
+    TransformComponent,
+} from '../../core/components/index.ts';
+import type { Entity } from '../../core/entities/index.ts';
+import type { ShapeGeometry } from '../../core/geometry/index.ts';
 import { BoundsCache, PiecesCache, WorldMatrixCache } from '../../core/derived/index.ts';
 import { Level } from '../../core/entities/index.ts';
 import { Signal } from '../../core/events/index.ts';
@@ -58,7 +68,7 @@ function makeCaches(level: Level) {
         pieces.dispose();
     });
 
-    return { pieces, bounds };
+    return { pieces, bounds, worldMatrices };
 }
 
 async function makeView(ratio = 1) {
@@ -343,5 +353,122 @@ describe('PixiLevelView overlays', () => {
         level.camera.setHidden(true);
         frames.runFrame();
         expect(overlays.cameraFrame.isShowing).toBe(false);
+    });
+    function placeAt(level: Level, parent: Entity, x: number, y: number) {
+        const entity = level.createEntity(parent, 0);
+        const transform = new TransformComponent();
+        transform.set('position', { x, y });
+        entity.addComponent(transform);
+
+        return entity;
+    }
+
+    function addJoint(level: Level, x: number, y: number, type: 'hinge' | 'rope' | 'spring') {
+        const entity = placeAt(level, level.world, x, y);
+        const joint = new JointComponent();
+        joint.set('type', type);
+        entity.addComponent(joint);
+
+        return entity;
+    }
+
+    function addCollidingShape(level: Level, parent: Entity, x: number, y: number, geometry: ShapeGeometry) {
+        const entity = placeAt(level, parent, x, y);
+        entity.addComponent(new ShapeComponent({ geometry }));
+        entity.addComponent(new SurfaceComponent());
+
+        return entity;
+    }
+
+    test('a joint icon sits at its position with the same size at any zoom, one per type', async () => {
+        const { level, view, frames, overlays } = await showNewLevel();
+        addJoint(level, 10, 20, 'hinge');
+        addJoint(level, -40, 0, 'rope');
+        addJoint(level, 0, -30, 'spring');
+        frames.runFrame();
+
+        const types = overlays.jointIcons.shownIcons.map((icon) => icon.type);
+        expect(types.sort()).toEqual(['hinge', 'rope', 'spring']);
+        const hinge = overlays.jointIcons.shownIcons.find((icon) => icon.type === 'hinge');
+        expect(hinge?.screenPosition).toEqual({ x: 160, y: 120 });
+        view.zoomAboutMiddle(4);
+        frames.runFrame();
+
+        const zoomedHinge = overlays.jointIcons.shownIcons.find((icon) => icon.type === 'hinge');
+        expect(zoomedHinge?.screenPosition).toEqual({ x: 190, y: 180 });
+    });
+
+    test('a joint icon keeps its size on screen at any zoom', async () => {
+        const { level, view, frames, overlays } = await showNewLevel();
+        addJoint(level, 0, 0, 'hinge');
+        frames.runFrame();
+        const widthAtFirst = overlays.jointIcons.graphics.getLocalBounds().width;
+
+        view.zoomAboutMiddle(8);
+        frames.runFrame();
+
+        expect(widthAtFirst).toBeGreaterThanOrEqual(14);
+        expect(widthAtFirst).toBeLessThan(17);
+        expect(overlays.jointIcons.graphics.getLocalBounds().width).toBe(widthAtFirst);
+    });
+
+    test('joint icons hide with their switch, the eye and a hidden parent', async () => {
+        const { level, settings, frames, overlays } = await showNewLevel();
+        const group = placeAt(level, level.world, 0, 0);
+        const joint = addJoint(level, 0, 0, 'hinge');
+        level.moveEntity(joint, group, 0);
+        frames.runFrame();
+        expect(overlays.jointIcons.shownIcons).toHaveLength(1);
+
+        group.setHidden(true);
+        frames.runFrame();
+        expect(overlays.jointIcons.shownIcons).toHaveLength(0);
+
+        group.setHidden(false);
+        settings.set('jointIcons', false);
+        frames.runFrame();
+        expect(overlays.jointIcons.graphics.visible).toBe(false);
+        expect(overlays.jointIcons.shownIcons).toHaveLength(0);
+    });
+
+    test('the physics view is off at first and draws hidden and see-through shapes too', async () => {
+        const { level, settings, frames, overlays } = await showNewLevel();
+        const box = addCollidingShape(level, level.world, 0, 0, { kind: 'rectangle', width: 40, height: 20 });
+        const ball = addCollidingShape(level, level.world, 50, 0, { kind: 'ellipse', width: 30, height: 30 });
+        addCollidingShape(level, level.world, 0, 50, {
+            kind: 'line',
+            points: [
+                { x: 0, y: 0 },
+                { x: 60, y: 0 },
+            ],
+        });
+        placeAt(level, level.world, 0, 0).addComponent(
+            new ShapeComponent({ geometry: { kind: 'rectangle', width: 10, height: 10 } }),
+        );
+        frames.runFrame();
+        expect(overlays.physicsView.graphics.visible).toBe(false);
+        expect(overlays.physicsView.drawnPieceCount).toBe(0);
+
+        settings.set('physicsView', true);
+        frames.runFrame();
+        expect(overlays.physicsView.drawnPieceCount).toBe(3);
+
+        box.setHidden(true);
+        ball.addComponent(new StyleComponent());
+        ball.requireComponent(StyleComponent).set('opacity', 0);
+        frames.runFrame();
+        expect(overlays.physicsView.drawnPieceCount).toBe(3);
+    });
+
+    test('the physics view leaves out shapes off screen and draws the walls when on', async () => {
+        const { level, settings, frames, overlays } = await showNewLevel();
+        settings.set('physicsView', true);
+        addCollidingShape(level, level.world, 5000, 0, { kind: 'rectangle', width: 40, height: 20 });
+        frames.runFrame();
+        expect(overlays.physicsView.drawnPieceCount).toBe(0);
+
+        level.world.requireComponent(PhysicsWorldComponent).set('walls', true);
+        frames.runFrame();
+        expect(overlays.physicsView.drawnPieceCount).toBe(1);
     });
 });

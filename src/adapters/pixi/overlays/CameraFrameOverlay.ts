@@ -48,7 +48,7 @@ export class CameraFrameOverlay {
         this.frame.clear();
 
         const level = scene.level;
-        const frameBounds = level === undefined ? undefined : scene.bounds?.ownBoundsOf(level.camera);
+        const frameBounds = level === undefined ? undefined : scene.caches?.bounds.ownBoundsOf(level.camera);
         const camera = level?.camera.getComponent(CameraComponent);
         const isOn = scene.settings.isOn('cameraFrame');
         const shows = isOn && level !== undefined && !cameraIsHidden(level) && frameBounds !== undefined;
