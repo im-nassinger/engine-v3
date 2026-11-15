@@ -34,6 +34,12 @@ export type PixiLevelViewParts = {
     readonly drawing: EntityDrawingOptions;
 };
 
+// The editor's session as the view sees it: the level open now, and a signal when New or Import replaces it.
+export type OpenLevelSource = {
+    readonly openLevel: { readonly level: Level; readonly caches: LevelDisplayCaches };
+    readonly openLevelChanged: { subscribe(listener: () => void): Unsubscribe };
+};
+
 // Owns the canvas and decides when to draw. There is no PixiJS Application and so no ticker: a
 // change marks the view dirty, which asks for one render on the next animation frame, and an idle
 // view asks for nothing.
@@ -53,6 +59,7 @@ export class PixiLevelView {
     private readonly jointIconOverlay = new JointIconOverlay();
     private readonly stopListening: Unsubscribe[] = [];
     private stopListeningToLevel: Unsubscribe | undefined;
+    private stopFollowing: Unsubscribe | undefined;
     private shownLevel: Level | undefined;
     private caches: LevelDisplayCaches | undefined;
     private resizeObserver: ResizeObserver | undefined;
@@ -167,6 +174,19 @@ export class PixiLevelView {
         this.markDirty();
     }
 
+    // Shows the open level, and the next one each time it is replaced, so New and Import need nothing more.
+    follow(source: OpenLevelSource) {
+        this.stopFollowing?.();
+
+        const showOpenLevel = () => {
+            const { level, caches } = source.openLevel;
+            this.show(level, caches);
+        };
+
+        showOpenLevel();
+        this.stopFollowing = source.openLevelChanged.subscribe(showOpenLevel);
+    }
+
     // Asks for one render on the next frame. Several changes before it still draw once.
     markDirty() {
         if (this.cancelFrame !== undefined) return;
@@ -187,6 +207,8 @@ export class PixiLevelView {
         }
         this.stopListeningToLevel?.();
         this.stopListeningToLevel = undefined;
+        this.stopFollowing?.();
+        this.stopFollowing = undefined;
 
         this.display?.dispose();
         this.display = undefined;

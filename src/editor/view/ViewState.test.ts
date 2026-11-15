@@ -161,6 +161,31 @@ describe('ViewState', () => {
         expect(view.zoom).toBe(2);
     });
 
+    test('fitting fills only the part the panels leave free, and centres the rectangle there', () => {
+        const view = viewOfSize(1000, 700);
+        view.setCoveredEdges({ left: 300, top: 40, right: 100, bottom: 20 });
+        const versionBefore = view.version.version;
+
+        view.fit(new Bounds(0, 0, 520, 100));
+
+        // The free part is 600 by 640; less the margins, 520 by 560.
+        expect(view.zoom).toBe(1);
+        expect(versionBefore).toBeLessThan(view.version.version);
+        expectPointClose(view.levelToScreen({ x: 0, y: 0 }), { x: 300 + FIT_MARGIN_PX, y: 310 });
+        expectPointClose(view.levelToScreen({ x: 520, y: 100 }), { x: 1000 - 100 - FIT_MARGIN_PX, y: 410 });
+    });
+
+    test('covering the edges moves nothing on screen', () => {
+        const view = viewOfSize(800, 600);
+        const versionBefore = view.version.version;
+
+        view.setCoveredEdges({ left: 200, top: 0, right: 0, bottom: -5 });
+
+        expect(view.version.version).toBe(versionBefore);
+        expect(view.middle).toEqual({ x: 0, y: 0 });
+        expect(view.coveredEdges.bottom).toBe(0);
+    });
+
     test('fitting nothing leaves the view alone', () => {
         const view = viewOfSize(800, 600);
         view.centreOn({ x: 10, y: 20 });

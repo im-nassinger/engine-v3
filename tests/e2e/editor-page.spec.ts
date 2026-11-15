@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-test('the built page opens, shows the project name and logs no error', async ({ page }) => {
+const PANEL_PLACES = ['Top bar', 'Tools', 'Inspector', 'Entities', 'Status bar'];
+
+test('the built page opens with every panel in its place and logs no error', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
     page.on('console', (message) => {
@@ -11,6 +13,8 @@ test('the built page opens, shows the project name and logs no error', async ({ 
 
     await page.goto('/');
 
-    await expect(page.getByRole('heading', { name: 'engine-v3' })).toBeVisible();
+    for (const label of PANEL_PLACES) {
+        await expect(page.getByRole('region', { name: label })).toBeVisible();
+    }
     expect(errors).toEqual([]);
 });

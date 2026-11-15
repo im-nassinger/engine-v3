@@ -1,22 +1,20 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import { TEST_SQUARE_COLOUR, TEST_SQUARE_POSITION } from '../../src/app/testLevel.ts';
 
 type Rgb = { r: number; g: number; b: number };
 
-function rgbOf(hexColour: string): Rgb {
-    return {
-        r: parseInt(hexColour.slice(1, 3), 16),
-        g: parseInt(hexColour.slice(3, 5), 16),
-        b: parseInt(hexColour.slice(5, 7), 16),
-    };
-}
+// A new level's World fill, its camera's size, and the panels' colour from theme.css.
+const BACKGROUND: Rgb = { r: 0xbf, g: 0xe3, b: 0xf5 };
+const PANEL: Rgb = { r: 0x21, g: 0x25, b: 0x2c };
+const CAMERA_WIDTH = 1920;
+const CAMERA_HEIGHT = 1080;
+// ViewState's FIT_MARGIN_PX.
+const FIT_MARGIN_PX = 40;
 
-// The colour on screen at a CSS pixel of the canvas, read from a screenshot, because a WebGL canvas
+// The colour on screen at a CSS pixel of the page, read from a screenshot, because a WebGL canvas
 // can't be read back after it is shown. The PNG is decoded in the page.
-async function colourOnCanvasAt(page: Page, x: number, y: number): Promise<Rgb> {
-    const canvas = page.locator('#level-view canvas');
-    const png = await canvas.screenshot({ scale: 'css' });
+async function colourOnPageAt(page: Page, x: number, y: number): Promise<Rgb> {
+    const png = await page.screenshot({ scale: 'css' });
 
     return page.evaluate(
         async ({ base64, x, y }) => {
@@ -34,66 +32,97 @@ async function colourOnCanvasAt(page: Page, x: number, y: number): Promise<Rgb> 
     );
 }
 
-async function canvasMiddle(page: Page) {
-    const canvas = page.locator('#level-view canvas');
-    await expect(canvas).toBeVisible();
-    const box = await canvas.boundingBox();
-    if (!box) throw new Error('The canvas has no size.');
-
-    return { x: box.width / 2, y: box.height / 2 };
-}
-
-function expectCloseTo(actual: Rgb, expected: Rgb) {
+function isCloseTo(actual: Rgb, expected: Rgb) {
     // The grid is drawn over the level, faintly, so a colour may move a little.
     const tolerance = 24;
-    expect(Math.abs(actual.r - expected.r)).toBeLessThanOrEqual(tolerance);
-    expect(Math.abs(actual.g - expected.g)).toBeLessThanOrEqual(tolerance);
-    expect(Math.abs(actual.b - expected.b)).toBeLessThanOrEqual(tolerance);
+    const redClose = Math.abs(actual.r - expected.r) <= tolerance;
+    const greenClose = Math.abs(actual.g - expected.g) <= tolerance;
+    const blueClose = Math.abs(actual.b - expected.b) <= tolerance;
+
+    return redClose && greenClose && blueClose;
 }
 
-test('the page draws the test level, with no error', async ({ page }) => {
+// The grid's lines cross the level view every few pixels, so a colour is looked for at a few points
+// along a short diagonal, and one of them is enough.
+async function showsColourNear(page: Page, x: number, y: number, expected: Rgb) {
+    for (let offset = 2; offset <= 12; offset += 2) {
+        const colour = await colourOnPageAt(page, x + offset, y + offset);
+        if (isCloseTo(colour, expected)) return true;
+    }
+
+    return false;
+}
+
+async function freeAreaBox(page: Page) {
+    const freeArea = page.locator('.free-area');
+    const box = await freeArea.boundingBox();
+    if (!box) throw new Error('The free area has no size.');
+
+    return box;
+}
+
+// Where the fitted camera frame's left edge falls, in the middle of the part no panel covers.
+function cameraFrameLeftEdge(free: { x: number; width: number; height: number }) {
+    const availableWidth = free.width - 2 * FIT_MARGIN_PX;
+    const availableHeight = free.height - 2 * FIT_MARGIN_PX;
+    const zoom = Math.min(availableWidth / CAMERA_WIDTH, availableHeight / CAMERA_HEIGHT);
+    const frameWidth = CAMERA_WIDTH * zoom;
+    const middleX = free.x + free.width / 2;
+
+    return middleX - frameWidth / 2;
+}
+
+test('a new level opens fitted to its camera frame, between the empty panels', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
 
     await page.goto('/');
-    const middle = await canvasMiddle(page);
+    await expect(page.locator('.level-view-host canvas')).toBeVisible();
+    const free = await freeAreaBox(page);
+    const middleX = free.x + free.width / 2;
+    const middleY = free.y + free.height / 2;
 
-    // Off the grid's lines, which fall on every 10 px from the origin at 100%.
-    const squareX = middle.x + TEST_SQUARE_POSITION.x + 5;
-    const squareY = middle.y + TEST_SQUARE_POSITION.y + 5;
-    const backgroundX = middle.x - 395;
-    const backgroundY = middle.y + 255;
+    await expect.poll(() => showsColourNear(page, middleX, middleY, BACKGROUND)).toBe(true);
 
-    await expect
-        .poll(async () => {
-            const colour = await colourOnCanvasAt(page, squareX, squareY);
-            return Math.abs(colour.r - rgbOf(TEST_SQUARE_COLOUR).r) < 24;
-        })
-        .toBe(true);
-    expectCloseTo(await colourOnCanvasAt(page, squareX, squareY), rgbOf(TEST_SQUARE_COLOUR));
-    expectCloseTo(await colourOnCanvasAt(page, backgroundX, backgroundY), rgbOf('#BFE3F5'));
+    // The frame is a dark line 1.5 px wide, so one of the pixels around its edge is much darker.
+    const frameLeft = cameraFrameLeftEdge(free);
+    const reds: number[] = [];
+    for (let offset = -3; offset <= 3; offset += 1) {
+        const colour = await colourOnPageAt(page, frameLeft + offset, middleY);
+        reds.push(colour.r);
+    }
+    const darkest = Math.min(...reds);
+    expect(darkest).toBeLessThan(150);
+
+    expect(await showsColourNear(page, frameLeft + 10, middleY, BACKGROUND)).toBe(true);
+
+    // The Inspector sits over the canvas, which fills the whole window.
+    const inspector = await page.getByRole('region', { name: 'Inspector' }).boundingBox();
+    if (!inspector) throw new Error('The Inspector has no size.');
+    expect(await showsColourNear(page, inspector.x + 20, inspector.y + 20, PANEL)).toBe(true);
     expect(errors).toEqual([]);
 });
 
 test.describe('at a device pixel ratio of 2', () => {
     test.use({ deviceScaleFactor: 2 });
 
-    test('the canvas has twice the pixels of its size', async ({ page }) => {
+    test('the canvas fills the window with twice the pixels of its size', async ({ page }) => {
         await page.goto('/');
-        const canvas = page.locator('#level-view canvas');
+        const canvas = page.locator('.level-view-host canvas');
         await expect(canvas).toBeVisible();
 
         await expect
             .poll(() => canvas.evaluate((element: HTMLCanvasElement) => element.width === 2 * element.clientWidth))
             .toBe(true);
         const size = await canvas.evaluate((element: HTMLCanvasElement) => ({
-            width: element.width,
             height: element.height,
             cssWidth: element.clientWidth,
             cssHeight: element.clientHeight,
         }));
+        const windowSize = page.viewportSize();
 
-        expect(size.cssWidth).toBeGreaterThan(100);
+        expect(size.cssWidth).toBe(windowSize?.width);
+        expect(size.cssHeight).toBe(windowSize?.height);
         expect(size.height).toBe(2 * size.cssHeight);
     });
 });

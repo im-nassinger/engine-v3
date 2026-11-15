@@ -27,6 +27,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Word | Meaning |
 |---|---|
 | Level view | Where you see and edit the level. It fills the whole window, with the panels on top. Older docs say "viewport". |
+| Free area | The part of the level view no panel or bar covers. Fitting the view (Whole level, Selection, Camera frame, and a new level opening) fills it. |
 | Panel | A fixed area on top of the level view: Entities, Inspector, Assets, Console. |
 | Entities panel | The panel listing every entity as a tree: groups with their children inside. One row is one entity. The top row is drawn in front. |
 | Inspector | The panel on the left showing the components of what is selected, so you can edit their values. |

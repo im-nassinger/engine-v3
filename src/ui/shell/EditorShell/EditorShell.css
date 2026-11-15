@@ -1,0 +1,12 @@
+.editor-shell {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: var(--toolbar) var(--inspector) 1fr var(--entities);
+    grid-template-rows: var(--top-bar) 1fr var(--status-bar);
+    grid-template-areas:
+        'top-bar top-bar top-bar top-bar'
+        'toolbar inspector free entities'
+        'status-bar status-bar status-bar status-bar';
+}

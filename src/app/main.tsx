@@ -1,10 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../ui/theme.css';
-import { startLevelView } from './startLevelView.ts';
-import { buildTestLevel } from './testLevel.ts';
-
-const PROJECT_NAME = 'engine-v3';
+import { EditorContext } from '../ui/EditorContext.tsx';
+import { LevelViewMountContext } from '../ui/level-view-host/index.ts';
+import { EditorShell } from '../ui/shell/index.ts';
+import { EditorComposition } from './EditorComposition.ts';
 
 function requireElement(id: string) {
     const element = document.getElementById(id);
@@ -13,12 +13,21 @@ function requireElement(id: string) {
     return element;
 }
 
+// The editor first draws in its own font, so no text jumps when the font arrives. Nothing on the page
+// uses the font yet, so document.fonts.ready alone wouldn't wait for it.
+const FONT_WEIGHTS = ['400', '500', '600'];
+const fontLoads = FONT_WEIGHTS.map((weight) => document.fonts.load(`${weight} 12px "JetBrains Mono"`));
+await Promise.all(fontLoads);
+
+const composition = await EditorComposition.create();
 const root = createRoot(requireElement('root'));
 
 root.render(
     <StrictMode>
-        <h1>{PROJECT_NAME}</h1>
+        <EditorContext value={composition.session}>
+            <LevelViewMountContext value={composition.levelView}>
+                <EditorShell />
+            </LevelViewMountContext>
+        </EditorContext>
     </StrictMode>,
 );
-
-await startLevelView(requireElement('level-view'), buildTestLevel());

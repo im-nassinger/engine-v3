@@ -12,7 +12,7 @@ import type { Entity } from '../../core/level/index.ts';
 import type { ShapeGeometry } from '../../core/geometry/index.ts';
 import { BoundsCache, PiecesCache, WorldMatrixCache } from '../../core/derived/index.ts';
 import { Level } from '../../core/level/index.ts';
-import { Signal } from '../../core/events/index.ts';
+import { Signal, VersionCounter } from '../../core/events/index.ts';
 import { ManualFrames } from '../../editor/time/testing/index.ts';
 import { ViewSettings, ViewState } from '../../editor/view/index.ts';
 import { PixiLevelView } from './PixiLevelView.ts';
@@ -272,6 +272,27 @@ describe('PixiLevelView', () => {
 
         expect(frames.pendingCount).toBe(0);
         expect(levelView.levelDisplay?.nodeOf(secondLevel.world)).toBeDefined();
+    });
+
+    test('following a session shows its open level, and the next one when it is replaced', async () => {
+        const { levelView, frames } = await makeView();
+        const firstLevel = Level.createNew();
+        const secondLevel = Level.createNew();
+        const session = {
+            openLevel: { level: firstLevel, caches: makeCaches(firstLevel) },
+            openLevelChanged: new VersionCounter(),
+        };
+
+        levelView.follow(session);
+        expect(levelView.levelDisplay?.nodeOf(firstLevel.world)).toBeDefined();
+
+        session.openLevel = { level: secondLevel, caches: makeCaches(secondLevel) };
+        session.openLevelChanged.increment();
+        frames.runFrame();
+        firstLevel.createEntity(firstLevel.world, 0);
+
+        expect(levelView.levelDisplay?.nodeOf(secondLevel.world)).toBeDefined();
+        expect(frames.pendingCount).toBe(0);
     });
 });
 

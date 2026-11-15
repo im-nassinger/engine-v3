@@ -9,6 +9,16 @@ export const ZOOM_STEP = 2;
 
 export type ViewSize = { readonly width: number; readonly height: number };
 
+// How far the panels reach over each edge of the level view, in CSS pixels.
+export type CoveredEdges = {
+    readonly left: number;
+    readonly top: number;
+    readonly right: number;
+    readonly bottom: number;
+};
+
+const NOTHING_COVERED: CoveredEdges = { left: 0, top: 0, right: 0, bottom: 0 };
+
 function clampZoom(zoom: number) {
     return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom));
 }
@@ -28,6 +38,7 @@ export class ViewState {
     private viewWidth = 0;
     private viewHeight = 0;
     private panArea: Bounds | undefined;
+    private covered = NOTHING_COVERED;
 
     get middle(): Point {
         return { x: this.middleX, y: this.middleY };
@@ -49,6 +60,21 @@ export class ViewState {
         this.viewWidth = safeWidth;
         this.viewHeight = safeHeight;
         this.version.increment();
+    }
+
+    get coveredEdges() {
+        return this.covered;
+    }
+
+    // The panels sit over the level view, so fitting fills only the part they leave free. Nothing on
+    // screen moves, so the version stays.
+    setCoveredEdges(edges: CoveredEdges) {
+        this.covered = {
+            left: Math.max(0, edges.left),
+            top: Math.max(0, edges.top),
+            right: Math.max(0, edges.right),
+            bottom: Math.max(0, edges.bottom),
+        };
     }
 
     // The World's rectangle. The view's middle stays inside it grown on every side by its larger
@@ -141,14 +167,16 @@ export class ViewState {
         this.zoomAboutMiddle(zoom);
     }
 
-    // Fills the view with the rectangle, less FIT_MARGIN_PX on each side, and centres it. Nothing to
-    // fit leaves the view alone. A rectangle with no width or height fits along its other side, and
-    // a single point zooms in fully.
+    // Fills the part of the view the panels leave free with the rectangle, less FIT_MARGIN_PX on each
+    // side, and centres it there. Nothing to fit leaves the view alone. A rectangle with no width or
+    // height fits along its other side, and a single point zooms in fully.
     fit(levelRectangle: Bounds | undefined) {
         if (levelRectangle === undefined) return;
 
-        const availableWidth = Math.max(1, this.viewWidth - 2 * FIT_MARGIN_PX);
-        const availableHeight = Math.max(1, this.viewHeight - 2 * FIT_MARGIN_PX);
+        const freeWidth = this.viewWidth - this.covered.left - this.covered.right;
+        const freeHeight = this.viewHeight - this.covered.top - this.covered.bottom;
+        const availableWidth = Math.max(1, freeWidth - 2 * FIT_MARGIN_PX);
+        const availableHeight = Math.max(1, freeHeight - 2 * FIT_MARGIN_PX);
 
         let zoom = MAX_ZOOM;
         if (levelRectangle.width > 0) {
@@ -160,7 +188,13 @@ export class ViewState {
 
         const newZoom = clampZoom(zoom);
         const centre = levelRectangle.centre;
-        this.change(centre.x, centre.y, newZoom);
+        // How far the free part's middle is from the view's middle, in screen pixels.
+        const freeOffsetX = (this.covered.left - this.covered.right) / 2;
+        const freeOffsetY = (this.covered.top - this.covered.bottom) / 2;
+        const middleX = centre.x - freeOffsetX / newZoom;
+        const middleY = centre.y - freeOffsetY / newZoom;
+
+        this.change(middleX, middleY, newZoom);
     }
 
     private moveMiddleTo(middleX: number, middleY: number) {

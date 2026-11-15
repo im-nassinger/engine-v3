@@ -1,0 +1,4 @@
+.free-area {
+    grid-area: free;
+    pointer-events: none;
+}
