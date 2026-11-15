@@ -12,7 +12,7 @@ The requirements set speed targets for a level of 10,000 entities on a mid-range
 | **Cached bounds** | Each entity's own bounds and its subtree's, kept the same way | Hit testing, the selection box, culling, F |
 | **Cached hidden and locked state** | Whether an entity or a parent is hidden or locked, kept per entity | Hit testing, drawing, the dimmed eye in the Entities panel. The play copy carries it through the level data |
 | **Cached collision pieces** | A shape is split into pieces once per change of its geometry, never on a move | Drawing, physics view, play start |
-| **Culling** | On every pan, zoom or move, entities whose subtree bounds are off screen get `renderable = false` on their PixiJS node, so they cost nothing to draw. Groups fully off screen skip their whole subtree | Drawing large levels |
+| **Culling** | On every render (so after every pan, zoom or move), entities whose subtree bounds are off screen get `renderable = false` on their PixiJS node, so they cost nothing to draw. Groups fully off screen skip their whole subtree. Built in stage 4, see [adapters.md](adapters.md#stage-4s-choices) | Drawing large levels |
 | **Drawing on change only** | The PixiJS ticker is off; one render per animation frame only when something changed | An idle editor uses no CPU |
 | **Rebuilding a drawing only when its shape or style changes** | Moving an entity only changes its node's matrix | Dragging, test play |
 | **Batching** | PixiJS batches `Graphics` that share the same kind of drawing state. v1 uses no filters, masks or blend modes per entity, which would break batches. Effects (v3) are the first to need a separate pass, as the scope says | Drawing many shapes |

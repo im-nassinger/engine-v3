@@ -65,7 +65,7 @@ Written under the standing yes (2026-11-14), and all eight built on 2026-11-14. 
 
 ## Stage 4 in steps
 
-Written under the standing yes (2026-11-14). Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [adapters.md](architecture/adapters.md#stage-4s-choices).
+Written under the standing yes (2026-11-14), and all nine built by 2026-11-15. Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [adapters.md](architecture/adapters.md#stage-4s-choices).
 
 | # | Step | Module | Ends with |
 |---|---|---|---|

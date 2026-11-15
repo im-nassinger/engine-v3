@@ -12,7 +12,7 @@ Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed*
 | `vite` | 8.3.8 | Dev server and build |
 | `react`, `react-dom` | 19.3.1 | The panels only. React never holds the level, see [ui.md](ui.md) |
 | `@types/react`, `@types/react-dom` | 19.3.0 | |
-| `pixi.js` | 8.23.0 | Draws the level view, see [adapters.md](adapters.md) |
+| `pixi.js` | 8.23.0, installed in stage 4 | Draws the level view, see [adapters.md](adapters.md). Used without an `Application`, through `autoDetectRenderer` with WebGL first and the canvas renderer second, never WebGPU, so there is no ticker and one path is tested in all three browsers (standing yes, 2026-11-14). See [adapters.md](adapters.md#stage-4s-choices) |
 | `box2d3-wasm` | 6.0.0 | Box2D v3.2 built to wasm. **Always imported as `box2d3-wasm/compat`**, see below |
 
 ### Why `box2d3-wasm/compat`

@@ -74,7 +74,7 @@ export type PhysicsWorld = {
 
 ### Stage 4's choices
 
-Made under the standing yes (2026-11-14), before building. The [plan](../plan.md#stage-4-in-steps) has the steps.
+Made under the standing yes (2026-11-14), before building, and the "as built" entries while building (2026-11-14 and 15). The [plan](../plan.md#stage-4-in-steps) has the steps.
 
 - **Stage 4 builds what later stages call, not their inputs.** The wheel, Space and middle-drag panning come with `PointerInput` (stage 9); F and the Zoom menu are commands (stages 5 and 6); the `Back to level` button is ui (stage 6); remembering the view in the browser is `LocalStorageSettings` (stage 12); `SelectionOverlay` is stage 9's and `ToolPreviewOverlay` stage 10's. *Why: a stage never builds what a later stage owns.*
 - **`PixiLevelView` is given the level, its caches, `ViewState`, `ViewSettings` and a `FrameScheduler`**, not the `EditorSession`, which stage 5 builds. `show(level, caches)` swaps the level, for New, Import and the `PlayMirror`.

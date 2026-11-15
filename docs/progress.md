@@ -2,11 +2,11 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**; the [runner](runner.md) pushes after each step. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **The owner gave a standing yes** (2026-11-14): Claude decides the smaller questions and keeps building without waiting, listing each decision in [decisions.md](decisions.md). Round 10 was settled that way. **Stage 2, the v1 components and the file format, is built** (2026-11-14): all ten v1 components, the registry, `level.json` with `LevelWriter` and `LevelReader`, with 418 tests. **Stage 3, geometry, is built** (2026-11-14): `exp`, `Units`, the polygon pipeline with `clipper2-ts` filling and the game's own `EarClipping` triangulating, lines, mass and the two caches, with 512 tests. **Stage 4, drawing a level, is under way**: its nine [steps](plan.md#stage-4-in-steps) are written, and `ViewState`, `ViewSettings`, `PixiLevelView`, `LevelDisplay`, culling and all five overlays (grid, bounds, camera frame, joint icons, physics view) are built, and the page draws a test level.
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**; the [runner](runner.md) pushes after each step. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **The owner gave a standing yes** (2026-11-14): Claude decides the smaller questions and keeps building without waiting, listing each decision in [decisions.md](decisions.md). Round 10 was settled that way. **Stage 2, the v1 components and the file format, is built** (2026-11-14): all ten v1 components, the registry, `level.json` with `LevelWriter` and `LevelReader`, with 418 tests. **Stage 3, geometry, is built** (2026-11-14): `exp`, `Units`, the polygon pipeline with `clipper2-ts` filling and the game's own `EarClipping` triangulating, lines, mass and the two caches, with 512 tests. **Stage 4, drawing a level, is built** (2026-11-15): `ViewState`, `ViewSettings`, `PixiLevelView` with PixiJS 8, `LevelDisplay`, culling and all five overlays (grid, bounds, camera frame, joint icons, physics view), and the page draws a test level, with 564 unit tests, 126 browser tests in three browsers and 3 Playwright tests. **Stage 5, editing without a mouse, is next.**
 
 ## Where things stand
 
-**Runner:** stage 4, step 8 of 9: the page draws a test level through `PixiLevelView`, and a Playwright test checks its colours and that a `devicePixelRatio` of 2 doubles the canvas's pixels. Next is the stage's docs: what the build showed and [stack.md](architecture/stack.md)'s `pixi.js` row. The [runner](runner.md) keeps this line up to date.
+**Runner:** stage 4, step 9 of 9: stage 4 is done and written up. Next is stage 5, whose first step writes its steps into [plan.md](plan.md). The [runner](runner.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -24,7 +24,8 @@
 | Stage 1, the model | Done on 2026-11-14. See below |
 | The stage 2 plan | Approved under the standing yes on 2026-11-14, with round 10, and written into the [architecture](architecture/README.md) |
 | Stage 3, geometry | Done on 2026-11-14. See below |
-| Code | Stages 0 to 3 done. Stage 4, drawing a level, is under way |
+| Stage 4, drawing a level | Done on 2026-11-15. See below |
+| Code | Stages 0 to 4 done. Stage 5, editing without a mouse, is next |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -73,6 +74,14 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 - **Round 10**, every card at Claude's pick: see [decisions.md](decisions.md#decided-under-the-standing-yes).
 - **An owner decision built differently** (2026-11-14): the owner said to ask again if `clipper2-ts` failed. Its fill works, but **its triangulation drops areas** (a one-stroke star loses its middle) while reporting success. The unattended runner can't ask, so it took the closest fix: `clipper2-ts` only fills, and the game's own `EarClipping` triangulates. See [geometry.md](architecture/core-model/geometry.md#the-polygon-pipeline); the owner can overturn it.
 
+### Stage 4, built on 2026-11-15
+
+- All nine [steps](plan.md#stage-4-in-steps) are done, one commit each. What the build showed is written into [adapters.md](architecture/adapters.md#stage-4s-choices) as "as built" entries, each choice listed in [decisions.md](decisions.md#decided-under-the-standing-yes). `pixi.js` 8.23.0 is installed, see [stack.md](architecture/stack.md).
+- `editor/view` holds `ViewState` and `ViewSettings`; `editor/time` the `FrameScheduler` contract with `ManualFrames`; `adapters/browser` `AnimationFrames` and `DevicePixelRatio`; `adapters/pixi` `PixiLevelView`, `LevelDisplay`, `EntityNode`, `EntityDrawing` and the five overlays.
+- **PixiJS runs without an `Application`**, through `autoDetectRenderer` with WebGL first, so there is no ticker and an idle view draws nothing. **Culling runs every render** from `BoundsCache`, so nothing tracks what moved. **The grid is drawn over the level**, because the World's fill is the background inside the level layer.
+- **A WebGL canvas can't be read back after it is shown**, so the Playwright test reads colours from a screenshot of the canvas.
+- **Left for later stages:** panning and zooming with the mouse (stage 9), F and the Zoom menu (stages 5 and 6), `Back to level` (stage 6), remembering the view (stage 12), `SelectionOverlay` (stage 9), `ToolPreviewOverlay` (stage 10), drawing during play (stage 16). `app/startLevelView.ts` and `app/testLevel.ts` go when stage 5's `EditorSession` and the editor page replace them.
+
 ### Stage 3, built on 2026-11-14
 
 - All eight [steps](plan.md#stage-3-in-steps) are done, one commit each. What the build showed is written into [geometry.md](architecture/core-model/geometry.md), each choice listed in [decisions.md](decisions.md#decided-under-the-standing-yes).
@@ -108,7 +117,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 ## Next
 
 1. **Push** so CI runs for the first time on x86 and ARM (step 7 of stage 0). The [runner](runner.md) does it after its first step.
-2. **Stage 4 of [plan.md](plan.md): drawing a level.** Its [steps](plan.md#stage-4-in-steps) are written; each is built in one commit.
+2. **Stage 5 of [plan.md](plan.md): editing without a mouse.** Its first step writes its steps into the plan; each step is then built in one commit.
 3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
