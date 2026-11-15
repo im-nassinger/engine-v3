@@ -136,7 +136,7 @@ Written under the standing yes (2026-11-15), and all twelve built on 2026-11-15.
 
 ## Stage 8 in steps
 
-Written under the standing yes (2026-11-15). Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-8s-choices).
+Written under the standing yes (2026-11-15), and all fifteen built on 2026-11-15. Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-8s-choices).
 
 | # | Step | Module | Ends with |
 |---|---|---|---|
