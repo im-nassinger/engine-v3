@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 5, step 5 of 11: `LevelReader.readSubtree` puts removed or pasted entities back with every file check, and `AddEntitiesChange` and `RemoveEntitiesChange` (in `editor/history/changes`) apply and revert exactly. Next is step 6, `EditTransaction`, `History` and `LevelEditor`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 5, step 6 of 11: `EditTransaction`, `History` (512 steps, joining within 1 second) and `LevelEditor` (in `editor/history`) make each command one undo step, all or nothing, and undo puts back the selection and the current group. Next is step 7, `OpenLevel`, `EditorSession`, the commands and the Undo, Redo and Select all commands. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -116,7 +116,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 5 of [plan.md](plan.md#stage-5-in-steps): editing without a mouse.** Steps 1 to 5 are done; each further step is built in one commit.
+1. **Stage 5 of [plan.md](plan.md#stage-5-in-steps): editing without a mouse.** Steps 1 to 6 are done; each further step is built in one commit.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

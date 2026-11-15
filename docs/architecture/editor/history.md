@@ -42,16 +42,23 @@ export class EditTransaction {
 }
 
 export class LevelEditor {
-    constructor(level: Level, history: History, selection: Selection, currentGroup: CurrentGroup);
+    constructor(options: { level: Level; history: History; selection: EditedSelection; currentGroup: EditedGroup });
 
     edit(label: string, work: (transaction: EditTransaction) => EditOutcome): EditOutcome;
     recordApplied(label: string, changes: readonly LevelChange[], joinKey?: string): void;  // drags, nudges
+    undo(): HistoryStep | undefined;        // also puts back the selection and group from before
+    redo(): HistoryStep | undefined;        // and from after
 }
 
 export type EditOutcome =
     | { kind: 'done'; selectAfter?: readonly EntityId[]; skipped?: readonly SkippedEntity[] }
-    | { kind: 'refused'; reason: RefusalReason };
+    | { kind: 'refused'; reason: string };
+
+export type SkippedEntity = { id: EntityId; kind: 'world' | 'camera' };
 ```
+
+- **As built (standing yes, 2026-11-15):** `EditedSelection` (`ids`, `replace`) and `EditedGroup` (`path`, `restore`) are the shapes `LevelEditor` needs of `Selection` and `CurrentGroup`, declared in `editor/history`, so history imports neither module. *Why: `editor/session` builds on history (the `EditorSession`), and a module circle is refused by dependency-cruiser.* A refusal's `reason` is the status bar's sentence itself, written by the command, as `CommandOutcome`'s is. `SkippedEntity` says which kind was kept, for `outcomeText`'s `Camera kept`.
+- **As built (standing yes, 2026-11-15):** `LevelEditor` has `undo` and `redo`, which call `History` and then put back the step's current group, then its selection, leaving out ids no longer in the level. A refused or throwing command also puts back the selection and group from before, since a rolled-back removal had dropped the entity from the selection. `selectAfter` is applied before the step is recorded, so the step's `selectionAfter` is what redo selects.
 
 - `edit` remembers the selection and current group, runs `work`, and:
   - on `done` with changes: records one step, then applies `selectAfter`;
@@ -69,7 +76,7 @@ export class History {
     readonly version: VersionCounter;
 
     constructor(clock: Clock);
-    record(step: HistoryStep): void;        // clears redo, drops the oldest past 512
+    record(step: NewHistoryStep): void;     // stamps the time, clears redo, drops the oldest past 512
     undo(level: Level): HistoryStep | undefined;
     redo(level: Level): HistoryStep | undefined;
     get undoLabel(): string | undefined;    // "Move 3 entities", for the tooltip and the status text
@@ -91,6 +98,7 @@ export type HistoryStep = {
 
 - **Undo restores the selection and the current group.** The group is stored as a path, so if that group no longer exists the editor lands in the nearest one above it that does, as the requirement says.
 - **Joining:** a step with the same `joinKey` as the last one, recorded within 1 second of it, joins it instead of making a new step. The arrow keys use the key `nudge:` plus the selected ids, so a run of nudges is one step, and selecting something else starts a new one. Joined `SetValueChange`s on the same value keep the first old value and the last new value.
+- **As built (standing yes, 2026-11-15):** `record` takes a `NewHistoryStep`, the step without `recordedAtMs`, and stamps it from the `Clock`. Only the step recorded last can be joined: after an undo or redo, a step with the same key starts a new one. A joined step keeps the first step's selection and group before, and takes the rest from the newest, its time included, so a run keeps joining while each step comes within a second of the one before. `SetValueChange`s are merged (`joinedWith`) only when both steps hold nothing but value edits; otherwise the changes are kept in order, because a move between two edits of a value would be reverted in the wrong order. `undoCount` and `redoCount` are there for tests and the menu.
 - Undo never moves the view. If the undone change is off screen, the status text still says `Undid: Move 3 entities`.
 - Undo and Redo are off during test play; the commands' availability says so.
 

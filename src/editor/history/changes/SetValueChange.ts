@@ -19,6 +19,7 @@ export class SetValueChange implements LevelChange {
     readonly entityId: EntityId;
     readonly componentType: ComponentTypeName;
     readonly key: string;
+    private readonly schema: AnyComponentSchema;
     private readonly entry: AnyValueEntry;
     private readonly oldValue: unknown;
     private readonly newValue: unknown;
@@ -32,6 +33,7 @@ export class SetValueChange implements LevelChange {
         this.entityId = options.entityId;
         this.componentType = options.schema.typeName;
         this.key = options.key;
+        this.schema = options.schema;
         this.entry = entry;
         this.oldValue = entry.type.clone(options.oldValue);
         this.newValue = entry.type.clone(options.newValue);
@@ -43,6 +45,28 @@ export class SetValueChange implements LevelChange {
 
     revert(level: Level) {
         this.write(level, this.oldValue);
+    }
+
+    writesSameValueAs(other: SetValueChange) {
+        const sameEntity = this.entityId === other.entityId;
+        const sameComponent = this.componentType === other.componentType;
+
+        return sameEntity && sameComponent && this.key === other.key;
+    }
+
+    // A joined run of edits to one value: from this change's old value to the later one's new value.
+    joinedWith(later: SetValueChange) {
+        if (!this.writesSameValueAs(later)) {
+            throw new Error(`Only changes to the same value join: ${this.key} and ${later.key}.`);
+        }
+
+        return new SetValueChange({
+            entityId: this.entityId,
+            schema: this.schema,
+            key: this.key,
+            oldValue: this.oldValue,
+            newValue: later.newValue,
+        });
     }
 
     private write(level: Level, value: unknown) {

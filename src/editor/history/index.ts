@@ -13,3 +13,9 @@ export type {
     SubtreeCopyOptions,
     TreePlace,
 } from './changes/index.ts';
+export type { EditOutcome, SkippedEntity } from './EditOutcome.ts';
+export { EditTransaction } from './EditTransaction.ts';
+export { History } from './History.ts';
+export type { HistoryStep, NewHistoryStep } from './HistoryStep.ts';
+export { LevelEditor } from './LevelEditor.ts';
+export type { EditedGroup, EditedSelection, LevelEditorOptions } from './LevelEditor.ts';
