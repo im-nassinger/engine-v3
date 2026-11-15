@@ -33,12 +33,15 @@ Source: round 1: C1, C10; round 3: R15; round 4: H2, SEL1; decisions: D14, D15; 
 
 ### One fixed list of field types · v1
 
-- Every Inspector field is one of: **number, text, checkbox, choice, colour, vector, angle, entity, asset, variable, tags**, or a **list** of any of these.
+- Every Inspector field is one of: **number, text, checkbox, choice, colour, vector, angle, entity, asset, variable, tags, path point**, or a **list** of any of these.
+- **A list is one field**, such as "Points", folded by default with its item count beside its name. Unfolded, it shows one row per item, each the field of its type. A + at the end adds an item and each row can be removed, unless that breaks the list's minimum or maximum, which is refused with a status text. Each change is one undo step.
+- A **path point** is one point of a path: its position, its two curve handles and its corner (sharp, smooth, or smooth with handles that move separately).
+- *Why the points are one list field: a shape's points are one value, so they read as one entry, not as a row per point (owner, 2026-11-15).*
 - Components and scripts share the list: a setting a `.lua` file declares shows as the same kind of field.
 - A new need adds a type to the list, never a special field on one component.
 - *Why: one list makes components and scripts look and behave the same, and the interface work is a fixed set of field types.*
 
-Source: round 3: S2; round 4: FT1
+Source: round 3: S2; round 4: FT1; owner: 2026-11-15
 
 ### Typing values · v1
 

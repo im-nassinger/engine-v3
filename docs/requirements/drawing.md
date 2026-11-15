@@ -67,7 +67,8 @@ Source: scope DR4; round 8: SH3
 - Polygons, lines and paths resize by moving their points.
 - A free resize of a single shape leaves its outline width alone. A resize with Shift (proportional) multiplies width, height and outline width together.
 - Inside a scaled group everything stretches, outlines and text included. An uneven group scale gives uneven outlines. That is what "like a picture" means.
-- The Inspector shows Width and Height for a rectangle, polygon, line or path, and Radius for a circle. Typing a size on a polygon, line or path rescales its points. The point count is shown read-only.
+- The Inspector shows Width and Height for a rectangle, polygon, line or path, and Radius for a circle. Typing a size on a polygon, line or path rescales its points.
+- **Points is one list field** in the Inspector: a polygon's or line's points are a list of vectors, a path's a list of path points. Typing a point moves it. A polygon keeps 3 to 1,000 points, a line 2 to 1,000 (owner: 2026-11-15).
 - **A circle stays round when resized:** its radius follows the larger stretch, as if Shift were held. Only its TransformComponent's scale stretches it (owner: 2026-11-15).
 
 Source: round 1: D21; round 5: 03 2.4; old: DR-21 to DR-30; owner: 2026-11-15

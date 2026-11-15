@@ -32,7 +32,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Entities panel | The panel listing every entity as a tree: groups with their children inside. One row is one entity. The top row is drawn in front. |
 | Inspector | The panel on the left showing the components of what is selected, so you can edit their values. |
 | Card | One component as the Inspector shows it: a title and its fields. |
-| Field | One editable value on a card. Fields come from one fixed list of field types. |
+| Field | One editable value on a card. Fields come from one fixed list of field types. A list field holds several values of one type as one field, such as a shape's Points. |
 | Attribute | One value of a component, as the Lua API names it: the Inspector field "Linear damping" is the attribute `linear_damping`. Scripts read it with `get_attribute` and change it with `set_attribute`. |
 | Assets panel | The panel listing the level's files in folders, like a small file system. |
 | Console | The panel at the bottom showing errors, `print()` messages and trigger lines from test play. |
@@ -64,6 +64,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Regular polygon | A polygon whose sides are all the same length, such as a hexagon. |
 | Line | An open chain of straight segments, 2 points or more. Used for ground. |
 | Path | A curved line drawn with the Bézier pen or the Pencil. It is only drawn. It never collides. |
+| Path point | One point of a path: its position, its two curve handles and its corner. A field type of its own (v2). |
 | Fill | What paints the inside of a shape, path or text: nothing, a solid colour, a gradient or an image. |
 | Outline | The line drawn around a shape, path or text: a colour and a width. |
 | Image | Not a kind of entity: a shape whose fill is an image file. |
