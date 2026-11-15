@@ -16,7 +16,7 @@ The requirements set speed targets for a level of 10,000 entities on a mid-range
 | **Drawing on change only** | The PixiJS ticker is off; one render per animation frame only when something changed | An idle editor uses no CPU |
 | **Rebuilding a drawing only when its shape or style changes** | Moving an entity only changes its node's matrix | Dragging, test play |
 | **Batching** | PixiJS batches `Graphics` that share the same kind of drawing state. v1 uses no filters, masks or blend modes per entity, which would break batches. Effects (v3) are the first to need a separate pass, as the scope says | Drawing many shapes |
-| **A virtual Entities panel** | Only the rows on screen exist, at a fixed 24 px height. The flat list of visible rows is rebuilt only when the tree or the folded rows change | Opening in under 0.2 s, smooth scrolling |
+| **A virtual Entities panel** | Only the rows on screen exist, at a fixed 28 px height, the `--row` token. The flat list of visible rows is rebuilt only when the tree or the folded rows change | Opening in under 0.2 s, smooth scrolling |
 | **Per-entity versions for React** | A change wakes only that entity's row and card | Dragging, editing values |
 | **Incremental editor messages** | Rules re-run only for entities that changed, once per frame | Editing big levels |
 | **Many selected entities** | Above 500 selected, outlines are replaced by the shared box and a count, as the requirement says | Selecting thousands |

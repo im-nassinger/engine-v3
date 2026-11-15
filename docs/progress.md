@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 6, step 11 of 11: stage 6 is done and written up. Next is stage 7, the Entities panel, whose first step writes its steps into [plan.md](plan.md). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 7, step 1 of 11: the steps of stage 7, the Entities panel, are written into [plan.md](plan.md#stage-7-in-steps), with their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). Next is step 2, `EntitiesRows`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -27,7 +27,7 @@
 | Stage 4, drawing a level | Done on 2026-11-15. See below |
 | Stage 5, editing without a mouse | Done on 2026-11-15. See below |
 | Stage 6, the editor shell | Done on 2026-11-15. See below |
-| Code | Stages 0 to 6 done. Stage 7, the Entities panel, is next |
+| Code | Stages 0 to 6 done. Stage 7, the Entities panel, is being built: its steps are written |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 

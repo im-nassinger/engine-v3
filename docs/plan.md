@@ -115,6 +115,24 @@ Written under the standing yes (2026-11-15), and all eleven built on 2026-11-15.
 | 10 | No page gestures: no scrolling, overscroll or swipe-back; `KeyboardInput` wired in `app` | `app`, `ui/shell`, `tests/e2e` | Playwright: G hides the grid, but G typed into the level name's box doesn't; Ctrl+0, F5 and Ctrl+R keep their default; the page never scrolls |
 | 11 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes |
 
+## Stage 7 in steps
+
+Written under the standing yes (2026-11-15). Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices).
+
+| # | Step | Module | Ends with |
+|---|---|---|---|
+| 1 | These steps, and the choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices) | `docs/` | `node tools/check-docs.js` passes |
+| 2 | `EntitiesRows`: the flat rows by a pre-order walk skipping folded children, rebuilt only when the tree or the folds change; `indexOf`, `reveal`, `setFolded`; `rowKind`, the icon a row shows; `OpenLevel` gains `entitiesRows` | `editor/entities-panel`, `editor/session` | Folding hides a subtree and unfolding brings it back; `reveal` unfolds every parent and gives the row's index; a child hidden by its parent is marked; reading the rows of a 10,000-entity level twice walks the tree once |
+| 3 | `RowClicks`: click, Ctrl+click and Shift+click with the range's anchor; the eye's `toggleEntityHidden` | `editor/entities-panel`, `editor/commands` | Shift+click selects the rows between the anchor and the click in row order; Ctrl+click on the World selects it alone; the eye hides only its row and is one step; the World has no eye |
+| 4 | `EntitiesDrop`: the drop target from the row, the place in the row and the pointer's indent | `editor/entities-panel` | Above, below and into a row; the indent picks the depth after a group's last child; into itself or its children, above the World, and the camera anywhere but directly in the World are refused |
+| 5 | `moveEntities`: the dragged entities to a drop target, in their panel order, each kept in place on screen, one step | `editor/commands` | The round trip; skew kept to within 1e-9; a move past 256 deep is refused; dropping where they already are makes no step |
+| 6 | `RenameRequest` on `OpenLevel`; the Rename command (`edit.rename`, F2), which asks the panel to rename the selected entity | `editor/entities-panel`, `editor/session`, `editor/commands` | Rename is disabled with nothing, several or the World selected, each with its reason; running it reveals the row and asks to rename it |
+| 7 | `@tanstack/react-virtual` installed; `EntitiesPanel` and `EntitiesRow`: the virtual list, the fold arrow, the kind icon, the name, the eye, the looks of [controls.md](design/controls.md#entities-panel-rows), the clicks | `ui/entities-panel` | Browser tests: at 10,000 rows only the rows on screen exist; a click selects and Ctrl+click adds; a rename redraws only that row; the eye hides |
+| 8 | Renaming in place: F2 and a double-click on the name; Enter and leaving the box commit, Esc reverts | `ui/entities-panel` | Playwright: double-click, type, Enter renames, and Ctrl+Z puts the name back; F2 renames the selected row; Esc keeps the old name |
+| 9 | Dragging rows: the 3 px start, the whole selection when a selected row is dragged, the drop line, scrolling near the list's edges, Esc cancelling | `ui/entities-panel` | Browser tests at 10,000 rows: a drag across rows scrolled into view lands where its line was drawn; a refused place draws no line; a drop is one undo step |
+| 10 | Reveal: a selection made outside the panel unfolds its parents and scrolls its row into view; the open time at 10,000 rows | `ui/entities-panel` | Browser tests: Group's new group inside folded rows is shown; the panel paints its first rows within 0.2 s of mounting at 10,000 entities, the time written into [performance.md](architecture/performance.md) |
+| 11 | The docs: what the build showed, [stack.md](architecture/stack.md)'s `@tanstack/react-virtual` row, `progress.md` | `docs/` | `node tools/check-docs.js` passes |
+
 ## After v1
 
 v2 starts with its own plan, written the same way, from the seams in the architecture: new components in the registry, new tick phases, `ScriptEngine` with `wasmoon`, the Assets panel's files in the project file and IndexedDB, Monaco, and the v2 tools.
