@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 3, step 1 of 8: its [steps](plan.md#stage-3-in-steps) are written; `DeterministicMath.exp` and `Units` are next. The [runner](runner.md) keeps this line up to date.
+**Runner:** stage 3, step 2 of 8: `DeterministicMath.exp` and `Units` are built; `Bounds`, `clipper2-ts` and `PolygonLibrary` are next. The [runner](runner.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

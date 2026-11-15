@@ -151,3 +151,54 @@ describe('DeterministicMath.sinCos', () => {
         expect(DeterministicMath.sinCos(Number.NaN).cos).toBeNaN();
     });
 });
+
+describe('DeterministicMath.exp', () => {
+    const SMALLEST_NORMAL = 2.2250738585072014e-308;
+    const EXP_SAMPLES = evenlySpaced(-700, 700, 200_003);
+    const SMALL_EXP_SAMPLES = evenlySpaced(-2, 2, 100_003);
+
+    function largestRelativeDifference(samples: number[]) {
+        let largest = 0;
+
+        for (const sample of samples) {
+            const expected = Math.exp(sample);
+            const difference = Math.abs(DeterministicMath.exp(sample) - expected);
+            largest = Math.max(largest, difference / expected);
+        }
+
+        return largest;
+    }
+
+    test('is within 1e-12 of Math, relative, from -700 to 700', () => {
+        const allSamples = [...EXP_SAMPLES, ...SMALL_EXP_SAMPLES];
+
+        expect(largestRelativeDifference(allSamples)).toBeLessThan(ACCURACY);
+    });
+
+    test('is within 1e-12 of Math, relative, where the result is subnormal or near overflow', () => {
+        const edgeSamples = [...evenlySpaced(-745, -708, 10_001), ...evenlySpaced(700, 709.78, 10_001)];
+
+        let largest = 0;
+
+        for (const sample of edgeSamples) {
+            const expected = Math.exp(sample);
+            const difference = Math.abs(DeterministicMath.exp(sample) - expected);
+            // A subnormal result has fewer bits, so it is compared against the smallest normal number.
+            const scale = Math.max(expected, SMALLEST_NORMAL);
+            largest = Math.max(largest, difference / scale);
+        }
+
+        expect(largest).toBeLessThan(ACCURACY);
+    });
+
+    test.each([0, -0, 1e-10, -1e-10, 710, -746, Infinity, -Infinity])(
+        'matches Math.exp(%d) exactly at the edges',
+        (value) => {
+            expect(DeterministicMath.exp(value)).toBe(Math.exp(value));
+        },
+    );
+
+    test('gives NaN for NaN', () => {
+        expect(DeterministicMath.exp(Number.NaN)).toBeNaN();
+    });
+});

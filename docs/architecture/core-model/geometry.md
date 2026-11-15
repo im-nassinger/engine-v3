@@ -9,8 +9,8 @@
 | Quantity | In the game, the Inspector and Lua | In Box2D | Converted by |
 |---|---|---|---|
 | Length, position | pixels | metres: px ÷ 50 | `Units.toMetres`, `Units.toPixels` |
-| Angle | degrees, clockwise on screen | radians | `Units.toRadians` |
-| Speed | px/s, °/s | m/s, rad/s | `Units` |
+| Angle | degrees, clockwise on screen | radians | `Units.toRadians`, `Units.toDegrees` |
+| Speed | px/s, °/s | m/s, rad/s | The same four functions: a speed converts like its length or angle |
 | Gravity | m/s² | m/s² | none |
 | Mass | kg | kg | none |
 
@@ -101,5 +101,6 @@ export class DeterministicMath {
 - Built only from `+ − × ÷` and `Math.sqrt`, which IEEE 754 defines exactly, so every computer gives the same bits. `Math.sin` and friends are not exactly defined and may differ between browsers and processors.
 - Used by everything that runs during a tick and by everything that builds the play copy: ellipse points, the matrices of bodies, camera smoothing (`exp`), joint angles. An ESLint rule bans `Math.sin`, `Math.cos`, `Math.atan2`, `Math.exp`, `Math.pow` and `Math.random` in `src/core`, see [parts-and-folders.md](../parts-and-folders.md).
 - Box2D does its own trigonometry inside the wasm build, which is the same everywhere.
+- `exp` is fdlibm's `e_exp`, like `sin`, `cos` and `atan2` are fdlibm's: the argument is split into k · ln 2 + r, a polynomial gives eʳ, and 2ᵏ is built by exact multiplication of powers of two, not by setting the number's bits. It gives Infinity above about 709.78 and 0 below about −745.1, like `Math.exp`, and can be one bit away from V8's (`exp(1)` is). *(standing yes, 2026-11-14)*
 - Accuracy target: within 1e-12 of `Math` over the range the game uses, checked by a test. For `exp` that is relative, over −700 to 700, where the result neither overflows nor reaches 0 (standing yes, 2026-11-14). Exactness matters less than sameness.
 - Random numbers (v2) come from `SeededRandom` in the same module: a small integer generator (xoshiro128**) seeded from the run's seed.

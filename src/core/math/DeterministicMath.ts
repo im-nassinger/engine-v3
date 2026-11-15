@@ -1,4 +1,5 @@
 import { arctangent } from './arctangent.ts';
+import { exponential } from './exponential.ts';
 import { cosineOfSmallAngle, sineOfSmallAngle } from './sineCosineKernels.ts';
 
 // pi/2 split in two: the high part has 33 bits, so quarterTurns * HIGH is exact for up to 2^20
@@ -98,7 +99,7 @@ function arctangentOnAnAxis(y: number, x: number) {
     return isLowerZero ? -Math.PI : Math.PI;
 }
 
-// The game's own sine, cosine and arctangent, built from + - * / and Math.sqrt only, so every
+// The game's own sine, cosine, arctangent and exponent, built from + - * / and Math.sqrt only, so every
 // computer gives the same bits. Math.sin and the others may differ between browsers.
 export class DeterministicMath {
     static sin(radians: number) {
@@ -128,6 +129,11 @@ export class DeterministicMath {
         if (hasInfinity) return arctangentWithInfinity(y, x);
 
         return arctangentOfQuotient(y, x);
+    }
+
+    // Same answers as Math.exp at the edges: Infinity above about 709.78, 0 below about -745.1.
+    static exp(value: number) {
+        return exponential(value);
     }
 
     // Exact at every whole multiple of 90 degrees, so a quarter turn never leaves a tiny slant.
