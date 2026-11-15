@@ -46,6 +46,33 @@ export function EntitiesList({ openLevel }: EntitiesListProps) {
         overscan: OVERSCAN,
     });
 
+    // The row to scroll into view, scrolled after the render that gave the virtualizer the new row
+    // count: an ask that unfolded parents adds rows the virtualizer doesn't know about yet. A new
+    // object each time, so asking for the same row again scrolls again.
+    const [scrollAsk, setScrollAsk] = useState<{ entityId: EntityId } | undefined>(undefined);
+    useEffect(() => {
+        if (scrollAsk === undefined) return;
+
+        const index = entitiesRows.indexOf(scrollAsk.entityId);
+        if (index < 0) return;
+
+        virtualizer.scrollToIndex(index);
+    }, [scrollAsk, entitiesRows, virtualizer]);
+
+    // A selection made outside the panel, by a command or an undo, has already unfolded its parents.
+    const selectionReveal = openLevel.selectionReveal;
+    useEffect(() => {
+        const scrollToRevealed = () => {
+            const revealedId = selectionReveal.entityId;
+            if (revealedId === undefined) return;
+
+            selectionReveal.clear();
+            setScrollAsk({ entityId: revealedId });
+        };
+
+        return selectionReveal.version.subscribe(scrollToRevealed);
+    }, [selectionReveal]);
+
     // The row whose name box is open. A rename asked by F2 scrolls its row into view first, so the
     // row exists to open the box in.
     const [renamingId, setRenamingId] = useState<EntityId | undefined>(undefined);
@@ -56,15 +83,12 @@ export function EntitiesList({ openLevel }: EntitiesListProps) {
             if (askedId === undefined) return;
 
             renameRequest.clear();
-            const index = entitiesRows.indexOf(askedId);
-            if (index < 0) return;
-
-            virtualizer.scrollToIndex(index);
+            setScrollAsk({ entityId: askedId });
             setRenamingId(askedId);
         };
 
         return renameRequest.version.subscribe(openAskedBox);
-    }, [renameRequest, entitiesRows, virtualizer]);
+    }, [renameRequest]);
 
     const endRenaming = () => setRenamingId(undefined);
 

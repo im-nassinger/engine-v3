@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 7, step 10 of 12: **dragging rows** is built: a drag past 3 px moves the row, or the whole selection, to where the drop line shows, as one step; the list scrolls near its edges and Esc cancels. Next is step 11, reveal and the open time at 10,000 rows. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 7, step 11 of 12: **reveal** is built: a selection made outside the panel unfolds its parents and scrolls its row into view, and the panel paints its first rows within 42 ms at 10,000 entities. Next is step 12, the docs: what the build showed, stack.md's `@tanstack/react-virtual` row, and this file. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

@@ -7,3 +7,4 @@ export type { RowKind } from './rows/rowKind.ts';
 export { EntitiesDrop } from './drop/EntitiesDrop.ts';
 export type { DropPointer, DropTarget } from './drop/EntitiesDrop.ts';
 export { RenameRequest } from './rename/RenameRequest.ts';
+export { SelectionReveal } from './reveal/SelectionReveal.ts';

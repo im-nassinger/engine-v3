@@ -57,8 +57,9 @@ describe('Rename', () => {
     test('reveals a row inside a folded group', () => {
         const { session, rename, group, child } = buildSession();
         const { entitiesRows, selection } = session.openLevel;
-        entitiesRows.setFolded(group.id, true);
+        // Selecting reveals the row itself, so the group is folded after.
         selection.replace([child.id]);
+        entitiesRows.setFolded(group.id, true);
         expect(entitiesRows.indexOf(child.id)).toBe(-1);
 
         rename.run();

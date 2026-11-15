@@ -113,7 +113,10 @@ export class RowDrag {
         this.swallowsNextClick = true;
         if (drag.target === undefined) return;
 
-        const outcome = moveEntities(press.openLevel, drag.draggedIds, drag.target);
+        // The panel selects the moved rows itself: a drop into a folded group leaves it folded.
+        const { openLevel } = press;
+        const target = drag.target;
+        const outcome = openLevel.selectionReveal.fromPanel(() => moveEntities(openLevel, drag.draggedIds, target));
         if (outcome.kind !== 'refused') return;
 
         this.status.show(outcome.reason);
@@ -155,9 +158,10 @@ export class RowDrag {
         const distance = Math.hypot(this.pointerX - press.startX, this.pointerY - press.startY);
         if (distance < DRAG_START_DISTANCE) return false;
 
-        const { selection, level, entitiesRows } = press.openLevel;
+        const { selection, level, entitiesRows, selectionReveal } = press.openLevel;
         if (!selection.has(press.entityId)) {
-            selection.replace([press.entityId]);
+            const pressedIds = [press.entityId];
+            selectionReveal.fromPanel(() => selection.replace(pressedIds));
         }
 
         const drop = new EntitiesDrop(level, entitiesRows);

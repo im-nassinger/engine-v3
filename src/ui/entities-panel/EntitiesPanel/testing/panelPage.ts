@@ -59,8 +59,19 @@ export function buildLevel(entityCount: number) {
 }
 
 export function showPanel(level: Level) {
+    const session = createSession(level);
+    mountPanel(session);
+
+    return session;
+}
+
+export function createSession(level: Level) {
     const timer = new ManualTimer();
-    const session = new EditorSession({ level, clock: new ManualClock(), timer });
+
+    return new EditorSession({ level, clock: new ManualClock(), timer });
+}
+
+export function mountPanel(session: EditorSession) {
     const commands: EditorCommands = {
         registry: createCommandRegistry(session),
         runner: new CommandRunner(session.status),
@@ -71,8 +82,6 @@ export function showPanel(level: Level) {
     const withCommands = createElement(CommandsContext, { value: commands }, panel);
     const withSession = createElement(EditorContext, { value: session }, withCommands);
     root.render(withSession);
-
-    return session;
 }
 
 export function shownRows() {
