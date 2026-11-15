@@ -5,6 +5,7 @@ import { GroupCommand } from './arrange/GroupCommand.ts';
 import { UngroupCommand } from './arrange/UngroupCommand.ts';
 import { CommandRegistry } from './CommandRegistry.ts';
 import { DeleteCommand } from './edit/DeleteCommand.ts';
+import { AboutCommand } from './help/AboutCommand.ts';
 import { HideOrShowCommand } from './edit/HideOrShowCommand.ts';
 import { RedoCommand } from './edit/RedoCommand.ts';
 import { SelectAllCommand } from './edit/SelectAllCommand.ts';
@@ -41,6 +42,7 @@ export function createCommandRegistry(session: EditorSession) {
     registry.register(new FitWholeLevelCommand(session));
     registry.register(new FitSelectionCommand(session));
     registry.register(new FitCameraFrameCommand(session));
+    registry.register(new AboutCommand());
 
     return registry;
 }

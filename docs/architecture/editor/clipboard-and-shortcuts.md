@@ -22,7 +22,18 @@ export type EditorCommand = {
 export type CommandOutcome =
     | { kind: 'done'; skipped?: readonly SkippedEntity[] }  // "Camera kept" in the status bar
     | { kind: 'refused'; reason: string }                  // "The camera can't be deleted"
-    | { kind: 'needsConfirmation'; question: Question; confirm(): CommandOutcome };
+    | { kind: 'needsConfirmation'; question: Question; confirm(): CommandOutcome }
+    | { kind: 'notice'; notice: Notice };                  // About: a dialog with only OK
+
+export type Question = { title: string; text: string; confirmLabel: string }; // Cancel is the other button
+export type Notice = { title: string; text: string };
+
+export class CommandRunner {                // commands/running/: every caller runs commands through it
+    readonly dialog: OpenDialog;            // the one dialog on screen; later ones wait behind it
+    run(command: EditorCommand): void;      // a disabled command's reason shows as status text
+    confirmDialog(): void;                  // the question's go-ahead: confirm(), then its outcome is shown
+    closeDialog(): void;                    // Cancel, OK or Esc: changes nothing
+}
 
 export class CommandRegistry {
     register(command: EditorCommand): void;
@@ -31,7 +42,7 @@ export class CommandRegistry {
 }
 ```
 
-- One class per command, grouped by menu: `commands/file/`, `edit/`, `arrange/`, `view/`, `play/`. Each takes what it needs through its constructor (the session's `OpenLevel`, the clipboard, the saving coordinator).
+- One class per command, grouped by menu: `commands/file/`, `edit/`, `arrange/`, `view/`, `play/`, `help/`. `CommandRunner` and `OpenDialog` are in `commands/running/`. Each takes what it needs through its constructor (the session's `OpenLevel`, the clipboard, the saving coordinator).
 - **The skip rule** from the requirements is shared: a command filters out the entities that don't allow it, returns them as `skipped`, and is disabled only when nothing would be left. The status text says what was skipped.
 - `needsConfirmation` covers the requirement's questions: "Replace the open level?" before New and Import, and the warning before a move that changes which body an entity belongs to. The UI shows the question and calls `confirm()`.
 

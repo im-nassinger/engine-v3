@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 6, step 2 of 11: `KeyChord`, `KeyPress` and `ShortcutMap` are built in `editor/shortcuts`, matching recorded keys from US, ABNT2, German, Russian and Mac keyboards. Next is step 3, `CommandRunner`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 6, step 3 of 11: `CommandRunner` and `OpenDialog` are built in `editor/commands/running`, showing every outcome as status text or as the one dialog, with the About command. Next is step 4, `ShortcutDispatcher`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -26,7 +26,7 @@
 | Stage 3, geometry | Done on 2026-11-14. See below |
 | Stage 4, drawing a level | Done on 2026-11-15. See below |
 | Stage 5, editing without a mouse | Done on 2026-11-15. See below |
-| Code | Stages 0 to 5 done. Stage 6, the editor shell, is being built: steps 1 and 2 of 11 done |
+| Code | Stages 0 to 5 done. Stage 6, the editor shell, is being built: steps 1 to 3 of 11 done |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 

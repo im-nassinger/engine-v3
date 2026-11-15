@@ -4,6 +4,7 @@ export { UngroupCommand } from './arrange/UngroupCommand.ts';
 export { CommandRegistry } from './CommandRegistry.ts';
 export { createCommandRegistry } from './createCommandRegistry.ts';
 export { DeleteCommand } from './edit/DeleteCommand.ts';
+export { AboutCommand, GAME_NAME } from './help/AboutCommand.ts';
 export { HideOrShowCommand } from './edit/HideOrShowCommand.ts';
 export { RedoCommand } from './edit/RedoCommand.ts';
 export { SelectAllCommand } from './edit/SelectAllCommand.ts';
@@ -15,8 +16,13 @@ export type {
     EditorCommand,
     MenuName,
     MenuPlace,
+    Notice,
+    Question,
     ShortcutScope,
 } from './EditorCommand.ts';
+export { CommandRunner } from './running/CommandRunner.ts';
+export { OpenDialog } from './running/OpenDialog.ts';
+export type { Dialog } from './running/OpenDialog.ts';
 export { renameEntity } from './rename/renameEntity.ts';
 export { renameLevel } from './rename/renameLevel.ts';
 export { EntityNamer } from './shared/EntityNamer.ts';
