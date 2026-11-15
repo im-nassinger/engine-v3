@@ -142,11 +142,10 @@ The Select tool holds one **drag state** at a time (the State pattern):
 
 ## The Shape tool
 
-- One tool, four kinds: rectangle, circle, polygon and line. **It has no options strip** (owner, 2026-11-15). Choosing it clears the selection, and the tool remembers the kind used last, a rectangle at first.
-- **The shape about to be drawn:** while the Shape tool is active and nothing is selected, `InspectorModel` shows a TransformComponent, a ShapeComponent and a StyleComponent card that belong to the tool, not to the level. Only Kind can be written, and it sets the tool's kind. The other fields show empty and disabled until drawing starts, then follow the drawing live: the position on the first press, the size during a drag. Nothing in it is an entity, saved or an undo step until `CreateShapeCommand` runs.
+- One tool, four kinds: rectangle, circle, polygon and line. **Its options strip offers Rectangle, Circle and Polygon** (owner, 2026-11-15); a line is a polygon drawing finished open. The tool remembers the kind used last, a rectangle at first.
+- **Choosing it clears the selection and hides the Inspector** (owner, 2026-11-15). `InspectorModel` only ever describes entities in the level, never a shape being drawn, so it needs no case for something that isn't an entity. The Inspector shows again when the tool is left: after a shape is finished the tool returns to Select with the shape selected.
 - A faded preview follows the mouse; a click places it at the remembered size, a drag sets a new size. A circle's drag gives the circle that fits the box, as if Shift were held. Resizing a circle with the Select tool's handles keeps it round: the radius follows the larger stretch.
-- Polygon and line: each click adds a point; clicking the first point closes a polygon; Enter, Esc and double-click finish; Ctrl+Z or Backspace removes the last point. Choosing another tool or pressing Play finishes and keeps the drawing.
-- Finishing runs `CreateShapeCommand`: a TransformComponent, a ShapeComponent and a StyleComponent with the v1 default look, in the current group, on top, named by `EntityNamer` ("Rectangle 1": one more than the highest number already used with that word), and selected.
+- Polygon: each click adds a point; clicking the first point closes it into a polygon; Enter, Esc, double-click, choosing another tool or Play finish it open, as a line (fewer than 2 points is dropped); Ctrl+Z or Backspace removes the last point. - Finishing runs `CreateShapeCommand`: a TransformComponent, a ShapeComponent and a StyleComponent with the v1 default look, in the current group, on top, named by `EntityNamer` ("Rectangle 1": one more than the highest number already used with that word), and selected.
 
 ## The Joint tool
 

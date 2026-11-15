@@ -41,7 +41,7 @@ The owner compared two directions and **picked A** (2026-11-14): exactly the rou
 
 1. **A new level:** the empty editor, the World and the camera in the Entities panel, the World's cards in the Inspector.
 2. **A selected shape:** a new shape in the default blue look, selected on the light blue background, its cards in the Inspector, its row selected in the Entities panel.
-3. **Drawing:** the Shape tool drawing a polygon, the faded preview, and the Inspector showing the shape about to be drawn with Kind: Polygon (owner, 2026-11-15: it replaced the options strip).
+3. **Drawing:** the Shape tool drawing a polygon, the faded preview, the Inspector hidden and the options strip with Polygon on in its place (owner, 2026-11-15).
 4. **The main menu and a dialog:** the main menu open on Edit, and the "Replace the open level?" question before New.
 5. **Test play:** the panels hidden, the camera's box with black bars, the Play bar.
 6. **States:** every control in each state, and the level view's overlays. Some states are Claude's proposals, marked in [controls.md](controls.md) and [level-view.md](level-view.md).

@@ -331,17 +331,10 @@ function inspectorWorld() {
     ${card('PhysicsWorldComponent', F.num('Gravity strength', '9.8', 'm/s²') + F.choice('Gravity direction', 'Down') + F.num('Gravity angle', '90', '°', { off: true }) + F.check('Walls', false))}
   </div>`;
 }
-// The shape about to be drawn: only Kind can change, the rest is greyed and follows the drawing.
-function inspectorDrawing() {
-  const off = { off: true };
-  return `<div class="panel insp"><div class="ph">Inspector</div>
-    <div class="ihead">${ic('polygon')}<div class="nm plain">New shape</div></div>
-    <div style="overflow:hidden">
-    ${card('TransformComponent', F.vec('Position', '−640', '−40', 'px', off) + F.num('Rotation', '0', '°', off) + F.vec('Scale', '1', '1', '', off) + F.num('Skew', '0', '°', off))}
-    ${card('ShapeComponent', F.choice('Kind', 'Polygon') + F.num('Width', '380', 'px', off) + F.num('Height', '310', 'px', off) + F.num('Points', '4', '', Object.assign({ ro: true }, off)))}
-    ${card('StyleComponent', F.colour('Fill', '#4a90d9', off) + F.colour('Outline colour', '#1f3552', off) + F.num('Outline width', '2', 'px', off) + F.num('Opacity', '100', '%', off))}
-    </div>
-  </div>`;
+// The Shape tool hides the Inspector; its options strip takes the Inspector's place, right of the toolbar.
+function shapeStrip(kind) {
+  const kinds = [['rect', 'Rectangle'], ['circle', 'Circle'], ['polygon', 'Polygon']];
+  return `<div class="opts" style="left:52px">${kinds.map(([icon, name]) => `<span class="ib${icon === kind ? ' on' : ''}">${ic(icon)}${name}</span>`).join('')}</div>`;
 }
 function inspectorRect() {
   return `<div class="panel insp"><div class="ph">Inspector</div>
@@ -386,7 +379,7 @@ function editor(o) {
   return topbar(o.top) +
     `<div class="view">${scene(VIEW_W, VIEW_H, o.zoom || Z, CX, CY, o.scene)}</div>` +
     toolstrip(o.tool || 'select', o.tooltip) + entities(o.rows, o.selectedRow, o.hoverRow) +
-    (o.inspector === 'rect' ? inspectorRect() : o.inspector === 'drawing' ? inspectorDrawing() : inspectorWorld()) +
+    (o.inspector === 'rect' ? inspectorRect() : o.inspector === 'none' ? '' : inspectorWorld()) + (o.strip || '') +
     statusbar(o.hint, o.pos, o.sel, o.warnings || 0) + (o.extra || '');
 }
 
@@ -426,9 +419,9 @@ const MOMENTS = [
     (d) => editor({ rows: ROWS_LEVEL, selectedRow: 'Rectangle 1', hoverRow: 'Crate 2', inspector: 'rect',
       scene: Object.assign({ selected: 'rect1' }, LEVEL_SCENE), top: { name: 'Car test', canUndo: true },
       hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Rectangle 1', warnings: 1 })],
-  ['3', 'Drawing', 'The Shape tool drawing a polygon: choosing the tool cleared the selection, so the Inspector shows the shape about to be drawn. Only Kind can be changed; the greyed fields follow the drawing. Four points placed, the faded preview following the mouse, the first point ringed to close it.',
-    (d) => editor({ rows: ROWS_LEVEL, tool: 'shape', inspector: 'drawing', scene: Object.assign({ drawing: true }, LEVEL_SCENE), top: { name: 'Car test', canUndo: true },
-      hint: 'Shape · click to add a point, click the first point or press Enter to close', pos: 'x −640, y −40', sel: 'Nothing selected', warnings: 1 })],
+  ['3', 'Drawing', 'The Shape tool drawing a polygon: choosing the tool cleared the selection and hid the Inspector. The options strip in its place offers Rectangle, Circle and Polygon, with Polygon on. Four points placed, the faded preview following the mouse, the first point ringed to close it. Enter would finish it open, as a line. Once finished, the tool returns to Select and the Inspector shows the new shape.',
+    (d) => editor({ rows: ROWS_LEVEL, tool: 'shape', inspector: 'none', strip: shapeStrip('polygon'), scene: Object.assign({ drawing: true }, LEVEL_SCENE), top: { name: 'Car test', canUndo: true },
+      hint: 'Shape · click to add a point, click the first point to close, Enter to finish as a line', pos: 'x −640, y −40', sel: 'Nothing selected', warnings: 1 })],
   ['4a', 'The main menu', 'The main menu open on Edit. Every command is listed with its shortcut. Redo is greyed because there is nothing to redo.',
     (d) => editor({ rows: ROWS_LEVEL, selectedRow: 'Rectangle 1', inspector: 'rect', scene: Object.assign({ selected: 'rect1' }, LEVEL_SCENE),
       top: { name: 'Car test', canUndo: true, menuOpen: true }, hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Rectangle 1', warnings: 1, extra: MENU })],

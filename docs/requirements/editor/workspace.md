@@ -16,7 +16,7 @@ Sizes in pixels are starting values until tested.
 - Panels can't be dragged to other places or floated. *Why: fixed panels are enough for the first version, and docking is a large feature.*
 - Starting sizes: toolbar 44 px wide, Inspector 300 px, Entities and Assets panels 260 px, top bar 44 px, status bar 24 px, Console 220 px when open.
 - The centre has a permanent `Level` tab. A `.lua` file opens as an extra closable tab beside it, one per file. The tab strip shows only while an extra tab is open.
-- A tool with options, such as the Joint tool's joint type, shows a small options strip over the top left of the level view. It never shifts the layout. The Shape tool has none: its kind is picked in the Inspector (owner: 2026-11-15), see [drawing](../drawing.md#the-shape-tool--v1).
+- A tool with options, such as the Joint tool's joint type, shows a small options strip over the top left of the level view. It never shifts the layout. The Shape tool's strip offers its kinds and takes the Inspector's place, since the Inspector is hidden while that tool is active (owner: 2026-11-15), see [drawing](../drawing.md#the-shape-tool--v1).
 - One dark theme. *Why: art and levels read well on it.*
 - Panel sizes, folded cards and open tabs are editor settings saved in the browser. They are never in the level and never in undo.
 

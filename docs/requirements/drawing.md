@@ -22,13 +22,14 @@ Source: round 1: D39; round 5: 03 2.1; old: DR-01 to DR-09
 
 ### The Shape tool · v1
 
-- One tool draws four kinds: **rectangle, circle, polygon, line**. These are the four kinds a ShapeComponent can hold.
-- **Choosing the Shape tool clears the selection.** With nothing selected, the Inspector shows the shape about to be drawn: a TransformComponent, a ShapeComponent and a StyleComponent card. **Only the ShapeComponent's Kind can be changed there**, and it picks what the tool draws. The other fields are empty and greyed out, and fill in as you draw: the position when you click, the size as you drag. It is not an entity yet: it isn't in the Entities panel, isn't saved and isn't an undo step until it is placed. *Why: the kind belongs to the shape, so it is picked where the shape's values are, and the Inspector never shows a selected shape beside the tool's choice.*
-- The tool draws the kind used last, a rectangle at first. Once a shape is placed it is selected, so to draw another kind, click empty space and pick it again.
+- One tool draws the four kinds a ShapeComponent can hold: **rectangle, circle, polygon, line**.
+- **Choosing the Shape tool clears the selection and hides the Inspector.** In its place, an options strip at the top left of the level view offers **Rectangle, Circle and Polygon**. A line is drawn as a polygon finished open, see below. *Why: the Inspector only shows entities that exist. A shape still being drawn isn't one, and showing it there would mean the Inspector had to handle things that aren't entities (owner: 2026-11-15).*
+- The strip starts on the kind used last, a rectangle at first.
+- When the shape is finished, the tool returns to Select (see [the toolbar](editor/workspace.md)), the new shape is selected, and the Inspector shows it. With tool lock on, the Shape tool stays active and the Inspector stays hidden until you leave it (standing yes, 2026-11-15).
 - A faded preview follows the mouse and shows exactly what a click will place. A click places it. Dragging sets the size instead, and the size is remembered for the next shape.
 - **Circle:** a circle has only a radius. A drag draws the circle that fits the dragged box, as if Shift were held. To make an ellipse, scale the circle unevenly in its TransformComponent: the shape stays a circle.
-- **Polygon:** each click adds a point. Clicking the first point closes it. Enter, Esc and double-click close it too. A polygon is always closed and can be any outline.
-- **Line:** an open chain of straight segments, 2 points or more. Each click adds a point, and Enter, Esc or double-click finishes. A single segment is a line with 2 points. Curved lines are paths. *Why a line is its own kind: Box2D calls it a chain and it is the usual way to make platformer ground.*
+- **Polygon:** each click adds a point. **Clicking the first point closes it into a polygon.** A polygon is always closed and can be any outline.
+- **Line:** **Enter finishes the polygon being drawn open, as a line**: an open chain of straight segments, 2 points or more. A single segment is a line with 2 points. Curved lines are paths. Esc, double-click, choosing another tool and Play finish it open too, so only clicking the first point closes it (standing yes, 2026-11-15: the owner named Enter; one rule for every other way of finishing). *Why a line is its own kind: Box2D calls it a chain and it is the usual way to make platformer ground. Why it isn't in the strip: an open polygon is a line, so one choice draws both (owner: 2026-11-15).*
 - The size in px shows beside the mouse during a drag.
 - A rectangle is at least 1 px on each side, and a circle at least 1 px across.
 - **A line drawn perfectly flat has a height of 0**, and typing a height for it is refused with a status text, because points all on one row can't be spread. To slope it, move a point. The same goes for its width when drawn perfectly upright (standing yes, 2026-11-14).

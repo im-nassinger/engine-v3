@@ -46,6 +46,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Locked | An entity whose lock icon is on. You can't click or drag it in the level view. Editor-only. |
 | Snapping | When an entity you move jumps into line with the grid or with other entities. |
 | Grid | The editor's grid of lines in the level view. Never the collision grid. |
+| Options strip | The small bar of choices a tool shows over the top left of the level view: the Joint tool's types, the Shape tool's kinds. |
 | Pivot | The point an entity rotates and scales around. |
 | Editor message | A short note on the card it is about, never blocking, maybe with a fix button. All of them are listed from the status bar. Two kinds: warning and tip. |
 | Warning | An editor message with a yellow icon: this setup may not work as expected. |
@@ -62,7 +63,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Circle | A shape with only a radius. There is no ellipse kind: an ellipse is a circle scaled unevenly by its TransformComponent. |
 | Polygon | A closed shape made of straight edges between points. It may cross itself. |
 | Regular polygon | A polygon whose sides are all the same length, such as a hexagon. |
-| Line | An open chain of straight segments, 2 points or more. Used for ground. |
+| Line | An open chain of straight segments, 2 points or more. Used for ground. Drawn as a polygon finished with Enter instead of closed. |
 | Path | A curved line drawn with the Bézier pen or the Pencil. It is only drawn. It never collides. |
 | Path point | One point of a path: its position, its two curve handles and its corner. A field type of its own (v2). |
 | Fill | What paints the inside of a shape, path or text: nothing, a solid colour, a gradient or an image. |
