@@ -86,6 +86,12 @@ Polygon steps:
 
 **Lines.** A line becomes Box2D chains: one chain in each direction, so it collides from both sides with no ghost bumps at its joins, the option the tech notes list. Points closer than 0.25 px are merged first, and a line that crosses itself is cut into separate chains at each crossing, because chains can't cross themselves. A line has no area, so it has no mass.
 
+- **`LineChains.build(points)`** (standing yes, 2026-11-14) returns the chains in the line's own space, each of 2 points or more, in the drawn direction; the Box2D adapter adds each one a second time reversed. The details:
+  - Merging keeps the line's last point in place of the kept point it is close to, so the line's ends never move and chains cut at a crossing meet exactly there. *Why: dropping the last point would shorten the line by up to 0.25 px at its end.*
+  - A line is cut wherever two of its segments that aren't neighbours cross or touch, also where it passes through one of its own points again or ends on an earlier segment. Both chains get the same point, so they meet exactly. A line crossing itself once gives three chains, the middle one a loop starting and ending at the crossing.
+  - Segments lying along each other (a line turning back on itself) aren't cut, because cutting can't separate them. *Why: chains only must not cross; Box2D handles an overlap like two segments in the same place.*
+  - Only `+ − × ÷` and comparisons, like the polygon steps. A test checks that 500 random lines give chains that don't cross themselves, with points at least 0.25 px apart.
+
 **What the editor can't draw:** a polygon whose every piece is too small has no collision. The v3 warning "Too small to collide" reads the same pipeline.
 
 ## Mass
