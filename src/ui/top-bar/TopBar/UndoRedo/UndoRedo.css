@@ -1,0 +1,4 @@
+.undo-redo {
+    display: inline-flex;
+    gap: var(--space-4);
+}

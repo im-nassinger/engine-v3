@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { MenuEntry, MenuSubmenu } from '../MenuEntry.ts';
 import { MenuActionRow } from './MenuActionRow/index.ts';
 import { MenuSubmenuRow } from './MenuSubmenuRow/index.ts';
@@ -6,14 +7,18 @@ import './MenuPanel.css';
 export type MenuPanelProps = {
     entries: MenuEntry[];
     onChoose: () => void;
+    header?: ReactNode;
     openSubmenuId?: string;
     onShowSubmenu?: (submenu: MenuSubmenu, topPx: number) => void;
     onHideSubmenu?: () => void;
 };
 
-export function MenuPanel({ entries, onChoose, openSubmenuId, onShowSubmenu, onHideSubmenu }: MenuPanelProps) {
+export function MenuPanel(props: MenuPanelProps) {
+    const { entries, onChoose, header, openSubmenuId, onShowSubmenu, onHideSubmenu } = props;
+
     return (
         <div className="menu-panel">
+            {header}
             {entries.map((entry) => (
                 <MenuPanelEntry
                     key={entry.id}

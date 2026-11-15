@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 6, step 7 of 11: the page is the editor's shell. `app/EditorComposition.ts` builds the session on a new level, and the level view fills the window under empty panels, opening fitted to the camera frame in the part the panels leave free. `startLevelView.ts` and `testLevel.ts` are gone. Next is step 8, the `TopBar` with the main menu. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 6, step 8 of 11: the top bar is built: the main menu lists every registered command with its shortcut, the level's name renames in place as an undo step and names the tab, Undo and Redo name their step, and the View menu, the zoom (with a typed value) and Help open their menus. Next is step 9, the status bar, the toolbar, the dialogs and the error boundaries. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -26,7 +26,7 @@
 | Stage 3, geometry | Done on 2026-11-14. See below |
 | Stage 4, drawing a level | Done on 2026-11-15. See below |
 | Stage 5, editing without a mouse | Done on 2026-11-15. See below |
-| Code | Stages 0 to 5 done. Stage 6, the editor shell, is being built: steps 1 to 7 of 11 done |
+| Code | Stages 0 to 5 done. Stage 6, the editor shell, is being built: steps 1 to 8 of 11 done |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 

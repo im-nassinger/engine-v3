@@ -1,6 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../ui/theme.css';
+import { CommandsContext } from '../ui/commands/index.ts';
+import type { EditorCommands } from '../ui/commands/index.ts';
 import { EditorContext } from '../ui/EditorContext.tsx';
 import { LevelViewMountContext } from '../ui/level-view-host/index.ts';
 import { EditorShell } from '../ui/shell/index.ts';
@@ -21,13 +23,20 @@ await Promise.all(fontLoads);
 
 const composition = await EditorComposition.create();
 const root = createRoot(requireElement('root'));
+const editorCommands: EditorCommands = {
+    registry: composition.commands,
+    runner: composition.runner,
+    platform: composition.platform,
+};
 
 root.render(
     <StrictMode>
         <EditorContext value={composition.session}>
-            <LevelViewMountContext value={composition.levelView}>
-                <EditorShell />
-            </LevelViewMountContext>
+            <CommandsContext value={editorCommands}>
+                <LevelViewMountContext value={composition.levelView}>
+                    <EditorShell />
+                </LevelViewMountContext>
+            </CommandsContext>
         </EditorContext>
     </StrictMode>,
 );

@@ -272,6 +272,7 @@ export class Level {
     }
 
     private announceLevelRenamed() {
+        this.signals.nameVersion.increment();
         this.signals.levelVersion.increment();
         this.signals.updated.emit({ kind: 'levelRenamed' });
     }

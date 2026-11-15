@@ -9,6 +9,8 @@ export class LevelSignals {
     // Any add, remove or move.
     readonly treeVersion = new VersionCounter();
     readonly entityVersions = new EntityVersions();
+    // Only the level's own name: the top bar and the browser tab title read it.
+    readonly nameVersion = new VersionCounter();
     // Anything at all: used by autosave.
     readonly levelVersion = new VersionCounter();
 }

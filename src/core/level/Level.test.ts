@@ -375,6 +375,18 @@ describe('Level name', () => {
         expect(updates).toEqual([{ kind: 'levelRenamed' }]);
     });
 
+    test('a rename moves the name version, and nothing else does', () => {
+        const level = Level.createNew();
+        const versionBefore = level.signals.nameVersion.version;
+
+        const worldName = level.world.requireComponent(NameComponent);
+        worldName.writeValue('name', 'Ground');
+        expect(level.signals.nameVersion.version).toBe(versionBefore);
+
+        level.rename('Bridge');
+        expect(level.signals.nameVersion.version).toBe(versionBefore + 1);
+    });
+
     test('an empty name and a name past 60 characters are refused', () => {
         const level = Level.createNew();
         const sixtyCharacters = 'é'.repeat(60);

@@ -1,0 +1,36 @@
+.menu-button {
+    position: relative;
+    display: inline-flex;
+
+    > .toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-6);
+        min-width: var(--control);
+        height: var(--control);
+        padding: 0 var(--space-6);
+        border: none;
+        border-radius: var(--radius);
+        background: none;
+        color: var(--text);
+        cursor: default;
+
+        &:hover {
+            background: var(--hover);
+        }
+
+        &[aria-expanded='true'] {
+            background: var(--accent-soft);
+        }
+
+        &:focus-visible {
+            outline: 1px solid var(--accent);
+        }
+
+        > .arrow {
+            display: flex;
+            color: var(--muted);
+        }
+    }
+}

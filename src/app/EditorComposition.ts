@@ -1,10 +1,17 @@
-import { AnimationFrames, BrowserTimer, DevicePixelRatio, SystemClock } from '../adapters/browser/index.ts';
+import {
+    AnimationFrames,
+    BrowserTimer,
+    DevicePixelRatio,
+    keyboardPlatform,
+    SystemClock,
+} from '../adapters/browser/index.ts';
 import { PixiLevelView } from '../adapters/pixi/index.ts';
 import { levelBoundsOf } from '../core/derived/index.ts';
 import { Level } from '../core/level/index.ts';
 import { CommandRunner, createCommandRegistry } from '../editor/commands/index.ts';
 import type { CommandRegistry } from '../editor/commands/index.ts';
 import { EditorSession } from '../editor/session/index.ts';
+import type { KeyboardPlatform } from '../editor/shortcuts/index.ts';
 
 const FIT_CAMERA_FRAME = 'view.fitCameraFrame';
 
@@ -12,6 +19,7 @@ type EditorParts = {
     readonly session: EditorSession;
     readonly commands: CommandRegistry;
     readonly runner: CommandRunner;
+    readonly platform: KeyboardPlatform;
     readonly levelView: PixiLevelView;
 };
 
@@ -21,12 +29,14 @@ export class EditorComposition {
     readonly session: EditorSession;
     readonly commands: CommandRegistry;
     readonly runner: CommandRunner;
+    readonly platform: KeyboardPlatform;
     readonly levelView: PixiLevelView;
 
     private constructor(parts: EditorParts) {
         this.session = parts.session;
         this.commands = parts.commands;
         this.runner = parts.runner;
+        this.platform = parts.platform;
         this.levelView = parts.levelView;
     }
 
@@ -38,6 +48,7 @@ export class EditorComposition {
         });
         const commands = createCommandRegistry(session);
         const runner = new CommandRunner(session.status);
+        const platform = keyboardPlatform(navigator.platform);
         const levelView = await PixiLevelView.create({
             view: session.view,
             settings: session.viewSettings,
@@ -46,7 +57,7 @@ export class EditorComposition {
             drawing: { showUnstyled: true },
         });
 
-        const composition = new EditorComposition({ session, commands, runner, levelView });
+        const composition = new EditorComposition({ session, commands, runner, platform, levelView });
         composition.start();
 
         return composition;

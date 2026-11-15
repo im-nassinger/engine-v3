@@ -150,6 +150,7 @@ export class LevelSignals {
     readonly updated: Signal<LevelUpdate>;
     readonly treeVersion: VersionCounter;      // any add, remove or move
     readonly entityVersions: EntityVersions;   // one counter per entity, for one Entities panel row or card
+    readonly nameVersion: VersionCounter;      // the level's own name: the top bar and the tab title
     readonly levelVersion: VersionCounter;     // anything at all: used by autosave
 }
 ```

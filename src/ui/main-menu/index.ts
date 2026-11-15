@@ -1,1 +1,1 @@
-export {};
+export { MainMenu } from './MainMenu/index.ts';

@@ -82,13 +82,15 @@ src/
     worker/            WorkerGameRunner, GameWorkerHost, ImportWorkerClient, ImportWorkerHost, protocol/
     zip/               FflateZipCodec
   ui/
-    EditorContext.tsx  the one React context: hands the editor session to components
-    hooks/             useVersion, useSelection, useEntityVersion, useLevelTree
+    EditorContext.tsx  hands the editor session to components
+    commands/          context/ (CommandsContext: the registry, CommandRunner and the platform),
+                       menu-entries/ (menus built from the registry), CommandMenu/
+    hooks/             useVersion, useReading, and later useSelection, useEntityVersion, useLevelTree
     theme.css          colour and size tokens of the one dark theme
     shell/ top-bar/ status-bar/ toolbar/ main-menu/ tool-options/ level-view-host/
     entities-panel/ inspector/ play-bar/ dialogs/
     fields/            one component per field type: NumberField/, ColourField/, ...
-    shared/            Button/, Menu/, Tooltip/, Icon/
+    shared/            Button/, IconButton/, Menu/, MenuButton/, Tooltip/, Icon/
 tests/
   guards/              tests that prove each check still refuses what it should
   determinism/         the determinism test and its recorded hashes

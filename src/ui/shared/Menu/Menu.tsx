@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { RefObject } from 'react';
+import type { ReactNode, RefObject } from 'react';
 import type { MenuEntry, MenuSubmenu } from './MenuEntry.ts';
 import { MenuPanel } from './MenuPanel/index.ts';
 import './Menu.css';
@@ -12,6 +12,8 @@ export type MenuProps = {
     // The button that opened the menu. A press on it is left to the button, which closes the menu itself.
     anchor: RefObject<HTMLElement | null>;
     align?: MenuAlign;
+    // Shown above the entries, such as the zoom's box for a typed percentage.
+    header?: ReactNode;
 };
 
 type OpenSubmenu = {
@@ -20,7 +22,7 @@ type OpenSubmenu = {
 };
 
 // Placed under its anchor by the anchor's wrapper, which is positioned. Esc and a press outside close it.
-export function Menu({ entries, onClose, anchor, align = 'start' }: MenuProps) {
+export function Menu({ entries, onClose, anchor, align = 'start', header }: MenuProps) {
     const rootRef = useRef<HTMLDivElement>(null);
     const [openSubmenu, setOpenSubmenu] = useState<OpenSubmenu | undefined>(undefined);
 
@@ -62,6 +64,7 @@ export function Menu({ entries, onClose, anchor, align = 'start' }: MenuProps) {
         <div className="menu" data-align={align} ref={rootRef} role="menu">
             <MenuPanel
                 entries={entries}
+                header={header}
                 openSubmenuId={openSubmenu?.submenu.id}
                 onChoose={onClose}
                 onShowSubmenu={showSubmenu}
