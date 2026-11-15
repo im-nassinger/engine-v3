@@ -169,7 +169,7 @@ Values worked out from the tree, kept until something they depend on changes. Th
 | `BoundsCache` | Each entity's own bounds in level positions, and the bounds of its subtree | Its matrix, shape, path or outline width changes; subtree bounds also when a child's do |
 | `PiecesCache` | The collision pieces of each shape, in its own space | Its shape changes. Moving it never splits the polygon again |
 
-- **As built (2026-11-14):** each cache subscribes to `LevelSignals.updated` in its constructor and has `dispose()`. Both keep their values in a small internal `PerEntityValues`: a value is stored only after its parent's, so marking a subtree stops at the first entity with no value. `WorldMatrixCache` treats an entity without a TransformComponent as not moved.
+- **As built (2026-11-14):** `BoundsCache` and `PiecesCache` are described in [geometry.md](geometry.md#bounds). Each cache subscribes to `LevelSignals.updated` in its constructor and has `dispose()`. Both keep their values in a small internal `PerEntityValues`: a value is stored only after its parent's, so marking a subtree stops at the first entity with no value. `WorldMatrixCache` treats an entity without a TransformComponent as not moved.
 - **Marking is cheap and computing is lazy.** A change marks the entity and its subtree with one walk, and nothing is computed until someone asks. Dragging 1,000 entities marks 1,000 subtrees once per frame and recomputes only what is drawn or hit-tested.
 - In the play copy, `WorldMatrixCache` takes body poses from the simulation, see [simulation.md](../simulation.md#bodies-and-their-entities).
 

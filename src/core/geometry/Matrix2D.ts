@@ -91,6 +91,17 @@ export class Matrix2D {
         return this.a * this.d - this.b * this.c;
     }
 
+    // How far the matrix can stretch a length of 1, in its most stretched direction: the larger singular
+    // value. An outline of width w is at most w times this wide after the matrix.
+    largestStretch() {
+        const squaresSum = this.a * this.a + this.b * this.b + this.c * this.c + this.d * this.d;
+        const determinant = this.determinant();
+        const discriminant = squaresSum * squaresSum - 4 * determinant * determinant;
+        const spread = Math.sqrt(Math.max(discriminant, 0));
+
+        return Math.sqrt((squaresSum + spread) / 2);
+    }
+
     // The inverse of fromTransform. The x scale comes back positive, so a mirror shows as a
     // negative y scale. The rotation comes back above -180 and at most 180, the skew strictly
     // between -90 and 90.

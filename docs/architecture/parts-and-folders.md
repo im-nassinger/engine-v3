@@ -39,7 +39,7 @@ src/
       BodyComponent/ SurfaceComponent/ JointComponent/ CameraComponent/ PhysicsWorldComponent/
     geometry/          Matrix2D, Point, Bounds, the polygon pipeline, mass
     math/              DeterministicMath, units (px and metres, degrees and radians)
-    derived/           WorldMatrixCache, BoundsCache, HiddenCache
+    derived/           WorldMatrixCache, BoundsCache, HiddenCache, PiecesCache
     level-data/        LevelData types, LevelWriter, LevelReader, FormatUpgrader, limits
     physics/           PhysicsWorld contract, PhysicsSceneBuilder (merging), BodyMass, JointEnds
     simulation/        Simulation, the tick phases, BodyPoses, CameraFollow, TickReport

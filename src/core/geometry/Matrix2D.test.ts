@@ -131,3 +131,24 @@ describe('moving between parents', () => {
         }
     });
 });
+
+describe('Matrix2D.largestStretch', () => {
+    test('is the larger scale of a rotated, unevenly scaled matrix', () => {
+        const matrix = Matrix2D.fromTransform(transform(5, 7, 30, 2, -3, 0));
+
+        expect(Math.abs(matrix.largestStretch() - 3)).toBeLessThan(CLOSE);
+    });
+
+    test('is 1 for no change and 0 for a scale of 0', () => {
+        expect(Matrix2D.identity().largestStretch()).toBe(1);
+        expect(new Matrix2D(0, 0, 0, 0, 4, 4).largestStretch()).toBe(0);
+    });
+
+    test('covers how far a skew stretches the diagonal', () => {
+        const matrix = Matrix2D.fromTransform(transform(0, 0, 0, 1, 1, 45));
+        const diagonal = matrix.apply({ x: Math.SQRT1_2, y: Math.SQRT1_2 });
+        const diagonalLength = Math.sqrt(diagonal.x * diagonal.x + diagonal.y * diagonal.y);
+
+        expect(matrix.largestStretch()).toBeGreaterThanOrEqual(diagonalLength);
+    });
+});
