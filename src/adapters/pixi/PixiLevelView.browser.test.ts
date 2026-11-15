@@ -455,7 +455,7 @@ describe('PixiLevelView overlays', () => {
     test('the physics view is off at first and draws hidden and see-through shapes too', async () => {
         const { level, settings, frames, overlays } = await showNewLevel();
         const box = addCollidingShape(level, level.world, 0, 0, { kind: 'rectangle', width: 40, height: 20 });
-        const ball = addCollidingShape(level, level.world, 50, 0, { kind: 'ellipse', width: 30, height: 30 });
+        const ball = addCollidingShape(level, level.world, 50, 0, { kind: 'circle', radius: 15 });
         addCollidingShape(level, level.world, 0, 50, {
             kind: 'line',
             points: [

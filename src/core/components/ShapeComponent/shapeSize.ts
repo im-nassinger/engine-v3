@@ -17,7 +17,9 @@ function extentAlong(points: readonly Point[], axis: Axis) {
 }
 
 function sizeAlong(geometry: ShapeGeometry, axis: Axis) {
-    if (geometry.kind === 'rectangle' || geometry.kind === 'ellipse') {
+    if (geometry.kind === 'circle') return geometry.radius * 2;
+
+    if (geometry.kind === 'rectangle') {
         if (axis === 'x') return geometry.width;
 
         return geometry.height;
@@ -34,10 +36,20 @@ export function heightOf(geometry: ShapeGeometry) {
     return sizeAlong(geometry, 'y');
 }
 
+// 0 on every kind but a circle, where the Radius field is hidden.
+export function radiusOf(geometry: ShapeGeometry) {
+    if (geometry.kind !== 'circle') return 0;
+
+    return geometry.radius;
+}
+
 // A polygon's or line's points move away from or towards the shape's own origin, the way a rectangle,
 // centred on it, grows both ways. Points all on one row (or column) can't be spread, so that is refused.
+// A circle stays round: either size becomes its diameter.
 export function resizedAlong(geometry: ShapeGeometry, axis: Axis, newSize: number): ParseOutcome<ShapeGeometry> {
-    if (geometry.kind === 'rectangle' || geometry.kind === 'ellipse') {
+    if (geometry.kind === 'circle') return { ok: true, value: { kind: 'circle', radius: newSize / 2 } };
+
+    if (geometry.kind === 'rectangle') {
         if (axis === 'x') return { ok: true, value: { ...geometry, width: newSize } };
 
         return { ok: true, value: { ...geometry, height: newSize } };

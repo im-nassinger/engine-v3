@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 7, step 1 of 11: the steps of stage 7, the Entities panel, are written into [plan.md](plan.md#stage-7-in-steps), with their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). Next is step 2, **a circle instead of an ellipse**, added by the owner on 2026-11-15; `EntitiesRows` moved to step 3. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 7, step 2 of 12: **a circle instead of an ellipse** is built: the circle kind holds only a radius, with its Radius field, pieces, mass, exact bounds and drawing, and `level.json` stores `{ "kind": "circle", "radius" }`. Next is step 3, `EntitiesRows`. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

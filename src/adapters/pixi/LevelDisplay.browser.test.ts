@@ -237,7 +237,7 @@ describe('LevelDisplay', () => {
                 { x: 0, y: 100 },
             ],
         });
-        const circle = addShape(level, level.world, { kind: 'ellipse', width: 80, height: 80 });
+        const circle = addShape(level, level.world, { kind: 'circle', radius: 40 });
         const path = level.createEntity(level.world, 0);
         path.addComponent(new TransformComponent());
         path.addComponent(

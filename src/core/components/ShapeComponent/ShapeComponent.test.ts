@@ -69,10 +69,39 @@ describe('ShapeComponent', () => {
         expect(pointsField?.appliesWhen?.(square.schema.defaults())).toBe(false);
     });
 
+    test('a circle shows only Radius, and typing it keeps the circle at least 1 px across', () => {
+        const circle = new ShapeComponent({ geometry: { kind: 'circle', radius: 30 } });
+        const circleValues = circle.schema.defaults();
+        const roundValues = { ...circleValues, geometry: { kind: 'circle', radius: 30 } } as const;
+        const radiusField = ShapeComponent.schema.findDerivedField('radius');
+        const widthField = ShapeComponent.schema.findDerivedField('width');
+        const heightField = ShapeComponent.schema.findDerivedField('height');
+
+        expect(circle.readDerived('kind')).toBe('circle');
+        expect(circle.readDerived('radius')).toBe(30);
+        expect(radiusField?.appliesWhen?.(roundValues)).toBe(true);
+        expect(widthField?.appliesWhen?.(roundValues)).toBe(false);
+        expect(heightField?.appliesWhen?.(roundValues)).toBe(false);
+        expect(radiusField?.appliesWhen?.(circleValues)).toBe(false);
+
+        circle.writeDerived('radius', 45);
+        expect(circle.get('geometry')).toEqual({ kind: 'circle', radius: 45 });
+
+        circle.writeDerived('radius', 0.1);
+        expect(circle.get('geometry')).toEqual({ kind: 'circle', radius: 0.5 });
+    });
+
+    test('a rectangle has no Radius to write', () => {
+        const square = new ShapeComponent();
+
+        expect(() => square.writeDerived('radius', 10)).toThrow();
+        expect(square.get('geometry')).toEqual({ kind: 'rectangle', width: 100, height: 100 });
+    });
+
     test('Kind and Points are read-only', () => {
         const shape = new ShapeComponent();
 
-        expect(() => shape.writeDerived('kind', 'ellipse')).toThrow();
+        expect(() => shape.writeDerived('kind', 'circle')).toThrow();
         expect(() => shape.writeDerived('points', 4)).toThrow();
     });
 });

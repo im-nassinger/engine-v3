@@ -9,9 +9,9 @@ import { PolygonLibrary } from './PolygonLibrary.ts';
 import { pointAt, turn } from './Ring.ts';
 import type { ShapeGeometry } from '../ShapeGeometry.ts';
 
-// A fixed count, because the points of an ellipse decide how it collides, so they must be the same on
-// every computer and in every version.
-export const ELLIPSE_POINT_COUNT = 32;
+// A fixed count, because the points of a stretched circle decide how it collides, so they must be the same
+// on every computer and in every version.
+export const CIRCLE_POINT_COUNT = 32;
 
 // The requirement's limit: a piece narrower than this can't collide.
 const SMALLEST_COLLIDING_SIZE = 1;
@@ -38,17 +38,15 @@ function rectangleOutline(width: number, height: number) {
 }
 
 // Increasing angles turn clockwise on screen with y down, so the outline has a positive area. sinCos is
-// exact at quarter turns, so the four extreme points sit exactly on the ellipse's box.
-function ellipseOutline(width: number, height: number) {
-    const halfWidth = width / 2;
-    const halfHeight = height / 2;
-    const degreesPerPoint = 360 / ELLIPSE_POINT_COUNT;
+// exact at quarter turns, so the four extreme points sit exactly on the circle's box.
+function circleOutline(radius: number) {
+    const degreesPerPoint = 360 / CIRCLE_POINT_COUNT;
     const outline: Point[] = [];
 
-    for (let i = 0; i < ELLIPSE_POINT_COUNT; i++) {
+    for (let i = 0; i < CIRCLE_POINT_COUNT; i++) {
         const angle = DeterministicMath.sinCos(i * degreesPerPoint);
-        const x = halfWidth * angle.cos + 0;
-        const y = halfHeight * angle.sin + 0;
+        const x = radius * angle.cos + 0;
+        const y = radius * angle.sin + 0;
         outline.push({ x, y });
     }
 
@@ -123,16 +121,15 @@ function rectanglePieces(width: number, height: number): ShapePiecesResult {
     return { filledOutlines: [outline], pieces };
 }
 
-function circlePieces(diameter: number): ShapePiecesResult {
+function circlePieces(radius: number): ShapePiecesResult {
+    const diameter = radius * 2;
     if (diameter < SMALLEST_COLLIDING_SIZE) return NOTHING;
-
-    const radius = diameter / 2;
 
     return { filledOutlines: [], pieces: [{ kind: 'circle', radius }] };
 }
 
-function ellipsePieces(width: number, height: number) {
-    const outline = ellipseOutline(width, height);
+function stretchableCirclePieces(radius: number) {
+    const outline = circleOutline(radius);
 
     return polygonPieces(outline);
 }
@@ -141,9 +138,7 @@ function ellipsePieces(width: number, height: number) {
 // keeps the result and rebuilds it only when the geometry changes, never when the shape moves.
 export class ShapePieces {
     static build(geometry: ShapeGeometry) {
-        if (geometry.kind === 'ellipse' && geometry.width === geometry.height) {
-            return circlePieces(geometry.width);
-        }
+        if (geometry.kind === 'circle') return circlePieces(geometry.radius);
 
         return ShapePieces.buildAsPolygons(geometry);
     }
@@ -154,8 +149,8 @@ export class ShapePieces {
         switch (geometry.kind) {
             case 'rectangle':
                 return rectanglePieces(geometry.width, geometry.height);
-            case 'ellipse':
-                return ellipsePieces(geometry.width, geometry.height);
+            case 'circle':
+                return stretchableCirclePieces(geometry.radius);
             case 'polygon':
                 return polygonPieces(geometry.points);
             case 'line':

@@ -9,6 +9,6 @@ export type { PathCorner, PathGeometry, PathPoint } from './PathGeometry.ts';
 export type { Point } from './Point.ts';
 export { PolygonLibrary } from './pieces/PolygonLibrary.ts';
 export type { ShapeGeometry, ShapeKind } from './ShapeGeometry.ts';
-export { ELLIPSE_POINT_COUNT, ShapePieces } from './pieces/ShapePieces.ts';
+export { CIRCLE_POINT_COUNT, ShapePieces } from './pieces/ShapePieces.ts';
 export type { ShapePiecesResult } from './pieces/ShapePieces.ts';
 export type { TransformValues } from './TransformValues.ts';

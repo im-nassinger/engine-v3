@@ -14,14 +14,11 @@ function lengthOf(x: number, y: number) {
     return Math.sqrt(x * x + y * y);
 }
 
-// The level bounds of an ellipse centred on the origin, exactly: across x it reaches
-// sqrt((a * halfWidth)^2 + (c * halfHeight)^2) from its centre, and the same for y with b and d.
-function ellipseBounds(width: number, height: number, matrix: Matrix2D) {
-    const halfWidth = width / 2;
-    const halfHeight = height / 2;
-
-    const reachX = lengthOf(matrix.a * halfWidth, matrix.c * halfHeight);
-    const reachY = lengthOf(matrix.b * halfWidth, matrix.d * halfHeight);
+// The level bounds of a circle centred on the origin, exactly, even under a matrix that stretches it into
+// an ellipse: across x it reaches radius * sqrt(a^2 + c^2) from its centre, and the same for y with b and d.
+function circleBounds(radius: number, matrix: Matrix2D) {
+    const reachX = radius * lengthOf(matrix.a, matrix.c);
+    const reachY = radius * lengthOf(matrix.b, matrix.d);
 
     return new Bounds(matrix.tx - reachX, matrix.ty - reachY, matrix.tx + reachX, matrix.ty + reachY);
 }
@@ -50,8 +47,8 @@ function shapeBounds(geometry: ShapeGeometry, matrix: Matrix2D) {
             const corners = centredRectangleCorners(geometry.width, geometry.height);
             return boundsOfMovedPoints(corners, matrix);
         }
-        case 'ellipse':
-            return ellipseBounds(geometry.width, geometry.height, matrix);
+        case 'circle':
+            return circleBounds(geometry.radius, matrix);
         case 'polygon':
         case 'line':
             return boundsOfMovedPoints(geometry.points, matrix);

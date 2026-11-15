@@ -27,7 +27,7 @@ describe('MassProperties.of', () => {
     });
 
     test('centres a circle on its middle, with area π r²', () => {
-        const pieces = ShapePieces.build({ kind: 'ellipse', width: 100, height: 100 }).pieces;
+        const pieces = ShapePieces.build({ kind: 'circle', radius: 50 }).pieces;
         const mass = MassProperties.of(pieces, 1);
 
         expect(mass.area).toBeCloseTo(Math.PI * 2500, 9);

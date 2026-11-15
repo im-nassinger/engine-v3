@@ -87,7 +87,7 @@
                     "scale": { "x": 1, "y": 1 },
                     "skew": 0
                 },
-                "ShapeComponent": { "geometry": { "kind": "ellipse", "width": 24, "height": 24 } }
+                "ShapeComponent": { "geometry": { "kind": "circle", "radius": 12 } }
             }
         },
         {

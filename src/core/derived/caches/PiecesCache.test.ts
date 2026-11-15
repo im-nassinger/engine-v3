@@ -40,7 +40,7 @@ describe('PiecesCache', () => {
         const { square, cache } = buildSquare();
         cache.piecesOf(square);
 
-        square.requireComponent(ShapeComponent).set('geometry', { kind: 'ellipse', width: 40, height: 40 });
+        square.requireComponent(ShapeComponent).set('geometry', { kind: 'circle', radius: 20 });
 
         expect(cache.cachedCount).toBe(0);
         expect(cache.piecesOf(square)?.pieces).toEqual([{ kind: 'circle', radius: 20 }]);

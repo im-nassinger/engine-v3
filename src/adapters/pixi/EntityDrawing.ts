@@ -73,7 +73,7 @@ function traceFilledOutlines(graphics: Graphics, result: ShapePiecesResult) {
 }
 
 // The outline follows the shape's own points, so a self-crossing polygon shows its crossings. A rectangle
-// and an ellipse follow the filled outline, which is the same points they collide with.
+// follows its filled outline and a circle its circle piece, the same shapes they collide with.
 function traceShapeOutline(graphics: Graphics, geometry: ShapeGeometry, result: ShapePiecesResult) {
     switch (geometry.kind) {
         case 'polygon':

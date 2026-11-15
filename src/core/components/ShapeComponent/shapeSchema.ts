@@ -5,20 +5,30 @@ import { ComponentSchema } from '../schema/ComponentSchema.ts';
 import { derivedField } from '../schema/DerivedFieldDefinition.ts';
 
 import type { ShapeValues } from './ShapeValues.ts';
-import { heightOf, resizedAlong, widthOf } from './shapeSize.ts';
+import { heightOf, radiusOf, resizedAlong, widthOf } from './shapeSize.ts';
 
 const kindType = new ChoiceFieldType<ShapeKind>([
     { value: 'rectangle', label: 'Rectangle' },
-    { value: 'ellipse', label: 'Ellipse' },
+    { value: 'circle', label: 'Circle' },
     { value: 'polygon', label: 'Polygon' },
     { value: 'line', label: 'Line' },
 ]);
-// A rectangle or ellipse is at least 1 px each side, and a typed size for a polygon or line too.
+// A rectangle is at least 1 px each side, and a typed size for a polygon or line too. A circle is at least
+// 1 px across.
 const sizeType = new NumberFieldType({ min: 1 });
+const radiusType = new NumberFieldType({ min: 0.5 });
 const pointCountType = new NumberFieldType({ min: 0, wholeNumber: true });
 
 function hasPoints(values: ShapeValues) {
     return values.geometry.kind === 'polygon' || values.geometry.kind === 'line';
+}
+
+function isCircle(values: ShapeValues) {
+    return values.geometry.kind === 'circle';
+}
+
+function isNotCircle(values: ShapeValues) {
+    return !isCircle(values);
 }
 
 export const shapeSchema = new ComponentSchema<ShapeValues>({
@@ -58,6 +68,7 @@ export const shapeSchema = new ComponentSchema<ShapeValues>({
 
                 return { ok: true, value: { geometry: resized.value } };
             },
+            appliesWhen: isNotCircle,
         }),
         derivedField<ShapeValues, number>({
             key: 'height',
@@ -73,6 +84,22 @@ export const shapeSchema = new ComponentSchema<ShapeValues>({
 
                 return { ok: true, value: { geometry: resized.value } };
             },
+            appliesWhen: isNotCircle,
+        }),
+        derivedField<ShapeValues, number>({
+            key: 'radius',
+            label: 'Radius',
+            type: radiusType,
+            description: 'How far the circle reaches from its middle, in pixels, before scale.',
+            unit: 'px',
+            read: (values) => radiusOf(values.geometry),
+            write: (values, radius) => {
+                // Radius is hidden on every other kind, so only a mistake in the code writes it there.
+                if (!isCircle(values)) throw new Error('Only a circle has a Radius.');
+
+                return { ok: true, value: { geometry: { kind: 'circle', radius } } };
+            },
+            appliesWhen: isCircle,
         }),
         derivedField<ShapeValues, number>({
             key: 'points',
@@ -80,7 +107,7 @@ export const shapeSchema = new ComponentSchema<ShapeValues>({
             type: pointCountType,
             description: 'How many points it has. Double-click the shape to edit them.',
             read: (values) => {
-                if (values.geometry.kind === 'rectangle' || values.geometry.kind === 'ellipse') return 0;
+                if (values.geometry.kind === 'rectangle' || values.geometry.kind === 'circle') return 0;
 
                 return values.geometry.points.length;
             },

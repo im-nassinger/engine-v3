@@ -85,10 +85,12 @@ describe('BoundsCache own bounds', () => {
         expect(sidesOf(cache.ownBoundsOf(crate))).toEqual([-63, -13, 63, 13]);
     });
 
-    test('a turned ellipse has its exact bounds', () => {
+    test('a circle stretched into an ellipse and turned has its exact bounds', () => {
         const level = Level.createNew();
-        const ball = addShape(level, level.world, 10, 20, { kind: 'ellipse', width: 100, height: 40 });
-        ball.requireComponent(TransformComponent).set('rotation', 90);
+        const ball = addShape(level, level.world, 10, 20, { kind: 'circle', radius: 50 });
+        const transform = ball.requireComponent(TransformComponent);
+        transform.set('scale', { x: 1, y: 0.4 });
+        transform.set('rotation', 90);
         const cache = buildCache(level);
 
         expectSidesClose(cache.ownBoundsOf(ball), [-10, -30, 30, 70]);

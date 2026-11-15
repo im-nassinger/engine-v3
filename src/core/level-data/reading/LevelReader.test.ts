@@ -335,7 +335,7 @@ describe('LevelReader refuses a damaged level', () => {
     test('refuses a World shape that is not a rectangle', () => {
         const levelData = newLevelData();
         requireEntity(levelData, 0).components['ShapeComponent'] = {
-            geometry: { kind: 'ellipse', width: 100, height: 100 },
+            geometry: { kind: 'circle', radius: 50 },
         };
 
         expectDamaged(levelData);

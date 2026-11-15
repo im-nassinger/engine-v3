@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest';
 import type { CollisionPiece } from './CollisionPiece.ts';
 import { ConvexMerging } from './ConvexMerging.ts';
 import type { Point } from '../Point.ts';
-import { ELLIPSE_POINT_COUNT, ShapePieces } from './ShapePieces.ts';
+import { CIRCLE_POINT_COUNT, ShapePieces } from './ShapePieces.ts';
 import {
     areaOf,
     createRandomNumbers,
@@ -48,32 +48,25 @@ describe('ShapePieces.build', () => {
         expect(result.filledOutlines).toEqual([piece]);
     });
 
-    test('makes an ellipse with equal sides one circle', () => {
-        const result = ShapePieces.build({ kind: 'ellipse', width: 80, height: 80 });
+    test('makes a circle one circle piece', () => {
+        const result = ShapePieces.build({ kind: 'circle', radius: 40 });
 
         expect(result.pieces).toEqual([{ kind: 'circle', radius: 40 }]);
         expect(result.filledOutlines).toEqual([]);
     });
 
-    test('makes any other ellipse convex pieces of its 32 points', () => {
-        const result = ShapePieces.build({ kind: 'ellipse', width: 100, height: 60 });
-        const polygons = polygonPoints(result.pieces);
-        const [outline = []] = result.filledOutlines;
-
-        expect(outline).toHaveLength(ELLIPSE_POINT_COUNT);
-        expect(outline).toContainEqual({ x: 50, y: 0 });
-        expect(outline).toContainEqual({ x: 0, y: 30 });
-        expect(polygons).toHaveLength(5);
-        expectValidPieces(polygons);
-        expect(totalArea(polygons)).toBeCloseTo(areaOf(outline), 6);
-    });
-
-    test('gives the circle as the 32-point polygon when asked for polygons', () => {
-        const asPolygons = ShapePieces.buildAsPolygons({ kind: 'ellipse', width: 80, height: 80 });
+    test('gives the circle as convex pieces of its 32 points when asked for polygons', () => {
+        const asPolygons = ShapePieces.buildAsPolygons({ kind: 'circle', radius: 50 });
+        const polygons = polygonPoints(asPolygons.pieces);
         const [outline = []] = asPolygons.filledOutlines;
 
-        expect(outline).toHaveLength(ELLIPSE_POINT_COUNT);
-        expectValidPieces(polygonPoints(asPolygons.pieces));
+        expect(outline).toHaveLength(CIRCLE_POINT_COUNT);
+        expect(outline).toContainEqual({ x: 50, y: 0 });
+        expect(outline).toContainEqual({ x: 0, y: 50 });
+        expect(outline).toContainEqual({ x: -50, y: 0 });
+        expect(outline).toContainEqual({ x: 0, y: -50 });
+        expectValidPieces(polygons);
+        expect(totalArea(polygons)).toBeCloseTo(areaOf(outline), 6);
     });
 
     test('cuts a figure-of-eight into its two triangles', () => {
@@ -116,7 +109,7 @@ describe('ShapePieces.build', () => {
 
     test('drops pieces under 1 px on their short side', () => {
         const thinRectangle = ShapePieces.build({ kind: 'rectangle', width: 500, height: 0.9 });
-        const tinyCircle = ShapePieces.build({ kind: 'ellipse', width: 0.5, height: 0.5 });
+        const tinyCircle = ShapePieces.build({ kind: 'circle', radius: 0.25 });
         const thinSliver: Point[] = [
             { x: 0, y: 0 },
             { x: 300, y: 0 },

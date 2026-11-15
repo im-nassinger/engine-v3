@@ -13,7 +13,7 @@ describe('ShapeGeometryValue', () => {
     test('parse accepts each of the four kinds', () => {
         const rawShapes = [
             { kind: 'rectangle', width: 200, height: 100 },
-            { kind: 'ellipse', width: 50, height: 50 },
+            { kind: 'circle', radius: 25 },
             { kind: 'polygon', points: triangle },
             { kind: 'line', points: triangle.slice(0, 2) },
         ];
@@ -45,12 +45,23 @@ describe('ShapeGeometryValue', () => {
         expect(valueType.parse({ kind: 'polygon', width: 10, height: 10 })).toEqual(wrongType);
     });
 
+    test('a circle holds only a radius', () => {
+        const wrongType = { ok: false, problem: { reason: 'wrongType' } };
+
+        expect(valueType.parse({ kind: 'circle', width: 10, height: 10 })).toEqual(wrongType);
+        expect(valueType.parse({ kind: 'circle', radius: 5, width: 10 })).toEqual(wrongType);
+        expect(valueType.parse({ kind: 'ellipse', width: 10, height: 10 })).toEqual({
+            ok: false,
+            problem: { reason: 'unknownChoice' },
+        });
+    });
+
     test('parse refuses an unknown kind, a bad number and a bad point', () => {
         expect(valueType.parse({ kind: 'star', width: 1, height: 1 })).toEqual({
             ok: false,
             problem: { reason: 'unknownChoice' },
         });
-        expect(valueType.parse({ kind: 'ellipse', width: Infinity, height: 1 })).toEqual({
+        expect(valueType.parse({ kind: 'circle', radius: Infinity })).toEqual({
             ok: false,
             problem: { reason: 'notFinite' },
         });
@@ -60,10 +71,12 @@ describe('ShapeGeometryValue', () => {
         });
     });
 
-    test('a rectangle or ellipse is at least 1 px each side', () => {
-        const normalized = valueType.normalize({ kind: 'rectangle', width: 0.2, height: -5 });
+    test('a rectangle is at least 1 px each side, and a circle 1 px across', () => {
+        const normalizedRectangle = valueType.normalize({ kind: 'rectangle', width: 0.2, height: -5 });
+        const normalizedCircle = valueType.normalize({ kind: 'circle', radius: 0.1 });
 
-        expect(normalized).toEqual({ kind: 'rectangle', width: 1, height: 1 });
+        expect(normalizedRectangle).toEqual({ kind: 'rectangle', width: 1, height: 1 });
+        expect(normalizedCircle).toEqual({ kind: 'circle', radius: 0.5 });
     });
 
     test('a round trip keeps the value and clone shares nothing', () => {
@@ -81,7 +94,9 @@ describe('ShapeGeometryValue', () => {
         const square = { kind: 'rectangle', width: 10, height: 10 } as const;
 
         expect(valueType.equals(square, { kind: 'rectangle', width: 10, height: 10 })).toBe(true);
-        expect(valueType.equals(square, { kind: 'ellipse', width: 10, height: 10 })).toBe(false);
+        expect(valueType.equals(square, { kind: 'circle', radius: 5 })).toBe(false);
+        expect(valueType.equals({ kind: 'circle', radius: 5 }, { kind: 'circle', radius: 5 })).toBe(true);
+        expect(valueType.equals({ kind: 'circle', radius: 5 }, { kind: 'circle', radius: 6 })).toBe(false);
         expect(valueType.equals(square, { kind: 'polygon', points: triangle })).toBe(false);
         expect(valueType.equals({ kind: 'line', points: triangle }, { kind: 'line', points: triangle.slice(1) })).toBe(
             false,
