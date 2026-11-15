@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 5, step 6 of 11: `EditTransaction`, `History` (512 steps, joining within 1 second) and `LevelEditor` (in `editor/history`) make each command one undo step, all or nothing, and undo puts back the selection and the current group. Next is step 7, `OpenLevel`, `EditorSession`, the commands and the Undo, Redo and Select all commands. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 5, step 7 of 11: `OpenLevel` and `EditorSession` (in `editor/session`) hold the open level with its history, selection and current group; `createCommandRegistry` builds the Undo, Redo and Select all commands, and `outcomeText` turns a command's outcome into the status bar's sentence. Next is step 8, Delete, Hide or show, and renaming an entity and the level. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

@@ -55,10 +55,10 @@ src/
     physics/           PhysicsWorld contract, PhysicsSceneBuilder (merging), BodyMass, JointEnds
     simulation/        Simulation, the tick phases, BodyPoses, CameraFollow, TickReport
   editor/
-    session/           EditorSession (the editor's root object), CurrentGroup
+    session/           EditorSession (the editor's root object), OpenLevel, CurrentGroup
     history/           History, HistoryStep, EditTransaction, changes/
     selection/         Selection
-    commands/          EditorCommand, CommandRegistry, then file/ edit/ arrange/ view/ play/
+    commands/          EditorCommand, CommandRegistry, createCommandRegistry, then file/ edit/ arrange/ view/ play/
     tools/             Tool, ToolController, EscapeChain, select/ shape/ joint/
     hit-testing/       HitTester, SpatialIndex, LinearSpatialIndex
     snapping/          Snapper, GridSnapper
