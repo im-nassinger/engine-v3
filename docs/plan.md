@@ -99,7 +99,7 @@ Written under the standing yes (2026-11-15), and all eleven built on 2026-11-15.
 
 ## Stage 6 in steps
 
-Written under the standing yes (2026-11-15). Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [ui.md](architecture/ui.md#stage-6s-choices).
+Written under the standing yes (2026-11-15), and all eleven built on 2026-11-15. Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [ui.md](architecture/ui.md#stage-6s-choices).
 
 | # | Step | Module | Ends with |
 |---|---|---|---|
