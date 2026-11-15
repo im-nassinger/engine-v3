@@ -2,11 +2,13 @@ import { autoDetectRenderer, Container, Matrix } from 'pixi.js';
 import type { Renderer } from 'pixi.js';
 import type { Level } from '../../core/entities/index.ts';
 import type { Unsubscribe } from '../../core/events/index.ts';
-import type { ViewState } from '../../editor/view/index.ts';
+import type { ViewSettings, ViewState } from '../../editor/view/index.ts';
 import type { Cancel, FrameScheduler } from '../../editor/time/index.ts';
 import type { EntityDrawingOptions } from './EntityDrawing.ts';
 import { LevelDisplay } from './LevelDisplay.ts';
 import type { LevelDisplayCaches } from './LevelDisplay.ts';
+import { BoundsOverlay, CameraFrameOverlay, GridOverlay } from './overlays/index.ts';
+import type { OverlayScene } from './overlays/index.ts';
 
 // Culling grows the visible area by this many screen pixels, so the editor's 1 px line around an unstyled
 // shape, which BoundsCache doesn't count, is never cut at the view's edge.
@@ -20,6 +22,7 @@ export type PixelRatioSource = {
 
 export type PixiLevelViewParts = {
     readonly view: ViewState;
+    readonly settings: ViewSettings;
     readonly frames: FrameScheduler;
     readonly pixelRatio: PixelRatioSource;
     readonly drawing: EntityDrawingOptions;
@@ -32,9 +35,17 @@ export class PixiLevelView {
     private readonly parts: PixiLevelViewParts;
     private readonly renderer: Renderer;
     private readonly stage = new Container();
-    // Holds the level, moved and zoomed by ViewState's matrix. Overlays will sit beside it, unzoomed.
+    // Holds the level, moved and zoomed by ViewState's matrix.
     private readonly levelLayer = new Container();
+    // In front of the level and unzoomed: overlays draw in screen pixels, so they keep their size at any zoom.
+    // The grid is over the level, since the World's fill, drawn first in the level, is the background.
+    private readonly gridOverlay = new GridOverlay();
+    private readonly boundsOverlay = new BoundsOverlay();
+    private readonly cameraFrameOverlay = new CameraFrameOverlay();
     private readonly stopListening: Unsubscribe[] = [];
+    private stopListeningToLevel: Unsubscribe | undefined;
+    private shownLevel: Level | undefined;
+    private caches: LevelDisplayCaches | undefined;
     private resizeObserver: ResizeObserver | undefined;
     private host: HTMLElement | undefined;
     private display: LevelDisplay | undefined;
@@ -45,9 +56,11 @@ export class PixiLevelView {
         this.parts = parts;
         this.renderer = renderer;
         this.stage.addChild(this.levelLayer);
+        this.stage.addChild(this.gridOverlay.graphics, this.boundsOverlay.graphics, this.cameraFrameOverlay.container);
         this.applyViewMatrix();
 
         this.stopListening.push(parts.view.version.subscribe(() => this.handleViewChange()));
+        this.stopListening.push(parts.settings.version.subscribe(() => this.markDirty()));
         this.stopListening.push(parts.pixelRatio.onChange((ratio) => this.setResolution(ratio)));
     }
 
@@ -77,6 +90,11 @@ export class PixiLevelView {
     // The level's nodes, undefined until show() is called.
     get levelDisplay() {
         return this.display;
+    }
+
+    // What the editor draws over the level, for tests.
+    get overlays() {
+        return { grid: this.gridOverlay, bounds: this.boundsOverlay, cameraFrame: this.cameraFrameOverlay };
     }
 
     // How many times the view has drawn, for tests and the performance numbers.
@@ -111,6 +129,7 @@ export class PixiLevelView {
     // Draws this level from now on: the editor's, a new or imported one, or the PlayMirror during play.
     show(level: Level, caches: LevelDisplayCaches) {
         this.display?.dispose();
+        this.stopListeningToLevel?.();
 
         const display = new LevelDisplay({
             level,
@@ -119,7 +138,11 @@ export class PixiLevelView {
             onChange: () => this.markDirty(),
         });
         this.display = display;
+        this.shownLevel = level;
+        this.caches = caches;
         this.levelLayer.addChild(display.root);
+        // Anything else that shows only in the overlays: the grid size, the camera's size, the World's fill.
+        this.stopListeningToLevel = level.signals.levelVersion.subscribe(() => this.markDirty());
         this.markDirty();
     }
 
@@ -141,9 +164,13 @@ export class PixiLevelView {
         for (const stop of this.stopListening) {
             stop();
         }
+        this.stopListeningToLevel?.();
+        this.stopListeningToLevel = undefined;
 
         this.display?.dispose();
         this.display = undefined;
+        this.shownLevel = undefined;
+        this.caches = undefined;
 
         this.stage.destroy({ children: true });
         this.renderer.destroy();
@@ -191,9 +218,23 @@ export class PixiLevelView {
         display.cull(cullingArea);
     }
 
+    private updateOverlays() {
+        const scene: OverlayScene = {
+            view: this.parts.view,
+            settings: this.parts.settings,
+            level: this.shownLevel,
+            bounds: this.caches?.bounds,
+        };
+
+        this.gridOverlay.update(scene);
+        this.boundsOverlay.update(scene);
+        this.cameraFrameOverlay.update(scene);
+    }
+
     private render() {
         this.renders += 1;
         this.prepareDisplay();
+        this.updateOverlays();
         this.renderer.render({ container: this.stage });
     }
 }

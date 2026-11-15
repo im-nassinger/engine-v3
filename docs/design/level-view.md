@@ -11,9 +11,11 @@ What the editor draws over the level: the grid, the dimmed outside, the camera f
 | Background | The World's fill. In the mockups the soft light blue is `#CDE3F2` (*proposal*: the requirements say "a soft light blue" without a value) |
 | Grid lines, every 50 px | 1 px, `#1E3C5F` at 13% |
 | The lines through the origin | 1 px, `#1E3C5F` at 32% |
-| Fainter lines every 10 px | Same colour at 7% (*proposal*), shown only when they are at least 8 screen px apart |
+| Fainter lines every 10 px | Same colour at 7% (*proposal*), shown only when they are at least 8 screen px apart. For another grid size, every fifth of it |
+| Zoomed far out | When the grid's lines would be under 8 screen px apart, only every fifth is drawn, then every 25th, and so on (*proposal*) |
 | Outside the level bounds | `#0A1423` at 35% over the background, and a 1 px edge at 50% (*proposal*) |
 
+- **The grid is drawn over the level's entities**, faint enough not to hide them (*proposal*).
 - **The grid adapts to the background** (requirement): on a dark background the same strengths use white instead of `#1E3C5F` (*proposal*: dark means a background whose brightness is under half).
 
 ## Editor-only drawing

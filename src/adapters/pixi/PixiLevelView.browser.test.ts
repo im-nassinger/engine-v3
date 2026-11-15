@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { ShapeComponent, StyleComponent, TransformComponent } from '../../core/components/index.ts';
+import { CameraComponent, ShapeComponent, StyleComponent, TransformComponent } from '../../core/components/index.ts';
 import { BoundsCache, PiecesCache, WorldMatrixCache } from '../../core/derived/index.ts';
 import { Level } from '../../core/entities/index.ts';
 import { Signal } from '../../core/events/index.ts';
 import { ManualFrames } from '../../editor/time/testing/index.ts';
-import { ViewState } from '../../editor/view/index.ts';
+import { ViewSettings, ViewState } from '../../editor/view/index.ts';
 import { PixiLevelView } from './PixiLevelView.ts';
 import type { PixelRatioSource } from './PixiLevelView.ts';
 
@@ -64,11 +64,13 @@ function makeCaches(level: Level) {
 async function makeView(ratio = 1) {
     const view = new ViewState();
     const frames = new ManualFrames();
+    const settings = new ViewSettings();
     const pixelRatio = new FakePixelRatio(ratio);
-    const levelView = await PixiLevelView.create({ view, frames, pixelRatio, drawing: { showUnstyled: true } });
+    const drawing = { showUnstyled: true };
+    const levelView = await PixiLevelView.create({ view, settings, frames, pixelRatio, drawing });
     cleanups.push(() => levelView.destroy());
 
-    return { levelView, view, frames, pixelRatio };
+    return { levelView, view, settings, frames, pixelRatio };
 }
 
 async function waitForSize(view: ViewState, width: number, height: number) {
@@ -260,5 +262,86 @@ describe('PixiLevelView', () => {
 
         expect(frames.pendingCount).toBe(0);
         expect(levelView.levelDisplay?.nodeOf(secondLevel.world)).toBeDefined();
+    });
+});
+
+describe('PixiLevelView overlays', () => {
+    async function showNewLevel() {
+        const parts = await makeView();
+        const host = makeHost(300, 200);
+        parts.levelView.mount(host);
+        await waitForSize(parts.view, 300, 200);
+
+        const level = Level.createNew();
+        parts.levelView.show(level, makeCaches(level));
+        parts.frames.runFrame();
+
+        return { ...parts, level, overlays: parts.levelView.overlays };
+    }
+
+    test('the grid draws a step every 50 px and its switch hides it', async () => {
+        const { settings, frames, overlays } = await showNewLevel();
+
+        expect(overlays.grid.graphics.visible).toBe(true);
+        expect(overlays.grid.plan?.spacing).toEqual({ step: 50, fineStep: 10 });
+
+        settings.toggle('grid');
+        expect(frames.pendingCount).toBe(1);
+        frames.runFrame();
+
+        expect(overlays.grid.graphics.visible).toBe(false);
+        expect(overlays.grid.plan).toBeUndefined();
+    });
+
+    test('a new grid size draws again with the new step', async () => {
+        const { level, frames, overlays } = await showNewLevel();
+
+        level.editorData.setGridSize(100);
+        expect(frames.pendingCount).toBe(1);
+        frames.runFrame();
+
+        expect(overlays.grid.plan?.spacing).toEqual({ step: 100, fineStep: 20 });
+    });
+
+    test('zoomed out, the fainter lines are left out', async () => {
+        const { view, frames, overlays } = await showNewLevel();
+
+        view.zoomAboutMiddle(0.5);
+        frames.runFrame();
+
+        expect(overlays.grid.plan?.spacing).toEqual({ step: 50, fineStep: undefined });
+    });
+
+    test('the outside of the level bounds is dimmed, and nothing when the level fills the view', async () => {
+        const { level, frames, overlays } = await showNewLevel();
+        expect(overlays.bounds.dimmedAreas).toEqual([]);
+
+        level.world.requireComponent(ShapeComponent).set('geometry', { kind: 'rectangle', width: 200, height: 100 });
+        frames.runFrame();
+
+        const areas = overlays.bounds.dimmedAreas;
+        const dimmedPixels = areas.reduce((sum, area) => sum + area.width * area.height, 0);
+        expect(areas).toHaveLength(4);
+        expect(dimmedPixels).toBe(300 * 200 - 200 * 100);
+    });
+
+    test('the camera frame shows its size and hides with its switch or the camera', async () => {
+        const { level, settings, frames, overlays } = await showNewLevel();
+
+        expect(overlays.cameraFrame.isShowing).toBe(true);
+        expect(overlays.cameraFrame.labelText).toBe('Camera 1920 × 1080');
+
+        level.camera.requireComponent(CameraComponent).set('width', 800);
+        frames.runFrame();
+        expect(overlays.cameraFrame.labelText).toBe('Camera 800 × 1080');
+
+        settings.set('cameraFrame', false);
+        frames.runFrame();
+        expect(overlays.cameraFrame.isShowing).toBe(false);
+
+        settings.set('cameraFrame', true);
+        level.camera.setHidden(true);
+        frames.runFrame();
+        expect(overlays.cameraFrame.isShowing).toBe(false);
     });
 });
