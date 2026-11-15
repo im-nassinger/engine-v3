@@ -8,6 +8,7 @@ const MAIN_MENU: Record<string, [string, string][]> = {
         ['Redo', 'Ctrl+Shift+Z'],
         ['Delete', 'Del'],
         ['Select all', 'Ctrl+A'],
+        ['Rename', 'F2'],
         ['Hide or show', 'Ctrl+Shift+H'],
     ],
     Arrange: [

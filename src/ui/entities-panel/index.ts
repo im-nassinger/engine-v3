@@ -1,1 +1,1 @@
-export {};
+export * from './EntitiesPanel/index.ts';

@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 7, step 7 of 12: **`RenameRequest` and the Rename command** are built: `edit.rename` (F2) is disabled with nothing, several or the World selected, each with its reason, and running it reveals the row and asks the panel through `OpenLevel.renameRequest` to rename it. Next is step 8, `EntitiesPanel` and `EntitiesRow` with `@tanstack/react-virtual`. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 7, step 8 of 12: **`EntitiesPanel`** is built and in the shell: a virtual list (`@tanstack/react-virtual`) that builds only the rows on screen, each with its fold arrow, kind icon, name and eye, and clicks that select. Next is step 9, renaming in place with F2 and a double-click. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

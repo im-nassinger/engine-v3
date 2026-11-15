@@ -1,0 +1,9 @@
+.row-kind-icon {
+    display: flex;
+    flex-shrink: 0;
+    color: var(--muted);
+
+    &[data-selected='true'] {
+        color: var(--text);
+    }
+}

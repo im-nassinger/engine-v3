@@ -1,0 +1,10 @@
+.entities-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+
+    > .content {
+        position: relative;
+        width: 100%;
+    }
+}
