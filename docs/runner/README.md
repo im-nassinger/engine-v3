@@ -21,7 +21,7 @@ Rules for the session:
 
 - **Don't change the game's code or the game's docs.** The runner's sessions are editing them.
 - When you change the runner, update this folder in the same commit, and commit only the runner's files (`tools/runner/`, `docs/runner/`) by naming them in `git commit -- <paths>`, never with `git add -A`.
-- `tools/runner/` code changes apply on their own: the runner restarts itself between sessions.
+- `tools/runner/` code changes apply on their own: the runner restarts itself between sessions. **Never restart or stop the service to apply a change**: that kills the session in the middle of a step, with its work half done and not committed.
 
 ## Files
 
