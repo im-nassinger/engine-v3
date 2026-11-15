@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 5, step 8 of 11: Delete (with the joints attached), Hide or show, `renameEntity` and `renameLevel` are built, each passing the run, undo, redo round trip. Next is step 9, Group, Ungroup and Go into group. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 5, step 9 of 11: Group, Ungroup and Go into group are built, keeping every entity in place on screen and passing the run, undo, redo round trip; `EntityNamer` names new groups. Next is step 10, the View commands. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -116,7 +116,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 5 of [plan.md](plan.md#stage-5-in-steps): editing without a mouse.** Steps 1 to 8 are done; each further step is built in one commit.
+1. **Stage 5 of [plan.md](plan.md#stage-5-in-steps): editing without a mouse.** Steps 1 to 9 are done; each further step is built in one commit.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

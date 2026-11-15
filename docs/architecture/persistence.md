@@ -49,6 +49,7 @@
 export class LevelWriter {
     write(level: Level): LevelData;
     writeSubtree(entities: readonly Entity[]): readonly EntityData[];
+    writeNewEntity(id: EntityId, parentId: EntityId, components: readonly AnyComponent[]): EntityData;  // not in a level yet
 }
 
 export class LevelReader {

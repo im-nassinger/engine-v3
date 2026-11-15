@@ -1,6 +1,6 @@
 import type { AnyComponent } from '../../components/index.ts';
 import type { Entity, Level } from '../../level/index.ts';
-import type { JsonValue } from '../../fields/index.ts';
+import type { EntityId, JsonValue } from '../../fields/index.ts';
 
 import { CURRENT_FORMAT_VERSION, LEVEL_FORMAT } from '../LevelData.ts';
 import type { ComponentData, EntityData, LevelData } from '../LevelData.ts';
@@ -36,6 +36,19 @@ export class LevelWriter {
         }
 
         return written;
+    }
+
+    // An entity that isn't in a level yet, as data a change adds later: shown, unlocked, its components in
+    // card order.
+    writeNewEntity(id: EntityId, parentId: EntityId, components: readonly AnyComponent[]): EntityData {
+        const inCardOrder = [...components].sort((first, second) => first.schema.cardOrder - second.schema.cardOrder);
+        const componentData: Record<string, ComponentData> = {};
+
+        for (const component of inCardOrder) {
+            componentData[component.schema.typeName] = this.writeComponent(component);
+        }
+
+        return { id, parent: parentId, hidden: false, locked: false, components: componentData };
     }
 
     private writeEntityAndChildren(entity: Entity, written: EntityData[]) {

@@ -36,6 +36,8 @@ type ListenedEntity = {
 export class Level {
     // Counted in characters after trimming.
     static readonly maxNameLength = MAX_NAME_LENGTH;
+    // Counted in parents above an entity.
+    static readonly maxDepth = MAX_DEPTH;
     readonly world: Entity;
     readonly camera: Entity;
     readonly signals = new LevelSignals();
@@ -137,6 +139,12 @@ export class Level {
         const id = this.idAllocator.next();
 
         return this.addEntity(id, parent, index);
+    }
+
+    // An id no entity has had in this session, for an entity a change adds later as data: the new group of
+    // Group. The id is used up even when that entity is never added.
+    allocateId() {
+        return this.idAllocator.next();
     }
 
     // An entity with a known id: undo of a delete, or loading.

@@ -1,9 +1,9 @@
-import { JointComponent } from '../../../core/components/index.ts';
-import type { Entity, EntityId, Level } from '../../../core/level/index.ts';
+import type { Entity } from '../../../core/level/index.ts';
 import { RemoveEntitiesChange } from '../../history/index.ts';
 import type { EditTransaction } from '../../history/index.ts';
 import type { EditorSession } from '../../session/index.ts';
 import type { Availability, CommandOutcome, EditorCommand } from '../EditorCommand.ts';
+import { attachedJoints } from '../shared/attachedJoints.ts';
 import { skipEntities } from '../shared/skipEntities.ts';
 import type { SkipResult } from '../shared/skipEntities.ts';
 import { stepLabel } from '../shared/stepLabel.ts';
@@ -71,52 +71,4 @@ function refusalReason(split: SkipResult) {
     if (skippedKinds.includes('camera')) return "The camera can't be deleted";
 
     return NOTHING_SELECTED;
-}
-
-// The joints outside the removed entities with an end inside them. Removing a joint removes what is inside
-// it too, which can be the end of yet another joint, so this repeats until nothing more is found.
-function attachedJoints(level: Level, removedRoots: readonly Entity[]) {
-    const removedIds = new Set<EntityId>();
-    for (const root of removedRoots) {
-        addSubtreeIds(root, removedIds);
-    }
-
-    const joints: Entity[] = [];
-    let foundMore = true;
-
-    while (foundMore) {
-        foundMore = false;
-
-        for (const entity of level.entitiesInPanelOrder()) {
-            const isAlreadyRemoved = removedIds.has(entity.id);
-            if (isAlreadyRemoved) continue;
-            if (!hasEndIn(entity, removedIds)) continue;
-
-            joints.push(entity);
-            addSubtreeIds(entity, removedIds);
-            foundMore = true;
-        }
-    }
-
-    return joints;
-}
-
-function hasEndIn(entity: Entity, ids: ReadonlySet<EntityId>) {
-    const joint = entity.getComponent(JointComponent);
-    if (joint === undefined) return false;
-
-    const endA = joint.get('a');
-    const endB = joint.get('b');
-    const isEndARemoved = endA !== null && ids.has(endA);
-    const isEndBRemoved = endB !== null && ids.has(endB);
-
-    return isEndARemoved || isEndBRemoved;
-}
-
-function addSubtreeIds(root: Entity, ids: Set<EntityId>) {
-    ids.add(root.id);
-
-    for (const child of root.children) {
-        addSubtreeIds(child, ids);
-    }
 }

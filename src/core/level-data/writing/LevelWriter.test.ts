@@ -94,6 +94,24 @@ describe('LevelWriter', () => {
         ]);
     });
 
+    test('writes a new entity in card order, shown and unlocked, under the given parent', () => {
+        const components = [new TransformComponent(), new NameComponent({ name: 'Group 1' })];
+
+        const written = new LevelWriter().writeNewEntity(9, 1, components);
+
+        expect(written).toEqual({
+            id: 9,
+            parent: 1,
+            hidden: false,
+            locked: false,
+            components: {
+                TransformComponent: { position: { x: 0, y: 0 }, rotation: 0, scale: { x: 1, y: 1 }, skew: 0 },
+                NameComponent: { name: 'Group 1' },
+            },
+        });
+        expect(Object.keys(written.components)).toEqual(['NameComponent', 'TransformComponent']);
+    });
+
     test('writes plain data that survives JSON unchanged', () => {
         const level = Level.createNew();
 

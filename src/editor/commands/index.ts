@@ -1,3 +1,6 @@
+export { GoIntoGroupCommand } from './arrange/GoIntoGroupCommand.ts';
+export { GroupCommand } from './arrange/GroupCommand.ts';
+export { UngroupCommand } from './arrange/UngroupCommand.ts';
 export { CommandRegistry } from './CommandRegistry.ts';
 export { createCommandRegistry } from './createCommandRegistry.ts';
 export { DeleteCommand } from './edit/DeleteCommand.ts';
@@ -8,3 +11,4 @@ export { UndoCommand } from './edit/UndoCommand.ts';
 export type { Availability, CommandId, CommandOutcome, EditorCommand, MenuName, MenuPlace } from './EditorCommand.ts';
 export { renameEntity } from './rename/renameEntity.ts';
 export { renameLevel } from './rename/renameLevel.ts';
+export { EntityNamer } from './shared/EntityNamer.ts';

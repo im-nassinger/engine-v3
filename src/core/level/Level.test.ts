@@ -119,6 +119,17 @@ describe('Level ids', () => {
 
         expect(() => level.restoreEntity(2, level.world, 0)).toThrow('already in the level');
     });
+
+    test('allocateId gives an id never handed out, and createEntity carries on after it', () => {
+        const level = Level.createNew();
+
+        const allocated = level.allocateId();
+        const created = level.createEntity(level.world, 0);
+
+        expect(allocated).toBe(3);
+        expect(level.findEntity(allocated)).toBeUndefined();
+        expect(created.id).toBe(4);
+    });
 });
 
 describe('Level moves', () => {

@@ -80,6 +80,8 @@ export class Level {
     findEntity(id: EntityId): Entity | undefined;
     requireEntity(id: EntityId): Entity;
 
+    static readonly maxDepth: number;                                      // 256
+    allocateId(): EntityId;                                               // a new id for an entity a change adds as data
     createEntity(parent: Entity, index: number): Entity;                  // a new id
     restoreEntity(id: EntityId, parent: Entity, index: number): Entity;   // a known id: undo, loading
     moveEntity(entity: Entity, newParent: Entity, index: number): MoveOutcome;
