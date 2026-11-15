@@ -1,11 +1,11 @@
-export { BoundsOverlay } from './BoundsOverlay.ts';
+export { BoundsOverlay } from './bounds/BoundsOverlay.ts';
 export { CameraFrameOverlay, cameraLabelOf } from './CameraFrameOverlay.ts';
-export { dimmedAreas } from './dimmedAreas.ts';
-export { gridColourFor, isDarkColour } from './gridColour.ts';
-export { GridOverlay } from './GridOverlay.ts';
+export { dimmedAreas } from './bounds/dimmedAreas.ts';
+export { gridColourFor, isDarkColour } from './grid/gridColour.ts';
+export { GridOverlay } from './grid/GridOverlay.ts';
 export { JOINT_ICON_RADIUS_PX, JointIconOverlay } from './JointIconOverlay.ts';
 export type { ShownJointIcon } from './JointIconOverlay.ts';
-export { FINE_LINES_PER_STEP, MIN_LINE_SPACING_PX, gridSpacingAt, planGrid } from './GridPlan.ts';
-export type { GridLine, GridLineStrength, GridPlan, GridSpacing } from './GridPlan.ts';
+export { FINE_LINES_PER_STEP, MIN_LINE_SPACING_PX, gridSpacingAt, planGrid } from './grid/GridPlan.ts';
+export type { GridLine, GridLineStrength, GridPlan, GridSpacing } from './grid/GridPlan.ts';
 export type { OverlayCaches, OverlayScene } from './OverlayScene.ts';
 export { PhysicsViewOverlay } from './PhysicsViewOverlay.ts';

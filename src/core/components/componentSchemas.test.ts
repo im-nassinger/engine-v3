@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { camelCaseOfLabel, snakeCaseOfLabel } from './attributeNames.ts';
-import { createV1Registry } from './createV1Registry.ts';
+import { camelCaseOfLabel, snakeCaseOfLabel } from './schema/attributeNames.ts';
+import { createV1Registry } from './registry/createV1Registry.ts';
 
 const registry = createV1Registry();
 const SCHEMAS = registry.all().map((componentClass) => componentClass.schema);

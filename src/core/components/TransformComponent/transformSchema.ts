@@ -1,7 +1,7 @@
 import { AngleFieldType, VectorFieldType } from '../../fields/index.ts';
 import type { TransformValues } from '../../geometry/index.ts';
 
-import { ComponentSchema } from '../ComponentSchema.ts';
+import { ComponentSchema } from '../schema/ComponentSchema.ts';
 
 export const transformSchema = new ComponentSchema<TransformValues>({
     typeName: 'TransformComponent',

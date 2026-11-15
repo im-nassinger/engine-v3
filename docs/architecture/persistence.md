@@ -39,7 +39,7 @@
 - **The writer writes every value, defaults included** *(standing yes, 2026-11-14)*: the file says exactly what the level held, and a later change of a default can't change an old level.
 - **Editor-only data** is `editor` (grid size, folded rows) and each entity's `locked`. The v3 play file drops them; `hidden` stays.
 - **A missing value reads as its default**, so a field added to a component later needs no upgrade code. An unknown component type or an unknown value makes the file "damaged".
-- **The physics version** is a whole number that goes up whenever the game's Box2D build changes. A table in `core/level-data/PhysicsVersions.ts` names the build for each number (1: `box2d3-wasm` 6.0.0, Box2D 3.2). v1 only records it, as the requirement says.
+- **The physics version** is a whole number that goes up whenever the game's Box2D build changes. A table in `core/level-data/versions/PhysicsVersions.ts` names the build for each number (1: `box2d3-wasm` 6.0.0, Box2D 3.2). v1 only records it, as the requirement says.
 
 ## Reading and writing
 

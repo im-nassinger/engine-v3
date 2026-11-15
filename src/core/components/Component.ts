@@ -2,9 +2,9 @@ import { Signal } from '../events/index.ts';
 import type { ParseOutcome } from '../fields/index.ts';
 
 import type { AnyComponent, ComponentChange } from './AnyComponent.ts';
-import type { ComponentSchema } from './ComponentSchema.ts';
+import type { ComponentSchema } from './schema/ComponentSchema.ts';
 import type { ComponentValues } from './ComponentValues.ts';
-import type { StoredValueDefinition } from './StoredValueDefinition.ts';
+import type { StoredValueDefinition } from './schema/StoredValueDefinition.ts';
 
 type ComponentConstructor<Values extends ComponentValues> = new (values: Values) => Component<Values>;
 

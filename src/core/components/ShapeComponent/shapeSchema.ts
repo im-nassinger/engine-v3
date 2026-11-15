@@ -1,8 +1,8 @@
 import type { ShapeKind } from '../../geometry/index.ts';
 import { ChoiceFieldType, NumberFieldType, ShapeGeometryValue } from '../../fields/index.ts';
 
-import { ComponentSchema } from '../ComponentSchema.ts';
-import { derivedField } from '../DerivedFieldDefinition.ts';
+import { ComponentSchema } from '../schema/ComponentSchema.ts';
+import { derivedField } from '../schema/DerivedFieldDefinition.ts';
 
 import type { ShapeValues } from './ShapeValues.ts';
 import { heightOf, resizedAlong, widthOf } from './shapeSize.ts';

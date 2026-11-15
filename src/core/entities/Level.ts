@@ -10,9 +10,9 @@ import type { EntityId } from '../fields/index.ts';
 
 import { Entity } from './Entity.ts';
 import type { EntityChange } from './EntityChange.ts';
-import { EntityIdAllocator } from './EntityIdAllocator.ts';
+import { EntityIdAllocator } from './bookkeeping/EntityIdAllocator.ts';
 import { LevelEditorData } from './LevelEditorData.ts';
-import { LevelSignals } from './LevelSignals.ts';
+import { LevelSignals } from './bookkeeping/LevelSignals.ts';
 import { LevelTree } from './LevelTree.ts';
 import type { LevelUpdate } from './LevelUpdate.ts';
 import type { MoveOutcome } from './outcomes/MoveOutcome.ts';

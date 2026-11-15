@@ -1,6 +1,6 @@
 import { CheckboxFieldType, ChoiceFieldType, NumberFieldType } from '../../fields/index.ts';
 
-import { ComponentSchema } from '../ComponentSchema.ts';
+import { ComponentSchema } from '../schema/ComponentSchema.ts';
 
 import type { BodyType, BodyValues } from './BodyValues.ts';
 

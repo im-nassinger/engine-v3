@@ -32,19 +32,26 @@ src/
       import.worker.ts     the import worker: unzips and checks a file
   core/
     events/            Signal, VersionCounter: how classes announce changes
-    entities/          Entity, EntityId, Level, EntityIdAllocator, LevelSignals
+    entities/          Entity, EntityId, Level, LevelTree, LevelUpdate, LevelEditorData
+      bookkeeping/       EntityIdAllocator, EntityVersions, LevelSignals
       outcomes/          what adding a component, moving and renaming return
     fields/            FieldType, ValueType, FieldDefinition, EntityId, Unit
       field-types/       one file per field type: NumberFieldType, ColourFieldType, ...
       values/            the value types that aren't fields: shape and path geometry, joint ends
-    components/        Component, ComponentSchema, ComponentRegistry, then one folder per component
+    components/        Component, AnyComponent, ComponentValues, then one folder per component
+      schema/            ComponentSchema, the stored and derived field definitions, PartnerRule
+      registry/          ComponentRegistry, createV1Registry
       TransformComponent/ NameComponent/ ShapeComponent/ PathComponent/ StyleComponent/
       BodyComponent/ SurfaceComponent/ JointComponent/ CameraComponent/ PhysicsWorldComponent/
     geometry/          Matrix2D, Point, Bounds, ShapeGeometry, PathGeometry, JointEnds
       pieces/            the polygon pipeline from a shape to collision pieces, line chains, mass
     math/              DeterministicMath, units (px and metres, degrees and radians)
-    derived/           WorldMatrixCache, BoundsCache, HiddenCache, PiecesCache
-    level-data/        LevelData types, LevelWriter, LevelReader, FormatUpgrader, limits
+    derived/           DerivedCaches, levelBoundsOf
+      caches/            WorldMatrixCache, BoundsCache, HiddenCache, PiecesCache
+    level-data/        LevelData types, limits
+      reading/           LevelReader and what it returns
+      writing/           LevelWriter
+      versions/          FormatUpgrader, PhysicsVersions
     physics/           PhysicsWorld contract, PhysicsSceneBuilder (merging), BodyMass, JointEnds
     simulation/        Simulation, the tick phases, BodyPoses, CameraFollow, TickReport
   editor/

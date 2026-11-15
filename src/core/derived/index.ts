@@ -1,7 +1,7 @@
-export { BoundsCache } from './BoundsCache.ts';
+export { BoundsCache } from './caches/BoundsCache.ts';
 export { DerivedCaches } from './DerivedCaches.ts';
-export { HiddenCache } from './HiddenCache.ts';
-export { OwnBounds } from './OwnBounds.ts';
-export { PiecesCache } from './PiecesCache.ts';
-export { WorldMatrixCache } from './WorldMatrixCache.ts';
+export { HiddenCache } from './caches/HiddenCache.ts';
+export { OwnBounds } from './caches/OwnBounds.ts';
+export { PiecesCache } from './caches/PiecesCache.ts';
+export { WorldMatrixCache } from './caches/WorldMatrixCache.ts';
 export { levelBoundsOf } from './levelBoundsOf.ts';

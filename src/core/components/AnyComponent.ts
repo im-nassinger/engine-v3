@@ -3,8 +3,8 @@ import type { FieldDefinition, ParseOutcome, ValueType } from '../fields/index.t
 
 import type { ComponentTypeName } from './ComponentTypeName.ts';
 import type { ComponentValues } from './ComponentValues.ts';
-import type { DerivedFieldDefinition } from './DerivedFieldDefinition.ts';
-import type { PartnerRule } from './PartnerRule.ts';
+import type { DerivedFieldDefinition } from './schema/DerivedFieldDefinition.ts';
+import type { PartnerRule } from './schema/PartnerRule.ts';
 
 export type AnyFieldDefinition = FieldDefinition<ComponentValues, string>;
 

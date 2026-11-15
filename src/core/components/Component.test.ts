@@ -5,8 +5,8 @@ import type { Point } from '../geometry/index.ts';
 
 import { Component } from './Component.ts';
 import type { ComponentChange } from './AnyComponent.ts';
-import { ComponentSchema } from './ComponentSchema.ts';
-import { derivedField } from './DerivedFieldDefinition.ts';
+import { ComponentSchema } from './schema/ComponentSchema.ts';
+import { derivedField } from './schema/DerivedFieldDefinition.ts';
 
 type CrateValues = {
     size: Point;

@@ -1,11 +1,11 @@
-export { FormatUpgrader } from './FormatUpgrader.ts';
-export type { FormatUpgradeStep } from './FormatUpgrader.ts';
+export { FormatUpgrader } from './versions/FormatUpgrader.ts';
+export type { FormatUpgradeStep } from './versions/FormatUpgrader.ts';
 export { CURRENT_FORMAT_VERSION, LEVEL_FORMAT } from './LevelData.ts';
 export type { ComponentData, EditorData, EntityData, LevelData } from './LevelData.ts';
 export { V1_LEVEL_LIMITS } from './LevelLimits.ts';
 export type { LevelLimits } from './LevelLimits.ts';
-export { LevelReader } from './LevelReader.ts';
-export { LevelWriter } from './LevelWriter.ts';
-export { PhysicsVersions } from './PhysicsVersions.ts';
-export type { PhysicsBuild } from './PhysicsVersions.ts';
-export type { ReadOutcome, ReadRefusal } from './ReadOutcome.ts';
+export { LevelReader } from './reading/LevelReader.ts';
+export { LevelWriter } from './writing/LevelWriter.ts';
+export { PhysicsVersions } from './versions/PhysicsVersions.ts';
+export type { PhysicsBuild } from './versions/PhysicsVersions.ts';
+export type { ReadOutcome, ReadRefusal } from './reading/ReadOutcome.ts';

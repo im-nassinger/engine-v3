@@ -1,9 +1,9 @@
 import type { Level } from '../entities/index.ts';
 
-import { BoundsCache } from './BoundsCache.ts';
-import { HiddenCache } from './HiddenCache.ts';
-import { PiecesCache } from './PiecesCache.ts';
-import { WorldMatrixCache } from './WorldMatrixCache.ts';
+import { BoundsCache } from './caches/BoundsCache.ts';
+import { HiddenCache } from './caches/HiddenCache.ts';
+import { PiecesCache } from './caches/PiecesCache.ts';
+import { WorldMatrixCache } from './caches/WorldMatrixCache.ts';
 
 // The four caches built for one level, so the editor's OpenLevel and the PlayMirror make and drop
 // them as one piece. The BoundsCache reads this WorldMatrixCache.

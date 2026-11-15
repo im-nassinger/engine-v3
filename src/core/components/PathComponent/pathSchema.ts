@@ -1,7 +1,7 @@
 import { NumberFieldType, PathGeometryValue } from '../../fields/index.ts';
 
-import { ComponentSchema } from '../ComponentSchema.ts';
-import { derivedField } from '../DerivedFieldDefinition.ts';
+import { ComponentSchema } from '../schema/ComponentSchema.ts';
+import { derivedField } from '../schema/DerivedFieldDefinition.ts';
 
 import type { PathValues } from './PathValues.ts';
 

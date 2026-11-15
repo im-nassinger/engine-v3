@@ -2,7 +2,7 @@
 import { NumberFieldType } from '../../fields/index.ts';
 
 import { Component } from '../Component.ts';
-import { ComponentSchema } from '../ComponentSchema.ts';
+import { ComponentSchema } from '../schema/ComponentSchema.ts';
 
 type SpeedValues = { speed: number };
 

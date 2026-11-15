@@ -1,6 +1,6 @@
 import { AngleFieldType, CheckboxFieldType, ChoiceFieldType, NumberFieldType } from '../../fields/index.ts';
 
-import { ComponentSchema } from '../ComponentSchema.ts';
+import { ComponentSchema } from '../schema/ComponentSchema.ts';
 
 import type { GravityDirection, PhysicsWorldValues } from './PhysicsWorldValues.ts';
 

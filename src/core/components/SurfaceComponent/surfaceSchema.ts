@@ -1,6 +1,6 @@
 import { CheckboxFieldType, NumberFieldType } from '../../fields/index.ts';
 
-import { ComponentSchema } from '../ComponentSchema.ts';
+import { ComponentSchema } from '../schema/ComponentSchema.ts';
 
 import type { SurfaceValues } from './SurfaceValues.ts';
 
