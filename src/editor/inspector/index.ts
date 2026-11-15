@@ -1,2 +1,13 @@
+export { CardFolds } from './folds/CardFolds.ts';
+export type { FoldStore } from './folds/FoldStore.ts';
+export { InMemoryFoldStore } from './folds/InMemoryFoldStore.ts';
+export { InspectorModel } from './inspector-model/InspectorModel.ts';
+export type { InspectorModelSources } from './inspector-model/InspectorModel.ts';
+export type { AddableComponent } from './model/AddableComponent.ts';
+export type { Availability } from './model/Availability.ts';
+export type { CardModel, FieldModel, ReadOnlyRow } from './model/CardModel.ts';
+export type { InspectorHeader } from './model/InspectorHeader.ts';
+export { MIXED } from './model/MIXED.ts';
+export type { Mixed } from './model/MIXED.ts';
 export { ValueInput } from './typing/ValueInput.ts';
 export type { NumberInputDefinition, NumberInputType, ValueInputResult } from './typing/ValueInput.ts';

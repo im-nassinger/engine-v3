@@ -66,7 +66,7 @@ src/
     snapping/          Snapper, GridSnapper
     view/              ViewState (pan and zoom), ViewSettings
     entities-panel/    rows/ (EntitiesRows, the visible rows, and rowKind, a row's icon), clicks/ (RowClicks), drop/ (EntitiesDrop, where a drag lands)
-    inspector/         InspectorModel, CardModel, FieldModel, ValueInput (typed text)
+    inspector/         InspectorModel, CardModel, FieldModel, CardFolds, ValueInput (typed text)
     messages/          EditorMessages, EditorMessageRule, rules/
     clipboard/         ClipboardCodec, PastePlacement, IdRemapping
     shortcuts/         KeyChord, KeyPress, ShortcutMap, ShortcutDispatcher
