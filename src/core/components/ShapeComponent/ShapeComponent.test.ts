@@ -146,9 +146,15 @@ describe('ShapeComponent', () => {
         expect(square.get('geometry')).toEqual({ kind: 'rectangle', width: 100, height: 100 });
     });
 
-    test('Kind is read-only', () => {
+    test('writing Kind changes the geometry, and a line of 2 points is refused as a polygon', () => {
         const shape = new ShapeComponent();
+        const line = new ShapeComponent({ geometry: { kind: 'line', points: triangle.slice(0, 2) } });
 
-        expect(() => shape.writeDerived('kind', 'circle')).toThrow();
+        shape.writeDerived('kind', 'circle');
+        const outcome = line.writeDerived('kind', 'polygon');
+
+        expect(shape.get('geometry')).toEqual({ kind: 'circle', radius: 50 });
+        expect(outcome).toEqual({ ok: false, problem: { reason: 'tooFewPoints', minCount: 3 } });
+        expect(line.readDerived('kind')).toBe('line');
     });
 });

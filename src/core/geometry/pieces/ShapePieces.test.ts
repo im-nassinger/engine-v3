@@ -3,7 +3,8 @@ import { describe, expect, test } from 'vitest';
 import type { CollisionPiece } from './CollisionPiece.ts';
 import { ConvexMerging } from './ConvexMerging.ts';
 import type { Point } from '../Point.ts';
-import { CIRCLE_POINT_COUNT, ShapePieces } from './ShapePieces.ts';
+import { ShapePieces } from './ShapePieces.ts';
+import { CIRCLE_POINT_COUNT } from './ShapeOutlines.ts';
 import {
     areaOf,
     createRandomNumbers,

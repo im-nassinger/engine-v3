@@ -1,17 +1,12 @@
-import { DeterministicMath } from '../../math/index.ts';
-
 import type { CollisionPiece } from './CollisionPiece.ts';
 import { ConvexMerging } from './ConvexMerging.ts';
 import { EarClipping } from './EarClipping.ts';
 import { OutlineCleaning } from './OutlineCleaning.ts';
 import type { Point } from '../Point.ts';
 import { PolygonLibrary } from './PolygonLibrary.ts';
+import { ShapeOutlines } from './ShapeOutlines.ts';
 import { pointAt, turn } from './Ring.ts';
 import type { ShapeGeometry } from '../ShapeGeometry.ts';
-
-// A fixed count, because the points of a stretched circle decide how it collides, so they must be the same
-// on every computer and in every version.
-export const CIRCLE_POINT_COUNT = 32;
 
 // The requirement's limit: a piece narrower than this can't collide.
 const SMALLEST_COLLIDING_SIZE = 1;
@@ -24,34 +19,6 @@ export type ShapePiecesResult = {
 };
 
 const NOTHING: ShapePiecesResult = { filledOutlines: [], pieces: [] };
-
-function rectangleOutline(width: number, height: number) {
-    const halfWidth = width / 2;
-    const halfHeight = height / 2;
-
-    return [
-        { x: -halfWidth, y: -halfHeight },
-        { x: halfWidth, y: -halfHeight },
-        { x: halfWidth, y: halfHeight },
-        { x: -halfWidth, y: halfHeight },
-    ];
-}
-
-// Increasing angles turn clockwise on screen with y down, so the outline has a positive area. sinCos is
-// exact at quarter turns, so the four extreme points sit exactly on the circle's box.
-function circleOutline(radius: number) {
-    const degreesPerPoint = 360 / CIRCLE_POINT_COUNT;
-    const outline: Point[] = [];
-
-    for (let i = 0; i < CIRCLE_POINT_COUNT; i++) {
-        const angle = DeterministicMath.sinCos(i * degreesPerPoint);
-        const x = radius * angle.cos + 0;
-        const y = radius * angle.sin + 0;
-        outline.push({ x, y });
-    }
-
-    return outline;
-}
 
 // A convex piece's width across one edge is the largest distance of its points from that edge's line:
 // turn / edge length. It is narrower than the limit if that holds across any edge. Compared squared so
@@ -115,7 +82,7 @@ function polygonPieces(points: readonly Point[]): ShapePiecesResult {
 }
 
 function rectanglePieces(width: number, height: number): ShapePiecesResult {
-    const outline = rectangleOutline(width, height);
+    const outline = ShapeOutlines.rectangle(width, height);
     const pieces = toPolygonPieces([outline]);
 
     return { filledOutlines: [outline], pieces };
@@ -129,7 +96,7 @@ function circlePieces(radius: number): ShapePiecesResult {
 }
 
 function stretchableCirclePieces(radius: number) {
-    const outline = circleOutline(radius);
+    const outline = ShapeOutlines.circle(radius);
 
     return polygonPieces(outline);
 }

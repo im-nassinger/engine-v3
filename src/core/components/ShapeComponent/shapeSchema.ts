@@ -1,3 +1,4 @@
+import { convertShape } from '../../geometry/index.ts';
 import type { Point, ShapeKind } from '../../geometry/index.ts';
 import {
     ChoiceFieldType,
@@ -65,8 +66,19 @@ export const shapeSchema = new ComponentSchema<ShapeValues>({
             key: 'kind',
             label: 'Kind',
             type: kindType,
-            description: 'What the shape is. Set when it is drawn.',
+            description: 'What the shape is. Changing it keeps its place and size.',
             read: (values) => values.geometry.kind,
+            // Only the geometry: the edit that changes Kind also moves the TransformComponent by convertShape's
+            // offset, which a component can't do for its partner.
+            write: (values, kind) => {
+                const converted = convertShape(values.geometry, kind);
+                if (!converted.ok) {
+                    const problem = { reason: 'tooFewPoints', minCount: converted.minPointCount } as const;
+                    return { ok: false, problem };
+                }
+
+                return { ok: true, value: { geometry: converted.value.geometry } };
+            },
         }),
         derivedField<ShapeValues, number>({
             key: 'width',
