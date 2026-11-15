@@ -1,0 +1,64 @@
+import type { CommandId, CommandRegistry, ShortcutScope } from '../commands/index.ts';
+
+import { KeyChord } from './KeyChord.ts';
+import type { KeyPress } from './KeyPress.ts';
+
+export type Shortcut = {
+    readonly chord: KeyChord;
+    readonly commandId: CommandId;
+    readonly scope: ShortcutScope;
+};
+
+// Every registered command's chords with where they work. Built once from the registry, which is
+// complete before the editor takes its first key.
+export class ShortcutMap {
+    private readonly shortcuts: readonly Shortcut[];
+
+    private constructor(shortcuts: readonly Shortcut[]) {
+        this.shortcuts = shortcuts;
+    }
+
+    // Throws when two commands share a chord in one scope, since one press can't run both.
+    static fromRegistry(registry: CommandRegistry) {
+        const shortcuts: Shortcut[] = [];
+
+        for (const command of registry.all) {
+            const scope = command.shortcutScope ?? 'editor';
+
+            for (const chordText of command.shortcuts) {
+                const chord = KeyChord.parse(chordText);
+                const shortcut = { chord, commandId: command.id, scope };
+
+                throwIfTaken(shortcuts, shortcut, chordText);
+                shortcuts.push(shortcut);
+            }
+        }
+
+        return new ShortcutMap(shortcuts);
+    }
+
+    get all() {
+        return this.shortcuts;
+    }
+
+    // Every shortcut the press matches, one per scope at most; the dispatcher picks by focus.
+    matching(press: KeyPress) {
+        return this.shortcuts.filter((shortcut) => shortcut.chord.matches(press));
+    }
+
+    // The first shortcut of a command, for its menu entry.
+    firstFor(commandId: CommandId) {
+        return this.shortcuts.find((shortcut) => shortcut.commandId === commandId);
+    }
+}
+
+function throwIfTaken(shortcuts: readonly Shortcut[], added: Shortcut, chordText: string) {
+    for (const existing of shortcuts) {
+        const sameScope = existing.scope === added.scope;
+        const sameKeys = existing.chord.sameKeysAs(added.chord);
+
+        if (sameScope && sameKeys) {
+            throw new Error(`${existing.commandId} and ${added.commandId} both use ${chordText} in one scope.`);
+        }
+    }
+}

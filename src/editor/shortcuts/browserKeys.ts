@@ -1,0 +1,41 @@
+// The requirement's "Keys the editor never uses", besides Ctrl+Alt, which is checked on its own: the
+// browser keeps them for tabs, reload, zoom, focus and developer tools.
+export const BROWSER_KEYS: readonly string[] = [
+    'Ctrl+N',
+    'Ctrl+T',
+    'Ctrl+W',
+    'Ctrl+Tab',
+    'Ctrl+Shift+Tab',
+    'Ctrl+PageUp',
+    'Ctrl+PageDown',
+    'Ctrl+F4',
+    'Ctrl+Shift+T',
+    'Ctrl+Shift+N',
+    'Ctrl+Shift+W',
+    'Ctrl+1',
+    'Ctrl+2',
+    'Ctrl+3',
+    'Ctrl+4',
+    'Ctrl+5',
+    'Ctrl+6',
+    'Ctrl+7',
+    'Ctrl+8',
+    'Ctrl+9',
+    'Alt+Left',
+    'Alt+Right',
+    'Alt+D',
+    'Ctrl+L',
+    'Ctrl+R',
+    'F5',
+    'F11',
+    'F12',
+    'Ctrl+Shift+I',
+    'Ctrl+U',
+    'Ctrl+0',
+    'F6',
+    'F7',
+    'F10',
+];
+
+// Windows reports AltGr as Ctrl+Alt, so only these two may use it, and only when AltGr is not down.
+export const CTRL_ALT_ALLOWED: readonly string[] = ['Ctrl+Alt+C', 'Ctrl+Alt+V'];

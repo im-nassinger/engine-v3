@@ -13,7 +13,8 @@ export type EditorCommand = {
     readonly id: CommandId;                 // 'arrange.group'
     readonly label: string;                 // 'Group'
     readonly menu: MenuPlace;               // { menu: 'Arrange', section: 1, order: 10 }
-    readonly shortcuts: readonly KeyChord[];
+    readonly shortcuts: readonly string[];  // 'Ctrl+Shift+G', read by KeyChord
+    readonly shortcutScope?: ShortcutScope; // 'editor' when missing
     availability(): Availability;           // a disabled button's tooltip shows the reason
     run(): CommandOutcome;
 };
@@ -48,12 +49,23 @@ export class CommandRegistry {
 
 ```typescript
 export class KeyChord {
-    static parse(text: string): KeyChord;   // 'Ctrl+Shift+G', 'Shift+3', '?'
-    static fromKeyboard(input: KeyboardInputData): KeyChord;
-    matches(other: KeyChord): boolean;
+    static parse(text: string): KeyChord;          // 'Ctrl+Shift+G', 'Shift+3', '?'
+    matches(press: KeyPress): boolean;
+    sameKeysAs(other: KeyChord): boolean;
+    text(platform: KeyboardPlatform): string;       // 'Cmd+Shift+Z' on a Mac
 }
 
-export type ShortcutScope = 'everywhere' | 'editor' | 'levelView';
+export class KeyPress {
+    static fromKeyboard(input: KeyboardInputData, platform: KeyboardPlatform): KeyPress | undefined;
+}
+
+export class ShortcutMap {
+    static fromRegistry(registry: CommandRegistry): ShortcutMap;  // throws on a chord shared in one scope
+    matching(press: KeyPress): readonly Shortcut[];
+    firstFor(commandId: CommandId): Shortcut | undefined;
+}
+
+export type ShortcutScope = 'everywhere' | 'editor' | 'levelView';   // in editor/commands, on EditorCommand
 export type FocusPlace = 'level' | 'panel' | 'textField' | 'codeEditor';
 
 export class ShortcutDispatcher {
@@ -62,6 +74,14 @@ export class ShortcutDispatcher {
     handleKeyUp(input: KeyboardInputData): void;
 }
 ```
+
+**As built (stage 6, step 2, standing yes, 2026-11-15):**
+
+- **A command's shortcuts stay text** (`readonly shortcuts: readonly string[]`), written as the requirement writes them, and `ShortcutMap` parses them once. *Why: a command file reads like the requirement's table, and a typo fails the map's test instead of hiding in a constructor.* `ShortcutScope` lives in `editor/commands` beside `EditorCommand`, because `editor/shortcuts` imports the registry and the other way round would be a circle.
+- **A press and a chord are two classes:** `KeyChord` is what a shortcut asks for, `KeyPress` what the keyboard gave. `KeyPress.fromKeyboard` reads Cmd as Ctrl on a Mac and returns `undefined` when AltGr is down, so a symbol typed with AltGr is never a shortcut. The modifier no shortcut uses (the Windows key, or Control on a Mac) is kept, and a press holding it matches nothing.
+- **Shift is ignored for a symbol** (`+`, `-`, `=`, `?`), because it is already in the typed character: `+` is Shift+= on a US layout and a key of its own on a German one. `Shift+?` is refused when parsed. Digits match on the number row and the numpad.
+- **A letter falls back to its physical key** when the layout types no Latin letter there: Cyrillic, Greek, or Option on a Mac.
+- **The recorded key data** for US, ABNT2, German, Russian and a Mac is in `editor/shortcuts/testing/recordedKeys.ts`; the browser's keys are in `browserKeys.ts`, from the requirement's table.
 
 - **Matching** follows the tech notes: digits (and Shift+digit) by the physical key, `?` and `+` by the typed character, letters by the typed letter so Ctrl+Z stays on Z in every layout, falling back to the physical key when the layout types no Latin letter. On a Mac, Cmd is Ctrl and Option is Alt.
 - **Scopes:** "everywhere" works even while typing (Ctrl+Enter, Ctrl+S, Esc, F8, F9). "editor" is skipped while the focus is in a text field or the code editor. "levelView" needs the mouse over the level view.

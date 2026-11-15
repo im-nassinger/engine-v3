@@ -67,7 +67,7 @@ src/
     inspector/         InspectorModel, CardModel, FieldModel, ValueInput (typed text)
     messages/          EditorMessages, EditorMessageRule, rules/
     clipboard/         ClipboardCodec, PastePlacement, IdRemapping
-    shortcuts/         KeyChord, ShortcutMap, ShortcutDispatcher
+    shortcuts/         KeyChord, KeyPress, ShortcutMap, ShortcutDispatcher
     saving/            Autosave, SaveState, ProjectFile, ImportLevel, ExportLevel, contracts
     play/              PlaySession, TickPacer, PlayMirror, Watchdog, GameRunner contract
     status/            StatusText (the status bar's left slot)
