@@ -4,6 +4,8 @@ export { CURRENT_FORMAT_VERSION, LEVEL_FORMAT } from './LevelData.ts';
 export type { ComponentData, EditorData, EntityData, LevelData } from './LevelData.ts';
 export { V1_LEVEL_LIMITS } from './LevelLimits.ts';
 export type { LevelLimits } from './LevelLimits.ts';
+export { LevelReader } from './LevelReader.ts';
 export { LevelWriter } from './LevelWriter.ts';
 export { PhysicsVersions } from './PhysicsVersions.ts';
 export type { PhysicsBuild } from './PhysicsVersions.ts';
+export type { ReadOutcome, ReadRefusal } from './ReadOutcome.ts';

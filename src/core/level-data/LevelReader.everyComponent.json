@@ -1,0 +1,196 @@
+{
+    "format": "engine-v3-level",
+    "formatVersion": 1,
+    "physicsVersion": 1,
+    "name": "Castle",
+    "editor": { "gridSize": 32, "foldedRows": [3] },
+    "entities": [
+        {
+            "id": 1,
+            "parent": null,
+            "hidden": false,
+            "locked": true,
+            "components": {
+                "NameComponent": { "name": "World" },
+                "TransformComponent": {
+                    "position": { "x": 0, "y": 0 },
+                    "rotation": 0,
+                    "scale": { "x": 1, "y": 1 },
+                    "skew": 0
+                },
+                "ShapeComponent": { "geometry": { "kind": "rectangle", "width": 30000, "height": 12000 } },
+                "StyleComponent": {
+                    "fill": { "kind": "none" },
+                    "outline_colour": "#000000FF",
+                    "outline_width": 0,
+                    "opacity": 1
+                },
+                "PhysicsWorldComponent": {
+                    "gravity_strength": 4.5,
+                    "gravity_direction": "custom",
+                    "gravity_angle": 45,
+                    "walls": true
+                }
+            }
+        },
+        {
+            "id": 3,
+            "parent": 1,
+            "hidden": true,
+            "locked": false,
+            "components": {
+                "NameComponent": { "name": "Cart" },
+                "TransformComponent": {
+                    "position": { "x": 120.5, "y": -40 },
+                    "rotation": 30,
+                    "scale": { "x": 2, "y": -1 },
+                    "skew": 15
+                },
+                "ShapeComponent": {
+                    "geometry": {
+                        "kind": "polygon",
+                        "points": [
+                            { "x": 0, "y": 0 },
+                            { "x": 60, "y": 0 },
+                            { "x": 30, "y": 40 }
+                        ]
+                    }
+                },
+                "StyleComponent": {
+                    "fill": { "kind": "solid", "colour": "#C0392BFF" },
+                    "outline_colour": "#2ECC7180",
+                    "outline_width": 5,
+                    "opacity": 0.5
+                },
+                "BodyComponent": {
+                    "type": "kinematic",
+                    "gravity_scale": -2,
+                    "linear_damping": 0.4,
+                    "angular_damping": 1.5,
+                    "fixed_rotation": true,
+                    "bullet": true,
+                    "merge": false
+                },
+                "SurfaceComponent": { "density": 2.5, "friction": 0.9, "restitution": 0.6, "sensor": true }
+            }
+        },
+        {
+            "id": 7,
+            "parent": 3,
+            "hidden": false,
+            "locked": true,
+            "components": {
+                "NameComponent": { "name": "Wheel" },
+                "TransformComponent": {
+                    "position": { "x": 10, "y": 20 },
+                    "rotation": 0,
+                    "scale": { "x": 1, "y": 1 },
+                    "skew": 0
+                },
+                "ShapeComponent": { "geometry": { "kind": "ellipse", "width": 24, "height": 24 } }
+            }
+        },
+        {
+            "id": 2,
+            "parent": 1,
+            "hidden": true,
+            "locked": false,
+            "components": {
+                "NameComponent": { "name": "Camera" },
+                "TransformComponent": {
+                    "position": { "x": 300, "y": 200 },
+                    "rotation": 0,
+                    "scale": { "x": 1, "y": 1 },
+                    "skew": 0
+                },
+                "CameraComponent": {
+                    "width": 1280,
+                    "height": 720,
+                    "follow": { "entity": 3 },
+                    "smoothing": 0.8,
+                    "mode": "fixedSize"
+                }
+            }
+        },
+        {
+            "id": 9,
+            "parent": 1,
+            "hidden": false,
+            "locked": false,
+            "components": {
+                "NameComponent": { "name": "Rope" },
+                "TransformComponent": {
+                    "position": { "x": 0, "y": 0 },
+                    "rotation": 0,
+                    "scale": { "x": 1, "y": 1 },
+                    "skew": 0
+                },
+                "PathComponent": {
+                    "path": {
+                        "closed": true,
+                        "points": [
+                            { "x": 0, "y": 0, "handle_in": null, "handle_out": { "x": 5, "y": 5 }, "corner": "smooth" },
+                            {
+                                "x": 50,
+                                "y": 10,
+                                "handle_in": { "x": -5, "y": 0 },
+                                "handle_out": null,
+                                "corner": "separate"
+                            },
+                            { "x": 100, "y": 0, "handle_in": null, "handle_out": null, "corner": "sharp" }
+                        ]
+                    }
+                },
+                "StyleComponent": {
+                    "fill": { "kind": "none" },
+                    "outline_colour": "#1F3552FF",
+                    "outline_width": 3,
+                    "opacity": 1
+                },
+                "JointComponent": {
+                    "type": "spring",
+                    "a": { "entity": 3 },
+                    "b": { "entity": 99 },
+                    "let_connected_objects_collide": true,
+                    "limit_rotation": true,
+                    "min_angle": -30,
+                    "max_angle": 60,
+                    "motor": true,
+                    "motor_speed": 90,
+                    "motor_strength": 20,
+                    "resistance": 0.5,
+                    "match_drawn_distance": false,
+                    "length": 150,
+                    "rest_length": 120,
+                    "stiffness": 4,
+                    "damping": 0.1,
+                    "ends": { "a": { "x": -10, "y": 0 }, "b": { "x": 110, "y": 5 } }
+                }
+            }
+        },
+        {
+            "id": 12,
+            "parent": 1,
+            "hidden": false,
+            "locked": false,
+            "components": {
+                "NameComponent": { "name": "Ledge" },
+                "TransformComponent": {
+                    "position": { "x": -500, "y": 300 },
+                    "rotation": -90,
+                    "scale": { "x": 1, "y": 1 },
+                    "skew": 0
+                },
+                "ShapeComponent": {
+                    "geometry": {
+                        "kind": "line",
+                        "points": [
+                            { "x": 0, "y": 0 },
+                            { "x": 200, "y": 0 }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

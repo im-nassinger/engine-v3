@@ -14,6 +14,7 @@ export { NumberFieldType } from './NumberFieldType.ts';
 export type { NumberFieldOptions } from './NumberFieldType.ts';
 export type { ParseOutcome, ParseProblem } from './ParseOutcome.ts';
 export { PathGeometryValue } from './PathGeometryValue.ts';
+export { isPlainObject } from './rawChecks.ts';
 export { ShapeGeometryValue } from './ShapeGeometryValue.ts';
 export type { SolidFill } from './SolidFill.ts';
 export { SolidFillFieldType } from './SolidFillFieldType.ts';

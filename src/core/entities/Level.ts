@@ -44,13 +44,17 @@ export class Level {
     private readonly idAllocator = new EntityIdAllocator();
     private levelName = NEW_LEVEL_NAME;
 
-    private constructor() {
-        const worldId = this.idAllocator.next();
+    private constructor(worldId: EntityId, cameraId: EntityId) {
+        if (worldId === cameraId) {
+            throw new Error('The World and the camera need two different ids.');
+        }
+
+        this.idAllocator.reserve(worldId);
         this.world = new Entity(worldId, this.tree);
         this.tree.addRoot(this.world);
         this.listenTo(this.world);
 
-        const cameraId = this.idAllocator.next();
+        this.idAllocator.reserve(cameraId);
         this.camera = this.attach(cameraId, this.world, 0);
 
         this.editorData.version.subscribe(() => this.signals.levelVersion.increment());
@@ -59,7 +63,7 @@ export class Level {
     // The World is id 1 and the camera id 2, at the origin. The World's rectangle is the level bounds,
     // centred on the origin, and its fill is the background, with no outline: the editor draws the bounds.
     static createNew() {
-        const level = new Level();
+        const level = new Level(1, 2);
 
         const bounds = new ShapeComponent({
             geometry: { kind: 'rectangle', width: NEW_LEVEL_BOUNDS_WIDTH, height: NEW_LEVEL_BOUNDS_HEIGHT },
@@ -81,6 +85,12 @@ export class Level {
         level.camera.addComponent(new CameraComponent());
 
         return level;
+    }
+
+    // The World and the camera with the given ids and no components, the camera the World's only child.
+    // Only the reader uses it, and fills in the rest from the file.
+    static createEmpty(worldId: EntityId, cameraId: EntityId) {
+        return new Level(worldId, cameraId);
     }
 
     get name() {
