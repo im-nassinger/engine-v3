@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 5, step 2 of 11: `Clock`, `Timer`, `ManualClock`, `ManualTimer`, `StatusText` and `DerivedCaches` are built, and `app/startLevelView.ts` uses `DerivedCaches`. Next is step 3, `Selection` and `CurrentGroup`. The [runner](runner.md) keeps this line up to date.
+**Runner:** stage 5, step 3 of 11: `Selection` (in `editor/selection`) and `CurrentGroup` (in `editor/session`) are built and follow the level. Next is step 4, `SetValueChange`, `SetSwitchChange`, `RenameLevelChange` and `MoveEntityChange`. The [runner](runner.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

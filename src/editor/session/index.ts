@@ -1,1 +1,1 @@
-export {};
+export { CurrentGroup } from './CurrentGroup.ts';

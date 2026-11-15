@@ -32,6 +32,7 @@ export class CurrentGroup {
 
 - Both listen to the level: a removed entity leaves the selection, and a removed current group falls back to its nearest existing parent.
 - Neither is ever saved or undone, as the requirements say. Undo restores them from the history step.
+- **`Selection` and `CurrentGroup` as built** (standing yes, 2026-11-15): `replace` is one batch, where a parent wins over its children and the World is dropped when anything else is in it. `add` and `toggle` go one at a time and **the newest wins**: adding a parent drops its selected children (the requirement), adding a child drops its selected parent, adding the World selects it alone, and adding anything else drops the World (*proposal*, as Figma does). *Why: the requirement says only what adding a parent does; the newest click winning is what the user just asked for.* A move that puts one selected entity inside another keeps the parent. `entities` and `isEmpty` were added for the commands. An unknown id is a bug and throws. Each `version` moves only on a real change; `CurrentGroup.version` also moves when the group or a parent of it moves, because its `path` changed. `enter` takes any entity of the level; whether it has children is the Go into group command's check. `restore` lands in the deepest id on the path that still exists, or the World. Both have `dispose()`.
 - **"Selected" in the Inspector:** an empty selection shows the World, see [inspector-and-entities.md](inspector-and-entities.md).
 
 ## Hit testing
