@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 3, step 5 of 8: `Bounds`, `PolygonLibrary` (with `clipper2-ts`), `EarClipping`, `ShapePieces` and `LineChains` are built; `MassProperties` is next. The [runner](runner.md) keeps this line up to date.
+**Runner:** stage 3, step 6 of 8: `Bounds`, `PolygonLibrary` (with `clipper2-ts`), `EarClipping`, `ShapePieces`, `LineChains` and `MassProperties` are built; `PiecesCache` and `BoundsCache` are next. The [runner](runner.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

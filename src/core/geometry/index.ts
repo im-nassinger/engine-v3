@@ -3,6 +3,7 @@ export type { CollisionPiece } from './CollisionPiece.ts';
 export { EarClipping } from './EarClipping.ts';
 export type { JointEnds } from './JointEnds.ts';
 export { LineChains } from './LineChains.ts';
+export { MassProperties } from './MassProperties.ts';
 export { Matrix2D } from './Matrix2D.ts';
 export type { PathCorner, PathGeometry, PathPoint } from './PathGeometry.ts';
 export type { Point } from './Point.ts';

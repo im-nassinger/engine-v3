@@ -98,6 +98,12 @@ Polygon steps:
 
 - `MassProperties.of(pieces, density)` returns area, mass and centre of mass. Mass is area in square metres times density: a 100 px square at density 1 is 2 m × 2 m = 4 kg, as the requirement's example says.
 - The BodyComponent's read-only Mass adds up every surface that belongs to the body, merged shapes included. Stage 3 builds `MassProperties.combine`, which adds several up; which surfaces belong to a body is `BodyMass` in `core/physics`, built by the first stage that shows Mass, the Inspector's (standing yes, 2026-11-14: the merging rules it follows belong to `core/physics`). The tech notes require editor mass to come from shared geometry code, not from the physics engine, so it matches play.
+- **`MassProperties`** (standing yes, 2026-11-14) is a value with `area` in px², `mass` in kg and `centreOfMass` in px, in the pieces' own space. The details:
+  - A polygon's centre comes from the shoelace sums measured from its first point, so a shape far from the origin keeps its precision; a circle's is its middle, with area π r². Only `+ − × ÷`, like the polygon steps.
+  - **Something with no mass has no centre of mass** (`undefined`): a line, or a surface at density 0. Its area still counts. *Why: a centre weighed by nothing is meaningless, and the 1 kg rule below decides a weightless body's mass.*
+  - `combine(parts)` adds areas and masses and weighs each centre by its mass, so parts with no mass don't move the centre.
+  - `transformedBy(matrix)` moves a shape's result into its body's space: every area, a circle's too, is multiplied by the size of the matrix's determinant, and the centre moves like any point. *Why: an affine matrix keeps centres of mass, so the pieces needn't be moved, and scaling a shape changes its mass as the requirement says.*
+  - No rotational inertia: Box2D works it out from the same pieces, and the editor shows none.
 - A Dynamic body whose surfaces add up to 0 kg is given 1 kg when the body is built, as the tech notes advise.
 
 ## DeterministicMath

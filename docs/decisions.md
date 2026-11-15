@@ -85,6 +85,7 @@ The owner asked for v1 to be built to the end with nobody typing "continue": one
 | 2026-11-14 | `exp` is fdlibm's `e_exp` with 2ᵏ built by multiplying powers of two; `Units` also has `toDegrees`, and speeds use the length and angle functions | [geometry](architecture/core-model/geometry.md) |
 | 2026-11-14 | `ShapePieces` also returns the cleaned filled outlines; points within 0.01 px of straight are dropped in step 1; merging drops only exactly straight corners, so pieces cover the outline exactly; the short side is measured across each edge; circles under 1 px are dropped; ellipse points go through the library like any polygon | [geometry](architecture/core-model/geometry.md#the-polygon-pipeline) |
 | 2026-11-14 | `LineChains` keeps the line's ends in place when merging close points, cuts where the line crosses, touches or passes through its own point again, and doesn't cut segments lying along each other; the Box2D adapter adds each chain twice, once reversed | [geometry](architecture/core-model/geometry.md#the-polygon-pipeline) |
+| 2026-11-14 | `MassProperties` is a value with area (px²), mass (kg) and centre of mass (px); something with no mass, a line or density 0, has no centre but keeps its area; `combine` weighs centres by mass; `transformedBy(matrix)` moves the result into a body's space without moving the pieces; no rotational inertia, because Box2D works it out from the same pieces | [geometry](architecture/core-model/geometry.md#mass) |
 
 ## Still to decide
 
