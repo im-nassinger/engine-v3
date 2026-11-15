@@ -1,8 +1,8 @@
-import type { Point } from '../geometry/index.ts';
+import type { Point } from '../../geometry/index.ts';
 
-import type { FieldType } from './FieldType.ts';
-import type { ParseOutcome } from './ParseOutcome.ts';
-import { accept, clamp, parsePoint, refuse } from './rawChecks.ts';
+import type { FieldType } from '../FieldType.ts';
+import type { ParseOutcome } from '../ParseOutcome.ts';
+import { accept, clamp, parsePoint, refuse } from '../rawChecks.ts';
 
 export type VectorFieldOptions = {
     // Each applies to x and y alike.

@@ -1,5 +1,5 @@
-import type { FieldType } from './FieldType.ts';
-import { clamp, parseFiniteNumber } from './rawChecks.ts';
+import type { FieldType } from '../FieldType.ts';
+import { clamp, parseFiniteNumber } from '../rawChecks.ts';
 
 export type NumberFieldOptions = {
     readonly min?: number;

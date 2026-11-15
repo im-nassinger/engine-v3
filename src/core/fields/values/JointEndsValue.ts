@@ -1,8 +1,8 @@
-import type { JointEnds } from '../geometry/index.ts';
+import type { JointEnds } from '../../geometry/index.ts';
 
-import type { ParseOutcome } from './ParseOutcome.ts';
-import { accept, hasExactlyKeys, isPlainObject, parsePoint, refuse } from './rawChecks.ts';
-import type { ValueType } from './ValueType.ts';
+import type { ParseOutcome } from '../ParseOutcome.ts';
+import { accept, hasExactlyKeys, isPlainObject, parsePoint, refuse } from '../rawChecks.ts';
+import type { ValueType } from '../ValueType.ts';
 
 // The JointComponent's two ends, saved as { a: { x, y }, b: { x, y } }.
 export class JointEndsValue implements ValueType<JointEnds> {

@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'vitest';
 
 import { EarClipping } from './EarClipping.ts';
-import type { Point } from './Point.ts';
+import type { Point } from '../Point.ts';
 import { PolygonLibrary } from './PolygonLibrary.ts';
-import { areaOf, createRandomNumbers, ONE_STROKE_STAR, randomPolygon, totalArea } from './testing/testPolygons.ts';
+import { areaOf, createRandomNumbers, ONE_STROKE_STAR, randomPolygon, totalArea } from '../testing/testPolygons.ts';
 
 describe('EarClipping.triangulate', () => {
     test('cuts a square into two triangles', () => {

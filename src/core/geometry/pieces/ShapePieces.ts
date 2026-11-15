@@ -1,13 +1,13 @@
-import { DeterministicMath } from '../math/index.ts';
+import { DeterministicMath } from '../../math/index.ts';
 
 import type { CollisionPiece } from './CollisionPiece.ts';
 import { ConvexMerging } from './ConvexMerging.ts';
 import { EarClipping } from './EarClipping.ts';
 import { OutlineCleaning } from './OutlineCleaning.ts';
-import type { Point } from './Point.ts';
+import type { Point } from '../Point.ts';
 import { PolygonLibrary } from './PolygonLibrary.ts';
 import { pointAt, turn } from './Ring.ts';
-import type { ShapeGeometry } from './ShapeGeometry.ts';
+import type { ShapeGeometry } from '../ShapeGeometry.ts';
 
 // A fixed count, because the points of an ellipse decide how it collides, so they must be the same on
 // every computer and in every version.

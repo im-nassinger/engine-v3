@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
-import type { Point } from './Point.ts';
+import type { Point } from '../Point.ts';
 import { PolygonLibrary } from './PolygonLibrary.ts';
 import {
     areaOf,
@@ -8,7 +8,7 @@ import {
     FIGURE_OF_EIGHT,
     ONE_STROKE_STAR,
     randomPolygon,
-} from './testing/testPolygons.ts';
+} from '../testing/testPolygons.ts';
 
 // The same list as BANNED_MATH_IN_CORE in eslint.config.ts, but for atan2, which is checked apart.
 const BANNED_MATH = [

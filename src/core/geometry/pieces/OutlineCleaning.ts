@@ -1,4 +1,4 @@
-import type { Point } from './Point.ts';
+import type { Point } from '../Point.ts';
 import { pointAt, turn } from './Ring.ts';
 
 // Points closer than this are merged. It is Box2D's linear slop, 0.005 m, in pixels: Box2D welds

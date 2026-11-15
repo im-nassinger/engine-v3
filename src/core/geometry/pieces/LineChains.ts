@@ -1,4 +1,4 @@
-import type { Point } from './Point.ts';
+import type { Point } from '../Point.ts';
 import { turn } from './Ring.ts';
 
 // The same limit as an outline's: Box2D's linear slop, 0.005 m, in pixels. Chain points closer than

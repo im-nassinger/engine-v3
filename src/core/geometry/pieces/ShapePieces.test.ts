@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import type { CollisionPiece } from './CollisionPiece.ts';
 import { ConvexMerging } from './ConvexMerging.ts';
-import type { Point } from './Point.ts';
+import type { Point } from '../Point.ts';
 import { ELLIPSE_POINT_COUNT, ShapePieces } from './ShapePieces.ts';
 import {
     areaOf,
@@ -11,7 +11,7 @@ import {
     ONE_STROKE_STAR,
     randomPolygon,
     totalArea,
-} from './testing/testPolygons.ts';
+} from '../testing/testPolygons.ts';
 
 function polygonPoints(pieces: readonly CollisionPiece[]) {
     const polygons: (readonly Point[])[] = [];

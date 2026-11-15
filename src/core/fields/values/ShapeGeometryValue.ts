@@ -1,8 +1,8 @@
-import type { Point, ShapeGeometry } from '../geometry/index.ts';
+import type { Point, ShapeGeometry } from '../../geometry/index.ts';
 
-import type { JsonValue } from './JsonValue.ts';
+import type { JsonValue } from '../JsonValue.ts';
 
-import type { ParseOutcome } from './ParseOutcome.ts';
+import type { ParseOutcome } from '../ParseOutcome.ts';
 import {
     accept,
     clamp,
@@ -12,8 +12,8 @@ import {
     parsePointList,
     pointsEqual,
     refuse,
-} from './rawChecks.ts';
-import type { ValueType } from './ValueType.ts';
+} from '../rawChecks.ts';
+import type { ValueType } from '../ValueType.ts';
 
 // A rectangle or ellipse is at least 1 px each side.
 const MIN_SIDE = 1;

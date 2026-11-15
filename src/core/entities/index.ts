@@ -1,4 +1,4 @@
-export type { AddComponentOutcome } from './AddComponentOutcome.ts';
+export type { AddComponentOutcome } from './outcomes/AddComponentOutcome.ts';
 export { Entity } from './Entity.ts';
 export type { EntityChange, SwitchName } from './EntityChange.ts';
 export { entityName } from './entityName.ts';
@@ -8,6 +8,6 @@ export { Level } from './Level.ts';
 export { LevelEditorData } from './LevelEditorData.ts';
 export { LevelSignals } from './LevelSignals.ts';
 export type { LevelUpdate } from './LevelUpdate.ts';
-export type { MoveOutcome, MoveRefusal } from './MoveOutcome.ts';
-export type { RenameOutcome } from './RenameOutcome.ts';
+export type { MoveOutcome, MoveRefusal } from './outcomes/MoveOutcome.ts';
+export type { RenameOutcome } from './outcomes/RenameOutcome.ts';
 export type { EntityId } from '../fields/index.ts';

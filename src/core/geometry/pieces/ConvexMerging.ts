@@ -1,4 +1,4 @@
-import type { Point } from './Point.ts';
+import type { Point } from '../Point.ts';
 import { pointAt, samePlace, startingAt, turn } from './Ring.ts';
 
 // Box2D's largest polygon.

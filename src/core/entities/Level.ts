@@ -15,8 +15,8 @@ import { LevelEditorData } from './LevelEditorData.ts';
 import { LevelSignals } from './LevelSignals.ts';
 import { LevelTree } from './LevelTree.ts';
 import type { LevelUpdate } from './LevelUpdate.ts';
-import type { MoveOutcome } from './MoveOutcome.ts';
-import type { RenameOutcome } from './RenameOutcome.ts';
+import type { MoveOutcome } from './outcomes/MoveOutcome.ts';
+import type { RenameOutcome } from './outcomes/RenameOutcome.ts';
 
 // Counted in parents above an entity: an entity directly inside the World is 1 deep.
 const MAX_DEPTH = 256;

@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'vitest';
 
 import { LineChains } from './LineChains.ts';
-import type { Point } from './Point.ts';
+import type { Point } from '../Point.ts';
 import { turn } from './Ring.ts';
-import { createRandomNumbers } from './testing/testPolygons.ts';
+import { createRandomNumbers } from '../testing/testPolygons.ts';
 
 function randomLine(nextRandom: () => number) {
     const pointCount = 2 + Math.floor(nextRandom() * 14);

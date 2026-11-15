@@ -3,7 +3,7 @@ import { Signal } from '../events/index.ts';
 import type { Unsubscribe } from '../events/index.ts';
 import type { EntityId } from '../fields/index.ts';
 
-import type { AddComponentOutcome } from './AddComponentOutcome.ts';
+import type { AddComponentOutcome } from './outcomes/AddComponentOutcome.ts';
 import type { EntityChange } from './EntityChange.ts';
 import type { LevelTree } from './LevelTree.ts';
 

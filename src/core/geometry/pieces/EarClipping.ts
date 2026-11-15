@@ -1,4 +1,4 @@
-import type { Point } from './Point.ts';
+import type { Point } from '../Point.ts';
 import { pointAt, samePlace, signedDoubleArea, turn } from './Ring.ts';
 
 type Corner = {

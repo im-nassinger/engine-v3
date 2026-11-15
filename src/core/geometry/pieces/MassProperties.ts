@@ -1,8 +1,8 @@
-import { Units } from '../math/index.ts';
+import { Units } from '../../math/index.ts';
 
 import type { CollisionPiece } from './CollisionPiece.ts';
-import type { Matrix2D } from './Matrix2D.ts';
-import type { Point } from './Point.ts';
+import type { Matrix2D } from '../Matrix2D.ts';
+import type { Point } from '../Point.ts';
 
 const SQUARE_PIXELS_PER_SQUARE_METRE = Units.PIXELS_PER_METRE * Units.PIXELS_PER_METRE;
 

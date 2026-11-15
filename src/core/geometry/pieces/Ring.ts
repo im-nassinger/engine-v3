@@ -1,4 +1,4 @@
-import type { Point } from './Point.ts';
+import type { Point } from '../Point.ts';
 
 // Helpers for a closed outline held as an array of points, where the point after the last is the first.
 

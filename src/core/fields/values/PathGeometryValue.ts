@@ -1,8 +1,8 @@
-import type { PathCorner, PathGeometry, PathPoint, Point } from '../geometry/index.ts';
+import type { PathCorner, PathGeometry, PathPoint, Point } from '../../geometry/index.ts';
 
-import type { ParseOutcome } from './ParseOutcome.ts';
-import { accept, hasExactlyKeys, isPlainObject, parseFiniteNumber, parsePoint, refuse } from './rawChecks.ts';
-import type { ValueType } from './ValueType.ts';
+import type { ParseOutcome } from '../ParseOutcome.ts';
+import { accept, hasExactlyKeys, isPlainObject, parseFiniteNumber, parsePoint, refuse } from '../rawChecks.ts';
+import type { ValueType } from '../ValueType.ts';
 
 const CORNERS: readonly PathCorner[] = ['sharp', 'smooth', 'separate'];
 const POINT_KEYS = ['x', 'y', 'handle_in', 'handle_out', 'corner'];

@@ -33,11 +33,15 @@ src/
   core/
     events/            Signal, VersionCounter: how classes announce changes
     entities/          Entity, EntityId, Level, EntityIdAllocator, LevelSignals
-    fields/            value types, the field types, FieldDefinition, EntityId
+      outcomes/          what adding a component, moving and renaming return
+    fields/            FieldType, ValueType, FieldDefinition, EntityId, Unit
+      field-types/       one file per field type: NumberFieldType, ColourFieldType, ...
+      values/            the value types that aren't fields: shape and path geometry, joint ends
     components/        Component, ComponentSchema, ComponentRegistry, then one folder per component
       TransformComponent/ NameComponent/ ShapeComponent/ PathComponent/ StyleComponent/
       BodyComponent/ SurfaceComponent/ JointComponent/ CameraComponent/ PhysicsWorldComponent/
-    geometry/          Matrix2D, Point, Bounds, the polygon pipeline, mass
+    geometry/          Matrix2D, Point, Bounds, ShapeGeometry, PathGeometry, JointEnds
+      pieces/            the polygon pipeline from a shape to collision pieces, line chains, mass
     math/              DeterministicMath, units (px and metres, degrees and radians)
     derived/           WorldMatrixCache, BoundsCache, HiddenCache, PiecesCache
     level-data/        LevelData types, LevelWriter, LevelReader, FormatUpgrader, limits
@@ -99,7 +103,7 @@ Each component folder is named exactly like its class, as the owner's React rule
 | A helper used by one module? | Inside that module, until a second module needs it |
 | A contract? | In the module that needs it, never in the module that implements it |
 | A test fake for a contract? | In a `testing/` folder of the module that declares the contract, such as `editor/time/testing/FakeClock.ts` |
-| A new folder grows past about 15 files with different jobs? | Split it into subfolders by area, each with its own `index.ts` |
+| Does a folder now hold files with different jobs? | Split it into subfolders, one per area, whatever the number of files. A folder of many files with one job (one change per file, one cache per file) stays as it is. A subfolder inside a module has no `index.ts` of its own: the module's `index.ts` exports from it |
 
 ## Modules and their public entry
 

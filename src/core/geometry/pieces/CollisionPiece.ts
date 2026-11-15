@@ -1,4 +1,4 @@
-import type { Point } from './Point.ts';
+import type { Point } from '../Point.ts';
 
 // One convex part of a shape, as handed to the physics engine and drawn by the physics view, in the
 // shape's own space. A circle is centred on the origin. A polygon has 3 to 8 points and a positive

@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import { MassProperties } from './MassProperties.ts';
-import { Matrix2D } from './Matrix2D.ts';
+import { Matrix2D } from '../Matrix2D.ts';
 import { ShapePieces } from './ShapePieces.ts';
 import {
     createRandomNumbers,
@@ -9,7 +9,7 @@ import {
     ONE_STROKE_STAR,
     randomPolygon,
     totalArea,
-} from './testing/testPolygons.ts';
+} from '../testing/testPolygons.ts';
 
 const SQUARE_100 = ShapePieces.build({ kind: 'rectangle', width: 100, height: 100 }).pieces;
 

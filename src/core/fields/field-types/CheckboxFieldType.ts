@@ -1,6 +1,6 @@
-import type { FieldType } from './FieldType.ts';
-import type { ParseOutcome } from './ParseOutcome.ts';
-import { accept, refuse } from './rawChecks.ts';
+import type { FieldType } from '../FieldType.ts';
+import type { ParseOutcome } from '../ParseOutcome.ts';
+import { accept, refuse } from '../rawChecks.ts';
 
 export class CheckboxFieldType implements FieldType<boolean> {
     readonly kind = 'checkbox';

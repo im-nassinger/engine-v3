@@ -1,6 +1,6 @@
-import type { FieldType } from './FieldType.ts';
-import type { ParseOutcome } from './ParseOutcome.ts';
-import { accept, refuse } from './rawChecks.ts';
+import type { FieldType } from '../FieldType.ts';
+import type { ParseOutcome } from '../ParseOutcome.ts';
+import { accept, refuse } from '../rawChecks.ts';
 
 const COLOUR_PATTERN = /^#[0-9A-Fa-f]{8}$/;
 

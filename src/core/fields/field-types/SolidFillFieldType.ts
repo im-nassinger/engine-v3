@@ -1,9 +1,9 @@
 import { ColourFieldType } from './ColourFieldType.ts';
-import type { FieldType } from './FieldType.ts';
-import type { JsonValue } from './JsonValue.ts';
-import type { ParseOutcome } from './ParseOutcome.ts';
-import { accept, hasExactlyKeys, isPlainObject, refuse } from './rawChecks.ts';
-import type { SolidFill } from './SolidFill.ts';
+import type { FieldType } from '../FieldType.ts';
+import type { JsonValue } from '../JsonValue.ts';
+import type { ParseOutcome } from '../ParseOutcome.ts';
+import { accept, hasExactlyKeys, isPlainObject, refuse } from '../rawChecks.ts';
+import type { SolidFill } from '../SolidFill.ts';
 
 const colourType = new ColourFieldType();
 

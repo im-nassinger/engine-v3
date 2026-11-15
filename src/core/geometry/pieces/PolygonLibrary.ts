@@ -1,7 +1,7 @@
 import { area, FillRule, union } from 'clipper2-ts';
 import type { Path64, Paths64 } from 'clipper2-ts';
 
-import type { Point } from './Point.ts';
+import type { Point } from '../Point.ts';
 
 // Clipper2 works in whole numbers. Scaling pixels by 1,000 keeps a thousandth of a pixel, far below
 // the 0.25 px at which points are merged anyway.

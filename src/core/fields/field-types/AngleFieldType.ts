@@ -1,6 +1,6 @@
-import type { FieldType } from './FieldType.ts';
-import type { ParseOutcome } from './ParseOutcome.ts';
-import { accept, clamp, parseFiniteNumber, refuse } from './rawChecks.ts';
+import type { FieldType } from '../FieldType.ts';
+import type { ParseOutcome } from '../ParseOutcome.ts';
+import { accept, clamp, parseFiniteNumber, refuse } from '../rawChecks.ts';
 
 export type AngleFieldOptions = {
     readonly min?: number;

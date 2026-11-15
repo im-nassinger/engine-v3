@@ -1,7 +1,7 @@
-import type { EntityId } from './EntityId.ts';
-import type { FieldType } from './FieldType.ts';
-import type { ParseOutcome } from './ParseOutcome.ts';
-import { accept, hasExactlyKeys, isPlainObject, refuse } from './rawChecks.ts';
+import type { EntityId } from '../EntityId.ts';
+import type { FieldType } from '../FieldType.ts';
+import type { ParseOutcome } from '../ParseOutcome.ts';
+import { accept, hasExactlyKeys, isPlainObject, refuse } from '../rawChecks.ts';
 
 // Stored as { "entity": 12 }, not a bare number, so a later "follow by tag" can store { "tag": "player" }
 // beside it without changing saved levels.
