@@ -12,6 +12,7 @@ import { useEditorSession } from '../../../../EditorContext.tsx';
 import { useEntityVersion, useReading } from '../../../../hooks/index.ts';
 import { Icon } from '../../../../shared/index.ts';
 import { RowKindIcon } from './RowKindIcon/index.ts';
+import { RowNameBox } from './RowNameBox/index.ts';
 import './EntitiesListRow.css';
 
 // The left padding before the World's fold arrow, and the --indent token per level below it.
@@ -23,11 +24,15 @@ export type EntitiesListRowProps = {
     row: EntitiesRow;
     // From the top of the list, in pixels.
     top: number;
+    // True while the row's name box is open.
+    isRenaming: boolean;
+    onRenameStart: () => void;
+    onRenameEnd: () => void;
 };
 
 // One entity's row: the fold arrow, the kind icon, the name and the eye. It redraws when its own
 // entity changes or its selected state does, never when another entity is renamed.
-export function EntitiesListRow({ openLevel, row, top }: EntitiesListRowProps) {
+export function EntitiesListRow({ openLevel, row, top, isRenaming, onRenameStart, onRenameEnd }: EntitiesListRowProps) {
     // The name and the eye are read from the same entity object after it changed, so the React
     // Compiler must not keep their old values.
     'use no memo';
@@ -67,6 +72,15 @@ export function EntitiesListRow({ openLevel, row, top }: EntitiesListRowProps) {
         session.status.show(outcome.reason);
     };
 
+    const startRenaming = () => {
+        if (isWorld) {
+            session.status.show("The World can't be renamed");
+            return;
+        }
+
+        onRenameStart();
+    };
+
     const expanded = row.hasChildren ? !row.isFolded : undefined;
 
     return (
@@ -82,7 +96,13 @@ export function EntitiesListRow({ openLevel, row, top }: EntitiesListRowProps) {
         >
             <FoldArrow row={row} onToggle={toggleFold} />
             <RowKindIcon kind={kind} isSelected={isSelected} />
-            <span className="name">{name}</span>
+            {isRenaming ? (
+                <RowNameBox openLevel={openLevel} entityId={entityId} name={name} onClose={onRenameEnd} />
+            ) : (
+                <span className="name" onDoubleClick={startRenaming}>
+                    {name}
+                </span>
+            )}
             {!isWorld && <EyeButton name={name} isHidden={entity.isHidden} onToggle={toggleHidden} />}
         </div>
     );

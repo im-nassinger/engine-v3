@@ -1,5 +1,6 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { EntityId } from '../../../../core/level/index.ts';
 import type { EntitiesRow } from '../../../../editor/entities-panel/index.ts';
 import type { OpenLevel } from '../../../../editor/session/index.ts';
 import { useVersion } from '../../../hooks/index.ts';
@@ -40,6 +41,28 @@ export function EntitiesList({ openLevel }: EntitiesListProps) {
         overscan: OVERSCAN,
     });
 
+    // The row whose name box is open. A rename asked by F2 scrolls its row into view first, so the
+    // row exists to open the box in.
+    const [renamingId, setRenamingId] = useState<EntityId | undefined>(undefined);
+    const renameRequest = openLevel.renameRequest;
+    useEffect(() => {
+        const openAskedBox = () => {
+            const askedId = renameRequest.entityId;
+            if (askedId === undefined) return;
+
+            renameRequest.clear();
+            const index = entitiesRows.indexOf(askedId);
+            if (index < 0) return;
+
+            virtualizer.scrollToIndex(index);
+            setRenamingId(askedId);
+        };
+
+        return renameRequest.version.subscribe(openAskedBox);
+    }, [renameRequest, entitiesRows, virtualizer]);
+
+    const endRenaming = () => setRenamingId(undefined);
+
     const contentHeight = { height: `${virtualizer.getTotalSize()}px` };
     const shownRows: ShownRow[] = [];
     for (const virtualRow of virtualizer.getVirtualItems()) {
@@ -53,7 +76,15 @@ export function EntitiesList({ openLevel }: EntitiesListProps) {
         <div className="entities-list" ref={scrollElement}>
             <div className="content" role="tree" aria-label="Entities" aria-multiselectable style={contentHeight}>
                 {shownRows.map(({ row, top }) => (
-                    <EntitiesListRow key={row.entityId} openLevel={openLevel} row={row} top={top} />
+                    <EntitiesListRow
+                        key={row.entityId}
+                        openLevel={openLevel}
+                        row={row}
+                        top={top}
+                        isRenaming={row.entityId === renamingId}
+                        onRenameStart={() => setRenamingId(row.entityId)}
+                        onRenameEnd={endRenaming}
+                    />
                 ))}
             </div>
         </div>

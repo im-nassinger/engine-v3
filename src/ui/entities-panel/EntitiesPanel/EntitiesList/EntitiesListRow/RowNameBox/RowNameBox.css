@@ -1,0 +1,12 @@
+.row-name-box {
+    flex: 1;
+    min-width: 0;
+    height: calc(var(--row) - var(--space-4));
+    padding: 0 var(--space-4);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    outline: none;
+    background: var(--field);
+    color: var(--text);
+    user-select: text;
+}

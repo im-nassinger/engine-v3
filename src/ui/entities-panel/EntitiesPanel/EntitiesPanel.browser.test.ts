@@ -96,6 +96,27 @@ function click(element: Element, modifiers: MouseEventInit = {}) {
     element.dispatchEvent(event);
 }
 
+function nameBox() {
+    return container.querySelector<HTMLInputElement>('input[aria-label="Entity name"]');
+}
+
+function requireNameBox() {
+    const box = nameBox();
+    if (box === null) throw new Error('The name box is open.');
+
+    return box;
+}
+
+// Sets the box's text the way typing does, through the setter React listens to.
+function type(input: HTMLInputElement, text: string) {
+    Reflect.set(HTMLInputElement.prototype, 'value', text, input);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function press(input: HTMLInputElement, key: string) {
+    input.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+}
+
 describe('EntitiesPanel', () => {
     test('at 10,000 rows only the rows on screen exist', async () => {
         const { level } = buildLevel(10_000);
@@ -190,5 +211,58 @@ describe('EntitiesPanel', () => {
 
         await expect.poll(() => shownRows().length).toBe(1);
         expect(level.editorData.isFolded(level.world.id)).toBe(true);
+    });
+    test('an asked rename scrolls its row into view and opens its box, and Enter renames', async () => {
+        const { level, entities } = buildLevel(10_000);
+        const session = showPanel(level);
+        // Crates are added at the top, so the first one made is the last row.
+        const crate = entities[0];
+        if (crate === undefined) throw new Error('The level has its crates.');
+
+        await rowShown('World');
+        session.openLevel.renameRequest.request(crate.id);
+
+        await expect.poll(() => nameBox()).not.toBeNull();
+        const input = requireNameBox();
+        expect(input.value).toBe('Crate 1');
+        expect(document.activeElement).toBe(input);
+        expect(session.openLevel.renameRequest.entityId).toBeUndefined();
+
+        type(input, '  Barrel ');
+        press(input, 'Enter');
+
+        await rowShown('Barrel');
+        expect(nameBox()).toBeNull();
+        expect(session.openLevel.history.undoLabel).toBe('Rename Crate 1');
+    });
+
+    test('a double-click on the name opens the box, and Esc keeps the old name', async () => {
+        const { level } = buildLevel(3);
+        const session = showPanel(level);
+
+        const name = (await rowShown('Crate 2')).querySelector('.name');
+        if (name === null) throw new Error('The row shows its name.');
+        name.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true }));
+
+        await expect.poll(() => nameBox()).not.toBeNull();
+        const input = requireNameBox();
+        type(input, 'Barrel');
+        press(input, 'Escape');
+
+        await rowShown('Crate 2');
+        expect(nameBox()).toBeNull();
+        expect(session.openLevel.history.undoLabel).toBeUndefined();
+    });
+
+    test("a double-click on the World's name says it can't be renamed", async () => {
+        const { level } = buildLevel(1);
+        const session = showPanel(level);
+
+        const name = (await rowShown('World')).querySelector('.name');
+        if (name === null) throw new Error('The row shows its name.');
+        name.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true }));
+
+        await expect.poll(() => session.status.current).toBe("The World can't be renamed");
+        expect(nameBox()).toBeNull();
     });
 });

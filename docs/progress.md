@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 7, step 8 of 12: **`EntitiesPanel`** is built and in the shell: a virtual list (`@tanstack/react-virtual`) that builds only the rows on screen, each with its fold arrow, kind icon, name and eye, and clicks that select. Next is step 9, renaming in place with F2 and a double-click. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 7, step 9 of 12: **renaming in place** is built: F2 or a double-click on a name opens the row's name box; Enter and leaving the box rename as one step, Esc keeps the old name. Next is step 10, dragging rows. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
