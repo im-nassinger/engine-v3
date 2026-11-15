@@ -8,6 +8,10 @@ import type { EntityDrawingOptions } from './EntityDrawing.ts';
 import { LevelDisplay } from './LevelDisplay.ts';
 import type { LevelDisplayCaches } from './LevelDisplay.ts';
 
+// Culling grows the visible area by this many screen pixels, so the editor's 1 px line around an unstyled
+// shape, which BoundsCache doesn't count, is never cut at the view's edge.
+const CULLING_MARGIN_SCREEN_PX = 2;
+
 // Where the renderer's resolution comes from. DevicePixelRatio in adapters/browser fulfils it.
 export type PixelRatioSource = {
     current(): number;
@@ -174,9 +178,22 @@ export class PixiLevelView {
         this.levelLayer.setFromMatrix(pixiMatrix);
     }
 
+    private prepareDisplay() {
+        const display = this.display;
+        if (display === undefined) return;
+
+        display.prepare();
+
+        const view = this.parts.view;
+        const marginInLevel = CULLING_MARGIN_SCREEN_PX / view.zoom;
+        const visibleBounds = view.visibleBounds();
+        const cullingArea = visibleBounds.expandedBy(marginInLevel);
+        display.cull(cullingArea);
+    }
+
     private render() {
         this.renders += 1;
-        this.display?.prepare();
+        this.prepareDisplay();
         this.renderer.render({ container: this.stage });
     }
 }

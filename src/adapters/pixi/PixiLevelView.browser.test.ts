@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { ShapeComponent, StyleComponent, TransformComponent } from '../../core/components/index.ts';
-import { PiecesCache } from '../../core/derived/index.ts';
+import { BoundsCache, PiecesCache, WorldMatrixCache } from '../../core/derived/index.ts';
 import { Level } from '../../core/entities/index.ts';
 import { Signal } from '../../core/events/index.ts';
 import { ManualFrames } from '../../editor/time/testing/index.ts';
@@ -46,6 +46,19 @@ function makeHost(width: number, height: number) {
     cleanups.push(() => host.remove());
 
     return host;
+}
+
+function makeCaches(level: Level) {
+    const pieces = new PiecesCache(level);
+    const worldMatrices = new WorldMatrixCache(level);
+    const bounds = new BoundsCache(level, worldMatrices);
+    cleanups.push(() => {
+        bounds.dispose();
+        worldMatrices.dispose();
+        pieces.dispose();
+    });
+
+    return { pieces, bounds };
 }
 
 async function makeView(ratio = 1) {
@@ -193,9 +206,7 @@ describe('PixiLevelView', () => {
         frames.runFrame();
 
         const level = Level.createNew();
-        const pieces = new PiecesCache(level);
-        cleanups.push(() => pieces.dispose());
-        levelView.show(level, { pieces });
+        levelView.show(level, makeCaches(level));
 
         expect(frames.pendingCount).toBe(1);
         frames.runFrame();
@@ -214,17 +225,36 @@ describe('PixiLevelView', () => {
         expect(levelView.levelDisplay?.drawingBuildCount).toBe(buildsAfterShow + 1);
     });
 
+    test('each render culls to what the view shows, so panning to an entity shows it', async () => {
+        const { levelView, view, frames } = await makeView();
+        const host = makeHost(300, 200);
+        levelView.mount(host);
+        await waitForSize(view, 300, 200);
+
+        const level = Level.createNew();
+        const farSquare = level.createEntity(level.world, 0);
+        farSquare.addComponent(new TransformComponent());
+        farSquare.addComponent(new ShapeComponent());
+        farSquare.addComponent(new StyleComponent());
+        farSquare.requireComponent(TransformComponent).set('position', { x: 1000, y: 0 });
+        levelView.show(level, makeCaches(level));
+        frames.runFrame();
+
+        const node = levelView.levelDisplay?.nodeOf(farSquare);
+        expect(node?.container.renderable).toBe(false);
+
+        view.centreOn({ x: 1000, y: 0 });
+        frames.runFrame();
+
+        expect(node?.container.renderable).toBe(true);
+    });
+
     test('showing another level lets go of the first one', async () => {
         const { levelView, frames } = await makeView();
         const firstLevel = Level.createNew();
         const secondLevel = Level.createNew();
-        const firstPieces = new PiecesCache(firstLevel);
-        const secondPieces = new PiecesCache(secondLevel);
-        cleanups.push(() => firstPieces.dispose());
-        cleanups.push(() => secondPieces.dispose());
-
-        levelView.show(firstLevel, { pieces: firstPieces });
-        levelView.show(secondLevel, { pieces: secondPieces });
+        levelView.show(firstLevel, makeCaches(firstLevel));
+        levelView.show(secondLevel, makeCaches(secondLevel));
         frames.runFrame();
         firstLevel.createEntity(firstLevel.world, 0);
 

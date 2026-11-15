@@ -1,8 +1,9 @@
 import { PathComponent, ShapeComponent, StyleComponent, TransformComponent } from '../../core/components/index.ts';
 import type { AnyComponent } from '../../core/components/index.ts';
-import type { PiecesCache } from '../../core/derived/index.ts';
+import type { BoundsCache, PiecesCache } from '../../core/derived/index.ts';
 import type { Entity, Level, LevelUpdate } from '../../core/entities/index.ts';
 import type { Unsubscribe } from '../../core/events/index.ts';
+import type { Bounds } from '../../core/geometry/index.ts';
 import { EntityDrawing } from './EntityDrawing.ts';
 import type { EntityDrawingOptions } from './EntityDrawing.ts';
 import { EntityNode } from './EntityNode.ts';
@@ -10,6 +11,8 @@ import { EntityNode } from './EntityNode.ts';
 // The level's caches the display reads. The editor's full set comes with EditorSession in stage 5.
 export type LevelDisplayCaches = {
     readonly pieces: PiecesCache;
+    // Must follow the same level. Culling reads it.
+    readonly bounds: BoundsCache;
 };
 
 export type LevelDisplayParts = {
@@ -77,6 +80,14 @@ export class LevelDisplay {
         this.staleDrawings.clear();
     }
 
+    // Skips drawing what lies outside the visible area, a level rectangle. A subtree wholly outside it is
+    // skipped as one, so its descendants are not even visited. Hidden subtrees are not visited either:
+    // showing one again is a change, and every change renders, which culls again first.
+    cull(visibleArea: Bounds) {
+        const world = this.parts.level.world;
+        this.cullSubtree(world, visibleArea);
+    }
+
     dispose() {
         this.unsubscribe();
         this.worldNode.destroy();
@@ -98,6 +109,25 @@ export class LevelDisplay {
         }
 
         return node;
+    }
+
+    private cullSubtree(entity: Entity, visibleArea: Bounds) {
+        const node = this.requireNode(entity);
+        if (entity.isHidden) return;
+
+        const bounds = this.parts.caches.bounds;
+        const subtreeBounds = bounds.subtreeBoundsOf(entity);
+        const subtreeOnScreen = subtreeBounds !== undefined && subtreeBounds.overlaps(visibleArea);
+        node.container.renderable = subtreeOnScreen;
+        if (!subtreeOnScreen) return;
+
+        const ownBounds = bounds.ownBoundsOf(entity);
+        const ownOnScreen = ownBounds !== undefined && ownBounds.overlaps(visibleArea);
+        node.graphics.renderable = ownOnScreen;
+
+        for (const child of entity.children) {
+            this.cullSubtree(child, visibleArea);
+        }
     }
 
     private handleUpdate(update: LevelUpdate) {

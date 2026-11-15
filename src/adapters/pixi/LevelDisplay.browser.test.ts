@@ -2,9 +2,10 @@ import { autoDetectRenderer, Rectangle } from 'pixi.js';
 import type { Renderer } from 'pixi.js';
 import { afterEach, describe, expect, test } from 'vitest';
 import { PathComponent, ShapeComponent, StyleComponent, TransformComponent } from '../../core/components/index.ts';
-import { PiecesCache } from '../../core/derived/index.ts';
+import { BoundsCache, PiecesCache, WorldMatrixCache } from '../../core/derived/index.ts';
 import type { Entity } from '../../core/entities/index.ts';
 import { Level } from '../../core/entities/index.ts';
+import { Bounds } from '../../core/geometry/index.ts';
 import type { ShapeGeometry } from '../../core/geometry/index.ts';
 import { LevelDisplay } from './LevelDisplay.ts';
 
@@ -18,10 +19,12 @@ afterEach(() => {
 
 function makeDisplay(level: Level, showUnstyled = true) {
     const pieces = new PiecesCache(level);
+    const worldMatrices = new WorldMatrixCache(level);
+    const bounds = new BoundsCache(level, worldMatrices);
     let changeCount = 0;
     const display = new LevelDisplay({
         level,
-        caches: { pieces },
+        caches: { pieces, bounds },
         options: { showUnstyled },
         onChange: () => {
             changeCount += 1;
@@ -29,6 +32,8 @@ function makeDisplay(level: Level, showUnstyled = true) {
     });
     cleanups.push(() => {
         display.dispose();
+        bounds.dispose();
+        worldMatrices.dispose();
         pieces.dispose();
     });
 
@@ -264,6 +269,97 @@ describe('LevelDisplay', () => {
         addShape(level, level.world, SQUARE);
 
         expect(changes()).toBe(0);
+    });
+});
+
+describe('LevelDisplay culling', () => {
+    // The default World's rectangle is centred on the origin and much larger than this area.
+    const VISIBLE_AREA = new Bounds(-100, -100, 100, 100);
+
+    function nodeOf(display: LevelDisplay, entity: Entity) {
+        const node = display.nodeOf(entity);
+        if (node === undefined) throw new Error(`Entity ${entity.id} has no node.`);
+
+        return node;
+    }
+
+    test('an entity off screen is not drawn, one on screen or touching its edge is', () => {
+        const level = Level.createNew();
+        const onScreen = addShape(level, level.world, SQUARE);
+        const offScreen = addShape(level, level.world, SQUARE);
+        const touching = addShape(level, level.world, SQUARE);
+        offScreen.requireComponent(TransformComponent).set('position', { x: 500, y: 0 });
+        touching.requireComponent(StyleComponent).set('outlineWidth', 0);
+        touching.requireComponent(TransformComponent).set('position', { x: 0, y: 150 });
+        const { display } = makeDisplay(level);
+
+        display.cull(VISIBLE_AREA);
+
+        expect(nodeOf(display, onScreen).container.renderable).toBe(true);
+        expect(nodeOf(display, offScreen).container.renderable).toBe(false);
+        expect(nodeOf(display, touching).container.renderable).toBe(true);
+    });
+
+    test('a group fully off screen skips its subtree without visiting it', () => {
+        const level = Level.createNew();
+        const group = addGroup(level, level.world);
+        const child = addShape(level, group, SQUARE);
+        group.requireComponent(TransformComponent).set('position', { x: 1000, y: 0 });
+        const { display } = makeDisplay(level);
+        const childNode = nodeOf(display, child);
+
+        display.cull(VISIBLE_AREA);
+
+        // Left as it was: a child that had been visited would have been set to false.
+        expect(nodeOf(display, group).container.renderable).toBe(false);
+        expect(childNode.container.renderable).toBe(true);
+    });
+
+    test('a group on screen through a child draws the child but not its own off-screen drawing', () => {
+        const level = Level.createNew();
+        const parent = addShape(level, level.world, SQUARE);
+        const child = addShape(level, parent, SQUARE);
+        parent.requireComponent(TransformComponent).set('position', { x: 400, y: 0 });
+        child.requireComponent(TransformComponent).set('position', { x: -400, y: 0 });
+        const { display } = makeDisplay(level);
+
+        display.cull(VISIBLE_AREA);
+
+        const parentNode = nodeOf(display, parent);
+        expect(parentNode.container.renderable).toBe(true);
+        expect(parentNode.graphics.renderable).toBe(false);
+        expect(nodeOf(display, child).container.renderable).toBe(true);
+    });
+
+    test('panning back, or moving an entity back, shows it again', () => {
+        const level = Level.createNew();
+        const square = addShape(level, level.world, SQUARE);
+        const { display } = makeDisplay(level);
+        const node = nodeOf(display, square);
+
+        display.cull(new Bounds(1000, 1000, 1200, 1200));
+        expect(node.container.renderable).toBe(false);
+
+        display.cull(VISIBLE_AREA);
+        expect(node.container.renderable).toBe(true);
+
+        square.requireComponent(TransformComponent).set('position', { x: 900, y: 0 });
+        display.cull(VISIBLE_AREA);
+        expect(node.container.renderable).toBe(false);
+
+        square.requireComponent(TransformComponent).set('position', { x: 0, y: 0 });
+        display.cull(VISIBLE_AREA);
+        expect(node.container.renderable).toBe(true);
+    });
+
+    test('a group that draws nothing in its subtree is skipped', () => {
+        const level = Level.createNew();
+        const emptyGroup = addGroup(level, level.world);
+        const { display } = makeDisplay(level);
+
+        display.cull(VISIBLE_AREA);
+
+        expect(nodeOf(display, emptyGroup).container.renderable).toBe(false);
     });
 });
 
