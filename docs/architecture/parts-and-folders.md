@@ -62,9 +62,9 @@ src/
     selection/         Selection
     commands/          EditorCommand, CommandRegistry, createCommandRegistry, then file/ edit/ arrange/ view/ play/, rename/ (renameEntity, renameLevel), hide/ (toggleEntityHidden, a row's eye), shared/ (skip rule, step labels, EntityNamer, attached joints, keeping in place), testing/
     tools/             Tool, ToolController, EscapeChain, select/ shape/ joint/
-    hit-testing/       HitTester, SpatialIndex, LinearSpatialIndex
+    hit-testing/       HitTester, HitProbe; areas/ (each entity's hit area), spatial-index/ (SpatialIndex, LinearSpatialIndex)
     snapping/          Snapper, GridSnapper
-    view/              ViewState (pan and zoom), ViewSettings
+    view/              ViewState (pan and zoom), ViewSettings, the overlay sizes the drawing and hitting share
     entities-panel/    rows/ (EntitiesRows, the visible rows, and rowKind, a row's icon), clicks/ (RowClicks), drop/ (EntitiesDrop, where a drag lands)
     inspector/         InspectorModel, CardModel, FieldModel, CardFolds, ValueInput (typed text)
     messages/          EditorMessages, EditorMessageRule, rules/

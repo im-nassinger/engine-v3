@@ -4,10 +4,10 @@ import { JointComponent } from '../../../core/components/index.ts';
 import type { JointType } from '../../../core/components/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
+import { JOINT_ICON_RADIUS_PX } from '../../../editor/view/index.ts';
 import type { OverlayScene } from './OverlayScene.ts';
 
-// The design's joint icon: a 14 px white circle with a 1.5 px edge.
-export const JOINT_ICON_RADIUS_PX = 7;
+// The design's joint icon: a white circle of JOINT_ICON_RADIUS_PX with a 1.5 px edge.
 const EDGE_COLOUR = 0x1d2430;
 const EDGE: StrokeStyle = { color: EDGE_COLOUR, width: 1.5 };
 const MARK: StrokeStyle = { color: EDGE_COLOUR, width: 1.5, cap: 'round', join: 'round' };

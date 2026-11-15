@@ -39,22 +39,34 @@ export class CurrentGroup {
 
 ```typescript
 export class HitTester {
-    constructor(level: Level, caches: DerivedCaches, index: SpatialIndex);
+    constructor(level: Level, caches: DerivedCaches, index: SpatialIndex, settings: ViewSettings);
 
-    topmostAt(point: Point, tolerancePx: number): Entity | undefined;          // front to back
-    allAt(point: Point, tolerancePx: number): readonly Entity[];              // v3: Alt+click
-    allTouching(box: Bounds): readonly Entity[];                              // the selection box
+    topmostAt(point: Point, probe: HitProbe): Entity | undefined;             // front to back
+    allAt(point: Point, probe: HitProbe): readonly Entity[];                 // v3: Alt+click
+    allTouching(box: Bounds, probe: HitProbe): readonly Entity[];            // the selection box
     selectableFor(hit: Entity, currentGroup: Entity, insideGroups: boolean): Entity | undefined;
 }
 
+export type HitProbe = {
+    readonly zoom: number;             // for the sizes that stay the same on screen
+    readonly currentGroup: Entity;     // decides whether entities inside the camera are reached
+};
+
 export type SpatialIndex = {
-    query(area: Bounds): Iterable<Entity>;   // candidates whose bounds overlap the area
+    query(area: Bounds): Iterable<Entity>;   // candidates, back to front; may return more than overlap
 };
 ```
 
 - **The hit areas are the requirement's table**, checked against the shape's outline from the [polygon pipeline](../core-model/geometry.md#the-polygon-pipeline): filled shapes by inside and edge, shapes with no fill or no StyleComponent by edge only, lines and open paths by the line with at least 5 screen pixels of tolerance, groups only through their children, joints by their icon, the camera by its frame's edge.
 - Hidden entities, locked entities and entities inside the camera are passed through, as the requirements say. The camera frame and joint icons are tested only while the View menu shows them.
 - `selectableFor` turns the hit into what a click selects: the hit's ancestor that is a direct child of the current group. A hit outside the current group selects nothing and stays inside. With Ctrl, the selection box selects inside groups.
+- **`HitTester` as built** (standing yes, 2026-11-15): each call takes a `HitProbe` instead of a tolerance, because the joint icon, the 5 px tolerance and the Ctrl box all need the zoom, and reaching inside the camera needs the current group; the tolerance is the requirement's 5 px, `HIT_TOLERANCE_PX`. `ViewSettings` is passed in for the two View menu switches. *Why: the signature above it had no zoom, so nothing on screen could keep its size.* The details:
+  - **An edge reaches half the drawn outline's width or 5 screen px, whichever is wider**, for every shape and path, filled or not. *Why: "the edge" is what the user sees, and a thin edge still needs the requirement's tolerance.*
+  - The edge follows what the level view draws: a polygon's own points, a rectangle's outline, a circle as 128 points, a path with its curves cut into 16 straight steps. The fill is the filled outlines, even-odd for a closed path.
+  - **The selection box touches without any tolerance**, and a box wholly inside a filled shape touches it. Groups never appear in its list; the Select tool turns each hit into what it selects through `selectableFor`.
+  - A joint is hit only by its icon, a 7 px radius on screen (`JOINT_ICON_RADIUS_PX`, moved to `editor/view` so the drawing and the hit share it), even a Rope with its path. The World is never hit.
+  - **Entities inside the camera are passed through unless the current group is the camera or inside it**, and then they are in front of the level, as they are drawn. *Why: the requirement's double-click goes into the camera "to reach the entities inside it".*
+  - `selectableFor` returns nothing for the current group itself.
 - **`LinearSpatialIndex` is v1:** it returns every entity, and the precise test runs only for those whose cached bounds overlap. That is under a millisecond for 10,000 entities. A grid index replaces it only if the speed test fails, see [performance.md](../performance.md).
 
 ## The tool contract

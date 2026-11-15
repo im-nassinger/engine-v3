@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 9, step 3 of 16 is done: `LiveEdit` changes values live during a drag and records one step on release, Esc puts the start values back, and Undo and Redo are off during a drag, with 1001 tests in Node. Next is step 4: `HitTester`. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 9, step 4 of 16 is done: `HitTester` with `LinearSpatialIndex` hits every v1 row of the hit area table, passes through the World, hidden and locked entities and those inside the camera, and turns a hit into what a click selects, with 1027 tests in Node. Next is step 5: `GridSnapper`. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
