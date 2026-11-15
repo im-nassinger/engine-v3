@@ -187,16 +187,32 @@ describe('dragging rows', () => {
         expect(session.openLevel.history.undoLabel).toBeUndefined();
     });
 
-    test('dragging a row that is not selected selects it alone, and Esc cancels the drag', async () => {
+    test('a row that is not selected is dragged alone, and selected only when it lands', async () => {
         const { level, entities } = buildLevel(3);
         const session = showPanel(level);
         const crate1 = requireEntity(entities, 0);
-        const crate2 = requireEntity(entities, 1);
+        const crate3 = requireEntity(entities, 2);
+        session.openLevel.selection.replace([crate1.id]);
+
+        startDrag(await rowShown('Crate 3'));
+        expect(session.openLevel.selection.ids).toEqual([crate1.id]);
+
+        const lastRow = await rowShown('Crate 1');
+        moveTo(pointInRow(lastRow, 0.9));
+        await expect.poll(() => dropLine()).not.toBeNull();
+        release(pointInRow(lastRow, 0.9));
+
+        expect(rowIndexOf(session, crate3)).toBeGreaterThan(rowIndexOf(session, crate1));
+        expect(session.openLevel.selection.ids).toEqual([crate3.id]);
+    });
+
+    test('Esc cancels the drag of a row that is not selected, and the selection stays', async () => {
+        const { level, entities } = buildLevel(3);
+        const session = showPanel(level);
+        const crate1 = requireEntity(entities, 0);
         session.openLevel.selection.replace([crate1.id]);
 
         startDrag(await rowShown('Crate 2'));
-        expect(session.openLevel.selection.ids).toEqual([crate2.id]);
-
         const lastRow = await rowShown('Crate 1');
         moveTo(pointInRow(lastRow, 0.9));
         await expect.poll(() => dropLine()).not.toBeNull();
@@ -207,7 +223,7 @@ describe('dragging rows', () => {
         release(pointInRow(lastRow, 0.9));
         click(lastRow);
         expect(session.openLevel.history.undoLabel).toBeUndefined();
-        expect(session.openLevel.selection.ids).toEqual([crate2.id]);
+        expect(session.openLevel.selection.ids).toEqual([crate1.id]);
     });
 
     test('a change to the tree during a drag, such as Ctrl+Z, ends the drag', async () => {

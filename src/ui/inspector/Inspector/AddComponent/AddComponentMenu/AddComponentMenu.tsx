@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import type { KeyboardEvent, RefObject } from 'react';
+import type { RefObject } from 'react';
 import { addComponent } from '../../../../../editor/commands/index.ts';
 import type { EntityId } from '../../../../../core/level/index.ts';
 import type { AddableComponent } from '../../../../../editor/inspector/index.ts';
 import type { OpenLevel } from '../../../../../editor/session/index.ts';
 import { useEditorSession } from '../../../../EditorContext.tsx';
-import { Menu } from '../../../../shared/index.ts';
+import { Menu, MenuSearch } from '../../../../shared/index.ts';
 import type { MenuEntry } from '../../../../shared/index.ts';
-import './AddComponentMenu.css';
 
 export type AddComponentMenuProps = {
     openLevel: OpenLevel;
@@ -40,27 +39,19 @@ export function AddComponentMenu({ openLevel, entries, entityIds, anchor, onClos
         onClose();
     };
 
-    const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key !== 'Enter') return;
-
-        event.preventDefault();
-        addFirstMatch();
-    };
+    let noneText;
+    if (matching.length === 0) {
+        noneText = 'No component matches';
+    }
 
     const searchBox = (
-        <div className="add-component-menu">
-            <input
-                className="search"
-                aria-label="Search components"
-                placeholder="Search"
-                spellCheck={false}
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                onKeyDown={handleKeyDown}
-                autoFocus
-            />
-            {matching.length === 0 && <p className="none">No component matches</p>}
-        </div>
+        <MenuSearch
+            label="Search components"
+            search={search}
+            onSearch={setSearch}
+            onEnter={addFirstMatch}
+            noneText={noneText}
+        />
     );
 
     const menuEntries = menuEntriesOf(matching, add);

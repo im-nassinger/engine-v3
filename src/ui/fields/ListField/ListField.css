@@ -1,0 +1,45 @@
+.list-field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    min-width: 0;
+
+    &[data-mixed='true'] {
+        color: var(--muted);
+        font-style: italic;
+        line-height: var(--row);
+    }
+
+    > .fold {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        height: var(--row);
+        padding: 0;
+        border: none;
+        background: none;
+        color: var(--muted);
+        font: inherit;
+        cursor: pointer;
+
+        &:hover {
+            color: var(--text);
+        }
+
+        &:focus-visible {
+            outline: 1px solid var(--accent);
+            outline-offset: 1px;
+        }
+    }
+
+    /* The rows reach back under the field's label, so a row of two boxes has the card's whole width. */
+    > .items {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: var(--space-4);
+        width: calc(100% + var(--label) + var(--space-8));
+        margin-left: calc(-1 * (var(--label) + var(--space-8)));
+    }
+}

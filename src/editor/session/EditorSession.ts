@@ -3,7 +3,7 @@ import type { ComponentRegistry } from '../../core/components/index.ts';
 import type { Level } from '../../core/level/index.ts';
 import { FormatUpgrader, LevelReader, V1_LEVEL_LIMITS } from '../../core/level-data/index.ts';
 import { VersionCounter } from '../../core/events/index.ts';
-import { CardFolds } from '../inspector/index.ts';
+import { CardFolds, ListFolds } from '../inspector/index.ts';
 import type { FoldStore } from '../inspector/index.ts';
 import { StatusText } from '../status/index.ts';
 import type { Clock, FrameScheduler, Timer } from '../time/index.ts';
@@ -36,6 +36,7 @@ export class EditorSession {
     readonly status: StatusText;
     // Kept across New and Import: a fold belongs to the component type, not to a level.
     readonly cardFolds: CardFolds;
+    readonly listFolds = new ListFolds();
     readonly openLevelChanged = new VersionCounter();
     private readonly services: OpenLevelServices;
     private current: OpenLevel;

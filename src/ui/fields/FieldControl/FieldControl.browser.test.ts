@@ -15,6 +15,7 @@ import { ManualClock, ManualFrames, ManualTimer } from '../../../editor/time/tes
 import { CommandsContext } from '../../commands/index.ts';
 import type { EditorCommands } from '../../commands/index.ts';
 import '../../theme.css';
+import type { FieldSubject } from '../FieldProps.ts';
 import { FieldControl } from './FieldControl.tsx';
 
 let container: HTMLElement;
@@ -59,8 +60,10 @@ function showField(definition: AnyFieldDefinition, value: unknown) {
 
     const committed: unknown[] = [];
     const field: FieldModel = { kind: 'field', definition, value, isEnabled: true, isReadOnly: false };
+    const subject: FieldSubject = { openLevel: session.openLevel, typeName: 'TestComponent', entityIds: [] };
     const control = createElement(FieldControl, {
         field,
+        subject,
         onCommit: (newValue) => committed.push(newValue),
         onCommitAxis: (axis, newValue) => committed.push({ [axis]: newValue }),
     });

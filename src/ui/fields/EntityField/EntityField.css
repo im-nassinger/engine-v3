@@ -1,0 +1,20 @@
+.entity-field {
+    display: flex;
+    min-width: 0;
+
+    .chosen {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &[data-shown='none'] .chosen,
+    &[data-shown='mixed'] .chosen {
+        color: var(--muted);
+        font-style: italic;
+    }
+
+    &[data-shown='missing'] .chosen {
+        color: var(--warning);
+    }
+}

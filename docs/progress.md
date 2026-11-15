@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 8, step 11 of 14: the vector and colour fields in `ui/fields` are built: two boxes with their axis letters, Mixed per axis, the swatch with the browser's picker, the code, and the fill's None switch. Next is step 12, the entity and list fields in `ui/fields`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 8, step 12 of 14: the entity and list fields in `ui/fields` are built: the entity field's searchable dropdown, a dropped Entities panel row, `missing entity`, and the list field folded with its count, a row per item, + and remove. Next is step 13, the editor messages' count in the status bar and the whole Inspector in the page. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

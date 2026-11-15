@@ -1,0 +1,22 @@
+.list-field-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    width: 100%;
+    min-width: 0;
+
+    > .number {
+        flex: 0 0 auto;
+        min-width: 2ch;
+        color: var(--faint);
+        line-height: var(--row);
+        text-align: right;
+    }
+
+    > .item {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        min-width: 0;
+    }
+}

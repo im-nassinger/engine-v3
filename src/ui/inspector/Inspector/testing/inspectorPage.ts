@@ -1,4 +1,5 @@
 import { createElement } from 'react';
+import type { ReactElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
 import {
@@ -16,6 +17,7 @@ import { CommandsContext } from '../../../commands/index.ts';
 import type { EditorCommands } from '../../../commands/index.ts';
 import { EditorContext } from '../../../EditorContext.tsx';
 import '../../../theme.css';
+import { EntitiesPanel } from '../../../entities-panel/index.ts';
 import { Inspector } from '../Inspector.tsx';
 
 let container: HTMLElement;
@@ -55,8 +57,9 @@ export function addBareEntity(level: Level, name: string) {
     return entity;
 }
 
-// The session, and the frames its editor messages are checked on.
-export function showInspector(level: Level) {
+// The session, and the frames its editor messages are checked on. With the Entities panel beside it,
+// for dragging its rows onto the Inspector's fields.
+export function showInspector(level: Level, withPanel = false) {
     const frames = new ManualFrames();
     const session = new EditorSession({ level, clock: new ManualClock(), timer: new ManualTimer(), frames });
 
@@ -66,8 +69,15 @@ export function showInspector(level: Level) {
         platform: 'other',
     };
 
-    const inspector = createElement(Inspector);
-    const withCommands = createElement(CommandsContext, { value: commands }, inspector);
+    let shown: ReactElement = createElement(Inspector);
+    if (withPanel) {
+        container.style.width = '560px';
+        const inspectorPlace = createElement('div', { style: { width: '300px' } }, shown);
+        const panelPlace = createElement('div', { style: { width: '260px' } }, createElement(EntitiesPanel));
+        shown = createElement('div', { style: { display: 'flex', height: '700px' } }, inspectorPlace, panelPlace);
+    }
+
+    const withCommands = createElement(CommandsContext, { value: commands }, shown);
     const withSession = createElement(EditorContext, { value: session }, withCommands);
     root.render(withSession);
 

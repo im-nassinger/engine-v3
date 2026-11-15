@@ -39,13 +39,15 @@ export function CardField({ openLevel, typeName, entityIds, field }: CardFieldPr
         showRefusal(outcome);
     };
 
+    const subject = { openLevel, typeName, entityIds };
+
     return (
         <div className="card-field" data-key={key} data-enabled={field.isEnabled}>
             <Tooltip label={description} isLong>
                 <span className="label">{label}</span>
             </Tooltip>
             <span className="control">
-                <FieldControl field={field} onCommit={commit} onCommitAxis={commitAxis} />
+                <FieldControl field={field} subject={subject} onCommit={commit} onCommitAxis={commitAxis} />
             </span>
         </div>
     );

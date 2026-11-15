@@ -6,6 +6,7 @@ import { EntitiesDrop } from '../../../../../editor/entities-panel/index.ts';
 import type { DropTarget } from '../../../../../editor/entities-panel/index.ts';
 import type { OpenLevel } from '../../../../../editor/session/index.ts';
 import type { StatusText } from '../../../../../editor/status/index.ts';
+import { dropEntityRowAt } from '../../../../shared/index.ts';
 import { autoScrollSpeed } from './autoScrollSpeed.ts';
 import { dropPointerAt } from './dropPointerAt.ts';
 
@@ -104,14 +105,17 @@ export class RowDrag {
         this.keepScrolling();
     };
 
-    private readonly handleUp = () => {
+    private readonly handleUp = (event: PointerEvent) => {
         const press = this.press;
         const drag = this.drag;
         this.end();
         if (press === undefined || drag === undefined) return;
 
         this.swallowsNextClick = true;
-        if (drag.target === undefined) return;
+        if (drag.target === undefined) {
+            dropEntityRowAt(event.clientX, event.clientY, press.entityId);
+            return;
+        }
 
         // The panel selects the moved rows itself: a drop into a folded group leaves it folded.
         const { openLevel } = press;
@@ -149,8 +153,9 @@ export class RowDrag {
         this.updateTarget();
     };
 
-    // Dragging a selected row drags the whole selection; dragging one that isn't selected selects it
-    // first and drags it alone.
+    // Dragging a selected row drags the whole selection; dragging one that isn't selected drags it alone,
+    // and the selection changes only when it lands in the list. Let go over an entity field, it fills the
+    // field of the entity the Inspector still shows.
     private beginDragPastStart() {
         const press = this.press;
         if (press === undefined) return false;
@@ -158,14 +163,14 @@ export class RowDrag {
         const distance = Math.hypot(this.pointerX - press.startX, this.pointerY - press.startY);
         if (distance < DRAG_START_DISTANCE) return false;
 
-        const { selection, level, entitiesRows, selectionReveal } = press.openLevel;
+        const { selection, level, entitiesRows } = press.openLevel;
+        let draggedIds = selection.ids;
         if (!selection.has(press.entityId)) {
-            const pressedIds = [press.entityId];
-            selectionReveal.fromPanel(() => selection.replace(pressedIds));
+            draggedIds = [press.entityId];
         }
 
         const drop = new EntitiesDrop(level, entitiesRows);
-        this.drag = { draggedIds: selection.ids, drop, target: undefined };
+        this.drag = { draggedIds, drop, target: undefined };
 
         return true;
     }
@@ -175,12 +180,24 @@ export class RowDrag {
         const drag = this.drag;
         if (press === undefined || drag === undefined) return;
 
+        // Beside the list, the pointer is over another panel, where an entity field may take the row.
+        const scrollerBox = press.elements.scroller.getBoundingClientRect();
+        const isBesideList = this.pointerX < scrollerBox.left || this.pointerX > scrollerBox.right;
+        if (isBesideList) {
+            this.setTarget(drag, undefined);
+            return;
+        }
+
         const contentBox = press.elements.content.getBoundingClientRect();
         const point = { x: this.pointerX - contentBox.left, y: this.pointerY - contentBox.top };
         const rowCount = press.openLevel.entitiesRows.rows.length;
         const pointer = dropPointerAt(point, rowCount);
 
         const target = pointer === undefined ? undefined : drag.drop.targetAt(drag.draggedIds, pointer);
+        this.setTarget(drag, target);
+    }
+
+    private setTarget(drag: Drag, target: DropTarget | undefined) {
         if (isSameTarget(target, drag.target)) return;
 
         drag.target = target;
