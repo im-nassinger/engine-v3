@@ -53,6 +53,8 @@ src/
       writing/           LevelWriter
       versions/          FormatUpgrader, PhysicsVersions
     physics/           PhysicsWorld contract, PhysicsSceneBuilder (merging), BodyMass, JointEnds
+      merging/           mergesInto: which body a shape merges into
+      mass/              BodyMass: a body's mass from its surfaces
     simulation/        Simulation, the tick phases, BodyPoses, CameraFollow, TickReport
   editor/
     session/           EditorSession (the editor's root object), OpenLevel, CurrentGroup

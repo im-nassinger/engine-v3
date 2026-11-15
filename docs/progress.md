@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 8, step 3 of 14: `convertShape` is built, and Kind's write changes a shape's kind. Next is step 4, `BodyMass` and `mergesInto`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 8, step 4 of 14: `BodyMass` and `mergesInto` are built in `core/physics`. Next is step 5, `ValueInput`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
