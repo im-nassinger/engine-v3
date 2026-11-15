@@ -5,6 +5,7 @@ export { CommandRegistry } from './CommandRegistry.ts';
 export { createCommandRegistry } from './createCommandRegistry.ts';
 export { DeleteCommand } from './edit/DeleteCommand.ts';
 export { AboutCommand, GAME_NAME } from './help/AboutCommand.ts';
+export { toggleEntityHidden } from './hide/toggleEntityHidden.ts';
 export { HideOrShowCommand } from './edit/HideOrShowCommand.ts';
 export { RedoCommand } from './edit/RedoCommand.ts';
 export { SelectAllCommand } from './edit/SelectAllCommand.ts';

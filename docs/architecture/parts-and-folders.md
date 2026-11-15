@@ -58,12 +58,12 @@ src/
     session/           EditorSession (the editor's root object), OpenLevel, CurrentGroup
     history/           History, HistoryStep, EditTransaction, changes/
     selection/         Selection
-    commands/          EditorCommand, CommandRegistry, createCommandRegistry, then file/ edit/ arrange/ view/ play/, rename/ (renameEntity, renameLevel), shared/ (skip rule, step labels, EntityNamer, attached joints, keeping in place), testing/
+    commands/          EditorCommand, CommandRegistry, createCommandRegistry, then file/ edit/ arrange/ view/ play/, rename/ (renameEntity, renameLevel), hide/ (toggleEntityHidden, a row's eye), shared/ (skip rule, step labels, EntityNamer, attached joints, keeping in place), testing/
     tools/             Tool, ToolController, EscapeChain, select/ shape/ joint/
     hit-testing/       HitTester, SpatialIndex, LinearSpatialIndex
     snapping/          Snapper, GridSnapper
     view/              ViewState (pan and zoom), ViewSettings
-    entities-panel/    rows/ (EntitiesRows, the visible rows, and rowKind, a row's icon), EntitiesDrop (where a drag lands)
+    entities-panel/    rows/ (EntitiesRows, the visible rows, and rowKind, a row's icon), clicks/ (RowClicks), EntitiesDrop (where a drag lands)
     inspector/         InspectorModel, CardModel, FieldModel, ValueInput (typed text)
     messages/          EditorMessages, EditorMessageRule, rules/
     clipboard/         ClipboardCodec, PastePlacement, IdRemapping
