@@ -141,7 +141,7 @@ Rules: [requirements/physics](requirements/physics/README.md)
 | PH6 | The collision grid: pick which tags hit which. Example: enemies pass through each other but still hit the player. | v3 | In v1 every solid surface hits every other, and sensors cover coins and finish zones. |
 | PH7 | The Collision check: right-click two entities, 'Why do these collide?'. | v3 | Comes with the collision grid. |
 | PH8 | The physics view: draws every physics shape on top of the level. | v1 | A sensor with no StyleComponent is invisible, and this is the only way to see it. |
-| PH9 | Gravity strength and direction, and the background colour, on the World. | v1 | Basic level settings. |
+| PH9 | Gravity as one vector, and the background colour, on the World. | v1 | Basic level settings. |
 | PH10 | Buttons for gravity: Earth, Moon, Arcade, None. | v3 | Typing a number works. |
 | PH11 | Game speed on the World, so triggers and scripts can slow the whole level down. Example: slow motion for 2 seconds after the player hits a bomb. | v3 | An effect, not something a test needs. |
 | PH12 | Level bounds: the edges all walls or all open, and entities past an open edge are removed. | v1 | Without them a fallen crate falls forever, and the camera has no edge to stop at. |

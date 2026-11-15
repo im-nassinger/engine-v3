@@ -38,7 +38,7 @@ export type FieldType<T> = ValueType<T> & {
 | `NumberFieldType` | `number` | `min`, `max`, `wholeNumber` | Densities, dampings, sizes, speeds |
 | `TextFieldType` | `string` | `minLength`, `maxLength`, `trimmed` | The name (1 to 64 characters) |
 | `CheckboxFieldType` | `boolean` | | Sensor, Bullet, Motor |
-| `ChoiceFieldType<T extends string>` | one of a union | the options and their labels | Body type, joint type, gravity direction |
+| `ChoiceFieldType<T extends string>` | one of a union | the options and their labels | Body type, joint type, shape kind |
 | `ColourFieldType` | `#RRGGBBAA` text | | Outline colour |
 | `VectorFieldType` | `{ x, y }` | `min`, `max`, `refuseZero` | Position, scale (scale can't be 0) |
 | `AngleFieldType` | degrees | `min`, `max`, `refuseLimits` | Rotation, hinge limits, skew (refuses −90° and 90°) |
@@ -238,11 +238,11 @@ export function createV1Registry(): ComponentRegistry;
 | SurfaceComponent | 7 | Density 0 to 100, 1. Friction 0 to 5, 0.3. Restitution 0 to 2, 0. Sensor: checkbox | | ShapeComponent |
 | JointComponent | 8 | Type: choice Hinge, Rope, Spring. A, B: entity. Let connected objects collide. Hinge: Limit rotation, Min angle, Max angle, Motor, Motor speed, Motor strength, Resistance. Rope: Match drawn distance, Length. Spring: Match drawn distance, Rest length, Stiffness, Damping. Ranges and defaults as in [joints](../../requirements/physics/joints.md) | `ends`: the two ends, in the joint's own space | |
 | CameraComponent | 9 | Width, Height: number px, 160 to 7,680, 1920 × 1080. Follow: entity, empty. Smoothing: number s, 0 to 5, 0.3. Not in the Add Component menu | `mode`: `fixedSize` until v3 | |
-| PhysicsWorldComponent | 10, World only | Gravity strength: number m/s², 0 to 100, 9.8. Gravity direction: choice Down, Up, Left, Right, Custom. Gravity angle: angle, any, 90°, applies when Custom. Walls: checkbox, off (all four edges of the level bounds walls, or all open) | | |
+| PhysicsWorldComponent | 10, World only | Gravity: vector m/s², each axis −100 to 100, 0, 9.8 (owner, 2026-11-15). Walls: checkbox, off (all four edges of the level bounds walls, or all open) | | |
 
 - **Mass isn't a field of the BodyComponent**, because it adds up the shapes of other entities merged into the body. `BodyMass.of(entity, caches)` in `core/physics`, which knows which shapes merge, works it out from [geometry](geometry.md#mass), and the Inspector shows it as a read-only row at the end of the BodyComponent's card. It looks exactly as the requirement says.
 - Every setting of every joint type is stored, whatever the current type, so switching type in v3 keeps them, as the joints rules ask.
-- **Which camera and world values change during play** (standing yes, 2026-11-14): Follow and Smoothing do, because v3's Change value sets them, and so do the three gravity fields, as the World's rules say. The camera's width and height and Walls don't.
+- **Which camera and world values change during play** (standing yes, 2026-11-14): Follow and Smoothing do, because v3's Change value sets them, and so does Gravity, as the World's rules say. The camera's width and height and Walls don't.
 - **The PhysicsWorldComponent's card comes last, at 10** (standing yes, 2026-11-14), after the World's ShapeComponent and StyleComponent, so the bounds and the background read first.
 - **Merge** is a checkbox on the BodyComponent, on by default (owner, 2026-11-13).
 - **Which values change during play** (owner, 2026-11-14): the TransformComponent's position and rotation; not its scale or skew, and not the name. **The hover descriptions** of these five fields are in the [Inspector's requirements](../../requirements/editor/inspector-and-undo.md#cards-for-the-selection--v1).

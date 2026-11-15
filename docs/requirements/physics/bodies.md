@@ -153,7 +153,7 @@ Editor messages for setups likely to behave badly. None of them stops you playin
 | A Dynamic body with density 0 everywhere | Warning | "Nothing here has weight, so it counts as 1 kg and can't spin. Set Density above 0." | Set Density to 1 |
 | A Dynamic circle scaled unevenly | Tip | "This stretched circle collides as a many-sided shape, so it won't roll perfectly." | Make scale even |
 | A body that starts outside the level bounds | Tip | "This starts outside the level bounds." | |
-| Gravity above 30 | Tip | "Very strong gravity can make stacks jitter." | |
+| Gravity longer than 30 m/s² | Tip | "Very strong gravity can make stacks jitter." | |
 | Level bounds smaller than the camera | Warning | "The level bounds are smaller than the camera view." | |
 
 The sizes come from Box2D's advice at 50 px per metre: moving shapes from 5 to 500 px, static shapes up to 2,500 px. The 1 px, 20 to 1 and 10 px figures are judgement calls to confirm in play.

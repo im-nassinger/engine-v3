@@ -15,7 +15,7 @@
 | Mass | kg | kg | none |
 
 - **y points down everywhere, Box2D included.** In a y-down frame, Box2D's positive (counter-clockwise in y-up) rotation is clockwise on screen, which is the game's convention. So no sign is ever flipped. This settles the tech note "Clockwise ... Confirm".
-- Gravity "Down" is the vector (0, +strength).
+- Gravity is saved as the vector Box2D takes, so down is (0, +9.8).
 - Only the Box2D adapter converts to metres and radians. Everything else works in pixels and degrees.
 
 ## Matrix2D and the TransformComponent

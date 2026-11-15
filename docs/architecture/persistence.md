@@ -20,7 +20,7 @@
         "TransformComponent": { "position": { "x": 0, "y": 0 }, "rotation": 0, "scale": { "x": 1, "y": 1 }, "skew": 0 },
         "ShapeComponent": { "geometry": { "kind": "rectangle", "width": 20000, "height": 10000 } },
         "StyleComponent": { "fill": { "kind": "solid", "colour": "#BFE3F5FF" }, "outline_colour": "#1F3552FF", "outline_width": 0, "opacity": 1 },
-        "PhysicsWorldComponent": { "gravity_strength": 9.8, "gravity_direction": "down", "gravity_angle": 90, "walls": false }
+        "PhysicsWorldComponent": { "gravity": { "x": 0, "y": 9.8 }, "walls": false }
       } },
     { "id": 2, "parent": 1, "hidden": false, "locked": false,
       "components": { "...": {} } },

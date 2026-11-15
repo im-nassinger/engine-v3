@@ -328,7 +328,7 @@ function inspectorWorld() {
     <div class="ihead">${ic('world')}<div class="nm plain">World</div></div>
     ${card('ShapeComponent', F.choice('Kind', 'Rectangle', { ro: true }) + F.num('Width', '20000', 'px') + F.num('Height', '10000', 'px'))}
     ${card('StyleComponent', F.colour('Fill', BG) + F.colour('Outline colour', '#1f3552') + F.num('Outline width', '0', 'px') + F.num('Opacity', '100', '%', { slider: 1 }))}
-    ${card('PhysicsWorldComponent', F.num('Gravity strength', '9.8', 'm/s²') + F.choice('Gravity direction', 'Down') + F.num('Gravity angle', '90', '°', { off: true }) + F.check('Walls', false))}
+    ${card('PhysicsWorldComponent', F.vec('Gravity', '0', '9.8', 'm/s²') + F.check('Walls', false))}
   </div>`;
 }
 // The Shape tool hides the Inspector; its options strip takes the Inspector's place, right of the toolbar.

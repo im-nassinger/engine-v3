@@ -142,6 +142,9 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 - What the build showed differs from the plan is written into [tooling.md](architecture/tooling.md): `Math.f16round` (new in Node 26) is allowed in core, the ESLint guards switch off the type-aware rules, the circle between modules is a folder-scope rule in dependency-cruiser, and `tools/package.json` keeps the two doc tools CommonJS.
 - WebKit needed three system packages on the laptop, installed with apt.
 
+- **Gravity is one vector, x and y** (owner): the World's gravity is one vector field in m/s², default 0, 9.8, instead of strength, direction and custom angle, so zero gravity keeps no direction. The v3 gravity buttons set the vector's length. Stage 8 gained step 14 to change the code. See [world](requirements/physics/world.md#gravity-and-background-colour--v1).
+- **Push's fixed kick is a vector, x and y** (owner), in px/s. See [triggers](requirements/triggers/triggers.md#actions--v2).
+
 ## Waiting for the owner
 
 Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
