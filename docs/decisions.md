@@ -102,6 +102,10 @@ The owner asked for v1 to be built to the end with nobody typing "continue": one
 | 2026-11-15 | `readSubtree(level, data, parent, index)` treats each entity whose parent isn't listed before it as a root, placed side by side from the index; it keeps ids and refuses one already in the level, a camera or a PhysicsWorldComponent; adding and removing entities share one `SubtreeCopy`, one place per change | [entities-and-level](architecture/core-model/entities-and-level.md#copying-and-the-one-data-shape), [history](architecture/editor/history.md) |
 | 2026-11-15 | `LevelEditor` takes `EditedSelection` and `EditedGroup` shapes, not the classes, to keep modules from circling; it also does undo and redo, putting back group then selection, and a refused or throwing command puts both back too; a refusal's reason is its sentence; `History` stamps each step's time, joins only the step recorded last, merges value edits only when both steps hold nothing else | [history](architecture/editor/history.md) |
 
+## 2026-11-15: No folder holds files with different jobs
+
+The owner's rule: a folder that mixes files with different jobs is split into subfolders, one per area, at any size. There is no file count limit, because some folders genuinely hold many files with one job. Every session loads `clean-architecture` and `typescript-style`, and the runner's prompt has each step check the folders it added to. See [parts-and-folders.md](architecture/parts-and-folders.md).
+
 ## Still to decide
 
 Nothing waits for the owner. Under the standing yes, new questions are decided and listed above instead of asked.

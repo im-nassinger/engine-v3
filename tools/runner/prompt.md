@@ -1,12 +1,13 @@
 You are running unattended, started by the runner (`tools/runner/run.ts`, see `docs/runner/`). Nobody is watching this session and nobody can answer a question. Do **one step** of the work, then stop.
 
-1. Follow the project's CLAUDE.md and the `working-with-me` skill as usual. Start at `docs/progress.md`.
+1. Follow the project's CLAUDE.md as usual. Before anything else, load the `working-with-me`, `typescript-style` and `clean-architecture` skills, once each. Start at `docs/progress.md`.
 2. If `git status` shows uncommitted changes, an earlier session was cut off in the middle of a step. Finish that step (or undo the half-done part) before anything else.
 3. Do the next step of the current stage in `docs/plan.md`. A step is one commit's worth of work: one piece built, its tests passing, the docs it changes updated. If the current stage has no steps written yet, write them into the docs first; that is the step.
 4. Decide every open question yourself under the owner's standing yes, as CLAUDE.md says. Never stop to ask.
-5. Run `npm run check`. It must pass before you commit. Commit with a clear message, without any Claude attribution.
-6. Run `git push origin master` (the owner allowed it on 2026-11-14). If the push fails, keep the commit and say so in SUMMARY.
-7. Keep the line `**Runner:** stage <N>, step <S> of <T>` at the top of `docs/progress.md`'s "Where things stand" section up to date, where N is the current stage of `docs/plan.md`.
+5. Look at every folder you added a file to. If it now holds files with different jobs, split it into subfolders, one per area, and update the docs that describe it.
+6. Run `npm run check`. It must pass before you commit. Commit with a clear message, without any Claude attribution.
+7. Run `git push origin master` (the owner allowed it on 2026-11-14). If the push fails, keep the commit and say so in SUMMARY.
+8. Keep the line `**Runner:** stage <N>, step <S> of <T>` at the top of `docs/progress.md`'s "Where things stand" section up to date, where N is the current stage of `docs/plan.md`.
 
 **Never use `sudo`, `pkexec` or the `sudo` skill.** If something needs root, work on anything else you can, write what is needed into `docs/progress.md` under "Waiting for the owner", and report `STATUS: sudo`.
 

@@ -18,4 +18,5 @@ What the owner decided about the runner, newest last. The changes the runner mad
 | 2026-11-15 | The runner's docs live in `docs/runner/` in this repo, not in a project of its own | The owner's choice |
 | 2026-11-15 | The runner writes its own state into `docs/runner/status.md`, not in git | A session looking after the runner should learn everything from the docs, not from the journal, the logs and git |
 | 2026-11-15 | Keep the webhook for now; the Discord bot comes later | The owner's choice. The bot's open questions are in [progress.md](progress.md) |
+| 2026-11-15 | Every session loads `working-with-me`, `typescript-style` and `clean-architecture`, and checks the folders it added files to before committing | No session had loaded `clean-architecture`, so the folder rule in it never applied |
 | 2026-11-15 | Only one runner, and one of its sessions, may run at a time | The owner's rule: two sessions must never work on the same thing at once |
