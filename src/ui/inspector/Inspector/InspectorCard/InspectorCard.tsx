@@ -1,4 +1,5 @@
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import type { ComponentTypeName } from '../../../../core/components/index.ts';
 import type { EntityId } from '../../../../core/level/index.ts';
 import type { CardModel, CardNote, FieldModel } from '../../../../editor/inspector/index.ts';
 import type { OpenLevel } from '../../../../editor/session/index.ts';
@@ -29,6 +30,7 @@ export function InspectorCard({ openLevel, card, entityIds }: InspectorCardProps
 
     const foldIcon = card.isFolded ? ChevronRight : ChevronDown;
     const rows = cardRows(card);
+    const rowProps = { openLevel, typeName: card.typeName, entityIds };
 
     return (
         <div className="inspector-card" data-type={card.typeName}>
@@ -39,18 +41,22 @@ export function InspectorCard({ openLevel, card, entityIds }: InspectorCardProps
                 </button>
                 <CardMenu openLevel={openLevel} card={card} entityIds={entityIds} />
             </div>
-            {!card.isFolded && rows.map((row) => <CardRowView key={row.key} openLevel={openLevel} row={row} />)}
+            {!card.isFolded && rows.map((row) => <CardRowView key={row.key} {...rowProps} row={row} />)}
         </div>
     );
 }
 
 type CardRowViewProps = {
     openLevel: OpenLevel;
+    typeName: ComponentTypeName;
+    entityIds: readonly EntityId[];
     row: CardRow;
 };
 
-function CardRowView({ openLevel, row }: CardRowViewProps) {
-    if (row.kind === 'field') return <CardField field={row.field} />;
+function CardRowView({ openLevel, typeName, entityIds, row }: CardRowViewProps) {
+    if (row.kind === 'field') {
+        return <CardField openLevel={openLevel} typeName={typeName} entityIds={entityIds} field={row.field} />;
+    }
 
     return <CardNoteBox openLevel={openLevel} note={row.note} />;
 }

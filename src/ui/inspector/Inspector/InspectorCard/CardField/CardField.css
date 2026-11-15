@@ -1,21 +1,27 @@
 .card-field {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--space-8);
     min-height: var(--row);
     padding: 0 var(--space-12);
 
     .label {
+        display: block;
         width: var(--label);
         overflow: hidden;
         color: var(--muted);
+        line-height: var(--row);
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
     > .control {
+        display: flex;
         flex: 1;
+        flex-direction: column;
+        justify-content: center;
         min-width: 0;
+        min-height: var(--row);
     }
 
     &[data-enabled='false'] .label {

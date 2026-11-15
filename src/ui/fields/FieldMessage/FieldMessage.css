@@ -1,0 +1,10 @@
+.field-message {
+    display: block;
+    padding: var(--space-4) 0 0;
+    color: var(--muted);
+    font-size: var(--text-small);
+
+    &[data-tone='refused'] {
+        color: var(--danger);
+    }
+}

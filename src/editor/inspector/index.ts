@@ -11,4 +11,4 @@ export type { InspectorHeader } from './model/InspectorHeader.ts';
 export { MIXED } from './model/MIXED.ts';
 export type { Mixed } from './model/MIXED.ts';
 export { ValueInput } from './typing/ValueInput.ts';
-export type { NumberInputDefinition, NumberInputType, ValueInputResult } from './typing/ValueInput.ts';
+export type { NumberDisplay, NumberInputDefinition, NumberInputType, ValueInputResult } from './typing/ValueInput.ts';

@@ -121,7 +121,7 @@ export function LevelViewHost() {
 | `PlayBar` | `PlaySession` | Stop, Pause, Step |
 | `Dialogs` | Questions from commands (`needsConfirmation`), import refusals | One dialog at a time |
 
-**Fields:** `ui/fields/` has one component per field type (`NumberField`, `TextField`, `CheckboxField`, `ChoiceField`, `ColourField`, `VectorField`, `AngleField`, `EntityField`). `Card` picks the component from `FieldModel.definition.type.kind` through a lookup table, so a new field type adds one entry and one component. `NumberField` uses `ValueInput` from the editor for parsing and formatting.
+**Fields:** `ui/fields/` has one component per field type (`NumberField`, `TextField`, `CheckboxField`, `ChoiceField`, `ColourField`, `VectorField`, `EntityField`). `FieldControl` picks the component from `FieldModel.definition.type.kind` through a lookup table, so a new field type adds one entry and one component. `NumberField` uses `ValueInput` from the editor for parsing and formatting, and serves angles too (standing yes, 2026-11-15).
 
 **The Entities panel** uses `@tanstack/react-virtual` with a fixed row height, the row design token (28 px, see [design](../design/README.md)), so only the rows on screen exist. Drag and drop is the panel's own pointer handling: it asks `EntitiesDrop` for the target on each move and draws the line it returns. The tech notes warn that virtual lists and drag and drop break together, so the plan builds both at once and tests them at 10,000 rows.
 

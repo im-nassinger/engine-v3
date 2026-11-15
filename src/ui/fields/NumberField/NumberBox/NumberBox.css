@@ -1,0 +1,45 @@
+.number-box {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    min-width: 0;
+    height: var(--input);
+    padding: 0 var(--space-6);
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    background: var(--field);
+
+    > input {
+        flex: 1;
+        width: 100%;
+        min-width: 0;
+        padding: 0;
+        border: none;
+        outline: none;
+        background: none;
+        color: var(--text);
+        font: inherit;
+
+        &::placeholder {
+            color: var(--muted);
+            font-style: italic;
+        }
+    }
+
+    > .unit {
+        padding-left: var(--space-4);
+        color: var(--faint);
+    }
+
+    &:focus-within {
+        border-color: var(--accent);
+    }
+
+    &[data-refused='true'] {
+        border-color: var(--danger);
+    }
+
+    &[data-disabled='true'] > input {
+        color: var(--faint);
+    }
+}

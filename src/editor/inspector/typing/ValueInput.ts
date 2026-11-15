@@ -12,6 +12,9 @@ export type NumberInputDefinition = {
     readonly precision?: number;
 };
 
+// What showing a number needs: a read-only row, such as Mass, has no field type.
+export type NumberDisplay = Pick<NumberInputDefinition, 'displayScale' | 'precision'>;
+
 export type ValueInputResult =
     // note: "Max is 1500" after clamping.
     | { readonly kind: 'value'; readonly value: number; readonly note?: string }
@@ -46,7 +49,7 @@ export class ValueInput {
     }
 
     // Up to the field's decimals, without trailing zeros and without the unit, which the field shows faded.
-    static format(value: number, definition: NumberInputDefinition) {
+    static format(value: number, definition: NumberDisplay) {
         const displayScale = definition.displayScale ?? 1;
         const precision = definition.precision ?? DEFAULT_PRECISION;
         const shownValue = value * displayScale;
@@ -57,7 +60,7 @@ export class ValueInput {
     }
 
     // What a focused field shows: the stored value in full.
-    static formatFull(value: number, definition: NumberInputDefinition) {
+    static formatFull(value: number, definition: NumberDisplay) {
         const displayScale = definition.displayScale ?? 1;
         const shownValue = value * displayScale;
         const fullText = shownValue.toPrecision(FULL_VALUE_DIGITS);

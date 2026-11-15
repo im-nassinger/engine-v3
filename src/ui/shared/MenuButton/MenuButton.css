@@ -33,4 +33,21 @@
             color: var(--muted);
         }
     }
+
+    &[data-look='field'] {
+        display: flex;
+        width: 100%;
+
+        > .toggle {
+            flex: 1;
+            justify-content: space-between;
+            min-width: 0;
+            height: var(--input);
+            background: var(--field);
+
+            &:disabled {
+                color: var(--faint);
+            }
+        }
+    }
 }

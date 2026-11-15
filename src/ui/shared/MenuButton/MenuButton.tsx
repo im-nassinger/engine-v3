@@ -12,10 +12,20 @@ export type MenuButtonProps = {
     // Shown only while open. It reads useOpenMenu to close itself and to sit under the button.
     menu: ReactNode;
     hasArrow?: boolean;
+    // 'field' fills its row like a field's box: a choice field's value.
+    look?: 'bar' | 'field';
+    isDisabled?: boolean;
 };
 
 // A button in a bar that opens a menu under itself, and closes it on a second press.
-export function MenuButton({ label, children, menu, hasArrow = false }: MenuButtonProps) {
+export function MenuButton({
+    label,
+    children,
+    menu,
+    hasArrow = false,
+    look = 'bar',
+    isDisabled = false,
+}: MenuButtonProps) {
     const [isOpen, setIsOpen] = useState(false);
     const anchorRef = useRef<HTMLSpanElement>(null);
 
@@ -24,8 +34,15 @@ export function MenuButton({ label, children, menu, hasArrow = false }: MenuButt
     const openMenu = { close, anchor: anchorRef };
 
     return (
-        <span className="menu-button" ref={anchorRef}>
-            <button type="button" className="toggle" aria-label={label} aria-expanded={isOpen} onClick={toggle}>
+        <span className="menu-button" data-look={look} ref={anchorRef}>
+            <button
+                type="button"
+                className="toggle"
+                aria-label={label}
+                aria-expanded={isOpen}
+                disabled={isDisabled}
+                onClick={toggle}
+            >
                 {children}
                 {hasArrow && <MenuArrow />}
             </button>

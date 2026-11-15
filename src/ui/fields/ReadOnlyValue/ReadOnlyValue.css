@@ -1,0 +1,15 @@
+.read-only-value {
+    display: inline-flex;
+    gap: var(--space-4);
+    align-items: baseline;
+    color: var(--text);
+
+    > .unit {
+        color: var(--faint);
+    }
+
+    &[data-mixed='true'] {
+        color: var(--muted);
+        font-style: italic;
+    }
+}

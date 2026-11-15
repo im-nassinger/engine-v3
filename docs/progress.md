@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 8, step 9 of 14: the `Inspector` in `ui/inspector` is built, with its header, cards, `…` menus, notes with their fix link, and Add Component's searchable menu. Next is step 10, the number, angle, text, checkbox and choice fields in `ui/fields`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 8, step 10 of 14: the number, angle, text, checkbox and choice fields in `ui/fields` are built, with the unit suffix, the slider, the refusal and clamp messages, `Mixed`, Enter, Tab, Esc and Ctrl+Z. Next is step 11, the vector and colour fields in `ui/fields`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

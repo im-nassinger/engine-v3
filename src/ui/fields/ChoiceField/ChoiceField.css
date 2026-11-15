@@ -1,0 +1,15 @@
+.choice-field {
+    display: flex;
+    min-width: 0;
+
+    .chosen {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &[data-mixed='true'] .chosen {
+        color: var(--muted);
+        font-style: italic;
+    }
+}
