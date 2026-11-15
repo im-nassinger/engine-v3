@@ -1,15 +1,23 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { startLevelView } from './startLevelView.ts';
+import { buildTestLevel } from './testLevel.ts';
 
 const PROJECT_NAME = 'engine-v3';
 
-const rootElement = document.getElementById('root');
-if (!rootElement) throw new Error('The page has no #root element.');
+function requireElement(id: string) {
+    const element = document.getElementById(id);
+    if (!element) throw new Error(`The page has no #${id} element.`);
 
-const root = createRoot(rootElement);
+    return element;
+}
+
+const root = createRoot(requireElement('root'));
 
 root.render(
     <StrictMode>
         <h1>{PROJECT_NAME}</h1>
     </StrictMode>,
 );
+
+await startLevelView(requireElement('level-view'), buildTestLevel());
