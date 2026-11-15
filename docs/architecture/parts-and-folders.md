@@ -63,7 +63,7 @@ src/
     hit-testing/       HitTester, SpatialIndex, LinearSpatialIndex
     snapping/          Snapper, GridSnapper
     view/              ViewState (pan and zoom), ViewSettings
-    entities-panel/    rows/ (EntitiesRows, the visible rows, and rowKind, a row's icon), clicks/ (RowClicks), EntitiesDrop (where a drag lands)
+    entities-panel/    rows/ (EntitiesRows, the visible rows, and rowKind, a row's icon), clicks/ (RowClicks), drop/ (EntitiesDrop, where a drag lands)
     inspector/         InspectorModel, CardModel, FieldModel, ValueInput (typed text)
     messages/          EditorMessages, EditorMessageRule, rules/
     clipboard/         ClipboardCodec, PastePlacement, IdRemapping

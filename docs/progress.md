@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 7, step 4 of 12: **`RowClicks`** is built: click, Ctrl+click and Shift+click on a row, the range running in row order from the anchor (the last row clicked without Shift), held by `OpenLevel`; and the eye's `toggleEntityHidden`, one step for its own row only. Next is step 5, `EntitiesDrop`. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 7, step 5 of 12: **`EntitiesDrop`** is built: a drag's target from the row, its thirds (above, into, below) and the pointer's indent, which picks the depth after a group's last child; into a dragged row or its children, above the World, and the camera anywhere but directly in the World are refused. Next is step 6, `moveEntities`. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
