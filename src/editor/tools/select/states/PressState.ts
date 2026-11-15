@@ -1,7 +1,9 @@
+import { SelectionMove } from '../../../commands/index.ts';
 import type { LevelPointerInput } from '../../Tool.ts';
 import type { PressTarget } from '../SelectionPicker.ts';
 
 import { BoxSelectState } from './BoxSelectState.ts';
+import { MoveState } from './MoveState.ts';
 import type { SelectState, SelectStateHost } from './SelectState.ts';
 
 // The requirement's "a drag under 3 px is a click", in screen pixels.
@@ -33,9 +35,7 @@ export class PressState implements SelectState {
             return;
         }
 
-        // Step 8's MoveState moves the selection from here. Until then the entity pressed stays selected
-        // and the rest of the drag does nothing.
-        this.host.goIdle();
+        this.startMove(input);
     }
 
     pointerUp() {
@@ -67,6 +67,23 @@ export class PressState implements SelectState {
         }
 
         selection.replace([selectable.id]);
+    }
+
+    // The press already selected the entity, so the drag moves the whole selection. With nothing that can
+    // move, or another drag's LiveEdit running, the rest of the drag does nothing.
+    private startMove(input: LevelPointerInput) {
+        const { openLevel } = this.host.context;
+        const move = SelectionMove.ofSelection(openLevel);
+        const canMove = move instanceof SelectionMove && !openLevel.liveEdit.isActive;
+        if (!canMove) {
+            this.host.goIdle();
+            return;
+        }
+
+        openLevel.liveEdit.begin(move.targets);
+        const moving = new MoveState(this.host, move, this.press.levelPosition);
+        this.host.goTo(moving);
+        moving.pointerMove(input);
     }
 
     private hasMovedFarEnough(input: LevelPointerInput) {

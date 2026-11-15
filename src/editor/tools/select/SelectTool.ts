@@ -6,10 +6,11 @@ import { SelectionPicker } from './SelectionPicker.ts';
 import { IdleState } from './states/IdleState.ts';
 import type { SelectState, SelectStateHost } from './states/SelectState.ts';
 
-const SELECT_HINT = 'Click to select. Drag on empty space to select with a box. Double-click goes into a group.';
+const SELECT_HINT =
+    'Click to select. Drag to move. Drag on empty space to select with a box. Double-click goes into a group.';
 
-// Picks entities by click, Shift+click and the selection box, and goes into and out of groups by
-// double-click. It holds one drag state at a time; moving, resizing and rotating come in the next steps.
+// Picks entities by click, Shift+click and the selection box, moves them by dragging, and goes into and
+// out of groups by double-click. It holds one drag state at a time; resizing and rotating come next.
 export class SelectTool implements Tool {
     readonly id = 'select';
     readonly hint = SELECT_HINT;

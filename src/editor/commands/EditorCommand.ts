@@ -46,7 +46,8 @@ export type ShortcutScope = 'everywhere' | 'editor' | 'levelView';
 export type EditorCommand = {
     readonly id: CommandId;
     readonly label: string;
-    readonly menu: MenuPlace;
+    // Missing for a command only a shortcut runs: the twelve nudges would crowd the Edit menu.
+    readonly menu?: MenuPlace;
     readonly shortcuts: readonly string[];
     // 'editor' when missing.
     readonly shortcutScope?: ShortcutScope;
@@ -58,3 +59,6 @@ export type EditorCommand = {
     checked?(): boolean;
     run(): CommandOutcome;
 };
+
+// A command with a place in a menu, as CommandRegistry.menu returns it.
+export type MenuCommand = EditorCommand & { readonly menu: MenuPlace };

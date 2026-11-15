@@ -1,11 +1,11 @@
-import type { CommandRunner, EditorCommand } from '../../../editor/commands/index.ts';
+import type { CommandRunner, MenuCommand } from '../../../editor/commands/index.ts';
 import type { KeyboardPlatform } from '../../../editor/shortcuts/index.ts';
 import type { MenuItem } from '../../shared/index.ts';
 
 import { commandAction } from './commandAction.ts';
 
 // Commands already in menu order, with a line wherever the section changes.
-export function commandSections(commands: readonly EditorCommand[], runner: CommandRunner, platform: KeyboardPlatform) {
+export function commandSections(commands: readonly MenuCommand[], runner: CommandRunner, platform: KeyboardPlatform) {
     const items: MenuItem[] = [];
     let previousSection: number | undefined;
 

@@ -16,6 +16,7 @@ import { FitWholeLevelCommand } from './view/FitWholeLevelCommand.ts';
 import { VIEW_SWITCH_ENTRIES, ViewSwitchCommand } from './view/ViewSwitchCommand.ts';
 import { ZoomInCommand } from './view/ZoomInCommand.ts';
 import { ZoomOutCommand } from './view/ZoomOutCommand.ts';
+import { NudgeCommand } from './move/NudgeCommand.ts';
 import { RenameCommand } from './rename/RenameCommand.ts';
 import { ZoomToActualSizeCommand } from './view/ZoomToActualSizeCommand.ts';
 
@@ -33,6 +34,10 @@ export function createCommandRegistry(session: EditorSession) {
     registry.register(new GroupCommand(session));
     registry.register(new UngroupCommand(session));
     registry.register(new GoIntoGroupCommand(session));
+
+    for (const nudge of NudgeCommand.all(session)) {
+        registry.register(nudge);
+    }
 
     for (const entry of VIEW_SWITCH_ENTRIES) {
         registry.register(new ViewSwitchCommand(session, entry));

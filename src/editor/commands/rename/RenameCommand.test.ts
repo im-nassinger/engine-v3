@@ -16,7 +16,7 @@ describe('Rename', () => {
         const { rename } = buildSession();
 
         expect(rename.shortcuts).toEqual(['F2']);
-        expect(rename.menu.menu).toBe('Edit');
+        expect(rename.menu?.menu).toBe('Edit');
     });
 
     test('is disabled with nothing selected, saying why', () => {

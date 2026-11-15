@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 9, step 7 of 16 is done: the Select tool's `IdleState`, `PressState` and `BoxSelectState`: the press table, Shift, Ctrl's box inside groups and the double-click table, through `SelectionPicker` and the `HitTester` now on `OpenLevel`, with 1094 tests in Node. Next is step 8: `MoveState` and nudges. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 9, step 8 of 16 is done: `MoveState` and nudges: a drag moves the whole selection live through `SelectionMove` and `LiveEdit` as one step, with Shift's axis lock, grid snapping and Ctrl, and twelve arrow commands joined by `nudge:`, with 1108 tests in Node. Next is step 9: `SelectionFrame` and `ResizeState`. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

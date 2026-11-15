@@ -64,10 +64,11 @@ export class LiveEdit {
     }
 
     // One step from the start values to the current ones; values back where they started make none.
-    commit(label: string) {
+    // A joinKey joins it to the last step with the same key, as a run of nudges is.
+    commit(label: string, joinKey?: string) {
         const changes = this.takeChanges();
 
-        this.editor.recordApplied(label, changes);
+        this.editor.recordApplied(label, changes, joinKey);
     }
 
     // Esc. Says whether there was a drag to cancel, for the Esc chain.

@@ -1,4 +1,4 @@
-import type { CommandId, EditorCommand, MenuName } from './EditorCommand.ts';
+import type { CommandId, EditorCommand, MenuCommand, MenuName } from './EditorCommand.ts';
 
 // Every command, by id. The main menu is built from it, so the menu is always the full list.
 export class CommandRegistry {
@@ -22,13 +22,13 @@ export class CommandRegistry {
 
     // The menu's commands by section, then by order within it.
     menu(name: MenuName) {
-        const inMenu = this.all.filter((command) => command.menu.menu === name);
+        const inMenu = this.all.filter((command): command is MenuCommand => command.menu?.menu === name);
 
         return inMenu.sort(compareMenuPlace);
     }
 }
 
-function compareMenuPlace(first: EditorCommand, second: EditorCommand) {
+function compareMenuPlace(first: MenuCommand, second: MenuCommand) {
     const sectionDifference = first.menu.section - second.menu.section;
     if (sectionDifference !== 0) return sectionDifference;
 
