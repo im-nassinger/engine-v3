@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 8, step 4 of 14: `BodyMass` and `mergesInto` are built in `core/physics`. Next is step 5, `ValueInput`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 8, step 5 of 14: `ValueInput` is built in `editor/inspector`. Next is step 6, `AddComponentChange`, `RemoveComponentChange` and the Inspector's edits. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
