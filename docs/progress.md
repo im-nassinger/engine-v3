@@ -2,11 +2,11 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **CI runs on every push** and passed on 2026-11-15; the [runner](runner/README.md) pushes after each step. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **The owner gave a standing yes** (2026-11-14): Claude decides the smaller questions and keeps building without waiting, listing each decision in [decisions.md](decisions.md). Round 10 was settled that way. **Stage 2, the v1 components and the file format, is built** (2026-11-14): all ten v1 components, the registry, `level.json` with `LevelWriter` and `LevelReader`, with 418 tests. **Stage 3, geometry, is built** (2026-11-14): `exp`, `Units`, the polygon pipeline with `clipper2-ts` filling and the game's own `EarClipping` triangulating, lines, mass and the two caches, with 512 tests. **Stage 4, drawing a level, is built** (2026-11-15): `ViewState`, `ViewSettings`, `PixiLevelView` with PixiJS 8, `LevelDisplay`, culling and all five overlays (grid, bounds, camera frame, joint icons, physics view), and the page draws a test level, with 564 unit tests, 126 browser tests in three browsers and 3 Playwright tests. **Stage 5, editing without a mouse, is under way:** its eleven steps are written into [plan.md](plan.md#stage-5-in-steps).
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **CI runs on every push** and passed on 2026-11-15; the [runner](runner/README.md) pushes after each step. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **The owner gave a standing yes** (2026-11-14): Claude decides the smaller questions and keeps building without waiting, listing each decision in [decisions.md](decisions.md). Round 10 was settled that way. **Stage 2, the v1 components and the file format, is built** (2026-11-14): all ten v1 components, the registry, `level.json` with `LevelWriter` and `LevelReader`, with 418 tests. **Stage 3, geometry, is built** (2026-11-14): `exp`, `Units`, the polygon pipeline with `clipper2-ts` filling and the game's own `EarClipping` triangulating, lines, mass and the two caches, with 512 tests. **Stage 4, drawing a level, is built** (2026-11-15): `ViewState`, `ViewSettings`, `PixiLevelView` with PixiJS 8, `LevelDisplay`, culling and all five overlays (grid, bounds, camera frame, joint icons, physics view), and the page draws a test level, with 564 unit tests, 126 browser tests in three browsers and 3 Playwright tests. **Stage 5, editing without a mouse, is built** (2026-11-15): `EditorSession`, `OpenLevel`, the changes, `History` (512), `LevelEditor`, `Selection`, `CurrentGroup`, `StatusText` and the command registry, with Undo, Redo, Select all, Delete, Hide or show, renaming, Group, Ungroup, Go into group and the View commands, and 717 tests in Node. **Stage 6, the editor shell, is next.**
 
 ## Where things stand
 
-**Runner:** stage 5, step 10 of 11: the View commands are built: zooming in, out and to 100%, fitting the whole level, the selection (F) and the camera frame, and the four View menu switches, none an undo step. Next is step 11, the docs that close stage 5. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 5, step 11 of 11: stage 5 is done and written up. Next is stage 6, whose first step writes its steps into [plan.md](plan.md). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -25,7 +25,8 @@
 | The stage 2 plan | Approved under the standing yes on 2026-11-14, with round 10, and written into the [architecture](architecture/README.md) |
 | Stage 3, geometry | Done on 2026-11-14. See below |
 | Stage 4, drawing a level | Done on 2026-11-15. See below |
-| Code | Stages 0 to 4 done. Stage 5, editing without a mouse, is under way |
+| Stage 5, editing without a mouse | Done on 2026-11-15. See below |
+| Code | Stages 0 to 5 done. Stage 6, the editor shell, is next |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -74,6 +75,14 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 - **Round 10**, every card at Claude's pick: see [decisions.md](decisions.md#decided-under-the-standing-yes).
 - **An owner decision built differently** (2026-11-14): the owner said to ask again if `clipper2-ts` failed. Its fill works, but **its triangulation drops areas** (a one-stroke star loses its middle) while reporting success. The unattended runner can't ask, so it took the closest fix: `clipper2-ts` only fills, and the game's own `EarClipping` triangulates. See [geometry.md](architecture/core-model/geometry.md#the-polygon-pipeline); the owner can overturn it.
 
+### Stage 5, built on 2026-11-15
+
+- All eleven [steps](plan.md#stage-5-in-steps) are done, one commit each. What the build showed is written into [editor/README.md](architecture/editor/README.md#stage-5s-choices) as "as built" entries per step, into [history.md](architecture/editor/history.md), [selection-and-tools.md](architecture/editor/selection-and-tools.md) and [entities-and-level.md](architecture/core-model/entities-and-level.md#copying-and-the-one-data-shape), each choice listed in [decisions.md](decisions.md#decided-under-the-standing-yes).
+- `editor/session` holds `EditorSession`, `OpenLevel` and `CurrentGroup`; `editor/selection` `Selection`; `editor/history` `EditTransaction`, `History`, `LevelEditor` and the six changes in `changes/`; `editor/status` `StatusText` and `outcomeText`; `editor/time` `Clock` and `Timer` with their manual fakes; `editor/commands` the registry and the commands in `edit/`, `arrange/`, `view/` and `rename/`; `core/derived` `DerivedCaches`; `core/level-data` `LevelReader.readSubtree`.
+- **`EditorSession` doesn't hold the commands:** `createCommandRegistry(session)` builds them on top of it, to avoid an import cycle. **Group goes into the frontmost selected entity's parent**, as the requirement words it. **Ungroup also removes the joints attached to the group.** **Joint icons and Camera frame got Shift+J and Shift+C.**
+- Nothing is on the page yet: the page still draws `app/testLevel.ts` through `app/startLevelView.ts`.
+- **Left for later stages:** the menu, `CommandRunner`, `KeyboardInput`, `ShortcutDispatcher`, `SystemClock`, `BrowserTimer` and wiring `EditorSession` into the page (stage 6); Rename (F2) in the Entities panel (stage 7); `EditorMessages`, `AddComponentChange` and `RemoveComponentChange` (stage 8); `HitTester`, `LiveEdit`, grid snapping (Shift+G) and Esc's `EscapeChain` (stage 9); `EntityNamer` for shapes (stage 10).
+
 ### Stage 4, built on 2026-11-15
 
 - All nine [steps](plan.md#stage-4-in-steps) are done, one commit each. What the build showed is written into [adapters.md](architecture/adapters.md#stage-4s-choices) as "as built" entries, each choice listed in [decisions.md](decisions.md#decided-under-the-standing-yes). `pixi.js` 8.23.0 is installed, see [stack.md](architecture/stack.md).
@@ -116,7 +125,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 5 of [plan.md](plan.md#stage-5-in-steps): editing without a mouse.** Steps 1 to 10 are done; the last step is built in one commit.
+1. **Stage 6 of [plan.md](plan.md): the editor shell.** Its first step writes its steps into the plan and its choices into the architecture docs.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

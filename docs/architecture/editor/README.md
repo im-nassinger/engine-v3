@@ -16,17 +16,17 @@
 ## The objects
 
 ```typescript
+// As built in stage 5, with the fields later stages add marked.
 export class EditorSession {
-    readonly commands: CommandRegistry;
-    readonly tools: ToolController;
     readonly view: ViewState;               // pan and zoom of the level view
     readonly viewSettings: ViewSettings;    // grid shown, View menu switches, folded cards
-    readonly saving: SaveCoordinator;       // see persistence.md
-    readonly play: PlaySession;             // see simulation.md
+    readonly reader: LevelReader;           // puts removed entities back on undo
     readonly status: StatusText;            // the status bar's left slot
-    readonly shortcuts: ShortcutDispatcher;
     readonly openLevelChanged: VersionCounter;
+    // later: tools (stage 9), saving: SaveCoordinator (stage 12, see persistence.md),
+    // play: PlaySession (stage 16, see simulation.md), shortcuts (stage 6)
 
+    constructor(options: EditorSessionOptions);  // level, clock, timer, and optionally viewSettings and reader
     get openLevel(): OpenLevel;
     replaceOpenLevel(level: Level): void;   // New, Import, loading the saved level
 }
@@ -37,14 +37,16 @@ export class OpenLevel {
     readonly selection: Selection;
     readonly currentGroup: CurrentGroup;
     readonly history: History;
-    readonly messages: EditorMessages;
-    readonly hitTester: HitTester;
     readonly editor: LevelEditor;           // runs edit transactions, see history.md
+    // later: messages: EditorMessages (stage 8), hitTester: HitTester (stage 9)
 }
+
+// The commands are built on top of the session, not held by it (see "As built, step 7" below).
+const commands: CommandRegistry = createCommandRegistry(session);
 ```
 
 - **Why `OpenLevel`:** New and Import replace the level, and with it the history, the selection and the current group. Keeping them in one object means replacing one reference, so nothing can point at the old level by mistake.
-- `EditorSession` is built once, in `app/EditorComposition.ts`, with every contract (clock, timers, storage, game runner) passed to its constructor. Tests build it with fakes.
+- `EditorSession` will be built once, in `app/EditorComposition.ts` (stage 6), with every contract (clock, timers, storage, game runner) passed to its constructor. Tests build it with fakes.
 - During test play the editor's `OpenLevel` is left alone. The page's copy of the running level is the `PlayMirror`, see [simulation.md](../simulation.md#the-page-side).
 
 ## How a user's edit flows

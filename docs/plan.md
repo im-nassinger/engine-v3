@@ -81,7 +81,7 @@ Written under the standing yes (2026-11-14), and all nine built by 2026-11-15. E
 
 ## Stage 5 in steps
 
-Written under the standing yes (2026-11-15). Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [editor/README.md](architecture/editor/README.md#stage-5s-choices).
+Written under the standing yes (2026-11-15), and all eleven built on 2026-11-15. Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [editor/README.md](architecture/editor/README.md#stage-5s-choices).
 
 | # | Step | Module | Ends with |
 |---|---|---|---|
