@@ -240,6 +240,9 @@ async function main() {
     const startingCode = readRunnerCode();
     let failuresInARow = 0;
 
+    const progress = statusFile.readProgress();
+    await announce(`🟢 **Runner started.** v1: ${progress}`);
+
     while (true) {
         if (readRunnerCode() !== startingCode) {
             console.log('The runner code changed, restarting.');

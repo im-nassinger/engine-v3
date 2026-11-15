@@ -35,6 +35,10 @@ export class StatusFile {
         this.write();
     }
 
+    readProgress() {
+        return this.saved.progress;
+    }
+
     setProgress(progress: string) {
         this.saved.progress = progress;
         this.save();

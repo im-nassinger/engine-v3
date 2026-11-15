@@ -8,6 +8,7 @@ A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: s
 
 | Message | When |
 |---|---|
+| 🟢 Runner started, with v1's % | Every time the runner starts, including when systemd starts it again or it restarts after its own code changes |
 | ✅ **v1: N%** · the stage and step, then one sentence on what the step did | After each step |
 | ⚠️ N% of the usage limit used | Once per limit window, at 90% |
 | 🛑 Usage limit reached, resuming at a time | When the limit is hit. A ▶️ follows when it resumes |
