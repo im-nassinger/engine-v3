@@ -80,6 +80,27 @@ describe('Undo and Redo', () => {
         expect(selection.ids).toEqual([square.id]);
     });
 
+    test('are off while a drag holds the mouse, and the drag goes on', () => {
+        const { session, registry, square } = buildSession();
+        hideSquare(session, square.id);
+        const undo = requireCommand(registry, 'edit.undo');
+        const redo = requireCommand(registry, 'edit.redo');
+        const { liveEdit } = session.openLevel;
+        const position = { entityId: square.id, schema: TransformComponent.schema, key: 'position' };
+
+        liveEdit.begin([position]);
+        liveEdit.update(position, { x: 9, y: 9 });
+
+        expect(undo.availability()).toEqual({ enabled: false, reason: 'Not during a drag' });
+        expect(redo.availability()).toEqual({ enabled: false, reason: 'Not during a drag' });
+        expect(undo.run()).toEqual({ kind: 'refused', reason: 'Not during a drag' });
+        expect(square.isHidden).toBe(true);
+        expect(liveEdit.isActive).toBe(true);
+
+        liveEdit.commit('Move 1 entity');
+        expect(undo.run()).toEqual({ kind: 'done', text: 'Undid: Move 1 entity' });
+    });
+
     test('work on the open level after it is replaced', () => {
         const { session, registry, square } = buildSession();
         hideSquare(session, square.id);

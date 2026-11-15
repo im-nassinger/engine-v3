@@ -119,6 +119,7 @@ export class LiveEdit {
 - Moving, resizing, rotating, dragging points and scrubbing a field (v3) all use `LiveEdit`.
 - `commit` builds `SetValueChange`s from the remembered start values to the current values and calls `LevelEditor.recordApplied`, because the values are already in place.
 - Ctrl+Z is ignored while a mouse button is held in a drag, and losing window focus cancels the drag, as the requirements say.
+- **As built (standing yes, 2026-11-15):** a `ValueTarget` is `{ entityId, schema, key }`, like a `SetValueChange`'s. `OpenLevel` owns one `LiveEdit`. `update` writes through the file form like the changes do and returns the `ParseOutcome`: a refused value keeps the last good one and the drag goes on, so a tool needs no checks of its own. `commit` leaves out values back where they started, so a drag that ends where it began makes no step. `cancel` returns whether there was a drag, for `EscapeChain`. A second `begin`, or an `update` of a value not begun, throws. While `isActive`, Undo and Redo are disabled with the reason `Not during a drag`. *Why: the requirement's "ignored" is kept by the commands' availability, so the menu shows it too and no key code needs to know about drags.*
 
 ## What is and isn't a step
 

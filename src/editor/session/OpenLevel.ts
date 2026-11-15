@@ -2,7 +2,7 @@ import type { ComponentRegistry } from '../../core/components/index.ts';
 import { DerivedCaches } from '../../core/derived/index.ts';
 import type { Level } from '../../core/level/index.ts';
 import { EntitiesRows, RenameRequest, RowClicks, SelectionReveal } from '../entities-panel/index.ts';
-import { History, LevelEditor } from '../history/index.ts';
+import { History, LevelEditor, LiveEdit } from '../history/index.ts';
 import { InspectorModel } from '../inspector/index.ts';
 import type { CardFolds } from '../inspector/index.ts';
 import { createV1Rules, EditorMessages } from '../messages/index.ts';
@@ -35,6 +35,8 @@ export class OpenLevel {
     readonly renameRequest = new RenameRequest();
     readonly history: History;
     readonly editor: LevelEditor;
+    // A drag's values, changed live and recorded as one step on release.
+    readonly liveEdit: LiveEdit;
     readonly messages: EditorMessages;
     readonly inspector: InspectorModel;
 
@@ -54,6 +56,7 @@ export class OpenLevel {
             selection: this.selection,
             currentGroup: this.currentGroup,
         });
+        this.liveEdit = new LiveEdit(level, this.editor);
         this.messages = new EditorMessages(level, createV1Rules(), services.frames);
         this.inspector = new InspectorModel({
             level,
