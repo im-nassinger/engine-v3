@@ -98,7 +98,7 @@ Rules: [requirements/drawing](requirements/drawing.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
-| DR1 | The Shape tool: rectangle, ellipse, polygon and line. Shift keeps proportions, Alt draws from the centre. | v1 | Shapes are what levels are made of. |
+| DR1 | The Shape tool: rectangle, circle, polygon and line, the kind picked in the Inspector and changeable afterwards (owner, 2026-11-15). Shift keeps proportions, Alt draws from the centre. | v1 | Shapes are what levels are made of. |
 | DR2 | Point editing: double-click a polygon, line or path with Select to move its points. Double-click an edge to add a point. | v1 | Without it, one wrong point means drawing the shape again. |
 | DR3 | Polygons may cross themselves. Every enclosed area is filled and collides. Example: a figure-of-eight polygon is filled in both loops. | v1 | People draw them by accident, and a polygon library handles them. Supporting them from the start is less work than deciding what else should happen. |
 | DR4 | W, A, S and D set the size of the Shape tool's preview before you click. D wider, A narrower, W taller, S shorter, 1 px per press. | v3 | Dragging already sets the size. |

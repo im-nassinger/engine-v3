@@ -49,7 +49,7 @@ export class Matrix2D {
 - **Subtree bounds** are the union of its own and its children's. Hit testing, the selection box, culling and F (zoom to selection) all read `BoundsCache`.
 - **As built** (standing yes, 2026-11-14):
   - `BoundsCache` is given the level's `WorldMatrixCache` and reads each entity's level matrix from it. `ownBoundsOf(entity)` and `subtreeBoundsOf(entity)` give `undefined` when nothing is drawn, like a group with no children that draw. `OwnBounds.of(entity, matrix)` works out one entity's own bounds.
-  - An entity draws a path before a shape before a camera frame, the requirement's order. A rectangle's and a camera frame's bounds cover their moved corners, a polygon's and a line's their moved points, an **ellipse's are exact** under any matrix. A path's cover its points and its handles, because a curve stays inside them. *Why: exact where it's cheap, and never smaller than what is drawn.*
+  - An entity draws a path before a shape before a camera frame, the requirement's order. A rectangle's and a camera frame's bounds cover their moved corners, a polygon's and a line's their moved points, a **circle's are exact** under any matrix, even one that stretches it into an ellipse. A path's cover its points and its handles, because a curve stays inside them. *Why: exact where it's cheap, and never smaller than what is drawn.*
   - **The outline** is drawn in the entity's own space, so the matrix stretches it like the shape. The bounds grow by half the outline width times `Matrix2D.largestStretch()`, the most the matrix stretches any length. That covers the outline only with **round joins**, so stage 4 draws outlines with round joins; a mitre join can reach far past the corner. *Why: round joins keep the outline within half its width everywhere, which the selection box and culling rely on.* Without a StyleComponent nothing grows.
   - **Hidden entities keep their bounds.** Who asks, hit testing or culling, also asks `HiddenCache`. *Why: hiding is a switch, not geometry, and showing again needs no recomputing.*
   - Marking: a TransformComponent change or a move marks every own bounds in the subtree; a ShapeComponent, PathComponent, StyleComponent or CameraComponent change marks only that entity's. Either way the subtree bounds of the entity and its parents are marked, stopping at the first parent with none, because a subtree's value is kept only after all its children's.
@@ -62,8 +62,7 @@ export class Matrix2D {
 | Shape | Pieces |
 |---|---|
 | Rectangle | One 4-point piece |
-| Ellipse with equal width and height | One circle. It stays a circle in play only if the entity's level matrix scales it evenly with no skew; otherwise the many-sided polygon below, which the play copy asks `ShapePieces` for (standing yes, 2026-11-14: the cache keeps only the circle, because whether the matrix is even is known only in play) |
-| Any other ellipse | A polygon of **32 points**, a fixed count because it affects determinism, then the polygon steps below |
+| Circle | One circle. It stays a circle in play only if the entity's level matrix scales it evenly with no skew; otherwise a polygon of **32 points**, a fixed count because it affects determinism, then the polygon steps below. The play copy asks `ShapePieces` for that polygon (standing yes, 2026-11-14: the cache keeps only the circle, because whether the matrix is even is known only in play). There is no ellipse kind (owner, 2026-11-15) |
 | Polygon (closed, may cross itself) | Steps 1 to 5 below |
 | Line (open) | A cleaned chain, see below. Never pieces |
 
@@ -85,7 +84,7 @@ Polygon steps:
   - Step 1 merges points closer than **0.25 px**, Box2D's linear slop of 0.005 m, and counts a point as straight when it lies within **0.01 px** of the line between its neighbours, so the library's rounding to a thousandth of a pixel leaves no corner that is straight in all but name. It runs again on each outline step 2 returns. *Why: Box2D welds points closer than its slop itself, so keeping them only makes pieces Box2D changes.*
   - Step 4 drops only corners that are **exactly** straight when it joins two pieces. *Why: dropping a nearly straight one adds or removes a sliver, so the pieces would no longer cover exactly the filled outline; the tests check that they do.*
   - Step 5 measures a piece's short side as the smallest, over its edges, of the widest distance of its points from that edge's line. A circle under 1 px across is dropped too.
-  - The 32 ellipse points come from `DeterministicMath.sinCos` at steps of 11.25°, starting on the right and turning clockwise, then go through the same steps as a polygon, so they are rounded to a thousandth of a pixel like every other outline.
+  - The 32 points of a circle come from `DeterministicMath.sinCos` at steps of 11.25°, starting on the right and turning clockwise, then go through the same steps as a polygon, so they are rounded to a thousandth of a pixel like every other outline.
   - A one-stroke star becomes five convex pieces, a figure-of-eight two triangles. Hertel-Mehlhorn isn't the fewest pieces possible, but it is at most four times that and needs only the steps above.
 - Clipper2 works in whole numbers internally, so step 2 gives the same result on every computer. Steps 1, 3, 4 and 5 use only `+ − × ÷` and comparisons.
 - **Drawing uses step 2's outlines** for the fill, which avoids the self-crossing fill artefacts the tech notes warn about, and the original outline for the outline. **Box2D and the physics view use step 5's pieces.** Hit testing uses step 2's outlines.

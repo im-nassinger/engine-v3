@@ -57,7 +57,9 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 
 | Word | Meaning |
 |---|---|
-| Shape | A rectangle, ellipse, polygon or line, held in a ShapeComponent. Used for drawing, for collision, or both. |
+| Shape | A rectangle, circle, polygon or line, held in a ShapeComponent. Used for drawing, for collision, or both. |
+| Kind | Which of the four a shape is: rectangle, circle, polygon or line. Each kind holds its own values. Not "type": a joint's type and a component's type are other things. |
+| Circle | A shape with only a radius. There is no ellipse kind: an ellipse is a circle scaled unevenly by its TransformComponent. |
 | Polygon | A closed shape made of straight edges between points. It may cross itself. |
 | Regular polygon | A polygon whose sides are all the same length, such as a hexagon. |
 | Line | An open chain of straight segments, 2 points or more. Used for ground. |
@@ -196,7 +198,7 @@ Component names end in `Component`, the TransformComponent included (owner: 2026
 | TransformComponent | Position, rotation, scale, skew, measured from the parent | Every entity |
 | NameComponent | The entity's name, filled automatically ("Rectangle 1"). Not unique | Every entity |
 | TagsComponent | The entity's tags (v2) | Any entity |
-| ShapeComponent | A rectangle, ellipse, polygon or line. On the World, a rectangle: the level bounds | Any entity, the World included |
+| ShapeComponent | A rectangle, circle, polygon or line. On the World, a rectangle: the level bounds | Any entity, the World included |
 | PathComponent | A curved path. Read-only on Rope, Spring and Rod joints | Any entity |
 | TextComponent | Text and its font settings (v2) | Any entity |
 | StyleComponent | Fill, outline and opacity, for a shape, path or text. On the World, its fill is the background | Any entity that draws, the World included |

@@ -185,7 +185,7 @@ const ICON = {
   world: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/>',
   camera: '<rect x="3" y="7" width="13" height="10" rx="1"/><path d="M16 10.5l5-3v9l-5-3"/>',
   rect: '<rect x="4" y="6" width="16" height="12" rx="1"/>',
-  ellipse: '<ellipse cx="12" cy="12" rx="9" ry="6.5"/>',
+  circle: '<circle cx="12" cy="12" r="8"/>',
   polygon: '<path d="M12 3l9 7-3.5 10h-11L3 10z"/>',
   line: '<path d="M3 18l6-8 5 4 7-9"/>',
   group: '<path d="M3 6.5h6l2 2h10V19H3z"/>',
@@ -294,10 +294,10 @@ function scene(w, h, z, cx, cy, opts) {
 // Entities panel rows: [depth, icon, name, folded state, row state]. The top row is drawn in front.
 const ROWS_NEW = [[0, 'world', 'World', 'open'], [1, 'camera', 'Camera']];
 const ROWS_LEVEL = [
-  [0, 'world', 'World', 'open'], [1, 'camera', 'Camera'], [1, 'rect', 'Rectangle 1'], [1, 'ellipse', 'Ball'],
+  [0, 'world', 'World', 'open'], [1, 'camera', 'Camera'], [1, 'rect', 'Rectangle 1'], [1, 'circle', 'Ball'],
   [1, 'rect', 'Crate 3'], [1, 'rect', 'Crate 2'], [1, 'rect', 'Crate 1'], [1, 'rect', 'Platform'],
-  [1, 'group', 'Car', 'open'], [2, 'joint', 'Hinge 2'], [2, 'joint', 'Hinge 1'], [2, 'ellipse', 'Wheel 2'],
-  [2, 'ellipse', 'Wheel 1'], [2, 'polygon', 'Cabin'], [2, 'rect', 'Body'],
+  [1, 'group', 'Car', 'open'], [2, 'joint', 'Hinge 2'], [2, 'joint', 'Hinge 1'], [2, 'circle', 'Wheel 2'],
+  [2, 'circle', 'Wheel 1'], [2, 'polygon', 'Cabin'], [2, 'rect', 'Body'],
   [1, 'polygon', 'Ramp'], [1, 'rect', 'Ground']
 ];
 function entities(rows, selected, hover) {
@@ -316,9 +316,9 @@ const F = {
   num: (l, v, u = '', o = {}) => `<div class="f${o.off ? ' off' : ''}"><label>${l}</label><div class="vals">${o.slider !== undefined
     ? `<div class="inp short">${v}<span class="unit">${u}</span></div><div class="slider"><i style="width:${o.slider * 100}%"></i><b style="left:${o.slider * 100}%"></b></div>`
     : `<div class="inp${o.ro ? ' ro' : ''}${o.focus ? ' focus' : ''}">${v}<span class="unit">${u}</span></div>`}</div></div>`,
-  vec: (l, a, b, u = '') => `<div class="f"><label>${l}</label><div class="vals"><div class="inp"><span class="ax">X</span>${a}<span class="unit">${u}</span></div><div class="inp"><span class="ax">Y</span>${b}<span class="unit">${u}</span></div></div></div>`,
+  vec: (l, a, b, u = '', o = {}) => `<div class="f${o.off ? ' off' : ''}"><label>${l}</label><div class="vals"><div class="inp"><span class="ax">X</span>${a}<span class="unit">${u}</span></div><div class="inp"><span class="ax">Y</span>${b}<span class="unit">${u}</span></div></div></div>`,
   choice: (l, v, o = {}) => `<div class="f${o.off ? ' off' : ''}"><label>${l}</label><div class="vals"><div class="inp${o.ro ? ' ro' : ''}">${v}${o.ro ? '' : ic('down', 'class="i chev"')}</div></div></div>`,
-  colour: (l, hex) => `<div class="f"><label>${l}</label><div class="vals"><div class="inp"><span class="sw" style="background:${hex}"></span>${hex.toUpperCase()}</div></div></div>`,
+  colour: (l, hex, o = {}) => `<div class="f${o.off ? ' off' : ''}"><label>${l}</label><div class="vals"><div class="inp"><span class="sw" style="background:${hex}${o.off ? ';opacity:.4' : ''}"></span>${hex.toUpperCase()}</div></div></div>`,
   check: (l, on, o = {}) => `<div class="f${o.off ? ' off' : ''}"><label>${l}</label><div class="vals"><span class="cb${on ? ' on' : ''}">${on ? ic('check') : ''}</span></div></div>`
 };
 const card = (title, body) => `<div class="card"><div class="chead">${ic('down')}<span class="t">${title}</span>${ic('dots')}</div>${body}</div>`;
@@ -331,12 +331,24 @@ function inspectorWorld() {
     ${card('PhysicsWorldComponent', F.num('Gravity strength', '9.8', 'm/s²') + F.choice('Gravity direction', 'Down') + F.num('Gravity angle', '90', '°', { off: true }) + F.check('Walls', false))}
   </div>`;
 }
+// The shape about to be drawn: only Kind can change, the rest is greyed and follows the drawing.
+function inspectorDrawing() {
+  const off = { off: true };
+  return `<div class="panel insp"><div class="ph">Inspector</div>
+    <div class="ihead">${ic('polygon')}<div class="nm plain">New shape</div></div>
+    <div style="overflow:hidden">
+    ${card('TransformComponent', F.vec('Position', '−640', '−40', 'px', off) + F.num('Rotation', '0', '°', off) + F.vec('Scale', '1', '1', '', off) + F.num('Skew', '0', '°', off))}
+    ${card('ShapeComponent', F.choice('Kind', 'Polygon') + F.num('Width', '380', 'px', off) + F.num('Height', '310', 'px', off) + F.num('Points', '4', '', Object.assign({ ro: true }, off)))}
+    ${card('StyleComponent', F.colour('Fill', '#4a90d9', off) + F.colour('Outline colour', '#1f3552', off) + F.num('Outline width', '2', 'px', off) + F.num('Opacity', '100', '%', off))}
+    </div>
+  </div>`;
+}
 function inspectorRect() {
   return `<div class="panel insp"><div class="ph">Inspector</div>
     <div class="ihead">${ic('rect')}<div class="nm">Rectangle 1</div><span class="ib">${ic('eye')}</span></div>
     <div style="overflow:hidden">
     ${card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°') + F.vec('Scale', '1', '1') + F.num('Skew', '0', '°'))}
-    ${card('ShapeComponent', F.choice('Kind', 'Rectangle', { ro: true }) + F.num('Width', '160', 'px') + F.num('Height', '80', 'px', { focus: true }))}
+    ${card('ShapeComponent', F.choice('Kind', 'Rectangle') + F.num('Width', '160', 'px') + F.num('Height', '80', 'px', { focus: true }))}
     ${card('StyleComponent', F.colour('Fill', '#4a90d9') + F.colour('Outline colour', '#1f3552') + F.num('Outline width', '2', 'px') + F.num('Opacity', '100', '%', { slider: 1 }))}
     ${card('BodyComponent', F.choice('Type', 'Dynamic') + F.num('Gravity scale', '1', '', { slider: .55 }) + F.num('Linear damping', '0', '', { slider: 0 }) + F.num('Angular damping', '0', '', { slider: 0 }) + F.check('Fixed rotation', false) + F.check('Bullet', false) + F.check('Merge', true) + F.num('Mass', '5.12', 'kg', { ro: true }))}
     ${card('SurfaceComponent', F.num('Density', '1', '', { slider: .01 }) + F.num('Friction', '0.3', '', { slider: .06 }) + F.num('Restitution', '0', '', { slider: 0 }) + F.check('Sensor', false))}
@@ -374,7 +386,7 @@ function editor(o) {
   return topbar(o.top) +
     `<div class="view">${scene(VIEW_W, VIEW_H, o.zoom || Z, CX, CY, o.scene)}</div>` +
     toolstrip(o.tool || 'select', o.tooltip) + entities(o.rows, o.selectedRow, o.hoverRow) +
-    (o.inspector === 'rect' ? inspectorRect() : inspectorWorld()) +
+    (o.inspector === 'rect' ? inspectorRect() : o.inspector === 'drawing' ? inspectorDrawing() : inspectorWorld()) +
     statusbar(o.hint, o.pos, o.sel, o.warnings || 0) + (o.extra || '');
 }
 
@@ -414,10 +426,9 @@ const MOMENTS = [
     (d) => editor({ rows: ROWS_LEVEL, selectedRow: 'Rectangle 1', hoverRow: 'Crate 2', inspector: 'rect',
       scene: Object.assign({ selected: 'rect1' }, LEVEL_SCENE), top: { name: 'Car test', canUndo: true },
       hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Rectangle 1', warnings: 1 })],
-  ['3', 'Drawing', 'The Shape tool drawing a polygon: the options strip over the level view, four points placed, the faded preview following the mouse, the first point ringed to close it.',
-    (d) => editor({ rows: ROWS_LEVEL, tool: 'shape', scene: Object.assign({ drawing: true }, LEVEL_SCENE), top: { name: 'Car test', canUndo: true },
-      hint: 'Shape · click to add a point, click the first point or press Enter to close', pos: 'x −640, y −40', sel: 'Nothing selected', warnings: 1,
-      extra: `<div class="opts"><span class="ib">${ic('rect')}Rectangle</span><span class="ib">${ic('ellipse')}Ellipse</span><span class="ib on">${ic('polygon')}Polygon</span><span class="ib">${ic('line')}Line</span></div>` })],
+  ['3', 'Drawing', 'The Shape tool drawing a polygon: choosing the tool cleared the selection, so the Inspector shows the shape about to be drawn. Only Kind can be changed; the greyed fields follow the drawing. Four points placed, the faded preview following the mouse, the first point ringed to close it.',
+    (d) => editor({ rows: ROWS_LEVEL, tool: 'shape', inspector: 'drawing', scene: Object.assign({ drawing: true }, LEVEL_SCENE), top: { name: 'Car test', canUndo: true },
+      hint: 'Shape · click to add a point, click the first point or press Enter to close', pos: 'x −640, y −40', sel: 'Nothing selected', warnings: 1 })],
   ['4a', 'The main menu', 'The main menu open on Edit. Every command is listed with its shortcut. Redo is greyed because there is nothing to redo.',
     (d) => editor({ rows: ROWS_LEVEL, selectedRow: 'Rectangle 1', inspector: 'rect', scene: Object.assign({ selected: 'rect1' }, LEVEL_SCENE),
       top: { name: 'Car test', canUndo: true, menuOpen: true }, hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Rectangle 1', warnings: 1, extra: MENU })],
@@ -458,7 +469,7 @@ function statesSheet() {
     ${box('Tools', line(`<span class="tool">${ic('select')}</span><span class="tool hover">${ic('select')}</span><span class="tool on">${ic('shape')}</span><span class="tool on locked">${ic('joint')}</span>`, 'Normal, hover, active, active with tool lock (the dot)') +
       line(`<span class="tip-box static">Shape<span class="k">4</span></span><span class="tip-box static">Nothing to paste</span>`, 'Tooltips: a name and its key; a disabled button\'s reason'))}
     ${box('Entities panel rows', row('Crate 1', 'rect') + row('Crate 2', 'rect', 'hover') + row('Rectangle 1', 'rect', 'sel') +
-      `<div class="dropline"></div>` + row('Ball', 'ellipse', '', 'off') + row('Wheel 1', 'ellipse', '', 'dim', 2) +
+      `<div class="dropline"></div>` + row('Ball', 'circle', '', 'off') + row('Wheel 1', 'circle', '', 'dim', 2) +
       `<div class="cap" style="padding-top:4px">Normal, hover, selected, drop line, hidden, hidden by its parent (dimmed eye)</div>`)}
     ${box('Editor messages', `<div class="note">${ic('warning', 'style="color:var(--warning);margin-top:1px"')}<span>Needs a SurfaceComponent to collide. <span class="fix">Add SurfaceComponent</span></span></div>
       <div class="note">${ic('info', 'style="color:var(--tip);margin-top:1px"')}<span>A tip reads the same, with a blue icon.</span></div>` +

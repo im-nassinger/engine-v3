@@ -90,7 +90,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Level bound walls** can be static surfaces that collide with everything.
 - **Game speed.** Scale the time step, keeping 60 ticks per second. 2× gives 1/30 s, the coarsest step Box2D's docs suggest. Determinism holds because the step comes from level state.
 - **Far from the origin.** Float precision at 2,000 m is about 0.1 mm, well below Box2D's slop, so ±100,000 px is safe.
-- **Ellipses** that aren't circles need more than 8 sides to roll smoothly, so several convex pieces. Pin the side count, because it affects determinism.
+- **Circles scaled unevenly** need more than 8 sides to roll smoothly, so several convex pieces. Pin the side count, because it affects determinism.
 - **Joint ends.** Box2D measures angles of body B against body A and keeps slider and wheel axes in body A's frame. Decide the mapping of fields A and B once. An empty end maps to the ground body.
 - **Clockwise.** Box2D's counter-clockwise positive reads as clockwise on screen when y points down. Confirm.
 - **Rod, Rope, Spring** are one distance joint: Rod sets min and max to the length, Rope sets no stiffness and only a max, Spring sets a rest length with stiffness and damping.

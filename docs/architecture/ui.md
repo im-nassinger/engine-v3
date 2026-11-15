@@ -114,7 +114,7 @@ export function LevelViewHost() {
 |---|---|---|
 | `TopBar` | `History`, `SaveState`, `ViewSettings`, `PlaySession`, the level's name | The main menu is built from `CommandRegistry.menu()` |
 | `Toolbar` | `ToolController` | Three buttons in v1 |
-| `ToolOptions` | The active tool | The options strip over the level view's top left |
+| `ToolOptions` | The active tool | The options strip over the level view's top left. The Joint tool's only: the Shape tool's kind is in the Inspector (owner, 2026-11-15) |
 | `EntitiesPanel` | `EntitiesRows` | Virtual list, below |
 | `Inspector` | `InspectorModel` | One `Card` per card model, one field component per field type |
 | `StatusBar` | `ToolController`, the mouse position, `Selection`, `EditorMessages`, `StatusText` | |

@@ -116,12 +116,12 @@ Source: scope PH4; round 1: C8; round 6: 05 2.6; old: PH-24 to PH-31; owner: 202
 
 - Physics shapes and groups can be scaled, rotated and skewed freely. **Collision always matches what you see.**
 - Density stays fixed, so bigger means heavier. Mass updates as you scale.
-- An ellipse with equal width and height, scaled evenly, is a true circle. Any other ellipse collides as a many-sided polygon.
+- A circle scaled evenly is a true circle. A circle scaled unevenly (an ellipse on screen) collides as a many-sided polygon.
 - Mirroring with a negative scale mirrors the collision too.
 - Shape and scale don't change during play.
 - Entities at rest sit about 1 px apart. It only shows when zoomed in.
 
-Source: round 6: 05 2.7; old: PH-32 to PH-38
+Source: round 6: 05 2.7; old: PH-32 to PH-38; owner: 2026-11-15
 
 ## Seeing physics
 
@@ -151,14 +151,14 @@ Editor messages for setups likely to behave badly. None of them stops you playin
 | A Dynamic body whose surfaces are all sensors | Warning | "This sensor will fall during play, because its body is Dynamic." | Make Static |
 | A group with a body and nothing inside that collides | Warning | "Car has a body, but nothing inside collides. It will fall through everything." | |
 | A Dynamic body with density 0 everywhere | Warning | "Nothing here has weight, so it counts as 1 kg and can't spin. Set Density above 0." | Set Density to 1 |
-| A Dynamic ellipse that isn't a true circle | Tip | "This ellipse collides as a many-sided shape, so it won't roll perfectly." | Make circle |
+| A Dynamic circle scaled unevenly | Tip | "This stretched circle collides as a many-sided shape, so it won't roll perfectly." | Make scale even |
 | A body that starts outside the level bounds | Tip | "This starts outside the level bounds." | |
 | Gravity above 30 | Tip | "Very strong gravity can make stacks jitter." | |
 | Level bounds smaller than the camera | Warning | "The level bounds are smaller than the camera view." | |
 
 The sizes come from Box2D's advice at 50 px per metre: moving shapes from 5 to 500 px, static shapes up to 2,500 px. The 1 px, 20 to 1 and 10 px figures are judgement calls to confirm in play.
 
-Source: scope ED10; round 6: 05 2.9; round 10: EM1; old: PH-44 to PH-46
+Source: scope ED10; round 6: 05 2.9; round 10: EM1; old: PH-44 to PH-46; owner: 2026-11-15
 
 ## Small features
 

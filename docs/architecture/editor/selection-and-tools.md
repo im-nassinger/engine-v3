@@ -142,7 +142,9 @@ The Select tool holds one **drag state** at a time (the State pattern):
 
 ## The Shape tool
 
-- One tool, four kinds picked in its options strip. A faded preview follows the mouse; a click places it at the remembered size, a drag sets a new size.
+- One tool, four kinds: rectangle, circle, polygon and line. **It has no options strip** (owner, 2026-11-15). Choosing it clears the selection, and the tool remembers the kind used last, a rectangle at first.
+- **The shape about to be drawn:** while the Shape tool is active and nothing is selected, `InspectorModel` shows a TransformComponent, a ShapeComponent and a StyleComponent card that belong to the tool, not to the level. Only Kind can be written, and it sets the tool's kind. The other fields show empty and disabled until drawing starts, then follow the drawing live: the position on the first press, the size during a drag. Nothing in it is an entity, saved or an undo step until `CreateShapeCommand` runs.
+- A faded preview follows the mouse; a click places it at the remembered size, a drag sets a new size. A circle's drag gives the circle that fits the box, as if Shift were held. Resizing a circle with the Select tool's handles keeps it round: the radius follows the larger stretch.
 - Polygon and line: each click adds a point; clicking the first point closes a polygon; Enter, Esc and double-click finish; Ctrl+Z or Backspace removes the last point. Choosing another tool or pressing Play finishes and keeps the drawing.
 - Finishing runs `CreateShapeCommand`: a TransformComponent, a ShapeComponent and a StyleComponent with the v1 default look, in the current group, on top, named by `EntityNamer` ("Rectangle 1": one more than the highest number already used with that word), and selected.
 

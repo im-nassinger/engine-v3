@@ -63,11 +63,11 @@ A field is a row of `--row` height: the label in `--muted` in a 128 px column, t
 
 - **Menu:** `--panel`, a `--line` edge, a shadow. Entries are 26 px high, the shortcut in `--muted` and `--text-small` at the right. The hovered entry is `--accent` with `--on-accent` text. A disabled entry is `--faint`. A submenu opens to the right of its entry.
 - **Dialog:** 400 px wide, centred, over the `--scrim`. A title in `--text-title` and weight 600, the text in `--muted`, then a line and the buttons at the right: the safe one first, the primary one last.
-- **Options strip** (the Shape tool's kinds, the Joint tool's types): floats over the top left of the level view, 8 px from its corner, with a shadow. Each choice is an icon button with its name. The chosen one is on.
+- **Options strip** (the Joint tool's types; the Shape tool has none, its kind is picked in the Inspector, owner 2026-11-15): floats over the top left of the level view, 8 px from its corner, with a shadow. Each choice is an icon button with its name. The chosen one is on.
 - **Status bar:** `--text-small`. From the left: the tool's hint or a status text in `--text`, then the mouse position, the selection and the warning count in `--muted`. The count's icon is `--warning` when it isn't 0.
 - **Play bar:** floats at the top centre of the window. A 1.5 px frame and a label with a dot: PLAYING in `--playing`, PAUSED in `--paused` (*proposal* for the colours). Then Pause (Resume while paused), Step (disabled while running), Stop, each with its key in `--muted`.
 
 ## Icons
 
 - **Outline icons** (owner, 2026-11-14): 24 px drawings shown at 16 px, a 1.6 px stroke with round ends and corners, no fill. One open set for every icon: `lucide-react`, picked in stage 6 (standing yes, 2026-11-15, see [ui.md](../architecture/ui.md#stage-6s-choices)).
-- v1 needs these: main menu, Select, Shape, Joint, the four shape kinds (rectangle, ellipse, polygon, line), group, World, camera, hinge, the eye and the eye crossed out, fold arrows (right and down), undo, redo, grid snapping, Play, Pause, Step, Stop, help, saved, warning, tip, the target picker, `…`, plus, and the down arrow of a choice.
+- v1 needs these: main menu, Select, Shape, Joint, the four shape kinds (rectangle, circle, polygon, line), group, World, camera, hinge, the eye and the eye crossed out, fold arrows (right and down), undo, redo, grid snapping, Play, Pause, Step, Stop, help, saved, warning, tip, the target picker, `…`, plus, and the down arrow of a choice.

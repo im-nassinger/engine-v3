@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 7, step 1 of 11: the steps of stage 7, the Entities panel, are written into [plan.md](plan.md#stage-7-in-steps), with their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). Next is step 2, `EntitiesRows`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 7, step 1 of 11: the steps of stage 7, the Entities panel, are written into [plan.md](plan.md#stage-7-in-steps), with their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). Next is step 2, **a circle instead of an ellipse**, added by the owner on 2026-11-15; `EntitiesRows` moved to step 3. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -70,6 +70,11 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 - **The stage 1 plan is approved** (owner): `DeterministicMath`'s `sin`, `cos`, `atan2` and `sinCos` move to stage 1, because `Matrix2D` needs them and `Math.sin` is banned in core; `exp` stays in stage 3. **Skew is strictly between −90° and 90°**, refused past that like a scale of 0. See [geometry.md](architecture/core-model/geometry.md) and [inspector-and-undo.md](requirements/editor/inspector-and-undo.md).
 
 - **Round 9** (owner): a name is never empty (an empty one in a file makes it damaged) and reads as `Entity` when missing; names can't change during play; only position and rotation change during play; the five hover descriptions as proposed; a level name past 60 characters is refused, not cut; **stage 3 tries `clipper2-ts` first**. See [selection.md](requirements/editor/selection.md), [inspector-and-undo.md](requirements/editor/inspector-and-undo.md), [saving.md](requirements/play-and-save/saving.md) and [geometry.md](architecture/core-model/geometry.md).
+
+### Settled on 2026-11-15
+
+- **A circle, not an ellipse** (owner): the fourth shape kind is a circle with only a radius. An ellipse is a circle scaled unevenly by its TransformComponent, which collides as a 32-point polygon. Resizing keeps a circle round. Stage 7 gained step 2 to change the code built in stages 2 to 4. See [drawing](requirements/drawing.md#the-shape-tool--v1).
+- **Kind is picked in the Inspector, not an options strip** (owner): choosing the Shape tool clears the selection, and the Inspector shows the shape about to be drawn, with only Kind editable and the other fields filling in as you draw. Kind on a selected shape changes it. See [changing a shape's kind](requirements/drawing.md#changing-a-shapes-kind--v1). One rule had to give way: with nothing selected the Inspector shows the World, except while the Shape tool is active (standing yes, 2026-11-15).
 
 ### Settled under the standing yes, 2026-11-14
 

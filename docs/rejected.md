@@ -24,6 +24,8 @@ What we decided against, and why. **Check here before proposing something**: an 
 | A Drop through trigger action | `drop_through(id)` in a script | One line in the player's script | owner: 2026-11-14 |
 | Music and Sound effects groups, base volume on the asset | One kind of audio, settings on each "Play sound" | Simpler, and assets are raw files | round 6: SND1; round 8: FX3 |
 | An ImageComponent, image opacity, "Add hitbox" | A shape with an image fill | Everything known about shapes works on images for free | round 1: D31; round 5: 04 2.8; round 6: ST1 |
+| An ellipse kind with a width and a height | A circle with only a radius; an ellipse is a circle scaled unevenly | Scale isn't part of the shape, and the shape is a circle | owner: 2026-11-15 |
+| The Shape tool's kinds in an options strip over the level view | Kind on the ShapeComponent card; the Shape tool clears the selection and the Inspector shows the shape about to be drawn | The strip and the selected shape's card showed two different kinds at once | owner: 2026-11-15 |
 | A separate tool for editing points, and tools for each shape | Double-click with Select, one Shape tool | The owner wanted fewer tools | round 4: TK1; round 5: TK2 |
 | Ctrl+click for the deepest entity | Alt+click for the next entity underneath | One key is enough | round 4: 02 2.2 |
 | An "Entities here" list in the right-click menu | The Entities panel, and Alt+click in v3 | Two ways to reach a hidden entity are enough | owner: 2026-11-14 |

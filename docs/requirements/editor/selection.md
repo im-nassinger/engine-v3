@@ -141,7 +141,7 @@ Source: scope SE3; round 5: 02 2.8; round 6: MS1; old: SG-57 to SG-61
 | A group | Go into it |
 | Text | Edit the text |
 | A polygon, line or path | Edit its points |
-| A rectangle or ellipse, a joint | Select only |
+| A rectangle or circle, a joint | Select only |
 | The camera frame | Go into the camera, to reach the entities inside it |
 | Empty space inside a group | Go up one group |
 
