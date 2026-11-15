@@ -1,4 +1,4 @@
-import type { Unsubscribe } from '../../core/events/index.ts';
+import type { Unsubscribe } from '../../../core/events/index.ts';
 
 // The browser's devicePixelRatio, and a call when it changes: browser zoom, or the window moving to
 // another screen. A media query on the current ratio stops matching when it changes, so the

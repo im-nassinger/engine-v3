@@ -76,8 +76,9 @@ src/
     pixi/              PixiLevelView, EntityNode, EntityDrawing, overlays/
     box2d/             Box2dPhysicsEngine, Box2dPhysicsWorld, Box2dShapes, Box2dJoints
     storage/           IndexedDbLevelStore, LocalStorageSettings, WebLockTabGuard, BrowserPersistence
-    browser/           KeyboardInput, PointerInput, ClipboardBridge, FileDownload, BrowserFilePicker,
-                       SystemClock, BrowserTimer, AnimationFrames, PageVisibility, LeavePrompt
+    browser/           keyboard/ (KeyboardInput), time/ (SystemClock, BrowserTimer, AnimationFrames),
+                       screen/ (DevicePixelRatio), and later PointerInput, ClipboardBridge,
+                       FileDownload, BrowserFilePicker, PageVisibility, LeavePrompt in their own areas
     worker/            WorkerGameRunner, GameWorkerHost, ImportWorkerClient, ImportWorkerHost, protocol/
     zip/               FflateZipCodec
   ui/
