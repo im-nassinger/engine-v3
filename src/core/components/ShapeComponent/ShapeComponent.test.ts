@@ -59,14 +59,62 @@ describe('ShapeComponent', () => {
         expect(shape.get('geometry')).toEqual({ kind: 'line', points: floor });
     });
 
-    test('Points counts the points, and applies only to a polygon or line', () => {
+    test('Points lists the points, and applies only to a polygon or line', () => {
         const pointsField = ShapeComponent.schema.findDerivedField('points');
         const polygon = new ShapeComponent({ geometry: { kind: 'polygon', points: triangle } });
         const square = new ShapeComponent();
 
-        expect(polygon.readDerived('points')).toBe(3);
+        expect(polygon.readDerived('points')).toEqual(triangle);
+        expect(pointsField?.type.kind).toBe('list');
         expect(pointsField?.appliesWhen?.({ geometry: { kind: 'polygon', points: triangle } })).toBe(true);
         expect(pointsField?.appliesWhen?.(square.schema.defaults())).toBe(false);
+    });
+
+    test("writing Points on a polygon replaces its points, and the read list isn't the stored one", () => {
+        const polygon = new ShapeComponent({ geometry: { kind: 'polygon', points: triangle } });
+        const square = [
+            { x: -10, y: -10 },
+            { x: 10, y: -10 },
+            { x: 10, y: 10 },
+            { x: -10, y: 10 },
+        ];
+
+        const outcome = polygon.writeDerived('points', square);
+        const readPoints = polygon.readDerived('points') as { x: number; y: number }[];
+        for (const point of readPoints) {
+            point.x = 99;
+        }
+
+        expect(outcome).toEqual({ ok: true, value: square });
+        expect(polygon.get('geometry')).toEqual({ kind: 'polygon', points: square });
+    });
+
+    test('a polygon keeps at least 3 points and a line 2, and neither more than 1,000', () => {
+        const polygon = new ShapeComponent({ geometry: { kind: 'polygon', points: triangle } });
+        const line = new ShapeComponent({ geometry: { kind: 'line', points: triangle.slice(0, 2) } });
+        const twoPoints = triangle.slice(0, 2);
+        const tooMany = Array.from({ length: 1_001 }, (_, index) => ({ x: index, y: 0 }));
+
+        expect(polygon.writeDerived('points', twoPoints)).toEqual({
+            ok: false,
+            problem: { reason: 'tooFewItems', minCount: 3 },
+        });
+        expect(line.writeDerived('points', triangle.slice(0, 1))).toEqual({
+            ok: false,
+            problem: { reason: 'tooFewItems', minCount: 2 },
+        });
+        expect(line.writeDerived('points', tooMany)).toEqual({
+            ok: false,
+            problem: { reason: 'tooManyItems', maxCount: 1_000 },
+        });
+        expect(polygon.get('geometry')).toEqual({ kind: 'polygon', points: triangle });
+        expect(line.writeDerived('points', twoPoints)).toEqual({ ok: true, value: twoPoints });
+    });
+
+    test('a rectangle has no Points to write', () => {
+        const square = new ShapeComponent();
+
+        expect(() => square.writeDerived('points', triangle)).toThrow();
     });
 
     test('a circle shows only Radius, and typing it keeps the circle at least 1 px across', () => {
@@ -98,10 +146,9 @@ describe('ShapeComponent', () => {
         expect(square.get('geometry')).toEqual({ kind: 'rectangle', width: 100, height: 100 });
     });
 
-    test('Kind and Points are read-only', () => {
+    test('Kind is read-only', () => {
         const shape = new ShapeComponent();
 
         expect(() => shape.writeDerived('kind', 'circle')).toThrow();
-        expect(() => shape.writeDerived('points', 4)).toThrow();
     });
 });

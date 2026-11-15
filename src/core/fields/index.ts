@@ -10,6 +10,8 @@ export type { FieldDefinition } from './FieldDefinition.ts';
 export type { FieldKind, FieldType } from './FieldType.ts';
 export type { JsonValue } from './JsonValue.ts';
 export { JointEndsValue } from './values/JointEndsValue.ts';
+export { ListFieldType } from './field-types/ListFieldType.ts';
+export type { ListFieldOptions } from './field-types/ListFieldType.ts';
 export { NumberFieldType } from './field-types/NumberFieldType.ts';
 export type { NumberFieldOptions } from './field-types/NumberFieldType.ts';
 export type { ParseOutcome, ParseProblem } from './ParseOutcome.ts';

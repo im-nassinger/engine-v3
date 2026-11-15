@@ -9,6 +9,8 @@ export type ParseProblem =
     | { readonly reason: 'badColour' }
     | { readonly reason: 'badEntityId' }
     | { readonly reason: 'tooFewPoints'; readonly minCount: number }
+    | { readonly reason: 'tooFewItems'; readonly minCount: number }
+    | { readonly reason: 'tooManyItems'; readonly maxCount: number }
     // A size typed for a line whose points are all on one row, or one column: they can't be spread.
     | { readonly reason: 'flatShape' };
 

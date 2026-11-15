@@ -1,5 +1,11 @@
-import type { ShapeKind } from '../../geometry/index.ts';
-import { ChoiceFieldType, NumberFieldType, ShapeGeometryValue } from '../../fields/index.ts';
+import type { Point, ShapeKind } from '../../geometry/index.ts';
+import {
+    ChoiceFieldType,
+    ListFieldType,
+    NumberFieldType,
+    ShapeGeometryValue,
+    VectorFieldType,
+} from '../../fields/index.ts';
 
 import { ComponentSchema } from '../schema/ComponentSchema.ts';
 import { derivedField } from '../schema/DerivedFieldDefinition.ts';
@@ -17,7 +23,15 @@ const kindType = new ChoiceFieldType<ShapeKind>([
 // 1 px across.
 const sizeType = new NumberFieldType({ min: 1 });
 const radiusType = new NumberFieldType({ min: 0.5 });
-const pointCountType = new NumberFieldType({ min: 0, wholeNumber: true });
+// A line needs 2 points and a polygon 3, which the write checks. 1,000 is LevelLimits' maxPoints.
+const MIN_LINE_POINTS = 2;
+const MIN_POLYGON_POINTS = 3;
+const MAX_POINTS = 1_000;
+const pointsType = new ListFieldType<Point>({
+    itemType: new VectorFieldType(),
+    minItems: MIN_LINE_POINTS,
+    maxItems: MAX_POINTS,
+});
 
 function hasPoints(values: ShapeValues) {
     return values.geometry.kind === 'polygon' || values.geometry.kind === 'line';
@@ -101,15 +115,29 @@ export const shapeSchema = new ComponentSchema<ShapeValues>({
             },
             appliesWhen: isCircle,
         }),
-        derivedField<ShapeValues, number>({
+        derivedField<ShapeValues, Point[]>({
             key: 'points',
             label: 'Points',
-            type: pointCountType,
-            description: 'How many points it has. Double-click the shape to edit them.',
+            type: pointsType,
+            description: "Its points, in pixels in the shape's own space. Double-click the shape to edit them.",
+            unit: 'px',
             read: (values) => {
-                if (values.geometry.kind === 'rectangle' || values.geometry.kind === 'circle') return 0;
+                if (values.geometry.kind === 'rectangle' || values.geometry.kind === 'circle') return [];
 
-                return values.geometry.points.length;
+                return values.geometry.points.map((point) => ({ x: point.x, y: point.y }));
+            },
+            write: (values, points) => {
+                const kind = values.geometry.kind;
+                // Points is hidden on every other kind, so only a mistake in the code writes it there.
+                if (kind !== 'polygon' && kind !== 'line') throw new Error('Only a polygon or line has Points.');
+
+                const tooFewForPolygon = kind === 'polygon' && points.length < MIN_POLYGON_POINTS;
+                if (tooFewForPolygon) {
+                    const problem = { reason: 'tooFewItems', minCount: MIN_POLYGON_POINTS } as const;
+                    return { ok: false, problem };
+                }
+
+                return { ok: true, value: { geometry: { kind, points } } };
             },
             appliesWhen: hasPoints,
         }),

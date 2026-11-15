@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 8, step 1 of 14: the steps of stage 8, the Inspector, are written into [plan.md](plan.md#stage-8-in-steps), with their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-8s-choices). Next is step 2, `ListFieldType`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 8, step 2 of 14: `ListFieldType` is built, and the ShapeComponent's Points is a writable list of vectors. Next is step 3, `convertShape`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
