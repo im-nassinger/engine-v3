@@ -24,6 +24,7 @@ What we decided against, and why. **Check here before proposing something**: an 
 | A Drop through trigger action | `drop_through(id)` in a script | One line in the player's script | owner: 2026-11-14 |
 | Music and Sound effects groups, base volume on the asset | One kind of audio, settings on each "Play sound" | Simpler, and assets are raw files | round 6: SND1; round 8: FX3 |
 | An ImageComponent, image opacity, "Add hitbox" | A shape with an image fill | Everything known about shapes works on images for free | round 1: D31; round 5: 04 2.8; round 6: ST1 |
+| `level.json`'s entities as a flat list, each naming its parent | One `world` entity, each entity holding its `children` | The file's shape is the tree, so a broken tree can't be written and the World is the one entity at the top | owner: 2026-11-15 |
 | An ellipse kind with a width and a height | A circle with only a radius; an ellipse is a circle scaled unevenly | Scale isn't part of the shape, and the shape is a circle | owner: 2026-11-15 |
 | The Inspector showing the shape about to be drawn, with only Kind editable | The Inspector hidden while the Shape tool is active, its kinds in an options strip | The Inspector only shows finished entities; a half-made shape in it would make its code handle things that aren't entities. The strip's old problem, two kinds shown at once, is gone because the Inspector is hidden | owner: 2026-11-15 |
 | A Line choice in the Shape tool's options strip | A polygon finished open with Enter is a line | One choice draws both | owner: 2026-11-15 |

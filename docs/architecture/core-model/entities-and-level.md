@@ -178,7 +178,7 @@ Values worked out from the tree, kept until something they depend on changes. Th
 
 ## Copying and the one data shape
 
-- **`EntityData`** is one entity as plain data: its id, its parent's id, its hidden and locked switches, and each component's values, keyed by attribute name. It is the same shape as one entity in `level.json`.
+- **`EntityData`** is one entity as plain data: its id, its hidden and locked switches, each component's values, keyed by attribute name, and its `children` as `EntityData` in Entities panel order. It holds no parent id: its parent is the entity it sits in (owner, 2026-11-15). It is the same shape as one entity in `level.json`.
 - `LevelWriter.writeSubtree(entity)` and `LevelReader.readSubtree(level, data, parent, index)` are the only code that turns entities into data and back. They are used by:
 
 | Use | Ids |
@@ -189,5 +189,5 @@ Values worked out from the tree, kept until something they depend on changes. Th
 | The play copy | Kept |
 | `.entity` files and spawning (v2) | Replaced by new ids |
 
-- **`readSubtree` as built** *(standing yes, 2026-11-15)*: each entity whose parent isn't listed before it is a **root**, and the roots go into `parent` from `index` on, in their order; the rest go under their listed parent. It keeps the ids, and refuses, as `damaged`, an id already in the level, a root without a parent id, a CameraComponent or a PhysicsWorldComponent; it counts the entity and depth limits from the level and the parent it goes into. Every check runs before the level changes, so a refusal leaves it as it was. It gives the roots. An index outside the children throws, because the caller picked it. *Why: one reader for undo and paste, and paste puts several roots side by side.*
+- **`readSubtree` as built** *(standing yes, 2026-11-15)*: each `EntityData` in the list it is given is a **root**, and the roots go into `parent` from `index` on, in their order, each with its nested `children` under it. *(Changed for the nested file, owner, 2026-11-15: until then each entity named its parent, and an entity whose parent wasn't listed before it was a root.)* It keeps the ids, and refuses, as `damaged`, an id already in the level, a CameraComponent or a PhysicsWorldComponent; it counts the entity and depth limits from the level and the parent it goes into. Every check runs before the level changes, so a refusal leaves it as it was. It gives the roots. An index outside the children throws, because the caller picked it. *Why: one reader for undo and paste, and paste puts several roots side by side.*
 - A component is copied with `component.copy()`, which clones each value through its field type, so a list or a point list is never shared between two components.

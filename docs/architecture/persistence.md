@@ -13,28 +13,33 @@
   "physicsVersion": 1,
   "name": "Castle",
   "editor": { "gridSize": 50, "foldedRows": [12, 40] },
-  "entities": [
-    { "id": 1, "parent": null, "hidden": false, "locked": false,
-      "components": {
-        "NameComponent": { "name": "World" },
-        "TransformComponent": { "position": { "x": 0, "y": 0 }, "rotation": 0, "scale": { "x": 1, "y": 1 }, "skew": 0 },
-        "ShapeComponent": { "geometry": { "kind": "rectangle", "width": 20000, "height": 10000 } },
-        "StyleComponent": { "fill": { "kind": "solid", "colour": "#BFE3F5FF" }, "outline_colour": "#1F3552FF", "outline_width": 0, "opacity": 1 },
-        "PhysicsWorldComponent": { "gravity": { "x": 0, "y": 9.8 }, "walls": false }
-      } },
-    { "id": 2, "parent": 1, "hidden": false, "locked": false,
-      "components": { "...": {} } },
-    { "id": 7, "parent": 1, "hidden": false, "locked": false,
-      "components": {
-        "BodyComponent": { "type": "dynamic", "gravity_scale": 1, "linear_damping": 0, "merge": true },
-        "JointComponent": { "type": "hinge", "a": { "entity": 5 }, "b": null }
-      } }
-  ]
+  "world": {
+    "id": 1, "hidden": false, "locked": false,
+    "components": {
+      "NameComponent": { "name": "World" },
+      "TransformComponent": { "position": { "x": 0, "y": 0 }, "rotation": 0, "scale": { "x": 1, "y": 1 }, "skew": 0 },
+      "ShapeComponent": { "geometry": { "kind": "rectangle", "width": 20000, "height": 10000 } },
+      "StyleComponent": { "fill": { "kind": "solid", "colour": "#BFE3F5FF" }, "outline_colour": "#1F3552FF", "outline_width": 0, "opacity": 1 },
+      "PhysicsWorldComponent": { "gravity": { "x": 0, "y": 9.8 }, "walls": false }
+    },
+    "children": [
+      { "id": 2, "hidden": false, "locked": false,
+        "components": { "...": {} },
+        "children": [] },
+      { "id": 7, "hidden": false, "locked": false,
+        "components": {
+          "BodyComponent": { "type": "dynamic", "gravity_scale": 1, "linear_damping": 0, "merge": true },
+          "JointComponent": { "type": "hinge", "a": { "entity": 5 }, "b": null }
+        },
+        "children": [] }
+    ]
+  }
 }
 ```
 
 - The World and the camera of a new level are written exactly as in `src/core/level-data/LevelWriter.newLevel.json`, which a test compares with the writer's output. Entity 7 is an illustration, with some values left out.
-- **Entities are a flat list in Entities panel order** (pre-order, top row first). Each names its parent, which must appear before it; the order of the list is the order of each parent's children. A flat list is easy to check for cycles and depth, and reads well in a diff.
+- **Entities are nested** (owner, 2026-11-15): the file holds one `world` entity, and each entity holds its `children` in Entities panel order, top row first. An entity has no `parent` key; its parent is the entity it sits in. *Why: the file's shape is the tree, so a missing parent, a parent listed after its child, an entity inside itself and a second World can't be written at all, and the World is the one entity at the top.* This replaces a flat list where each entity named its parent.
+- **`children` is always written**, `[]` when there are none *(standing yes, 2026-11-15)*. *Why: every entity holds exactly the same keys, as the reader requires.*
 - **Components are keyed by type name, in card order. Their values are keyed by attribute name** (the field's label in snake_case), the same names Lua uses, then the stored values under their key in snake_case (a shape's `geometry`). Values are written by each type's `serialize`.
 - **The writer writes every value, defaults included** *(standing yes, 2026-11-14)*: the file says exactly what the level held, and a later change of a default can't change an old level.
 - **Editor-only data** is `editor` (grid size, folded rows) and each entity's `locked`. The v3 play file drops them; `hidden` stays.
@@ -48,8 +53,8 @@
 ```typescript
 export class LevelWriter {
     write(level: Level): LevelData;
-    writeSubtree(entities: readonly Entity[]): readonly EntityData[];
-    writeNewEntity(id: EntityId, parentId: EntityId, components: readonly AnyComponent[]): EntityData;  // not in a level yet
+    writeSubtree(entities: readonly Entity[]): readonly EntityData[];   // one nested EntityData per root
+    writeNewEntity(id: EntityId, components: readonly AnyComponent[]): EntityData;  // not in a level yet, no children
 }
 
 export class LevelReader {
@@ -72,9 +77,10 @@ export type ReadRefusal =
 - **Parse at the boundary:** `raw` is `unknown` until `LevelReader` has checked every entity, parent, component and value with its field type. After that, the rules trust the types.
 - **Upgrading:** `FormatUpgrader` holds a list of steps, each turning version N's JSON into N+1's, so the latest version is one more than the number of steps. v1 has none. A file with a higher `formatVersion` than the game knows is refused with "made by a newer version of the game". Versions are never rolled back, as the tech notes warn.
 - **As built (2026-11-14), the reader's rules** *(standing yes, 2026-11-14)*:
-  - **The top of the file and each entity must hold exactly their keys**: `format`, `formatVersion`, `physicsVersion`, `name`, `editor`, `entities`, and `id`, `parent`, `hidden`, `locked`, `components`. The writer always writes them all, and a later change to these shapes is a format version with an upgrade step. Only component values read as their defaults when missing.
+  - **The top of the file and each entity must hold exactly their keys**: `format`, `formatVersion`, `physicsVersion`, `name`, `editor`, `world`, and `id`, `hidden`, `locked`, `components`, `children`. The writer always writes them all, and a later change to these shapes is a format version with an upgrade step. Only component values read as their defaults when missing.
   - **A physics version above the game's own is refused as `newerVersion`**, with the file's format version: only a newer game can write one.
-  - **The World is the first entity**, and must hold its ShapeComponent (a rectangle), StyleComponent and PhysicsWorldComponent, and no BodyComponent or SurfaceComponent. **The camera is the one entity with a CameraComponent.** A missing TransformComponent or NameComponent is made with its defaults, on any entity.
+  - **The World is the `world` entity**, and must hold its ShapeComponent (a rectangle), StyleComponent and PhysicsWorldComponent, and no BodyComponent or SurfaceComponent. **The camera is the one entity with a CameraComponent.** A missing TransformComponent or NameComponent is made with its defaults, on any entity.
+  - **The reader counts the depth as it goes down** and refuses the file as `overLimit` on reaching 257 levels, before reading further *(standing yes, 2026-11-15)*. *Why: a nested file is read by going down into it, so a file nested thousands deep must stop at the limit, not run out of stack.*
   - **A value goes through the component's `writeValue`**, so its type's `parse` refuses it and its `normalize` clamps it, exactly as when the user types it. The point limit is checked on the parsed ShapeComponent and PathComponent.
   - **A folded row whose entity isn't in the file is dropped**, because deleting an entity doesn't unfold its row. The grid size is clamped to 5 to 1,000 px like any other change.
   - **The level is built only once everything is checked**, with `Level.createEmpty(worldId, cameraId)`, so a refused file never makes half a level. The camera is moved to its place among the World's children last.
@@ -89,8 +95,7 @@ export type ReadRefusal =
   | `formatVersion` or `physicsVersion` above the game's own | `newerVersion` |
   | A missing or extra key at the top or on an entity | `damaged` |
   | An id that isn't a whole number from 1, or used twice | `damaged` |
-  | A parent that doesn't appear earlier in the list | `damaged` |
-  | No World first, or a second entity without a parent | `damaged` |
+  | A `world` or an entity that isn't an object, or `children` that isn't a list | `damaged` |
   | Not exactly one CameraComponent, or the camera not directly inside the World | `damaged` |
   | A PhysicsWorldComponent anywhere but the World, the World missing one of its components, a World shape that isn't a rectangle, or a BodyComponent or SurfaceComponent on the World | `damaged` |
   | An unknown component, or an unknown value inside one | `damaged` |

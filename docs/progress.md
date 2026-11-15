@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 8 is done (all fifteen steps). Next is stage 9, the Select tool, step 1: write its steps into [plan.md](plan.md) and its choices into the architecture docs. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 8 is done (all fifteen steps). Next is stage 9, the Select tool, step 1: write its steps into [plan.md](plan.md) and its choices into the architecture docs, with step 2 changing the code to the nested level file (owner, 2026-11-15). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -78,6 +78,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 - **A circle, not an ellipse** (owner): the fourth shape kind is a circle with only a radius. An ellipse is a circle scaled unevenly by its TransformComponent, which collides as a 32-point polygon. Resizing keeps a circle round. Stage 7 gained step 2 to change the code built in stages 2 to 4. See [drawing](requirements/drawing.md#the-shape-tool--v1).
 - **The Shape tool hides the Inspector** (owner, replacing the same day's "shape about to be drawn" in the Inspector): choosing the tool clears the selection and hides the Inspector, and an options strip at the top left offers Rectangle, Circle and Polygon. Enter finishes a polygon open, as a line; clicking the first point closes it. Once finished, the tool returns to Select and the Inspector shows the new shape. The Inspector only ever shows entities that exist. Kind on a selected shape still changes it, see [the Shape tool](requirements/drawing.md#the-shape-tool--v1) and [changing a shape's kind](requirements/drawing.md#changing-a-shapes-kind--v1).
 - **Points is one list field** (owner): a polygon's or line's points show in the Inspector as one Points field, a list of vectors, instead of a read-only count. The list field type moves from v2 to v1 and is built in stage 8. A path's points become a list of **path points**, a new field type that comes with v2's pen. See [field types](requirements/editor/inspector-and-undo.md#one-fixed-list-of-field-types--v1).
+- **The level file is nested** (owner): `level.json` holds one `world` entity, and each entity holds its `children` instead of naming its parent, so the file can't describe a broken tree and the World is the one entity at the top. The clipboard and undo copies are nested the same way. Stage 9 gained step 2 to change the code built in stages 2 and 5. See [persistence](architecture/persistence.md#leveljson).
 
 ### Settled under the standing yes, 2026-11-14
 
@@ -161,7 +162,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 9 of [plan.md](plan.md): the Select tool.** Its first step writes its steps into the plan and its choices into the architecture docs.
+1. **Stage 9 of [plan.md](plan.md): the Select tool.** Its first step writes its steps into the plan and its choices into the architecture docs; its second changes the code to the nested level file (owner, 2026-11-15).
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

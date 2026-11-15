@@ -126,7 +126,7 @@ The text is JSON with a tag, as the tech notes suggest:
   "physicsVersion": 1,
   "sourceToken": "k3x9...",
   "centre": { "x": 1200, "y": 640 },
-  "entities": [ { "id": 41, "parent": null, "components": { "...": {} } } ]
+  "entities": [ { "id": 41, "hidden": false, "locked": false, "components": { "...": {} }, "children": [] } ]
 }
 ```
 
