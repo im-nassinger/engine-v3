@@ -80,7 +80,7 @@ export type ShortcutScope = 'everywhere' | 'editor' | 'levelView';   // in edito
 export type FocusPlace = 'level' | 'panel' | 'textField' | 'codeEditor';
 
 export class ShortcutDispatcher {
-    constructor(registry: CommandRegistry, tools: ToolController, escape: EscapeChain);
+    constructor(registry: CommandRegistry, runner: CommandRunner, platform: KeyboardPlatform, tools: ToolController, escape: EscapeChain);   // tools and escape from stage 9
     handleKeyDown(input: KeyboardInputData, focus: FocusPlace, pointerOverLevelView: boolean): boolean;
     handleKeyUp(input: KeyboardInputData): void;
 }
@@ -92,6 +92,7 @@ export class ShortcutDispatcher {
 - **A press and a chord are two classes:** `KeyChord` is what a shortcut asks for, `KeyPress` what the keyboard gave. `KeyPress.fromKeyboard` reads Cmd as Ctrl on a Mac and returns `undefined` when AltGr is down, so a symbol typed with AltGr is never a shortcut. The modifier no shortcut uses (the Windows key, or Control on a Mac) is kept, and a press holding it matches nothing.
 - **Shift is ignored for a symbol** (`+`, `-`, `=`, `?`), because it is already in the typed character: `+` is Shift+= on a US layout and a key of its own on a German one. `Shift+?` is refused when parsed. Digits match on the number row and the numpad.
 - **A letter falls back to its physical key** when the layout types no Latin letter there: Cyrillic, Greek, or Option on a Mac.
+- **`ShortcutDispatcher` (step 4)** takes the registry, the `CommandRunner` and the `KeyboardPlatform` until the tools and `EscapeChain` join it in stage 9, along with `handleKeyUp`. `FocusPlace` has its own file. A used key always returns true, even when its command is disabled (the runner shows why) or when it is a held key's repeat that doesn't run again; only Zoom in and Zoom out have `repeatsWhileHeld`. The narrowest matching scope wins (level view, editor, everywhere); a level view key is left to a text field; and with a dialog open every key returns false.
 - **The recorded key data** for US, ABNT2, German, Russian and a Mac is in `editor/shortcuts/testing/recordedKeys.ts`; the browser's keys are in `browserKeys.ts`, from the requirement's table.
 
 - **Matching** follows the tech notes: digits (and Shift+digit) by the physical key, `?` and `+` by the typed character, letters by the typed letter so Ctrl+Z stays on Z in every layout, falling back to the physical key when the layout types no Latin letter. On a Mac, Cmd is Ctrl and Option is Alt.

@@ -4,3 +4,5 @@ export { KeyChord } from './KeyChord.ts';
 export { KeyPress } from './KeyPress.ts';
 export { ShortcutMap } from './ShortcutMap.ts';
 export type { Shortcut } from './ShortcutMap.ts';
+export type { FocusPlace } from './FocusPlace.ts';
+export { ShortcutDispatcher } from './ShortcutDispatcher.ts';

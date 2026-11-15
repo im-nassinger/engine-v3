@@ -10,6 +10,7 @@ export class ZoomOutCommand implements EditorCommand {
     readonly label = 'Zoom out';
     readonly menu = { menu: 'View', section: 2, order: 20 } as const;
     readonly shortcuts = ['-', 'Ctrl+-'];
+    readonly repeatsWhileHeld = true;
     private readonly session: EditorSession;
 
     constructor(session: EditorSession) {

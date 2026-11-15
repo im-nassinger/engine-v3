@@ -50,6 +50,9 @@ export type EditorCommand = {
     readonly shortcuts: readonly string[];
     // 'editor' when missing.
     readonly shortcutScope?: ShortcutScope;
+    // Only the zoom keys: holding the key runs the command again with each key repeat. Every other
+    // command runs once per press, so holding Ctrl+Z doesn't undo 30 steps a second.
+    readonly repeatsWhileHeld?: boolean;
     availability(): Availability;
     // Only a switch has it: true shows a tick next to the menu entry.
     checked?(): boolean;

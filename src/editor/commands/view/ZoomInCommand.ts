@@ -10,6 +10,7 @@ export class ZoomInCommand implements EditorCommand {
     readonly label = 'Zoom in';
     readonly menu = { menu: 'View', section: 2, order: 10 } as const;
     readonly shortcuts = ['+', 'Ctrl+='];
+    readonly repeatsWhileHeld = true;
     private readonly session: EditorSession;
 
     constructor(session: EditorSession) {
