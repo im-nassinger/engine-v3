@@ -1,0 +1,21 @@
+.status-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-16);
+    height: 100%;
+    padding: 0 var(--space-8);
+    font-size: var(--text-small);
+    white-space: nowrap;
+
+    > .status-text {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--text);
+    }
+
+    > .selection-summary {
+        color: var(--muted);
+    }
+}

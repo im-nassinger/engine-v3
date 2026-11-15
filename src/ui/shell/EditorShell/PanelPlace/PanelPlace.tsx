@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { PanelErrorBoundary } from '../../PanelErrorBoundary/index.ts';
 import './PanelPlace.css';
 
 export type PanelPlaceProps = {
@@ -10,7 +11,8 @@ export type PanelPlaceProps = {
     letsMenusOut?: boolean;
 };
 
-// One panel's fixed place over the level view, flush with its neighbours.
+// One panel's fixed place over the level view, flush with its neighbours. A panel that throws shows
+// a notice in its place and leaves the others working.
 export function PanelPlace({ area, label, children, letsMenusOut = false }: PanelPlaceProps) {
     const placement = { gridArea: area };
 
@@ -22,7 +24,7 @@ export function PanelPlace({ area, label, children, letsMenusOut = false }: Pane
             aria-label={label}
             data-focus-place="panel"
         >
-            {children}
+            <PanelErrorBoundary>{children}</PanelErrorBoundary>
         </section>
     );
 }

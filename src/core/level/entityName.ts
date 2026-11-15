@@ -7,3 +7,11 @@ export function entityName(entity: Entity) {
 
     return nameComponent.get('name');
 }
+
+// A name missing from the entity reads as its default, as it does in a file.
+export function labelName(entity: Entity) {
+    const nameComponent = entity.getComponent(NameComponent);
+    if (nameComponent === undefined) return 'Entity';
+
+    return nameComponent.get('name');
+}

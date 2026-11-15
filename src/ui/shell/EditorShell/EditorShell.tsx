@@ -1,11 +1,15 @@
+import { Dialogs } from '../../dialogs/index.ts';
 import { LevelViewHost } from '../../level-view-host/index.ts';
+import { StatusBar } from '../../status-bar/index.ts';
+import { Toolbar } from '../../toolbar/index.ts';
 import { TopBar } from '../../top-bar/index.ts';
+import { PanelErrorBoundary } from '../PanelErrorBoundary/index.ts';
 import { FreeArea } from './FreeArea/index.ts';
 import { PanelPlace } from './PanelPlace/index.ts';
 import './EditorShell.css';
 
-// The level view fills the window, and the panels sit over it in fixed places. The places
-// without a panel yet stay empty until the stage that builds it.
+// The level view fills the window, and the panels sit over it in fixed places. The Inspector and the
+// Entities panel stay empty until stages 8 and 7 build them.
 export function EditorShell() {
     return (
         <div className="editor-shell">
@@ -13,11 +17,18 @@ export function EditorShell() {
             <PanelPlace area="top-bar" label="Top bar" letsMenusOut>
                 <TopBar />
             </PanelPlace>
-            <PanelPlace area="toolbar" label="Tools" />
+            <PanelPlace area="toolbar" label="Tools" letsMenusOut>
+                <Toolbar />
+            </PanelPlace>
             <PanelPlace area="inspector" label="Inspector" />
             <FreeArea />
             <PanelPlace area="entities" label="Entities" />
-            <PanelPlace area="status-bar" label="Status bar" />
+            <PanelPlace area="status-bar" label="Status bar">
+                <StatusBar />
+            </PanelPlace>
+            <PanelErrorBoundary>
+                <Dialogs />
+            </PanelErrorBoundary>
         </div>
     );
 }

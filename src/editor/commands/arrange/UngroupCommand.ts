@@ -1,4 +1,5 @@
 import { NameComponent, TransformComponent } from '../../../core/components/index.ts';
+import { labelName } from '../../../core/level/index.ts';
 import type { Entity, EntityId } from '../../../core/level/index.ts';
 import { MoveEntityChange, RemoveEntitiesChange } from '../../history/index.ts';
 import type { EditTransaction } from '../../history/index.ts';
@@ -8,7 +9,7 @@ import { attachedJoints } from '../shared/attachedJoints.ts';
 import { inPanelOrder } from '../shared/inPanelOrder.ts';
 import { transformUnder, transformValuesOf } from '../shared/keepInPlace.ts';
 import { skipEntities } from '../shared/skipEntities.ts';
-import { labelName, stepLabel } from '../shared/stepLabel.ts';
+import { stepLabel } from '../shared/stepLabel.ts';
 
 const NOTHING_TO_UNGROUP = 'Nothing to ungroup';
 

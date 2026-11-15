@@ -1,0 +1,66 @@
+import { expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
+
+async function openEditor(page: Page) {
+    await page.goto('/');
+    await expect(page.getByRole('button', { name: 'Main menu' })).toBeVisible();
+}
+
+async function openSubmenu(page: Page, name: string) {
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name, exact: true }).hover();
+}
+
+test('with nothing selected, Delete is greyed and its tooltip says why', async ({ page }) => {
+    await openEditor(page);
+    await openSubmenu(page, 'Edit');
+
+    const deleteEntry = page.getByRole('menuitem', { name: /^Delete/ });
+    await expect(deleteEntry).toHaveAttribute('aria-disabled', 'true');
+
+    await deleteEntry.hover();
+    await expect(page.getByRole('tooltip')).toHaveText('Nothing selected');
+});
+
+test('the status bar shows a status text, then clears it', async ({ page }) => {
+    await openEditor(page);
+    const statusText = page.locator('.status-bar .status-text');
+
+    await page.getByRole('button', { name: 'Zoom' }).click();
+    const box = page.getByRole('textbox', { name: 'Zoom percentage' });
+    await box.fill('big');
+    await box.press('Enter');
+
+    await expect(statusText).toHaveText('Type a zoom such as 150%');
+    await expect(statusText).toHaveText('', { timeout: 6_000 });
+});
+
+test('the toolbar shows Select as the active tool', async ({ page }) => {
+    await openEditor(page);
+
+    const select = page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name: 'Select' });
+    await expect(select).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('About opens from Help, and Esc closes it', async ({ page }) => {
+    await openEditor(page);
+    await page.getByRole('button', { name: 'Help' }).click();
+    await page.getByRole('menuitem', { name: /^About/ }).click();
+
+    const about = page.getByRole('dialog', { name: 'About engine-v3' });
+    await expect(about).toBeVisible();
+    await expect(about).toContainText('Level file format version 1');
+    await expect(about.getByRole('button', { name: 'OK' })).toBeFocused();
+
+    await page.keyboard.press('Escape');
+    await expect(about).toBeHidden();
+});
+
+test('OK closes About', async ({ page }) => {
+    await openEditor(page);
+    await page.getByRole('button', { name: 'Help' }).click();
+    await page.getByRole('menuitem', { name: /^About/ }).click();
+
+    await page.getByRole('button', { name: 'OK' }).click();
+    await expect(page.getByRole('dialog')).toBeHidden();
+});

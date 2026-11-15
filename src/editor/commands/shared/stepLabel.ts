@@ -1,13 +1,5 @@
-import { NameComponent } from '../../../core/components/index.ts';
+import { labelName } from '../../../core/level/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
-
-// A name missing from the entity reads as its default, as it does in a file.
-export function labelName(entity: Entity) {
-    const nameComponent = entity.getComponent(NameComponent);
-    if (nameComponent === undefined) return 'Entity';
-
-    return nameComponent.get('name');
-}
 
 // Names the entity when there is one and counts otherwise: "Delete Square", "Delete 3 entities".
 export function stepLabel(verb: string, entities: readonly Entity[]) {

@@ -1,0 +1,12 @@
+.panel-problem {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-8);
+    padding: var(--space-8);
+    font-size: var(--text-small);
+
+    > .message {
+        color: var(--muted);
+    }
+}

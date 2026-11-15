@@ -4,7 +4,7 @@ import { NameComponent, ShapeComponent, TransformComponent } from '../../../core
 import { Level } from '../../../core/level/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { buildCommandTestSession, expectRoundTrip } from '../testing/commandTestSession.ts';
-import { labelName } from '../shared/stepLabel.ts';
+import { labelName } from '../../../core/level/index.ts';
 import { ManualTimer } from '../../time/testing/index.ts';
 import { levelMatrixOf, matrixDifference } from '../testing/levelMatrices.ts';
 

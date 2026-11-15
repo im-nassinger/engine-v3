@@ -1,6 +1,5 @@
+import { labelName } from '../../../core/level/index.ts';
 import type { Level } from '../../../core/level/index.ts';
-
-import { labelName } from './stepLabel.ts';
 
 // Names a new entity with a word and a number: one more than the highest number already used with that
 // word in the level, so "Group 3" follows "Group 2" even after "Group 1" was deleted. Stage 10 extends it.

@@ -87,8 +87,11 @@ src/
                        menu-entries/ (menus built from the registry), CommandMenu/
     hooks/             useVersion, useReading, and later useSelection, useEntityVersion, useLevelTree
     theme.css          colour and size tokens of the one dark theme
-    shell/ top-bar/ status-bar/ toolbar/ main-menu/ tool-options/ level-view-host/
-    entities-panel/ inspector/ play-bar/ dialogs/
+    shell/             EditorShell/ (with FreeArea/, PanelPlace/), PanelErrorBoundary/
+    status-bar/        StatusBar/
+    toolbar/           Toolbar/
+    dialogs/           Dialogs/ (with DialogBox/)
+    top-bar/ main-menu/ tool-options/ level-view-host/ entities-panel/ inspector/ play-bar/
     fields/            one component per field type: NumberField/, ColourField/, ...
     shared/            Button/, IconButton/, Menu/, MenuButton/, Tooltip/, Icon/
 tests/

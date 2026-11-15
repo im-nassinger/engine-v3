@@ -1,7 +1,7 @@
 export type { AddComponentOutcome } from './outcomes/AddComponentOutcome.ts';
 export { Entity } from './Entity.ts';
 export type { EntityChange, SwitchName } from './EntityChange.ts';
-export { entityName } from './entityName.ts';
+export { entityName, labelName } from './entityName.ts';
 export { EntityIdAllocator } from './bookkeeping/EntityIdAllocator.ts';
 export { EntityVersions } from './bookkeeping/EntityVersions.ts';
 export { Level } from './Level.ts';
