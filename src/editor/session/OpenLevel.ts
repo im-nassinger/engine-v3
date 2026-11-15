@@ -1,5 +1,6 @@
 import { DerivedCaches } from '../../core/derived/index.ts';
 import type { Level } from '../../core/level/index.ts';
+import { EntitiesRows } from '../entities-panel/index.ts';
 import { History, LevelEditor } from '../history/index.ts';
 import { Selection } from '../selection/index.ts';
 import type { Clock } from '../time/index.ts';
@@ -13,6 +14,7 @@ export class OpenLevel {
     readonly caches: DerivedCaches;
     readonly selection: Selection;
     readonly currentGroup: CurrentGroup;
+    readonly entitiesRows: EntitiesRows;
     readonly history: History;
     readonly editor: LevelEditor;
 
@@ -21,6 +23,7 @@ export class OpenLevel {
         this.caches = new DerivedCaches(level);
         this.selection = new Selection(level);
         this.currentGroup = new CurrentGroup(level);
+        this.entitiesRows = new EntitiesRows(level);
         this.history = new History(clock);
         this.editor = new LevelEditor({
             level,
@@ -32,6 +35,7 @@ export class OpenLevel {
 
     // Stops everything here following the level.
     dispose() {
+        this.entitiesRows.dispose();
         this.currentGroup.dispose();
         this.selection.dispose();
         this.caches.dispose();

@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 7, step 2 of 12: **a circle instead of an ellipse** is built: the circle kind holds only a radius, with its Radius field, pieces, mass, exact bounds and drawing, and `level.json` stores `{ "kind": "circle", "radius" }`. Next is step 3, `EntitiesRows`. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 7, step 3 of 12: **`EntitiesRows`** is built: the panel's visible rows from a pre-order walk that skips folded children, rebuilt only when the tree, the folds or a parent's eye change, with `indexOf`, `reveal`, `setFolded` and `rowKind` for a row's icon, held by `OpenLevel`. Next is step 4, `RowClicks`. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

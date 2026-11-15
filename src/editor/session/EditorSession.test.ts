@@ -63,6 +63,7 @@ describe('EditorSession', () => {
         expect(openLevel.history.undoCount).toBe(0);
         expect(openLevel.selection.isEmpty).toBe(true);
         expect(openLevel.currentGroup.group).toBe(newLevel.world);
+        expect(openLevel.entitiesRows.rows[0]?.entityId).toBe(newLevel.world.id);
         expect(session.openLevelChanged.version).toBe(versionBefore + 1);
     });
 
