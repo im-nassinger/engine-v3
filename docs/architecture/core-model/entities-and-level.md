@@ -69,7 +69,8 @@ export class Level {
     private readonly idAllocator: EntityIdAllocator;
     private levelName: string;
 
-    static createNew(registry: ComponentRegistry): Level;   // World, camera, defaults
+    static createNew(): Level;                  // World, camera, their components at defaults
+    static createEmpty(worldId: EntityId, cameraId: EntityId): Level;   // for LevelReader only
 
     get name(): string;
     rename(name: string): RenameOutcome;        // 1 to 60 characters, trimmed

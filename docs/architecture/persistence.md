@@ -78,7 +78,25 @@ export type ReadRefusal =
   - **A folded row whose entity isn't in the file is dropped**, because deleting an entity doesn't unfold its row. The grid size is clamped to 5 to 1,000 px like any other change.
   - **The level is built only once everything is checked**, with `Level.createEmpty(worldId, cameraId)`, so a refused file never makes half a level. The camera is moved to its place among the World's children last.
   - Inside, each check throws a `ReadRefused` that `read` turns into the refusal, so no exception leaves the reader for a bad file.
+  - **A joint's A or B that names an id not in the file is kept**, and the field shows `missing entity`, as the joints rules say.
   - `readFragment` (the clipboard, `.entity` files) is built with the clipboard, in stage 11.
+- **What the reader refuses**, each with a test:
+
+  | Case | Refusal |
+  |---|---|
+  | Not JSON, or no `"format": "engine-v3-level"` | `notALevel` |
+  | `formatVersion` or `physicsVersion` above the game's own | `newerVersion` |
+  | A missing or extra key at the top or on an entity | `damaged` |
+  | An id that isn't a whole number from 1, or used twice | `damaged` |
+  | A parent that doesn't appear earlier in the list | `damaged` |
+  | No World first, or a second entity without a parent | `damaged` |
+  | Not exactly one CameraComponent, or the camera not directly inside the World | `damaged` |
+  | A PhysicsWorldComponent anywhere but the World, the World missing one of its components, a World shape that isn't a rectangle, or a BodyComponent or SurfaceComponent on the World | `damaged` |
+  | An unknown component, or an unknown value inside one | `damaged` |
+  | A value its value type refuses, such as an empty name or a scale of 0 | `damaged` |
+  | Over 100,000 entities, deeper than 256, more than 1,000 points in a shape or path | `overLimit` |
+
+- **The 256 MB limit is checked where the bytes are** (stage 2, standing yes, 2026-11-14), not by the reader: `read` takes data already parsed from JSON, so it can't count bytes, and measuring the level after each change would be slow. `LevelLimits` holds the number; the import worker counts the unpacked bytes and the save measures the text it already has, both in stage 12.
 - **The same reader** reads imports, the browser's saved level, the clipboard, the play copy in the worker and (v2) `.entity` files. So a damaged saved level and a damaged import fail the same way.
 
 ## The project file

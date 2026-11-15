@@ -25,7 +25,7 @@ export type ValueType<T> = {
 };
 
 export type FieldKind =
-    | 'number' | 'text' | 'checkbox' | 'choice' | 'colour' | 'vector' | 'angle' | 'entity'
+    | 'number' | 'text' | 'checkbox' | 'choice' | 'colour' | 'vector' | 'angle' | 'entity' | 'fill'
     | 'asset' | 'variable' | 'tags' | 'list';          // the last four come with v2
 
 export type FieldType<T> = ValueType<T> & {
@@ -43,14 +43,16 @@ export type FieldType<T> = ValueType<T> & {
 | `VectorFieldType` | `{ x, y }` | `min`, `max`, `refuseZero` | Position, scale (scale can't be 0) |
 | `AngleFieldType` | degrees | `min`, `max`, `refuseLimits` | Rotation, hinge limits, skew (refuses −90° and 90°) |
 | `EntityFieldType` | `EntityId \| null` | | Joint A and B, the camera's follow target |
+| `SolidFillFieldType` | `{ kind: 'none' } \| { kind: 'solid', colour }` | | The StyleComponent's fill |
 
 - **`parse` checks the shape, `normalize` clamps** (as built, 2026-11-14): `parse` refuses the wrong type, a number that isn't finite, an unknown choice, a colour not written `#RRGGBBAA`, and the two values a field refuses (`refuseZero`, `refuseLimits`). A value out of range parses, and `normalize` clamps it, which is what import does with a joint limit past its range. A field that refuses its limits never clamps. `ParseProblem` is a code with data, not the sentence the first draft had, because [core returns reasons, never sentences](../errors.md#where-the-sentences-come-from).
 - **A colour** is read in either case and stored uppercase, so two equal colours compare equal. **A text's length** counts characters (code points), so a character outside the basic plane is never cut in half. **A vector** is geometry's `Point`; `refuseZero` refuses 0 in x or in y, since either makes a matrix that can't be inverted. `JsonValue` is declared in `core/fields` with `EntityId`.
 - **`ColourFieldType` has no `canBeEmpty`** (as built, 2026-11-14): the only colour that could be emptied was the fill, which uses `SolidFillFieldType`, so nothing in v1 needs it.
-- **The fixed list is v1, but each field type is built when the first component needs it.** v1 builds the eight above. Asset, variable, tags and list come with the v2 components that use them, and the fill field type comes with gradients (owner, 2026-11-13).
-- **The fill in v1** (owner, 2026-11-13): the StyleComponent's fill uses `SolidFillFieldType`, which the Inspector shows as a colour field that can be emptied, but whose value is already the tagged value `{ kind: 'none' } | { kind: 'solid', colour }`. In v2 it is replaced by `FillFieldType` (kind `'fill'`) with the same stored shape plus gradients, and in v3 images. Saved levels never change.
+- **The fixed list is v1, but each field type is built when the first component needs it.** v1 builds the nine above. Asset, variable, tags and list come with the v2 components that use them, and the fill field type comes with gradients (owner, 2026-11-13).
+- **The fill in v1** (owner, 2026-11-13): the StyleComponent's fill uses `SolidFillFieldType`, which the Inspector shows as a colour field that can be emptied, but whose value is already the tagged value `{ kind: 'none' } | { kind: 'solid', colour }`. In v2 it is replaced by `FillFieldType` with the same stored shape plus gradients, and in v3 images. Saved levels never change.
+- **`SolidFillFieldType`'s kind is already `'fill'`** (stage 2, standing yes, 2026-11-14), not `'colour'`. *Why: the Inspector picks a field's control by its kind, and the colour control reads `#RRGGBBAA` text, not the tagged value. With `'fill'` now, v2's `FillFieldType` takes the kind over and no kind changes.* The user still sees a colour field that can be emptied.
 - **An entity field is stored as `{ "entity": 12 }`**, not a bare number, so a later "follow by tag" (open question 15) can store `{ "tag": "player" }` beside it without changing saved levels.
-- Internal value types, never shown as fields, use the same `ValueType` contract: `ShapeGeometryValue`, `PathGeometryValue`, `JointEndsValue`.
+- Internal value types, never shown as fields, use the same `ValueType` contract: `ShapeGeometryValue`, `PathGeometryValue`, `JointEndsValue`. They hold the stored values below.
 
 ## Field definitions
 
@@ -82,7 +84,8 @@ export type FieldDefinition<Values, Key extends keyof Values> = {
 
 ```typescript
 export type PartnerRule = {
-    readonly partner: ComponentTypeName;              // 'SurfaceComponent'
+    readonly partner: ComponentTypeName;              // 'SurfaceComponent': the one the note's button adds
+    readonly alsoSatisfiedBy?: readonly ComponentTypeName[];  // others that end the note too
     readonly onlyWith?: ComponentTypeName;            // 'ShapeComponent': the note shows only when the entity has it
     readonly noteText: string;                        // "Needs a SurfaceComponent to collide."
 };
@@ -94,7 +97,14 @@ export type DerivedFieldDefinition<Values extends object, T> = {
     readonly description: string;
     readonly unit?: Unit;
     read(values: Values): T;                          // Width and Height read the shape's own geometry
-    write?(values: Values, value: T): Values;         // they rescale the points. No write: read-only
+    appliesWhen?(values: Values): boolean;            // hidden when false: a rectangle has no Points row
+    write?(values: Values, value: T): ParseOutcome<Partial<Values>>;  // they rescale the points. No write: read-only
+};
+
+export type StoredValueDefinition<Values, Key extends keyof Values> = {
+    readonly key: Key;                                // 'geometry'; saved under its snake_case
+    readonly type: ValueType<Values[Key]>;
+    readonly defaultValue: Values[Key];
 };
 
 export class ComponentSchema<Values extends object> {
@@ -141,12 +151,37 @@ export type ComponentClass<T extends Component> = {
   - **`Values extends ComponentValues`** (`Record<string, unknown>`), not `object`, so a values `type` widens to that contract. A values `interface` doesn't, so values are always a `type`.
   - **`addMenuSection` is optional:** the TransformComponent and the NameComponent are on every entity, so the Add Component menu never lists them.
   - **`ComponentClass<T extends AnyComponent>`** has `schema: AnyComponentSchema` and `new (...args: never[]): T`. Test components for code that holds components are in `core/components/testing/`.
-  - **`storedValues` comes with the ShapeComponent** in stage 2, the first component that has one, together with `StoredValueDefinition`, which these docs don't describe yet.
+  - **`derivedField(...)`** checks a derived field against its own type, then widens it for the schema's list.
 - Code that knows the component uses the typed `get` and `set` (`body.get('gravityScale')`). Generic code (the Inspector, undo, the reader, Lua) uses `readValue` and `writeValue` by key, which go through the same field type.
 - `set` returns the value actually stored, after clamping, so the Inspector can show "Max is 1500" when it differs from what was typed.
 - **A component never knows which entity holds it.** `set` and `writeValue` raise the component's own `changed` signal. `Entity.addComponent` subscribes to it and turns it into the level's `valueChanged` update, and `removeComponent` unsubscribes.
 - **Partner notes come from the schema** (Q5 and Q6, owner 2026-11-13): a component lists, as plain data, the partners it needs and when they are needed. The editor's `MissingPartnerRule` turns them into editor messages with an [Add ...] button. Removing a component removes only that one, so the cards left behind show their notes.
 - **Every note reads "Needs a X to Y. [Add X]"** (owner, 2026-11-13), with Y written per partner in the schema: "to draw anything" for a StyleComponent, "to collide" for a SurfaceComponent and a BodyComponent.
+- **`alsoSatisfiedBy`** (stage 2, standing yes, 2026-11-14): the StyleComponent's note shows only when the entity has neither a ShapeComponent nor a PathComponent, so its rule names ShapeComponent as `partner` (what the button adds) and PathComponent in `alsoSatisfiedBy`. v2 adds the TextComponent to the list. *Why: one `partner` can't say "either of two".*
+
+## Stored values
+
+**A stored value is a value the Inspector never shows** (stage 2, standing yes, 2026-11-14): a `key`, a `ValueType` and a default, listed in the schema's `storedValues`. It is saved under its key's snake_case like a field, and `readValue` and `writeValue` reach it the same way, so undo, copy and the reader need nothing new. *Why: the docs named `StoredValueDefinition` but never described it, and a field's way of saving and checking already does everything a hidden value needs.*
+
+| Component | Stored value | Value type | Holds |
+|---|---|---|---|
+| ShapeComponent | `geometry` | `ShapeGeometryValue` | The kind and what that kind needs (below) |
+| PathComponent | `path` | `PathGeometryValue` | `closed` and the points with their handles (below) |
+| JointComponent | `ends` | `JointEndsValue` | `{ a: { x, y }, b: { x, y } }`, the two ends in the joint's own space |
+| CameraComponent | `mode` | a choice | `fixedSize` until v3 |
+
+**A shape's kind and size are one stored value** (stage 2, standing yes, 2026-11-14):
+
+```json
+"ShapeComponent": { "geometry": { "kind": "rectangle", "width": 200, "height": 100 } }
+"ShapeComponent": { "geometry": { "kind": "line", "points": [{ "x": 0, "y": 0 }, { "x": 300, "y": 40 }] } }
+```
+
+- A rectangle or ellipse holds `width` and `height`, at least 1 px each (smaller is clamped). A polygon holds at least 3 points and a line at least 2, and nothing else. The 1,000-point limit is the reader's, from `LevelLimits`.
+- **Kind, Width, Height and Points are derived fields** read from it. Kind and Points have no `write`, so they are read-only. Points is the count of points, hidden on a rectangle or ellipse. Typing a Width or Height on a polygon or line rescales its points along that axis.
+- *Why: kept apart, a file could say `rectangle` beside a list of points, and every reader of the shape would have to check that they agree. One value makes a rectangle with points impossible.*
+
+**A path stores what v2's pen needs** (stage 2, standing yes, 2026-11-14): `{ "closed": false, "points": [{ "x", "y", "handle_in", "handle_out", "corner" }] }`. A handle is a point or `null`; `corner` is `sharp`, `smooth` or `separate` (smooth with handles that move separately), as [point editing](../../requirements/drawing.md#point-editing--v1) names them. An open path keeps at least 2 points, a closed one 3. In v1 a path only comes from a Rope or a Spring: all sharp, no handles, and the PathComponent isn't in the Add Component menu. Its one derived field is Points, the count, read-only. *Why: if v1 stored bare points, v2's curves would have to change saved files.*
 
 A component class is short. Example:
 
@@ -194,13 +229,13 @@ export function createV1Registry(): ComponentRegistry;
 |---|---|---|---|---|
 | TransformComponent | 1 | Position: vector px. Rotation: angle °. Scale: vector, not 0, (1, 1). Skew: angle °, strictly between −90° and 90° | | |
 | NameComponent | none | Name: text, 1 to 64, trimmed, filled automatically. `Entity` when missing from a file; `parse` refuses an empty name, counted after trimming (owner, 2026-11-14) | | |
-| ShapeComponent | 2 | Kind: choice, read-only. Width, Height: derived px, at least 1. Points: derived, read-only | The geometry: rectangle and ellipse sizes, or polygon and line points (up to 1,000) | |
-| PathComponent | 3 | Points: derived, read-only. v1 only has the read-only path a Rope or Spring keeps | The path's points and handles | |
-| StyleComponent | 5 | Fill: colour that can be emptied, `#4A90D9`. Outline colour: colour, `#1F3552`. Outline width: number px, 0 to 200, 2. Opacity: number, 0 to 1 shown as %, 1 | | ShapeComponent or PathComponent: "Needs a ShapeComponent to draw anything." |
+| ShapeComponent | 2 | Kind: choice, derived, read-only. Width, Height: derived px, at least 1. Points: derived count, read-only, only on a polygon or line | `geometry`: rectangle and ellipse sizes, or polygon and line points (up to 1,000) | |
+| PathComponent | 3 | Points: derived count, read-only. v1 only has the read-only path a Rope or Spring keeps | `path`: the points and handles | |
+| StyleComponent | 5 | Fill: `SolidFillFieldType`, a colour that can be emptied, `#4A90D9`. Outline colour: colour, `#1F3552`. Outline width: number px, 0 to 200, 2. Opacity: number, 0 to 1 shown as %, 1 | | ShapeComponent, also satisfied by a PathComponent: "Needs a ShapeComponent to draw anything." |
 | BodyComponent | 6 | Type: choice. Gravity scale, Linear damping, Angular damping, Fixed rotation, Bullet: as in [bodies](../../requirements/physics/bodies.md). Merge: checkbox, on. The card also shows a read-only Mass, see below | | SurfaceComponent, only when the entity has a ShapeComponent and no SurfaceComponent |
 | SurfaceComponent | 7 | Density 0 to 100, 1. Friction 0 to 5, 0.3. Restitution 0 to 2, 0. Sensor: checkbox | | ShapeComponent |
-| JointComponent | 8 | Type: choice Hinge, Rope, Spring. A, B: entity. Let connected objects collide. Hinge: Limit rotation, Min angle, Max angle, Motor, Motor speed, Motor strength, Resistance. Rope: Match drawn distance, Length. Spring: Match drawn distance, Rest length, Stiffness, Damping. Ranges and defaults as in [joints](../../requirements/physics/joints.md) | The two ends, in the joint's own space | |
-| CameraComponent | 9 | Width, Height: number px, 160 to 7,680, 1920 × 1080. Follow: entity, empty. Smoothing: number s, 0 to 5, 0.3. Not in the Add Component menu | Mode, `fixedSize` until v3 | |
+| JointComponent | 8 | Type: choice Hinge, Rope, Spring. A, B: entity. Let connected objects collide. Hinge: Limit rotation, Min angle, Max angle, Motor, Motor speed, Motor strength, Resistance. Rope: Match drawn distance, Length. Spring: Match drawn distance, Rest length, Stiffness, Damping. Ranges and defaults as in [joints](../../requirements/physics/joints.md) | `ends`: the two ends, in the joint's own space | |
+| CameraComponent | 9 | Width, Height: number px, 160 to 7,680, 1920 × 1080. Follow: entity, empty. Smoothing: number s, 0 to 5, 0.3. Not in the Add Component menu | `mode`: `fixedSize` until v3 | |
 | PhysicsWorldComponent | 10, World only | Gravity strength: number m/s², 0 to 100, 9.8. Gravity direction: choice Down, Up, Left, Right, Custom. Gravity angle: angle, any, 90°, applies when Custom. Walls: checkbox, off (all four edges of the level bounds walls, or all open) | | |
 
 - **Mass isn't a field of the BodyComponent**, because it adds up the shapes of other entities merged into the body. `BodyMass.of(entity, caches)` in `core/physics`, which knows which shapes merge, works it out from [geometry](geometry.md#mass), and the Inspector shows it as a read-only row at the end of the BodyComponent's card. It looks exactly as the requirement says.

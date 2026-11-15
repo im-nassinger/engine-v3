@@ -2,11 +2,11 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**; the [runner](runner.md) pushes after each step. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **The owner gave a standing yes** (2026-11-14): Claude decides the smaller questions and keeps building without waiting, listing each decision in [decisions.md](decisions.md). Round 10 was settled that way. **Stage 2 is being built** from [proposals/stage-2.md](proposals/stage-2.md).
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**; the [runner](runner.md) pushes after each step. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **The owner gave a standing yes** (2026-11-14): Claude decides the smaller questions and keeps building without waiting, listing each decision in [decisions.md](decisions.md). Round 10 was settled that way. **Stage 2, the v1 components and the file format, is built** (2026-11-14): all ten v1 components, the registry, `level.json` with `LevelWriter` and `LevelReader`, with 418 tests. **Stage 3, geometry, is next.**
 
 ## Where things stand
 
-**Runner:** stage 2, step 7 of 8. The [runner](runner.md) keeps this line up to date.
+**Runner:** stage 3, step 0 of 0: its steps aren't written yet, and writing them is the next step. The [runner](runner.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -22,8 +22,8 @@
 | Small features without a version | Done: all given a version in round 7 |
 | Stage 0, project setup | Done, except the first CI run, which needs a push. See below |
 | Stage 1, the model | Done on 2026-11-14. See below |
-| The stage 2 plan | Approved under the standing yes on 2026-11-14, with round 10: [proposals/stage-2.md](proposals/stage-2.md) |
-| Code | Stages 0 and 1 done. Stage 2: steps 1 to 7 of 8 done: all v1 components, the registry, `LevelEditorData`, a new level's World and camera with all their components, `LevelWriter` with the limits, physics versions and an empty `FormatUpgrader`, and `LevelReader` with every refusal. Step 8 is the docs |
+| The stage 2 plan | Approved under the standing yes on 2026-11-14, with round 10, and written into the [architecture](architecture/README.md) |
+| Code | Stages 0, 1 and 2 done. Stage 3, geometry, is next |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -71,6 +71,12 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 - **Round 10**, every card at Claude's pick: see [decisions.md](decisions.md#decided-under-the-standing-yes).
 
+### Stage 2, built on 2026-11-14
+
+- All eight steps of the plan are done, one commit each, and the plan file is deleted. Its eight changes to the docs are written where they belong: a shape's kind and size are one stored `geometry`, `StoredValueDefinition`, the path's stored shape, the fill's kind `'fill'` and `alsoSatisfiedBy` in [components-and-fields.md](architecture/core-model/components-and-fields.md); `Level.createNew` without a registry and `LevelEditorData` in [entities-and-level.md](architecture/core-model/entities-and-level.md); the reader's refusals and where the 256 MB limit is checked in [persistence.md](architecture/persistence.md).
+- `core/components` holds the ten v1 components and `createV1Registry`; `core/level-data` holds `LevelWriter`, `LevelReader`, `LevelLimits`, `PhysicsVersions` and an empty `FormatUpgrader`. A new level's `level.json` is recorded in `src/core/level-data/LevelWriter.newLevel.json`, and every component's round trip in `LevelReader.everyComponent.json`.
+- The smaller choices made while building are in [decisions.md](decisions.md#decided-under-the-standing-yes).
+
 ### Stage 1, built on 2026-11-14
 
 - All eight steps of the approved plan are done, one commit each, and the plan file is deleted. Its decisions are in [core-model/](architecture/core-model/README.md); what stays for later is in [plan.md](plan.md).
@@ -93,7 +99,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 ## Next
 
 1. **Push** so CI runs for the first time on x86 and ARM (step 7 of stage 0). The [runner](runner.md) does it after its first step.
-2. **Stage 2 of [plan.md](plan.md): the v1 components and the file format**, following [proposals/stage-2.md](proposals/stage-2.md).
+2. **Stage 3 of [plan.md](plan.md): geometry.** Its steps are written into the docs first, then built one per commit.
 3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
