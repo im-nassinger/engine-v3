@@ -1,0 +1,36 @@
+.card-note-box {
+    display: flex;
+    gap: var(--space-6);
+    margin: var(--space-4) var(--space-12);
+    padding: var(--space-6) var(--space-8);
+    border-radius: var(--radius);
+    background: var(--field);
+    color: var(--text);
+    line-height: 1.4;
+
+    > .mark {
+        display: flex;
+        flex-shrink: 0;
+        padding-top: 2px;
+        color: var(--warning);
+    }
+
+    &[data-kind='tip'] > .mark {
+        color: var(--tip);
+    }
+
+    .fix {
+        padding: 0;
+        border: none;
+        background: none;
+        color: var(--accent);
+        font: inherit;
+        cursor: pointer;
+
+        &:hover,
+        &:focus-visible {
+            text-decoration: underline;
+            outline: none;
+        }
+    }
+}

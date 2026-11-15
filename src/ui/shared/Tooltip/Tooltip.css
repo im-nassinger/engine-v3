@@ -23,4 +23,11 @@
             color: var(--muted);
         }
     }
+
+    &[data-long='true'] > .bubble {
+        left: 0;
+        width: 240px;
+        white-space: normal;
+        transform: none;
+    }
 }

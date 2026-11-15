@@ -16,8 +16,9 @@ function row(page: Page, name: string) {
         .filter({ has: page.locator('.name', { hasText: name }) });
 }
 
+// The Inspector's header has a name box too.
 function nameBox(page: Page) {
-    return page.getByRole('textbox', { name: 'Entity name' });
+    return page.getByRole('region', { name: 'Entities' }).getByRole('textbox', { name: 'Entity name' });
 }
 
 test('a double-click on a name, typing and Enter renames, and Ctrl+Z puts the name back', async ({ page }) => {

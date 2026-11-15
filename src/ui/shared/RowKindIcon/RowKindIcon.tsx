@@ -13,8 +13,8 @@ import {
     Waves,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import type { RowKind } from '../../../../../../editor/entities-panel/index.ts';
-import { Icon } from '../../../../../shared/index.ts';
+import type { RowKind } from '../../../editor/entities-panel/index.ts';
+import { Icon } from '../Icon/index.ts';
 import './RowKindIcon.css';
 
 const ICON_BY_KIND: Record<RowKind, LucideIcon> = {

@@ -10,9 +10,8 @@ import { labelName } from '../../../../../core/level/index.ts';
 import { useCommands } from '../../../../commands/index.ts';
 import { useEditorSession } from '../../../../EditorContext.tsx';
 import { useEntityVersion, useReading } from '../../../../hooks/index.ts';
-import { Icon } from '../../../../shared/index.ts';
+import { Icon, RowKindIcon } from '../../../../shared/index.ts';
 import { indentAt } from '../rowLayout.ts';
-import { RowKindIcon } from './RowKindIcon/index.ts';
 import { RowNameBox } from './RowNameBox/index.ts';
 import './EntitiesListRow.css';
 

@@ -1,0 +1,30 @@
+.add-component {
+    position: relative;
+    padding: var(--space-12);
+
+    > .open {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-6);
+        width: 100%;
+        height: var(--control);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: none;
+        color: var(--text);
+        cursor: default;
+
+        &:hover {
+            background: var(--hover);
+        }
+
+        &[aria-expanded='true'] {
+            background: var(--accent-soft);
+        }
+
+        &:focus-visible {
+            outline: 1px solid var(--accent);
+        }
+    }
+}

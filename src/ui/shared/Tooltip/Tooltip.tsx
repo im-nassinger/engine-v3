@@ -8,10 +8,12 @@ const SHOW_DELAY_MS = 500;
 export type TooltipProps = {
     label: string;
     shortcut?: string;
+    // A sentence, such as a field's description: it wraps and starts at the left edge instead of the middle.
+    isLong?: boolean;
     children: ReactNode;
 };
 
-export function Tooltip({ label, shortcut, children }: TooltipProps) {
+export function Tooltip({ label, shortcut, isLong = false, children }: TooltipProps) {
     const [isShown, setIsShown] = useState(false);
     const showTimer = useRef<number | undefined>(undefined);
 
@@ -33,7 +35,14 @@ export function Tooltip({ label, shortcut, children }: TooltipProps) {
     useEffect(() => cancelShowing, []);
 
     return (
-        <span className="tooltip" onPointerEnter={showSoon} onPointerLeave={hide} onFocus={showSoon} onBlur={hide}>
+        <span
+            className="tooltip"
+            data-long={isLong}
+            onPointerEnter={showSoon}
+            onPointerLeave={hide}
+            onFocus={showSoon}
+            onBlur={hide}
+        >
             {children}
             {isShown && <TooltipBubble label={label} shortcut={shortcut} />}
         </span>

@@ -1,0 +1,24 @@
+.card-field {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-height: var(--row);
+    padding: 0 var(--space-12);
+
+    .label {
+        width: var(--label);
+        overflow: hidden;
+        color: var(--muted);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    > .control {
+        flex: 1;
+        min-width: 0;
+    }
+
+    &[data-enabled='false'] .label {
+        color: var(--faint);
+    }
+}
