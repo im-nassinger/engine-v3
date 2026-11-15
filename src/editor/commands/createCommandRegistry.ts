@@ -9,6 +9,13 @@ import { HideOrShowCommand } from './edit/HideOrShowCommand.ts';
 import { RedoCommand } from './edit/RedoCommand.ts';
 import { SelectAllCommand } from './edit/SelectAllCommand.ts';
 import { UndoCommand } from './edit/UndoCommand.ts';
+import { FitCameraFrameCommand } from './view/FitCameraFrameCommand.ts';
+import { FitSelectionCommand } from './view/FitSelectionCommand.ts';
+import { FitWholeLevelCommand } from './view/FitWholeLevelCommand.ts';
+import { VIEW_SWITCH_ENTRIES, ViewSwitchCommand } from './view/ViewSwitchCommand.ts';
+import { ZoomInCommand } from './view/ZoomInCommand.ts';
+import { ZoomOutCommand } from './view/ZoomOutCommand.ts';
+import { ZoomToActualSizeCommand } from './view/ZoomToActualSizeCommand.ts';
 
 // Every command built so far, each reading the session's open level when it runs, so replacing the
 // open level needs no new registry.
@@ -23,6 +30,17 @@ export function createCommandRegistry(session: EditorSession) {
     registry.register(new GroupCommand(session));
     registry.register(new UngroupCommand(session));
     registry.register(new GoIntoGroupCommand(session));
+
+    for (const entry of VIEW_SWITCH_ENTRIES) {
+        registry.register(new ViewSwitchCommand(session, entry));
+    }
+
+    registry.register(new ZoomInCommand(session));
+    registry.register(new ZoomOutCommand(session));
+    registry.register(new ZoomToActualSizeCommand(session));
+    registry.register(new FitWholeLevelCommand(session));
+    registry.register(new FitSelectionCommand(session));
+    registry.register(new FitCameraFrameCommand(session));
 
     return registry;
 }

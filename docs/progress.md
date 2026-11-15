@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 5, step 9 of 11: Group, Ungroup and Go into group are built, keeping every entity in place on screen and passing the run, undo, redo round trip; `EntityNamer` names new groups. Next is step 10, the View commands. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 5, step 10 of 11: the View commands are built: zooming in, out and to 100%, fitting the whole level, the selection (F) and the camera frame, and the four View menu switches, none an undo step. Next is step 11, the docs that close stage 5. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -116,7 +116,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 5 of [plan.md](plan.md#stage-5-in-steps): editing without a mouse.** Steps 1 to 9 are done; each further step is built in one commit.
+1. **Stage 5 of [plan.md](plan.md#stage-5-in-steps): editing without a mouse.** Steps 1 to 10 are done; the last step is built in one commit.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

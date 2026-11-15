@@ -27,5 +27,7 @@ export type EditorCommand = {
     readonly menu: MenuPlace;
     readonly shortcuts: readonly string[];
     availability(): Availability;
+    // Only a switch has it: true shows a tick next to the menu entry.
+    checked?(): boolean;
     run(): CommandOutcome;
 };

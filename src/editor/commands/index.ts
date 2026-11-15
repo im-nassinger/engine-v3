@@ -12,3 +12,11 @@ export type { Availability, CommandId, CommandOutcome, EditorCommand, MenuName, 
 export { renameEntity } from './rename/renameEntity.ts';
 export { renameLevel } from './rename/renameLevel.ts';
 export { EntityNamer } from './shared/EntityNamer.ts';
+export { FitCameraFrameCommand } from './view/FitCameraFrameCommand.ts';
+export { FitSelectionCommand } from './view/FitSelectionCommand.ts';
+export { FitWholeLevelCommand } from './view/FitWholeLevelCommand.ts';
+export { ViewSwitchCommand } from './view/ViewSwitchCommand.ts';
+export type { ViewSwitchEntry } from './view/ViewSwitchCommand.ts';
+export { ZoomInCommand } from './view/ZoomInCommand.ts';
+export { ZoomOutCommand } from './view/ZoomOutCommand.ts';
+export { ZoomToActualSizeCommand } from './view/ZoomToActualSizeCommand.ts';

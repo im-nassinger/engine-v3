@@ -36,6 +36,8 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 | G | Show or hide the grid | Editor | Grid, v1 |
 | Shift+G | Grid snapping on or off | Editor | Grid, v1 |
 | Shift+P | Physics view on or off | Editor | Physics view, v1 |
+| Shift+J | Joint icons on or off (standing yes, 2026-11-15) | Editor | A joint is an ordinary entity, v1 |
+| Shift+C | Camera frame on or off (standing yes, 2026-11-15) | Editor | One camera, v1 |
 | Ctrl+S | Export the project file | Everywhere | Saving, v1 |
 | Ctrl+O | Import a project file | Editor | Saving, v1 |
 | Ctrl+Enter | Play, or Stop while playing. In a field it commits the field first | Everywhere | Test play, v1 |
