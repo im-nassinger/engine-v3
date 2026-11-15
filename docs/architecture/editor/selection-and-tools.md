@@ -167,3 +167,20 @@ export type Snapper = {
 
 - **`GridSnapper` is v1**: edges and centre jump to the nearest grid line within 6 screen pixels. Ctrl held during a drag turns it off. Typed values and arrow keys are never snapped.
 - v3's snapping to entities is a second `Snapper` with guides. A `CombinedSnapper` picks the nearest result, the entity winning a tie, as the requirement says. Neither tool changes.
+
+## Stage 9's choices
+
+Made under the standing yes (2026-11-15), before building. The [plan](../../plan.md#stage-9-in-steps) has the steps.
+
+- **The nested level file comes first** (owner, 2026-11-15), as step 2, before any tool, so every later test writes the new shape. *Why: the tools add nothing to the file, and changing it while nothing else moves keeps the change easy to check.*
+- **Stage 9 builds the Select tool, not what links it to later stages.** `PointEditState` is stage 10's point editing, so until then a double-click on a polygon or line only selects it. Editing text is v2. The Shape and Joint buttons join the toolbar with their stages (10 and 14); the toolbar shows Select alone, which tool lock still applies to. Hover outlines, Alt+click and resizing several entities are v3. *Why: a stage never builds what a later stage owns.*
+- **The lock is honoured though it is v3:** `HitTester` passes through locked entities and the Select tool never moves one, since `locked` is already in every entity. *Why: one check each, and v3's Lock icon then needs no change here.*
+- **`LiveEdit` lives in `editor/history`** beside `LevelEditor`, as [history.md](history.md#drags-and-live-edits) draws it, and also drives the Inspector's slider while dragged (step 14), as stage 8 left it.
+- **The handles' sizes** (*proposal*): 8 screen px squares, grabbed within 4 px of their edge; the rotate area is a 16 px square just outside each corner, outside the handle. The cursor shows which. *Why: the sizes Figma and Inkscape use, and the design's 8 px grid.*
+- **Rotating turns around the entity's bounds' centre** in v1, since the pivot marker is v3, and keeps that centre in place on screen through the TransformComponent's position.
+- **The readout's texts** (*proposal*): moving `120, −40 px` (the distance moved), resizing `200 × 100 px` (the new size in level pixels), rotating `45°`, shown 16 px below and right of the mouse, in the status font.
+- **Nudges are a command per direction and distance**, `Move left 1 px` and so on, in the shortcut map's `levelView` scope, so a focused field keeps its arrows. Each runs `nudgeSelection`, which shares `MoveState`'s offset code and records with the join key `nudge:` plus the selected ids. Ctrl+Shift+arrow moves one grid size, read from `LevelEditorData`.
+- **The body question** (*proposal*): moving between groups, or grouping, when it changes which body any moved entity or one below it merges into (through `mergesInto`), asks `Move into another body?` with the text `2 entities will move with a different body in play.` and the buttons Move and Cancel. Undo never asks. *Why: [errors.md](../errors.md) lists it as a question first; the wording names the effect, not the rule.*
+- **`PointerInput` also owns the wheel**: the wheel zooms by `ZOOM_STEP` per notch (a trackpad's small steps add up), keeping the point under the mouse, and Shift+wheel pans sideways. *Why: [adapters.md](../adapters.md#rendering) gave panning and the wheel to stage 9; one adapter turns all the level view's pointer events into calls.*
+- **The entity field's picker is a short mode of `ToolController`**, not a tool: while it waits, the next click in the level view picks `topmostAt` the mouse (inside groups, since a Follow target may be a child) and returns to the tool before it; Esc leaves it. The status bar's hint reads `Click an entity to pick it. Esc cancels.` *Why: it has no button or key of its own, so it isn't one of the seven tools.*
+- **The speed tests come now**, in `tests/performance/` with a level from `tests/levels/`, since the stage's done-when names them; stage 17 adds the rest.

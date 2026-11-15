@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 8 is done (all fifteen steps). Next is stage 9, the Select tool, step 1: write its steps into [plan.md](plan.md) and its choices into the architecture docs, with step 2 changing the code to the nested level file (owner, 2026-11-15). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 9, the Select tool, step 1 is done: its sixteen steps are in [plan.md](plan.md#stage-9-in-steps) and its choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). Next is step 2: change the code to the nested level file (owner, 2026-11-15). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -162,7 +162,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 9 of [plan.md](plan.md): the Select tool.** Its first step writes its steps into the plan and its choices into the architecture docs; its second changes the code to the nested level file (owner, 2026-11-15).
+1. **Stage 9 of [plan.md](plan.md#stage-9-in-steps): the Select tool.** Step 1 is done; step 2 changes the code to the nested level file (owner, 2026-11-15).
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
