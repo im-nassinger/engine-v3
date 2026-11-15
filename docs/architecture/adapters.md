@@ -54,7 +54,7 @@ export type PhysicsWorld = {
 
 ## Rendering
 
-`PixiLevelView` (`adapters/pixi/`) owns the PixiJS `Application` and draws a given `Level`: the editor's, or the `PlayMirror` during play.
+`PixiLevelView` (`adapters/pixi/`) owns a PixiJS renderer and its stage, without an `Application`, and draws a given `Level`: the editor's, or the `PlayMirror` during play.
 
 | Class | Job |
 |---|---|
@@ -64,7 +64,7 @@ export type PhysicsWorld = {
 | `EntityDrawing` | Builds the `Graphics` content from the ShapeComponent's outlines or the PathComponent, and the StyleComponent. Rebuilt only when one of them changes |
 | `overlays/` | `GridOverlay`, `BoundsOverlay` (dims outside the World's rectangle), `CameraFrameOverlay`, `JointIconOverlay`, `SelectionOverlay` (outlines, handles, the selection box), `ToolPreviewOverlay`, `PhysicsViewOverlay` |
 
-- **Drawing only when something changed.** The PixiJS ticker is off. A dirty flag set by level updates, the selection, the tools' previews, `ViewState` and the play session's frames triggers one render on the next animation frame. An idle editor draws nothing.
+- **Drawing only when something changed.** There is no PixiJS ticker: no `Application` is made. A dirty flag set by level updates, the selection, the tools' previews, `ViewState` and the play session's frames triggers one render on the next animation frame. An idle editor draws nothing.
 - **Drawing order:** the level (back to front), then the grid, then the editor overlays. Overlays live in a container with no zoom, so handles, icons and outlines keep their size on screen.
 - **Each entity draws one thing**, text before path before shape, as the requirement says. A shape with no StyleComponent is drawn as a thin outline in the editor and not at all in play.
 - **The physics view** draws the collision pieces from `PiecesCache` at each entity's level matrix, in the editor and in play alike (owner, 2026-11-13).
@@ -82,6 +82,8 @@ Made under the standing yes (2026-11-14), before building. The [plan](../plan.md
 - **Fitting a rectangle** (F, the whole level, the camera frame) zooms so it fills the view less 40 screen px on each side, within 1% to 1000%, and centres it. Nothing to fit leaves the view alone.
 - **`ViewState` as built** (`editor/view`, standing yes, 2026-11-14): `levelToScreen`, `screenToLevel` and `matrix()` convert positions; `panBy` takes screen pixels; `zoomAt(screenPoint, zoom)` keeps the point under the mouse still; `zoomIn` and `zoomOut` double and halve the zoom about the middle (*proposal*: the steps the wheel uses come with `PointerInput` in stage 9); `fit(bounds)` fits a rectangle, and one with no width or height fits along its other side, so a single point zooms to 1000%; `setPanLimit(worldRectangle)` sets the pan limit and pulls the middle inside it; `holdsNothing(contents)` says when `Back to level` is due. Its `version` moves only on a real change.
 - **`ViewSettings` as built:** the four View menu switches, `grid`, `jointIcons`, `cameraFrame` and `physicsView`, with `isOn`, `set` and `toggle`. A new editor starts with the physics view off and the other three on (*proposal*), because the physics view draws over everything. Folded cards join it with the Inspector in stage 8.
+- **`PixiLevelView` as built** (`adapters/pixi`, standing yes, 2026-11-14): `PixiLevelView.create(parts)` is async, because PixiJS starts its renderer asynchronously, so `mount(host)` stays a plain call that only places the canvas. It makes a renderer with `autoDetectRenderer`, not an `Application`, so there is no ticker to switch off. *Why: an `Application` only adds the ticker and a resize plugin, and the view does both itself.* It asks for WebGL, then the canvas renderer, and skips WebGPU (*proposal*). *Why: WebGL works in all three browsers the tests run, so one path is tested.* `markDirty()` asks the `FrameScheduler` for one frame, and changes before it draw once. The resolution comes from a `PixelRatioSource`, which `DevicePixelRatio` in `adapters/browser` fulfils with a media query on the current ratio, so browser zoom and a move to another screen are seen. The level sits in a layer that takes `ViewState.matrix()`; the overlays will sit beside it, unzoomed. `renderCount` counts draws for the tests.
+- **The time contracts as built** (`editor/time`): `FrameScheduler` and `Cancel` only, with `ManualFrames` in `editor/time/testing`. `Clock` and `Timer` come with the first code that needs them.
 - **The pan limit:** the view's middle stays inside the World's rectangle grown on every side by its larger side. **The view holds nothing** when it doesn't overlap the World's subtree bounds. *Why: "well outside the level" with one rule that scales with the level.*
 - **Shapes are filled from the polygon pipeline's filled outlines**, the same `PiecesCache` result physics uses, and their outline is drawn along the shape's own points, with round joins. So a self-crossing polygon fills as it collides, and an ellipse is the same 32 points it collides with. *Why: collision always matches what you see.* Paths are drawn as PixiJS curves.
 - **A shape with no StyleComponent** is drawn in the editor as a 1 screen px line, `#1D2430` at 60% (*proposal*), with PixiJS's `pixelLine`, so it stays thin at any zoom.
