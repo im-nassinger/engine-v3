@@ -2,7 +2,7 @@ import { ShapeComponent, TransformComponent } from '../../../core/components/ind
 import type { AnyComponent, ComponentTypeName } from '../../../core/components/index.ts';
 import type { ParseOutcome } from '../../../core/fields/index.ts';
 import { convertShape, Matrix2D } from '../../../core/geometry/index.ts';
-import type { ShapeKind } from '../../../core/geometry/index.ts';
+import type { Point, ShapeKind } from '../../../core/geometry/index.ts';
 import type { EntityId } from '../../../core/level/index.ts';
 import { SetValueChange } from '../../history/index.ts';
 import type { EditOutcome, LevelChange } from '../../history/index.ts';
@@ -11,6 +11,9 @@ import type { OpenLevel } from '../../session/index.ts';
 import { changesToMatch, holdersOf } from './componentEdits.ts';
 import type { HeldComponent } from './componentEdits.ts';
 import { problemText } from './problemText.ts';
+
+// The box of a vector field being typed in.
+export type Axis = 'x' | 'y';
 
 type EditedField = {
     readonly label: string;
@@ -28,6 +31,35 @@ export function setFieldValue(
     key: string,
     value: unknown,
 ): EditOutcome {
+    return editEach(openLevel, entityIds, componentType, key, () => value);
+}
+
+// One box of a vector field: the typed axis on every entity, each keeping its own other axis, so a
+// Position whose y is Mixed can have its x typed. One step, refused like setFieldValue.
+export function setVectorAxis(
+    openLevel: OpenLevel,
+    entityIds: readonly EntityId[],
+    componentType: ComponentTypeName,
+    key: string,
+    axis: Axis,
+    value: number,
+): EditOutcome {
+    const withAxis = (held: HeldComponent) => {
+        const vector = held.component.readValue(key) as Point;
+
+        return { ...vector, [axis]: value };
+    };
+
+    return editEach(openLevel, entityIds, componentType, key, withAxis);
+}
+
+function editEach(
+    openLevel: OpenLevel,
+    entityIds: readonly EntityId[],
+    componentType: ComponentTypeName,
+    key: string,
+    valueFor: (held: HeldComponent) => unknown,
+): EditOutcome {
     const { level, editor } = openLevel;
     const holders = holdersOf(level, entityIds, componentType);
     const firstHolder = holders[0];
@@ -37,6 +69,7 @@ export function setFieldValue(
     const changes: LevelChange[] = [];
 
     for (const held of holders) {
+        const value = valueFor(held);
         const edited = held.component.copy();
         const written = writeInto(edited, field, key, value);
         if (!written.ok) {

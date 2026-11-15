@@ -1,6 +1,8 @@
 import type { ComponentTypeName } from '../../../../../core/components/index.ts';
 import type { EntityId } from '../../../../../core/level/index.ts';
-import { setFieldValue } from '../../../../../editor/commands/index.ts';
+import type { EditOutcome } from '../../../../../editor/history/index.ts';
+import { setFieldValue, setVectorAxis } from '../../../../../editor/commands/index.ts';
+import type { Axis } from '../../../../../editor/commands/index.ts';
 import type { FieldModel } from '../../../../../editor/inspector/index.ts';
 import type { OpenLevel } from '../../../../../editor/session/index.ts';
 import { useEditorSession } from '../../../../EditorContext.tsx';
@@ -21,11 +23,20 @@ export function CardField({ openLevel, typeName, entityIds, field }: CardFieldPr
     const session = useEditorSession();
     const { key, label, description } = field.definition;
 
-    const commit = (value: unknown) => {
-        const outcome = setFieldValue(openLevel, entityIds, typeName, key, value);
+    const showRefusal = (outcome: EditOutcome) => {
         if (outcome.kind !== 'refused') return;
 
         session.status.show(outcome.reason);
+    };
+
+    const commit = (value: unknown) => {
+        const outcome = setFieldValue(openLevel, entityIds, typeName, key, value);
+        showRefusal(outcome);
+    };
+
+    const commitAxis = (axis: Axis, value: number) => {
+        const outcome = setVectorAxis(openLevel, entityIds, typeName, key, axis, value);
+        showRefusal(outcome);
     };
 
     return (
@@ -34,7 +45,7 @@ export function CardField({ openLevel, typeName, entityIds, field }: CardFieldPr
                 <span className="label">{label}</span>
             </Tooltip>
             <span className="control">
-                <FieldControl field={field} onCommit={commit} />
+                <FieldControl field={field} onCommit={commit} onCommitAxis={commitAxis} />
             </span>
         </div>
     );

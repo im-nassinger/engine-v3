@@ -119,6 +119,18 @@ describe('InspectorModel: what is shown', () => {
         expect(model.header.isHidden).toBe(MIXED);
         expect(model.header.canRename).toEqual({ enabled: false, reason: 'Select one entity to rename' });
     });
+
+    test('a vector is Mixed per axis: a shared x shows while y reads Mixed', () => {
+        const { crate, other, selection, model } = buildModel();
+        crate.requireComponent(TransformComponent).set('position', { x: 10, y: 20 });
+        other.requireComponent(TransformComponent).set('position', { x: 10, y: 30 });
+
+        selection.replace([crate.id, other.id]);
+
+        const transform = requireCard(model, 'TransformComponent');
+        expect(requireField(transform, 'position').value).toEqual({ x: 10, y: MIXED });
+        expect(requireField(transform, 'scale').value).toEqual({ x: 1, y: 1 });
+    });
 });
 
 describe('InspectorModel: fields', () => {

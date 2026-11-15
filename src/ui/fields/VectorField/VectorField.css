@@ -1,0 +1,5 @@
+.vector-field {
+    display: flex;
+    gap: var(--space-4);
+    min-width: 0;
+}

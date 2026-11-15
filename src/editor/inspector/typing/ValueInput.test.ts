@@ -137,3 +137,28 @@ describe('ValueInput.format', () => {
         expect(ValueInput.parseNumber(shown, rotation)).toEqual({ kind: 'value', value: -12.75 });
     });
 });
+
+describe('ValueInput.parseColour', () => {
+    test('reads a code with or without its #, in any case, and stores it in capitals', () => {
+        expect(ValueInput.parseColour('#ff8800cc', undefined)).toEqual({ kind: 'value', value: '#FF8800CC' });
+        expect(ValueInput.parseColour(' ff8800cc ', undefined)).toEqual({ kind: 'value', value: '#FF8800CC' });
+    });
+
+    test('six digits keep the old see-through part, or are opaque without one', () => {
+        expect(ValueInput.parseColour('#112233', '#AABBCC80')).toEqual({ kind: 'value', value: '#11223380' });
+        expect(ValueInput.parseColour('#112233', undefined)).toEqual({ kind: 'value', value: '#112233FF' });
+    });
+
+    test('empty text restores, and anything else is refused', () => {
+        expect(ValueInput.parseColour('  ', '#112233FF')).toEqual({ kind: 'restore' });
+        expect(ValueInput.parseColour('red', undefined)).toEqual({ kind: 'invalid', reason: 'Not a colour code' });
+        expect(ValueInput.parseColour('#12345', undefined)).toEqual({ kind: 'invalid', reason: 'Not a colour code' });
+    });
+});
+
+describe('ValueInput.withPickedColour', () => {
+    test("keeps the old colour's see-through part", () => {
+        expect(ValueInput.withPickedColour('#a1b2c3', '#00000040')).toBe('#A1B2C340');
+        expect(ValueInput.withPickedColour('#a1b2c3', undefined)).toBe('#A1B2C3FF');
+    });
+});

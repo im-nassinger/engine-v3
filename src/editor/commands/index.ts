@@ -41,4 +41,5 @@ export { addComponent } from './inspector/addComponent.ts';
 export { applyMessageFix } from './inspector/applyMessageFix.ts';
 export { removeComponent } from './inspector/removeComponent.ts';
 export { resetComponent } from './inspector/resetComponent.ts';
-export { setFieldValue } from './inspector/setFieldValue.ts';
+export { setFieldValue, setVectorAxis } from './inspector/setFieldValue.ts';
+export type { Axis } from './inspector/setFieldValue.ts';

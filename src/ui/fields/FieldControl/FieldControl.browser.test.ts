@@ -59,7 +59,11 @@ function showField(definition: AnyFieldDefinition, value: unknown) {
 
     const committed: unknown[] = [];
     const field: FieldModel = { kind: 'field', definition, value, isEnabled: true, isReadOnly: false };
-    const control = createElement(FieldControl, { field, onCommit: (newValue) => committed.push(newValue) });
+    const control = createElement(FieldControl, {
+        field,
+        onCommit: (newValue) => committed.push(newValue),
+        onCommitAxis: (axis, newValue) => committed.push({ [axis]: newValue }),
+    });
     root.render(createElement(CommandsContext, { value: commands }, control));
 
     return committed;

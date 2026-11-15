@@ -6,6 +6,7 @@ import type {
     ComponentValues,
     DerivedFieldDefinition,
 } from '../../../core/components/index.ts';
+import type { Point } from '../../../core/geometry/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { BodyMass, mergesInto } from '../../../core/physics/index.ts';
 import type { BodyMassCaches } from '../../../core/physics/index.ts';
@@ -13,7 +14,7 @@ import type { BodyMassCaches } from '../../../core/physics/index.ts';
 import type { FieldModel, ReadOnlyRow } from '../model/CardModel.ts';
 import { isWorldsKind } from '../rules/componentRules.ts';
 
-import { sameOrMixed, valuesOf } from './componentValues.ts';
+import { sameOrMixed, sharedAxes, valuesOf } from './componentValues.ts';
 
 // One component type on every shown entity, in the same order.
 export type HeldComponents = {
@@ -55,7 +56,7 @@ export function fieldModels(held: HeldComponents, caches: BodyMassCaches) {
 
 function storedFieldModel(held: HeldComponents, field: AnyFieldDefinition): FieldModel {
     const values = held.components.map((component) => component.readValue(field.key));
-    const value = sameOrMixed(values, (first, second) => field.type.equals(first, second));
+    const value = sharedValueOf(field, values);
 
     // Greyed only when it applies to none of them: typing a value still sets it on all.
     const isEnabled = held.components.some((component, i) => {
@@ -65,6 +66,12 @@ function storedFieldModel(held: HeldComponents, field: AnyFieldDefinition): Fiel
     });
 
     return { kind: 'field', definition: field, value, isEnabled, isReadOnly: false };
+}
+
+function sharedValueOf(field: AnyFieldDefinition, values: readonly unknown[]) {
+    if (field.type.kind === 'vector') return sharedAxes(values as Point[]);
+
+    return sameOrMixed(values, (first, second) => field.type.equals(first, second));
 }
 
 function appliesTo(field: AnyFieldDefinition, component: AnyComponent) {

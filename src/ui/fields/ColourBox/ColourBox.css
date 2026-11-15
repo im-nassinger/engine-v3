@@ -1,0 +1,49 @@
+.colour-box {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+
+    > .row {
+        display: flex;
+        gap: var(--space-6);
+        align-items: center;
+        min-width: 0;
+        height: var(--input);
+        padding: 0 var(--space-6);
+        border: 1px solid transparent;
+        border-radius: var(--radius);
+        background: var(--field);
+
+        > input {
+            flex: 1;
+            width: 100%;
+            min-width: 0;
+            padding: 0;
+            border: none;
+            outline: none;
+            background: none;
+            color: var(--text);
+            font: inherit;
+            text-transform: uppercase;
+
+            &::placeholder {
+                color: var(--muted);
+                font-style: italic;
+                text-transform: none;
+            }
+        }
+
+        &:has(> input:focus) {
+            border-color: var(--accent);
+        }
+
+        &[data-refused='true'] {
+            border-color: var(--danger);
+        }
+
+        &[data-disabled='true'] > input {
+            color: var(--faint);
+        }
+    }
+}

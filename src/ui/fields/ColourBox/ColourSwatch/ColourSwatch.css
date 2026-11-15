@@ -1,0 +1,42 @@
+.colour-swatch {
+    position: relative;
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-small);
+    background: var(--swatch);
+
+    > input {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        border: none;
+        opacity: 0;
+        cursor: pointer;
+
+        &:disabled {
+            cursor: default;
+        }
+    }
+
+    &:focus-within {
+        outline: 1px solid var(--accent);
+        outline-offset: 1px;
+    }
+
+    &[data-none='true']::after {
+        position: absolute;
+        top: 50%;
+        left: -2px;
+        width: 20px;
+        height: 1.5px;
+        background: var(--danger);
+        content: '';
+        rotate: -45deg;
+    }
+}

@@ -8,7 +8,7 @@ import { buildCommandTestSession, expectRoundTrip } from '../testing/commandTest
 import { addComponent } from './addComponent.ts';
 import { removeComponent } from './removeComponent.ts';
 import { resetComponent } from './resetComponent.ts';
-import { setFieldValue } from './setFieldValue.ts';
+import { setFieldValue, setVectorAxis } from './setFieldValue.ts';
 
 // The square and the child as crates: a shape, a body and a surface each.
 function buildSession() {
@@ -148,6 +148,36 @@ describe('setFieldValue', () => {
 
         setFieldValue(session.openLevel, [square.id], 'ShapeComponent', 'kind', 'rectangle');
 
+        expect(session.openLevel.history.undoCount).toBe(0);
+    });
+});
+
+describe('setVectorAxis', () => {
+    test('sets one axis on several entities in one step, each keeping its other axis', () => {
+        const { session, square, child } = buildSession();
+        square.requireComponent(TransformComponent).set('position', { x: 1, y: 20 });
+        child.requireComponent(TransformComponent).set('position', { x: 2, y: 30 });
+        const ids = [square.id, child.id];
+
+        const trip = expectRoundTrip(session, () =>
+            setVectorAxis(session.openLevel, ids, 'TransformComponent', 'position', 'x', 5),
+        );
+
+        expect(trip.afterUndo).toEqual(trip.before);
+        expect(trip.afterRedo).toEqual(trip.after);
+        expect(square.requireComponent(TransformComponent).get('position')).toEqual({ x: 5, y: 20 });
+        expect(child.requireComponent(TransformComponent).get('position')).toEqual({ x: 5, y: 30 });
+        expect(session.openLevel.history.undoCount).toBe(1);
+        expect(session.openLevel.history.undoLabel).toBe('Change Position');
+    });
+
+    test('refuses a scale of 0 in either axis and makes no step', () => {
+        const { session, square } = buildSession();
+
+        const outcome = setVectorAxis(session.openLevel, [square.id], 'TransformComponent', 'scale', 'y', 0);
+
+        expect(outcome.kind).toBe('refused');
+        expect(square.requireComponent(TransformComponent).get('scale')).toEqual({ x: 1, y: 1 });
         expect(session.openLevel.history.undoCount).toBe(0);
     });
 });

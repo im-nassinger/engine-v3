@@ -26,6 +26,11 @@
         }
     }
 
+    > .axis {
+        padding-right: var(--space-6);
+        color: var(--muted);
+    }
+
     > .unit {
         padding-left: var(--space-4);
         color: var(--faint);

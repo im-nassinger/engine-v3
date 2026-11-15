@@ -1,7 +1,9 @@
 import type { AnyComponent, ComponentTypeName, ComponentValues } from '../../../core/components/index.ts';
+import type { Point } from '../../../core/geometry/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 
 import { MIXED } from '../model/MIXED.ts';
+import type { MixedVector } from '../model/MixedVector.ts';
 
 export function componentOfType(entity: Entity, typeName: ComponentTypeName) {
     return entity.components.find((component) => component.schema.typeName === typeName);
@@ -29,4 +31,15 @@ export function sameOrMixed<T>(values: readonly T[], equals: (first: T, second: 
     if (!allSame) return MIXED;
 
     return first;
+}
+
+// A vector is never Mixed as a whole: each axis is shared or MIXED on its own, so typing one box keeps
+// every entity's other axis.
+export function sharedAxes(vectors: readonly Point[]): MixedVector {
+    const xs = vectors.map((vector) => vector.x);
+    const ys = vectors.map((vector) => vector.y);
+    const x = sameOrMixed(xs, (first, second) => first === second);
+    const y = sameOrMixed(ys, (first, second) => first === second);
+
+    return { x, y };
 }

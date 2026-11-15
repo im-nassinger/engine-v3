@@ -17,7 +17,7 @@ export type ReadOnlyRow = {
     readonly unit: Unit;
 };
 
-// value is MIXED when the selected entities hold different values.
+// value is MIXED when the selected entities hold different values; a vector's is a MixedVector instead.
 export type FieldModel =
     | {
           readonly kind: 'field';

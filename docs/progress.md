@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 8, step 10 of 14: the number, angle, text, checkbox and choice fields in `ui/fields` are built, with the unit suffix, the slider, the refusal and clamp messages, `Mixed`, Enter, Tab, Esc and Ctrl+Z. Next is step 11, the vector and colour fields in `ui/fields`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 8, step 11 of 14: the vector and colour fields in `ui/fields` are built: two boxes with their axis letters, Mixed per axis, the swatch with the browser's picker, the code, and the fill's None switch. Next is step 12, the entity and list fields in `ui/fields`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

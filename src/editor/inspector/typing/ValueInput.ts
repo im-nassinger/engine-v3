@@ -23,10 +23,18 @@ export type ValueInputResult =
     // Red outline, and Enter does nothing.
     | { readonly kind: 'invalid'; readonly reason: string };
 
+export type ColourInputResult =
+    | { readonly kind: 'value'; readonly value: string }
+    | { readonly kind: 'restore' }
+    | { readonly kind: 'invalid'; readonly reason: string };
+
 const LARGEST_TYPED_NUMBER = 1e9;
 const DEFAULT_PRECISION = 2;
 // Enough digits to show any stored value in full, without the float noise a display scale adds (0.1 * 100).
 const FULL_VALUE_DIGITS = 15;
+
+const COLOUR_CODE = /^#?([0-9A-F]{6})([0-9A-F]{2})?$/i;
+const OPAQUE = 'FF';
 
 const DECIMAL_NUMBER = /^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i;
 
@@ -46,6 +54,30 @@ export class ValueInput {
         if (refusal !== undefined) return { kind: 'invalid', reason: refusal };
 
         return clampedValue(typedValue, definition);
+    }
+
+    // A colour code, with or without its #, in any case. Six digits keep the old colour's see-through
+    // part, or are opaque when there is none (Mixed). Stored as #RRGGBBAA in capitals.
+    static parseColour(text: string, oldColour: string | undefined): ColourInputResult {
+        const typedCode = text.trim();
+        if (typedCode === '') return { kind: 'restore' };
+
+        const match = COLOUR_CODE.exec(typedCode);
+        if (match === null) return { kind: 'invalid', reason: 'Not a colour code' };
+
+        const rgb = match[1] as string;
+        const alpha = match[2] ?? alphaOf(oldColour);
+        const code = `#${rgb}${alpha}`;
+
+        return { kind: 'value', value: code.toUpperCase() };
+    }
+
+    // The browser's picker knows no see-through part: its #rrggbb keeps the old colour's.
+    static withPickedColour(pickedRgb: string, oldColour: string | undefined) {
+        const alpha = alphaOf(oldColour);
+        const code = `${pickedRgb}${alpha}`;
+
+        return code.toUpperCase();
     }
 
     // Up to the field's decimals, without trailing zeros and without the unit, which the field shows faded.
@@ -68,6 +100,12 @@ export class ValueInput {
 
         return numberText(shownNumber);
     }
+}
+
+function alphaOf(colour: string | undefined) {
+    if (colour === undefined) return OPAQUE;
+
+    return colour.slice(7, 9);
 }
 
 // 'empty' for nothing typed, undefined for text that can't be read.
