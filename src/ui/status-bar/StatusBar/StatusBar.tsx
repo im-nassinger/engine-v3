@@ -1,11 +1,11 @@
 import { selectionSummary } from '../../../editor/status/index.ts';
 import { useEditorSession } from '../../EditorContext.tsx';
 import { useReading, useVersion } from '../../hooks/index.ts';
+import { MessagesCount } from './MessagesCount/index.ts';
 import './StatusBar.css';
 
-// Left to right: the status text, then the selection. The tool's hint (stage 9) fills the left slot
-// while it is empty, and the mouse position (stage 9) and the editor messages' count (stage 8) come
-// with their stages.
+// Left to right: the status text, the selection, then the editor messages' count. The tool's hint
+// (stage 9) fills the left slot while it is empty, and the mouse position comes with stage 9.
 export function StatusBar() {
     const session = useEditorSession();
     useVersion(session.openLevelChanged);
@@ -24,6 +24,7 @@ export function StatusBar() {
         <div className="status-bar" role="status">
             <span className="status-text">{statusText}</span>
             <span className="selection-summary">{summary}</span>
+            <MessagesCount openLevel={openLevel} />
         </div>
     );
 }

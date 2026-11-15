@@ -28,7 +28,7 @@ export function EditorShell() {
             <PanelPlace area="entities" label="Entities">
                 <EntitiesPanel />
             </PanelPlace>
-            <PanelPlace area="status-bar" label="Status bar">
+            <PanelPlace area="status-bar" label="Status bar" letsMenusOut>
                 <StatusBar />
             </PanelPlace>
             <PanelErrorBoundary>

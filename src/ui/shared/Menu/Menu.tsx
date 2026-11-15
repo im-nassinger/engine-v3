@@ -6,12 +6,16 @@ import './Menu.css';
 
 export type MenuAlign = 'start' | 'end';
 
+// Above, for a button at the bottom of the window, such as the status bar's.
+export type MenuSide = 'below' | 'above';
+
 export type MenuProps = {
     entries: MenuEntry[];
     onClose: () => void;
     // The button that opened the menu. A press on it is left to the button, which closes the menu itself.
     anchor: RefObject<HTMLElement | null>;
     align?: MenuAlign;
+    side?: MenuSide;
     // Shown above the entries, such as the zoom's box for a typed percentage.
     header?: ReactNode;
 };
@@ -22,7 +26,7 @@ type OpenSubmenu = {
 };
 
 // Placed under its anchor by the anchor's wrapper, which is positioned. Esc and a press outside close it.
-export function Menu({ entries, onClose, anchor, align = 'start', header }: MenuProps) {
+export function Menu({ entries, onClose, anchor, align = 'start', side = 'below', header }: MenuProps) {
     const rootRef = useRef<HTMLDivElement>(null);
     const [openSubmenu, setOpenSubmenu] = useState<OpenSubmenu | undefined>(undefined);
 
@@ -61,7 +65,7 @@ export function Menu({ entries, onClose, anchor, align = 'start', header }: Menu
     const submenuStyle = { top: openSubmenu?.topPx };
 
     return (
-        <div className="menu" data-align={align} ref={rootRef} role="menu">
+        <div className="menu" data-align={align} data-side={side} ref={rootRef} role="menu">
             <MenuPanel
                 entries={entries}
                 header={header}

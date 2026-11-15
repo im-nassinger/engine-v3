@@ -12,8 +12,8 @@ export type MenuButtonProps = {
     // Shown only while open. It reads useOpenMenu to close itself and to sit under the button.
     menu: ReactNode;
     hasArrow?: boolean;
-    // 'field' fills its row like a field's box: a choice field's value.
-    look?: 'bar' | 'field';
+    // 'field' fills its row like a field's box: a choice field's value. 'status' fits the status bar.
+    look?: 'bar' | 'field' | 'status';
     isDisabled?: boolean;
 };
 

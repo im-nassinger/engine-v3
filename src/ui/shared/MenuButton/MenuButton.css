@@ -50,4 +50,9 @@
             }
         }
     }
+
+    &[data-look='status'] > .toggle {
+        height: var(--input);
+        color: inherit;
+    }
 }

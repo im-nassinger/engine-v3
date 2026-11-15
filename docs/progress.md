@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 8, step 12 of 14: the entity and list fields in `ui/fields` are built: the entity field's searchable dropdown, a dropped Entities panel row, `missing entity`, and the list field folded with its count, a row per item, + and remove. Next is step 13, the editor messages' count in the status bar and the whole Inspector in the page. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 8, step 13 of 15: the editor messages' count is in the status bar with its list, and Playwright tests drive the whole Inspector in the page. Step 14, gravity as one vector, was already built (commit 34b455f), so next is step 15, the docs: what the build showed and this file. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

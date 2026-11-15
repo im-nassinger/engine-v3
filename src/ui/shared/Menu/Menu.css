@@ -9,6 +9,11 @@
         left: auto;
     }
 
+    &[data-side='above'] {
+        top: auto;
+        bottom: calc(100% + var(--space-4));
+    }
+
     > .submenu {
         position: absolute;
         left: 100%;
