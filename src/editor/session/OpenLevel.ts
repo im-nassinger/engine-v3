@@ -1,6 +1,6 @@
 import { DerivedCaches } from '../../core/derived/index.ts';
 import type { Level } from '../../core/level/index.ts';
-import { EntitiesRows, RowClicks } from '../entities-panel/index.ts';
+import { EntitiesRows, RenameRequest, RowClicks } from '../entities-panel/index.ts';
 import { History, LevelEditor } from '../history/index.ts';
 import { Selection } from '../selection/index.ts';
 import type { Clock } from '../time/index.ts';
@@ -16,6 +16,7 @@ export class OpenLevel {
     readonly currentGroup: CurrentGroup;
     readonly entitiesRows: EntitiesRows;
     readonly rowClicks: RowClicks;
+    readonly renameRequest = new RenameRequest();
     readonly history: History;
     readonly editor: LevelEditor;
 

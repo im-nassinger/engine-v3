@@ -16,6 +16,7 @@ import { FitWholeLevelCommand } from './view/FitWholeLevelCommand.ts';
 import { VIEW_SWITCH_ENTRIES, ViewSwitchCommand } from './view/ViewSwitchCommand.ts';
 import { ZoomInCommand } from './view/ZoomInCommand.ts';
 import { ZoomOutCommand } from './view/ZoomOutCommand.ts';
+import { RenameCommand } from './rename/RenameCommand.ts';
 import { ZoomToActualSizeCommand } from './view/ZoomToActualSizeCommand.ts';
 
 // Every command built so far, each reading the session's open level when it runs, so replacing the
@@ -27,6 +28,7 @@ export function createCommandRegistry(session: EditorSession) {
     registry.register(new RedoCommand(session));
     registry.register(new DeleteCommand(session));
     registry.register(new SelectAllCommand(session));
+    registry.register(new RenameCommand(session));
     registry.register(new HideOrShowCommand(session));
     registry.register(new GroupCommand(session));
     registry.register(new UngroupCommand(session));

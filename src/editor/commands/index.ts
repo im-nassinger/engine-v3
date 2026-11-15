@@ -25,6 +25,7 @@ export { CommandRunner } from './running/CommandRunner.ts';
 export { OpenDialog } from './running/OpenDialog.ts';
 export type { Dialog } from './running/OpenDialog.ts';
 export { moveEntities } from './move/moveEntities.ts';
+export { RenameCommand } from './rename/RenameCommand.ts';
 export { renameEntity } from './rename/renameEntity.ts';
 export { renameLevel } from './rename/renameLevel.ts';
 export { EntityNamer } from './shared/EntityNamer.ts';

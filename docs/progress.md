@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 7, step 6 of 12: **`moveEntities`** is built: the dragged entities land side by side in their panel order at a drop target, each kept in place on screen, in one step; a dragged entity inside another moves with it; past 256 deep, the World, the camera outside the World and into itself are refused, and dropping where they already are makes no step. Next is step 7, `RenameRequest` and the Rename command. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 7, step 7 of 12: **`RenameRequest` and the Rename command** are built: `edit.rename` (F2) is disabled with nothing, several or the World selected, each with its reason, and running it reveals the row and asks the panel through `OpenLevel.renameRequest` to rename it. Next is step 8, `EntitiesPanel` and `EntitiesRow` with `@tanstack/react-virtual`. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
