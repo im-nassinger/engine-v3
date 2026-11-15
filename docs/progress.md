@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 9, step 8 of 16 is done: `MoveState` and nudges: a drag moves the whole selection live through `SelectionMove` and `LiveEdit` as one step, with Shift's axis lock, grid snapping and Ctrl, and twelve arrow commands joined by `nudge:`, with 1108 tests in Node. Next is step 9: `SelectionFrame` and `ResizeState`. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 9, step 9 of 16 is done: `SelectionFrame` and `ResizeState`: one shape, group or the World resizes by its eight handles along its own sides, live through `EntityResize` and `LiveEdit` as one step, with Shift, Alt, Ctrl, mirroring, a circle kept round and at least 1 px, with 1124 tests in Node. Next is step 10: `RotateState` and the readouts' texts. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
