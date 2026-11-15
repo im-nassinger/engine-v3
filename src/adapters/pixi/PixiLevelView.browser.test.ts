@@ -1,4 +1,7 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
+import { ShapeComponent, StyleComponent, TransformComponent } from '../../core/components/index.ts';
+import { PiecesCache } from '../../core/derived/index.ts';
+import { Level } from '../../core/entities/index.ts';
 import { Signal } from '../../core/events/index.ts';
 import { ManualFrames } from '../../editor/time/testing/index.ts';
 import { ViewState } from '../../editor/view/index.ts';
@@ -49,7 +52,7 @@ async function makeView(ratio = 1) {
     const view = new ViewState();
     const frames = new ManualFrames();
     const pixelRatio = new FakePixelRatio(ratio);
-    const levelView = await PixiLevelView.create({ view, frames, pixelRatio });
+    const levelView = await PixiLevelView.create({ view, frames, pixelRatio, drawing: { showUnstyled: true } });
     cleanups.push(() => levelView.destroy());
 
     return { levelView, view, frames, pixelRatio };
@@ -180,5 +183,52 @@ describe('PixiLevelView', () => {
 
         expect(levelView.canvas.parentElement).toBe(secondHost);
         expect(firstHost.childElementCount).toBe(0);
+    });
+
+    test('show draws the level, and a change to it draws once more with the drawing rebuilt', async () => {
+        const { levelView, view, frames } = await makeView();
+        const host = makeHost(300, 200);
+        levelView.mount(host);
+        await waitForSize(view, 300, 200);
+        frames.runFrame();
+
+        const level = Level.createNew();
+        const pieces = new PiecesCache(level);
+        cleanups.push(() => pieces.dispose());
+        levelView.show(level, { pieces });
+
+        expect(frames.pendingCount).toBe(1);
+        frames.runFrame();
+        const buildsAfterShow = levelView.levelDisplay?.drawingBuildCount ?? 0;
+
+        const square = level.createEntity(level.world, 0);
+        square.addComponent(new TransformComponent());
+        square.addComponent(new ShapeComponent());
+        square.addComponent(new StyleComponent());
+        const rendersBefore = levelView.renderCount;
+
+        expect(frames.pendingCount).toBe(1);
+        frames.runFrame();
+
+        expect(levelView.renderCount).toBe(rendersBefore + 1);
+        expect(levelView.levelDisplay?.drawingBuildCount).toBe(buildsAfterShow + 1);
+    });
+
+    test('showing another level lets go of the first one', async () => {
+        const { levelView, frames } = await makeView();
+        const firstLevel = Level.createNew();
+        const secondLevel = Level.createNew();
+        const firstPieces = new PiecesCache(firstLevel);
+        const secondPieces = new PiecesCache(secondLevel);
+        cleanups.push(() => firstPieces.dispose());
+        cleanups.push(() => secondPieces.dispose());
+
+        levelView.show(firstLevel, { pieces: firstPieces });
+        levelView.show(secondLevel, { pieces: secondPieces });
+        frames.runFrame();
+        firstLevel.createEntity(firstLevel.world, 0);
+
+        expect(frames.pendingCount).toBe(0);
+        expect(levelView.levelDisplay?.nodeOf(secondLevel.world)).toBeDefined();
     });
 });

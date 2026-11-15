@@ -1,8 +1,12 @@
 import { autoDetectRenderer, Container, Matrix } from 'pixi.js';
 import type { Renderer } from 'pixi.js';
+import type { Level } from '../../core/entities/index.ts';
 import type { Unsubscribe } from '../../core/events/index.ts';
 import type { ViewState } from '../../editor/view/index.ts';
 import type { Cancel, FrameScheduler } from '../../editor/time/index.ts';
+import type { EntityDrawingOptions } from './EntityDrawing.ts';
+import { LevelDisplay } from './LevelDisplay.ts';
+import type { LevelDisplayCaches } from './LevelDisplay.ts';
 
 // Where the renderer's resolution comes from. DevicePixelRatio in adapters/browser fulfils it.
 export type PixelRatioSource = {
@@ -14,6 +18,7 @@ export type PixiLevelViewParts = {
     readonly view: ViewState;
     readonly frames: FrameScheduler;
     readonly pixelRatio: PixelRatioSource;
+    readonly drawing: EntityDrawingOptions;
 };
 
 // Owns the canvas and decides when to draw. There is no PixiJS Application and so no ticker: a
@@ -28,6 +33,7 @@ export class PixiLevelView {
     private readonly stopListening: Unsubscribe[] = [];
     private resizeObserver: ResizeObserver | undefined;
     private host: HTMLElement | undefined;
+    private display: LevelDisplay | undefined;
     private cancelFrame: Cancel | undefined;
     private renders = 0;
 
@@ -64,6 +70,11 @@ export class PixiLevelView {
         return this.renderer.resolution;
     }
 
+    // The level's nodes, undefined until show() is called.
+    get levelDisplay() {
+        return this.display;
+    }
+
     // How many times the view has drawn, for tests and the performance numbers.
     get renderCount() {
         return this.renders;
@@ -93,6 +104,21 @@ export class PixiLevelView {
         this.host = undefined;
     }
 
+    // Draws this level from now on: the editor's, a new or imported one, or the PlayMirror during play.
+    show(level: Level, caches: LevelDisplayCaches) {
+        this.display?.dispose();
+
+        const display = new LevelDisplay({
+            level,
+            caches,
+            options: this.parts.drawing,
+            onChange: () => this.markDirty(),
+        });
+        this.display = display;
+        this.levelLayer.addChild(display.root);
+        this.markDirty();
+    }
+
     // Asks for one render on the next frame. Several changes before it still draw once.
     markDirty() {
         if (this.cancelFrame !== undefined) return;
@@ -111,6 +137,9 @@ export class PixiLevelView {
         for (const stop of this.stopListening) {
             stop();
         }
+
+        this.display?.dispose();
+        this.display = undefined;
 
         this.stage.destroy({ children: true });
         this.renderer.destroy();
@@ -147,6 +176,7 @@ export class PixiLevelView {
 
     private render() {
         this.renders += 1;
+        this.display?.prepare();
         this.renderer.render({ container: this.stage });
     }
 }
