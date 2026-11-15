@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 8, step 13 of 15: the editor messages' count is in the status bar with its list, and Playwright tests drive the whole Inspector in the page. Step 14, gravity as one vector, was already built (commit 34b455f), so next is step 15, the docs: what the build showed and this file. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 8, step 14 of 15: the World's gravity is one x, y vector in the code, the level file and the Inspector (the docs alone had changed in commit 34b455f). Next is step 15, the docs: what the build showed and this file. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

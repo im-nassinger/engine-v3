@@ -1,12 +1,8 @@
-import { AngleFieldType, CheckboxFieldType, ChoiceFieldType, NumberFieldType } from '../../fields/index.ts';
+import { CheckboxFieldType, VectorFieldType } from '../../fields/index.ts';
 
 import { ComponentSchema } from '../schema/ComponentSchema.ts';
 
-import type { GravityDirection, PhysicsWorldValues } from './PhysicsWorldValues.ts';
-
-function isCustom(values: PhysicsWorldValues) {
-    return values.gravityDirection === 'custom';
-}
+import type { PhysicsWorldValues } from './PhysicsWorldValues.ts';
 
 export const physicsWorldSchema = new ComponentSchema<PhysicsWorldValues>({
     typeName: 'PhysicsWorldComponent',
@@ -16,38 +12,15 @@ export const physicsWorldSchema = new ComponentSchema<PhysicsWorldValues>({
     addableByHand: false,
     fields: [
         {
-            key: 'gravityStrength',
-            label: 'Gravity strength',
-            type: new NumberFieldType({ min: 0, max: 100 }),
-            defaultValue: 9.8,
-            description: 'How hard everything falls, in m/s². 9.8 is Earth, 0 floats.',
+            key: 'gravity',
+            label: 'Gravity',
+            // The old strength's limit of 100, per axis.
+            type: new VectorFieldType({ min: -100, max: 100 }),
+            // Straight down, since y points down.
+            defaultValue: { x: 0, y: 9.8 },
+            description: 'Which way and how hard everything falls, in m/s². 0, 9.8 is Earth, 0, 0 floats.',
             unit: 'm/s²',
             changeableInPlay: true,
-        },
-        {
-            key: 'gravityDirection',
-            label: 'Gravity direction',
-            type: new ChoiceFieldType<GravityDirection>([
-                { value: 'down', label: 'Down' },
-                { value: 'up', label: 'Up' },
-                { value: 'left', label: 'Left' },
-                { value: 'right', label: 'Right' },
-                { value: 'custom', label: 'Custom' },
-            ]),
-            defaultValue: 'down',
-            description: 'Which way everything falls.',
-            changeableInPlay: true,
-        },
-        {
-            key: 'gravityAngle',
-            label: 'Gravity angle',
-            type: new AngleFieldType(),
-            // 90° is down, so picking Custom never flips gravity by surprise.
-            defaultValue: 90,
-            description: 'Which way everything falls, in degrees clockwise from the right. 90° is down.',
-            unit: '°',
-            changeableInPlay: true,
-            appliesWhen: isCustom,
         },
         {
             key: 'walls',

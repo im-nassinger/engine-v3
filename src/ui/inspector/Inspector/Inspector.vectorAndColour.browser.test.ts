@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { StyleComponent, TransformComponent } from '../../../core/components/index.ts';
+import { PhysicsWorldComponent, StyleComponent, TransformComponent } from '../../../core/components/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { Level } from '../../../core/level/index.ts';
 import type { EditorSession } from '../../../editor/session/index.ts';
@@ -37,14 +37,14 @@ function fieldRow(typeName: string, key: string) {
     return requireElement<HTMLElement>(requireCard(typeName), `.card-field[data-key="${key}"]`);
 }
 
-function axisBox(key: string, axis: 'x' | 'y') {
-    const row = fieldRow('TransformComponent', key);
+function axisBox(key: string, axis: 'x' | 'y', typeName = 'TransformComponent') {
+    const row = fieldRow(typeName, key);
 
     return requireElement<HTMLInputElement>(row, `.vector-axis-box[data-axis="${axis}"] input`);
 }
 
-function axisMessage(key: string, axis: 'x' | 'y') {
-    const row = fieldRow('TransformComponent', key);
+function axisMessage(key: string, axis: 'x' | 'y', typeName = 'TransformComponent') {
+    const row = fieldRow(typeName, key);
     const box = requireElement<HTMLElement>(row, `.vector-axis-box[data-axis="${axis}"]`);
 
     return box.querySelector('.field-message')?.textContent;
@@ -147,6 +147,28 @@ describe('Inspector: the vector field', () => {
         await expect.poll(() => transformOf(first).get('position')).toEqual({ x: 5, y: 1 });
         expect(transformOf(second).get('position')).toEqual({ x: 5, y: 2 });
         expect(undoCount(session)).toBe(1);
+    });
+});
+
+describe("Inspector: the World's gravity", () => {
+    test('is one vector in m/s², and 101 in either box is clamped to 100 as one step', async () => {
+        const level = Level.createNew();
+        const { session } = showInspector(level);
+        await expect.poll(() => inspectorContainer().querySelector('.card-field[data-key="gravity"]')).not.toBeNull();
+        const world = level.world.requireComponent(PhysicsWorldComponent);
+        expect(axisBox('gravity', 'x', 'PhysicsWorldComponent').value).toBe('0');
+        expect(axisBox('gravity', 'y', 'PhysicsWorldComponent').value).toBe('9.8');
+
+        await typeInto(axisBox('gravity', 'x', 'PhysicsWorldComponent'), '101');
+
+        await expect.poll(() => world.get('gravity')).toEqual({ x: 100, y: 9.8 });
+        expect(axisMessage('gravity', 'x', 'PhysicsWorldComponent')).toBe('Max is 100');
+        expect(undoCount(session)).toBe(1);
+
+        await typeInto(axisBox('gravity', 'y', 'PhysicsWorldComponent'), '-101');
+
+        await expect.poll(() => world.get('gravity')).toEqual({ x: 100, y: -100 });
+        expect(undoCount(session)).toBe(2);
     });
 });
 

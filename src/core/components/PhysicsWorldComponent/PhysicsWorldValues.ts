@@ -1,9 +1,7 @@
-export type GravityDirection = 'down' | 'up' | 'left' | 'right' | 'custom';
+import type { Point } from '../../geometry/index.ts';
 
-// Strength and direction are kept apart, so zero gravity keeps its direction for when the strength returns.
+// Gravity is one vector in m/s², so zero gravity is 0, 0 and keeps no direction.
 export type PhysicsWorldValues = {
-    gravityStrength: number;
-    gravityDirection: GravityDirection;
-    gravityAngle: number;
+    gravity: Point;
     walls: boolean;
 };

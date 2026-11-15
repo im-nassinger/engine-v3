@@ -29,7 +29,7 @@ export type { NameValues } from './NameComponent/NameValues.ts';
 export { PathComponent } from './PathComponent/PathComponent.ts';
 export type { PathValues } from './PathComponent/PathValues.ts';
 export { PhysicsWorldComponent } from './PhysicsWorldComponent/PhysicsWorldComponent.ts';
-export type { GravityDirection, PhysicsWorldValues } from './PhysicsWorldComponent/PhysicsWorldValues.ts';
+export type { PhysicsWorldValues } from './PhysicsWorldComponent/PhysicsWorldValues.ts';
 export { ShapeComponent } from './ShapeComponent/ShapeComponent.ts';
 export type { ShapeValues } from './ShapeComponent/ShapeValues.ts';
 export { StyleComponent } from './StyleComponent/StyleComponent.ts';

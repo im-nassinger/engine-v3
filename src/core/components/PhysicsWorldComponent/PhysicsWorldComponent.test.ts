@@ -1,42 +1,34 @@
 import { describe, expect, test } from 'vitest';
 
 import { PhysicsWorldComponent } from './PhysicsWorldComponent.ts';
-import type { PhysicsWorldValues } from './PhysicsWorldValues.ts';
-
-function applyingKeys(values: PhysicsWorldValues) {
-    const applying = PhysicsWorldComponent.schema.fields.filter((field) => field.appliesWhen?.(values) ?? true);
-
-    return applying.map((field) => field.key);
-}
 
 describe('PhysicsWorldComponent', () => {
-    const defaults = PhysicsWorldComponent.schema.defaults();
-
-    test('a new world pulls down at 9.8 m/s², with open edges', () => {
+    test('a new world pulls straight down at 9.8 m/s², with open edges', () => {
         const world = new PhysicsWorldComponent();
 
-        expect(world.get('gravityStrength')).toBe(9.8);
-        expect(world.get('gravityDirection')).toBe('down');
-        expect(world.get('gravityAngle')).toBe(90);
+        expect(world.get('gravity')).toEqual({ x: 0, y: 9.8 });
         expect(world.get('walls')).toBe(false);
     });
 
-    test('Gravity angle applies only when the direction is Custom, its value kept', () => {
-        expect(applyingKeys(defaults)).toEqual(['gravityStrength', 'gravityDirection', 'walls']);
-        expect(applyingKeys({ ...defaults, gravityDirection: 'custom' })).toEqual([
-            'gravityStrength',
-            'gravityDirection',
-            'gravityAngle',
-            'walls',
-        ]);
-    });
-
-    test('gravity strength goes from 0 to 100, and the angle takes any angle', () => {
+    test('gravity is one vector, each axis from -100 to 100', () => {
         const world = new PhysicsWorldComponent();
 
-        expect(world.writeValue('gravityStrength', -3)).toEqual({ ok: true, value: 0 });
-        expect(world.writeValue('gravityStrength', 500)).toEqual({ ok: true, value: 100 });
-        expect(world.writeValue('gravityAngle', 450)).toEqual({ ok: true, value: 450 });
+        expect(world.writeValue('gravity', { x: 101, y: 9.8 })).toEqual({ ok: true, value: { x: 100, y: 9.8 } });
+        expect(world.writeValue('gravity', { x: 0, y: -101 })).toEqual({ ok: true, value: { x: 0, y: -100 } });
+        expect(world.writeValue('gravity', { x: -3, y: 4 })).toEqual({ ok: true, value: { x: -3, y: 4 } });
+    });
+
+    test('zero gravity is 0, 0', () => {
+        const world = new PhysicsWorldComponent();
+
+        expect(world.writeValue('gravity', { x: 0, y: 0 })).toEqual({ ok: true, value: { x: 0, y: 0 } });
+    });
+
+    test('every field applies, whatever the values', () => {
+        const fields = PhysicsWorldComponent.schema.fields;
+
+        expect(fields.map((field) => field.key)).toEqual(['gravity', 'walls']);
+        expect(fields.every((field) => field.appliesWhen === undefined)).toBe(true);
     });
 
     test('only Walls is fixed during play', () => {

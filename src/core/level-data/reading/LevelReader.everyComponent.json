@@ -26,9 +26,7 @@
                     "opacity": 1
                 },
                 "PhysicsWorldComponent": {
-                    "gravity_strength": 4.5,
-                    "gravity_direction": "custom",
-                    "gravity_angle": 45,
+                    "gravity": { "x": -4.5, "y": 3 },
                     "walls": true
                 }
             }
