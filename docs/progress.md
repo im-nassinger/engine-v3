@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 3, step 3 of 8: `Bounds`, `PolygonLibrary` (with `clipper2-ts`) and `EarClipping` are built; `ShapePieces` is next. The [runner](runner.md) keeps this line up to date.
+**Runner:** stage 3, step 4 of 8: `Bounds`, `PolygonLibrary` (with `clipper2-ts`), `EarClipping` and `ShapePieces` are built; `LineChains` is next. The [runner](runner.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

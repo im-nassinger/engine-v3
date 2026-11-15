@@ -1,4 +1,5 @@
 import type { Point } from './Point.ts';
+import { pointAt, samePlace, signedDoubleArea, turn } from './Ring.ts';
 
 type Corner = {
     readonly previous: Point;
@@ -6,23 +7,8 @@ type Corner = {
     readonly next: Point;
 };
 
-// Twice the signed area of the triangle a, b, c: positive when the three turn clockwise on screen
-// (y down), the same direction as an outline with a positive area.
-function turn(a: Point, b: Point, c: Point) {
-    return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-}
-
 function turnOf(corner: Corner) {
     return turn(corner.previous, corner.current, corner.next);
-}
-
-// The ring wraps around, so the point before the first is the last.
-function pointAt(ring: readonly Point[], position: number) {
-    const wrapped = (position + ring.length) % ring.length;
-    const point = ring[wrapped];
-    if (point === undefined) throw new Error(`No point at ${position} in a ring of ${ring.length}.`);
-
-    return point;
 }
 
 function cornerAt(ring: readonly Point[], position: number): Corner {
@@ -31,22 +17,6 @@ function cornerAt(ring: readonly Point[], position: number): Corner {
     const next = pointAt(ring, position + 1);
 
     return { previous, current, next };
-}
-
-function signedDoubleArea(outline: readonly Point[]) {
-    let sum = 0;
-
-    for (let position = 0; position < outline.length; position++) {
-        const current = pointAt(outline, position);
-        const next = pointAt(outline, position + 1);
-        sum += current.x * next.y - next.x * current.y;
-    }
-
-    return sum;
-}
-
-function samePlace(first: Point, second: Point) {
-    return first.x === second.x && first.y === second.y;
 }
 
 function isCornerPoint(point: Point, corner: Corner) {
