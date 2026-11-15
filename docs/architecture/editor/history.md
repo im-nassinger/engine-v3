@@ -26,7 +26,8 @@ Changes point at entities by id, never by object, because undo of a delete creat
 | `RenameLevelChange` | Old and new name | The top bar |
 
 - **As built (standing yes, 2026-11-15):** a change writes a value back through its file form, the value type's `serialize` then the component's `writeValue`, the one path that parses every value type, entity links and paths included. A change refused on apply or revert was built wrong, so it throws instead of returning an outcome; the command checked the edit before building it. `MoveEntityChange` moves first and then writes all four TransformComponent values.
-- A `RemoveEntitiesChange` keeps the whole subtree as `EntityData`, the same shape as the file, and its revert reads it back with `Level.restoreEntity`. One copy format, tested by every save.
+- A `RemoveEntitiesChange` keeps the whole subtree as `EntityData`, the same shape as the file, and its revert reads it back with `LevelReader.readSubtree`, which uses `Level.restoreEntity`. One copy format, tested by every save.
+- **As built (standing yes, 2026-11-15):** `AddEntitiesChange` and `RemoveEntitiesChange` share a `SubtreeCopy`: the `EntityData` list (cloned through JSON text), the place of its first root, and the `LevelReader` given to them. Putting reads the list back; taking removes each root by id. `RemoveEntitiesChange.ofEntity(reader, entity)` writes one entity's subtree and its place before it is removed, so Delete makes **one change per removed subtree**, removed bottom row first, and undo puts each back at its own index. *Why: one place per change can't put back siblings that weren't side by side.*
 - New change classes come with new kinds of data in v2 (files in the Assets panel, script edits). The tech notes' byte limit on history only matters once files exist; `History` measures each step's size from v2 on.
 
 ## Edit transactions

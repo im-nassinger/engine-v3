@@ -130,6 +130,27 @@ export class LevelReader {
         }
     }
 
+    // Entities as LevelWriter.writeSubtree gave them, put back into a level with their ids: undo of a delete,
+    // and paste once its ids are replaced. Each entity whose parent isn't listed before it is a root, and the
+    // roots go into the parent from the index on, in their order. Everything is checked before the level
+    // changes, so a refusal leaves it as it was. Gives the roots.
+    readSubtree(level: Level, raw: unknown, parent: Entity, index: number): ReadOutcome<readonly Entity[]> {
+        const isPlaceInParent = Number.isSafeInteger(index) && index >= 0 && index <= parent.children.length;
+        if (!isPlaceInParent) {
+            throw new Error(`Index ${index} is not a place among entity ${parent.id}'s children.`);
+        }
+
+        try {
+            const entities = this.readSubtreeEntities(level, raw, parent);
+            const roots = this.buildSubtree(level, entities, parent, index);
+            return { ok: true, value: roots };
+        } catch (error) {
+            if (error instanceof ReadRefused) return { ok: false, refusal: error.refusal };
+
+            throw error;
+        }
+    }
+
     private readLevel(raw: unknown) {
         const fileVersion = this.checkFormat(raw);
         const upgraded = this.upgrader.upgrade(raw, fileVersion);
@@ -185,7 +206,9 @@ export class LevelReader {
 
         for (const rawEntity of raw) {
             const isFirst = entities.length === 0;
-            const entity = this.readEntity(rawEntity, isFirst, depthById);
+            const entity = this.readEntity(rawEntity, depthById, (id, parentId) =>
+                this.depthOfUnlistedParent(id, parentId, isFirst),
+            );
             entities.push(entity);
         }
 
@@ -194,8 +217,27 @@ export class LevelReader {
         return entities;
     }
 
-    // The World comes first, with no parent. Every other entity names a parent listed before it.
-    private readEntity(raw: unknown, isFirst: boolean, depthById: Map<EntityId, number>): CheckedEntity {
+    // In a file, only the World, listed first, has no parent listed before it.
+    private depthOfUnlistedParent(id: EntityId, parentId: unknown, isFirst: boolean) {
+        if (isFirst) {
+            if (parentId !== null) throw ReadRefused.damaged('the first entity, the World, has a parent');
+
+            return 0;
+        }
+
+        if (parentId === null) throw ReadRefused.damaged(`entity ${id} has no parent, but only the World can`);
+        if (!isEntityId(parentId)) throw ReadRefused.damaged(`entity ${id}'s parent is not an entity id`);
+
+        throw ReadRefused.damaged(`entity ${id}'s parent ${parentId} is not listed before it`);
+    }
+
+    // An entity whose parent is listed before it sits one deeper than that parent. Any other entity is a
+    // root, placed by depthOfRoot, which refuses it when the data can't have one there.
+    private readEntity(
+        raw: unknown,
+        depthById: Map<EntityId, number>,
+        depthOfRoot: (id: EntityId, parentId: unknown) => number,
+    ): CheckedEntity {
         const entityData = requireExactKeys(raw, ENTITY_KEYS, 'an entity');
 
         const id = entityData['id'];
@@ -203,7 +245,9 @@ export class LevelReader {
         if (depthById.has(id)) throw ReadRefused.damaged(`entity id ${id} is used twice`);
 
         const parentId = entityData['parent'];
-        const depth = this.depthOf(id, parentId, isFirst, depthById);
+        const parentDepth = isEntityId(parentId) ? depthById.get(parentId) : undefined;
+        const depth = parentDepth === undefined ? depthOfRoot(id, parentId) : parentDepth + 1;
+        this.checkDepth(depth);
         depthById.set(id, depth);
 
         const hidden = requireBoolean(entityData['hidden'], `entity ${id}'s hidden`);
@@ -218,27 +262,10 @@ export class LevelReader {
         return { id, parentId: checkedParentId, hidden, locked, components };
     }
 
-    private depthOf(id: EntityId, parentId: unknown, isFirst: boolean, depthById: ReadonlyMap<EntityId, number>) {
-        if (isFirst) {
-            if (parentId !== null) throw ReadRefused.damaged('the first entity, the World, has a parent');
-
-            return 0;
-        }
-
-        if (parentId === null) throw ReadRefused.damaged(`entity ${id} has no parent, but only the World can`);
-        if (!isEntityId(parentId)) throw ReadRefused.damaged(`entity ${id}'s parent is not an entity id`);
-
-        const parentDepth = depthById.get(parentId);
-        if (parentDepth === undefined) {
-            throw ReadRefused.damaged(`entity ${id}'s parent ${parentId} is not listed before it`);
-        }
-
-        const depth = parentDepth + 1;
+    private checkDepth(depth: number) {
         if (depth > this.limits.maxDepth) {
             throw new ReadRefused({ reason: 'overLimit', limit: 'depth', max: this.limits.maxDepth });
         }
-
-        return depth;
     }
 
     // A missing TransformComponent or NameComponent reads as its defaults, because every entity has one.
@@ -323,6 +350,72 @@ export class LevelReader {
         }
 
         if (camera.parentId !== world.id) throw ReadRefused.damaged('the camera is not directly inside the World');
+    }
+
+    private readSubtreeEntities(level: Level, raw: unknown, parent: Entity) {
+        if (!Array.isArray(raw)) throw ReadRefused.damaged('the entities are not a list');
+        if (raw.length === 0) throw ReadRefused.damaged('the entities are an empty list');
+
+        const isOverLimit = level.entityCount + raw.length > this.limits.maxEntities;
+        if (isOverLimit) {
+            throw new ReadRefused({ reason: 'overLimit', limit: 'entities', max: this.limits.maxEntities });
+        }
+
+        const rootDepth = parent.depth + 1;
+        const depthById = new Map<EntityId, number>();
+        const entities: CheckedEntity[] = [];
+
+        for (const rawEntity of raw) {
+            const entity = this.readEntity(rawEntity, depthById, (id, parentId) => {
+                if (!isEntityId(parentId)) throw ReadRefused.damaged(`entity ${id}'s parent is not an entity id`);
+
+                return rootDepth;
+            });
+            entities.push(entity);
+        }
+
+        this.checkSubtreeEntities(level, entities);
+
+        return entities;
+    }
+
+    // The World and the camera are never copied or removed, so their components can't come back this way.
+    private checkSubtreeEntities(level: Level, entities: readonly CheckedEntity[]) {
+        for (const entity of entities) {
+            const isInLevel = level.findEntity(entity.id) !== undefined;
+            if (isInLevel) throw ReadRefused.damaged(`entity id ${entity.id} is already in the level`);
+
+            if (hasComponent(entity, PhysicsWorldComponent)) {
+                throw ReadRefused.damaged('a PhysicsWorldComponent is not on the World');
+            }
+
+            if (hasComponent(entity, CameraComponent)) {
+                throw ReadRefused.damaged('a second camera');
+            }
+        }
+    }
+
+    // The entities are already checked, so nothing here can refuse.
+    private buildSubtree(level: Level, entities: readonly CheckedEntity[], parent: Entity, index: number) {
+        const placedById = new Map<EntityId, Entity>();
+        const roots: Entity[] = [];
+
+        for (const checked of entities) {
+            const listedParent = checked.parentId === null ? undefined : placedById.get(checked.parentId);
+
+            let entity: Entity;
+            if (listedParent === undefined) {
+                entity = level.restoreEntity(checked.id, parent, index + roots.length);
+                roots.push(entity);
+            } else {
+                entity = level.restoreEntity(checked.id, listedParent, listedParent.children.length);
+            }
+
+            placedById.set(checked.id, entity);
+            this.fillEntity(entity, checked);
+        }
+
+        return roots;
     }
 
     // The entities are already checked, so nothing here can refuse.

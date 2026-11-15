@@ -99,6 +99,7 @@ The owner asked for v1 to be built to the end with nobody typing "continue": one
 | 2026-11-15 | A `ManualTimer` moves its own `ManualClock`, which tests share with the code under test; `startLevelView` takes `DerivedCaches` | [adapters](architecture/adapters.md#stage-4s-choices) |
 | 2026-11-15 | The selection's newest wins: adding a child drops its selected parent, adding the World selects it alone, adding anything else drops the World; a batch `replace` keeps parents over children and drops the World when others are in it; a move keeps the parent | [selection-and-tools](architecture/editor/selection-and-tools.md#selection-and-the-current-group) |
 | 2026-11-15 | A change writes values back through their file form (`serialize`, then `writeValue`); a change refused on apply or revert throws, because the command checked it first; `MoveEntityChange` moves, then writes all four TransformComponent values | [history](architecture/editor/history.md) |
+| 2026-11-15 | `readSubtree(level, data, parent, index)` treats each entity whose parent isn't listed before it as a root, placed side by side from the index; it keeps ids and refuses one already in the level, a camera or a PhysicsWorldComponent; adding and removing entities share one `SubtreeCopy`, one place per change | [entities-and-level](architecture/core-model/entities-and-level.md#copying-and-the-one-data-shape), [history](architecture/editor/history.md) |
 
 ## Still to decide
 

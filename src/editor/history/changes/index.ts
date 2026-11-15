@@ -5,3 +5,6 @@ export { RenameLevelChange } from './RenameLevelChange.ts';
 export { SetSwitchChange } from './SetSwitchChange.ts';
 export { SetValueChange } from './SetValueChange.ts';
 export type { SetValueChangeOptions } from './SetValueChange.ts';
+export { AddEntitiesChange } from './AddEntitiesChange.ts';
+export { RemoveEntitiesChange } from './RemoveEntitiesChange.ts';
+export type { SubtreeCopyOptions } from './SubtreeCopy.ts';
