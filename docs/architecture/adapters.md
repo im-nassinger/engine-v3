@@ -72,6 +72,22 @@ export type PhysicsWorld = {
 - **Sharp at any browser zoom:** the renderer's resolution follows `devicePixelRatio` and a `ResizeObserver` on the host, as the tech notes say. Antialiasing is on.
 - Culling and batching are described in [performance.md](performance.md).
 
+### Stage 4's choices
+
+Made under the standing yes (2026-11-14), before building. The [plan](../plan.md#stage-4-in-steps) has the steps.
+
+- **Stage 4 builds what later stages call, not their inputs.** The wheel, Space and middle-drag panning come with `PointerInput` (stage 9); F and the Zoom menu are commands (stages 5 and 6); the `Back to level` button is ui (stage 6); remembering the view in the browser is `LocalStorageSettings` (stage 12); `SelectionOverlay` is stage 9's and `ToolPreviewOverlay` stage 10's. *Why: a stage never builds what a later stage owns.*
+- **`PixiLevelView` is given the level, its caches, `ViewState`, `ViewSettings` and a `FrameScheduler`**, not the `EditorSession`, which stage 5 builds. `show(level, caches)` swaps the level, for New, Import and the `PlayMirror`.
+- **`ViewState` holds the level position at the middle of the view, the zoom and the view's size** in CSS pixels, which `PixiLevelView` sets on each resize. Zoom 1 is 100%: one level pixel per CSS pixel; the renderer's resolution covers `devicePixelRatio`. *Why: keeping the middle means resizing the window keeps the level where it was.*
+- **Fitting a rectangle** (F, the whole level, the camera frame) zooms so it fills the view less 40 screen px on each side, within 1% to 1000%, and centres it. Nothing to fit leaves the view alone.
+- **The pan limit:** the view's middle stays inside the World's rectangle grown on every side by its larger side. **The view holds nothing** when it doesn't overlap the World's subtree bounds. *Why: "well outside the level" with one rule that scales with the level.*
+- **Shapes are filled from the polygon pipeline's filled outlines**, the same `PiecesCache` result physics uses, and their outline is drawn along the shape's own points, with round joins. So a self-crossing polygon fills as it collides, and an ellipse is the same 32 points it collides with. *Why: collision always matches what you see.* Paths are drawn as PixiJS curves.
+- **A shape with no StyleComponent** is drawn in the editor as a 1 screen px line, `#1D2430` at 60% (*proposal*), with PixiJS's `pixelLine`, so it stays thin at any zoom.
+- **Hiding** sets the `EntityNode`'s `visible`, and PixiJS hides its children with it, which is what `HiddenCache` says. The World is drawn like any entity, first, so its fill is the background.
+- **A joint's own bounds are the single point at its position.** Hit testing and F add the icon's 7 screen px around it at the current zoom. *Why: the icon keeps its size on screen, so its size in level pixels depends on the zoom, which `BoundsCache` doesn't know.*
+- **Joint icons** sit at the joint's position: Hinge is the design's circle with a dot, Rope the circle with a short upright line, Spring the circle with a small zigzag (*proposal*).
+- **The grid's dark background** is one whose brightness, 0.299 R + 0.587 G + 0.114 B, is under half, as [the level view's colours](../design/level-view.md) say.
+
 ## Storage
 
 | Adapter | Uses | Notes |
