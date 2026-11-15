@@ -23,6 +23,7 @@ describe('libraries', () => {
         ['a core test importing vitest', 'src/core/math/sample.test.ts', 'vitest'],
         ['adapters importing box2d3-wasm/compat', 'src/adapters/box2d/sample.ts', 'box2d3-wasm/compat'],
         ['ui importing react', 'src/ui/shell/sample.ts', 'react'],
+        ['ui importing lucide-react', 'src/ui/shared/sample.ts', 'lucide-react'],
     ])('allows %s', async (_description, filePath, library) => {
         const code = `import * as library from '${library}';\nexport const sample = library;\n`;
 

@@ -1,0 +1,30 @@
+.button {
+    height: var(--control);
+    padding: 0 var(--space-12);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: none;
+    color: var(--text);
+    cursor: default;
+
+    &:hover {
+        background: var(--hover);
+    }
+
+    &[data-variant='primary'] {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: var(--on-accent);
+        font-weight: var(--weight-heading);
+    }
+
+    &[aria-disabled='true'] {
+        background: none;
+        color: var(--faint);
+    }
+
+    &:focus-visible {
+        outline: 1px solid var(--accent);
+        outline-offset: 1px;
+    }
+}

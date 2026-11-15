@@ -1,0 +1,6 @@
+.icon {
+    display: block;
+    flex: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}

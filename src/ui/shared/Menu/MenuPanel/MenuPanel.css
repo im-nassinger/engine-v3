@@ -1,0 +1,16 @@
+.menu-panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+    padding: var(--space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--panel);
+    box-shadow: var(--shadow-menu);
+
+    > .separator {
+        height: 1px;
+        margin: var(--space-4) 0;
+        background: var(--line);
+    }
+}

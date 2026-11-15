@@ -102,7 +102,7 @@ const PARTS: Part[] = [
         name: 'ui',
         folder: 'src/ui',
         partsItMayNotImport: ['adapters', 'app'],
-        librariesItMayImport: ['react', 'react-dom', '@tanstack/react-virtual'],
+        librariesItMayImport: ['react', 'react-dom', '@tanstack/react-virtual', 'lucide-react'],
     },
     {
         name: 'app',

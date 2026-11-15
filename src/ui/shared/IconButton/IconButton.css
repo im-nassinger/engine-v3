@@ -1,0 +1,30 @@
+.icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--control);
+    height: var(--control);
+    padding: 0;
+    border: none;
+    border-radius: var(--radius);
+    background: none;
+    color: var(--text);
+    cursor: default;
+
+    &:hover {
+        background: var(--hover);
+    }
+
+    &[aria-pressed='true'] {
+        background: var(--accent-soft);
+    }
+
+    &[aria-disabled='true'] {
+        background: none;
+        color: var(--faint);
+    }
+
+    &:focus-visible {
+        outline: 1px solid var(--accent);
+    }
+}

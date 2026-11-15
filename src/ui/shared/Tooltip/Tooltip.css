@@ -1,0 +1,26 @@
+.tooltip {
+    position: relative;
+    display: inline-flex;
+
+    > .bubble {
+        position: absolute;
+        top: calc(100% + var(--space-4));
+        left: 50%;
+        z-index: 30;
+        display: flex;
+        gap: var(--space-8);
+        padding: var(--space-4) var(--space-8);
+        border-radius: var(--radius);
+        background: var(--tooltip);
+        box-shadow: var(--shadow-tooltip);
+        color: var(--tooltip-text);
+        font-size: var(--text-small);
+        white-space: nowrap;
+        pointer-events: none;
+        transform: translateX(-50%);
+
+        > .shortcut {
+            color: var(--muted);
+        }
+    }
+}

@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 6, step 5 of 11: the browser adapters `SystemClock`, `BrowserTimer` and `KeyboardInput` are built in `adapters/browser`, now split into `keyboard/`, `time/` and `screen/`, with browser tests in three browsers. Next is step 6, the fonts, icons, theme and shared UI pieces. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 6, step 6 of 11: `lucide-react` and `@fontsource/jetbrains-mono` are installed, `ui/theme.css` holds every design token and the font's three weights, and `ui` has `EditorContext`, `useVersion` and the shared `Icon`, `Button`, `IconButton`, `Tooltip` and `Menu`. Nothing on the page uses them yet. Next is step 7, `app/EditorComposition.ts` and the `EditorShell`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -26,7 +26,7 @@
 | Stage 3, geometry | Done on 2026-11-14. See below |
 | Stage 4, drawing a level | Done on 2026-11-15. See below |
 | Stage 5, editing without a mouse | Done on 2026-11-15. See below |
-| Code | Stages 0 to 5 done. Stage 6, the editor shell, is being built: steps 1 to 5 of 11 done |
+| Code | Stages 0 to 5 done. Stage 6, the editor shell, is being built: steps 1 to 6 of 11 done |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 

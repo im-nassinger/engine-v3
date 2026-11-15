@@ -135,7 +135,7 @@ One file, `eslint.config.ts`, with one block per part. ESLint needs `jiti` to re
 | core | none | `clipper2-ts`, the polygon library, named in one constant in `eslint.config.ts` and imported only by `PolygonLibrary` (see [geometry](core-model/geometry.md#the-polygon-pipeline)) |
 | editor | core | none |
 | adapters | core, editor | `pixi.js`, `box2d3-wasm/compat`, `idb`, `fflate` |
-| ui | core, editor | `react`, `react-dom`, `@tanstack/react-virtual` |
+| ui | core, editor | `react`, `react-dom`, `@tanstack/react-virtual`, `lucide-react` (stage 6). The font comes in through `theme.css`, which ESLint doesn't read |
 | app | all | all |
 
 - **Test files** (`*.test.ts`) may also import `vitest` and the `testing/` fakes. The direction stays the same for them. *Why: a rule on the import's text can't tell a test from the code, so without this exception core couldn't have tests next to its files.*
