@@ -19,7 +19,7 @@ A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: s
 
 ## How it knows
 
-- **Progress:** every session ends with `STATUS` (`done`, `blocked` or `finished`), `SUMMARY` and `NEEDS` lines. The stage and step come from the `**Runner:** stage N, step S of T` line at the top of `docs/progress.md`, which each session updates in its commit. The % is (stage + finished steps ÷ steps in the stage) ÷ 18 stages.
+- **Progress:** every session ends with `STATUS` (`done`, `blocked` or `finished`), `SUMMARY` and `NEEDS` lines. The stage and step come from the `**Runner:** stage N, step S of T` line at the top of `docs/progress.md`, which each session updates in its commit. The % is (stage + finished steps ÷ steps in the stage) ÷ 18 stages. The prompt tells sessions to keep that form, ending a stage with `step T of T`. A line reading `stage N is done` counts as stage N + 1 with no steps done: on 2026-11-15 a session wrote that, and the runner read it as stage 8 with no steps done, so it reported 44% instead of 50%.
 - **Pushing:** after every session, the runner pushes `master` if it has commits that aren't on `origin`. Sessions only commit.
 - **The prompt:** kept short on purpose, so a session spends its effort on the step. It gives the context and the step's loop, and leaves the project's rules to CLAUDE.md. It is re-read before every session.
 - **The usage limit:** `claude -p --output-format stream-json` prints a `rate_limit_event` line with how much of the 5-hour and 7-day windows is used and when each resets. The CLI prints it, not the model, so the runner sees the limit even when the model is cut off mid-step. The next session finishes the cut-off step first.

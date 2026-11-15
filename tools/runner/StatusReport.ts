@@ -62,6 +62,13 @@ export function parseRunnerLine(progressText: string) {
         return runnerLine;
     }
 
+    // `stage 8 is done` means stage 8 is all finished, so the next stage starts with no steps done.
+    const doneMatch = /\*\*Runner:\*\*\s*stage (\d+) is (?:done|finished|built|complete)/i.exec(progressText);
+    if (doneMatch !== null) {
+        const runnerLine: RunnerLine = { stage: Number(doneMatch[1]) + 1, step: 0, stepCount: 0 };
+        return runnerLine;
+    }
+
     const stageMatch = /\*\*Runner:\*\*\s*stage (\d+)/i.exec(progressText);
     if (stageMatch === null) return undefined;
 
