@@ -22,6 +22,7 @@ A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: s
 - **A change to the runner's own code:** it restarts itself between sessions, so the change applies without stopping a step.
 - **Waiting:** every wait counts by the wall clock, a minute at a time, so a night with the computer asleep doesn't make it wait hours too long. While it runs, it blocks the computer from going to sleep on its own (`systemd-inhibit`). Closing the lid still puts it to sleep.
 - **A hung session:** no output for 30 minutes ends it, and it counts as a failure.
+- **Never two at once:** a runner writes its process ID to `~/.local/state/engine-v3-runner/runner.pid` and refuses to start while another live runner holds it (under systemd it tries again a minute later). Each session's process ID goes in `session.pid` next to it, and the runner waits for a session still alive from an earlier runner to end before starting a new one.
 
 ## Files
 
@@ -33,6 +34,8 @@ A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: s
 | `.claude/settings.json` | Allows `git push`, refuses `sudo`, `pkexec` and force pushes. Sessions run with `--permission-mode auto` |
 | `~/.config/engine-v3-runner/env` | `DISCORD_WEBHOOK_URL`. Secret, outside the repo |
 | `~/.local/state/engine-v3-runner/sessions/` | Every session's full output, one `.jsonl` file each |
+| `~/.local/state/engine-v3-runner/runner.pid`, `session.pid` | The running runner's and session's process IDs, so a second one never starts |
+| `tools/runner/PidFile.ts` | Reads and writes those two files |
 
 ## Commands
 

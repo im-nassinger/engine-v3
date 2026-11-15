@@ -7,6 +7,7 @@ import path from 'node:path';
 import { setTimeout as sleepFor } from 'node:timers/promises';
 import { runClaudeSession } from './ClaudeSession.ts';
 import { DiscordNotifier } from './DiscordNotifier.ts';
+import { PidFile } from './PidFile.ts';
 import { RateLimitTracker } from './RateLimitTracker.ts';
 import { StatusFile } from './StatusFile.ts';
 import { parseStatusReport, percentComplete } from './StatusReport.ts';
@@ -32,17 +33,62 @@ if (webhookUrl === '') {
     process.exit(1);
 }
 
+fs.mkdirSync(stateFolder, { recursive: true });
+
+// Only one runner at a time, and only one of its sessions at a time: two sessions
+// would edit the same files and commit over each other.
+const runnerPidFile = new PidFile(path.join(stateFolder, 'runner.pid'), 'run.ts');
+const sessionPidFile = new PidFile(path.join(stateFolder, 'session.pid'), 'claude');
+claimRunnerLock();
+
 const discord = new DiscordNotifier(webhookUrl);
 const rateLimits = new RateLimitTracker();
 const sentNeeds = new Set<string>();
 
-fs.mkdirSync(stateFolder, { recursive: true });
 const statusFile = new StatusFile(statusFilePath, path.join(stateFolder, 'status.json'));
 
 // Every message goes both to Discord and to the status file.
 async function announce(message: string) {
     statusFile.addEvent(formatTime(Date.now()), message);
     await discord.send(message);
+}
+
+// Exits with a failure if another runner is alive, so systemd tries again a minute later.
+function claimRunnerLock() {
+    const otherRunnerId = runnerPidFile.readLiveProcessId();
+    if (otherRunnerId !== undefined) {
+        console.error(`Another runner is already running (process ${otherRunnerId}). Not starting a second one.`);
+        process.exit(1);
+    }
+
+    runnerPidFile.remove();
+    if (!runnerPidFile.writeIfAbsent(process.pid)) {
+        console.error('Another runner started at the same moment. Not starting a second one.');
+        process.exit(1);
+    }
+
+    process.on('exit', () => {
+        if (runnerPidFile.readLiveProcessId() === process.pid) {
+            runnerPidFile.remove();
+        }
+    });
+}
+
+// A session can outlive its runner if the runner is killed on its own. Starting
+// the next one before it ends would put two sessions on the same step.
+async function waitForEarlierSession() {
+    let earlierSessionId = sessionPidFile.readLiveProcessId();
+    if (earlierSessionId === undefined) return;
+
+    statusFile.setState(
+        `Waiting for an earlier session (process ${earlierSessionId}) to end before starting a new one.`,
+    );
+    console.log(`Waiting for an earlier session, process ${earlierSessionId}, to end.`);
+
+    while (earlierSessionId !== undefined) {
+        await sleepFor(MINUTE_MS);
+        earlierSessionId = sessionPidFile.readLiveProcessId();
+    }
 }
 
 function git(...args: string[]) {
@@ -147,6 +193,8 @@ async function reportNeeds(report: StatusReport) {
 }
 
 async function runOneStep() {
+    await waitForEarlierSession();
+
     const prompt = fs.readFileSync(promptFile, 'utf8');
     const startCommit = git('rev-parse', 'HEAD');
     const startedAt = new Date().toISOString().replaceAll(':', '-');
@@ -163,7 +211,12 @@ async function runOneStep() {
             statusFile.setUsage(rateLimits.describeUsage(formatTime));
             void sendLimitWarnings();
         },
+        onStarted: (processId) => {
+            sessionPidFile.remove();
+            sessionPidFile.writeIfAbsent(processId);
+        },
     });
+    sessionPidFile.remove();
     console.log(`Session ended with code ${result.exitCode}`);
 
     const newCommits = git('log', '--format=%h %s', `${startCommit}..HEAD`);

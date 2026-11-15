@@ -20,6 +20,7 @@ type SessionOptions = {
     logFile: string;
     rateLimits: RateLimitTracker;
     onRateLimitEvent: () => void;
+    onStarted: (processId: number) => void;
 };
 
 // Runs one fresh `claude -p` session and reads its stream until it ends.
@@ -27,6 +28,10 @@ export function runClaudeSession(options: SessionOptions) {
     const args = ['-p', options.prompt, '--output-format', 'stream-json', '--verbose', '--permission-mode', 'auto'];
     const child = spawn('claude', args, { cwd: options.projectFolder, stdio: ['ignore', 'pipe', 'pipe'] });
     const log = fs.createWriteStream(options.logFile);
+
+    if (child.pid !== undefined) {
+        options.onStarted(child.pid);
+    }
 
     const result: SessionResult = { exitCode: null, finalText: '', isError: false, apiError: '', wentSilent: false };
     let lastAssistantText = '';
