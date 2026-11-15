@@ -1,29 +1,18 @@
-You are running unattended, started by the runner (`tools/runner/run.ts`, see `docs/runner/`). Nobody is watching this session and nobody can answer a question. Do **one step** of the work, then stop.
+engine-v3 is a 2D physics game with a level editor, for the browser. It is built stage by stage from `docs/plan.md`, one step at a time. You are one of those steps: the runner (`tools/runner/`) starts a fresh session for each step, and the next session picks up where you stop. Nobody is watching, and nobody can answer a question.
 
-1. Follow the project's CLAUDE.md as usual. Before anything else, load the `working-with-me`, `typescript-style` and `clean-architecture` skills, once each. Start at `docs/progress.md`.
-2. If `git status` shows uncommitted changes, an earlier session was cut off in the middle of a step. Finish that step (or undo the half-done part) before anything else.
-3. Do the next step of the current stage in `docs/plan.md`. A step is one commit's worth of work: one piece built, its tests passing, the docs it changes updated. If the current stage has no steps written yet, write them into the docs first; that is the step.
-4. Decide every open question yourself under the owner's standing yes, as CLAUDE.md says. Never stop to ask.
-5. Look at every folder you added a file to. If it now holds files with different jobs, split it into subfolders, one per area, and update the docs that describe it.
-6. Run `npm run check`. It must pass before you commit. Commit with a clear message, without any Claude attribution.
-7. Run `git push origin master` (the owner allowed it on 2026-11-14). If the push fails, keep the commit and say so in SUMMARY.
-8. Keep the line `**Runner:** stage <N>, step <S> of <T>` at the top of `docs/progress.md`'s "Where things stand" section up to date, where N is the current stage of `docs/plan.md`.
+Your job: do the next step, commit it, and stop.
 
-**Never use `sudo`, `pkexec` or the `sudo` skill.** If something needs root, work on anything else you can, write what is needed into `docs/progress.md` under "Waiting for the owner", and report `STATUS: sudo`.
+1. Follow CLAUDE.md. Start at `docs/progress.md`: its **Runner:** line says which step is next.
+2. If `git status` shows uncommitted changes, an earlier session was cut off in the middle of a step. Finish that step first.
+3. Do the next step of the current stage in `docs/plan.md`. If the stage has no steps written yet, writing them is the step. Decide open questions yourself under the standing yes.
+4. Run `npm run check` and fix things until it passes. Then commit, with the **Runner:** line in `docs/progress.md` updated in the same commit. Don't stop before the step is committed.
 
-**Don't stop early** because the step feels big. Stop only when the step is committed, or when you truly can't go on.
+Never use `sudo`. If something needs root, skip that part, write it in `docs/progress.md` under "Waiting for the owner", and put the command in NEEDS.
 
-End your last message with exactly these lines, and nothing after them:
+End with exactly these lines:
 
-```
-STATUS: <done | sudo | blocked | finished>
-STAGE: <current stage number, 0 to 17>
-STEP: <S>/<T>
-SUMMARY: <what this step did, in one short plain sentence the owner understands without reading code, under 20 words>
-NEEDS: <for sudo: the exact command; for blocked: what you need from the owner; otherwise: none>
-```
+STATUS: <done | blocked | finished>
+SUMMARY: <what the step did, in one plain sentence under 20 words>
+NEEDS: <a command that needs sudo, or what you need from the owner; otherwise none>
 
-- `done`: the step is committed.
-- `sudo`: the step is committed or skipped, and something needs the owner's password.
-- `blocked`: you can't go on at all without the owner. Use it only when no step of any stage can be done.
-- `finished`: every stage of `docs/plan.md`, stage 17 included, is done and committed.
+done: the step is committed. blocked: no step of any stage can be done without the owner. finished: stage 17 is done.

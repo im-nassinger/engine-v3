@@ -11,7 +11,8 @@
 | The loop, the prompt, the Discord webhook messages | Done, running |
 | Detecting the usage limit and waiting for the reset | Built; not yet seen hitting a real limit |
 | Restarting itself when its own code changes | Done |
-| Pushing after each step | Works since 2026-11-15. The first push started CI |
+| Pushing after each step | Works since 2026-11-15. The first push started CI. Since 2026-11-15 the runner pushes, not the session |
+| The short prompt | Since 2026-11-15: context, the step's loop, and `STATUS`, `SUMMARY`, `NEEDS` |
 
 ## Known issues
 

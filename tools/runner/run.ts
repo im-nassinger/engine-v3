@@ -10,8 +10,8 @@ import { DiscordNotifier } from './DiscordNotifier.ts';
 import { PidFile } from './PidFile.ts';
 import { RateLimitTracker } from './RateLimitTracker.ts';
 import { StatusFile } from './StatusFile.ts';
-import { parseStatusReport, percentComplete } from './StatusReport.ts';
-import type { StatusReport } from './StatusReport.ts';
+import { hasNeeds, parseRunnerLine, parseStatusReport, percentComplete } from './StatusReport.ts';
+import type { RunnerLine, StatusReport } from './StatusReport.ts';
 
 const MINUTE_MS = 60 * 1000;
 const LIMIT_RETRY_MS = 30 * MINUTE_MS;
@@ -24,6 +24,7 @@ const logFolder = path.join(stateFolder, 'sessions');
 const pauseFile = path.join(stateFolder, 'paused');
 const promptFile = path.join(import.meta.dirname, 'prompt.md');
 const planFile = path.join(projectFolder, 'docs/plan.md');
+const progressFile = path.join(projectFolder, 'docs/progress.md');
 const statusFilePath = path.join(projectFolder, 'docs/runner/status.md');
 const RESTART_EXIT_CODE = 75;
 
@@ -156,22 +157,47 @@ function readStageName(stage: number) {
     return match?.[1] ?? '';
 }
 
-async function reportStep(report: StatusReport, newCommits: string) {
-    const percent = percentComplete(report);
-    const stageName = readStageName(report.stage);
-
-    let stageText = `Stage ${report.stage}: ${stageName}`;
-    if (report.stepCount > 0) {
-        stageText += `, step ${report.step} of ${report.stepCount}`;
+// The stage and step come from the **Runner:** line sessions keep in docs/progress.md.
+function readStageText(runnerLine: RunnerLine) {
+    let stageText = `Stage ${runnerLine.stage}: ${readStageName(runnerLine.stage)}`;
+    if (runnerLine.stepCount > 0) {
+        stageText += `, step ${runnerLine.step} of ${runnerLine.stepCount}`;
     }
 
+    return stageText;
+}
+
+async function reportStep(report: StatusReport, newCommits: string) {
     let summary = report.summary;
     if (newCommits === '') {
         summary += ' (nothing committed)';
     }
 
+    const runnerLine = parseRunnerLine(fs.readFileSync(progressFile, 'utf8'));
+    if (runnerLine === undefined) {
+        await announce(`✅ **v1:** ${statusFile.readProgress()} (no **Runner:** line in docs/progress.md)\n${summary}`);
+        return;
+    }
+
+    const percent = percentComplete(runnerLine, report.status);
+    const stageText = readStageText(runnerLine);
     statusFile.setProgress(`**${percent}%** · ${stageText}.`);
     await announce(`✅ **v1: ${percent}%** · ${stageText}\n${summary}`);
+}
+
+// The runner pushes, not the session, so a session only has to commit.
+async function pushNewCommits() {
+    const unpushed = git('rev-list', '@{u}..HEAD');
+    if (unpushed === '') return;
+
+    try {
+        git('push', 'origin', 'master');
+    } catch (error) {
+        const reason = error instanceof Error ? error.message.slice(-600) : String(error);
+        await announce(
+            `⚠️ **Push failed.** The commits stay local; the runner tries again after the next step.\n\`\`\`\n${reason}\n\`\`\``,
+        );
+    }
 }
 
 // The runner's own code changes when a session or the owner edits it. Restarting between
@@ -188,7 +214,7 @@ async function reportNeeds(report: StatusReport) {
     sentNeeds.add(report.needs);
 
     await announce(
-        `🔑 **Needs your password.** Run this, then the runner picks it up on its own:\n\`\`\`\n${report.needs}\n\`\`\``,
+        `🔑 **Needs you.** The work goes on without it; once it's done, the runner picks it up on its own:\n\`\`\`\n${report.needs}\n\`\`\``,
     );
 }
 
@@ -218,6 +244,7 @@ async function runOneStep() {
     });
     sessionPidFile.remove();
     console.log(`Session ended with code ${result.exitCode}`);
+    await pushNewCommits();
 
     const newCommits = git('log', '--format=%h %s', `${startCommit}..HEAD`);
     const report = parseStatusReport(result.finalText);
@@ -283,7 +310,7 @@ async function main() {
         const report = outcome.report;
         await reportStep(report, outcome.newCommits);
 
-        if (report.status === 'sudo') {
+        if (report.status === 'done' && hasNeeds(report)) {
             await reportNeeds(report);
         }
 

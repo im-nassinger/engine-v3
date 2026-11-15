@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: start a fresh `claude -p` session with the prompt in `tools/runner/prompt.md`, read its stream, post one Discord message through the webhook, start the next. Each session gets one prompt and is never used again. It reads the usage limit from the CLI's own output, waits out the reset, and stops when stage 17 of [plan.md](../plan.md) is done.
+A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: start a fresh `claude -p` session with the prompt in `tools/runner/prompt.md`, read its stream, push its commits, post one Discord message through the webhook, start the next. Each session gets one prompt and is never used again. It reads the usage limit from the CLI's own output, waits out the reset, and stops when stage 17 of [plan.md](../plan.md) is done.
 
 ## What it sends to Discord
 
@@ -12,13 +12,16 @@ A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: s
 | ✅ **v1: N%** · the stage and step, then one sentence on what the step did | After each step |
 | ⚠️ N% of the usage limit used | Once per limit window, at 90% |
 | 🛑 Usage limit reached, resuming at a time | When the limit is hit. A ▶️ follows when it resumes |
-| 🔑 Needs your password | When something needs `sudo`. The work goes on without it |
+| 🔑 Needs you | When a finished step reports something in `NEEDS`, such as a command that needs `sudo`. The work goes on without it |
+| ⚠️ Push failed | When `git push` fails after a step. The commits stay local and the next step tries again |
 | ⏸️ Paused | When Claude is blocked, or three sessions in a row fail. Nothing runs until you resume |
 | 🎉 v1 is finished | The end. The runner stops |
 
 ## How it knows
 
-- **Progress:** every session ends with `STATUS`, `STAGE`, `STEP`, `SUMMARY` and `NEEDS` lines. The % is (stage + finished steps ÷ steps in the stage) ÷ 18 stages.
+- **Progress:** every session ends with `STATUS` (`done`, `blocked` or `finished`), `SUMMARY` and `NEEDS` lines. The stage and step come from the `**Runner:** stage N, step S of T` line at the top of `docs/progress.md`, which each session updates in its commit. The % is (stage + finished steps ÷ steps in the stage) ÷ 18 stages.
+- **Pushing:** after every session, the runner pushes `master` if it has commits that aren't on `origin`. Sessions only commit.
+- **The prompt:** kept short on purpose, so a session spends its effort on the step. It gives the context and the step's loop, and leaves the project's rules to CLAUDE.md. It is re-read before every session.
 - **The usage limit:** `claude -p --output-format stream-json` prints a `rate_limit_event` line with how much of the 5-hour and 7-day windows is used and when each resets. The CLI prints it, not the model, so the runner sees the limit even when the model is cut off mid-step. The next session finishes the cut-off step first.
 - **A change to the runner's own code:** it restarts itself between sessions, so the change applies without stopping a step.
 - **Waiting:** every wait counts by the wall clock, a minute at a time, so a night with the computer asleep doesn't make it wait hours too long. While it runs, it blocks the computer from going to sleep on its own (`systemd-inhibit`). Closing the lid still puts it to sleep.

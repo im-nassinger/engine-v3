@@ -1,17 +1,20 @@
 const STAGE_COUNT = 18;
 
-export type SessionStatus = 'done' | 'sudo' | 'blocked' | 'finished';
+export type SessionStatus = 'done' | 'blocked' | 'finished';
 
 export type StatusReport = {
     status: SessionStatus;
-    stage: number;
-    step: number;
-    stepCount: number;
     summary: string;
     needs: string;
 };
 
-const STATUSES: readonly string[] = ['done', 'sudo', 'blocked', 'finished'];
+export type RunnerLine = {
+    stage: number;
+    step: number;
+    stepCount: number;
+};
+
+const STATUSES: readonly string[] = ['done', 'blocked', 'finished'];
 
 function isSessionStatus(value: string): value is SessionStatus {
     return STATUSES.includes(value);
@@ -22,7 +25,7 @@ export function parseStatusReport(finalText: string) {
     const fields = new Map<string, string>();
 
     for (const line of finalText.split('\n')) {
-        const match = /^\s*(STATUS|STAGE|STEP|SUMMARY|NEEDS):\s*(.*)$/.exec(line);
+        const match = /^\s*(STATUS|SUMMARY|NEEDS):\s*(.*)$/.exec(line);
         if (match === null) continue;
 
         const key = match[1] ?? '';
@@ -33,16 +36,8 @@ export function parseStatusReport(finalText: string) {
     const status = fields.get('STATUS') ?? '';
     if (!isSessionStatus(status)) return undefined;
 
-    const stage = Number.parseInt(fields.get('STAGE') ?? '', 10);
-    const stepMatch = /^(\d+)\s*\/\s*(\d+)$/.exec(fields.get('STEP') ?? '');
-    const step = Number(stepMatch?.[1] ?? 0);
-    const stepCount = Number(stepMatch?.[2] ?? 0);
-
     const report: StatusReport = {
         status,
-        stage: Number.isNaN(stage) ? 0 : stage,
-        step,
-        stepCount,
         summary: fields.get('SUMMARY') ?? '',
         needs: fields.get('NEEDS') ?? 'none',
     };
@@ -50,16 +45,40 @@ export function parseStatusReport(finalText: string) {
     return report;
 }
 
-// Every stage counts the same, and the current stage counts by its finished steps.
-export function percentComplete(report: StatusReport) {
-    if (report.status === 'finished') return 100;
+export function hasNeeds(report: StatusReport) {
+    const needs = report.needs.trim().toLowerCase();
+    return needs !== '' && needs !== 'none';
+}
 
-    let stageFraction = 0;
-    if (report.stepCount > 0) {
-        stageFraction = report.step / report.stepCount;
+// Reads `**Runner:** stage 7, step 3 of 12` from docs/progress.md, which every session keeps current.
+export function parseRunnerLine(progressText: string) {
+    const fullMatch = /\*\*Runner:\*\*\s*stage (\d+), step (\d+) of (\d+)/i.exec(progressText);
+    if (fullMatch !== null) {
+        const runnerLine: RunnerLine = {
+            stage: Number(fullMatch[1]),
+            step: Number(fullMatch[2]),
+            stepCount: Number(fullMatch[3]),
+        };
+        return runnerLine;
     }
 
-    const stagesDone = report.stage + stageFraction;
+    const stageMatch = /\*\*Runner:\*\*\s*stage (\d+)/i.exec(progressText);
+    if (stageMatch === null) return undefined;
+
+    const runnerLine: RunnerLine = { stage: Number(stageMatch[1]), step: 0, stepCount: 0 };
+    return runnerLine;
+}
+
+// Every stage counts the same, and the current stage counts by its finished steps.
+export function percentComplete(runnerLine: RunnerLine, status: SessionStatus) {
+    if (status === 'finished') return 100;
+
+    let stageFraction = 0;
+    if (runnerLine.stepCount > 0) {
+        stageFraction = runnerLine.step / runnerLine.stepCount;
+    }
+
+    const stagesDone = runnerLine.stage + stageFraction;
     const percent = (stagesDone / STAGE_COUNT) * 100;
 
     return Math.min(99, Math.floor(percent));

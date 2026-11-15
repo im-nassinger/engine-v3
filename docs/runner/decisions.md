@@ -8,6 +8,7 @@ What the owner decided about the runner, newest last. The changes the runner mad
 |---|---|---|
 | 2026-11-14 | The runner exists: one fresh session per step, progress to Discord, waits out the usage limit | The owner was typing "continue from where we left off" by hand |
 | 2026-11-14 | Claude pushes `master` after each step | CI needs a push, and the runner must finish v1 alone |
+| 2026-11-15 | The runner pushes, not the session, and reads the stage and step from `docs/progress.md`; the prompt shrinks to context, the step's loop and three report lines | The owner found the prompt too long and wanted sessions to focus on the code |
 | 2026-11-14 | Stage 17's layout and phone checks are Playwright tests, not checks by hand | Same reason |
 | 2026-11-14 | Anything that needs `sudo` goes to Discord, and the work goes on without it | The owner isn't there to type a password |
 | 2026-11-14 | The usage limit is read by the runner from the CLI's output, not reported by the model | A model cut off by the limit can't report it |
