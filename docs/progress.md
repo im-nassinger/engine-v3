@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 7, step 9 of 12: **renaming in place** is built: F2 or a double-click on a name opens the row's name box; Enter and leaving the box rename as one step, Esc keeps the old name. Next is step 10, dragging rows. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 7, step 10 of 12: **dragging rows** is built: a drag past 3 px moves the row, or the whole selection, to where the drop line shows, as one step; the list scrolls near its edges and Esc cancels. Next is step 11, reveal and the open time at 10,000 rows. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

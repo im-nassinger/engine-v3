@@ -1,0 +1,20 @@
+.drop-line {
+    position: absolute;
+    top: -1px;
+    right: var(--space-8);
+    height: 2px;
+    background: var(--accent);
+    pointer-events: none;
+
+    &::before {
+        position: absolute;
+        top: -3px;
+        left: -4px;
+        width: 8px;
+        height: 8px;
+        box-sizing: border-box;
+        border: 2px solid var(--accent);
+        border-radius: 50%;
+        content: '';
+    }
+}

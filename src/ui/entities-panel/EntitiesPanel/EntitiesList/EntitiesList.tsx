@@ -1,14 +1,17 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useEffect, useRef, useState } from 'react';
+import type { MouseEvent, PointerEvent } from 'react';
 import type { EntityId } from '../../../../core/level/index.ts';
 import type { EntitiesRow } from '../../../../editor/entities-panel/index.ts';
 import type { OpenLevel } from '../../../../editor/session/index.ts';
+import { useEditorSession } from '../../../EditorContext.tsx';
 import { useVersion } from '../../../hooks/index.ts';
+import { DropLine } from './DropLine/index.ts';
 import { EntitiesListRow } from './EntitiesListRow/index.ts';
+import { RowDrag } from './row-drag/RowDrag.ts';
+import { ROW_HEIGHT } from './rowLayout.ts';
 import './EntitiesList.css';
 
-// The --row token. The virtual list needs it as a number to place rows without measuring them.
-const ROW_HEIGHT = 28;
 // Rows built past each edge, so a fast scroll doesn't show an empty strip for a frame.
 const OVERSCAN = 8;
 
@@ -32,7 +35,9 @@ export function EntitiesList({ openLevel }: EntitiesListProps) {
     useVersion(entitiesRows.version);
     const rows = entitiesRows.rows;
 
+    const session = useEditorSession();
     const scrollElement = useRef<HTMLDivElement>(null);
+    const contentElement = useRef<HTMLDivElement>(null);
     // eslint-disable-next-line react-hooks/incompatible-library -- the component opts out of the compiler above.
     const virtualizer = useVirtualizer({
         count: rows.length,
@@ -63,6 +68,25 @@ export function EntitiesList({ openLevel }: EntitiesListProps) {
 
     const endRenaming = () => setRenamingId(undefined);
 
+    const [rowDrag] = useState(() => new RowDrag(session.status));
+    useVersion(rowDrag.version);
+    useEffect(() => () => rowDrag.dispose(), [rowDrag]);
+    const dropTarget = rowDrag.target;
+
+    const startDragPress = (entityId: EntityId, event: PointerEvent) => {
+        const scroller = scrollElement.current;
+        const content = contentElement.current;
+        if (scroller === null || content === null) return;
+
+        rowDrag.start(openLevel, entityId, { scroller, content }, event.nativeEvent);
+    };
+
+    const swallowClickAfterDrag = (event: MouseEvent) => {
+        if (rowDrag.takesClick()) {
+            event.stopPropagation();
+        }
+    };
+
     const contentHeight = { height: `${virtualizer.getTotalSize()}px` };
     const shownRows: ShownRow[] = [];
     for (const virtualRow of virtualizer.getVirtualItems()) {
@@ -74,7 +98,17 @@ export function EntitiesList({ openLevel }: EntitiesListProps) {
 
     return (
         <div className="entities-list" ref={scrollElement}>
-            <div className="content" role="tree" aria-label="Entities" aria-multiselectable style={contentHeight}>
+            <div
+                className="content"
+                ref={contentElement}
+                role="tree"
+                aria-label="Entities"
+                aria-multiselectable
+                data-dragging={rowDrag.isDragging}
+                style={contentHeight}
+                onPointerDownCapture={() => rowDrag.forgetClick()}
+                onClickCapture={swallowClickAfterDrag}
+            >
                 {shownRows.map(({ row, top }) => (
                     <EntitiesListRow
                         key={row.entityId}
@@ -84,8 +118,10 @@ export function EntitiesList({ openLevel }: EntitiesListProps) {
                         isRenaming={row.entityId === renamingId}
                         onRenameStart={() => setRenamingId(row.entityId)}
                         onRenameEnd={endRenaming}
+                        onDragPress={(event) => startDragPress(row.entityId, event)}
                     />
                 ))}
+                {dropTarget !== undefined && <DropLine target={dropTarget} />}
             </div>
         </div>
     );

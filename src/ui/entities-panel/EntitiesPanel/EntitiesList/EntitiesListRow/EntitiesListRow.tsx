@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronRight, Eye, EyeOff } from 'lucide-react';
-import type { MouseEvent } from 'react';
+import type { MouseEvent, PointerEvent } from 'react';
 import type { EntitiesRow } from '../../../../../editor/entities-panel/index.ts';
 import { rowKind } from '../../../../../editor/entities-panel/index.ts';
 import type { RowClickKind } from '../../../../../editor/entities-panel/index.ts';
@@ -11,13 +11,10 @@ import { useCommands } from '../../../../commands/index.ts';
 import { useEditorSession } from '../../../../EditorContext.tsx';
 import { useEntityVersion, useReading } from '../../../../hooks/index.ts';
 import { Icon } from '../../../../shared/index.ts';
+import { indentAt } from '../rowLayout.ts';
 import { RowKindIcon } from './RowKindIcon/index.ts';
 import { RowNameBox } from './RowNameBox/index.ts';
 import './EntitiesListRow.css';
-
-// The left padding before the World's fold arrow, and the --indent token per level below it.
-const START_PADDING = 8;
-const INDENT = 16;
 
 export type EntitiesListRowProps = {
     openLevel: OpenLevel;
@@ -28,11 +25,21 @@ export type EntitiesListRowProps = {
     isRenaming: boolean;
     onRenameStart: () => void;
     onRenameEnd: () => void;
+    // A press that may become a drag of the row. Presses on the arrow, the eye and the name box don't.
+    onDragPress: (event: PointerEvent) => void;
 };
 
 // One entity's row: the fold arrow, the kind icon, the name and the eye. It redraws when its own
 // entity changes or its selected state does, never when another entity is renamed.
-export function EntitiesListRow({ openLevel, row, top, isRenaming, onRenameStart, onRenameEnd }: EntitiesListRowProps) {
+export function EntitiesListRow({
+    openLevel,
+    row,
+    top,
+    isRenaming,
+    onRenameStart,
+    onRenameEnd,
+    onDragPress,
+}: EntitiesListRowProps) {
     // The name and the eye are read from the same entity object after it changed, so the React
     // Compiler must not keep their old values.
     'use no memo';
@@ -51,12 +58,20 @@ export function EntitiesListRow({ openLevel, row, top, isRenaming, onRenameStart
 
     const placement = {
         transform: `translateY(${top}px)`,
-        paddingLeft: `${START_PADDING + row.depth * INDENT}px`,
+        paddingLeft: `${indentAt(row.depth)}px`,
     };
 
     const handleClick = (event: MouseEvent) => {
         const clickKind = rowClickKind(event, platform);
         rowClicks.click(entityId, clickKind);
+    };
+
+    const handlePointerDown = (event: PointerEvent) => {
+        const pressedElement = event.target;
+        const onControl = pressedElement instanceof Element && pressedElement.closest('button, input') !== null;
+        if (onControl) return;
+
+        onDragPress(event);
     };
 
     const toggleFold = (event: MouseEvent) => {
@@ -93,6 +108,7 @@ export function EntitiesListRow({ openLevel, row, top, isRenaming, onRenameStart
             data-hidden-by-parent={row.hiddenByParent}
             style={placement}
             onClick={handleClick}
+            onPointerDown={handlePointerDown}
         >
             <FoldArrow row={row} onToggle={toggleFold} />
             <RowKindIcon kind={kind} isSelected={isSelected} />

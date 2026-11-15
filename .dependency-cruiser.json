@@ -5,7 +5,7 @@
             "name": "module-entry",
             "comment": "Another module is entered only through its index.ts.",
             "severity": "error",
-            "from": { "path": "^src/([^/]+)/([^/]+)", "pathNot": "\\.test\\.tsx?$" },
+            "from": { "path": "^src/([^/]+)/([^/]+)", "pathNot": ["\\.test\\.tsx?$", "/testing/"] },
             "to": {
                 "path": "^src/[^/]+/[^/]+/",
                 "pathNot": ["^src/$1/$2/", "^src/[^/]+/[^/]+/index\\.tsx?$"]
@@ -13,9 +13,9 @@
         },
         {
             "name": "module-entry-in-tests",
-            "comment": "A test may also import another module's testing/ fakes, and nothing else past its index.ts.",
+            "comment": "A test, or a testing/ helper, may also import another module's testing/ fakes, and nothing else past its index.ts.",
             "severity": "error",
-            "from": { "path": "^src/([^/]+)/([^/]+)/.+\\.test\\.tsx?$" },
+            "from": { "path": "^src/([^/]+)/([^/]+)/(.+\\.test\\.tsx?$|.*\\btesting/)" },
             "to": {
                 "path": "^src/[^/]+/[^/]+/",
                 "pathNot": ["^src/$1/$2/", "^src/[^/]+/[^/]+/index\\.tsx?$", "/testing/"]
