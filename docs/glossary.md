@@ -173,7 +173,7 @@ Words for how the game is built, used in [architecture/](architecture/README.md)
 | Status text | The short result the status bar's left slot shows for 4 seconds, such as "Undid: Move 3 entities". |
 | Browser event | Something the browser reports to the page, such as a key press or a paste. Never a game event. |
 | Body pose | A body's position and angle during play, as the physics engine reports it. |
-| Runner | The script that builds the plan without the owner: it starts one fresh Claude session per step and reports to Discord. See [runner.md](runner.md). |
+| Runner | The script that builds the plan without the owner: it starts one fresh Claude session per step and reports to Discord. See [runner/](runner/README.md). |
 
 ## The look
 

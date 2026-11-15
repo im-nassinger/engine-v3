@@ -1,8 +1,8 @@
-# The runner
+# How the runner works
 
 ## TL;DR
 
-**The runner builds v1 without the owner.** It is a Node script, `tools/runner/run.ts`, run as a systemd user service. It starts one fresh Claude session per step of [plan.md](plan.md), with the prompt in `tools/runner/prompt.md`. Each session does one step, commits, pushes and ends with a short status block. The runner then posts the progress % to Discord and starts the next session. It waits out the usage limit on its own and stops when stage 17 is done. Agreed by the owner on 2026-11-14 (see [decisions.md](decisions.md)).
+A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: start a fresh `claude -p` session with the prompt in `tools/runner/prompt.md`, read its stream, post one Discord message through the webhook, start the next. Each session gets one prompt and is never used again. It reads the usage limit from the CLI's own output, waits out the reset, and stops when stage 17 of [plan.md](../plan.md) is done.
 
 ## What it sends to Discord
 

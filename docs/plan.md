@@ -31,7 +31,7 @@ v1 in **18 small stages**, each tested on its own before the next starts. The or
 | 14 | **Joints** | Hinge, Rope and Spring in the simulation, the Joint tool, the joint ends' snapping, which body is A and scaling a group with joints, the read-only path that shows Rope and Spring | [joints](requirements/physics/joints.md); [selection and tools](architecture/editor/selection-and-tools.md#the-joint-tool) | Each joint's settings change what it does in a headless run; joints copy and move only when selected |
 | 15 | **The camera** | `CameraPhase`: following with smoothing, stopping at the bounds, the safety margin, Fixed size drawing with bars | [camera](requirements/camera.md) | A followed body stays in view; the camera never leaves the bounds; determinism levels include it |
 | 16 | **Test play** | `PlaySession`, `TickPacer`, `Watchdog`, `PlayMirror`, `WorkerGameRunner`, `GameWorkerHost`, preloading, the Play bar, Play, Stop, Pause, Step, switching tabs pauses | [simulation](architecture/simulation.md); [test play](requirements/play-and-save/test-play.md) | Stop puts the editor back exactly; a hung worker ends the run with a message; Step runs one tick; a hidden tab adds no ticks |
-| 17 | **The speed pass and the browser checks** | The speed tests at 10,000 and 100,000 entities, the journeys, the layout and phone checks as Playwright tests at phone and desktop sizes, with screenshots (owner, 2026-11-14: no checks by hand, so the [runner](runner.md) can finish v1) | [performance](architecture/performance.md), [testing](architecture/testing.md) | Every target met on the owner's laptop, or a decision recorded to build a place left in [performance.md](architecture/performance.md) |
+| 17 | **The speed pass and the browser checks** | The speed tests at 10,000 and 100,000 entities, the journeys, the layout and phone checks as Playwright tests at phone and desktop sizes, with screenshots (owner, 2026-11-14: no checks by hand, so the [runner](runner/README.md) can finish v1) | [performance](architecture/performance.md), [testing](architecture/testing.md) | Every target met on the owner's laptop, or a decision recorded to build a place left in [performance.md](architecture/performance.md) |
 
 ## Stage 0 in steps
 
@@ -45,7 +45,7 @@ Approved by the owner on 2026-11-14. Each step ends with its checks passing and 
 | 4 | dependency-cruiser | `npm run deps` passes |
 | 5 | Vitest in Node, and the guard tests | `npm test` passes, every guard test sees its check refuse |
 | 6 | Vitest in three browsers, Playwright with one whole-app test. Downloads Playwright's browsers, and may need the owner's password for WebKit's system packages | `npm run test:browser` and `npm run test:e2e` pass |
-| 7 | The CI workflow | Green on x86 and ARM. Needs a push: the [runner](runner.md) pushes after each step (owner, 2026-11-14) |
+| 7 | The CI workflow | Green on x86 and ARM. Needs a push: the [runner](runner/README.md) pushes after each step (owner, 2026-11-14) |
 | 8 | The docs: anything the build showed differs from [tooling.md](architecture/tooling.md), `progress.md`, and `CLAUDE.md` (no longer "no code yet", and `npm run check` before every commit) | `node tools/check-docs.js` passes |
 
 ## Stage 3 in steps

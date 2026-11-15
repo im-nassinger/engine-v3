@@ -1,5 +1,5 @@
 // The runner: starts one fresh Claude session per step until the plan is finished.
-// See docs/runner.md. Run from the project root: node tools/runner/run.ts
+// See docs/runner/. Run from the project root: node tools/runner/run.ts
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -26,7 +26,7 @@ const RESTART_EXIT_CODE = 75;
 
 const webhookUrl = process.env.DISCORD_WEBHOOK_URL ?? '';
 if (webhookUrl === '') {
-    console.error('DISCORD_WEBHOOK_URL is not set. See docs/runner.md.');
+    console.error('DISCORD_WEBHOOK_URL is not set. See docs/runner/how-it-works.md.');
     process.exit(1);
 }
 

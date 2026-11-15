@@ -1,4 +1,4 @@
-You are running unattended, started by the runner (`tools/runner/run.mjs`, see `docs/runner.md`). Nobody is watching this session and nobody can answer a question. Do **one step** of the work, then stop.
+You are running unattended, started by the runner (`tools/runner/run.ts`, see `docs/runner/`). Nobody is watching this session and nobody can answer a question. Do **one step** of the work, then stop.
 
 1. Follow the project's CLAUDE.md and the `working-with-me` skill as usual. Start at `docs/progress.md`.
 2. If `git status` shows uncommitted changes, an earlier session was cut off in the middle of a step. Finish that step (or undo the half-done part) before anything else.
