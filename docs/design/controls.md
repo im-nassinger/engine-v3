@@ -69,5 +69,5 @@ A field is a row of `--row` height: the label in `--muted` in a 128 px column, t
 
 ## Icons
 
-- **Outline icons** (owner, 2026-11-14): 24 px drawings shown at 16 px, a 1.6 px stroke with round ends and corners, no fill. One open set for every icon, such as Lucide. The package is proposed in stage 6, when the first icon is drawn.
+- **Outline icons** (owner, 2026-11-14): 24 px drawings shown at 16 px, a 1.6 px stroke with round ends and corners, no fill. One open set for every icon: `lucide-react`, picked in stage 6 (standing yes, 2026-11-15, see [ui.md](../architecture/ui.md#stage-6s-choices)).
 - v1 needs these: main menu, Select, Shape, Joint, the four shape kinds (rectangle, ellipse, polygon, line), group, World, camera, hinge, the eye and the eye crossed out, fold arrows (right and down), undo, redo, grid snapping, Play, Pause, Step, Stop, help, saved, warning, tip, the target picker, `…`, plus, and the down arrow of a choice.

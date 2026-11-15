@@ -25,7 +25,7 @@ All from the owner, 2026-11-14, on the [review page](../review.html).
 | Density | **Medium**: about 28 px rows and 12 px text, as in Figma | |
 | Corners | **Slightly rounded, 4 px**, for buttons, fields, menus and cards | |
 | Panels | **Flush** with the window's edges, a thin line between a panel and the level view | |
-| Icons | **Outline icons**, from one open set such as Lucide | The package is proposed in stage 6, when the first icon is drawn |
+| Icons | **Outline icons**, from one open set such as Lucide | Stage 6 picked `lucide-react` (standing yes, 2026-11-15), see [ui.md](../architecture/ui.md#stage-6s-choices) |
 | Font | **JetBrains Mono for the whole editor** (the owner's change to Inter) | Texts in levels keep their own fonts: Inter by default, see [drawing](../requirements/drawing.md) |
 | Mockups | **Five moments of v1, in two directions** | See below |
 

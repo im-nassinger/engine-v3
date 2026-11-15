@@ -42,13 +42,15 @@ Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed*
 | `fflate` | 0.8.3 | Makes and reads the `.editable` zip | Small, fast, and can stop unpacking at a size limit |
 | `idb` | 8.0.4 | A thin promise layer over IndexedDB | IndexedDB's own API is callback-based. `idb` adds no storage logic of its own |
 | `@tanstack/react-virtual` | 3.14.26 | Builds only the visible Entities panel rows | Fixed row height, no styling of its own, so drag and drop stays ours |
+| `lucide-react` | 1.73.0, installed in stage 6 | The editor's outline icons | The open outline set the owner named; one React component per icon, so only the icons used are bundled (standing yes, 2026-11-15) |
+| `@fontsource/jetbrains-mono` | 5.3.0, installed in stage 6 | The editor's font, hosted with the game | Vite bundles its files, so the font never comes from another site; only weights 400, 500 and 600 are imported (standing yes, 2026-11-15) |
 | `@types/node` | 26.6.6 | Types for the Node tools and tests | Matches Node 26 |
 | `jiti` | 2.7.0 | Lets ESLint read `eslint.config.ts` | ESLint 10 refuses a TypeScript config without it (owner, 2026-11-14) |
 | `dependency-cruiser` | 18.7.2 | Checks the import graph: module entries and circles | ESLint reads one import at a time and can't see a circle between modules. See [tooling.md](tooling.md#dependency-cruiser) (owner, 2026-11-14) |
 
 **Node.js 26** runs the tools, the version on the owner's laptop, so a CI failure can be repeated there (owner, 2026-11-14). Every package accepts it. `.node-version` holds the number, and CI reads it.
 
-**Installed when its stage comes** (owner, 2026-11-14): stage 0 installs the tools plus `react` and `react-dom`. `clipper2-ts` waits for stage 3, `pixi.js` for stage 4, `@tanstack/react-virtual` for stage 7, `fflate` and `idb` for stage 12, `box2d3-wasm` for stage 13. *Why: `package.json` lists only what the code uses, and each library gets a real look when a stage starts using it.* The whole v1 stack was checked to install together with no conflict on 2026-11-14.
+**Installed when its stage comes** (owner, 2026-11-14): stage 0 installs the tools plus `react` and `react-dom`. `clipper2-ts` waits for stage 3, `pixi.js` for stage 4, `lucide-react` and `@fontsource/jetbrains-mono` for stage 6, `@tanstack/react-virtual` for stage 7, `fflate` and `idb` for stage 12, `box2d3-wasm` for stage 13. *Why: `package.json` lists only what the code uses, and each library gets a real look when a stage starts using it.* The whole v1 stack was checked to install together with no conflict on 2026-11-14.
 
 ### Not installed until v2
 

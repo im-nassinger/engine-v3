@@ -97,6 +97,24 @@ Written under the standing yes (2026-11-15), and all eleven built on 2026-11-15.
 | 10 | The View commands: Zoom in, Zoom out, 100%, Whole level, Selection (F), Camera frame (Shift+3), and the four switches | `editor/commands` | F fits the selection, or the whole level with nothing selected; the switches flip `ViewSettings`; none makes a step |
 | 11 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes |
 
+## Stage 6 in steps
+
+Written under the standing yes (2026-11-15). Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [ui.md](architecture/ui.md#stage-6s-choices).
+
+| # | Step | Module | Ends with |
+|---|---|---|---|
+| 1 | These steps, and the choices in [ui.md](architecture/ui.md#stage-6s-choices) | `docs/` | `node tools/check-docs.js` passes |
+| 2 | `KeyChord`: parsing, matching by typed letter, physical digit or typed character, Cmd as Ctrl on a Mac, AltGr refusing Ctrl+Alt, the text a menu shows; `ShortcutMap`: every registered command's chords with their scope; `EditorCommand` gains `shortcutScope` | `editor/shortcuts`, `editor/commands` | Recorded key data from US, ABNT2 and a German layout match; no two commands share a chord in one scope; the map uses none of the keys the requirements leave to the browser |
+| 3 | `CommandRunner`: runs a command, shows `outcomeText` as status text, holds a `needsConfirmation` question or a notice as the one open dialog in `OpenDialog`; `CommandOutcome` gains `notice`; the About command | `editor/commands` | A refused command shows its reason for 4 seconds; confirming runs `confirm()` and shows its outcome; cancelling changes nothing; a second dialog waits for the first |
+| 4 | `ShortcutDispatcher`: scopes, focus places, the mouse over the level view, key repeat | `editor/shortcuts` | An editor key is ignored in a text field and an everywhere key isn't; an unused key returns false; a level view key needs the mouse over it |
+| 5 | `SystemClock`, `BrowserTimer`, `KeyboardInput` (focus places from `data-focus-place`, releasing keys on `blur`, Alt alone never reaching the browser menu) | `adapters/browser` | Browser tests in three browsers: a used key's default is stopped and an unused one's isn't; focus in an input reads as a text field; a timer fires and cancels |
+| 6 | `lucide-react` and `@fontsource/jetbrains-mono` installed; `theme.css` from the tokens; `EditorContext`, `useVersion`; `Icon`, `Button`, `IconButton`, `Tooltip`, `Menu` | `ui`, `ui/hooks`, `ui/shared` | `npm run build` passes; the font's three weights are bundled |
+| 7 | `app/EditorComposition.ts` builds the session on a new level fitted to the camera frame; `EditorShell` with `LevelViewHost` and the panels' places; `PixiLevelView` fulfils `LevelViewMount`; `startLevelView.ts` and `testLevel.ts` removed | `app`, `ui/shell`, `ui/level-view-host`, `adapters/pixi`, `tests/e2e` | The Playwright test sees the new level's background and camera frame in the middle of the window, under empty panels |
+| 8 | `TopBar`: `MainMenu` built from the registry with ticks, shortcuts and disabled reasons; the level's name renamed in place; Undo and Redo; the View menu; the zoom with its menu and typed value; the browser tab title | `ui/top-bar`, `ui/main-menu` | Playwright: every registered command is in the menu with its shortcut; renaming the level and Ctrl+Z put the name back; the tab title follows the name |
+| 9 | `StatusBar` (status text, selection summary), `Toolbar` (Select), `Dialogs` (question and notice), an error boundary per panel | `ui/status-bar`, `ui/toolbar`, `ui/dialogs`, `ui/shell` | Playwright: with nothing selected, Delete is greyed in the menu and its tooltip says `Nothing selected`; the status bar shows a status text, then clears it; About opens and Esc closes it; a panel that throws shows its notice and the rest still works |
+| 10 | No page gestures: no scrolling, overscroll or swipe-back; `KeyboardInput` wired in `app` | `app`, `ui/shell`, `tests/e2e` | Playwright: G hides the grid, but G typed into the level name's box doesn't; Ctrl+0, F5 and Ctrl+R keep their default; the page never scrolls |
+| 11 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes |
+
 ## After v1
 
 v2 starts with its own plan, written the same way, from the seams in the architecture: new components in the registry, new tick phases, `ScriptEngine` with `wasmoon`, the Assets panel's files in the project file and IndexedDB, Monaco, and the v2 tools.
