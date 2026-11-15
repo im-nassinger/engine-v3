@@ -34,6 +34,8 @@ type ListenedEntity = {
 
 // Owns the tree: which entity sits in which parent, in which order. Changes only the tree.
 export class Level {
+    // Counted in characters after trimming.
+    static readonly maxNameLength = MAX_NAME_LENGTH;
     readonly world: Entity;
     readonly camera: Entity;
     readonly signals = new LevelSignals();

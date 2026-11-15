@@ -58,7 +58,7 @@ src/
     session/           EditorSession (the editor's root object), OpenLevel, CurrentGroup
     history/           History, HistoryStep, EditTransaction, changes/
     selection/         Selection
-    commands/          EditorCommand, CommandRegistry, createCommandRegistry, then file/ edit/ arrange/ view/ play/
+    commands/          EditorCommand, CommandRegistry, createCommandRegistry, then file/ edit/ arrange/ view/ play/, rename/ (renameEntity, renameLevel), shared/ (skip rule, step labels), testing/
     tools/             Tool, ToolController, EscapeChain, select/ shape/ joint/
     hit-testing/       HitTester, SpatialIndex, LinearSpatialIndex
     snapping/          Snapper, GridSnapper

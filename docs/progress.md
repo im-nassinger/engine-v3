@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 5, step 7 of 11: `OpenLevel` and `EditorSession` (in `editor/session`) hold the open level with its history, selection and current group; `createCommandRegistry` builds the Undo, Redo and Select all commands, and `outcomeText` turns a command's outcome into the status bar's sentence. Next is step 8, Delete, Hide or show, and renaming an entity and the level. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 5, step 8 of 11: Delete (with the joints attached), Hide or show, `renameEntity` and `renameLevel` are built, each passing the run, undo, redo round trip. Next is step 9, Group, Ungroup and Go into group. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -116,7 +116,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 5 of [plan.md](plan.md#stage-5-in-steps): editing without a mouse.** Steps 1 to 6 are done; each further step is built in one commit.
+1. **Stage 5 of [plan.md](plan.md#stage-5-in-steps): editing without a mouse.** Steps 1 to 8 are done; each further step is built in one commit.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
