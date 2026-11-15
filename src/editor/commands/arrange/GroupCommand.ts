@@ -9,6 +9,7 @@ import type { EditTransaction } from '../../history/index.ts';
 import type { EditorSession } from '../../session/index.ts';
 import type { Availability, CommandOutcome, EditorCommand } from '../EditorCommand.ts';
 import { EntityNamer } from '../shared/EntityNamer.ts';
+import { heightBelow } from '../shared/heightBelow.ts';
 import { inPanelOrder } from '../shared/inPanelOrder.ts';
 import { transformUnder, transformValuesOf } from '../shared/keepInPlace.ts';
 import { skipEntities } from '../shared/skipEntities.ts';
@@ -180,18 +181,6 @@ function fitsInDepth(members: readonly Entity[]) {
     }
 
     return true;
-}
-
-// How many levels of children sit below the entity: 0 for an entity without children.
-function heightBelow(entity: Entity): number {
-    let height = 0;
-
-    for (const child of entity.children) {
-        const childHeight = 1 + heightBelow(child);
-        height = Math.max(height, childHeight);
-    }
-
-    return height;
 }
 
 // One unbroken run of rows in one group: the draw order stays as it was.

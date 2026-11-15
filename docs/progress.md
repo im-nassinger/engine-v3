@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 7, step 5 of 12: **`EntitiesDrop`** is built: a drag's target from the row, its thirds (above, into, below) and the pointer's indent, which picks the depth after a group's last child; into a dragged row or its children, above the World, and the camera anywhere but directly in the World are refused. Next is step 6, `moveEntities`. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 7, step 6 of 12: **`moveEntities`** is built: the dragged entities land side by side in their panel order at a drop target, each kept in place on screen, in one step; a dragged entity inside another moves with it; past 256 deep, the World, the camera outside the World and into itself are refused, and dropping where they already are makes no step. Next is step 7, `RenameRequest` and the Rename command. The steps are in [plan.md](plan.md#stage-7-in-steps), their choices in [inspector-and-entities.md](architecture/editor/inspector-and-entities.md#stage-7s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
