@@ -132,7 +132,7 @@ One file, `eslint.config.ts`, with one block per part. ESLint needs `jiti` to re
 
 | Part | Other parts it may import | Libraries it may import |
 |---|---|---|
-| core | none | The polygon library, kept in one constant (see the open question in [progress.md](../progress.md#open-questions-for-the-owner)) |
+| core | none | `clipper2-ts`, the polygon library, named in one constant in `eslint.config.ts` and imported only by `PolygonLibrary` (see [geometry](core-model/geometry.md#the-polygon-pipeline)) |
 | editor | core | none |
 | adapters | core, editor | `pixi.js`, `box2d3-wasm/compat`, `idb`, `fflate` |
 | ui | core, editor | `react`, `react-dom`, `@tanstack/react-virtual` |

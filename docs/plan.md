@@ -50,7 +50,7 @@ Approved by the owner on 2026-11-14. Each step ends with its checks passing and 
 
 ## Stage 3 in steps
 
-Written under the standing yes (2026-11-14). Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [geometry.md](architecture/core-model/geometry.md).
+Written under the standing yes (2026-11-14), and all eight built on 2026-11-14. Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [geometry.md](architecture/core-model/geometry.md).
 
 | # | Step | Module | Ends with |
 |---|---|---|---|

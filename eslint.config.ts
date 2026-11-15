@@ -4,7 +4,8 @@ import type { Linter } from 'eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 
-// The one place the polygon library is named. See the open question in docs/progress.md.
+// The one place the polygon library is named. Only core/geometry/PolygonLibrary.ts imports it.
+// See docs/architecture/core-model/geometry.md, "The polygon pipeline".
 const POLYGON_LIBRARY = 'clipper2-ts';
 
 // The Math functions the JavaScript standard lets a browser approximate, plus random.

@@ -2,11 +2,11 @@
 
 ## TL;DR
 
-**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**; the [runner](runner.md) pushes after each step. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **The owner gave a standing yes** (2026-11-14): Claude decides the smaller questions and keeps building without waiting, listing each decision in [decisions.md](decisions.md). Round 10 was settled that way. **Stage 2, the v1 components and the file format, is built** (2026-11-14): all ten v1 components, the registry, `level.json` with `LevelWriter` and `LevelReader`, with 418 tests. **Stage 3, geometry, is next.**
+**Everything before code is done and approved:** the requirements, the scope, and the [architecture](architecture/README.md) (owner, 2026-11-14). Every feature has a version. **v1 is a level you build and watch**, with all logic in v2. **The editor's look is settled** (owner, 2026-11-14): direction A of the [mockups](design/mockups/index.html), written as a design system in [design/](design/README.md). **Stage 0, the project setup, is built** (2026-11-14): every check runs with `npm run check`, the browser tests run in three browsers, and an empty page builds. **Only CI hasn't run, because it needs a push**; the [runner](runner.md) pushes after each step. **Stage 1, the model, is built** (2026-11-14): `Level`, `Entity`, the components with TransformComponent and NameComponent, `Matrix2D` and the two caches, with 217 unit tests. **Round 9 is answered** (owner, 2026-11-14). **The owner gave a standing yes** (2026-11-14): Claude decides the smaller questions and keeps building without waiting, listing each decision in [decisions.md](decisions.md). Round 10 was settled that way. **Stage 2, the v1 components and the file format, is built** (2026-11-14): all ten v1 components, the registry, `level.json` with `LevelWriter` and `LevelReader`, with 418 tests. **Stage 3, geometry, is built** (2026-11-14): `exp`, `Units`, the polygon pipeline with `clipper2-ts` filling and the game's own `EarClipping` triangulating, lines, mass and the two caches, with 512 tests. **Stage 4, drawing a level, is next.**
 
 ## Where things stand
 
-**Runner:** stage 3, step 7 of 8: `Bounds`, `PolygonLibrary` (with `clipper2-ts`), `EarClipping`, `ShapePieces`, `LineChains`, `MassProperties`, `PiecesCache` and `BoundsCache` are built; step 8, the stage's docs, is next. The [runner](runner.md) keeps this line up to date.
+**Runner:** stage 3, step 8 of 8: stage 3 is done. Next is writing stage 4's steps into the plan. The [runner](runner.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -23,7 +23,8 @@
 | Stage 0, project setup | Done, except the first CI run, which needs a push. See below |
 | Stage 1, the model | Done on 2026-11-14. See below |
 | The stage 2 plan | Approved under the standing yes on 2026-11-14, with round 10, and written into the [architecture](architecture/README.md) |
-| Code | Stages 0, 1 and 2 done. Stage 3, geometry, is next |
+| Stage 3, geometry | Done on 2026-11-14. See below |
+| Code | Stages 0 to 3 done. Stage 4, drawing a level, is next |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -72,6 +73,13 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 - **Round 10**, every card at Claude's pick: see [decisions.md](decisions.md#decided-under-the-standing-yes).
 - **An owner decision built differently** (2026-11-14): the owner said to ask again if `clipper2-ts` failed. Its fill works, but **its triangulation drops areas** (a one-stroke star loses its middle) while reporting success. The unattended runner can't ask, so it took the closest fix: `clipper2-ts` only fills, and the game's own `EarClipping` triangulates. See [geometry.md](architecture/core-model/geometry.md#the-polygon-pipeline); the owner can overturn it.
 
+### Stage 3, built on 2026-11-14
+
+- All eight [steps](plan.md#stage-3-in-steps) are done, one commit each. What the build showed is written into [geometry.md](architecture/core-model/geometry.md), each choice listed in [decisions.md](decisions.md#decided-under-the-standing-yes).
+- **`clipper2-ts` only fills; the game's own `EarClipping` triangulates**, because the library's triangulation drops areas while reporting success. This builds an owner decision differently; see "Settled under the standing yes" above.
+- `core/math` gained `exp` and `Units`; `core/geometry` holds `Bounds`, `PolygonLibrary` (the only file importing `clipper2-ts`), `EarClipping`, `ShapePieces`, `LineChains` and `MassProperties`; `core/derived` holds `PiecesCache` and `BoundsCache`.
+- **Left for later stages:** a joint's bounds come with the joint icons in stage 4, and `BodyMass` (which surfaces belong to a body) with the Inspector in stage 8.
+
 ### Stage 2, built on 2026-11-14
 
 - All eight steps of the plan are done, one commit each, and the plan file is deleted. Its eight changes to the docs are written where they belong: a shape's kind and size are one stored `geometry`, `StoredValueDefinition`, the path's stored shape, the fill's kind `'fill'` and `alsoSatisfiedBy` in [components-and-fields.md](architecture/core-model/components-and-fields.md); `Level.createNew` without a registry and `LevelEditorData` in [entities-and-level.md](architecture/core-model/entities-and-level.md); the reader's refusals and where the 256 MB limit is checked in [persistence.md](architecture/persistence.md).
@@ -100,7 +108,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 ## Next
 
 1. **Push** so CI runs for the first time on x86 and ARM (step 7 of stage 0). The [runner](runner.md) does it after its first step.
-2. **Stage 3 of [plan.md](plan.md): geometry.** Its [steps](plan.md#stage-3-in-steps) are written; they are built one per commit.
+2. **Stage 4 of [plan.md](plan.md): drawing a level.** Its steps are written into the plan first, then built one per commit.
 3. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
