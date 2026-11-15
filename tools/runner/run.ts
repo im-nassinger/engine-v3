@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { setTimeout as sleep } from 'node:timers/promises';
+import { setTimeout as sleepFor } from 'node:timers/promises';
 import { runClaudeSession } from './ClaudeSession.ts';
 import { DiscordNotifier } from './DiscordNotifier.ts';
 import { RateLimitTracker } from './RateLimitTracker.ts';
@@ -36,6 +36,19 @@ const sentNeeds = new Set<string>();
 
 function git(...args: string[]) {
     return execFileSync('git', args, { cwd: projectFolder, encoding: 'utf8' }).trim();
+}
+
+// Waits by the wall clock, a minute at a time. A plain timer stops counting while the
+// computer sleeps, so after a night asleep it would still be waiting for hours.
+async function sleepUntil(wakeTimeMs: number) {
+    while (Date.now() < wakeTimeMs) {
+        const remainingMs = wakeTimeMs - Date.now();
+        await sleepFor(Math.min(MINUTE_MS, remainingMs));
+    }
+}
+
+async function sleep(durationMs: number) {
+    await sleepUntil(Date.now() + durationMs);
 }
 
 function formatTime(timeMs: number) {
@@ -137,9 +150,10 @@ async function runOneStep() {
 
     const newCommits = git('log', '--format=%h %s', `${startCommit}..HEAD`);
     const report = parseStatusReport(result.finalText);
-    const mentionsLimit = /usage limit|hit your limit|rate limit/i.test(result.finalText);
+    const mentionsLimit = /usage limit|hit your .*limit|rate limit/i.test(result.finalText);
+    const isLimitError = result.apiError === 'usage_limit_reached';
 
-    if (report === undefined && (rateLimits.isLimitReached() || mentionsLimit)) {
+    if (report === undefined && (rateLimits.isLimitReached() || isLimitError || mentionsLimit)) {
         return { kind: 'limit' } as const;
     }
     if (report === undefined) {

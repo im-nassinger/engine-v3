@@ -16,6 +16,7 @@
 ## Known issues
 
 - **Push is refused:** the commits include `.github/workflows/`, and the GitHub token has no `workflow` scope. Fix, by the owner: `gh auth refresh -h github.com -s workflow`. Each session's push then sends every waiting commit.
+- **The laptop must stay awake.** On 2026-11-15 it went to sleep on battery at 00:23 and woke at 10:19, so nothing ran overnight. The runner now blocks sleep when the computer is idle, but closing the lid still sleeps it, and on battery it can run flat. Keep it plugged in with the lid open.
 - **The systemd unit names Node 26.13.0 from nvm.** After a Node upgrade, update `tools/runner/engine-v3-runner.service` and run `systemctl --user daemon-reload`.
 
 ## Next: the Discord bot

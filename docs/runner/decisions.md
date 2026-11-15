@@ -14,5 +14,6 @@ What the owner decided about the runner, newest last. The changes the runner mad
 | 2026-11-14 | Each session gets exactly one prompt and is never used again | The owner's rule: a new session always continues the work |
 | 2026-11-14 | The runner doesn't wait for other Claude sessions in the project to close | The owner keeps a chat session open in this folder to talk to Claude |
 | 2026-11-14 | Discord messages are one line of % and stage, then one plain sentence on what the step did | The owner wants them short and clear |
+| 2026-11-15 | The runner blocks the computer's idle sleep while it runs, and waits by the wall clock | The laptop slept through the night and the limit's reset, and the runner's timer didn't count the time asleep |
 | 2026-11-15 | The runner's docs live in `docs/runner/` in this repo, not in a project of its own | The owner's choice |
 | 2026-11-15 | Keep the webhook for now; the Discord bot comes later | The owner's choice. The bot's open questions are in [progress.md](progress.md) |

@@ -10,6 +10,7 @@ export type SessionResult = {
     exitCode: number | null;
     finalText: string;
     isError: boolean;
+    apiError: string;
     wentSilent: boolean;
 };
 
@@ -27,7 +28,7 @@ export function runClaudeSession(options: SessionOptions) {
     const child = spawn('claude', args, { cwd: options.projectFolder, stdio: ['ignore', 'pipe', 'pipe'] });
     const log = fs.createWriteStream(options.logFile);
 
-    const result: SessionResult = { exitCode: null, finalText: '', isError: false, wentSilent: false };
+    const result: SessionResult = { exitCode: null, finalText: '', isError: false, apiError: '', wentSilent: false };
     let lastAssistantText = '';
     let silenceTimer: NodeJS.Timeout | undefined;
 
@@ -60,6 +61,9 @@ export function runClaudeSession(options: SessionOptions) {
 
         if (event.type === 'result') {
             result.isError = event.is_error === true;
+            if (typeof event.api_error === 'string') {
+                result.apiError = event.api_error;
+            }
             const resultText = event.result;
             if (typeof resultText === 'string') {
                 result.finalText = resultText;

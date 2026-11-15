@@ -20,6 +20,7 @@ A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: s
 - **Progress:** every session ends with `STATUS`, `STAGE`, `STEP`, `SUMMARY` and `NEEDS` lines. The % is (stage + finished steps ÷ steps in the stage) ÷ 18 stages.
 - **The usage limit:** `claude -p --output-format stream-json` prints a `rate_limit_event` line with how much of the 5-hour and 7-day windows is used and when each resets. The CLI prints it, not the model, so the runner sees the limit even when the model is cut off mid-step. The next session finishes the cut-off step first.
 - **A change to the runner's own code:** it restarts itself between sessions, so the change applies without stopping a step.
+- **Waiting:** every wait counts by the wall clock, a minute at a time, so a night with the computer asleep doesn't make it wait hours too long. While it runs, it blocks the computer from going to sleep on its own (`systemd-inhibit`). Closing the lid still puts it to sleep.
 - **A hung session:** no output for 30 minutes ends it, and it counts as a failure.
 
 ## Files
