@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 6, step 9 of 11: the status bar shows status texts and the selection, the toolbar shows Select, About and every question open as a dialog that Esc closes, and a panel that fails shows a notice while the rest keeps working. Next is step 10, the keys and no page gestures. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 6, step 10 of 11: the keys work (G hides the grid, Ctrl+Z undoes, typing in a box stays the box's), the browser keeps its own keys such as Ctrl+0, F5 and Ctrl+R, and the page never scrolls or bounces. Next is step 11, the docs. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -26,7 +26,7 @@
 | Stage 3, geometry | Done on 2026-11-14. See below |
 | Stage 4, drawing a level | Done on 2026-11-15. See below |
 | Stage 5, editing without a mouse | Done on 2026-11-15. See below |
-| Code | Stages 0 to 5 done. Stage 6, the editor shell, is being built: steps 1 to 9 of 11 done |
+| Code | Stages 0 to 5 done. Stage 6, the editor shell, is being built: steps 1 to 10 of 11 done |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 

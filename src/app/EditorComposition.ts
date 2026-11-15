@@ -2,6 +2,7 @@ import {
     AnimationFrames,
     BrowserTimer,
     DevicePixelRatio,
+    KeyboardInput,
     keyboardPlatform,
     SystemClock,
 } from '../adapters/browser/index.ts';
@@ -11,6 +12,7 @@ import { Level } from '../core/level/index.ts';
 import { CommandRunner, createCommandRegistry } from '../editor/commands/index.ts';
 import type { CommandRegistry } from '../editor/commands/index.ts';
 import { EditorSession } from '../editor/session/index.ts';
+import { ShortcutDispatcher } from '../editor/shortcuts/index.ts';
 import type { KeyboardPlatform } from '../editor/shortcuts/index.ts';
 
 const FIT_CAMERA_FRAME = 'view.fitCameraFrame';
@@ -21,6 +23,7 @@ type EditorParts = {
     readonly runner: CommandRunner;
     readonly platform: KeyboardPlatform;
     readonly levelView: PixiLevelView;
+    readonly keyboard: KeyboardInput;
 };
 
 // The composition root: the only code that knows both the editor's rules and the browser's details.
@@ -31,6 +34,7 @@ export class EditorComposition {
     readonly runner: CommandRunner;
     readonly platform: KeyboardPlatform;
     readonly levelView: PixiLevelView;
+    private readonly keyboard: KeyboardInput;
 
     private constructor(parts: EditorParts) {
         this.session = parts.session;
@@ -38,6 +42,7 @@ export class EditorComposition {
         this.runner = parts.runner;
         this.platform = parts.platform;
         this.levelView = parts.levelView;
+        this.keyboard = parts.keyboard;
     }
 
     static async create() {
@@ -56,8 +61,10 @@ export class EditorComposition {
             pixelRatio: new DevicePixelRatio(),
             drawing: { showUnstyled: true },
         });
+        const dispatcher = new ShortcutDispatcher(commands, runner, platform);
+        const keyboard = new KeyboardInput(dispatcher, window);
 
-        const composition = new EditorComposition({ session, commands, runner, platform, levelView });
+        const composition = new EditorComposition({ session, commands, runner, platform, levelView, keyboard });
         composition.start();
 
         return composition;
@@ -65,6 +72,8 @@ export class EditorComposition {
 
     private start() {
         this.levelView.follow(this.session);
+        // The editor lives as long as the page, so the keyboard is never disconnected.
+        this.keyboard.connect();
         this.limitPanToOpenLevel();
         this.session.openLevelChanged.subscribe(() => this.limitPanToOpenLevel());
         this.fitCameraFrameOnceSized();
