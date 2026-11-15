@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 3, step 2 of 8: `DeterministicMath.exp` and `Units` are built; `Bounds`, `clipper2-ts` and `PolygonLibrary` are next. The [runner](runner.md) keeps this line up to date.
+**Runner:** stage 3, step 3 of 8: `Bounds`, `PolygonLibrary` (with `clipper2-ts`) and `EarClipping` are built; `ShapePieces` is next. The [runner](runner.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -70,6 +70,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 ### Settled under the standing yes, 2026-11-14
 
 - **Round 10**, every card at Claude's pick: see [decisions.md](decisions.md#decided-under-the-standing-yes).
+- **An owner decision built differently** (2026-11-14): the owner said to ask again if `clipper2-ts` failed. Its fill works, but **its triangulation drops areas** (a one-stroke star loses its middle) while reporting success. The unattended runner can't ask, so it took the closest fix: `clipper2-ts` only fills, and the game's own `EarClipping` triangulates. See [geometry.md](architecture/core-model/geometry.md#the-polygon-pipeline); the owner can overturn it.
 
 ### Stage 2, built on 2026-11-14
 

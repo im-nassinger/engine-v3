@@ -38,7 +38,7 @@ Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed*
 | `typescript-eslint` | 8.72.2 | TypeScript rules for ESLint | |
 | `eslint-plugin-react-hooks` | 7.1.1 | Hook rules and the React Compiler's checks | |
 | `prettier` | 3.10.1 | One code format | Formatting is never a review topic. Settings: 4 spaces, single quotes, 120 columns, matching the owner's TypeScript style |
-| `clipper2-ts` | 2.0.1-19, untried | Cuts self-crossing polygons, triangulates | Integer arithmetic inside, so its results are the same on every computer. **Tried first in stage 3** (owner, 2026-11-14), because `clipper2-js` 1.2.4 has no triangulation and brings Angular 15. See [geometry](core-model/geometry.md) |
+| `clipper2-ts` | 2.0.1-19, installed in stage 3 | Cuts self-crossing polygons and fills what they enclose | Integer arithmetic inside, so its results are the same on every computer. Tried first in stage 3 (owner, 2026-11-14), because `clipper2-js` 1.2.4 has no triangulation and brings Angular 15. **Only its fill is used**: its triangulation drops areas, so the game triangulates with its own `EarClipping` (standing yes, 2026-11-14). See [geometry](core-model/geometry.md) |
 | `fflate` | 0.8.3 | Makes and reads the `.editable` zip | Small, fast, and can stop unpacking at a size limit |
 | `idb` | 8.0.4 | A thin promise layer over IndexedDB | IndexedDB's own API is callback-based. `idb` adds no storage logic of its own |
 | `@tanstack/react-virtual` | 3.14.26 | Builds only the visible Entities panel rows | Fixed row height, no styling of its own, so drag and drop stays ours |
@@ -67,7 +67,7 @@ Their versions are checked again when v2 starts.
 | A CSS framework, CSS-in-JS, CSS Modules | Each React component has its own plain `.css` file scoped under its root class, as the owner's component rules say |
 | A UI component library | The editor needs a few plain controls (buttons, menus, number fields), and how each one works is in the requirements |
 | An ECS library | Entities and components are the game's own model with the owner's rules (one of each type, a tree, Entities panel order). A library would bring its own rules |
-| `poly-decomp`, `earcut` | `clipper2-ts` already triangulates. One polygon library |
+| `poly-decomp`, `earcut` | One polygon library. The game's own `EarClipping` triangulates, because `clipper2-ts`'s triangulation drops areas (standing yes, 2026-11-14) |
 | Box2D's debug draw | The physics view draws the game's own collision pieces (owner, 2026-11-13) |
 | `fake-indexeddb` and other browser imitations | Browser storage is tested in real browsers, see [testing.md](testing.md) |
 
