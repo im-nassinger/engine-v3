@@ -27,14 +27,14 @@ function labelsOf(items: MenuItem[]) {
 }
 
 describe('the top bar menus', () => {
-    test('the View menu holds the four switches, each with its shortcut and a tick', () => {
+    test('the View menu holds the five switches, each with its shortcut and a tick', () => {
         const { commands } = editorCommands();
 
         const entries = viewMenuEntries(commands);
 
-        expect(labelsOf(entries)).toEqual(['Grid', 'Joint icons', 'Camera frame', 'Physics view']);
+        expect(labelsOf(entries)).toEqual(['Grid', 'Grid snapping', 'Joint icons', 'Camera frame', 'Physics view']);
         const shortcuts = entries.map((entry) => (entry.kind === 'action' ? entry.shortcut : undefined));
-        expect(shortcuts).toEqual(['G', 'Shift+J', 'Shift+C', 'Shift+P']);
+        expect(shortcuts).toEqual(['G', 'Shift+G', 'Shift+J', 'Shift+C', 'Shift+P']);
         const ticks = entries.map((entry) => (entry.kind === 'action' ? entry.checked : undefined));
         expect(ticks.every((tick) => typeof tick === 'boolean')).toBe(true);
     });

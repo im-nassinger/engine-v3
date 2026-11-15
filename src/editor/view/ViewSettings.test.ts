@@ -3,14 +3,20 @@ import { describe, expect, test } from 'vitest';
 import { ViewSettings } from './ViewSettings.ts';
 
 describe('ViewSettings', () => {
-    test('starts with the grid, joint icons and camera frame on, and the physics view off', () => {
+    test('starts with the grid, grid snapping, joint icons and camera frame on, and the physics view off', () => {
         const settings = new ViewSettings();
 
-        expect(settings.all()).toEqual({ grid: true, jointIcons: true, cameraFrame: true, physicsView: false });
+        expect(settings.all()).toEqual({
+            grid: true,
+            gridSnapping: true,
+            jointIcons: true,
+            cameraFrame: true,
+            physicsView: false,
+        });
     });
 
     test('starts from given switches, without sharing them', () => {
-        const given = { grid: false, jointIcons: false, cameraFrame: true, physicsView: true };
+        const given = { grid: false, gridSnapping: false, jointIcons: false, cameraFrame: true, physicsView: true };
         const settings = new ViewSettings(given);
 
         settings.set('grid', true);

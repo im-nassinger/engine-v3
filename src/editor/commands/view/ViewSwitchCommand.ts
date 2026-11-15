@@ -10,7 +10,7 @@ export type ViewSwitchEntry = {
     readonly shortcuts: readonly string[];
 };
 
-// One of the View menu's switches: flips what the editor draws over the level. Never a step.
+// One of the View menu's switches: flips what the editor draws over the level, or grid snapping. Never a step.
 export class ViewSwitchCommand implements EditorCommand {
     readonly id: string;
     readonly label: string;
@@ -45,6 +45,7 @@ export class ViewSwitchCommand implements EditorCommand {
 
 export const VIEW_SWITCH_ENTRIES: readonly ViewSwitchEntry[] = [
     { viewSwitch: 'grid', id: 'view.grid', label: 'Grid', order: 10, shortcuts: ['G'] },
+    { viewSwitch: 'gridSnapping', id: 'view.gridSnapping', label: 'Grid snapping', order: 15, shortcuts: ['Shift+G'] },
     { viewSwitch: 'jointIcons', id: 'view.jointIcons', label: 'Joint icons', order: 20, shortcuts: ['Shift+J'] },
     { viewSwitch: 'cameraFrame', id: 'view.cameraFrame', label: 'Camera frame', order: 30, shortcuts: ['Shift+C'] },
     { viewSwitch: 'physicsView', id: 'view.physicsView', label: 'Physics view', order: 40, shortcuts: ['Shift+P'] },

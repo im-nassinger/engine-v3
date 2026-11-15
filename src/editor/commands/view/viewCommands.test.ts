@@ -140,6 +140,7 @@ describe('The View menu switches', () => {
         const settings = session.viewSettings;
         const switches = [
             ['view.grid', 'grid'],
+            ['view.gridSnapping', 'gridSnapping'],
             ['view.jointIcons', 'jointIcons'],
             ['view.cameraFrame', 'cameraFrame'],
             ['view.physicsView', 'physicsView'],
@@ -166,7 +167,7 @@ describe('Every View command', () => {
             command.run();
         }
 
-        expect(viewCommands).toHaveLength(10);
+        expect(viewCommands).toHaveLength(11);
         expect(session.openLevel.history.undoLabel).toBeUndefined();
     });
 });

@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 9, step 4 of 16 is done: `HitTester` with `LinearSpatialIndex` hits every v1 row of the hit area table, passes through the World, hidden and locked entities and those inside the camera, and turns a hit into what a click selects, with 1027 tests in Node. Next is step 5: `GridSnapper`. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 9, step 5 of 16 is done: `GridSnapper` snaps a move's edges and centre, or a point, to the grid within 6 screen px, off with Ctrl or the new Grid snapping switch (Shift+G), with 1036 tests in Node. Next is step 6: the tool contract, `ToolController`, `PanGesture` and `EscapeChain`. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

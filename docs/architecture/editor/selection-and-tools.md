@@ -172,12 +172,13 @@ The Select tool holds one **drag state** at a time (the State pattern):
 
 ```typescript
 export type Snapper = {
-    snapMove(movingBounds: Bounds, offset: Point, view: ViewState): SnapResult;   // edges and centre
-    snapPoint(point: Point, view: ViewState): SnapResult;                         // drawing, resizing
+    snapMove(movingBounds: Bounds, offset: Point, view: ViewState, options: SnapOptions): SnapResult;   // edges and centre
+    snapPoint(point: Point, view: ViewState, options: SnapOptions): SnapResult;                         // drawing, resizing
 };
 ```
 
 - **`GridSnapper` is v1**: edges and centre jump to the nearest grid line within 6 screen pixels. Ctrl held during a drag turns it off. Typed values and arrow keys are never snapped.
+- **As built (standing yes, 2026-11-15):** `SnapOptions` is `{ ctrlHeld }`, so the snapper, not each tool, knows that Ctrl turns snapping off. A `SnapResult` is the snapped point (for `snapMove`, the snapped offset) and, per axis, whether it snapped, for v3's guides. Each axis snaps on its own; on an axis the nearest of the three positions within 6 screen px (inclusive) wins, the first of left (top), centre, right (bottom) on a tie. Snapping goes to the lines a grid size apart through the origin, not the fainter lines between them. **Grid snapping is a fifth `ViewSettings` switch, `gridSnapping`, on by default**, with the View menu's `Grid snapping` (`view.gridSnapping`, Shift+G); hiding the grid doesn't stop snapping. *Why: the switch lives in the browser like the others and never makes a step; a hidden grid is a drawing choice, and the requirement ties snapping to its own switch.*
 - v3's snapping to entities is a second `Snapper` with guides. A `CombinedSnapper` picks the nearest result, the entity winning a tie, as the requirement says. Neither tool changes.
 
 ## Stage 9's choices
