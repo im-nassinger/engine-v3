@@ -9,17 +9,17 @@ import { buildChangesTestLevel, snapshotOf } from './changesTestLevel.ts';
 
 const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createV1());
 
-// The group and its child as data under new ids, as paste will give them.
+// The group and its child as data under new ids, as paste will give them. The lists are the test's own,
+// so a test can change them.
 function groupWithNewIds(level: ReturnType<typeof buildChangesTestLevel>) {
-    const [groupData, childData] = new LevelWriter().writeSubtree([level.group]);
+    const [groupData] = new LevelWriter().writeSubtree([level.group]);
+    const childData = groupData?.children[0];
     if (groupData === undefined || childData === undefined) throw new Error('The group was not written.');
 
-    const entities: EntityData[] = [
-        { ...groupData, id: 100 },
-        { ...childData, id: 101, parent: 100 },
-    ];
+    const children: EntityData[] = [{ ...childData, id: 101 }];
+    const group = { ...groupData, id: 100, children };
 
-    return entities;
+    return { entities: [group], children };
 }
 
 describe('AddEntitiesChange', () => {
@@ -29,7 +29,7 @@ describe('AddEntitiesChange', () => {
         const before = snapshotOf(level);
         const change = new AddEntitiesChange({
             reader,
-            entities: groupWithNewIds(built),
+            entities: groupWithNewIds(built).entities,
             place: { parentId: square.id, index: 0 },
         });
 
@@ -45,10 +45,11 @@ describe('AddEntitiesChange', () => {
 
     test('clones the data, so changing the caller objects afterwards changes nothing', () => {
         const built = buildChangesTestLevel();
-        const entities = groupWithNewIds(built);
+        const { entities, children } = groupWithNewIds(built);
         const change = new AddEntitiesChange({ reader, entities, place: { parentId: built.level.world.id, index: 0 } });
 
-        entities.splice(0, 2);
+        children.splice(0, 1);
+        entities.splice(0, 1);
         change.apply(built.level);
 
         expect(built.level.world.children[0]?.id).toBe(100);

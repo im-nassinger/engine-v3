@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 9, the Select tool, step 1 is done: its sixteen steps are in [plan.md](plan.md#stage-9-in-steps) and its choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). Next is step 2: change the code to the nested level file (owner, 2026-11-15). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 9, step 2 of 16 is done: the code reads and writes the nested level file, with `world` at the top and each entity's `children` inside it, and 991 tests in Node. Next is step 3: `LiveEdit`. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

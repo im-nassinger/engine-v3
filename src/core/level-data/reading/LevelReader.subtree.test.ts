@@ -39,8 +39,8 @@ function buildLevel() {
     return { level, square, group };
 }
 
-function plainEntity(id: number, parent: number | null, components: Record<string, unknown> = {}) {
-    return { id, parent, hidden: false, locked: false, components };
+function plainEntity(id: number, components: Record<string, unknown> = {}, children: unknown[] = []) {
+    return { id, hidden: false, locked: false, components, children };
 }
 
 function expectDamaged(level: Level, data: unknown) {
@@ -107,27 +107,31 @@ describe('LevelReader.readSubtree', () => {
     test('refuses an id already in the level, or used twice, and leaves the level as it was', () => {
         const { level, square } = buildLevel();
 
-        expectDamaged(level, [plainEntity(10, 1), plainEntity(square.id, 10)]);
-        expectDamaged(level, [plainEntity(10, 1), plainEntity(10, 1)]);
+        expectDamaged(level, [plainEntity(10, {}, [plainEntity(square.id)])]);
+        expectDamaged(level, [plainEntity(10), plainEntity(10)]);
+        expectDamaged(level, [plainEntity(10, {}, [plainEntity(10)])]);
     });
 
-    test('refuses a root without a parent id, since the World is never in a subtree', () => {
+    test('refuses an entity without its children, or children that are not a list', () => {
         const { level } = buildLevel();
+        const childless: Record<string, unknown> = plainEntity(10);
+        delete childless['children'];
 
-        expectDamaged(level, [plainEntity(10, null)]);
+        expectDamaged(level, [childless]);
+        expectDamaged(level, [{ ...plainEntity(10), children: {} }]);
     });
 
     test('refuses a camera or a PhysicsWorldComponent', () => {
         const { level } = buildLevel();
 
-        expectDamaged(level, [plainEntity(10, 1, { [CameraComponent.schema.typeName]: {} })]);
-        expectDamaged(level, [plainEntity(10, 1, { PhysicsWorldComponent: {} })]);
+        expectDamaged(level, [plainEntity(10, { [CameraComponent.schema.typeName]: {} })]);
+        expectDamaged(level, [plainEntity(10, {}, [plainEntity(11, { PhysicsWorldComponent: {} })])]);
     });
 
     test('refuses a damaged component value', () => {
         const { level } = buildLevel();
 
-        expectDamaged(level, [plainEntity(10, 1, { NameComponent: { name: '' } })]);
+        expectDamaged(level, [plainEntity(10, { NameComponent: { name: '' } })]);
     });
 
     test('counts the entities and the depth from the level it goes into', () => {
@@ -136,20 +140,22 @@ describe('LevelReader.readSubtree', () => {
         if (first === undefined) throw new Error('The test level has no first child.');
         const reader = createReader(SMALL_LIMITS);
 
-        const tooDeep = reader.readSubtree(level, [plainEntity(10, 1)], first, 0);
-        const twoMore = reader.readSubtree(level, [plainEntity(11, 1), plainEntity(12, 1)], level.world, 0);
-        const oneMore = reader.readSubtree(level, [plainEntity(13, 1)], group, 0);
+        const tooDeep = reader.readSubtree(level, [plainEntity(10)], first, 0);
+        const twoMore = reader.readSubtree(level, [plainEntity(11), plainEntity(12)], level.world, 0);
 
+        const nestedTooDeep = reader.readSubtree(level, [plainEntity(14, {}, [plainEntity(15)])], group, 0);
+
+        expect(nestedTooDeep).toEqual({ ok: false, refusal: { reason: 'overLimit', limit: 'depth', max: 2 } });
         expect(tooDeep).toEqual({ ok: false, refusal: { reason: 'overLimit', limit: 'depth', max: 2 } });
         expect(twoMore).toEqual({ ok: false, refusal: { reason: 'overLimit', limit: 'entities', max: 7 } });
-        expect(oneMore.ok).toBe(true);
+        expect(reader.readSubtree(level, [plainEntity(13)], group, 0).ok).toBe(true);
     });
 
     test('throws on an index that is not a place among the children', () => {
         const { level } = buildLevel();
         const outOfRange = level.world.children.length + 1;
 
-        const read = () => createReader().readSubtree(level, [plainEntity(10, 1)], level.world, outOfRange);
+        const read = () => createReader().readSubtree(level, [plainEntity(10)], level.world, outOfRange);
 
         expect(read).toThrow(`Index ${outOfRange} is not a place among entity ${level.world.id}'s children.`);
     });

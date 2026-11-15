@@ -13,10 +13,10 @@ import everyComponentLevel from './LevelReader.everyComponent.json' with { type:
 import recordedNewLevel from '../writing/LevelWriter.newLevel.json' with { type: 'json' };
 
 type EditableComponents = Record<string, unknown>;
-type EditableEntity = Record<string, unknown> & { components: EditableComponents };
+type EditableEntity = Record<string, unknown> & { components: EditableComponents; children: EditableEntity[] };
 type EditableLevel = Record<string, unknown> & {
     editor: Record<string, unknown>;
-    entities: EditableEntity[];
+    world: EditableEntity;
 };
 
 const SMALL_LIMITS: LevelLimits = { maxEntities: 4, maxDepth: 2, maxPoints: 4, maxBytes: 1000 };
@@ -38,19 +38,33 @@ function newLevelData() {
     return JSON.parse(text) as EditableLevel;
 }
 
-function requireEntity(levelData: EditableLevel, index: number) {
-    const entity = levelData.entities[index];
-    if (entity === undefined) throw new Error(`The test level has no entity at ${index}.`);
+// One of the World's children: in a new level, the camera is at 0.
+function requireWorldChild(levelData: EditableLevel, index: number) {
+    const entity = levelData.world.children[index];
+    if (entity === undefined) throw new Error(`The test level's World has no child at ${index}.`);
 
     return entity;
 }
 
-function plainEntity(id: number, parent: number, components: EditableComponents = {}): EditableEntity {
-    return { id, parent, hidden: false, locked: false, components };
+function plainEntity(id: number, components: EditableComponents = {}, children: EditableEntity[] = []): EditableEntity {
+    return { id, hidden: false, locked: false, components, children };
 }
 
 function shapeEntity(id: number, geometry: Record<string, unknown>) {
-    return plainEntity(id, 1, { ShapeComponent: { geometry } });
+    return plainEntity(id, { ShapeComponent: { geometry } });
+}
+
+// Entities each inside the one before, ids from firstId on, built without recursion so it can be deep.
+function nestedChain(firstId: number, length: number) {
+    const top = plainEntity(firstId);
+    let innermost = top;
+    for (let offset = 1; offset < length; offset += 1) {
+        const child = plainEntity(firstId + offset);
+        innermost.children.push(child);
+        innermost = child;
+    }
+
+    return top;
 }
 
 function pointsOf(count: number) {
@@ -144,7 +158,7 @@ describe('LevelReader round trips', () => {
 describe('LevelReader missing values', () => {
     test('reads a missing value as its default', () => {
         const levelData = newLevelData();
-        levelData.entities.push(plainEntity(3, 1, { BodyComponent: { type: 'static' } }));
+        levelData.world.children.push(plainEntity(3, { BodyComponent: { type: 'static' } }));
 
         const level = expectRead(levelData);
         const body = level.requireEntity(3).requireComponent(BodyComponent);
@@ -155,11 +169,11 @@ describe('LevelReader missing values', () => {
 
     test('gives an entity without a TransformComponent or a NameComponent the defaults', () => {
         const levelData = newLevelData();
-        levelData.entities.push(plainEntity(3, 1));
+        levelData.world.children.push(plainEntity(3));
 
         const level = expectRead(levelData);
         const written = new LevelWriter().write(level);
-        const writtenEntity = written.entities.find((entity) => entity.id === 3);
+        const writtenEntity = written.world.children.find((entity) => entity.id === 3);
 
         expect(writtenEntity?.components['TransformComponent']).toEqual(DEFAULT_TRANSFORM);
         expect(level.requireEntity(3).requireComponent(NameComponent).get('name')).toBe('Entity');
@@ -227,8 +241,9 @@ describe('LevelReader refuses a damaged level', () => {
         ['a grid size that is not a number', { editor: { gridSize: '50', foldedRows: [] } }],
         ['a folded row that is not an id', { editor: { gridSize: 50, foldedRows: [0] } }],
         ['editor data without folded rows', { editor: { gridSize: 50 } }],
-        ['entities that are not a list', { entities: {} }],
-        ['no entities', { entities: [] }],
+        ['a world that is not an object', { world: 'World' }],
+        ['no world', { world: null }],
+        ['two Worlds at the top', { world: [recordedNewLevel.world, recordedNewLevel.world] }],
     ])('refuses %s', (_, changes) => {
         const levelData = { ...newLevelData(), ...changes };
 
@@ -249,45 +264,42 @@ describe('LevelReader refuses a damaged level', () => {
         ['an id used twice', 2],
     ])('refuses %s', (_, id) => {
         const levelData = newLevelData();
-        levelData.entities.push(plainEntity(3, 1));
-        requireEntity(levelData, 2).id = id;
+        levelData.world.children.push(plainEntity(3));
+        requireWorldChild(levelData, 1).id = id;
 
         expectDamaged(levelData);
     });
 
-    test('refuses a parent that is listed after its child', () => {
+    test('refuses a second World inside the World', () => {
         const levelData = newLevelData();
-        levelData.entities.push(plainEntity(3, 4), plainEntity(4, 1));
+        levelData.world.children.push({ ...levelData.world, id: 3, children: [] });
 
         expectDamaged(levelData);
     });
 
-    test('refuses a parent that is not in the file', () => {
-        const levelData = newLevelData();
-        levelData.entities.push(plainEntity(3, 50));
+    test('refuses an entity without its children, or children that are not a list', () => {
+        const withoutChildren = newLevelData();
+        const camera: Record<string, unknown> = requireWorldChild(withoutChildren, 0);
+        delete camera['children'];
+        const withBadChildren = newLevelData();
+        requireWorldChild(withBadChildren, 0).children = 'none' as unknown as EditableEntity[];
 
-        expectDamaged(levelData);
+        expectDamaged(withoutChildren);
+        expectDamaged(withBadChildren);
     });
 
-    test('refuses a World with a parent', () => {
+    test('refuses an entity with a parent key, which the nested file never writes', () => {
         const levelData = newLevelData();
-        requireEntity(levelData, 0).parent = 2;
-
-        expectDamaged(levelData);
-    });
-
-    test('refuses a second entity without a parent', () => {
-        const levelData = newLevelData();
-        levelData.entities.push({ ...plainEntity(3, 1), parent: null });
+        levelData.world.children.push({ ...plainEntity(3), parent: 1 });
 
         expectDamaged(levelData);
     });
 
     test('refuses an entity with an unknown value, or a switch that is not true or false', () => {
         const withUnknown = newLevelData();
-        withUnknown.entities.push({ ...plainEntity(3, 1), colour: 'red' });
+        withUnknown.world.children.push({ ...plainEntity(3), colour: 'red' });
         const withBadSwitch = newLevelData();
-        withBadSwitch.entities.push({ ...plainEntity(3, 1), hidden: 'yes' });
+        withBadSwitch.world.children.push({ ...plainEntity(3), hidden: 'yes' });
 
         expectDamaged(withUnknown);
         expectDamaged(withBadSwitch);
@@ -295,29 +307,29 @@ describe('LevelReader refuses a damaged level', () => {
 
     test('refuses a level without a camera', () => {
         const levelData = newLevelData();
-        levelData.entities.pop();
+        levelData.world.children.pop();
 
         expectDamaged(levelData);
     });
 
     test('refuses a second camera', () => {
         const levelData = newLevelData();
-        levelData.entities.push(plainEntity(3, 1, { CameraComponent: {} }));
+        levelData.world.children.push(plainEntity(3, { CameraComponent: {} }));
 
         expectDamaged(levelData);
     });
 
     test('refuses a camera that is not directly inside the World', () => {
         const levelData = newLevelData();
-        const camera = requireEntity(levelData, 1);
-        levelData.entities = [requireEntity(levelData, 0), plainEntity(3, 1), { ...camera, parent: 3 }];
+        const camera = requireWorldChild(levelData, 0);
+        levelData.world.children = [plainEntity(3, {}, [camera])];
 
         expectDamaged(levelData);
     });
 
     test('refuses a PhysicsWorldComponent anywhere but the World', () => {
         const levelData = newLevelData();
-        levelData.entities.push(plainEntity(3, 1, { PhysicsWorldComponent: {} }));
+        levelData.world.children.push(plainEntity(3, { PhysicsWorldComponent: {} }));
 
         expectDamaged(levelData);
     });
@@ -326,7 +338,7 @@ describe('LevelReader refuses a damaged level', () => {
         'refuses a World without its %s',
         (typeName) => {
             const levelData = newLevelData();
-            delete requireEntity(levelData, 0).components[typeName];
+            delete levelData.world.components[typeName];
 
             expectDamaged(levelData);
         },
@@ -334,7 +346,7 @@ describe('LevelReader refuses a damaged level', () => {
 
     test('refuses a World shape that is not a rectangle', () => {
         const levelData = newLevelData();
-        requireEntity(levelData, 0).components['ShapeComponent'] = {
+        levelData.world.components['ShapeComponent'] = {
             geometry: { kind: 'circle', radius: 50 },
         };
 
@@ -343,21 +355,21 @@ describe('LevelReader refuses a damaged level', () => {
 
     test.each(['BodyComponent', 'SurfaceComponent'])('refuses a World with a %s', (typeName) => {
         const levelData = newLevelData();
-        requireEntity(levelData, 0).components[typeName] = {};
+        levelData.world.components[typeName] = {};
 
         expectDamaged(levelData);
     });
 
     test('refuses an unknown component', () => {
         const levelData = newLevelData();
-        levelData.entities.push(plainEntity(3, 1, { WingsComponent: {} }));
+        levelData.world.children.push(plainEntity(3, { WingsComponent: {} }));
 
         expectDamaged(levelData);
     });
 
     test('refuses an unknown value inside a component', () => {
         const levelData = newLevelData();
-        levelData.entities.push(plainEntity(3, 1, { BodyComponent: { wings: true } }));
+        levelData.world.children.push(plainEntity(3, { BodyComponent: { wings: true } }));
 
         expectDamaged(levelData);
     });
@@ -370,7 +382,7 @@ describe('LevelReader refuses a damaged level', () => {
         ['a component that is not an object', { BodyComponent: 'dynamic' }],
     ])('refuses a value its type refuses: %s', (_, components) => {
         const levelData = newLevelData();
-        levelData.entities.push(plainEntity(3, 1, components));
+        levelData.world.children.push(plainEntity(3, components));
 
         expectDamaged(levelData);
     });
@@ -379,9 +391,9 @@ describe('LevelReader refuses a damaged level', () => {
 describe('LevelReader limits', () => {
     test('reads the most entities allowed, and refuses one more', () => {
         const atLimit = newLevelData();
-        atLimit.entities.push(plainEntity(3, 1), plainEntity(4, 1));
+        atLimit.world.children.push(plainEntity(3), plainEntity(4));
         const overLimit = newLevelData();
-        overLimit.entities.push(plainEntity(3, 1), plainEntity(4, 1), plainEntity(5, 1));
+        overLimit.world.children.push(plainEntity(3), plainEntity(4), plainEntity(5));
 
         expectRead(atLimit, SMALL_LIMITS);
         expectOverLimit(overLimit, 'entities', SMALL_LIMITS.maxEntities);
@@ -389,19 +401,42 @@ describe('LevelReader limits', () => {
 
     test('reads the deepest entity allowed, and refuses one deeper', () => {
         const atLimit = newLevelData();
-        atLimit.entities.push(plainEntity(3, 1), plainEntity(4, 3));
+        atLimit.world.children.push(nestedChain(3, 2));
         const overLimit = newLevelData();
-        overLimit.entities.push(plainEntity(3, 2), plainEntity(4, 3));
+        requireWorldChild(overLimit, 0).children.push(nestedChain(3, 2));
 
         expectRead(atLimit, SMALL_LIMITS);
         expectOverLimit(overLimit, 'depth', SMALL_LIMITS.maxDepth);
     });
 
+    test('refuses an entity 257 deep with the v1 limits, and reads one 256 deep', () => {
+        const atLimit = newLevelData();
+        atLimit.world.children.push(nestedChain(3, 256));
+        const overLimit = newLevelData();
+        overLimit.world.children.push(nestedChain(3, 257));
+
+        expectRead(atLimit);
+        expect(createReader().read(overLimit)).toEqual({
+            ok: false,
+            refusal: { reason: 'overLimit', limit: 'depth', max: 256 },
+        });
+    });
+
+    test('stops at the depth limit in a file nested 50,000 deep, without running out of stack', () => {
+        const levelData = newLevelData();
+        levelData.world.children.push(nestedChain(3, 50_000));
+
+        expect(createReader().read(levelData)).toEqual({
+            ok: false,
+            refusal: { reason: 'overLimit', limit: 'depth', max: 256 },
+        });
+    });
+
     test.each(['polygon', 'line'])('reads a %s with the most points allowed, and refuses one more', (kind) => {
         const atLimit = newLevelData();
-        atLimit.entities.push(shapeEntity(3, { kind, points: pointsOf(4) }));
+        atLimit.world.children.push(shapeEntity(3, { kind, points: pointsOf(4) }));
         const overLimit = newLevelData();
-        overLimit.entities.push(shapeEntity(3, { kind, points: pointsOf(5) }));
+        overLimit.world.children.push(shapeEntity(3, { kind, points: pointsOf(5) }));
 
         expectRead(atLimit, SMALL_LIMITS);
         expectOverLimit(overLimit, 'points', SMALL_LIMITS.maxPoints);
@@ -410,12 +445,12 @@ describe('LevelReader limits', () => {
     test('reads a path with the most points allowed, and refuses one more', () => {
         const pathPoint = { x: 0, y: 0, handle_in: null, handle_out: null, corner: 'sharp' };
         const atLimit = newLevelData();
-        atLimit.entities.push(
-            plainEntity(3, 1, { PathComponent: { path: { closed: false, points: Array(4).fill(pathPoint) } } }),
+        atLimit.world.children.push(
+            plainEntity(3, { PathComponent: { path: { closed: false, points: Array(4).fill(pathPoint) } } }),
         );
         const overLimit = newLevelData();
-        overLimit.entities.push(
-            plainEntity(3, 1, { PathComponent: { path: { closed: false, points: Array(5).fill(pathPoint) } } }),
+        overLimit.world.children.push(
+            plainEntity(3, { PathComponent: { path: { closed: false, points: Array(5).fill(pathPoint) } } }),
         );
 
         expectRead(atLimit, SMALL_LIMITS);

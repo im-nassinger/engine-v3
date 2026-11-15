@@ -74,13 +74,13 @@ export type ReadRefusal =
     | { reason: 'missingFile'; path: string };                    // v2
 ```
 
-- **Parse at the boundary:** `raw` is `unknown` until `LevelReader` has checked every entity, parent, component and value with its field type. After that, the rules trust the types.
+- **Parse at the boundary:** `raw` is `unknown` until `LevelReader` has checked every entity, its children, components and values with their field types. After that, the rules trust the types.
 - **Upgrading:** `FormatUpgrader` holds a list of steps, each turning version N's JSON into N+1's, so the latest version is one more than the number of steps. v1 has none. A file with a higher `formatVersion` than the game knows is refused with "made by a newer version of the game". Versions are never rolled back, as the tech notes warn.
 - **As built (2026-11-14), the reader's rules** *(standing yes, 2026-11-14)*:
   - **The top of the file and each entity must hold exactly their keys**: `format`, `formatVersion`, `physicsVersion`, `name`, `editor`, `world`, and `id`, `hidden`, `locked`, `components`, `children`. The writer always writes them all, and a later change to these shapes is a format version with an upgrade step. Only component values read as their defaults when missing.
   - **A physics version above the game's own is refused as `newerVersion`**, with the file's format version: only a newer game can write one.
   - **The World is the `world` entity**, and must hold its ShapeComponent (a rectangle), StyleComponent and PhysicsWorldComponent, and no BodyComponent or SurfaceComponent. **The camera is the one entity with a CameraComponent.** A missing TransformComponent or NameComponent is made with its defaults, on any entity.
-  - **The reader counts the depth as it goes down** and refuses the file as `overLimit` on reaching 257 levels, before reading further *(standing yes, 2026-11-15)*. *Why: a nested file is read by going down into it, so a file nested thousands deep must stop at the limit, not run out of stack.*
+  - **The reader counts the depth as it goes down** and refuses the file as `overLimit` on reaching 257 levels, before reading further *(standing yes, 2026-11-15)*. *Why: a nested file is read by going down into it, so a file nested thousands deep must stop at the limit, not run out of stack.* As built (stage 9 step 2), the entity count is kept the same way, and a test reads a file nested 50,000 deep and stops at the limit.
   - **A value goes through the component's `writeValue`**, so its type's `parse` refuses it and its `normalize` clamps it, exactly as when the user types it. The point limit is checked on the parsed ShapeComponent and PathComponent.
   - **A folded row whose entity isn't in the file is dropped**, because deleting an entity doesn't unfold its row. The grid size is clamped to 5 to 1,000 px like any other change.
   - **The level is built only once everything is checked**, with `Level.createEmpty(worldId, cameraId)`, so a refused file never makes half a level. The camera is moved to its place among the World's children last.

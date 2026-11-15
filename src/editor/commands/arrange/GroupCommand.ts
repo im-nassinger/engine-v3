@@ -120,7 +120,7 @@ export class GroupCommand implements EditorCommand {
         const components = [new TransformComponent(plan.groupTransform), new NameComponent({ name })];
 
         const groupId = level.allocateId();
-        const groupData = new LevelWriter().writeNewEntity(groupId, plan.parent.id, components);
+        const groupData = new LevelWriter().writeNewEntity(groupId, components);
         const place = { parentId: plan.parent.id, index: plan.index };
         const change = new AddEntitiesChange({ reader: this.session.reader, entities: [groupData], place });
         transaction.apply(change);

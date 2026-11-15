@@ -5,7 +5,7 @@ import type { TreePlace } from './MoveEntityChange.ts';
 
 export type SubtreeCopyOptions = {
     readonly reader: LevelReader;
-    // As LevelWriter.writeSubtree gave them: each parent before its children.
+    // The roots as LevelWriter.writeSubtree gave them, each with its children nested inside.
     readonly entities: readonly EntityData[];
     // Where the first root goes; the other roots follow it in their order.
     readonly place: TreePlace;
@@ -23,7 +23,7 @@ export class SubtreeCopy {
         this.reader = options.reader;
         this.entities = cloneEntities(options.entities);
         this.place = options.place;
-        this.rootIds = rootIdsOf(this.entities);
+        this.rootIds = this.entities.map((root) => root.id);
     }
 
     // The command checked the data before building the change, so a refusal is a bug.
@@ -49,23 +49,6 @@ function cloneEntities(entities: readonly EntityData[]) {
     const text = JSON.stringify(entities);
 
     return JSON.parse(text) as readonly EntityData[];
-}
-
-// The same roots LevelReader.readSubtree finds: each entity whose parent isn't listed before it.
-function rootIdsOf(entities: readonly EntityData[]) {
-    const listed = new Set<EntityId>();
-    const rootIds: EntityId[] = [];
-
-    for (const entity of entities) {
-        const isRoot = entity.parent === null || !listed.has(entity.parent);
-        if (isRoot) {
-            rootIds.push(entity.id);
-        }
-
-        listed.add(entity.id);
-    }
-
-    return rootIds;
 }
 
 // Where an entity sits now, to put it back in the same place.

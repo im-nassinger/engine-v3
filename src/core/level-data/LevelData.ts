@@ -4,14 +4,15 @@ import type { EntityId, JsonValue } from '../fields/index.ts';
 export type ComponentData = { readonly [fileKey: string]: JsonValue };
 
 // One entity as plain data, the same shape as one entity in level.json. Copies, undo of a delete, the
-// clipboard and the play copy all use it.
+// clipboard and the play copy all use it. It names no parent: its parent is the entity it sits in.
 export type EntityData = {
     readonly id: EntityId;
-    readonly parent: EntityId | null;
     readonly hidden: boolean;
     readonly locked: boolean;
     // Keyed by component type name, in card order.
     readonly components: { readonly [typeName: string]: ComponentData };
+    // In Entities panel order, top row first.
+    readonly children: readonly EntityData[];
 };
 
 // What only the editor reads. The v3 play file drops it.
@@ -27,8 +28,8 @@ export type LevelData = {
     readonly physicsVersion: number;
     readonly name: string;
     readonly editor: EditorData;
-    // Entities panel order: each parent before its children, children in their order.
-    readonly entities: readonly EntityData[];
+    // The one entity at the top, with every other entity inside it.
+    readonly world: EntityData;
 };
 
 // The first thing the reader checks: without it, a file is not a level at all.

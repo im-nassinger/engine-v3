@@ -14,7 +14,7 @@ export class LevelWriter {
             gridSize: level.editorData.gridSize,
             foldedRows: level.editorData.foldedRows(),
         };
-        const entities = this.writeSubtree([level.world]);
+        const world = this.writeEntity(level.world);
 
         return {
             format: LEVEL_FORMAT,
@@ -22,25 +22,18 @@ export class LevelWriter {
             physicsVersion: PhysicsVersions.current,
             name: level.name,
             editor,
-            entities,
+            world,
         };
     }
 
-    // Each given entity with everything inside it, parents first. The given entities keep their own
-    // parent's id, which the caller may ignore.
+    // Each given entity with everything inside it, one nested EntityData per given entity.
     writeSubtree(entities: readonly Entity[]): readonly EntityData[] {
-        const written: EntityData[] = [];
-
-        for (const subtreeRoot of entities) {
-            this.writeEntityAndChildren(subtreeRoot, written);
-        }
-
-        return written;
+        return entities.map((entity) => this.writeEntity(entity));
     }
 
     // An entity that isn't in a level yet, as data a change adds later: shown, unlocked, its components in
-    // card order.
-    writeNewEntity(id: EntityId, parentId: EntityId, components: readonly AnyComponent[]): EntityData {
+    // card order, no children.
+    writeNewEntity(id: EntityId, components: readonly AnyComponent[]): EntityData {
         const inCardOrder = [...components].sort((first, second) => first.schema.cardOrder - second.schema.cardOrder);
         const componentData: Record<string, ComponentData> = {};
 
@@ -48,17 +41,10 @@ export class LevelWriter {
             componentData[component.schema.typeName] = this.writeComponent(component);
         }
 
-        return { id, parent: parentId, hidden: false, locked: false, components: componentData };
+        return { id, hidden: false, locked: false, components: componentData, children: [] };
     }
 
-    private writeEntityAndChildren(entity: Entity, written: EntityData[]) {
-        written.push(this.writeEntity(entity));
-
-        for (const child of entity.children) {
-            this.writeEntityAndChildren(child, written);
-        }
-    }
-
+    // Recursion is safe: the level is never deeper than the depth limit.
     private writeEntity(entity: Entity): EntityData {
         const components: Record<string, ComponentData> = {};
 
@@ -66,14 +52,14 @@ export class LevelWriter {
             components[component.schema.typeName] = this.writeComponent(component);
         }
 
-        const parentId = entity.parent?.id ?? null;
+        const children = entity.children.map((child) => this.writeEntity(child));
 
         return {
             id: entity.id,
-            parent: parentId,
             hidden: entity.isHidden,
             locked: entity.isLocked,
             components,
+            children,
         };
     }
 
