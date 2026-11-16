@@ -13,3 +13,5 @@ export type { LevelPointerInput, Modifiers, PointerButton, Tool, ToolContext, To
 export { PICK_HINT, ToolController } from './ToolController.ts';
 export type { PickEntity, ToolServices } from './ToolController.ts';
 export { TOOL_KEYS } from './toolKeys.ts';
+export { JointTool, NOTHING_HERE } from './joint/JointTool.ts';
+export type { JointPreview } from './joint/JointTool.ts';

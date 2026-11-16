@@ -61,6 +61,8 @@ export { moveEntities } from './move/moveEntities.ts';
 export type { MoveOutcome } from './move/moveEntities.ts';
 export { SelectionMove } from './move/SelectionMove.ts';
 export { nudgeSelection } from './move/nudgeSelection.ts';
+export { placeJoint } from './joints/placeJoint.ts';
+export type { JointPlacement, PlaceJointOutcome } from './joints/placeJoint.ts';
 export { addPoint } from './points/addPoint.ts';
 export type { AddPointOutcome } from './points/addPoint.ts';
 export { deletePoints } from './points/deletePoints.ts';
