@@ -236,7 +236,7 @@ Written under the standing yes (2026-11-16), and all thirteen built that day. Ea
 
 ## Stage 13 in steps
 
-Written under the standing yes (2026-11-16). Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [simulation.md](architecture/simulation.md#stage-13s-choices). Joints and their `JointPathPhase` wait for stage 14 and the `CameraPhase` for stage 15, so this stage builds bodies and surfaces only.
+Written under the standing yes (2026-11-16), and all eleven built that day. Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [simulation.md](architecture/simulation.md#stage-13s-choices). Joints and their `JointPathPhase` wait for stage 14 and the `CameraPhase` for stage 15, so this stage builds bodies and surfaces only.
 
 | # | Step | Module | Ends with |
 |---|---|---|---|
@@ -250,7 +250,7 @@ Written under the standing yes (2026-11-16). Each step ends with its tests, `npm
 | 8 | `LevelBoundsPhase`: an entity fully outside an open edge is removed, once it has been inside; the hard limit: a body past 100,000 px from the origin is removed with a warning in the report; the maximum level size: the World's rectangle at most 200,000×200,000 px, refused by the reader and capped in the editor | `core/simulation`, `core/level-data`, `core/components` | A body falling out of open bounds is removed and with Walls on it lands; one starting outside stays until it has been inside; one thrown past the hard limit with Walls on is removed and named; a level with 200,001 px bounds is refused and the width field stops at 200,000. **Done** |
 | 9 | `runHeadless`, the determinism test's seven levels as `level.json` files in `tests/levels/determinism/`, `npm run determinism:record` writing each level's 600 hashes, and `tests/determinism/determinism.test.ts` in Node, so `npm run check` runs it in CI on x86 and ARM; a failure names the first tick and the first body that differ | `core/simulation`, `tests/determinism`, `tests/levels/determinism` | Every level matches its recorded hashes; the same level run twice in one process matches; CI passes on `ubuntu-24.04` and `ubuntu-24.04-arm`. **Done** |
 | 10 | The determinism test in Chromium, Firefox and WebKit through Vitest's browser mode, against the same recorded hashes | `tests/determinism` | The browser tests pass in three browsers. **Done** |
-| 11 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes |
+| 11 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes. **Done** |
 
 ## After v1
 
