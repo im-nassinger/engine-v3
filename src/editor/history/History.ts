@@ -12,6 +12,8 @@ export class History {
     static readonly joinWithinMs = 1_000;
 
     readonly version = new VersionCounter();
+    // Moves on each undo and redo but not on a new step, for what an undo or redo makes stale.
+    readonly undoneOrRedone = new VersionCounter();
     private readonly clock: Clock;
     private undoSteps: HistoryStep[] = [];
     private redoSteps: HistoryStep[] = [];
@@ -54,6 +56,7 @@ export class History {
         this.redoSteps.push(step);
         this.lastStepCanJoin = false;
         this.version.increment();
+        this.undoneOrRedone.increment();
 
         return step;
     }
@@ -69,6 +72,7 @@ export class History {
         this.undoSteps.push(step);
         this.lastStepCanJoin = false;
         this.version.increment();
+        this.undoneOrRedone.increment();
 
         return step;
     }

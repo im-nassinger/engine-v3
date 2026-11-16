@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 10, step 5 of 11: `HighDetailRule` gives a polygon or line over 200 points the tip `High detail may slow physics` under its Points field, and the tip goes when points are deleted down to 200. Next is step 6: `PointEditState`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 10, step 6 of 11: `PointEditState` edits a polygon's or line's points after a double-click: a click, Shift+click and a box select them, and Esc, another entity, empty space outside the frame, a selection change or the shape going away end it; undo and redo clear the selected points. Next is step 7: the point edits. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -172,7 +172,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 10 of [plan.md](plan.md#stage-10-in-steps): the Shape tool and point editing.** Steps 1 and 2 are done; step 3 builds the Shape tool's rectangle and circle.
+1. **Stage 10 of [plan.md](plan.md#stage-10-in-steps): the Shape tool and point editing.** Steps 1 to 6 are done; step 7 builds the point edits.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

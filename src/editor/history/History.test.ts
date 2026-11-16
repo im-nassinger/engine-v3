@@ -202,4 +202,22 @@ describe('History', () => {
         expect(history.undoCount).toBe(0);
         expect(history.redoCount).toBe(0);
     });
+
+    test('undoneOrRedone moves on an undo and a redo, not on a new step or one with nothing to undo', () => {
+        const { level, square } = buildChangesTestLevel();
+        const history = new History(new ManualClock());
+        let moves = 0;
+        history.undoneOrRedone.subscribe(() => {
+            moves += 1;
+        });
+
+        recordApplied(history, level, stepOf('Hide', [new SetSwitchChange(square.id, 'hidden', false, true)]));
+        expect(moves).toBe(0);
+
+        history.undo(level);
+        history.undo(level);
+        history.redo(level);
+
+        expect(moves).toBe(2);
+    });
 });

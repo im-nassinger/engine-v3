@@ -6,14 +6,18 @@ import { SelectionFrame } from './frame/SelectionFrame.ts';
 import type { DragReadout } from '../readout/DragReadout.ts';
 import { SelectionPicker } from './SelectionPicker.ts';
 import { IdleState } from './states/IdleState.ts';
+import { PointBoxState } from './states/PointBoxState.ts';
+import type { PointEditing } from './states/PointEditing.ts';
+import { PointEditState } from './states/PointEditState.ts';
+import { PointPressState } from './states/PointPressState.ts';
 import type { SelectState, SelectStateHost } from './states/SelectState.ts';
 
 const SELECT_HINT =
     'Click to select. Drag to move. Drag a handle to resize, or just outside a corner to rotate. Drag on empty space to select with a box. Double-click goes into a group.';
 
 // Picks entities by click, Shift+click and the selection box, moves them by dragging, resizes one entity by
-// its handles and rotates it just outside a corner, and goes into and out of groups by double-click. It
-// holds one drag state at a time.
+// its handles and rotates it just outside a corner, goes into and out of groups by double-click, and edits
+// a polygon's or line's points after a double-click on it. It holds one state at a time.
 export class SelectTool implements Tool {
     readonly id = 'select';
     readonly hint = SELECT_HINT;
@@ -41,6 +45,14 @@ export class SelectTool implements Tool {
         return SelectionFrame.of(this.context.openLevel);
     }
 
+    // The polygon or line whose points are being edited, with its selected points, for the overlay.
+    get editedPoints() {
+        const editing = pointEditingOf(this.state);
+        if (editing === undefined || !editing.isEditing) return undefined;
+
+        return editing.points;
+    }
+
     activate(context: ToolContext) {
         this.context = context;
         const host: SelectStateHost = {
@@ -50,19 +62,26 @@ export class SelectTool implements Tool {
                 this.state = state;
             },
             goIdle: () => {
-                this.state = new IdleState(host);
+                const idle = new IdleState(host);
+                this.state = idle;
                 this.showReadout(undefined);
+
+                return idle;
             },
             showBox: (box) => this.showBox(box),
             showReadout: (readout) => this.showReadout(readout),
+            redraw: () => this.preview.increment(),
         };
 
         this.state = new IdleState(host);
     }
 
-    // A drag in progress ends as if Esc were pressed.
+    // A drag in progress ends as if Esc were pressed, and so does point editing.
     deactivate() {
-        this.state?.cancel();
+        let hadSomethingToCancel = this.state?.cancel() ?? false;
+        while (hadSomethingToCancel) {
+            hadSomethingToCancel = this.state?.cancel() ?? false;
+        }
     }
 
     pointerDown(input: LevelPointerInput) {
@@ -105,4 +124,12 @@ export class SelectTool implements Tool {
         this.shownReadout = readout;
         this.preview.increment();
     }
+}
+
+// Point editing goes on during a press or a box drag on its points.
+function pointEditingOf(state: SelectState | undefined): PointEditing | undefined {
+    if (state instanceof PointEditState) return state;
+    if (state instanceof PointPressState || state instanceof PointBoxState) return state.editing;
+
+    return undefined;
 }

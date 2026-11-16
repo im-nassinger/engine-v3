@@ -8,10 +8,12 @@ export type SelectStateHost = {
     readonly context: ToolContext;
     readonly picker: SelectionPicker;
     goTo(state: SelectState): void;
-    // Also hides the readout.
-    goIdle(): void;
+    // Also hides the readout. Returns the new IdleState, for a press it should answer.
+    goIdle(): SelectState;
     showBox(box: Bounds | undefined): void;
     showReadout(readout: DragReadout): void;
+    // The overlay draws again: the selected points changed.
+    redraw(): void;
 };
 
 // One of the Select tool's drag states (the State pattern). Only one is active at a time.
