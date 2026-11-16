@@ -158,7 +158,7 @@ Written under the standing yes (2026-11-15), and all fifteen built on 2026-11-15
 
 ## Stage 9 in steps
 
-Written under the standing yes (2026-11-15). Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices).
+Written under the standing yes (2026-11-15), and all seventeen built by 2026-11-16 (step 16 added on 2026-11-16). Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices).
 
 | # | Step | Module | Ends with |
 |---|---|---|---|
@@ -178,7 +178,7 @@ Written under the standing yes (2026-11-15). Each step ends with its tests, `npm
 | 14 | The page: the toolbar from `ToolController` with tool lock, the grid snapping switch in the top bar, the status bar's tool hint and mouse position, `Back to level`, the entity field's picker that waits for a click in the level view, the Inspector's slider changing the level while dragged through `LiveEdit` | `ui/toolbar`, `ui/top-bar`, `ui/status-bar`, `ui/level-view-host`, `ui/fields`, `app` | Browser tests: double-clicking Select locks it; the mouse position follows; the picker sets the camera's Follow in one step and Esc leaves it; a slider drag is one step |
 | 15 | Playwright: select the camera by its frame, move it, undo; a selection box; go into a group and out with Esc. The speed tests: selecting within 0.05 s and dragging 1,000 entities at 10,000, on a level from `tests/levels/` | `tests/e2e`, `tests/performance`, `tests/levels` | Both speed numbers met and written in [performance.md](architecture/performance.md) |
 | 16 | **Dragging 1,000 entities meets 16.7 ms** (standing yes, 2026-11-16, added after step 15 measured 22 ms): culling only what changed while the view stays, and the moved shapes' drawing cheaper for PixiJS, from the frame's parts in [performance.md](architecture/performance.md#targets-and-their-tests) | `adapters/pixi`, `editor/tools/select` | `npm run test:performance` on the owner's laptop: 95% of drag frames under 16.7 ms, written in performance.md. **Done:** 14.0 to 14.8 ms, with render chunks and culling only what changed |
-| 17 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes |
+| 17 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes. **Done** |
 
 ## After v1
 
