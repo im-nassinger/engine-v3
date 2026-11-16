@@ -7,6 +7,8 @@ import { EditorContext } from '../ui/EditorContext.tsx';
 import { LevelViewMountContext } from '../ui/level-view-host/index.ts';
 import { OpenWindowsContext } from '../ui/open-windows/index.ts';
 import { EditorShell } from '../ui/shell/index.ts';
+import { ToolsContext } from '../ui/tools/index.ts';
+import type { EditorTools } from '../ui/tools/index.ts';
 import { EditorComposition } from './EditorComposition.ts';
 
 function requireElement(id: string) {
@@ -29,16 +31,19 @@ const editorCommands: EditorCommands = {
     runner: composition.runner,
     platform: composition.platform,
 };
+const editorTools: EditorTools = { controller: composition.tools, mouse: composition.mouse };
 
 root.render(
     <StrictMode>
         <EditorContext value={composition.session}>
             <CommandsContext value={editorCommands}>
-                <OpenWindowsContext value={composition.openWindows}>
-                    <LevelViewMountContext value={composition.levelView}>
-                        <EditorShell />
-                    </LevelViewMountContext>
-                </OpenWindowsContext>
+                <ToolsContext value={editorTools}>
+                    <OpenWindowsContext value={composition.openWindows}>
+                        <LevelViewMountContext value={composition.levelView}>
+                            <EditorShell />
+                        </LevelViewMountContext>
+                    </OpenWindowsContext>
+                </ToolsContext>
             </CommandsContext>
         </EditorContext>
     </StrictMode>,

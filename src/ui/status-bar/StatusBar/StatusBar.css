@@ -15,7 +15,12 @@
         color: var(--text);
     }
 
+    > .mouse-position,
     > .selection-summary {
         color: var(--muted);
+    }
+
+    > .mouse-position {
+        font-variant-numeric: tabular-nums;
     }
 }

@@ -8,10 +8,11 @@ import { useFieldTyping } from '../typing/useFieldTyping.ts';
 import { FieldSlider } from './FieldSlider/index.ts';
 import './NumberField.css';
 
-// A number or an angle: the box with its faded unit, and a slider when it has both limits. A value that
+// A number or an angle: the box with its faded unit, and a slider when it has both limits, changing the
+// level while dragged when given slide handlers. A value that
 // can't be read gets a red outline and its reason under the box; one past a limit is clamped, with a
 // brief note saying so.
-export function NumberField({ field, onCommit }: FieldProps) {
+export function NumberField({ field, onCommit, slide }: FieldProps) {
     const definition = numberInputOf(field);
     const { message, refuse, noteClamp, clear } = useFieldMessage();
     // The value the slider is dragged to, shown in the box until it is let go.
@@ -39,9 +40,20 @@ export function NumberField({ field, onCommit }: FieldProps) {
         return true;
     };
 
+    const slideSlider = (value: number) => {
+        setSlidingValue(value);
+        slide?.slideTo(value);
+    };
+
     const releaseSlider = (value: number) => {
         setSlidingValue(undefined);
-        commitValue(value, undefined);
+        if (slide === undefined) {
+            commitValue(value, undefined);
+            return;
+        }
+
+        clear();
+        slide.release(value);
     };
 
     const value = field.value;
@@ -70,7 +82,7 @@ export function NumberField({ field, onCommit }: FieldProps) {
             definition={definition}
             value={shownValue}
             isDisabled={!field.isEnabled}
-            onSlide={setSlidingValue}
+            onSlide={slideSlider}
             onRelease={releaseSlider}
         />
     );

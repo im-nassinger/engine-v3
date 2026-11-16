@@ -1,15 +1,32 @@
-import { MousePointer2 } from 'lucide-react';
-import { IconButton } from '../../shared/index.ts';
+import { useVersion } from '../../hooks/index.ts';
+import { useEditorTools } from '../../tools/index.ts';
+import { ToolButton } from './ToolButton/index.ts';
 import './Toolbar.css';
 
-// Select is the only tool until stage 9 builds ToolController, so it is always the active one and
-// clicking it changes nothing. Its key, 1, joins its tooltip when the key works.
+// One button per tool ToolController holds, in its order: Select in v1 until the Shape and Joint tools
+// come with their stages. Clicking a tool picks it; clicking the active one again locks it.
 export function Toolbar() {
-    const keepSelect = () => {};
+    // The active tool and the lock are read from the same controller object each time it moves, so the
+    // React Compiler must not keep an old answer.
+    'use no memo';
+
+    const { controller } = useEditorTools();
+    useVersion(controller.version);
+
+    const activeId = controller.active.id;
+    const isLocked = controller.isLocked;
 
     return (
         <div className="toolbar" role="toolbar" aria-label="Tools" aria-orientation="vertical">
-            <IconButton icon={MousePointer2} label="Select" isOn onClick={keepSelect} />
+            {controller.tools.map((tool) => (
+                <ToolButton
+                    key={tool.id}
+                    toolId={tool.id}
+                    isActive={tool.id === activeId}
+                    isLocked={tool.id === activeId && isLocked}
+                    onPick={() => controller.pick(tool.id)}
+                />
+            ))}
         </div>
     );
 }

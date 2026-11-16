@@ -1,0 +1,16 @@
+.tool-button {
+    position: relative;
+    display: flex;
+
+    &[data-locked='true']::after {
+        content: '';
+        position: absolute;
+        right: 3px;
+        bottom: 3px;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--accent);
+        pointer-events: none;
+    }
+}

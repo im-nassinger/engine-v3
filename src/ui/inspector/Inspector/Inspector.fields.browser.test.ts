@@ -235,7 +235,30 @@ describe('Inspector fields', () => {
         expect(fieldRow('TransformComponent', 'skew').querySelector('input[type="range"]')).toBeNull();
     });
 
-    test('the slider commits once, when it is let go', async () => {
+    test('the slider changes the level while dragged and is one step when let go', async () => {
+        const { crate, session } = await showCrate();
+        const slider = requireElement<HTMLInputElement>(
+            fieldRow('BodyComponent', 'linearDamping'),
+            'input[type="range"]',
+        );
+
+        for (const value of ['10', '18', '25']) {
+            Reflect.set(HTMLInputElement.prototype, 'value', value, slider);
+            slider.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        await expect.poll(() => boxOf('BodyComponent', 'linearDamping').value).toBe('25');
+        expect(linearDamping(crate)).toBe(25);
+        expect(session.openLevel.history.undoCount).toBe(0);
+
+        slider.dispatchEvent(new Event('change', { bubbles: true }));
+        await expect.poll(() => session.openLevel.history.undoCount).toBe(1);
+        expect(undoLabel(session)).toBe('Change Linear damping');
+
+        session.openLevel.editor.undo();
+        expect(linearDamping(crate)).toBe(0);
+    });
+
+    test('Esc during a slider drag puts the value back and the release makes no step', async () => {
         const { crate, session } = await showCrate();
         const slider = requireElement<HTMLInputElement>(
             fieldRow('BodyComponent', 'linearDamping'),
@@ -244,12 +267,13 @@ describe('Inspector fields', () => {
 
         Reflect.set(HTMLInputElement.prototype, 'value', '25', slider);
         slider.dispatchEvent(new Event('input', { bubbles: true }));
-        await expect.poll(() => boxOf('BodyComponent', 'linearDamping').value).toBe('25');
-        expect(linearDamping(crate)).toBe(0);
-
-        slider.dispatchEvent(new Event('change', { bubbles: true }));
         await expect.poll(() => linearDamping(crate)).toBe(25);
-        expect(undoLabel(session)).toBe('Change Linear damping');
+
+        session.openLevel.liveEdit.cancel();
+        slider.dispatchEvent(new Event('change', { bubbles: true }));
+
+        expect(linearDamping(crate)).toBe(0);
+        expect(session.openLevel.history.undoCount).toBe(0);
     });
 
     test('a checkbox click is one step', async () => {

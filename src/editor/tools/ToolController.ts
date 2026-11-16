@@ -9,6 +9,11 @@ export type ToolServices = Omit<ToolContext, 'finished'>;
 
 const SPACE_CODE = 'Space';
 
+export const PICK_HINT = 'Click an entity to pick it. Esc cancels.';
+
+// What the entity field's picker is told: the entity clicked, or undefined for a click on nothing.
+export type PickEntity = (entityId: EntityId | undefined) => void;
+
 // Picks the active tool, keeps tool lock, pans before any tool, and returns to Select after a tool
 // makes something.
 export class ToolController {
@@ -20,6 +25,8 @@ export class ToolController {
     private readonly toolButtons = new Set<PointerButton>();
     private current: Tool;
     private locked = false;
+    // While the entity field's picker waits, the next click in the level view goes to it, not the tool.
+    private pickWaiting: PickEntity | undefined;
 
     constructor(tools: readonly Tool[], services: ToolServices, pan: PanGesture) {
         for (const tool of tools) {
@@ -40,6 +47,22 @@ export class ToolController {
 
     get isLocked() {
         return this.locked;
+    }
+
+    get isPicking() {
+        return this.pickWaiting !== undefined;
+    }
+
+    // Whether this picker is the one waiting, for the entity field whose picker button shows it.
+    isWaitingFor(onPicked: PickEntity) {
+        return this.pickWaiting === onPicked;
+    }
+
+    // The status bar's hint: the picker's while it waits, else the active tool's.
+    get hint() {
+        if (this.pickWaiting !== undefined) return PICK_HINT;
+
+        return this.current.hint;
     }
 
     // In the order given, for the toolbar.
@@ -71,8 +94,26 @@ export class ToolController {
         return this.toolsById.has(id);
     }
 
+    // The entity field's picker: the next left click in the level view picks the topmost entity under
+    // the mouse, inside groups, and the tool before it comes back. Asking again replaces the one waiting.
+    // The answer stops it waiting, if it still is.
+    waitForPick(onPicked: PickEntity) {
+        this.pickWaiting = onPicked;
+        this.version.increment();
+
+        return () => {
+            if (this.pickWaiting !== onPicked) return;
+
+            this.endPick();
+        };
+    }
+
     pointerDown(input: LevelPointerInput) {
         if (this.pan.pointerDown(input)) return;
+        if (this.pickWaiting !== undefined) {
+            this.pickAt(input);
+            return;
+        }
 
         this.toolButtons.add(input.button);
         this.current.pointerDown(input);
@@ -81,6 +122,11 @@ export class ToolController {
     // While panning during a tool's drag, the tool hears the mouse at its new level position, since
     // the level moved under it.
     pointerMove(input: LevelPointerInput) {
+        if (this.pickWaiting !== undefined) {
+            this.pan.pointerMove(input);
+            return;
+        }
+
         if (this.pan.pointerMove(input)) {
             if (this.toolButtons.size === 0) return;
 
@@ -134,8 +180,10 @@ export class ToolController {
         return wasDragging;
     }
 
-    // Esc's third step: the tool's unfinished drawing.
+    // Esc's third step: the picker waiting, or else the tool's unfinished drawing.
     cancelDrawing() {
+        if (this.endPick()) return true;
+
         return this.current.cancel();
     }
 
@@ -152,6 +200,28 @@ export class ToolController {
         return true;
     }
 
+    private pickAt(input: LevelPointerInput) {
+        const onPicked = this.pickWaiting;
+        if (onPicked === undefined) return;
+        if (input.button !== 'left') return;
+
+        const { openLevel, view } = this.context;
+        const probe = { zoom: view.zoom, currentGroup: openLevel.level.world };
+        const hit = openLevel.hitTester.topmostAt(input.levelPosition, probe);
+
+        this.endPick();
+        onPicked(hit?.id);
+    }
+
+    private endPick() {
+        if (this.pickWaiting === undefined) return false;
+
+        this.pickWaiting = undefined;
+        this.version.increment();
+
+        return true;
+    }
+
     private finish(created: readonly EntityId[]) {
         this.context.openLevel.selection.replace(created);
         if (this.locked) return;
@@ -162,6 +232,7 @@ export class ToolController {
     }
 
     private switchTo(tool: Tool) {
+        this.endPick();
         this.current.deactivate();
         this.toolButtons.clear();
         this.current = tool;

@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'vitest';
 
+import { ShapeComponent, StyleComponent } from '../../core/components/index.ts';
+import type { EntityId } from '../../core/level/index.ts';
 import { pointerAt, buildToolTestSession, toolKey } from './testing/toolTestSession.ts';
+import { PICK_HINT } from './ToolController.ts';
 
 const SPACE = toolKey('Space', ' ');
 
@@ -134,5 +137,91 @@ describe('ToolController', () => {
 
         expect(controller.keyDown(toolKey('Enter', 'Enter'))).toBe(true);
         expect(controller.keyDown(toolKey('KeyQ', 'q'))).toBe(false);
+    });
+
+    describe("the entity field's picker", () => {
+        // The group's square gets a filled 100 px shape around the origin, so a click there hits it.
+        function buildPickSession() {
+            const parts = buildToolTestSession();
+            const geometry = { kind: 'rectangle', width: 100, height: 100 } as const;
+            parts.square.addComponent(new ShapeComponent({ geometry }));
+            parts.square.addComponent(new StyleComponent());
+            const picked: (EntityId | undefined)[] = [];
+            const recordPick = (entityId: EntityId | undefined) => picked.push(entityId);
+
+            return { ...parts, picked, recordPick };
+        }
+
+        test('the next click picks the entity inside its group, and the tool never hears it', () => {
+            const { controller, select, square, picked, recordPick, session } = buildPickSession();
+
+            controller.waitForPick(recordPick);
+            expect(controller.isPicking).toBe(true);
+            expect(controller.hint).toBe(PICK_HINT);
+
+            controller.pointerDown(pointerAt({ x: 10, y: 10 }));
+            controller.pointerMove(pointerAt({ x: 12, y: 10 }));
+            controller.pointerUp(pointerAt({ x: 12, y: 10 }));
+
+            expect(picked).toEqual([square.id]);
+            expect(controller.isPicking).toBe(false);
+            expect(controller.hint).toBe('select hint');
+            expect(select.heard).toEqual(['activate', 'move']);
+            expect(session.openLevel.selection.isEmpty).toBe(true);
+        });
+
+        test('a click on nothing ends it with nothing picked', () => {
+            const { controller, picked, recordPick } = buildPickSession();
+
+            controller.waitForPick(recordPick);
+            controller.pointerDown(pointerAt({ x: 500, y: 500 }));
+
+            expect(picked).toEqual([undefined]);
+            expect(controller.isPicking).toBe(false);
+        });
+
+        test('a right click and a middle pan leave it waiting', () => {
+            const { controller, picked, recordPick } = buildPickSession();
+
+            controller.waitForPick(recordPick);
+            controller.pointerDown(pointerAt({ x: 10, y: 10 }, 'right'));
+            controller.pointerDown(pointerAt({ x: 10, y: 10 }, 'middle'));
+            controller.pointerMove(pointerAt({ x: 40, y: 10 }));
+            controller.pointerUp(pointerAt({ x: 40, y: 10 }, 'middle'));
+
+            expect(picked).toEqual([]);
+            expect(controller.isPicking).toBe(true);
+        });
+
+        test('Esc, picking a tool or the answer it was given ends it with nothing picked', () => {
+            const { controller, select, picked, recordPick } = buildPickSession();
+
+            controller.waitForPick(recordPick);
+            expect(controller.cancelDrawing()).toBe(true);
+            expect(controller.isPicking).toBe(false);
+            expect(select.heard).toEqual(['activate']);
+
+            controller.waitForPick(recordPick);
+            controller.pick('shape');
+            expect(controller.isPicking).toBe(false);
+
+            const stopWaiting = controller.waitForPick(recordPick);
+            stopWaiting();
+            expect(controller.isPicking).toBe(false);
+            expect(picked).toEqual([]);
+        });
+
+        test('an older answer never stops a newer picker', () => {
+            const { controller, recordPick } = buildPickSession();
+
+            const stopFirst = controller.waitForPick(recordPick);
+            const pickSecond = () => {};
+            controller.waitForPick(pickSecond);
+            stopFirst();
+
+            expect(controller.isPicking).toBe(true);
+            expect(controller.isWaitingFor(pickSecond)).toBe(true);
+            expect(controller.isWaitingFor(recordPick)).toBe(false);
+        });
     });
 });

@@ -16,7 +16,14 @@ import { EditorSession } from '../editor/session/index.ts';
 import { ShortcutDispatcher } from '../editor/shortcuts/index.ts';
 import type { KeyboardPlatform } from '../editor/shortcuts/index.ts';
 import { GridSnapper } from '../editor/snapping/index.ts';
-import { EscapeChain, OpenWindowCount, PanGesture, SelectTool, ToolController } from '../editor/tools/index.ts';
+import {
+    EscapeChain,
+    MousePosition,
+    OpenWindowCount,
+    PanGesture,
+    SelectTool,
+    ToolController,
+} from '../editor/tools/index.ts';
 
 import { EditorSelectionSource } from './EditorSelectionSource.ts';
 
@@ -31,6 +38,7 @@ type EditorParts = {
     readonly keyboard: KeyboardInput;
     readonly pointer: PointerInput;
     readonly tools: ToolController;
+    readonly mouse: MousePosition;
     readonly openWindows: OpenWindowCount;
 };
 
@@ -43,6 +51,7 @@ export class EditorComposition {
     readonly platform: KeyboardPlatform;
     readonly levelView: PixiLevelView;
     readonly tools: ToolController;
+    readonly mouse: MousePosition;
     // The page's menus and the Entities panel's row drag report here, so Esc leaves them to close.
     readonly openWindows: OpenWindowCount;
     private readonly keyboard: KeyboardInput;
@@ -57,6 +66,7 @@ export class EditorComposition {
         this.keyboard = parts.keyboard;
         this.pointer = parts.pointer;
         this.tools = parts.tools;
+        this.mouse = parts.mouse;
         this.openWindows = parts.openWindows;
     }
 
@@ -83,7 +93,8 @@ export class EditorComposition {
         const escape = new EscapeChain(session, tools, openWindows);
         const dispatcher = new ShortcutDispatcher(commands, runner, platform, { tools, escape });
         const keyboard = new KeyboardInput(dispatcher, window);
-        const pointerParts = { tools, escape, view: session.view, platform };
+        const mouse = new MousePosition(frames);
+        const pointerParts = { tools, escape, mouse, view: session.view, platform };
         const pointer = new PointerInput(pointerParts, levelView.canvas, window);
 
         const composition = new EditorComposition({
@@ -95,6 +106,7 @@ export class EditorComposition {
             keyboard,
             pointer,
             tools,
+            mouse,
             openWindows,
         });
         composition.start();

@@ -1,7 +1,13 @@
 import type { Unsubscribe } from '../../../core/events/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
 import type { KeyboardPlatform } from '../../../editor/shortcuts/index.ts';
-import type { EscapeChain, LevelPointerInput, PointerButton, ToolController } from '../../../editor/tools/index.ts';
+import type {
+    EscapeChain,
+    LevelPointerInput,
+    MousePosition,
+    PointerButton,
+    ToolController,
+} from '../../../editor/tools/index.ts';
 import { ZOOM_STEP } from '../../../editor/view/index.ts';
 import type { ViewState } from '../../../editor/view/index.ts';
 
@@ -11,6 +17,8 @@ import { NOTCH_PX, wheelPixels } from './wheelPixels.ts';
 export type PointerInputParts = {
     readonly tools: Pick<ToolController, 'pointerDown' | 'pointerMove' | 'pointerUp'>;
     readonly escape: Pick<EscapeChain, 'dragLost' | 'focusLost'>;
+    // The status bar's mouse position.
+    readonly mouse: Pick<MousePosition, 'moveTo' | 'leave'>;
     readonly view: ViewState;
     readonly platform: KeyboardPlatform;
 };
@@ -49,6 +57,7 @@ export class PointerInput {
         const handleMove = (event: PointerEvent) => this.handleMove(event);
         const handleUp = (event: PointerEvent) => this.handleUp(event);
         const handleCancel = () => this.parts.escape.dragLost();
+        const handleLeave = () => this.parts.mouse.leave();
         const handleMouseDown = (event: MouseEvent) => stopAutoscroll(event);
         const handleWheel = (event: WheelEvent) => this.handleWheel(event);
         const handleBlur = (event: FocusEvent) => this.handleBlur(event);
@@ -57,6 +66,7 @@ export class PointerInput {
         element.addEventListener('pointermove', handleMove);
         element.addEventListener('pointerup', handleUp);
         element.addEventListener('pointercancel', handleCancel);
+        element.addEventListener('pointerleave', handleLeave);
         element.addEventListener('mousedown', handleMouseDown);
         element.addEventListener('wheel', handleWheel, notPassive);
         this.page.addEventListener('blur', handleBlur);
@@ -66,6 +76,7 @@ export class PointerInput {
             element.removeEventListener('pointermove', handleMove);
             element.removeEventListener('pointerup', handleUp);
             element.removeEventListener('pointercancel', handleCancel);
+            element.removeEventListener('pointerleave', handleLeave);
             element.removeEventListener('mousedown', handleMouseDown);
             element.removeEventListener('wheel', handleWheel);
             this.page.removeEventListener('blur', handleBlur);
@@ -80,7 +91,9 @@ export class PointerInput {
         capture(this.element, event.pointerId);
         const screenPosition = this.screenPositionOf(event);
         this.lastClickCount = this.clicks.press(button, screenPosition, event.timeStamp);
-        this.parts.tools.pointerDown(this.inputOf(event, button, screenPosition));
+        const input = this.inputOf(event, button, screenPosition);
+        this.parts.mouse.moveTo(input.levelPosition);
+        this.parts.tools.pointerDown(input);
     }
 
     // A second button going down or up while one is held comes as a move, not a press or release.
@@ -92,7 +105,10 @@ export class PointerInput {
         }
 
         const screenPosition = this.screenPositionOf(event);
-        this.parts.tools.pointerMove(this.inputOf(event, heldButtonOf(event), screenPosition));
+        const heldButton = heldButtonOf(event);
+        const input = this.inputOf(event, heldButton, screenPosition);
+        this.parts.mouse.moveTo(input.levelPosition);
+        this.parts.tools.pointerMove(input);
     }
 
     private handleChord(event: PointerEvent, button: PointerButton) {

@@ -43,6 +43,8 @@ export { ZoomOutCommand } from './view/ZoomOutCommand.ts';
 export { ZoomToActualSizeCommand } from './view/ZoomToActualSizeCommand.ts';
 export { addComponent } from './inspector/addComponent.ts';
 export { applyMessageFix } from './inspector/applyMessageFix.ts';
+export { FieldSlide } from './inspector/FieldSlide.ts';
+export type { SlidField } from './inspector/FieldSlide.ts';
 export { removeComponent } from './inspector/removeComponent.ts';
 export { resetComponent } from './inspector/resetComponent.ts';
 export { setFieldValue, setVectorAxis } from './inspector/setFieldValue.ts';

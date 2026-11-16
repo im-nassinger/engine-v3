@@ -22,7 +22,7 @@ test('with nothing selected, Delete is greyed and its tooltip says why', async (
     await expect(page.getByRole('tooltip')).toHaveText('Nothing selected');
 });
 
-test('the status bar shows a status text, then clears it', async ({ page }) => {
+test("the status bar shows a status text, then returns to the tool's hint", async ({ page }) => {
     await openEditor(page);
     const statusText = page.locator('.status-bar .status-text');
 
@@ -32,7 +32,25 @@ test('the status bar shows a status text, then clears it', async ({ page }) => {
     await box.press('Enter');
 
     await expect(statusText).toHaveText('Type a zoom such as 150%');
-    await expect(statusText).toHaveText('', { timeout: 6_000 });
+    await expect(statusText).toHaveText(/^Click to select\./, { timeout: 6_000 });
+});
+
+test('the status bar shows the mouse position over the level view, and nothing once it leaves', async ({ page }) => {
+    await openEditor(page);
+    const mousePosition = page.locator('.status-bar .mouse-position');
+    const canvas = page.locator('.level-view-host canvas');
+    const box = await canvas.boundingBox();
+    if (box === null) throw new Error('The level view has no box.');
+
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(mousePosition).toHaveText(/^−?\d+, −?\d+$/);
+    const first = await mousePosition.textContent();
+
+    await page.mouse.move(box.x + box.width / 2 + 40, box.y + box.height / 2);
+    await expect(mousePosition).not.toHaveText(first ?? '');
+
+    await page.mouse.move(box.x + box.width / 2, 1);
+    await expect(mousePosition).toHaveText('');
 });
 
 test('the toolbar shows Select as the active tool', async ({ page }) => {
@@ -40,6 +58,17 @@ test('the toolbar shows Select as the active tool', async ({ page }) => {
 
     const select = page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name: 'Select' });
     await expect(select).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('double-clicking Select locks it, and Esc ends the lock', async ({ page }) => {
+    await openEditor(page);
+    const selectPlace = page.locator('.tool-button[data-tool="select"]');
+
+    await selectPlace.getByRole('button', { name: 'Select' }).dblclick();
+    await expect(selectPlace).toHaveAttribute('data-locked', 'true');
+
+    await page.keyboard.press('Escape');
+    await expect(selectPlace).toHaveAttribute('data-locked', 'false');
 });
 
 test('About opens from Help, and Esc closes it', async ({ page }) => {

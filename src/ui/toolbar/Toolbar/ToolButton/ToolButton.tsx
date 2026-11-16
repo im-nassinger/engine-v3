@@ -1,0 +1,41 @@
+import { Link2, MousePointer2, Pencil, PenTool, Shapes, SquareDashed, Type } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { TOOL_KEYS } from '../../../../editor/tools/index.ts';
+import type { ToolId } from '../../../../editor/tools/index.ts';
+import { IconButton } from '../../../shared/index.ts';
+import './ToolButton.css';
+
+export type ToolButtonProps = {
+    toolId: ToolId;
+    isActive: boolean;
+    isLocked: boolean;
+    onPick: () => void;
+};
+
+type ToolLook = {
+    readonly label: string;
+    readonly icon: LucideIcon;
+};
+
+const TOOL_LOOKS: Readonly<Record<ToolId, ToolLook>> = {
+    select: { label: 'Select', icon: MousePointer2 },
+    pencil: { label: 'Pencil', icon: Pencil },
+    pen: { label: 'Pen', icon: PenTool },
+    shape: { label: 'Shape', icon: Shapes },
+    text: { label: 'Text', icon: Type },
+    joint: { label: 'Joint', icon: Link2 },
+    trigger: { label: 'Trigger', icon: SquareDashed },
+};
+
+// A tool's button with its number key in the tooltip. Tool lock shows as a small dot in its bottom
+// right corner.
+export function ToolButton({ toolId, isActive, isLocked, onPick }: ToolButtonProps) {
+    const { label, icon } = TOOL_LOOKS[toolId];
+    const key = TOOL_KEYS[toolId];
+
+    return (
+        <span className="tool-button" data-tool={toolId} data-locked={isLocked}>
+            <IconButton icon={icon} label={label} shortcut={key} isOn={isActive} onClick={onPick} />
+        </span>
+    );
+}

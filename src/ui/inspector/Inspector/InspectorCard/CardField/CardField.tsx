@@ -1,12 +1,14 @@
+import { useEffect, useRef } from 'react';
 import type { ComponentTypeName } from '../../../../../core/components/index.ts';
 import type { EntityId } from '../../../../../core/level/index.ts';
 import type { EditOutcome } from '../../../../../editor/history/index.ts';
-import { setFieldValue, setVectorAxis } from '../../../../../editor/commands/index.ts';
+import { FieldSlide, setFieldValue, setVectorAxis } from '../../../../../editor/commands/index.ts';
 import type { Axis } from '../../../../../editor/commands/index.ts';
 import type { FieldModel } from '../../../../../editor/inspector/index.ts';
 import type { OpenLevel } from '../../../../../editor/session/index.ts';
 import { useEditorSession } from '../../../../EditorContext.tsx';
 import { FieldControl } from '../../../../fields/index.ts';
+import type { FieldSlideHandlers } from '../../../../fields/index.ts';
 import { Tooltip } from '../../../../shared/index.ts';
 import './CardField.css';
 
@@ -18,10 +20,17 @@ export type CardFieldProps = {
 };
 
 // One field's row: its label, whose hover shows the description, and the field type's control. A
-// committed value is one step on every shown entity; a refused one gives its reason as status text.
+// committed value is one step on every shown entity; a refused one gives its reason as status text. A
+// slider changes the level while dragged and makes its one step when let go.
 export function CardField({ openLevel, typeName, entityIds, field }: CardFieldProps) {
     const session = useEditorSession();
     const { key, label, description } = field.definition;
+    // The drag in progress, begun by the slider's first move.
+    const slideRef = useRef<FieldSlide | undefined>(undefined);
+
+    useEffect(() => {
+        return () => slideRef.current?.cancel();
+    }, []);
 
     const showRefusal = (outcome: EditOutcome) => {
         if (outcome.kind !== 'refused') return;
@@ -39,6 +48,23 @@ export function CardField({ openLevel, typeName, entityIds, field }: CardFieldPr
         showRefusal(outcome);
     };
 
+    const startedSlide = () => {
+        if (slideRef.current === undefined) {
+            slideRef.current = new FieldSlide({ openLevel, entityIds, componentType: typeName, key });
+        }
+
+        return slideRef.current;
+    };
+
+    const slide: FieldSlideHandlers = {
+        slideTo: (value) => startedSlide().slideTo(value),
+        release: (value) => {
+            const outcome = startedSlide().release(value);
+            slideRef.current = undefined;
+            showRefusal(outcome);
+        },
+    };
+
     const subject = { openLevel, typeName, entityIds };
 
     return (
@@ -47,7 +73,13 @@ export function CardField({ openLevel, typeName, entityIds, field }: CardFieldPr
                 <span className="label">{label}</span>
             </Tooltip>
             <span className="control">
-                <FieldControl field={field} subject={subject} onCommit={commit} onCommitAxis={commitAxis} />
+                <FieldControl
+                    field={field}
+                    subject={subject}
+                    onCommit={commit}
+                    onCommitAxis={commitAxis}
+                    slide={slide}
+                />
             </span>
         </div>
     );

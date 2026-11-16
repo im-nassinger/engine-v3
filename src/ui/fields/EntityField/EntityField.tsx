@@ -5,10 +5,12 @@ import { useEntityVersion } from '../../hooks/index.ts';
 import { MenuButton, useEntityRowDrop } from '../../shared/index.ts';
 import type { FieldProps } from '../FieldProps.ts';
 import { EntityFieldMenu } from './EntityFieldMenu/index.ts';
+import { EntityPickButton } from './EntityPickButton/index.ts';
 import './EntityField.css';
 
 // The target's name, None, Mixed or `missing entity`, opening a searchable dropdown of the level's
-// entities. A row dropped from the Entities panel sets it too. Either is one step.
+// entities. A row dropped from the Entities panel, or an entity clicked in the level view after the
+// target icon, sets it too. Each is one step.
 export function EntityField({ field, subject, onCommit }: FieldProps) {
     // The target's name is read from the same entity object after it is renamed, so the React Compiler
     // must not keep the old one.
@@ -22,7 +24,7 @@ export function EntityField({ field, subject, onCommit }: FieldProps) {
     const targetId = shown.kind === 'entity' ? shown.entityId : 0;
     useEntityVersion(level, targetId);
 
-    const takeDroppedRow = (entityId: EntityId) => {
+    const takeEntity = (entityId: EntityId) => {
         const refusal = EntityChoices.refusal(level, subject.entityIds, entityId);
         if (refusal !== undefined) {
             session.status.show(refusal);
@@ -32,7 +34,7 @@ export function EntityField({ field, subject, onCommit }: FieldProps) {
         onCommit(entityId);
     };
 
-    const dropRef = useEntityRowDrop<HTMLSpanElement>(takeDroppedRow);
+    const dropRef = useEntityRowDrop<HTMLSpanElement>(takeEntity);
 
     const menu = (
         <EntityFieldMenu level={level} ownIds={subject.entityIds} chosenValue={field.value} onChoose={onCommit} />
@@ -43,6 +45,7 @@ export function EntityField({ field, subject, onCommit }: FieldProps) {
             <MenuButton label={field.definition.label} menu={menu} look="field" isDisabled={!field.isEnabled} hasArrow>
                 <span className="chosen">{shown.text}</span>
             </MenuButton>
+            <EntityPickButton isDisabled={!field.isEnabled} onPicked={takeEntity} />
         </span>
     );
 }

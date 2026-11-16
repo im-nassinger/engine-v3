@@ -18,6 +18,8 @@ import type { EditorCommands } from '../../../commands/index.ts';
 import { EditorContext } from '../../../EditorContext.tsx';
 import '../../../theme.css';
 import { EntitiesPanel } from '../../../entities-panel/index.ts';
+import { ToolsContext } from '../../../tools/index.ts';
+import { buildEditorTools } from '../../../tools/testing/buildEditorTools.ts';
 import { Inspector } from '../Inspector.tsx';
 
 let container: HTMLElement;
@@ -68,6 +70,7 @@ export function showInspector(level: Level, withPanel = false) {
         runner: new CommandRunner(session.status),
         platform: 'other',
     };
+    const tools = buildEditorTools(session, commands.registry, frames);
 
     let shown: ReactElement = createElement(Inspector);
     if (withPanel) {
@@ -77,11 +80,12 @@ export function showInspector(level: Level, withPanel = false) {
         shown = createElement('div', { style: { display: 'flex', height: '700px' } }, inspectorPlace, panelPlace);
     }
 
-    const withCommands = createElement(CommandsContext, { value: commands }, shown);
+    const withTools = createElement(ToolsContext, { value: tools }, shown);
+    const withCommands = createElement(CommandsContext, { value: commands }, withTools);
     const withSession = createElement(EditorContext, { value: session }, withCommands);
     root.render(withSession);
 
-    return { session, frames };
+    return { session, frames, tools };
 }
 
 export function select(session: EditorSession, entities: readonly Entity[]) {

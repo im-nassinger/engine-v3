@@ -61,7 +61,7 @@ src/
     history/           History, HistoryStep, EditTransaction, changes/
     selection/         Selection
     commands/          EditorCommand, CommandRegistry, createCommandRegistry, then file/ edit/ arrange/ view/ play/, rename/ (renameEntity, renameLevel), hide/ (toggleEntityHidden, a row's eye), shared/ (skip rule, step labels, EntityNamer, attached joints, keeping in place), testing/
-    tools/             Tool, ToolController, EscapeChain, select/ shape/ joint/
+    tools/             Tool, ToolController (with the entity field's picker), escape/ (EscapeChain), pan/, mouse/ (MousePosition), select/ shape/ joint/
     hit-testing/       HitTester, HitProbe; areas/ (each entity's hit area), spatial-index/ (SpatialIndex, LinearSpatialIndex)
     snapping/          Snapper, GridSnapper
     view/              ViewState (pan and zoom), ViewSettings, the overlay sizes the drawing and hitting share
@@ -72,7 +72,7 @@ src/
     shortcuts/         KeyChord, KeyPress, ShortcutMap, ShortcutDispatcher
     saving/            Autosave, SaveState, ProjectFile, ImportLevel, ExportLevel, contracts
     play/              PlaySession, TickPacer, PlayMirror, Watchdog, GameRunner contract
-    status/            StatusText (the status bar's left slot)
+    status/            StatusText (the status bar's left slot), the status bar's texts (selectionSummary, mousePositionText)
     time/              Clock, Timer, FrameScheduler contracts
   adapters/
     pixi/              PixiLevelView, EntityNode, EntityDrawing, overlays/
@@ -95,6 +95,8 @@ src/
     toolbar/           Toolbar/
     dialogs/           Dialogs/ (with DialogBox/)
     open-windows/      OpenWindowsContext: where menus and the row drag report themselves open
+    tools/             ToolsContext: ToolController and MousePosition for the toolbar, status bar and picker; testing/
+    testing/           editorPage: a component shown with the session, commands and tools, for browser tests
     top-bar/ main-menu/ tool-options/ level-view-host/ entities-panel/ inspector/ play-bar/
     fields/            one component per field type: NumberField/, ColourField/, ...
     shared/            Button/, IconButton/, Menu/, MenuButton/, Tooltip/, Icon/

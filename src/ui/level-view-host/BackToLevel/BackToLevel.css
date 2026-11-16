@@ -1,0 +1,7 @@
+.back-to-level {
+    position: absolute;
+    left: 50%;
+    bottom: var(--space-16);
+    transform: translateX(-50%);
+    pointer-events: auto;
+}

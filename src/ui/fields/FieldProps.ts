@@ -12,6 +12,13 @@ export type FieldSubject = {
     readonly entityIds: readonly EntityId[];
 };
 
+// A slider dragged changes the level as it moves and makes its one step on release. Without it, a
+// slider commits through onCommit when let go, as a list's item does.
+export type FieldSlideHandlers = {
+    readonly slideTo: (value: number) => void;
+    readonly release: (value: number) => void;
+};
+
 // What every field component takes: the field with its value (or MIXED), and where a new value goes.
 // onCommit makes the undo step on every shown entity; a refusal comes back as status text. A vector's
 // box commits only its own axis, so each entity keeps its other one.
@@ -20,4 +27,5 @@ export type FieldProps = {
     subject: FieldSubject;
     onCommit: (value: unknown) => void;
     onCommitAxis: (axis: Axis, value: number) => void;
+    slide?: FieldSlideHandlers;
 };

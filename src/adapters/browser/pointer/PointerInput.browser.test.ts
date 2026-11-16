@@ -51,11 +51,24 @@ class RecordingEscape {
     }
 }
 
+class RecordingMouse {
+    readonly positions: (Point | undefined)[] = [];
+
+    moveTo(levelPosition: Point) {
+        this.positions.push(levelPosition);
+    }
+
+    leave() {
+        this.positions.push(undefined);
+    }
+}
+
 let page: HTMLElement;
 let element: HTMLElement;
 let view: ViewState;
 let tools: RecordingTools;
 let escape: RecordingEscape;
+let mouse: RecordingMouse;
 let disconnect: () => void;
 // Each test's presses come later than the last test's, so no double-click runs across tests.
 let timeMs = 0;
@@ -72,7 +85,8 @@ beforeEach(() => {
     view.setSize(VIEW_WIDTH, VIEW_HEIGHT);
     tools = new RecordingTools();
     escape = new RecordingEscape();
-    const input = new PointerInput({ tools, escape, view, platform: 'other' }, element, window);
+    mouse = new RecordingMouse();
+    const input = new PointerInput({ tools, escape, mouse, view, platform: 'other' }, element, window);
     disconnect = input.connect();
     timeMs += 10_000;
 });
@@ -226,5 +240,16 @@ describe('PointerInput', () => {
 
         expect(tools.heard).toEqual([]);
         expect(view.zoom).toBe(1);
+    });
+
+    test('the mouse position follows the pointer in level positions and goes when it leaves', () => {
+        view.zoomAboutMiddle(2);
+        const viewPoint = { x: 100, y: 60 };
+
+        pointer('pointermove', viewPoint);
+        pointer('pointerleave', viewPoint);
+
+        const expected = view.screenToLevel(viewPoint);
+        expect(mouse.positions).toEqual([expected, undefined]);
     });
 });

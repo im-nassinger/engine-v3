@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { CameraComponent, ShapeComponent } from '../../../core/components/index.ts';
+import { CameraComponent, ShapeComponent, StyleComponent } from '../../../core/components/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
 import { Level } from '../../../core/level/index.ts';
 import { DeleteCommand } from '../../../editor/commands/index.ts';
 import type { EditorSession } from '../../../editor/session/index.ts';
+import { EscapeChain, OpenWindowCount } from '../../../editor/tools/index.ts';
+import type { LevelPointerInput } from '../../../editor/tools/index.ts';
 import {
     addBareEntity,
     addCrate,
@@ -160,6 +162,68 @@ describe('the entity field', () => {
         select(session, [level.camera]);
         frames.runFrame();
         await expect.poll(() => followText()).toBe('Player');
+    });
+});
+
+function pickButton() {
+    return requireElement<HTMLButtonElement>(followField(), 'button[aria-label="Pick in the level view"]');
+}
+
+function leftPressAt(levelPosition: Point): LevelPointerInput {
+    return {
+        levelPosition,
+        screenPosition: levelPosition,
+        button: 'left',
+        modifiers: { shift: false, alt: false, ctrl: false },
+        clickCount: 1,
+    };
+}
+
+// The player is a filled shape around the origin, so a click there hits it.
+async function showCameraWithPlayerShape() {
+    const shown = await showCameraWithPlayer();
+    shown.player.addComponent(new ShapeComponent());
+    shown.player.addComponent(new StyleComponent());
+
+    return shown;
+}
+
+describe("the entity field's picker", () => {
+    test("the target icon waits for a click in the level view, which sets the camera's Follow in one step", async () => {
+        const { level, player, session, tools } = await showCameraWithPlayerShape();
+        const { controller } = tools;
+
+        await userEvent.click(pickButton());
+        await expect.poll(() => pickButton().getAttribute('aria-pressed')).toBe('true');
+        expect(controller.hint).toBe('Click an entity to pick it. Esc cancels.');
+
+        controller.pointerDown(leftPressAt({ x: 0, y: 0 }));
+        controller.pointerUp(leftPressAt({ x: 0, y: 0 }));
+
+        expect(followOf(level)).toBe(player.id);
+        expect(undoCount(session)).toBe(1);
+        expect(session.openLevel.selection.ids).toEqual([level.camera.id]);
+        await expect.poll(() => pickButton().getAttribute('aria-pressed')).toBe('false');
+        await expect.poll(() => followText()).toBe('Player');
+    });
+
+    test('Esc leaves it with nothing changed, and so does clicking the icon again', async () => {
+        const { level, session, tools } = await showCameraWithPlayerShape();
+        const escape = new EscapeChain(session, tools.controller, new OpenWindowCount());
+
+        await userEvent.click(pickButton());
+        await expect.poll(() => tools.controller.isPicking).toBe(true);
+        expect(escape.press()).toBe('drawing');
+        await expect.poll(() => pickButton().getAttribute('aria-pressed')).toBe('false');
+
+        await userEvent.click(pickButton());
+        await expect.poll(() => tools.controller.isPicking).toBe(true);
+        await userEvent.click(pickButton());
+        await expect.poll(() => tools.controller.isPicking).toBe(false);
+
+        expect(followOf(level)).toBeNull();
+        expect(undoCount(session)).toBe(0);
+        expect(session.openLevel.selection.ids).toEqual([level.camera.id]);
     });
 });
 

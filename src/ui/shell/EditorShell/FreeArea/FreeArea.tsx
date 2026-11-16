@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 import { useEditorSession } from '../../../EditorContext.tsx';
+import { BackToLevel } from '../../../level-view-host/index.ts';
 import './FreeArea.css';
 
 function coveredEdgesAround(freeArea: HTMLElement) {
@@ -18,7 +19,7 @@ function coveredEdgesAround(freeArea: HTMLElement) {
 }
 
 // The part of the level view no panel covers. It tells the view how far the panels reach, so fitting
-// fills only what can be seen. Clicks pass through it to the canvas.
+// fills only what can be seen. Clicks pass through it to the canvas, except on `Back to level`.
 export function FreeArea() {
     const session = useEditorSession();
     const areaRef = useRef<HTMLDivElement>(null);
@@ -42,5 +43,9 @@ export function FreeArea() {
         return () => observer.disconnect();
     }, [session]);
 
-    return <div className="free-area" ref={areaRef} />;
+    return (
+        <div className="free-area" ref={areaRef}>
+            <BackToLevel />
+        </div>
+    );
 }
