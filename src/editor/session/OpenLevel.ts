@@ -12,6 +12,7 @@ import type { Clock, FrameScheduler } from '../time/index.ts';
 import type { ViewSettings } from '../view/index.ts';
 
 import { CurrentGroup } from './CurrentGroup.ts';
+import type { TokenMaker } from './TokenMaker.ts';
 
 // What an open level is built with besides the level: the session's, shared by every level opened.
 export type OpenLevelServices = {
@@ -22,6 +23,8 @@ export type OpenLevelServices = {
     readonly cardFolds: CardFolds;
     // The hit tester reads whether the camera frame and joint icons are shown.
     readonly viewSettings: ViewSettings;
+    // Makes this opening's source token.
+    readonly makeToken: TokenMaker;
 };
 
 // The level open in the editor with everything that belongs to it. New and Import replace it as one
@@ -45,6 +48,9 @@ export class OpenLevel {
     readonly inspector: InspectorModel;
     // What is under the mouse, for the tools.
     readonly hitTester: HitTester;
+    // Names this opening of the level in what it copies, so a paste can tell whether its links to entities
+    // outside the copy still mean the same entities. Made each time a level is opened, never saved.
+    readonly sourceToken: string;
 
     constructor(level: Level, services: OpenLevelServices) {
         this.level = level;
@@ -74,6 +80,7 @@ export class OpenLevel {
         });
         const index = new LinearSpatialIndex(level);
         this.hitTester = new HitTester(level, this.caches, index, services.viewSettings);
+        this.sourceToken = services.makeToken();
     }
 
     // Stops everything here following the level.

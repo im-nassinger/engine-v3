@@ -77,4 +77,25 @@ describe('EditorSession', () => {
 
         expect(oldOpenLevel.selection.ids).toEqual([square.id]);
     });
+
+    test('each opening gets a new source token from the token maker', () => {
+        const timer = new ManualTimer();
+        const tokens = ['first', 'second'];
+        const makeToken = () => tokens.shift() ?? 'none left';
+        const options = { level: Level.createNew(), clock: timer.clock, timer, frames: new ManualFrames(), makeToken };
+        const session = new EditorSession(options);
+        const firstToken = session.openLevel.sourceToken;
+
+        session.replaceOpenLevel(Level.createNew());
+
+        expect(firstToken).toBe('first');
+        expect(session.openLevel.sourceToken).toBe('second');
+    });
+
+    test('counts its tokens from 1 when no token maker is given', () => {
+        const { session } = buildSession();
+        session.replaceOpenLevel(Level.createNew());
+
+        expect(session.openLevel.sourceToken).toBe('opening-2');
+    });
 });

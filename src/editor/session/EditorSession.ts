@@ -11,6 +11,8 @@ import { ViewSettings, ViewState } from '../view/index.ts';
 
 import { OpenLevel } from './OpenLevel.ts';
 import type { OpenLevelServices } from './OpenLevel.ts';
+import { countingTokens } from './TokenMaker.ts';
+import type { TokenMaker } from './TokenMaker.ts';
 
 export type EditorSessionOptions = {
     readonly level: Level;
@@ -24,6 +26,9 @@ export type EditorSessionOptions = {
     readonly reader?: LevelReader;
     // Where the folded cards are kept. In memory when left out.
     readonly foldStore?: FoldStore;
+    // Makes each opening's source token: random in the page (crypto.randomUUID). Counting from 1 when left
+    // out, which only a test may rely on, since a reload would count from 1 again.
+    readonly makeToken?: TokenMaker;
 };
 
 // The editor's root object, built once by the page with every contract passed in. Tests build it with
@@ -53,6 +58,7 @@ export class EditorSession {
             registry: this.registry,
             cardFolds: this.cardFolds,
             viewSettings: this.viewSettings,
+            makeToken: options.makeToken ?? countingTokens(),
         };
         this.current = new OpenLevel(options.level, this.services);
     }

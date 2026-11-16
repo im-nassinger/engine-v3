@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 11, step 1 of 9: stage 11's steps are in [plan.md](plan.md#stage-11-in-steps) and its choices in [clipboard-and-shortcuts.md](architecture/editor/clipboard-and-shortcuts.md#stage-11s-choices). Next is step 2: `OpenLevel.sourceToken` and `ClipboardCodec` in `editor/clipboard`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 11, step 2 of 9: `OpenLevel.sourceToken` and `ClipboardCodec` are built in `editor/clipboard/codec/`, with 1,328 tests in Node. Next is step 3: `IdRemapping` and `LevelReader.checkSubtree`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -31,7 +31,7 @@
 | Stage 8, the Inspector | Done on 2026-11-15. See below |
 | Stage 9, the Select tool | Done on 2026-11-16. See below |
 | Stage 10, the Shape tool and point editing | Done on 2026-11-16. See below |
-| Code | Stages 0 to 10 done. Stage 11, copy and paste, is under way: its steps are written |
+| Code | Stages 0 to 10 done. Stage 11, copy and paste, is under way: steps 1 and 2 are done |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -181,7 +181,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 11 of [plan.md](plan.md#stage-11-in-steps): copy and paste.** Step 1 is done; step 2 builds `OpenLevel.sourceToken` and `ClipboardCodec`.
+1. **Stage 11 of [plan.md](plan.md#stage-11-in-steps): copy and paste.** Steps 1 and 2 are done; step 3 builds `IdRemapping` and `LevelReader.checkSubtree`.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

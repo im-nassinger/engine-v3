@@ -72,6 +72,7 @@ export class EditorComposition {
             clock: new SystemClock(),
             timer: new BrowserTimer(),
             frames,
+            makeToken: () => crypto.randomUUID(),
         });
         const commands = createCommandRegistry(session);
         const runner = new CommandRunner(session.status);

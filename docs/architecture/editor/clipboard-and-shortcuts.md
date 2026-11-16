@@ -157,3 +157,11 @@ Made under the standing yes (2026-11-16), before building. The [plan](../../plan
 - **Duplicate** puts each copied root at its original's own index in the same group, so it sits directly above it in the panel and is drawn on top, and selects the copies. Links inside the duplicated set are rewired and links outside it kept, through `IdRemapping` with the open level's own token.
 - **Pasting or duplicating inside a locked group is refused** with `This group is locked`, as drawing is, though locking is v3.
 - **The steps read** `Paste Crate`, `Paste 3 entities`, `Duplicate 3 entities`, `Cut 3 entities`, through `stepLabel` as Delete's do.
+
+**As built, step 2 (standing yes, 2026-11-16):**
+
+- **`ClipboardCodec` takes only the `LevelWriter`**, and `encode(entities, source)` takes a `CopySource` (`level`, `caches`, `sourceToken`), which an `OpenLevel` is. *Why: encoding needs the level matrices and the boxes, and decoding checks only the text's own shape; the entities inside are checked by `LevelReader` against the level and group they are pasted into (step 3), since only then are the ids in use and the depth known.*
+- **`decode`'s refusal carries the reader's `ReadRefusal`**, not a sentence: `{ kind: 'refused', refusal }`. *Why: the limits and the damaged text each get their own status text, which the paste writes, as `editor/saving` writes the file's.* A version above the game's is `newerVersion`, a missing or unknown key, a bad source token or centre, and an empty or missing entity list are `damaged`.
+- **`copiedRoots(level, entities)`** is its own function in `editor/clipboard/codec/`, so the commands can tell what is left before they encode; `encode` throws when nothing is. The fragment's `entities` stay `unknown` until the paste reads them.
+- **The token maker** is `TokenMaker` in `editor/session`; `EditorSession` counts `opening-1`, `opening-2` when none is given, which only tests rely on, and `EditorComposition` passes `crypto.randomUUID`.
+- **A root that draws nothing counts as its origin** for the centre, as it does for Group's.
