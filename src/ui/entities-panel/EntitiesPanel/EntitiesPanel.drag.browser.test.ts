@@ -1,10 +1,13 @@
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import type { Entity } from '../../../core/level/index.ts';
 import type { EditorSession } from '../../../editor/session/index.ts';
+import { OpenWindowCount } from '../../../editor/tools/index.ts';
 import {
     addNamedEntity,
     buildLevel,
     click,
+    createSession,
+    mountPanel,
     panelContainer,
     requireEntity,
     findRow,
@@ -224,6 +227,19 @@ describe('dragging rows', () => {
         click(lastRow);
         expect(session.openLevel.history.undoLabel).toBeUndefined();
         expect(session.openLevel.selection.ids).toEqual([crate1.id]);
+    });
+
+    test("a drag counts as an open window while it lasts, so the editor's Esc leaves it to the drag", async () => {
+        const { level } = buildLevel(3);
+        const session = createSession(level);
+        const openWindows = new OpenWindowCount();
+        mountPanel(session, openWindows);
+
+        startDrag(await rowShown('Crate 2'));
+        expect(openWindows.isOpen()).toBe(true);
+
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+        expect(openWindows.isOpen()).toBe(false);
     });
 
     test('a change to the tree during a drag, such as Ctrl+Z, ends the drag', async () => {

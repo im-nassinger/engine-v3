@@ -35,6 +35,18 @@ export class EscapeChain {
         return 'nothing';
     }
 
+    // The browser took the pointer away: the drag is put back, as Esc would.
+    dragLost() {
+        this.cancelDrag();
+    }
+
+    // The window lost focus: no button release or key up will arrive, so the drag is put back and a
+    // held Space is let go.
+    focusLost() {
+        this.cancelDrag();
+        this.tools.releaseKeys();
+    }
+
     // The tool puts its drag back first; a live edit it left running is put back here.
     private cancelDrag() {
         const liveEdit = this.source.openLevel.liveEdit;

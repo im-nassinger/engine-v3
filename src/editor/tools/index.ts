@@ -1,5 +1,7 @@
 export { EscapeChain } from './escape/EscapeChain.ts';
 export type { EscapeAnswer, OpenLevelSource } from './escape/EscapeChain.ts';
+export { OpenWindowCount } from './escape/OpenWindowCount.ts';
+export type { CloseWindow } from './escape/OpenWindowCount.ts';
 export type { OpenWindows } from './escape/OpenWindows.ts';
 export { PanGesture } from './pan/PanGesture.ts';
 export { SelectTool } from './select/SelectTool.ts';

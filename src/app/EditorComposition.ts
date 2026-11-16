@@ -4,6 +4,7 @@ import {
     DevicePixelRatio,
     KeyboardInput,
     keyboardPlatform,
+    PointerInput,
     SystemClock,
 } from '../adapters/browser/index.ts';
 import { PixiLevelView } from '../adapters/pixi/index.ts';
@@ -14,6 +15,8 @@ import type { CommandRegistry } from '../editor/commands/index.ts';
 import { EditorSession } from '../editor/session/index.ts';
 import { ShortcutDispatcher } from '../editor/shortcuts/index.ts';
 import type { KeyboardPlatform } from '../editor/shortcuts/index.ts';
+import { GridSnapper } from '../editor/snapping/index.ts';
+import { EscapeChain, OpenWindowCount, PanGesture, SelectTool, ToolController } from '../editor/tools/index.ts';
 
 const FIT_CAMERA_FRAME = 'view.fitCameraFrame';
 
@@ -24,6 +27,9 @@ type EditorParts = {
     readonly platform: KeyboardPlatform;
     readonly levelView: PixiLevelView;
     readonly keyboard: KeyboardInput;
+    readonly pointer: PointerInput;
+    readonly tools: ToolController;
+    readonly openWindows: OpenWindowCount;
 };
 
 // The composition root: the only code that knows both the editor's rules and the browser's details.
@@ -34,7 +40,11 @@ export class EditorComposition {
     readonly runner: CommandRunner;
     readonly platform: KeyboardPlatform;
     readonly levelView: PixiLevelView;
+    readonly tools: ToolController;
+    // The page's menus and the Entities panel's row drag report here, so Esc leaves them to close.
+    readonly openWindows: OpenWindowCount;
     private readonly keyboard: KeyboardInput;
+    private readonly pointer: PointerInput;
 
     private constructor(parts: EditorParts) {
         this.session = parts.session;
@@ -43,6 +53,9 @@ export class EditorComposition {
         this.platform = parts.platform;
         this.levelView = parts.levelView;
         this.keyboard = parts.keyboard;
+        this.pointer = parts.pointer;
+        this.tools = parts.tools;
+        this.openWindows = parts.openWindows;
     }
 
     static async create() {
@@ -63,10 +76,25 @@ export class EditorComposition {
             pixelRatio: new DevicePixelRatio(),
             drawing: { showUnstyled: true },
         });
-        const dispatcher = new ShortcutDispatcher(commands, runner, platform);
+        const tools = createTools(session, commands);
+        const openWindows = new OpenWindowCount();
+        const escape = new EscapeChain(session, tools, openWindows);
+        const dispatcher = new ShortcutDispatcher(commands, runner, platform, { tools, escape });
         const keyboard = new KeyboardInput(dispatcher, window);
+        const pointerParts = { tools, escape, view: session.view, platform };
+        const pointer = new PointerInput(pointerParts, levelView.canvas, window);
 
-        const composition = new EditorComposition({ session, commands, runner, platform, levelView, keyboard });
+        const composition = new EditorComposition({
+            session,
+            commands,
+            runner,
+            platform,
+            levelView,
+            keyboard,
+            pointer,
+            tools,
+            openWindows,
+        });
         composition.start();
 
         return composition;
@@ -74,8 +102,9 @@ export class EditorComposition {
 
     private start() {
         this.levelView.follow(this.session);
-        // The editor lives as long as the page, so the keyboard is never disconnected.
+        // The editor lives as long as the page, so the keyboard and the pointer are never disconnected.
         this.keyboard.connect();
+        this.pointer.connect();
         this.limitPanToOpenLevel();
         this.session.openLevelChanged.subscribe(() => this.limitPanToOpenLevel());
         this.fitCameraFrameOnceSized();
@@ -109,4 +138,31 @@ export class EditorComposition {
 
         this.runner.run(command);
     }
+}
+
+// v1's tools: Select now, Shape and Joint with their stages. The snapper is made again for each
+// level that opens, since it reads that level's grid.
+function createTools(session: EditorSession, commands: CommandRegistry) {
+    let snapperLevel = session.openLevel.level;
+    let snapper = new GridSnapper(snapperLevel.editorData, session.viewSettings);
+    const services = {
+        get openLevel() {
+            return session.openLevel;
+        },
+        get snapper() {
+            const level = session.openLevel.level;
+            if (level !== snapperLevel) {
+                snapperLevel = level;
+                snapper = new GridSnapper(level.editorData, session.viewSettings);
+            }
+
+            return snapper;
+        },
+        view: session.view,
+        commands,
+        status: session.status,
+    };
+    const pan = new PanGesture(session.view);
+
+    return new ToolController([new SelectTool()], services, pan);
 }

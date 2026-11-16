@@ -6,6 +6,7 @@ import type { CommandRunner, MoveOutcome } from '../../../../../editor/commands/
 import { EntitiesDrop } from '../../../../../editor/entities-panel/index.ts';
 import type { DropTarget } from '../../../../../editor/entities-panel/index.ts';
 import type { OpenLevel } from '../../../../../editor/session/index.ts';
+import type { CloseWindow, OpenWindowCount } from '../../../../../editor/tools/index.ts';
 import { dropEntityRowAt } from '../../../../shared/index.ts';
 import { autoScrollSpeed } from './autoScrollSpeed.ts';
 import { dropPointerAt } from './dropPointerAt.ts';
@@ -40,6 +41,9 @@ export class RowDrag {
     readonly version = new VersionCounter();
 
     private readonly runner: CommandRunner;
+    private readonly openWindows: OpenWindowCount;
+    // A drag counts as an open window, so the editor's Esc leaves it to this drag.
+    private closeWindow: CloseWindow | undefined;
     private press: Press | undefined;
     private drag: Drag | undefined;
     private pointerX = 0;
@@ -50,8 +54,9 @@ export class RowDrag {
     // it. That click must not change the selection.
     private swallowsNextClick = false;
 
-    constructor(runner: CommandRunner) {
+    constructor(runner: CommandRunner, openWindows: OpenWindowCount) {
         this.runner = runner;
+        this.openWindows = openWindows;
     }
 
     get target() {
@@ -170,6 +175,7 @@ export class RowDrag {
 
         const drop = new EntitiesDrop(level, entitiesRows);
         this.drag = { draggedIds, drop, target: undefined };
+        this.closeWindow = this.openWindows.open();
 
         return true;
     }
@@ -236,6 +242,8 @@ export class RowDrag {
         press?.elements.scroller.removeEventListener('scroll', this.handleScroll);
         this.stopFollowingRows?.();
         this.stopFollowingRows = undefined;
+        this.closeWindow?.();
+        this.closeWindow = undefined;
 
         if (this.scrollFrame !== undefined) {
             cancelAnimationFrame(this.scrollFrame);

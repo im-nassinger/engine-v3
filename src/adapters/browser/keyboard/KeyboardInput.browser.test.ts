@@ -11,6 +11,11 @@ type Call = {
 // Uses only the G key, like the editor's Hide grid.
 class FakeDispatcher {
     readonly calls: Call[] = [];
+    readonly keyUps: string[] = [];
+
+    handleKeyUp(input: KeyboardInputData) {
+        this.keyUps.push(input.code);
+    }
 
     handleKeyDown(input: KeyboardInputData, focus: FocusPlace, pointerOverLevelView: boolean) {
         this.calls.push({ input, focus, pointerOverLevelView });
@@ -175,7 +180,7 @@ describe('KeyboardInput', () => {
         disconnectSecond();
     });
 
-    test('a key up releases its key', () => {
+    test('a key up releases its key and reaches the dispatcher', () => {
         const keyboard = new KeyboardInput(dispatcher, window);
         const disconnectSecond = keyboard.connect();
 
@@ -183,6 +188,7 @@ describe('KeyboardInput', () => {
         document.body.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyW', key: 'w', bubbles: true }));
 
         expect(keyboard.isHeld('KeyW')).toBe(false);
+        expect(dispatcher.keyUps).toContain('KeyW');
 
         disconnectSecond();
     });

@@ -6,6 +6,7 @@ import type { EntitiesRow } from '../../../../editor/entities-panel/index.ts';
 import type { OpenLevel } from '../../../../editor/session/index.ts';
 import { useCommands } from '../../../commands/index.ts';
 import { useVersion } from '../../../hooks/index.ts';
+import { useOpenWindows } from '../../../open-windows/index.ts';
 import { DropLine } from './DropLine/index.ts';
 import { EntitiesListRow } from './EntitiesListRow/index.ts';
 import { RowDrag } from './row-drag/RowDrag.ts';
@@ -36,6 +37,8 @@ export function EntitiesList({ openLevel }: EntitiesListProps) {
     const rows = entitiesRows.rows;
 
     const { runner } = useCommands();
+
+    const openWindows = useOpenWindows();
     const scrollElement = useRef<HTMLDivElement>(null);
     const contentElement = useRef<HTMLDivElement>(null);
     // eslint-disable-next-line react-hooks/incompatible-library -- the component opts out of the compiler above.
@@ -92,7 +95,7 @@ export function EntitiesList({ openLevel }: EntitiesListProps) {
 
     const endRenaming = () => setRenamingId(undefined);
 
-    const [rowDrag] = useState(() => new RowDrag(runner));
+    const [rowDrag] = useState(() => new RowDrag(runner, openWindows));
     useVersion(rowDrag.version);
     useEffect(() => () => rowDrag.dispose(), [rowDrag]);
     const dropTarget = rowDrag.target;

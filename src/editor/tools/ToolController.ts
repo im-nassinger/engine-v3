@@ -118,6 +118,11 @@ export class ToolController {
         this.current.keyUp(key);
     }
 
+    // The window lost focus, so Space's key up goes elsewhere.
+    releaseKeys() {
+        this.pan.spaceUp();
+    }
+
     // Esc's first step: the tool puts its drag back, and its buttons' releases are ignored.
     cancelDrag() {
         const wasDragging = this.isDragging;

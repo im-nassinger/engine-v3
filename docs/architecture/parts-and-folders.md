@@ -78,8 +78,9 @@ src/
     pixi/              PixiLevelView, EntityNode, EntityDrawing, overlays/
     box2d/             Box2dPhysicsEngine, Box2dPhysicsWorld, Box2dShapes, Box2dJoints
     storage/           IndexedDbLevelStore, LocalStorageSettings, WebLockTabGuard, BrowserPersistence
-    browser/           keyboard/ (KeyboardInput), time/ (SystemClock, BrowserTimer, AnimationFrames),
-                       screen/ (DevicePixelRatio), and later PointerInput, ClipboardBridge,
+    browser/           keyboard/ (KeyboardInput), pointer/ (PointerInput, ClickCounter, wheelPixels),
+                       time/ (SystemClock, BrowserTimer, AnimationFrames),
+                       screen/ (DevicePixelRatio), and later ClipboardBridge,
                        FileDownload, BrowserFilePicker, PageVisibility, LeavePrompt in their own areas
     worker/            WorkerGameRunner, GameWorkerHost, ImportWorkerClient, ImportWorkerHost, protocol/
     zip/               FflateZipCodec
@@ -93,6 +94,7 @@ src/
     status-bar/        StatusBar/
     toolbar/           Toolbar/
     dialogs/           Dialogs/ (with DialogBox/)
+    open-windows/      OpenWindowsContext: where menus and the row drag report themselves open
     top-bar/ main-menu/ tool-options/ level-view-host/ entities-panel/ inspector/ play-bar/
     fields/            one component per field type: NumberField/, ColourField/, ...
     shared/            Button/, IconButton/, Menu/, MenuButton/, Tooltip/, Icon/

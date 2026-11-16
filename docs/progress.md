@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 9, step 11 of 16 is done: a move between groups, by the Entities panel's drop or by Group, that changes which body an entity belongs to asks `Move into another body?` first, counted by `countBodyChanges` in `core/physics`; Cancel changes nothing and Move is one step kept in place on screen, with 1154 tests in Node. Next is step 12: `PointerInput`, the level view's pointer events and the wheel, wired in `EditorComposition`. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 9, step 12 of 16 is done: `PointerInput` in `adapters/browser/pointer/` hands the level view's presses, moves, releases and double-clicks to `ToolController` in level positions, zooms at the mouse with the wheel, pans with Shift+wheel, stops the middle button's autoscroll and cancels a drag when the window loses focus; `EditorComposition` now wires Select, `PanGesture`, `EscapeChain` and key ups, and the menus and the row drag count themselves open for Esc. The e2e tests left from step 5's `Grid snapping` were fixed; all 25 pass. Next is step 13: `SelectionOverlay`. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode, RefObject } from 'react';
+import { useOpenWindows } from '../../open-windows/index.ts';
 import type { MenuEntry, MenuSubmenu } from './MenuEntry.ts';
 import { MenuPanel } from './MenuPanel/index.ts';
 import './Menu.css';
@@ -29,6 +30,10 @@ type OpenSubmenu = {
 export function Menu({ entries, onClose, anchor, align = 'start', side = 'below', header }: MenuProps) {
     const rootRef = useRef<HTMLDivElement>(null);
     const [openSubmenu, setOpenSubmenu] = useState<OpenSubmenu | undefined>(undefined);
+    const openWindows = useOpenWindows();
+
+    // Open as long as it is shown, so Esc closes it and nothing else.
+    useEffect(() => openWindows.open(), [openWindows]);
 
     useEffect(() => {
         const closeOnEscape = (event: KeyboardEvent) => {

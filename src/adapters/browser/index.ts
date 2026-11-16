@@ -1,5 +1,7 @@
 export { KeyboardInput } from './keyboard/KeyboardInput.ts';
 export { keyboardPlatform } from './keyboard/keyboardPlatform.ts';
+export { PointerInput } from './pointer/PointerInput.ts';
+export type { PointerInputParts } from './pointer/PointerInput.ts';
 export { DevicePixelRatio } from './screen/DevicePixelRatio.ts';
 export { AnimationFrames } from './time/AnimationFrames.ts';
 export { BrowserTimer } from './time/BrowserTimer.ts';

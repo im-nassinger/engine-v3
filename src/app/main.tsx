@@ -5,6 +5,7 @@ import { CommandsContext } from '../ui/commands/index.ts';
 import type { EditorCommands } from '../ui/commands/index.ts';
 import { EditorContext } from '../ui/EditorContext.tsx';
 import { LevelViewMountContext } from '../ui/level-view-host/index.ts';
+import { OpenWindowsContext } from '../ui/open-windows/index.ts';
 import { EditorShell } from '../ui/shell/index.ts';
 import { EditorComposition } from './EditorComposition.ts';
 
@@ -33,9 +34,11 @@ root.render(
     <StrictMode>
         <EditorContext value={composition.session}>
             <CommandsContext value={editorCommands}>
-                <LevelViewMountContext value={composition.levelView}>
-                    <EditorShell />
-                </LevelViewMountContext>
+                <OpenWindowsContext value={composition.openWindows}>
+                    <LevelViewMountContext value={composition.levelView}>
+                        <EditorShell />
+                    </LevelViewMountContext>
+                </OpenWindowsContext>
             </CommandsContext>
         </EditorContext>
     </StrictMode>,

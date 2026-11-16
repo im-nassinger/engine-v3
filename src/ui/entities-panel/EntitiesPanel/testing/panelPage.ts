@@ -6,10 +6,12 @@ import { Level } from '../../../../core/level/index.ts';
 import type { Entity } from '../../../../core/level/index.ts';
 import { CommandRunner, createCommandRegistry } from '../../../../editor/commands/index.ts';
 import { EditorSession } from '../../../../editor/session/index.ts';
+import { OpenWindowCount } from '../../../../editor/tools/index.ts';
 import { ManualClock, ManualFrames, ManualTimer } from '../../../../editor/time/testing/index.ts';
 import { CommandsContext } from '../../../commands/index.ts';
 import type { EditorCommands } from '../../../commands/index.ts';
 import { EditorContext } from '../../../EditorContext.tsx';
+import { OpenWindowsContext } from '../../../open-windows/index.ts';
 import '../../../theme.css';
 import { EntitiesPanel } from '../EntitiesPanel.tsx';
 
@@ -71,7 +73,7 @@ export function createSession(level: Level) {
     return new EditorSession({ level, clock: new ManualClock(), timer, frames: new ManualFrames() });
 }
 
-export function mountPanel(session: EditorSession) {
+export function mountPanel(session: EditorSession, openWindows = new OpenWindowCount()) {
     const commands: EditorCommands = {
         registry: createCommandRegistry(session),
         runner: new CommandRunner(session.status),
@@ -79,7 +81,8 @@ export function mountPanel(session: EditorSession) {
     };
 
     const panel = createElement(EntitiesPanel);
-    const withCommands = createElement(CommandsContext, { value: commands }, panel);
+    const withWindows = createElement(OpenWindowsContext, { value: openWindows }, panel);
+    const withCommands = createElement(CommandsContext, { value: commands }, withWindows);
     const withSession = createElement(EditorContext, { value: session }, withCommands);
     root.render(withSession);
 }

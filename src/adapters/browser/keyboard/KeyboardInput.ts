@@ -3,7 +3,7 @@ import type { KeyboardInputData, ShortcutDispatcher } from '../../../editor/shor
 
 import { focusPlaceOf } from './focusPlaceOf.ts';
 
-type KeyDownHandler = Pick<ShortcutDispatcher, 'handleKeyDown'>;
+type KeyHandler = Pick<ShortcutDispatcher, 'handleKeyDown' | 'handleKeyUp'>;
 
 const LEVEL_VIEW_SELECTOR = '[data-focus-place="level"]';
 
@@ -11,12 +11,12 @@ const LEVEL_VIEW_SELECTOR = '[data-focus-place="level"]';
 // mouse are, and the browser's default is stopped only when the editor used the key. Listens on the
 // window in the capture phase, so a focused element can't swallow a key first.
 export class KeyboardInput {
-    private readonly handler: KeyDownHandler;
+    private readonly handler: KeyHandler;
     private readonly page: Window;
     private readonly held = new Set<string>();
     private pointerOverLevelView = false;
 
-    constructor(handler: KeyDownHandler, page: Window) {
+    constructor(handler: KeyHandler, page: Window) {
         this.handler = handler;
         this.page = page;
     }
@@ -70,6 +70,7 @@ export class KeyboardInput {
     // Firefox and Windows open the browser's menu bar when Alt goes up after being pressed alone.
     private handleKeyUp(event: KeyboardEvent) {
         this.held.delete(event.code);
+        this.handler.handleKeyUp(readKeyboardInput(event));
 
         if (isAltAlone(event)) {
             event.preventDefault();

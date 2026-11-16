@@ -18,6 +18,7 @@ const MAIN_MENU: Record<string, [string, string][]> = {
     ],
     View: [
         ['Grid', 'G'],
+        ['Grid snapping', 'Shift+G'],
         ['Joint icons', 'Shift+J'],
         ['Camera frame', 'Shift+C'],
         ['Physics view', 'Shift+P'],
@@ -75,13 +76,13 @@ test('a switch shows its tick, and choosing it closes the menu', async ({ page }
     await openEditor(page);
     await page.getByRole('button', { name: 'View menu' }).click();
 
-    const grid = page.getByRole('menuitem', { name: /^Grid/ });
+    const grid = page.getByRole('menuitem', { name: /^Grid G/ });
     await expect(grid).toHaveAttribute('aria-checked', 'true');
     await grid.click();
     await expect(grid).toBeHidden();
 
     await page.getByRole('button', { name: 'View menu' }).click();
-    await expect(page.getByRole('menuitem', { name: /^Grid/ })).toHaveAttribute('aria-checked', 'false');
+    await expect(page.getByRole('menuitem', { name: /^Grid G/ })).toHaveAttribute('aria-checked', 'false');
 });
 
 test('renaming the level is an undo step, and the tab title follows the name', async ({ page }) => {

@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import { TransformComponent } from '../../../core/components/index.ts';
-import { buildToolTestSession, pointerAt } from '../testing/toolTestSession.ts';
+import { buildToolTestSession, pointerAt, toolKey } from '../testing/toolTestSession.ts';
 
 import { EscapeChain } from './EscapeChain.ts';
 
@@ -98,5 +98,44 @@ describe('EscapeChain', () => {
 
         expect(escape.press()).toBe('group');
         expect(openLevel.selection.ids).toEqual([group.id]);
+    });
+
+    test('losing focus mid-drag puts the drag back and lets go of Space', () => {
+        const { escape, controller, select, session, square } = buildChain();
+        const openLevel = session.openLevel;
+        const squarePosition = { entityId: square.id, schema: TransformComponent.schema, key: 'position' };
+
+        controller.pointerDown(pointerAt({ x: 0, y: 0 }));
+        openLevel.liveEdit.begin([squarePosition]);
+        openLevel.liveEdit.update(squarePosition, { x: 40, y: 0 });
+        escape.focusLost();
+        controller.pointerUp(pointerAt({ x: 40, y: 0 }));
+
+        expect(select.heard).toEqual(['activate', 'down left', 'cancel']);
+        expect(openLevel.liveEdit.isActive).toBe(false);
+        expect(square.requireComponent(TransformComponent).get('position')).toEqual({ x: 0, y: 0 });
+        expect(openLevel.history.undoCount).toBe(0);
+    });
+
+    test('losing focus with Space held and no drag lets go of Space', () => {
+        const { escape, controller, pan, select } = buildChain();
+
+        controller.keyDown(toolKey('Space', ' '));
+        escape.focusLost();
+        controller.pointerDown(pointerAt({ x: 0, y: 0 }));
+
+        expect(pan.isSpaceHeld).toBe(false);
+        expect(select.heard).toEqual(['activate', 'down left']);
+    });
+
+    test('the browser taking the pointer puts a pan back to rest', () => {
+        const { escape, controller, session } = buildChain();
+
+        controller.pointerDown(pointerAt({ x: 0, y: 0 }, 'middle'));
+        escape.dragLost();
+        controller.pointerMove(pointerAt({ x: 50, y: 0 }));
+
+        expect(controller.isDragging).toBe(false);
+        expect(session.view.middle).toEqual({ x: 0, y: 0 });
     });
 });
