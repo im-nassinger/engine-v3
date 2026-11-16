@@ -11,6 +11,9 @@ export type PasteTarget = {
     readonly sourceToken: string;
 };
 
+// The entities to remap and the opening they were written in: a pasted fragment, or Duplicate's own copy.
+export type RemapSource = Pick<EntityFragment, 'sourceToken' | 'entities'>;
+
 type RawRecord = Readonly<Record<string, unknown>>;
 
 function isEntityId(raw: unknown): raw is EntityId {
@@ -42,7 +45,7 @@ export class IdRemapping {
 
     // The fragment's entities with new ids, ready for LevelReader. The fragment is left as it was. The new
     // ids are used up even when the paste is refused.
-    remap(fragment: EntityFragment, target: PasteTarget): readonly unknown[] {
+    remap(fragment: RemapSource, target: PasteTarget): readonly unknown[] {
         const newIds = new Map<EntityId, EntityId>();
         for (const root of fragment.entities) {
             this.giveNewIds(root, newIds, target.level);

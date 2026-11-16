@@ -190,3 +190,9 @@ Made under the standing yes (2026-11-16), before building. The [plan](../../plan
 - **The menu's Paste shows its outcome itself** through the session's `StatusText` when the text arrives, since `run()` has already returned `done` to the `CommandRunner`.
 - **The page passes `navigator.clipboard`** to `EditorClipboard` when the browser has one; step 7 adds the events.
 
+**As built, step 6 (standing yes, 2026-11-16):**
+
+- **`DuplicateCommand`** in `editor/commands/clipboard/` writes the copied roots with `LevelWriter.writeSubtree` as they are, with no TransformComponent rewritten, since each copy stays in its original's group. `IdRemapping.remap` takes a `RemapSource` (the `sourceToken` and the `entities`), which a fragment is, so Duplicate remaps the whole set at once with the open level's own token without making a box it doesn't need.
+- **One `AddEntitiesChange` per root**, put at its original's index read just before, so the copy sits directly above it even when several roots share a group. Each root is checked with `checkSubtree` against the level as the earlier copies left it, so the entity limit counts them all, and a refusal rolls back the copies already in. *Why: the roots can be in different groups, and one change puts its roots side by side in one place.*
+- **Ctrl+D works everywhere**, also while typing in a text field, as the requirement's table says ("Everywhere except the code editor"). The code editor is v2, so v2 gives the shortcut a scope that leaves it out. *Why: the dispatcher's scopes have no "everywhere but the code editor" yet, and v1 has no code editor.*
+- **Its refusals** are the skip rule's (`The World can't be duplicated`), `This group is locked`, and the paste's limit texts through `pasteRefusalText`.

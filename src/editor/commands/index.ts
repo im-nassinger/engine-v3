@@ -1,7 +1,14 @@
 export { GoIntoGroupCommand } from './arrange/GoIntoGroupCommand.ts';
 export { GroupCommand } from './arrange/GroupCommand.ts';
 export { UngroupCommand } from './arrange/UngroupCommand.ts';
-export { CopyCommand, CutCommand, PasteCommand, pasteEntities, pasteRefusalText } from './clipboard/index.ts';
+export {
+    CopyCommand,
+    CutCommand,
+    DuplicateCommand,
+    PasteCommand,
+    pasteEntities,
+    pasteRefusalText,
+} from './clipboard/index.ts';
 export type { ClipboardParts, MouseOverView, PasteSpot, PasteTools } from './clipboard/index.ts';
 export { CommandRegistry } from './CommandRegistry.ts';
 export { createCommandRegistry } from './createCommandRegistry.ts';

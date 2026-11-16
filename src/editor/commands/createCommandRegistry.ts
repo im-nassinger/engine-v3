@@ -7,6 +7,7 @@ import { UngroupCommand } from './arrange/UngroupCommand.ts';
 import type { ClipboardParts } from './clipboard/ClipboardParts.ts';
 import { CopyCommand } from './clipboard/CopyCommand.ts';
 import { CutCommand } from './clipboard/CutCommand.ts';
+import { DuplicateCommand } from './clipboard/DuplicateCommand.ts';
 import { PasteCommand } from './clipboard/PasteCommand.ts';
 import { CommandRegistry } from './CommandRegistry.ts';
 import { DeleteCommand } from './edit/DeleteCommand.ts';
@@ -37,6 +38,7 @@ export function createCommandRegistry(session: EditorSession, clipboardParts?: C
     registry.register(new CutCommand(session, clipboard));
     registry.register(new CopyCommand(session, clipboard));
     registry.register(new PasteCommand(session, clipboard));
+    registry.register(new DuplicateCommand(session));
     registry.register(new DeleteCommand(session));
     registry.register(new SelectAllCommand(session));
     registry.register(new RenameCommand(session));
