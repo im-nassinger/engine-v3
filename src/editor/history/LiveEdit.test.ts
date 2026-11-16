@@ -143,6 +143,20 @@ describe('LiveEdit', () => {
         expect(liveEdit.isActive).toBe(true);
     });
 
+    test('moves activeChanged when a drag begins and when it ends, by commit or cancel', () => {
+        const { liveEdit, squarePosition } = buildLiveEdit();
+        const seen: boolean[] = [];
+        liveEdit.activeChanged.subscribe(() => seen.push(liveEdit.isActive));
+
+        liveEdit.begin([squarePosition]);
+        liveEdit.commit('Move 1 entity');
+        liveEdit.begin([squarePosition]);
+        liveEdit.cancel();
+        liveEdit.cancel();
+
+        expect(seen).toEqual([true, false, true, false]);
+    });
+
     test('refuses a second begin, an update of a value not begun, and a commit with no drag', () => {
         const { liveEdit, squarePosition, groupRotation } = buildLiveEdit();
 

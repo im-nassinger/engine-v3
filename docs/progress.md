@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 12, step 1 of 13: the steps and their choices are written. Next is step 2, `Autosave`'s timing. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 12, step 2 of 13: `Autosave`'s timing, `SaveState` and the saving contracts with their fakes are built. Next is step 3, `Autosave`'s failures. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

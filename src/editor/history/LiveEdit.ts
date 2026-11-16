@@ -1,4 +1,5 @@
 import type { AnyComponentSchema, AnyValueEntry } from '../../core/components/index.ts';
+import { VersionCounter } from '../../core/events/index.ts';
 import type { ParseOutcome } from '../../core/fields/index.ts';
 import type { EntityId, Level } from '../../core/level/index.ts';
 
@@ -23,6 +24,8 @@ type StartedValue = {
 // A drag: values change in the level every frame with no history, and the release makes one step from
 // the start values to the current ones. Esc puts the start values back and makes no step.
 export class LiveEdit {
+    // Moves when a drag begins and when it ends, so saving can wait for the drag's end.
+    readonly activeChanged = new VersionCounter();
     private readonly level: Level;
     private readonly editor: LevelEditor;
     private started = new Map<string, StartedValue>();
@@ -52,6 +55,7 @@ export class LiveEdit {
 
         this.started = started;
         this.active = true;
+        this.activeChanged.increment();
     }
 
     // Writes the value now, without history. A value the field refuses is left out and the old one kept,
@@ -110,6 +114,7 @@ export class LiveEdit {
     private end() {
         this.started = new Map();
         this.active = false;
+        this.activeChanged.increment();
     }
 
     private requireStarted(target: ValueTarget) {
