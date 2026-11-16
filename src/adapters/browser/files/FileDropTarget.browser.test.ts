@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { Level } from '../../../core/level/index.ts';
 import { LevelWriter } from '../../../core/level-data/index.ts';
@@ -67,13 +67,6 @@ function importedLevelData() {
     return new LevelWriter().write(level);
 }
 
-// Lets the import's promises run.
-async function settle() {
-    for (let turn = 0; turn < 10; turn += 1) {
-        await new Promise((resolve) => setTimeout(resolve, 0));
-    }
-}
-
 describe('FileDropTarget', () => {
     test('a drag carrying a file is taken as a copy, so the browser does not open it', () => {
         buildEditor();
@@ -105,10 +98,10 @@ describe('FileDropTarget', () => {
         expect(importer.importedCount).toBe(0);
 
         runner.confirmDialog();
-        await settle();
 
+        // Reading a dropped file's bytes is real browser I/O, so it takes as long as the machine needs.
+        await vi.waitFor(() => expect(session.status.current).toBe('Imported castle.editable'));
         expect(importer.importedCount).toBe(1);
         expect(session.openLevel.level.name).toBe('Castle');
-        expect(session.status.current).toBe('Imported castle.editable');
     });
 });
