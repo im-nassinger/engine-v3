@@ -39,6 +39,20 @@ describe('FileDownload', () => {
         expect(new Uint8Array(await blob.arrayBuffer())).toEqual(bytes);
     });
 
+    test('a text file is written as UTF-8', async () => {
+        const clicks = catchClicks();
+
+        new FileDownload(window).exportFile({
+            name: 'damaged-level.json',
+            text: '{"é":1}',
+            mediaType: 'application/json',
+        });
+
+        const response = await fetch(clicks[0]?.href ?? '');
+        const bytes = new Uint8Array(await response.arrayBuffer());
+        expect([...bytes]).toEqual([123, 34, 195, 169, 34, 58, 49, 125]);
+    });
+
     test('leaves no link in the page', () => {
         catchClicks();
 

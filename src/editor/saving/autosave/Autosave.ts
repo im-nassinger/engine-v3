@@ -95,6 +95,11 @@ export class Autosave {
         await this.save();
     }
 
+    // Why the last save failed, while it stands: the level-wide message's text.
+    get failureText() {
+        return this.messageText;
+    }
+
     dispose() {
         this.stopFollowingSession();
         this.followed.stop();

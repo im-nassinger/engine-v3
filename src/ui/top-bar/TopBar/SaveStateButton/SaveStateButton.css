@@ -1,0 +1,11 @@
+.save-state-button {
+    display: inline-flex;
+
+    .toggle {
+        color: var(--muted);
+    }
+
+    &[data-status='failed'] .toggle {
+        color: var(--warning);
+    }
+}

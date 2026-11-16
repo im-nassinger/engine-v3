@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import type { ReactNode, RefObject } from 'react';
-import { useOpenWindows } from '../../open-windows/index.ts';
 import type { MenuEntry, MenuSubmenu } from './MenuEntry.ts';
 import { MenuPanel } from './MenuPanel/index.ts';
+import { usePopupClosing } from '../popup-closing/index.ts';
 import './Menu.css';
 
 export type MenuAlign = 'start' | 'end';
@@ -30,39 +30,7 @@ type OpenSubmenu = {
 export function Menu({ entries, onClose, anchor, align = 'start', side = 'below', header }: MenuProps) {
     const rootRef = useRef<HTMLDivElement>(null);
     const [openSubmenu, setOpenSubmenu] = useState<OpenSubmenu | undefined>(undefined);
-    const openWindows = useOpenWindows();
-
-    // Open as long as it is shown, so Esc closes it and nothing else.
-    useEffect(() => openWindows.open(), [openWindows]);
-
-    useEffect(() => {
-        const closeOnEscape = (event: KeyboardEvent) => {
-            if (event.key !== 'Escape') return;
-
-            event.preventDefault();
-            event.stopPropagation();
-            onClose();
-        };
-
-        const closeOnPressOutside = (event: PointerEvent) => {
-            const target = event.target;
-            if (!(target instanceof Node)) return;
-
-            const isInsideMenu = rootRef.current?.contains(target) ?? false;
-            const isOnAnchor = anchor.current?.contains(target) ?? false;
-            if (isInsideMenu || isOnAnchor) return;
-
-            onClose();
-        };
-
-        document.addEventListener('keydown', closeOnEscape, { capture: true });
-        document.addEventListener('pointerdown', closeOnPressOutside, { capture: true });
-
-        return () => {
-            document.removeEventListener('keydown', closeOnEscape, { capture: true });
-            document.removeEventListener('pointerdown', closeOnPressOutside, { capture: true });
-        };
-    }, [onClose, anchor]);
+    usePopupClosing(rootRef, anchor, onClose);
 
     const showSubmenu = (submenu: MenuSubmenu, topPx: number) => setOpenSubmenu({ submenu, topPx });
     const hideSubmenu = () => setOpenSubmenu(undefined);

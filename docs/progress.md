@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 12, step 10 of 13: New, Import (Ctrl+O) and dropping a file are built: each asks `Replace the open level?` first, a refused file gets its plain message in a notice and changes nothing, and an import replaces the level, clears the history, saves and fits the camera frame. Next is step 11, the page. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 12, step 11 of 13: the page saves: it opens the level saved in this browser, `Autosave` runs when the tab holds the lock, the top bar shows the save state with its explanation, the tab title has `*` while unsaved, the leave prompt is armed only then, a hidden tab saves at once, and the read-only, crash and storage notes show as status text. Next is step 12, the Playwright tests. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

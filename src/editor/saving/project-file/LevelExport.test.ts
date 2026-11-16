@@ -67,7 +67,7 @@ describe('LevelExport', () => {
         const file = files.exported[0];
         expect(file?.name).toBe('A_B_ C_.editable');
         expect(file?.mediaType).toBe(PROJECT_FILE_MEDIA_TYPE);
-        expect(file?.bytes).toBe(zip.answers[0]);
+        expect(file !== undefined && 'bytes' in file ? file.bytes : undefined).toBe(zip.answers[0]);
         expect(zip.textAt(LEVEL_JSON_PATH)).toBe(JSON.stringify(writer.write(session.openLevel.level)));
     });
 

@@ -15,11 +15,13 @@ export type MenuPlace = {
 export type Availability = { readonly enabled: true } | { readonly enabled: false; readonly reason: string };
 
 // A question a command asks before it acts: "Replace the open level?". confirmLabel names the button
-// that goes ahead ("Replace"); the other button is always Cancel.
+// that goes ahead ("Replace"); the other button is Cancel unless cancelLabel names it.
 export type Question = {
     readonly title: string;
     readonly text: string;
     readonly confirmLabel: string;
+    // Only the damaged level's notice, which changes nothing either way: Close.
+    readonly cancelLabel?: string;
 };
 
 // Something to read, closed with OK only: About.

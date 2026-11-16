@@ -13,8 +13,7 @@ export class FileDownload implements FileExporter {
     }
 
     exportFile(file: ExportedFile) {
-        // A copy into a plain ArrayBuffer, since a Blob refuses a view of shared memory.
-        const blob = new Blob([new Uint8Array(file.bytes)], { type: file.mediaType });
+        const blob = new Blob([blobPartOf(file)], { type: file.mediaType });
         const url = URL.createObjectURL(blob);
         const link = this.page.document.createElement('a');
         link.href = url;
@@ -26,4 +25,12 @@ export class FileDownload implements FileExporter {
         link.remove();
         this.page.setTimeout(() => URL.revokeObjectURL(url), REVOKE_AFTER_MS);
     }
+}
+
+// Text goes in as it is, and the Blob writes it as UTF-8. Bytes are copied into a plain ArrayBuffer, since a
+// Blob refuses a view of shared memory.
+function blobPartOf(file: ExportedFile) {
+    if ('text' in file) return file.text;
+
+    return new Uint8Array(file.bytes);
 }

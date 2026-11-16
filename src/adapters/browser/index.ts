@@ -11,3 +11,6 @@ export { AnimationFrames } from './time/AnimationFrames.ts';
 export { BrowserTimer } from './time/BrowserTimer.ts';
 export { SystemClock } from './time/SystemClock.ts';
 export { LocalTimeOfDay } from './time/LocalTimeOfDay.ts';
+export { PageSavingEvents } from './page/PageSavingEvents.ts';
+export type { PageSavingParts } from './page/PageSavingEvents.ts';
+export { TabTitle, tabTitleText } from './page/TabTitle.ts';

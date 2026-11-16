@@ -7,3 +7,4 @@ export * from './MenuSearch/index.ts';
 export * from './RowKindIcon/index.ts';
 export * from './Tooltip/index.ts';
 export * from './entity-row-drop/index.ts';
+export * from './popup-closing/index.ts';

@@ -6,6 +6,7 @@ import type { EditorCommands } from '../ui/commands/index.ts';
 import { EditorContext } from '../ui/EditorContext.tsx';
 import { LevelViewMountContext } from '../ui/level-view-host/index.ts';
 import { OpenWindowsContext } from '../ui/open-windows/index.ts';
+import { SaveIndicatorContext } from '../ui/save-state/index.ts';
 import { EditorShell } from '../ui/shell/index.ts';
 import { ToolsContext } from '../ui/tools/index.ts';
 import type { EditorTools } from '../ui/tools/index.ts';
@@ -39,9 +40,11 @@ root.render(
             <CommandsContext value={editorCommands}>
                 <ToolsContext value={editorTools}>
                     <OpenWindowsContext value={composition.openWindows}>
-                        <LevelViewMountContext value={composition.levelView}>
-                            <EditorShell />
-                        </LevelViewMountContext>
+                        <SaveIndicatorContext value={composition.saveIndicator}>
+                            <LevelViewMountContext value={composition.levelView}>
+                                <EditorShell />
+                            </LevelViewMountContext>
+                        </SaveIndicatorContext>
                     </OpenWindowsContext>
                 </ToolsContext>
             </CommandsContext>

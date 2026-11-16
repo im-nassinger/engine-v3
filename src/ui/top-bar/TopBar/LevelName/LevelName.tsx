@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
-import { GAME_NAME, renameLevel } from '../../../../editor/commands/index.ts';
+import { renameLevel } from '../../../../editor/commands/index.ts';
 import { useEditorSession } from '../../../EditorContext.tsx';
 import { useReading, useVersion } from '../../../hooks/index.ts';
 import './LevelName.css';
 
 // The level's name, a box that reads as text until clicked. Enter or leaving the box renames the level
 // as one undo step, Esc puts the name back. A refused name shows its reason as status text. The
-// browser tab's title follows the name too.
+// browser tab's title is TabTitle's, in the page.
 export function LevelName() {
     const session = useEditorSession();
     useVersion(session.openLevelChanged);
@@ -18,10 +18,6 @@ export function LevelName() {
     const [draft, setDraft] = useState<string | undefined>(undefined);
     const skipsCommit = useRef(false);
     const shownText = draft ?? name;
-
-    useEffect(() => {
-        document.title = `${name} - ${GAME_NAME}`;
-    }, [name]);
 
     const commit = () => {
         if (draft === undefined) return;

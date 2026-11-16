@@ -29,7 +29,7 @@ export function Dialogs() {
             title={question.title}
             text={question.text}
             confirmLabel={question.confirmLabel}
-            cancelLabel="Cancel"
+            cancelLabel={question.cancelLabel ?? 'Cancel'}
             onConfirm={confirm}
             onClose={close}
         />

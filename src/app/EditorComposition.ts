@@ -8,20 +8,44 @@ import {
     FileDropTarget,
     KeyboardInput,
     keyboardPlatform,
+    LocalTimeOfDay,
+    PageSavingEvents,
     PointerInput,
     SystemClock,
+    TabTitle,
 } from '../adapters/browser/index.ts';
 import { PixiLevelView } from '../adapters/pixi/index.ts';
 import { ImportWorkerClient } from '../adapters/worker/index.ts';
-import { LocalStorageSettings } from '../adapters/storage/index.ts';
+import {
+    BrowserPersistence,
+    IndexedDbLevelStore,
+    LocalStorageSettings,
+    WebLockTabGuard,
+} from '../adapters/storage/index.ts';
 import { FflateZipCodec } from '../adapters/zip/index.ts';
 import { levelBoundsOf } from '../core/derived/index.ts';
-import { Level } from '../core/level/index.ts';
-import { LevelWriter } from '../core/level-data/index.ts';
+import { createV1Registry } from '../core/components/index.ts';
+import { FormatUpgrader, LevelReader, LevelWriter, V1_LEVEL_LIMITS } from '../core/level-data/index.ts';
 import { EditorClipboard } from '../editor/clipboard/index.ts';
-import { ClipboardEvents, CommandRunner, createCommandRegistry, FileDropEvents } from '../editor/commands/index.ts';
+import { READ_ONLY_REASON } from '../editor/history/index.ts';
+import {
+    ClipboardEvents,
+    CommandRunner,
+    createCommandRegistry,
+    damagedLevelQuestion,
+    FileDropEvents,
+} from '../editor/commands/index.ts';
 import type { CommandRegistry } from '../editor/commands/index.ts';
-import { EditorSettings, LevelExport, LevelImport, ProjectFile } from '../editor/saving/index.ts';
+import {
+    Autosave,
+    EditorSettings,
+    LevelExport,
+    LevelImport,
+    LevelOpener,
+    ProjectFile,
+    SaveIndicator,
+} from '../editor/saving/index.ts';
+import type { FileExporter, Opening, SavesNow } from '../editor/saving/index.ts';
 import { EditorSession } from '../editor/session/index.ts';
 import { ShortcutDispatcher } from '../editor/shortcuts/index.ts';
 import type { KeyboardPlatform } from '../editor/shortcuts/index.ts';
@@ -49,10 +73,15 @@ type EditorParts = {
     readonly tools: ToolController;
     readonly mouse: MousePosition;
     readonly openWindows: OpenWindowCount;
+    readonly opening: Opening;
+    readonly saveIndicator: SaveIndicator;
+    readonly pageSaving: PageSavingEvents;
+    readonly tabTitle: TabTitle;
+    readonly exporter: FileExporter;
 };
 
 // The composition root: the only code that knows both the editor's rules and the browser's details.
-// Stage 12 opens the saved level here instead of a new one.
+// It opens the level saved in this browser, and saves it with Autosave when this tab holds the lock.
 export class EditorComposition {
     readonly session: EditorSession;
     readonly settings: EditorSettings;
@@ -64,6 +93,12 @@ export class EditorComposition {
     readonly mouse: MousePosition;
     // The page's menus and the Entities panel's row drag report here, so Esc leaves them to close.
     readonly openWindows: OpenWindowCount;
+    // What the page shows of saving: the top bar's save state, the tab title's `*` and the leave prompt.
+    readonly saveIndicator: SaveIndicator;
+    private readonly opening: Opening;
+    private readonly pageSaving: PageSavingEvents;
+    private readonly tabTitle: TabTitle;
+    private readonly exporter: FileExporter;
     private readonly keyboard: KeyboardInput;
     private readonly pointer: PointerInput;
     private readonly clipboardBridge: ClipboardBridge;
@@ -83,15 +118,38 @@ export class EditorComposition {
         this.tools = parts.tools;
         this.mouse = parts.mouse;
         this.openWindows = parts.openWindows;
+        this.opening = parts.opening;
+        this.saveIndicator = parts.saveIndicator;
+        this.pageSaving = parts.pageSaving;
+        this.tabTitle = parts.tabTitle;
+        this.exporter = parts.exporter;
     }
 
     static async create() {
         const frames = new AnimationFrames();
         const settings = new EditorSettings(new LocalStorageSettings(), frames);
+        const clock = new SystemClock();
+        const timer = new BrowserTimer();
+        const store = new IndexedDbLevelStore();
+        const writer = new LevelWriter();
+        // One registry and reader for the opening and the session, so the saved level is read as an import is.
+        const registry = createV1Registry();
+        const reader = new LevelReader(registry, V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+        const opening = await new LevelOpener({
+            tabGuard: new WebLockTabGuard(),
+            store,
+            reader,
+            writer,
+            sessionOpen: settings.sessionOpen,
+            clock,
+            timeOfDay: new LocalTimeOfDay(),
+        }).open();
         const session = new EditorSession({
-            level: Level.createNew(),
-            clock: new SystemClock(),
-            timer: new BrowserTimer(),
+            level: opening.level,
+            registry,
+            reader,
+            clock,
+            timer,
             frames,
             viewSettings: settings.createViewSettings(),
             foldStore: settings.foldStore,
@@ -99,13 +157,29 @@ export class EditorComposition {
         });
         const mouse = new MousePosition(frames);
         const clipboard = new EditorClipboard(systemClipboard());
-        // Autosave joins the page with the saved level's opening in step 11; until then nothing is saved.
-        const saving = { saveNow: () => Promise.resolve() };
+        if (opening.readOnly) {
+            session.makeReadOnly();
+        }
+        // Started only when the opening can save, so a read-only tab or a kept damaged record is never written over.
+        const autosave = opening.canSave
+            ? new Autosave({
+                  session,
+                  store,
+                  writer,
+                  timer,
+                  clock,
+                  persistence: new BrowserPersistence(),
+                  persistAsked: settings.persistAsked,
+              })
+            : undefined;
+        const saving: SavesNow = autosave ?? { saveNow: () => Promise.resolve() };
+        const saveIndicator = SaveIndicator.forOpening(opening, autosave);
+        const exporter = new FileDownload(window);
         const levelExport = new LevelExport({
             session,
             saving,
-            projectFile: new ProjectFile(new LevelWriter(), new FflateZipCodec()),
-            exporter: new FileDownload(window),
+            projectFile: new ProjectFile(writer, new FflateZipCodec()),
+            exporter,
         });
         const importer = new ImportWorkerClient(createImportWorker);
         const levelImport = new LevelImport({ importer, reader: session.reader });
@@ -130,6 +204,9 @@ export class EditorComposition {
         const pointer = new PointerInput(pointerParts, levelView.canvas, window);
         const clipboardBridge = new ClipboardBridge(new ClipboardEvents(commands, runner), window);
         const fileDrop = new FileDropTarget(new FileDropEvents(commands, runner), window);
+        const sessionOpen = opening.readOnly ? undefined : settings.sessionOpen;
+        const pageSaving = new PageSavingEvents({ indicator: saveIndicator, saving, settings, sessionOpen }, window);
+        const tabTitle = new TabTitle(session, saveIndicator, document);
 
         const composition = new EditorComposition({
             session,
@@ -145,6 +222,11 @@ export class EditorComposition {
             tools,
             mouse,
             openWindows,
+            opening,
+            saveIndicator,
+            pageSaving,
+            tabTitle,
+            exporter,
         });
         composition.start();
 
@@ -157,16 +239,33 @@ export class EditorComposition {
         this.levelView.follow(this.session);
         this.levelView.showSelection(new EditorSelectionSource(this.session, this.tools));
         this.levelView.showDrawing(new EditorDrawingSource(this.tools));
-        // The editor lives as long as the page, so the keyboard, the pointer, the clipboard events and file drops
-        // are never disconnected.
+        // The editor lives as long as the page, so the keyboard, the pointer, the clipboard events, file drops
+        // and the page's saving events are never disconnected.
         this.keyboard.connect();
         this.pointer.connect();
         this.clipboardBridge.connect();
         this.fileDrop.connect();
+        this.pageSaving.connect();
+        this.tabTitle.connect();
         this.limitPanToOpenLevel();
         this.session.openLevelChanged.subscribe(() => this.limitPanToOpenLevel());
-        if (!viewRestored) {
+        // A new level has no place of its own yet, so a view kept from an earlier level would show nothing.
+        if (this.opening.isNew || !viewRestored) {
             this.fitCameraFrameOnceSized();
+        }
+        this.showOpeningNotes();
+    }
+
+    // The crash note, the storage notices or the read-only reason as status text, and the damaged level's notice.
+    private showOpeningNotes() {
+        const statusText = this.opening.statusText ?? (this.opening.readOnly ? READ_ONLY_REASON : undefined);
+        if (statusText !== undefined) {
+            this.session.status.show(statusText);
+        }
+
+        const damaged = this.opening.damaged;
+        if (damaged !== undefined) {
+            this.runner.showOutcome(damagedLevelQuestion(damaged, this.exporter));
         }
     }
 

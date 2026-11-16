@@ -17,7 +17,11 @@ export { createShape } from './draw/createShape.ts';
 export type { CreateShapeOutcome, ShapeDrawing } from './draw/createShape.ts';
 export { DeleteCommand } from './edit/DeleteCommand.ts';
 export {
+    DAMAGED_FILE_NAME,
+    DAMAGED_TITLE,
+    damagedLevelQuestion,
     EXPORT_FAILED_TEXT,
+    EXPORT_RAW_LABEL,
     ExportCommand,
     exportedText,
     FileDropEvents,
