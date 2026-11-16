@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 12, step 11 of 13: the page saves: it opens the level saved in this browser, `Autosave` runs when the tab holds the lock, the top bar shows the save state with its explanation, the tab title has `*` while unsaved, the leave prompt is armed only then, a hidden tab saves at once, and the read-only, crash and storage notes show as status text. Next is step 12, the Playwright tests. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 12, step 12 of 13: the Playwright tests of saving pass in three browsers: a drawn shape is there after a reload, a second tab is read-only and refuses edits, an exported level dropped on the page imports back, a full disk shows `Save failed` while Export still downloads, and a zip bomb is refused while the page keeps drawing. Next is step 13, the docs. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

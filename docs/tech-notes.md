@@ -173,6 +173,8 @@ Browser storage as checked in October 2026:
 - **Save cost.** Store each file once by hash. If full saves make the editor stutter, write only what changed.
 - **Firefox's `persist()` asks the user** and its promise stays pending until they answer (seen in stage 12's browser tests, 2026-11-16). Never await it before anything else.
 - **Reading a dropped `File` is real I/O.** `file.arrayBuffer()` can take many event-loop turns, longest in WebKit on CI's slow machines (a browser test that waited ten timer turns failed there, 2026-11-16). Tests wait for the outcome with `vi.waitFor`, never a fixed number of turns.
+- **Playwright's Firefox fires a file input's `cancel` before the `change` that carries `setFiles`'s file**, with Playwright's round trip in between, so a picker that answers the first of the two gives nothing (2026-11-16). It is the test tool's doing, not Firefox's with a person at the dialog, so `BrowserFilePicker` is left as it is and the Playwright tests import by dropping the file.
+- **WebKit's downloads turn spaces into `_`** in the name Playwright reports: the page's `Untitled level.editable` arrives as `Untitled_level.editable` (2026-11-16). Tests accept both.
 - **One tab.** Web Locks: one exclusive lock for the level, `ifAvailable` to detect the other tab. Whether a crashed tab releases its lock is only implied by the spec. Test it.
 - **Import in a worker**, to keep the page responsive and contain hostile files. Decode images only after the checks pass. Zip bombs must be refused without freezing the page.
 - **Reading script settings** means running the top of a script in a throwaway Lua state on load. That state needs the same safety as play, which is why importing a level counts as running untrusted code.
