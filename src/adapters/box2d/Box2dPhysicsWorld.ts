@@ -2,6 +2,7 @@ import type {
     Box2DModule,
     b2BodyId,
     b2BodyType,
+    b2JointDef,
     b2JointId,
     b2ShapeDef,
     b2Transform,
@@ -20,6 +21,8 @@ import type {
     JointDefinition,
     JointHandle,
     PhysicsWorld,
+    RopeDefinition,
+    SpringDefinition,
     SurfaceDefinition,
     SurfacePiece,
     WorldSettings,
@@ -129,7 +132,11 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
     createJoint(definition: JointDefinition): JointHandle {
         this.checkAlive();
 
-        const jointId = this.createHinge(definition);
+        if (definition.bodyA === definition.bodyB) {
+            throw new Error('A joint must join two different bodies.');
+        }
+
+        const jointId = definition.type === 'hinge' ? this.createHinge(definition) : this.createDistance(definition);
         this.joints.push(jointId);
 
         return this.joints.length - 1;
@@ -252,39 +259,12 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         return createdBody;
     }
 
-    // A Hinge is Box2D's revolute joint. Box2D turns its body B against its body A, so field A is Box2D's
-    // body B and field B is its body A. Each frame sits on its end; B's frame holds the angle between the
-    // two bodies at the start, so the placed angle reads 0 and the limits count from it. Resistance is a
-    // motor at speed 0, which brakes the turning without holding any angle.
+    // A Hinge is Box2D's revolute joint. Resistance is a motor at speed 0, which brakes the turning
+    // without holding any angle.
     private createHinge(definition: HingeDefinition) {
         const box2d = this.box2d;
-        const turningBodyId = this.bodyAt(definition.bodyA).bodyId;
-        const baseBodyId = this.bodyAt(definition.bodyB).bodyId;
-        if (definition.bodyA === definition.bodyB) {
-            throw new Error('A joint must join two different bodies.');
-        }
-
         const hingeDefinition = box2d.b2DefaultRevoluteJointDef();
-        const base = hingeDefinition.base;
-        base.bodyIdA = baseBodyId;
-        base.bodyIdB = turningBodyId;
-        base.collideConnected = definition.letConnectedObjectsCollide;
-        base.userData = definition.entity;
-
-        const baseFrame = this.localFrame(baseBodyId, definition.endB);
-        base.localFrameA = baseFrame;
-        baseFrame.delete();
-
-        const turningFrame = this.localFrame(turningBodyId, definition.endA);
-        const baseRotation = box2d.b2Body_GetRotation(baseBodyId);
-        const turningRotation = box2d.b2Body_GetRotation(turningBodyId);
-        const startAngle = box2d.b2InvMulRot(turningRotation, baseRotation);
-        turningFrame.q = startAngle;
-        startAngle.delete();
-        baseRotation.delete();
-        turningRotation.delete();
-        base.localFrameB = turningFrame;
-        turningFrame.delete();
+        this.setEnds(hingeDefinition.base, definition);
 
         hingeDefinition.enableLimit = definition.limitRotation;
         hingeDefinition.lowerAngle = Units.toRadians(definition.minAngle);
@@ -304,6 +284,65 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         hingeDefinition.delete();
 
         return jointId;
+    }
+
+    // Rope and Spring are Box2D's distance joint with its spring on. A Rope's spring has 0 bounces per
+    // second, so it pulls nothing, and its limit from 0 to Length makes it a longest distance that can go
+    // slack. A Spring has no limit. Box2D takes the stiffness in bounces per second, without the mass.
+    private createDistance(definition: RopeDefinition | SpringDefinition) {
+        const box2d = this.box2d;
+        const distanceDefinition = box2d.b2DefaultDistanceJointDef();
+        this.setEnds(distanceDefinition.base, definition);
+        distanceDefinition.enableSpring = true;
+
+        if (definition.type === 'rope') {
+            const length = Units.toMetres(definition.length);
+            distanceDefinition.length = length;
+            distanceDefinition.hertz = 0;
+            distanceDefinition.dampingRatio = 0;
+            distanceDefinition.enableLimit = true;
+            distanceDefinition.minLength = 0;
+            distanceDefinition.maxLength = length;
+        } else {
+            distanceDefinition.length = Units.toMetres(definition.restLength);
+            distanceDefinition.hertz = definition.stiffness;
+            distanceDefinition.dampingRatio = definition.damping;
+            distanceDefinition.enableLimit = false;
+        }
+
+        const jointId = box2d.b2CreateDistanceJoint(this.worldId, distanceDefinition);
+        distanceDefinition.delete();
+
+        return jointId;
+    }
+
+    // Box2D turns and measures its body B against its body A, so field A is Box2D's body B and field B is
+    // its body A. Each frame sits on its end; B's frame holds the angle between the two bodies at the
+    // start, so a Hinge's placed angle reads 0 and its limits count from it.
+    private setEnds(base: b2JointDef, definition: JointDefinition) {
+        const box2d = this.box2d;
+        const turningBodyId = this.bodyAt(definition.bodyA).bodyId;
+        const baseBodyId = this.bodyAt(definition.bodyB).bodyId;
+
+        base.bodyIdA = baseBodyId;
+        base.bodyIdB = turningBodyId;
+        base.collideConnected = definition.letConnectedObjectsCollide;
+        base.userData = definition.entity;
+
+        const baseFrame = this.localFrame(baseBodyId, definition.endB);
+        base.localFrameA = baseFrame;
+        baseFrame.delete();
+
+        const turningFrame = this.localFrame(turningBodyId, definition.endA);
+        const baseRotation = box2d.b2Body_GetRotation(baseBodyId);
+        const turningRotation = box2d.b2Body_GetRotation(turningBodyId);
+        const startAngle = box2d.b2InvMulRot(turningRotation, baseRotation);
+        turningFrame.q = startAngle;
+        startAngle.delete();
+        baseRotation.delete();
+        turningRotation.delete();
+        base.localFrameB = turningFrame;
+        turningFrame.delete();
     }
 
     // A frame on a body at a level position, turned as the body is.

@@ -6,7 +6,12 @@ export type { BodyVelocity } from './contracts/BodyVelocity.ts';
 export { BodyPoses } from './contracts/BodyPoses.ts';
 export type { PhysicsEngine, WorldSettings } from './contracts/PhysicsEngine.ts';
 export type { BodyHandle, JointHandle } from './contracts/Handles.ts';
-export type { HingeDefinition, JointDefinition } from './contracts/JointDefinition.ts';
+export type {
+    HingeDefinition,
+    JointDefinition,
+    RopeDefinition,
+    SpringDefinition,
+} from './contracts/JointDefinition.ts';
 export type { PhysicsWorld } from './contracts/PhysicsWorld.ts';
 export type { SurfaceDefinition, SurfacePiece } from './contracts/SurfaceDefinition.ts';
 export { countBodyChanges } from './merging/bodyChanges.ts';

@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 14, step 2 of 12: the Hinge in `Box2dPhysicsWorld` is built. Next is step 3, Rope and Spring. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 14, step 3 of 12: Rope and Spring in `Box2dPhysicsWorld` are built. Next is step 4, the joint tech notes rechecked against 3.2. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -34,8 +34,8 @@
 | Stage 11, copy and paste | Done on 2026-11-16. See below |
 | Stage 12, saving | Done on 2026-11-16. See below |
 | Stage 13, physics and the determinism test | Done on 2026-11-16. See below |
-| Stage 14, joints | Being built (step 2 of 12). See the [plan](plan.md#stage-14-in-steps) |
-| Code | Stages 0 to 13 done. Stage 14, joints, is being built: step 3 is next |
+| Stage 14, joints | Being built (step 3 of 12). See the [plan](plan.md#stage-14-in-steps) |
+| Code | Stages 0 to 13 done. Stage 14, joints, is being built: step 4 is next |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -216,7 +216,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 14 of [plan.md](plan.md#stage-14-in-steps): joints.** Steps 1 and 2 are done (the steps, then the Hinge in `Box2dPhysicsWorld`); step 3, Rope and Spring, is next.
+1. **Stage 14 of [plan.md](plan.md#stage-14-in-steps): joints.** Steps 1 to 3 are done (the steps, the Hinge, then Rope and Spring in `Box2dPhysicsWorld`); step 4, the joint tech notes rechecked against 3.2, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
