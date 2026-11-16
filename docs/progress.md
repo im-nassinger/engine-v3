@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 14, step 7 of 12: the determinism test's joint levels, a rope bridge, springs and a hinged car, match their hashes in Node and three browsers, and each joint setting changes a run. Next is step 8, `CreateJointCommand`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 14, step 8 of 12: `placeJoint`, the plan's `CreateJointCommand`, places a Hinge, Rope or Spring in the current group as one undoable step, with its ends where they were clicked. Next is step 9, `JointTool`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -34,8 +34,8 @@
 | Stage 11, copy and paste | Done on 2026-11-16. See below |
 | Stage 12, saving | Done on 2026-11-16. See below |
 | Stage 13, physics and the determinism test | Done on 2026-11-16. See below |
-| Stage 14, joints | Being built (step 7 of 12). See the [plan](plan.md#stage-14-in-steps) |
-| Code | Stages 0 to 13 done. Stage 14, joints, is being built: step 8 is next |
+| Stage 14, joints | Being built (step 8 of 12). See the [plan](plan.md#stage-14-in-steps) |
+| Code | Stages 0 to 13 done. Stage 14, joints, is being built: step 9 is next |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -216,7 +216,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 14 of [plan.md](plan.md#stage-14-in-steps): joints.** Steps 1 to 4 are done (the steps, the Hinge, Rope and Spring in `Box2dPhysicsWorld`, then the joint tech notes rechecked against 3.2 in `box2dJointFacts.test.ts`); step 5, `PhysicsSceneBuilder`'s joints, is next. Step 4 showed that Box2D 3.2 makes a joint with both ends on one body, or between two Static bodies, without an error, so step 5's skips are the only guard; and that 3.2 has force and torque thresholds with joint events, which v3's breaking can use.
+1. **Stage 14 of [plan.md](plan.md#stage-14-in-steps): joints.** Steps 1 to 8 are done: the Hinge, Rope and Spring in `Box2dPhysicsWorld`, the tech notes rechecked against 3.2, `PhysicsSceneBuilder`'s joints, joints in play, the three joint determinism levels, and `placeJoint` (the plan's `CreateJointCommand`). Step 9, `JointTool`, is next; it calls `placeJoint` with level positions.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
