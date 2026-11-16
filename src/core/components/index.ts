@@ -33,6 +33,7 @@ export type { PhysicsWorldValues } from './PhysicsWorldComponent/PhysicsWorldVal
 export { ShapeComponent } from './ShapeComponent/ShapeComponent.ts';
 export type { ShapeValues } from './ShapeComponent/ShapeValues.ts';
 export { StyleComponent } from './StyleComponent/StyleComponent.ts';
+export { DEFAULT_FILL_COLOUR, DEFAULT_OUTLINE_COLOUR } from './StyleComponent/styleSchema.ts';
 export type { StyleValues } from './StyleComponent/StyleValues.ts';
 export { SurfaceComponent } from './SurfaceComponent/SurfaceComponent.ts';
 export type { SurfaceValues } from './SurfaceComponent/SurfaceValues.ts';

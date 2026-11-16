@@ -5,4 +5,14 @@ export { LevelDisplay } from './LevelDisplay.ts';
 export type { LevelDisplayCaches, LevelDisplayParts } from './LevelDisplay.ts';
 export { PixiLevelView } from './PixiLevelView.ts';
 export type { OpenLevelSource, PixelRatioSource, PixiLevelViewParts } from './PixiLevelView.ts';
-export type { DrawnSelection, SelectionSource, ShownFrame, ShownReadout } from './overlays/index.ts';
+export type {
+    DrawingSource,
+    DrawnDrawing,
+    DrawnSelection,
+    SelectionSource,
+    ShownFrame,
+    ShownPoints,
+    ShownPolygonPreview,
+    ShownReadout,
+    ShownShapePreview,
+} from './overlays/index.ts';

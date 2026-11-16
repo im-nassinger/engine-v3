@@ -3,7 +3,7 @@ import { VersionCounter } from '../core/events/index.ts';
 import type { Unsubscribe } from '../core/events/index.ts';
 import type { Entity } from '../core/level/index.ts';
 import type { EditorSession } from '../editor/session/index.ts';
-import { SelectTool } from '../editor/tools/index.ts';
+import { SelectTool, ShapeTool } from '../editor/tools/index.ts';
 import type { ToolController } from '../editor/tools/index.ts';
 
 // The open level's selection and what the active tool shows of it, for the level view's selection overlay.
@@ -42,8 +42,19 @@ export class EditorSelectionSource implements SelectionSource {
         return this.selectTool?.selectionBox;
     }
 
+    // The Select tool's drags and the Shape tool's size both show here.
     get readout() {
-        return this.selectTool?.readout;
+        const active = this.tools.active;
+        const hasReadout = active instanceof SelectTool || active instanceof ShapeTool;
+
+        return hasReadout ? active.readout : undefined;
+    }
+
+    get editedPoints() {
+        const edited = this.selectTool?.editedPoints;
+        if (edited === undefined) return undefined;
+
+        return { points: edited.levelPoints(), selected: edited.selectedIndexes };
     }
 
     isHidden(entity: Entity) {

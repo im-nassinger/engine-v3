@@ -7,12 +7,13 @@ import type { Entity } from '../../../../core/level/index.ts';
 import { HANDLE_SIZE_PX } from '../../../../editor/tools/index.ts';
 import { JOINT_ICON_RADIUS_PX } from '../../../../editor/view/index.ts';
 import type { OverlayCaches, OverlayScene } from '../OverlayScene.ts';
-import { screenRectangleOf } from '../screenPixels.ts';
+import { dashedLine } from '../dashes.ts';
+import { screenRectangleOf, squareAround } from '../screenPixels.ts';
 
 import { planSelection } from './selectionPlan.ts';
 import type { SelectionPlan } from './selectionPlan.ts';
 import { shapeOutline } from './shapeOutline.ts';
-import type { SelectionSource, ShownFrame, ShownReadout } from './SelectionSource.ts';
+import type { SelectionSource, ShownFrame, ShownPoints, ShownReadout } from './SelectionSource.ts';
 
 // The design's --accent, which draws every selection.
 const ACCENT = 0x3b82f6;
@@ -27,8 +28,6 @@ const HANDLE_EDGE: StrokeStyle = { color: ACCENT, width: 1.5, join: 'miter' };
 const SELECTION_BOX_FILL: FillStyle = { color: ACCENT, alpha: 0.08 };
 // The ring sits just outside the joint icon's edge.
 const RING_RADIUS_PX = JOINT_ICON_RADIUS_PX + 3;
-const DASH_PX = 4;
-const DASH_GAP_PX = 3;
 // A hidden joint has no size, so its dashed box is at least this big.
 const MIN_HIDDEN_BOX_PX = 2 * RING_RADIUS_PX;
 const PADLOCK_WIDTH_PX = 8;
@@ -52,6 +51,9 @@ export type DrawnSelection = {
     readonly cameraFrames: number;
     readonly padlocks: number;
     readonly handles: readonly Bounds[];
+    // The edited polygon's or line's points, and how many of them draw as selected.
+    readonly points: readonly Bounds[];
+    readonly selectedPoints: number;
     readonly sharedBox: Bounds | undefined;
     readonly hiddenBox: Bounds | undefined;
     readonly selectionBox: Bounds | undefined;
@@ -66,6 +68,8 @@ const NOTHING_DRAWN: DrawnSelection = {
     cameraFrames: 0,
     padlocks: 0,
     handles: [],
+    points: [],
+    selectedPoints: 0,
     sharedBox: undefined,
     hiddenBox: undefined,
     selectionBox: undefined,
@@ -114,6 +118,7 @@ export class SelectionOverlay {
 
         const plan = planSelection(source, level, caches);
         const handles = source.frame === undefined ? [] : this.drawFrame(source.frame, scene);
+        const points = source.editedPoints === undefined ? [] : this.drawPoints(source.editedPoints, scene);
 
         this.shown = {
             outlines: this.drawOutlines(plan.outlines, plan.heavyOutline ? HEAVY_OUTLINE : THIN_OUTLINE, scene, caches),
@@ -122,6 +127,8 @@ export class SelectionOverlay {
             cameraFrames: this.drawCameraFrames(plan, scene),
             padlocks: this.drawPadlocks(plan, scene),
             handles,
+            points,
+            selectedPoints: source.editedPoints?.selected.length ?? 0,
             sharedBox: this.drawSharedBox(plan, scene),
             hiddenBox: this.drawHiddenBox(plan, scene),
             selectionBox: this.drawSelectionBox(source.selectionBox, scene),
@@ -171,11 +178,7 @@ export class SelectionOverlay {
         const corners = frame.corners.map((corner) => scene.view.levelToScreen(corner));
         this.strokePath(corners, true, BOX);
 
-        const half = HANDLE_SIZE_PX / 2;
-        const squares = frame.handles.map((handle) => {
-            const centre = scene.view.levelToScreen(handle);
-            return new Bounds(centre.x - half, centre.y - half, centre.x + half, centre.y + half);
-        });
+        const squares = frame.handles.map((handle) => squareAround(scene.view.levelToScreen(handle), HANDLE_SIZE_PX));
 
         for (const square of squares) {
             this.handleSquares
@@ -183,6 +186,22 @@ export class SelectionOverlay {
                 .fill(0xffffff)
                 .stroke(HANDLE_EDGE);
         }
+
+        return squares;
+    }
+
+    // Each point an 8 px handle at any zoom: the selected ones filled with the accent colour, the others hollow.
+    private drawPoints(edited: ShownPoints, scene: OverlayScene) {
+        const selected = new Set(edited.selected);
+        const squares = edited.points.map((point) => squareAround(scene.view.levelToScreen(point), HANDLE_SIZE_PX));
+
+        squares.forEach((square, index) => {
+            const inside = selected.has(index) ? ACCENT : 0xffffff;
+            this.handleSquares
+                .rect(square.left, square.top, square.width, square.height)
+                .fill(inside)
+                .stroke(HANDLE_EDGE);
+        });
 
         return squares;
     }
@@ -238,24 +257,12 @@ export class SelectionOverlay {
 
         let from = first;
         for (const to of [...rest, first]) {
-            this.dashedLine(from, to);
+            dashedLine(this.lines, from, to);
             from = to;
         }
         this.lines.stroke(BOX);
 
         return onScreen;
-    }
-
-    private dashedLine(from: Point, to: Point) {
-        const length = Math.hypot(to.x - from.x, to.y - from.y);
-        if (length === 0) return;
-
-        const along = { x: (to.x - from.x) / length, y: (to.y - from.y) / length };
-        for (let start = 0; start < length; start += DASH_PX + DASH_GAP_PX) {
-            const end = Math.min(start + DASH_PX, length);
-            this.lines.moveTo(from.x + along.x * start, from.y + along.y * start);
-            this.lines.lineTo(from.x + along.x * end, from.y + along.y * end);
-        }
     }
 
     private drawSelectionBox(box: Bounds | undefined, scene: OverlayScene) {

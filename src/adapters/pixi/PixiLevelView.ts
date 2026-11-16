@@ -10,12 +10,13 @@ import type { LevelDisplayCaches } from './LevelDisplay.ts';
 import {
     BoundsOverlay,
     CameraFrameOverlay,
+    DrawingPreviewOverlay,
     GridOverlay,
     JointIconOverlay,
     PhysicsViewOverlay,
     SelectionOverlay,
 } from './overlays/index.ts';
-import type { OverlayScene, SelectionSource } from './overlays/index.ts';
+import type { DrawingSource, OverlayScene, SelectionSource } from './overlays/index.ts';
 
 // Culling grows the visible area by this many screen pixels, so the editor's 1 px line around an unstyled
 // shape, which BoundsCache doesn't count, is never cut at the view's edge.
@@ -61,8 +62,12 @@ export class PixiLevelView {
     private readonly jointIconOverlay = new JointIconOverlay();
     // In front of the joint icons, since a selected joint's ring goes around its icon.
     private readonly selectionOverlay = new SelectionOverlay();
+    // In front of the selection, since a new shape is drawn over what is selected; the readout stays on top.
+    private readonly drawingPreviewOverlay = new DrawingPreviewOverlay();
     private selection: SelectionSource | undefined;
     private stopFollowingSelection: Unsubscribe | undefined;
+    private drawing: DrawingSource | undefined;
+    private stopFollowingDrawing: Unsubscribe | undefined;
     private readonly stopListening: Unsubscribe[] = [];
     private stopListeningToLevel: Unsubscribe | undefined;
     private stopFollowing: Unsubscribe | undefined;
@@ -84,6 +89,7 @@ export class PixiLevelView {
             this.cameraFrameOverlay.container,
             this.physicsViewOverlay.graphics,
             this.jointIconOverlay.graphics,
+            this.drawingPreviewOverlay.graphics,
             this.selectionOverlay.container,
         );
         this.applyViewMatrix();
@@ -130,6 +136,7 @@ export class PixiLevelView {
             physicsView: this.physicsViewOverlay,
             jointIcons: this.jointIconOverlay,
             selection: this.selectionOverlay,
+            drawingPreview: this.drawingPreviewOverlay,
         };
     }
 
@@ -203,6 +210,14 @@ export class PixiLevelView {
         this.markDirty();
     }
 
+    // Draws the Shape tool's preview from now on, and again each time it changes. Play shows none.
+    showDrawing(source: DrawingSource | undefined) {
+        this.stopFollowingDrawing?.();
+        this.drawing = source;
+        this.stopFollowingDrawing = source?.subscribe(() => this.markDirty());
+        this.markDirty();
+    }
+
     // Asks for one render on the next frame. Several changes before it still draw once.
     markDirty() {
         if (this.cancelFrame !== undefined) return;
@@ -228,6 +243,9 @@ export class PixiLevelView {
         this.stopFollowingSelection?.();
         this.stopFollowingSelection = undefined;
         this.selection = undefined;
+        this.stopFollowingDrawing?.();
+        this.stopFollowingDrawing = undefined;
+        this.drawing = undefined;
 
         this.display?.dispose();
         this.display = undefined;
@@ -293,6 +311,7 @@ export class PixiLevelView {
         this.cameraFrameOverlay.update(scene);
         this.physicsViewOverlay.update(scene);
         this.jointIconOverlay.update(scene);
+        this.drawingPreviewOverlay.update(scene, this.drawing);
         this.selectionOverlay.update(scene, this.selection);
     }
 

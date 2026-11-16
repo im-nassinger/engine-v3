@@ -15,6 +15,13 @@ export type ShownReadout = {
     readonly at: Point;
 };
 
+// The polygon or line whose points are being edited: its points in level positions, and the indexes of the
+// selected ones.
+export type ShownPoints = {
+    readonly points: readonly Point[];
+    readonly selected: readonly number[];
+};
+
 // What the selection overlay reads, besides the level and its caches: the editor's selection and what the
 // active tool shows of it. The composition root builds it from the session and the tools.
 export type SelectionSource = {
@@ -24,6 +31,8 @@ export type SelectionSource = {
     // The selection box being dragged, in level positions.
     readonly selectionBox: Bounds | undefined;
     readonly readout: ShownReadout | undefined;
+    // While the Select tool edits points.
+    readonly editedPoints: ShownPoints | undefined;
     // With the parents' switches.
     isHidden(entity: Entity): boolean;
     isLocked(entity: Entity): boolean;

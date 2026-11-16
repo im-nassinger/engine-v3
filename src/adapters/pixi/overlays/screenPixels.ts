@@ -19,3 +19,10 @@ export function wholeViewRectangle(view: ViewState) {
 
     return new Bounds(0, 0, size.width, size.height);
 }
+
+// A square of the given size centred on a screen position, such as a handle.
+export function squareAround(centre: { readonly x: number; readonly y: number }, size: number) {
+    const half = size / 2;
+
+    return new Bounds(centre.x - half, centre.y - half, centre.x + half, centre.y + half);
+}

@@ -10,7 +10,7 @@ import { ManualFrames } from '../../../../editor/time/testing/index.ts';
 import { ViewSettings, ViewState } from '../../../../editor/view/index.ts';
 import { PixiLevelView } from '../../PixiLevelView.ts';
 
-import type { SelectionSource, ShownFrame, ShownReadout } from './SelectionSource.ts';
+import type { SelectionSource, ShownFrame, ShownPoints, ShownReadout } from './SelectionSource.ts';
 
 const cleanups: (() => void)[] = [];
 
@@ -25,6 +25,7 @@ class FakeSelection implements SelectionSource {
     frame: ShownFrame | undefined;
     selectionBox: Bounds | undefined;
     readout: ShownReadout | undefined;
+    editedPoints: ShownPoints | undefined;
     private readonly changed = new VersionCounter();
     private readonly caches: DerivedCaches;
 
@@ -258,5 +259,41 @@ describe('SelectionOverlay', () => {
         expect(drawn().selectionBox).toMatchObject({ left: 150, top: 100, right: 190, bottom: 120 });
         expect(drawn().readout).toBe('120, −40 px');
         expect(drawn().handles).toEqual([]);
+    });
+
+    test('edited points draw as 8 px handles at three zooms, the selected ones counted', async () => {
+        const { level, view, frames, selection, drawn } = await showLevel();
+        const shape = addShape(level, level.world, 0, 0);
+        selection.editedPoints = {
+            points: [
+                { x: -10, y: -10 },
+                { x: 10, y: -10 },
+                { x: 10, y: 10 },
+            ],
+            selected: [1],
+        };
+        selection.select([shape], undefined);
+
+        for (const zoom of [0.25, 1, 8]) {
+            view.zoomAboutMiddle(zoom);
+            frames.runFrame();
+
+            const [first, second] = drawn().points;
+            expect(drawn().points).toHaveLength(3);
+            expect(first?.width).toBe(8);
+            expect(first?.height).toBe(8);
+            expect((second?.left ?? 0) - (first?.left ?? 0)).toBeCloseTo(20 * zoom);
+        }
+        expect(drawn().selectedPoints).toBe(1);
+        expect(drawn().handles).toEqual([]);
+    });
+
+    test('no point handles when no points are edited', async () => {
+        const { level, frames, selection, drawn } = await showLevel();
+        selection.select([addShape(level, level.world, 0, 0)]);
+        frames.runFrame();
+
+        expect(drawn().points).toEqual([]);
+        expect(drawn().selectedPoints).toBe(0);
     });
 });

@@ -19,6 +19,7 @@ import { EscapeChain, MousePosition, OpenWindowCount } from '../editor/tools/ind
 import type { ToolController } from '../editor/tools/index.ts';
 
 import { createTools } from './createTools.ts';
+import { EditorDrawingSource } from './EditorDrawingSource.ts';
 import { EditorSelectionSource } from './EditorSelectionSource.ts';
 
 const FIT_CAMERA_FRAME = 'view.fitCameraFrame';
@@ -111,6 +112,7 @@ export class EditorComposition {
     private start() {
         this.levelView.follow(this.session);
         this.levelView.showSelection(new EditorSelectionSource(this.session, this.tools));
+        this.levelView.showDrawing(new EditorDrawingSource(this.tools));
         // The editor lives as long as the page, so the keyboard and the pointer are never disconnected.
         this.keyboard.connect();
         this.pointer.connect();

@@ -13,4 +13,9 @@ export { MAX_OUTLINED_ENTITIES, planSelection } from './selection/selectionPlan.
 export type { SelectionPlan, SelectionPlanCaches } from './selection/selectionPlan.ts';
 export { SelectionOverlay } from './selection/SelectionOverlay.ts';
 export type { DrawnSelection } from './selection/SelectionOverlay.ts';
-export type { SelectionSource, ShownFrame, ShownReadout } from './selection/SelectionSource.ts';
+export type { SelectionSource, ShownFrame, ShownPoints, ShownReadout } from './selection/SelectionSource.ts';
+export { DrawingPreviewOverlay, FIRST_POINT_RING_PX } from './drawing/DrawingPreviewOverlay.ts';
+export type { DrawnDrawing } from './drawing/DrawingPreviewOverlay.ts';
+export { planDrawing } from './drawing/drawingPlan.ts';
+export type { DrawingPlan } from './drawing/drawingPlan.ts';
+export type { DrawingSource, ShownPolygonPreview, ShownShapePreview } from './drawing/DrawingSource.ts';

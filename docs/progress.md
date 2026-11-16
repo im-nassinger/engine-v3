@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 10, step 7 of 11: the point edits: dragging, nudging with the arrows, adding a point by double-clicking an edge and deleting points with Delete or Backspace, each one step through `LiveEdit`, with a polygon kept at 3 points and a line at 2. Next is step 8: `DrawingPreviewOverlay` and the point handles. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 10, step 8 of 11: `DrawingPreviewOverlay` with `planDrawing`, drawing the Shape tool's faded preview, its placed points as 8 px handles and the first point as a 12 px ring, and the point handles in `SelectionOverlay` while editing points. Next is step 9: the page, with the Shape button, the `ToolOptions` strip and the Inspector hidden while drawing. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

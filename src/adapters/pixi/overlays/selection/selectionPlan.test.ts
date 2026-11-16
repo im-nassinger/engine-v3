@@ -53,6 +53,7 @@ function sourceOf(entities: readonly Entity[], caches: DerivedCaches): Selection
         frame: undefined,
         selectionBox: undefined,
         readout: undefined,
+        editedPoints: undefined,
         isHidden: (entity) => caches.hidden.isHidden(entity),
         isLocked: (entity) => caches.hidden.isLocked(entity),
         subscribe: () => () => {},
