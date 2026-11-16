@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 12, step 4 of 13: the storage adapters are built: `IndexedDbLevelStore` with `idb` 8.0.4, `LocalStorageSettings`, `WebLockTabGuard` and `BrowserPersistence`, tested in three browsers. Next is step 5, `EditorSettings`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 12, step 5 of 13: `EditorSettings` is built: the view's position and zoom, the View menu's switches with the grid, the folded cards and `persistAsked` are read from `localStorage` before the first draw and written when they change, and a reload shows the same place. Next is step 6, read-only. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

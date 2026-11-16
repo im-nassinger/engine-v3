@@ -8,7 +8,7 @@ import { SetSwitchChange } from '../../history/index.ts';
 import { EditorSession } from '../../session/index.ts';
 import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 
-import { PersistAskedSetting } from '../settings/PersistAskedSetting.ts';
+import { EditorSettings } from '../settings/EditorSettings.ts';
 import { FakePersistence } from '../testing/FakePersistence.ts';
 import { InMemoryLevelStore } from '../testing/InMemoryLevelStore.ts';
 import { InMemorySettingsStore } from '../testing/InMemorySettingsStore.ts';
@@ -38,7 +38,7 @@ function buildAutosave(options: BuildOptions = {}) {
         timer,
         clock: timer.clock,
         persistence,
-        persistAsked: new PersistAskedSetting(settings),
+        persistAsked: new EditorSettings(settings, new ManualFrames()).persistAsked,
         limits: options.limits ?? V1_LEVEL_LIMITS,
     });
 

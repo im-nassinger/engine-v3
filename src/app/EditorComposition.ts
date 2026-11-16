@@ -9,11 +9,13 @@ import {
     SystemClock,
 } from '../adapters/browser/index.ts';
 import { PixiLevelView } from '../adapters/pixi/index.ts';
+import { LocalStorageSettings } from '../adapters/storage/index.ts';
 import { levelBoundsOf } from '../core/derived/index.ts';
 import { Level } from '../core/level/index.ts';
 import { EditorClipboard } from '../editor/clipboard/index.ts';
 import { ClipboardEvents, CommandRunner, createCommandRegistry } from '../editor/commands/index.ts';
 import type { CommandRegistry } from '../editor/commands/index.ts';
+import { EditorSettings } from '../editor/saving/index.ts';
 import { EditorSession } from '../editor/session/index.ts';
 import { ShortcutDispatcher } from '../editor/shortcuts/index.ts';
 import type { KeyboardPlatform } from '../editor/shortcuts/index.ts';
@@ -28,6 +30,7 @@ const FIT_CAMERA_FRAME = 'view.fitCameraFrame';
 
 type EditorParts = {
     readonly session: EditorSession;
+    readonly settings: EditorSettings;
     readonly commands: CommandRegistry;
     readonly runner: CommandRunner;
     readonly platform: KeyboardPlatform;
@@ -44,6 +47,7 @@ type EditorParts = {
 // Stage 12 opens the saved level here instead of a new one.
 export class EditorComposition {
     readonly session: EditorSession;
+    readonly settings: EditorSettings;
     readonly commands: CommandRegistry;
     readonly runner: CommandRunner;
     readonly platform: KeyboardPlatform;
@@ -58,6 +62,7 @@ export class EditorComposition {
 
     private constructor(parts: EditorParts) {
         this.session = parts.session;
+        this.settings = parts.settings;
         this.commands = parts.commands;
         this.runner = parts.runner;
         this.platform = parts.platform;
@@ -72,11 +77,14 @@ export class EditorComposition {
 
     static async create() {
         const frames = new AnimationFrames();
+        const settings = new EditorSettings(new LocalStorageSettings(), frames);
         const session = new EditorSession({
             level: Level.createNew(),
             clock: new SystemClock(),
             timer: new BrowserTimer(),
             frames,
+            viewSettings: settings.createViewSettings(),
+            foldStore: settings.foldStore,
             makeToken: () => crypto.randomUUID(),
         });
         const mouse = new MousePosition(frames);
@@ -102,6 +110,7 @@ export class EditorComposition {
 
         const composition = new EditorComposition({
             session,
+            settings,
             commands,
             runner,
             platform,
@@ -119,6 +128,8 @@ export class EditorComposition {
     }
 
     private start() {
+        // Before the first draw, so a reload shows the place the last session left.
+        const viewRestored = this.settings.follow(this.session);
         this.levelView.follow(this.session);
         this.levelView.showSelection(new EditorSelectionSource(this.session, this.tools));
         this.levelView.showDrawing(new EditorDrawingSource(this.tools));
@@ -129,7 +140,9 @@ export class EditorComposition {
         this.clipboardBridge.connect();
         this.limitPanToOpenLevel();
         this.session.openLevelChanged.subscribe(() => this.limitPanToOpenLevel());
-        this.fitCameraFrameOnceSized();
+        if (!viewRestored) {
+            this.fitCameraFrameOnceSized();
+        }
     }
 
     // The pan limit is set when a level opens; following a change to the World's rectangle comes
@@ -139,7 +152,7 @@ export class EditorComposition {
         this.session.view.setPanLimit(worldRectangle);
     }
 
-    // A new level opens fitted to the camera frame, which needs the view's size, known only once the
+    // With no saved view, the level opens fitted to the camera frame, which needs the view's size, known only once the
     // canvas is in the page.
     private fitCameraFrameOnceSized() {
         const view = this.session.view;

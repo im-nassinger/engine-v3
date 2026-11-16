@@ -7,7 +7,7 @@ export type ViewSwitches = Readonly<Record<ViewSwitch, boolean>>;
 // The physics view starts off because it draws over everything; the other three are what a new
 // editor expects to see (standing yes, 2026-11-14). Grid snapping starts on with the grid it snaps to
 // (standing yes, 2026-11-15).
-const DEFAULT_SWITCHES: ViewSwitches = {
+export const DEFAULT_VIEW_SWITCHES: ViewSwitches = {
     grid: true,
     gridSnapping: true,
     jointIcons: true,
@@ -21,7 +21,7 @@ export class ViewSettings {
     readonly version = new VersionCounter();
     private switches: ViewSwitches;
 
-    constructor(switches: ViewSwitches = DEFAULT_SWITCHES) {
+    constructor(switches: ViewSwitches = DEFAULT_VIEW_SWITCHES) {
         this.switches = { ...switches };
     }
 

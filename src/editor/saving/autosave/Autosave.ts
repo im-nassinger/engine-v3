@@ -6,15 +6,10 @@ import type { EditorSession, OpenLevel } from '../../session/index.ts';
 import type { Cancel, Clock, Timer } from '../../time/index.ts';
 
 import type { LevelStore, SaveWrite } from '../contracts/LevelStore.ts';
+import type { PersistAskedRecord } from '../contracts/PersistAskedRecord.ts';
 import type { StoragePersistence } from '../contracts/StoragePersistence.ts';
 import { SaveState } from './SaveState.ts';
 import { fitsWithoutCounting, utf8Length } from './utf8Length.ts';
-
-// Whether the browser was already asked to keep the saved level, in this session or an earlier one.
-export type PersistAskedRecord = {
-    readonly isAsked: boolean;
-    markAsked(): void;
-};
 
 export type AutosaveOptions = {
     readonly session: EditorSession;
