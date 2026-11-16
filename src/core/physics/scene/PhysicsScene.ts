@@ -2,7 +2,8 @@ import type { Matrix2D } from '../../geometry/index.ts';
 import type { Entity } from '../../level/index.ts';
 
 import type { BodyPose } from '../contracts/BodyPose.ts';
-import type { BodyHandle, PhysicsWorld } from '../contracts/PhysicsWorld.ts';
+import type { BodyHandle } from '../contracts/Handles.ts';
+import type { PhysicsWorld } from '../contracts/PhysicsWorld.ts';
 
 // One body play built: its entity, its handle in the physics world, and its level matrix split into the
 // pose Box2D moves and the rest it keeps.

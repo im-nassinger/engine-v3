@@ -1,4 +1,12 @@
-import type { Box2DModule, b2BodyId, b2BodyType, b2ShapeDef, b2WorldId } from 'box2d3-wasm/compat';
+import type {
+    Box2DModule,
+    b2BodyId,
+    b2BodyType,
+    b2JointId,
+    b2ShapeDef,
+    b2Transform,
+    b2WorldId,
+} from 'box2d3-wasm/compat';
 
 import type { BodyType } from '../../core/components/index.ts';
 import type { Point } from '../../core/geometry/index.ts';
@@ -8,6 +16,9 @@ import type {
     BodyHandle,
     BodyPoses,
     BodyVelocity,
+    HingeDefinition,
+    JointDefinition,
+    JointHandle,
     PhysicsWorld,
     SurfaceDefinition,
     SurfacePiece,
@@ -38,6 +49,8 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
     private readonly worldId: b2WorldId;
     // Indexed by handle, in creation order; undefined once destroyed.
     private readonly bodies: (CreatedBody | undefined)[] = [];
+    // Indexed by handle, in creation order; undefined once destroyed by destroyJoint.
+    private readonly joints: (b2JointId | undefined)[] = [];
     private destroyed = false;
 
     constructor(box2d: Box2DModule, settings: WorldSettings) {
@@ -111,6 +124,30 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         if (createdBody.type === 'dynamic' && this.box2d.b2Body_GetMass(createdBody.bodyId) === 0) {
             this.giveMassWithoutSurfaces(createdBody.bodyId);
         }
+    }
+
+    createJoint(definition: JointDefinition): JointHandle {
+        this.checkAlive();
+
+        const jointId = this.createHinge(definition);
+        this.joints.push(jointId);
+
+        return this.joints.length - 1;
+    }
+
+    destroyJoint(joint: JointHandle) {
+        this.checkAlive();
+
+        const jointId = this.joints[joint];
+        if (jointId === undefined) {
+            throw new Error(`Joint ${joint} doesn't exist in this world.`);
+        }
+
+        // Box2D destroys a body's joints with it, and the id then reads as no longer valid.
+        if (this.box2d.b2Joint_IsValid(jointId)) {
+            this.box2d.b2DestroyJoint(jointId);
+        }
+        this.joints[joint] = undefined;
     }
 
     setGravity(gravity: Point) {
@@ -196,6 +233,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
 
         this.box2d.b2DestroyWorld(this.worldId);
         this.bodies.length = 0;
+        this.joints.length = 0;
         this.destroyed = true;
     }
 
@@ -212,6 +250,76 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         }
 
         return createdBody;
+    }
+
+    // A Hinge is Box2D's revolute joint. Box2D turns its body B against its body A, so field A is Box2D's
+    // body B and field B is its body A. Each frame sits on its end; B's frame holds the angle between the
+    // two bodies at the start, so the placed angle reads 0 and the limits count from it. Resistance is a
+    // motor at speed 0, which brakes the turning without holding any angle.
+    private createHinge(definition: HingeDefinition) {
+        const box2d = this.box2d;
+        const turningBodyId = this.bodyAt(definition.bodyA).bodyId;
+        const baseBodyId = this.bodyAt(definition.bodyB).bodyId;
+        if (definition.bodyA === definition.bodyB) {
+            throw new Error('A joint must join two different bodies.');
+        }
+
+        const hingeDefinition = box2d.b2DefaultRevoluteJointDef();
+        const base = hingeDefinition.base;
+        base.bodyIdA = baseBodyId;
+        base.bodyIdB = turningBodyId;
+        base.collideConnected = definition.letConnectedObjectsCollide;
+        base.userData = definition.entity;
+
+        const baseFrame = this.localFrame(baseBodyId, definition.endB);
+        base.localFrameA = baseFrame;
+        baseFrame.delete();
+
+        const turningFrame = this.localFrame(turningBodyId, definition.endA);
+        const baseRotation = box2d.b2Body_GetRotation(baseBodyId);
+        const turningRotation = box2d.b2Body_GetRotation(turningBodyId);
+        const startAngle = box2d.b2InvMulRot(turningRotation, baseRotation);
+        turningFrame.q = startAngle;
+        startAngle.delete();
+        baseRotation.delete();
+        turningRotation.delete();
+        base.localFrameB = turningFrame;
+        turningFrame.delete();
+
+        hingeDefinition.enableLimit = definition.limitRotation;
+        hingeDefinition.lowerAngle = Units.toRadians(definition.minAngle);
+        hingeDefinition.upperAngle = Units.toRadians(definition.maxAngle);
+
+        if (definition.motor) {
+            hingeDefinition.enableMotor = true;
+            hingeDefinition.motorSpeed = Units.toRadians(definition.motorSpeed);
+            hingeDefinition.maxMotorTorque = definition.motorStrength;
+        } else if (definition.resistance > 0) {
+            hingeDefinition.enableMotor = true;
+            hingeDefinition.motorSpeed = 0;
+            hingeDefinition.maxMotorTorque = definition.resistance;
+        }
+
+        const jointId = box2d.b2CreateRevoluteJoint(this.worldId, hingeDefinition);
+        hingeDefinition.delete();
+
+        return jointId;
+    }
+
+    // A frame on a body at a level position, turned as the body is.
+    private localFrame(bodyId: b2BodyId, levelPosition: Point): b2Transform {
+        const box2d = this.box2d;
+
+        const frame = new box2d.b2Transform();
+        const position = this.toBox2dPoint(levelPosition);
+        const localPosition = box2d.b2Body_GetLocalPoint(bodyId, position);
+        frame.p = localPosition;
+        localPosition.delete();
+        position.delete();
+        frame.q.c = 1;
+        frame.q.s = 0;
+
+        return frame;
     }
 
     private addPiece(bodyId: b2BodyId, shapeDefinition: b2ShapeDef, piece: SurfacePiece) {

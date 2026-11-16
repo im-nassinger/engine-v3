@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 14, step 1 of 12: stage 14's steps and choices are written. Next is step 2, the Hinge in `Box2dPhysicsWorld`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 14, step 2 of 12: the Hinge in `Box2dPhysicsWorld` is built. Next is step 3, Rope and Spring. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -34,8 +34,8 @@
 | Stage 11, copy and paste | Done on 2026-11-16. See below |
 | Stage 12, saving | Done on 2026-11-16. See below |
 | Stage 13, physics and the determinism test | Done on 2026-11-16. See below |
-| Stage 14, joints | Steps written on 2026-11-16 (step 1 of 12). See the [plan](plan.md#stage-14-in-steps) |
-| Code | Stages 0 to 13 done. Stage 14, joints, is being built: step 2 is next |
+| Stage 14, joints | Being built (step 2 of 12). See the [plan](plan.md#stage-14-in-steps) |
+| Code | Stages 0 to 13 done. Stage 14, joints, is being built: step 3 is next |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -96,6 +96,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 - **An owner decision built differently** (2026-11-14): the owner said to ask again if `clipper2-ts` failed. Its fill works, but **its triangulation drops areas** (a one-stroke star loses its middle) while reporting success. The unattended runner can't ask, so it took the closest fix: `clipper2-ts` only fills, and the game's own `EarClipping` triangulates. See [geometry.md](architecture/core-model/geometry.md#the-polygon-pipeline); the owner can overturn it.
 
 - **An owner decision built differently** (2026-11-16): the requirement capped spin at 15 turns per second, but Box2D 3.2 turns a body at most 45° a step, 7.5 turns per second, with no setting to raise it. The closest fix is Box2D's own cap: [bodies.md](requirements/physics/bodies.md#body-settings--v1) now says 7.5, and the Hinge's motor speed range is ±2,700 °/s instead of ±5,400. See [adapters.md](architecture/adapters.md#physics); the owner can overturn it.
+- **An owner decision built differently** (2026-11-16): the requirement let a Hinge's Min and Max angle go to a full turn, ±360°, but Box2D 3.2 clamps a Hinge's limits to ±180°. The closest fix is Box2D's own: [joints.md](requirements/physics/joints.md#settings-of-each-joint--v1) and the JointComponent's schema now range over ±180°. See [adapters.md](architecture/adapters.md#physics); the owner can overturn it.
 
 ### Stage 13, built on 2026-11-16
 
@@ -215,7 +216,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 14 of [plan.md](plan.md#stage-14-in-steps): joints.** Step 1 wrote its twelve steps and choices; step 2, the Hinge in `Box2dPhysicsWorld`, is next.
+1. **Stage 14 of [plan.md](plan.md#stage-14-in-steps): joints.** Steps 1 and 2 are done (the steps, then the Hinge in `Box2dPhysicsWorld`); step 3, Rope and Spring, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

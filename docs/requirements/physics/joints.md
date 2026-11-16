@@ -79,7 +79,7 @@ Hinge:
 | Setting | What it does | Range | Default |
 |---|---|---|---|
 | Limit rotation | Stops A turning too far | On or off | Off |
-| Min angle, Max angle | How far it can turn each way from how it is placed | −360 to 0, 0 to 360 | −45, 45 |
+| Min angle, Max angle | How far it can turn each way from how it is placed. At most half a turn each way (standing yes, 2026-11-16) | −180 to 0, 0 to 180 | −45, 45 |
 | Motor | Turns A by itself | On or off | Off |
 | Motor speed | Target speed. At most the spin cap, see [bodies](bodies.md#body-settings--v1) (standing yes, 2026-11-16) | −2,700 to 2,700 °/s | 180 |
 | Motor strength | How hard it pushes. Too low and it never reaches speed | 0 to 100,000 | 50 (tune) |
@@ -105,6 +105,7 @@ Spring:
 - **Length and Rest length read as 100 px when a file leaves them out.** The Joint tool always sets them from the drawn gap, so only a file edited by hand can leave one out (standing yes, 2026-11-14).
 - Limits always include the placed position: Min can't go above 0 and Max can't go below 0.
 - Limits are measured from how the joint was built, so turning things in the editor never makes them wrong.
+- *Why half a turn, not the full turn first written: Box2D 3.2 holds a Hinge's limits to 180° each way, so a limit past it would stop the joint at 180° anyway. The closest fix to the owner's range is Box2D's own (standing yes, 2026-11-16).*
 - **Triggers and scripts can drive a joint's motor or destroy it, and react when it is destroyed.** The trigger or script doesn't have to sit on the joint.
 - Destroying a joint during play disconnects it. This is how a trigger cuts a rope.
 - These can change during play: motor on or off, motor speed and strength, limits, resistance, length, rest length, stiffness, damping. The type, the two entities and the ends can't.

@@ -40,6 +40,10 @@ export class ScriptedWorld implements PhysicsWorld {
     }
 
     addSurface() {}
+    createJoint() {
+        return 0;
+    }
+    destroyJoint() {}
     setGravity() {}
 
     step() {

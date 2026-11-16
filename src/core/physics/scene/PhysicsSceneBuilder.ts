@@ -6,7 +6,8 @@ import type { Entity, Level } from '../../level/index.ts';
 
 import type { BodyDefinition } from '../contracts/BodyDefinition.ts';
 import type { PhysicsEngine } from '../contracts/PhysicsEngine.ts';
-import type { BodyHandle, PhysicsWorld } from '../contracts/PhysicsWorld.ts';
+import type { BodyHandle } from '../contracts/Handles.ts';
+import type { PhysicsWorld } from '../contracts/PhysicsWorld.ts';
 import type { SurfaceDefinition, SurfacePiece } from '../contracts/SurfaceDefinition.ts';
 import { BodyMembership } from '../membership/BodyMembership.ts';
 

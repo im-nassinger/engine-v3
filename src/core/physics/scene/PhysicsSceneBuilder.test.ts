@@ -15,7 +15,8 @@ import { Level } from '../../level/index.ts';
 
 import type { BodyDefinition } from '../contracts/BodyDefinition.ts';
 import type { PhysicsEngine, WorldSettings } from '../contracts/PhysicsEngine.ts';
-import type { BodyHandle, PhysicsWorld } from '../contracts/PhysicsWorld.ts';
+import type { BodyHandle } from '../contracts/Handles.ts';
+import type { PhysicsWorld } from '../contracts/PhysicsWorld.ts';
 import type { SurfaceDefinition } from '../contracts/SurfaceDefinition.ts';
 
 import { PhysicsSceneBuilder } from './PhysicsSceneBuilder.ts';
@@ -53,6 +54,10 @@ class RecordingWorld implements PhysicsWorld {
         return this.calls.filter((call) => call.call === 'createBody');
     }
 
+    createJoint() {
+        return 0;
+    }
+    destroyJoint() {}
     setGravity() {}
     step() {}
     readMovedBodies() {}

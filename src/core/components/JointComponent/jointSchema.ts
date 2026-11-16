@@ -102,7 +102,7 @@ export const jointSchema = new ComponentSchema<JointValues>({
             key: 'minAngle',
             label: 'Min angle',
             // Limits always include the placed position, so Min can't go above 0.
-            type: new AngleFieldType({ min: -360, max: 0 }),
+            type: new AngleFieldType({ min: -180, max: 0 }),
             defaultValue: -45,
             description: 'How far it can turn anticlockwise from how it is placed.',
             unit: '°',
@@ -112,7 +112,7 @@ export const jointSchema = new ComponentSchema<JointValues>({
         {
             key: 'maxAngle',
             label: 'Max angle',
-            type: new AngleFieldType({ min: 0, max: 360 }),
+            type: new AngleFieldType({ min: 0, max: 180 }),
             defaultValue: 45,
             description: 'How far it can turn clockwise from how it is placed.',
             unit: '°',
