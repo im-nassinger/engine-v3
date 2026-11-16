@@ -152,3 +152,16 @@ describe('Matrix2D.largestStretch', () => {
         expect(matrix.largestStretch()).toBeGreaterThanOrEqual(diagonalLength);
     });
 });
+
+describe('Matrix2D.scalesEvenly', () => {
+    test('holds for a turned, evenly scaled matrix and a mirrored one', () => {
+        expect(Matrix2D.fromTransform(transform(5, 7, 30, 2, 2, 0)).scalesEvenly()).toBe(true);
+        expect(Matrix2D.fromTransform(transform(5, 7, 30, 2, -2, 0)).scalesEvenly()).toBe(true);
+    });
+
+    test('fails for an uneven scale, a skew and a scale of 0', () => {
+        expect(Matrix2D.fromTransform(transform(0, 0, 0, 2, 3, 0)).scalesEvenly()).toBe(false);
+        expect(Matrix2D.fromTransform(transform(0, 0, 0, 1, 1, 20)).scalesEvenly()).toBe(false);
+        expect(new Matrix2D(0, 0, 0, 0, 4, 4).scalesEvenly()).toBe(false);
+    });
+});

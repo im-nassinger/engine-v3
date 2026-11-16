@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 13, step 5 of 11: `BodyMembership` in `core/physics/membership/` says which body each entity moves with, whether play builds a body for it, and where its surface goes (a body, Static, or skipped for a line on a Dynamic body), with 8 tests. Next is step 6, `PhysicsSceneBuilder`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 13, step 6 of 11: `PhysicsSceneBuilder` in `core/physics/scene/` builds the play copy into bodies and surfaces in Entities panel order, with one Static ground body for loose surfaces and the Walls, each member's pieces moved into its body's space, with 8 tests against a recording `PhysicsWorld`. Next is step 7, `Simulation`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -205,7 +205,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 13 of [plan.md](plan.md#stage-13-in-steps): physics and the determinism test.** Steps 1 to 3 are done; step 4, rechecking the tech notes' Box2D facts against 3.2, is next.
+1. **Stage 13 of [plan.md](plan.md#stage-13-in-steps): physics and the determinism test.** Steps 1 to 6 are done; step 7, `Simulation` and its phases, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
@@ -229,3 +229,15 @@ Left open by 2026-11-16's variables change, all for v2 unless marked. None block
 - **Reading another entity's variables from a script**, such as an enemy's `health` for a health bar.
 - **Keep between runs for an entity's variables** (v3).
 - **Choice, variable and list types** for variables. The examples now name the level's `coins` directly instead of letting the creator pick it.
+
+## Pending owner change: resizing changes the scale (owner, 2026-11-16)
+
+Not written into the docs yet. The owner decided:
+
+- Polygons and lines have no Width or Height, only their points.
+- Resizing any shape with the handles changes its TransformComponent (its scale), never its shape values (width, height, radius, points).
+- The code must be changed to match before v2 starts.
+
+Still open: outlines. With resizing changing the scale, an uneven resize stretches the outline unevenly. The owner asked whether this can be a setting on the StyleComponent. Claude's answer: yes, a checkbox such as "Scale outline" that, when off, keeps the outline's width whatever the scale. Its name, its default, and whether it also ignores a parent group's scale still need the owner's answer.
+
+To update once that's settled: `requirements/drawing.md` ("Width and height, not scale"), `requirements/editor/selection.md`, `architecture/core-model/components-and-fields.md`, `architecture/editor/selection-and-tools.md` (`EntityResize`, the readout), `architecture/core-model/geometry.md` (outline bounds), `glossary.md`, `scope.md`, `decisions.md`, and a stage before v2 in `plan.md`. The World keeps resizing its rectangle, because its TransformComponent is fixed.

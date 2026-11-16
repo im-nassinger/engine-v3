@@ -13,3 +13,6 @@ export { mergesInto } from './merging/mergesInto.ts';
 export type { ParentOf } from './merging/mergesInto.ts';
 export { BodyMembership } from './membership/BodyMembership.ts';
 export type { SurfaceTarget } from './membership/BodyMembership.ts';
+export { PhysicsSceneBuilder } from './scene/PhysicsSceneBuilder.ts';
+export type { SceneCaches } from './scene/PhysicsSceneBuilder.ts';
+export type { PhysicsScene, SceneBody } from './scene/PhysicsScene.ts';

@@ -11,30 +11,12 @@ import { screenRectangleOf } from './screenPixels.ts';
 const PIECE_COLOUR = 0xff8a3d;
 const PIECE_FILL: FillStyle = { color: PIECE_COLOUR, alpha: 0.15 };
 const PIECE_EDGE: StrokeStyle = { color: PIECE_COLOUR, width: 1.5, join: 'round', cap: 'round' };
-// How close the matrix's two columns must be to the same length and square to each other, relative to their
-// length, for a circle to stay a circle.
-const CIRCLE_TOLERANCE = 1e-9;
-
-// The play copy hands Box2D a circle only when the entity's level matrix scales evenly without skew, and
-// the 32-point polygon otherwise. This answers the same question, mirrors included.
-function keepsCircles(matrix: Matrix2D) {
-    const firstLengthSquared = matrix.a * matrix.a + matrix.b * matrix.b;
-    const secondLengthSquared = matrix.c * matrix.c + matrix.d * matrix.d;
-    const dot = matrix.a * matrix.c + matrix.b * matrix.d;
-    const scale = Math.max(firstLengthSquared, secondLengthSquared);
-    if (scale === 0) return false;
-
-    const sameLength = Math.abs(firstLengthSquared - secondLengthSquared) <= CIRCLE_TOLERANCE * scale;
-    const square = Math.abs(dot) <= CIRCLE_TOLERANCE * scale;
-
-    return sameLength && square;
-}
-
 function piecesFor(entity: Entity, geometry: ShapeGeometry, matrix: Matrix2D, caches: OverlayCaches) {
     const result = caches.pieces.piecesOf(entity);
     const pieces = result?.pieces ?? [];
     const hasCircle = pieces.some((piece) => piece.kind === 'circle');
-    if (!hasCircle || keepsCircles(matrix)) return pieces;
+    // The play copy hands Box2D a circle only when the entity's level matrix scales evenly, mirrors included.
+    if (!hasCircle || matrix.scalesEvenly()) return pieces;
 
     return ShapePieces.buildAsPolygons(geometry).pieces;
 }

@@ -4,6 +4,9 @@ import type { Point } from './Point.ts';
 import type { TransformValues } from './TransformValues.ts';
 
 const DEGREES_PER_RADIAN = 180 / Math.PI;
+// How close two columns must be to the same length and square to each other, relative to their length,
+// for scalesEvenly.
+const EVEN_SCALE_TOLERANCE = 1e-9;
 
 // Adding 0 turns -0 into 0, so a decomposed value never shows as -0.
 function withoutNegativeZero(value: number) {
@@ -89,6 +92,21 @@ export class Matrix2D {
 
     determinant() {
         return this.a * this.d - this.b * this.c;
+    }
+
+    // True when the matrix stretches every direction by the same amount, with no skew, a mirror allowed:
+    // a circle stays a circle under it. The columns are compared relative to their length.
+    scalesEvenly() {
+        const firstLengthSquared = this.a * this.a + this.b * this.b;
+        const secondLengthSquared = this.c * this.c + this.d * this.d;
+        const dot = this.a * this.c + this.b * this.d;
+        const scale = Math.max(firstLengthSquared, secondLengthSquared);
+        if (scale === 0) return false;
+
+        const sameLength = Math.abs(firstLengthSquared - secondLengthSquared) <= EVEN_SCALE_TOLERANCE * scale;
+        const square = Math.abs(dot) <= EVEN_SCALE_TOLERANCE * scale;
+
+        return sameLength && square;
     }
 
     // How far the matrix can stretch a length of 1, in its most stretched direction: the larger singular
