@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 12, step 13 of 13: the docs, so stage 12 is built. Next is stage 13, physics and the determinism test, whose first step writes its steps. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 13, step 1 of 11: the steps and their choices are written. Next is step 2, the physics contracts and `Box2dPhysicsWorld`'s bodies. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -33,7 +33,7 @@
 | Stage 10, the Shape tool and point editing | Done on 2026-11-16. See below |
 | Stage 11, copy and paste | Done on 2026-11-16. See below |
 | Stage 12, saving | Done on 2026-11-16. See below |
-| Code | Stages 0 to 12 done. Stage 13, physics and the determinism test, is next: its steps aren't written yet |
+| Code | Stages 0 to 12 done. Stage 13, physics and the determinism test, is under way: its 11 steps are in [plan.md](plan.md#stage-13-in-steps) |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -199,7 +199,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 13 of [plan.md](plan.md): physics and the determinism test.** Its first step writes its steps and choices into the docs, as stage 12's did.
+1. **Stage 13 of [plan.md](plan.md#stage-13-in-steps): physics and the determinism test.** Step 1, the steps and the [choices](architecture/simulation.md#stage-13s-choices), is done; step 2, the physics contracts and `Box2dPhysicsWorld`'s bodies, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
