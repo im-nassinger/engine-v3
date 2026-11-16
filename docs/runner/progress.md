@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**The runner is built and running** (since 2026-11-14) as the systemd user service `engine-v3-runner`. **Pushing works** since 2026-11-15, after the owner gave the GitHub login the `workflow` scope. **Next for the runner: a Discord bot** to replace the webhook, waiting for the owner's answers below.
+**The runner is built and running** (since 2026-11-14) as the systemd user service `engine-v3-runner`. **Pushing works** since 2026-11-15, after the owner gave the GitHub login the `workflow` scope. **Since 2026-11-16 it waits for CI after each push**, and a failing CI is fixed before the next step. **Next for the runner: a Discord bot** to replace the webhook, waiting for the owner's answers below.
 
 ## Where it stands
 
@@ -12,6 +12,7 @@
 | Detecting the usage limit and waiting for the reset | Built; not yet seen hitting a real limit |
 | Restarting itself when its own code changes | Done |
 | Pushing after each step | Works since 2026-11-15. The first push started CI. Since 2026-11-15 the runner pushes, not the session |
+| Acting on CI | Since 2026-11-16: waits for CI after each push; a red CI makes the next session fix it, and three failed fixes pause the runner |
 | The short prompt | Since 2026-11-15: context, the step's loop, and `STATUS`, `SUMMARY`, `NEEDS` |
 
 ## Known issues

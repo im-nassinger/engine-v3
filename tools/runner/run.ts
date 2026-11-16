@@ -5,6 +5,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { setTimeout as sleepFor } from 'node:timers/promises';
+import { CiChecker } from './CiChecker.ts';
+import type { CiFailure } from './CiChecker.ts';
 import { runClaudeSession } from './ClaudeSession.ts';
 import { DiscordNotifier } from './DiscordNotifier.ts';
 import { PidFile } from './PidFile.ts';
@@ -17,12 +19,14 @@ const MINUTE_MS = 60 * 1000;
 const LIMIT_RETRY_MS = 30 * MINUTE_MS;
 const FAILURE_RETRY_MS = 5 * MINUTE_MS;
 const MAX_FAILURES_IN_A_ROW = 3;
+const MAX_CI_FIX_ATTEMPTS = 3;
 
 const projectFolder = path.resolve(import.meta.dirname, '../..');
 const stateFolder = path.join(os.homedir(), '.local/state/engine-v3-runner');
 const logFolder = path.join(stateFolder, 'sessions');
 const pauseFile = path.join(stateFolder, 'paused');
 const promptFile = path.join(import.meta.dirname, 'prompt.md');
+const ciFixPromptFile = path.join(import.meta.dirname, 'ci-fix-prompt.md');
 const planFile = path.join(projectFolder, 'docs/plan.md');
 const progressFile = path.join(projectFolder, 'docs/progress.md');
 const statusFilePath = path.join(projectFolder, 'docs/runner/status.md');
@@ -45,6 +49,8 @@ claimRunnerLock();
 const discord = new DiscordNotifier(webhookUrl);
 const rateLimits = new RateLimitTracker();
 const sentNeeds = new Set<string>();
+const ciChecker = new CiChecker(projectFolder, sleep);
+let ciWasFailing = false;
 
 const statusFile = new StatusFile(statusFilePath, path.join(stateFolder, 'status.json'));
 
@@ -218,10 +224,57 @@ async function reportNeeds(report: StatusReport) {
     );
 }
 
-async function runOneStep() {
+// Waits for CI on what the runner last pushed. Only a failure is returned: when CI can't
+// be read, the work goes on rather than stalling on GitHub.
+async function checkCi() {
+    const pushedCommit = git('rev-parse', '@{u}');
+    const shortCommit = pushedCommit.slice(0, 7);
+    statusFile.setState(`Waiting for CI on \`${shortCommit}\` before starting the next session.`);
+
+    const result = await ciChecker.waitForResult(pushedCommit);
+
+    if (result.kind === 'unknown') {
+        console.log(`CI result for ${shortCommit} unknown: ${result.reason}`);
+        return undefined;
+    }
+    if (result.kind === 'passed') {
+        if (ciWasFailing) {
+            await announce(`🟢 **CI passes again** on \`${shortCommit}\`.`);
+        }
+        ciWasFailing = false;
+        return undefined;
+    }
+
+    if (!ciWasFailing) {
+        const steps = result.failedSteps.join(', ');
+        await announce(
+            `🔴 **CI failed** on \`${shortCommit}\` (${steps}). The next session fixes it first.\n${result.url}`,
+        );
+    }
+    ciWasFailing = true;
+    return result;
+}
+
+function buildPrompt(ciFailure: CiFailure | undefined) {
+    const stepPrompt = fs.readFileSync(promptFile, 'utf8');
+    if (ciFailure === undefined) return stepPrompt;
+
+    const failedSteps = ciFailure.failedSteps.join(', ');
+    const fixTemplate = fs.readFileSync(ciFixPromptFile, 'utf8');
+    const fixPrompt = fixTemplate
+        .replaceAll('{{COMMIT}}', ciFailure.commit)
+        .replaceAll('{{URL}}', ciFailure.url)
+        .replaceAll('{{FAILED_STEPS}}', failedSteps)
+        .replaceAll('{{RUN_ID}}', String(ciFailure.runId))
+        .replaceAll('{{LOG}}', ciFailure.logExcerpt);
+
+    return `${fixPrompt}\n${stepPrompt}`;
+}
+
+async function runOneStep(ciFailure: CiFailure | undefined) {
     await waitForEarlierSession();
 
-    const prompt = fs.readFileSync(promptFile, 'utf8');
+    const prompt = buildPrompt(ciFailure);
     const startCommit = git('rev-parse', 'HEAD');
     const startedAt = new Date().toISOString().replaceAll(':', '-');
     const logFile = path.join(logFolder, `${startedAt}.jsonl`);
@@ -266,6 +319,7 @@ async function main() {
 
     const startingCode = readRunnerCode();
     let failuresInARow = 0;
+    let ciFixAttempts = 0;
 
     const progress = statusFile.readProgress();
     await announce(`🟢 **Runner started.** v1: ${progress}`);
@@ -278,9 +332,24 @@ async function main() {
 
         await waitWhilePaused();
 
-        const outcome = await runOneStep();
+        const ciFailure = await checkCi();
+        if (ciFailure === undefined) {
+            ciFixAttempts = 0;
+        } else if (ciFixAttempts >= MAX_CI_FIX_ATTEMPTS) {
+            await pause(`CI still fails after ${MAX_CI_FIX_ATTEMPTS} sessions tried to fix it: ${ciFailure.url}`);
+            ciFixAttempts = 0;
+            continue;
+        } else {
+            ciFixAttempts += 1;
+        }
+
+        const outcome = await runOneStep(ciFailure);
 
         if (outcome.kind === 'limit') {
+            // A session cut off by the limit didn't get its try at fixing CI.
+            if (ciFailure !== undefined) {
+                ciFixAttempts -= 1;
+            }
             await waitForLimitReset();
             continue;
         }
@@ -319,6 +388,9 @@ async function main() {
         }
 
         if (report.status === 'finished') {
+            const finalCiFailure = await checkCi();
+            if (finalCiFailure !== undefined) continue;
+
             statusFile.setState('Finished: v1 is done, and the runner has stopped.');
             await announce('🎉 **v1 is finished.** Every stage of the plan is done. The runner stops.');
             return;
