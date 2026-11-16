@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 12, step 2 of 13: `Autosave`'s timing, `SaveState` and the saving contracts with their fakes are built. Next is step 3, `Autosave`'s failures. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 12, step 3 of 13: `Autosave`'s failures are built: `failed` with its level-wide message and a retry every 10 s, the 256 MB check, site data cleared, and asking to persist once. Next is step 4, the storage adapters. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

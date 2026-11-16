@@ -2,16 +2,25 @@ import { describe, expect, test } from 'vitest';
 
 import { NameComponent, TransformComponent } from '../../../core/components/index.ts';
 import { Level } from '../../../core/level/index.ts';
-import { LevelWriter } from '../../../core/level-data/index.ts';
+import { LevelWriter, V1_LEVEL_LIMITS } from '../../../core/level-data/index.ts';
+import type { LevelLimits } from '../../../core/level-data/index.ts';
 import { SetSwitchChange } from '../../history/index.ts';
 import { EditorSession } from '../../session/index.ts';
 import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 
+import { PersistAskedSetting } from '../settings/PersistAskedSetting.ts';
+import { FakePersistence } from '../testing/FakePersistence.ts';
 import { InMemoryLevelStore } from '../testing/InMemoryLevelStore.ts';
-import { Autosave } from './Autosave.ts';
+import { InMemorySettingsStore } from '../testing/InMemorySettingsStore.ts';
+import { Autosave, DATA_CLEARED_TEXT, OVER_SIZE_TEXT, SAVE_FAILED_TEXT } from './Autosave.ts';
 import type { SaveStatus } from './SaveState.ts';
 
-function buildAutosave() {
+type BuildOptions = {
+    readonly settings?: InMemorySettingsStore;
+    readonly limits?: LevelLimits;
+};
+
+function buildAutosave(options: BuildOptions = {}) {
     const timer = new ManualTimer();
     const level = Level.createNew();
     const square = level.createEntity(level.world, 0);
@@ -20,7 +29,18 @@ function buildAutosave() {
     const session = new EditorSession({ level, clock: timer.clock, timer, frames: new ManualFrames() });
     const store = new InMemoryLevelStore();
     const writer = new LevelWriter();
-    const autosave = new Autosave({ session, store, writer, timer, clock: timer.clock });
+    const persistence = new FakePersistence();
+    const settings = options.settings ?? new InMemorySettingsStore();
+    const autosave = new Autosave({
+        session,
+        store,
+        writer,
+        timer,
+        clock: timer.clock,
+        persistence,
+        persistAsked: new PersistAskedSetting(settings),
+        limits: options.limits ?? V1_LEVEL_LIMITS,
+    });
 
     const statuses: SaveStatus[] = [];
     autosave.state.version.subscribe(() => statuses.push(autosave.state.status));
@@ -37,7 +57,7 @@ function buildAutosave() {
 
     const position = { entityId: square.id, schema: TransformComponent.schema, key: 'position' };
 
-    return { timer, session, store, writer, autosave, statuses, change, position };
+    return { timer, session, store, writer, autosave, statuses, change, position, persistence, settings };
 }
 
 // Lets the store's promise and what follows it run: a few turns of the microtask queue.
@@ -302,5 +322,156 @@ describe('Autosave', () => {
         await settle();
 
         expect(autosave.state.status).toBe('unsaved');
+    });
+
+    describe('failures', () => {
+        const savingMessages = (session: EditorSession) =>
+            session.openLevel.messages.all().filter((message) => message.entityId === undefined);
+
+        test('a failed save shows the level-wide message and is tried again 10 s later', async () => {
+            const { timer, session, store, autosave, change } = buildAutosave();
+            store.refusesSaves = true;
+            change();
+            await advance(timer, 2_000);
+
+            expect(savingMessages(session).map((message) => message.text)).toEqual([SAVE_FAILED_TEXT]);
+            expect(store.saveCount).toBe(0);
+
+            store.refusesSaves = false;
+            await advance(timer, 9_999);
+            expect(store.saveCount).toBe(0);
+
+            await advance(timer, 1);
+            expect(store.saveCount).toBe(1);
+            expect(autosave.state.status).toBe('saved');
+            expect(savingMessages(session)).toEqual([]);
+        });
+
+        test('keeps trying every 10 s while saves fail', async () => {
+            const { timer, store, autosave, change } = buildAutosave();
+            let tries = 0;
+            const save = store.save.bind(store);
+            store.save = (level) => {
+                tries += 1;
+                return save(level);
+            };
+            store.refusesSaves = true;
+            change();
+
+            await advance(timer, 2_000);
+            for (let retry = 0; retry < 3; retry += 1) {
+                await advance(timer, 10_000);
+            }
+
+            expect(tries).toBe(4);
+            expect(autosave.state.status).toBe('failed');
+        });
+
+        test('stays failed through a change, which still saves after the quiet delay', async () => {
+            const { timer, store, autosave, change } = buildAutosave();
+            store.refusesSaves = true;
+            change();
+            await advance(timer, 2_000);
+
+            store.refusesSaves = false;
+            change();
+            expect(autosave.state.status).toBe('failed');
+
+            await advance(timer, 2_000);
+            expect(store.saveCount).toBe(1);
+            expect(autosave.state.status).toBe('saved');
+        });
+
+        test('the message moves to a level opened while it stands', async () => {
+            const { timer, session, store, change } = buildAutosave();
+            store.refusesSaves = true;
+            change();
+            await advance(timer, 2_000);
+
+            session.replaceOpenLevel(Level.createNew());
+
+            expect(session.openLevel.messages.all().map((message) => message.text)).toEqual([SAVE_FAILED_TEXT]);
+        });
+
+        test('a level over the size limit is not written, and its message names the limit', async () => {
+            const { timer, session, store, autosave, change } = buildAutosave({
+                limits: { ...V1_LEVEL_LIMITS, maxBytes: 100 },
+            });
+            change();
+            await advance(timer, 2_000);
+
+            expect(store.saveCount).toBe(0);
+            expect(autosave.state.status).toBe('failed');
+            expect(savingMessages(session).map((message) => message.text)).toEqual([OVER_SIZE_TEXT]);
+
+            await advance(timer, 60_000);
+            expect(store.saveCount).toBe(0);
+        });
+
+        test('a store emptied after a save is written again, and the status text says so', async () => {
+            const { timer, session, store, change } = buildAutosave();
+            change();
+            await advance(timer, 2_000);
+            expect(session.status.current).toBeUndefined();
+
+            store.saved = undefined;
+            change();
+            await advance(timer, 2_000);
+
+            expect(store.saved).toBeDefined();
+            expect(session.status.current).toBe(DATA_CLEARED_TEXT);
+        });
+
+        test('the first save into an empty store says nothing', async () => {
+            const { timer, session, change } = buildAutosave();
+            change();
+            await advance(timer, 2_000);
+
+            expect(session.status.current).toBeUndefined();
+        });
+    });
+
+    describe('asking to persist', () => {
+        test('asks after the first save that works, not before', async () => {
+            const { timer, store, persistence, change } = buildAutosave();
+            store.refusesSaves = true;
+            change();
+            await advance(timer, 2_000);
+            expect(persistence.askCount).toBe(0);
+
+            store.refusesSaves = false;
+            await advance(timer, 10_000);
+            expect(persistence.askCount).toBe(1);
+
+            change();
+            await advance(timer, 2_000);
+            expect(persistence.askCount).toBe(1);
+        });
+
+        test('asks once across two sessions', async () => {
+            const first = buildAutosave();
+            first.change();
+            await advance(first.timer, 2_000);
+
+            const second = buildAutosave({ settings: first.settings });
+            second.change();
+            await advance(second.timer, 2_000);
+
+            expect(first.persistence.askCount).toBe(1);
+            expect(second.persistence.askCount).toBe(0);
+        });
+    });
+
+    test('dispose stops the retry', async () => {
+        const { timer, store, autosave, change } = buildAutosave();
+        store.refusesSaves = true;
+        change();
+        await advance(timer, 2_000);
+
+        autosave.dispose();
+        store.refusesSaves = false;
+        await advance(timer, 30_000);
+
+        expect(store.saveCount).toBe(0);
     });
 });
