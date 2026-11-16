@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 11, step 9 of 9: the docs, so stage 11 is built. Next is stage 12, saving, whose first step writes its steps. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 12, step 1 of 13: the steps and their choices are written. Next is step 2, `Autosave`'s timing. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -32,7 +32,7 @@
 | Stage 9, the Select tool | Done on 2026-11-16. See below |
 | Stage 10, the Shape tool and point editing | Done on 2026-11-16. See below |
 | Stage 11, copy and paste | Done on 2026-11-16. See below |
-| Code | Stages 0 to 11 done. Stage 12, saving, is next: its steps aren't written yet |
+| Code | Stages 0 to 11 done. Stage 12, saving, is under way: its 13 steps are in [plan.md](plan.md#stage-12-in-steps) |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -190,7 +190,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 12 of [plan.md](plan.md): saving.** Its first step writes its steps and choices into the docs, as stage 11's did.
+1. **Stage 12 of [plan.md](plan.md#stage-12-in-steps): saving.** Step 1, the steps and the [choices](architecture/persistence.md#stage-12s-choices), is done; step 2, `Autosave`'s timing, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

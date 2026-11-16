@@ -24,7 +24,7 @@ export class EditorSession {
     readonly reader: LevelReader;           // puts removed entities back on undo
     readonly status: StatusText;            // the status bar's left slot
     readonly openLevelChanged: VersionCounter;
-    // later: tools (stage 9), saving: SaveCoordinator (stage 12, see persistence.md),
+    // later: tools (stage 9), saving: none, the composition holds Autosave (stage 12, see persistence.md),
     // play: PlaySession (stage 16, see simulation.md), shortcuts (stage 6)
 
     constructor(options: EditorSessionOptions);  // level, clock, timer, and optionally viewSettings and reader
