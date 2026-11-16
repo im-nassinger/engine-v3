@@ -10,6 +10,7 @@ import {
 import { PixiLevelView } from '../adapters/pixi/index.ts';
 import { levelBoundsOf } from '../core/derived/index.ts';
 import { Level } from '../core/level/index.ts';
+import { EditorClipboard } from '../editor/clipboard/index.ts';
 import { CommandRunner, createCommandRegistry } from '../editor/commands/index.ts';
 import type { CommandRegistry } from '../editor/commands/index.ts';
 import { EditorSession } from '../editor/session/index.ts';
@@ -74,7 +75,9 @@ export class EditorComposition {
             frames,
             makeToken: () => crypto.randomUUID(),
         });
-        const commands = createCommandRegistry(session);
+        const mouse = new MousePosition(frames);
+        const clipboard = new EditorClipboard(systemClipboard());
+        const commands = createCommandRegistry(session, { clipboard, mouse });
         const runner = new CommandRunner(session.status);
         const platform = keyboardPlatform(navigator.platform);
         const levelView = await PixiLevelView.create({
@@ -89,7 +92,6 @@ export class EditorComposition {
         const escape = new EscapeChain(session, tools, openWindows);
         const dispatcher = new ShortcutDispatcher(commands, runner, platform, { tools, escape });
         const keyboard = new KeyboardInput(dispatcher, window);
-        const mouse = new MousePosition(frames);
         const pointerParts = { tools, escape, mouse, view: session.view, platform };
         const pointer = new PointerInput(pointerParts, levelView.canvas, window);
 
@@ -150,4 +152,12 @@ export class EditorComposition {
 
         this.runner.run(command);
     }
+}
+
+// The browser's asynchronous clipboard, missing outside a secure page, where copies stay in memory.
+function systemClipboard() {
+    const hasClipboard = 'clipboard' in navigator;
+    if (!hasClipboard) return undefined;
+
+    return navigator.clipboard;
 }

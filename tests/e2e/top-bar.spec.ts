@@ -6,6 +6,9 @@ const MAIN_MENU: Record<string, [string, string][]> = {
     Edit: [
         ['Undo', 'Ctrl+Z'],
         ['Redo', 'Ctrl+Shift+Z'],
+        ['Cut', 'Ctrl+X'],
+        ['Copy', 'Ctrl+C'],
+        ['Paste', 'Ctrl+V'],
         ['Delete', 'Del'],
         ['Select all', 'Ctrl+A'],
         ['Rename', 'F2'],
