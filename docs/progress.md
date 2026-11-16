@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 12, step 6 of 13: read-only is built: `EditorSession.makeReadOnly()` makes every edit, undo, redo, drag and drawing refuse with `The level is open in another tab`, the commands that edit are disabled with it, `Autosave` never saves, and selecting, panning, zooming, the View menu and Copy still work. Next is step 7, `LevelOpener`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 12, step 7 of 13: `LevelOpener` is built: the lock, then the saved record read like an import; no record gives a new level, storage that can't open a new level with `Nothing will be saved in this browser`, a record that won't open is kept as `damaged` and offered as raw data, and a crash gives the note with the last save's time. Next is step 8, `ProjectFile` and Export. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -190,7 +190,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 12 of [plan.md](plan.md#stage-12-in-steps): saving.** Steps 1 to 4 are done: the steps and the [choices](architecture/persistence.md#stage-12s-choices), `Autosave`'s timing and failures, and the storage adapters. Step 5, `EditorSettings`, is next.
+1. **Stage 12 of [plan.md](plan.md#stage-12-in-steps): saving.** Steps 1 to 7 are done: the steps and the [choices](architecture/persistence.md#stage-12s-choices), `Autosave`'s timing and failures, the storage adapters, `EditorSettings`, read-only and `LevelOpener`. Step 8, `ProjectFile` and Export, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

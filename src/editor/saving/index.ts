@@ -8,8 +8,12 @@ export {
 export type { AutosaveOptions } from './autosave/Autosave.ts';
 export { SaveState } from './autosave/SaveState.ts';
 export type { SaveStatus } from './autosave/SaveState.ts';
-export type { LevelStore, SavedLevel, SaveWrite } from './contracts/LevelStore.ts';
+export type { DamagedLevel, LevelStore, SavedLevel, SaveWrite } from './contracts/LevelStore.ts';
+export { LevelOpener } from './opening/LevelOpener.ts';
+export type { DamagedOpening, LevelOpenerOptions, Opening } from './opening/LevelOpener.ts';
+export { NOTHING_SAVED_TEXT } from './opening/openingTexts.ts';
 export type { PersistAskedRecord } from './contracts/PersistAskedRecord.ts';
+export type { SessionOpenRecord } from './contracts/SessionOpenRecord.ts';
 export type { SettingsStore } from './contracts/SettingsStore.ts';
 export type { StoragePersistence } from './contracts/StoragePersistence.ts';
 export { EditorSettings } from './settings/EditorSettings.ts';

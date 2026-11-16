@@ -7,6 +7,7 @@ import { DEFAULT_VIEW_SWITCHES, ViewSettings } from '../../view/index.ts';
 import type { ViewState, ViewSwitches } from '../../view/index.ts';
 
 import type { PersistAskedRecord } from '../contracts/PersistAskedRecord.ts';
+import type { SessionOpenRecord } from '../contracts/SessionOpenRecord.ts';
 import type { SettingsStore } from '../contracts/SettingsStore.ts';
 import { parseSettingsText, readFoldedCards, readSavedView, readViewSwitches } from './settingsValues.ts';
 import type { SavedView } from './settingsValues.ts';
@@ -18,6 +19,7 @@ import type { SavedView } from './settingsValues.ts';
 export class EditorSettings {
     readonly foldStore: FoldStore;
     readonly persistAsked: PersistAskedRecord;
+    readonly sessionOpen: SessionOpenRecord;
     private readonly store: SettingsStore;
     private readonly frames: FrameScheduler;
     private readonly others: Record<string, unknown>;
@@ -25,6 +27,7 @@ export class EditorSettings {
     private switches: ViewSwitches;
     private foldedCards: readonly ComponentTypeName[];
     private asked: boolean;
+    private open: boolean;
     private cancelWrite: Cancel | undefined;
     private stopFollowing: Unsubscribe[] = [];
 
@@ -39,6 +42,7 @@ export class EditorSettings {
         this.switches = readViewSwitches(stored.viewSwitches, DEFAULT_VIEW_SWITCHES);
         this.foldedCards = readFoldedCards(stored.foldedCards);
         this.asked = stored.persistAsked === true;
+        this.open = stored.sessionOpen === true;
 
         this.foldStore = {
             loadFolded: () => this.foldedCards,
@@ -56,6 +60,17 @@ export class EditorSettings {
             // browser runs no frames.
             markAsked: () => {
                 this.asked = true;
+                this.writeNow();
+            },
+        };
+        const readOpen = () => this.open;
+        this.sessionOpen = {
+            get isOpen() {
+                return readOpen();
+            },
+            // Written at once: it is cleared as the page goes away, when no frame will run.
+            setOpen: (open) => {
+                this.open = open;
                 this.writeNow();
             },
         };
@@ -129,6 +144,7 @@ export class EditorSettings {
             viewSwitches: this.switches,
             foldedCards: this.foldedCards,
             persistAsked: this.asked,
+            sessionOpen: this.open,
         };
         if (this.view !== undefined) {
             settings.view = this.view;

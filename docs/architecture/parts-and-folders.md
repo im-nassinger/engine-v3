@@ -73,13 +73,13 @@ src/
     saving/            Autosave, SaveState, ProjectFile, ImportLevel, ExportLevel, contracts
     play/              PlaySession, TickPacer, PlayMirror, Watchdog, GameRunner contract
     status/            StatusText (the status bar's left slot), the status bar's texts (selectionSummary, mousePositionText)
-    time/              Clock, Timer, FrameScheduler contracts
+    time/              Clock, Timer, FrameScheduler, TimeOfDay contracts
   adapters/
     pixi/              PixiLevelView, EntityNode, EntityDrawing, overlays/
     box2d/             Box2dPhysicsEngine, Box2dPhysicsWorld, Box2dShapes, Box2dJoints
     storage/           IndexedDbLevelStore, LocalStorageSettings, WebLockTabGuard, BrowserPersistence
     browser/           keyboard/ (KeyboardInput), pointer/ (PointerInput, ClickCounter, wheelPixels),
-                       time/ (SystemClock, BrowserTimer, AnimationFrames),
+                       time/ (SystemClock, LocalTimeOfDay, BrowserTimer, AnimationFrames),
                        screen/ (DevicePixelRatio), clipboard/ (ClipboardBridge), and later
                        FileDownload, BrowserFilePicker, PageVisibility, LeavePrompt in their own areas
     worker/            WorkerGameRunner, GameWorkerHost, ImportWorkerClient, ImportWorkerHost, protocol/

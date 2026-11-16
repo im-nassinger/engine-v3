@@ -168,7 +168,7 @@ describe('EditorSettings', () => {
     });
 
     test('a damaged key is written again, and keys it does not know are kept', () => {
-        const stored = { persistAsked: 'yes', sessionOpen: true, lastSavedAtMs: 1234 };
+        const stored = { persistAsked: 'yes', sessionOpen: true, laterKey: 1234 };
         const storedText = JSON.stringify(stored);
         const store = new InMemorySettingsStore(storedText);
         const { settings } = openEditor(store);
@@ -177,11 +177,30 @@ describe('EditorSettings', () => {
 
         expect(storedJson(store)).toEqual({
             sessionOpen: true,
-            lastSavedAtMs: 1234,
+            laterKey: 1234,
             viewSwitches: DEFAULT_VIEW_SWITCHES,
             foldedCards: [],
             persistAsked: true,
         });
+    });
+
+    test('sessionOpen is written at once and read back by the next session', () => {
+        const store = new InMemorySettingsStore();
+        const first = openEditor(store);
+
+        expect(first.settings.sessionOpen.isOpen).toBe(false);
+        first.settings.sessionOpen.setOpen(true);
+        expect(storedJson(store)).toMatchObject({ sessionOpen: true });
+        expect(openEditor(store).settings.sessionOpen.isOpen).toBe(true);
+
+        first.settings.sessionOpen.setOpen(false);
+        expect(openEditor(store).settings.sessionOpen.isOpen).toBe(false);
+    });
+
+    test('a damaged sessionOpen reads as closed', () => {
+        const store = new InMemorySettingsStore(JSON.stringify({ sessionOpen: 'yes' }));
+
+        expect(openEditor(store).settings.sessionOpen.isOpen).toBe(false);
     });
 
     test('a stopped settings writes nothing more', () => {

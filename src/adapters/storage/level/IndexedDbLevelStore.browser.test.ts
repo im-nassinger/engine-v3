@@ -1,4 +1,4 @@
-import { deleteDB } from 'idb';
+import { deleteDB, openDB } from 'idb';
 import { afterEach, describe, expect, test } from 'vitest';
 import { IndexedDbLevelStore } from './IndexedDbLevelStore.ts';
 
@@ -111,5 +111,19 @@ describe('IndexedDbLevelStore', () => {
         const loaded = await store.load();
 
         expect(loaded).toEqual({ levelJson: '{"other":5}', savedAtMs: 0 });
+    });
+
+    test('a damaged record is kept beside the level, and a later one replaces it', async () => {
+        const { store, databaseName } = newStore();
+        await store.save({ levelJson: 'level', savedAtMs: 1 });
+
+        await store.keepDamaged({ levelJson: 'first', savedAtMs: 2, refusal: { reason: 'notALevel' } });
+        await store.keepDamaged({ levelJson: 'second', savedAtMs: 3, refusal: { reason: 'damaged', detail: 'x' } });
+        const database = await openDB(databaseName);
+        const kept: unknown = await database.get('level', 'damaged');
+        database.close();
+
+        expect(kept).toEqual({ levelJson: 'second', savedAtMs: 3, refusal: { reason: 'damaged', detail: 'x' } });
+        expect(await store.load()).toEqual({ levelJson: 'level', savedAtMs: 1 });
     });
 });

@@ -1,9 +1,10 @@
 import { openDB } from 'idb';
 import type { DBSchema, IDBPDatabase } from 'idb';
-import type { LevelStore, SavedLevel, SaveWrite } from '../../../editor/saving/index.ts';
+import type { DamagedLevel, LevelStore, SavedLevel, SaveWrite } from '../../../editor/saving/index.ts';
 
 const DATABASE_VERSION = 1;
 const LEVEL_RECORD_KEY = 'level';
+const DAMAGED_RECORD_KEY = 'damaged';
 
 type LevelDatabase = DBSchema & {
     level: {
@@ -29,7 +30,8 @@ function toSavedLevel(record: unknown): SavedLevel {
 }
 
 // The level in IndexedDB through idb: one record in the store `level`, written in one transaction with strict
-// durability, so a save fully replaces the last one or leaves it as it was.
+// durability, so a save fully replaces the last one or leaves it as it was. A saved level that wouldn't open is
+// kept beside it under the key `damaged`.
 export class IndexedDbLevelStore implements LevelStore {
     static readonly defaultDatabaseName = 'engine-v3';
 
@@ -68,6 +70,14 @@ export class IndexedDbLevelStore implements LevelStore {
             abortQuietly(transaction);
             throw error;
         }
+    }
+
+    async keepDamaged(level: DamagedLevel) {
+        const database = await this.open();
+        const transaction = database.transaction('level', 'readwrite', { durability: 'strict' });
+        const record: DamagedLevel = { levelJson: level.levelJson, savedAtMs: level.savedAtMs, refusal: level.refusal };
+
+        await Promise.all([transaction.store.put(record, DAMAGED_RECORD_KEY), transaction.done]);
     }
 
     // Opened on first use and kept. A failed opening, or a database the browser closed, is opened again next time,
