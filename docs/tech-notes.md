@@ -146,7 +146,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 ## Scripts
 
 - **One copy of a script per entity.** Compile a file once, then run it once per entity with a fresh environment, so memory stays low and line numbers stay right.
-- **The editor has no Lua.** Checking syntax and reading a script's settings needs a separate worker, which can reuse the game's Lua build for exact error messages.
+- **The editor has no Lua.** Checking a script's syntax and reading the variables it needs takes a separate worker, which can reuse the game's Lua build for exact error messages.
 - **`__gc` and `__mode`.** Finalizers run outside any instruction counting, and weak tables make results depend on memory history. Refuse both in `setmetatable`.
 - **Table order.** Tables, functions and ids used as keys hash by address, so `pairs` order repeats only if allocation is identical. `print` must behave the same in every mode for that reason.
 - **Read-only library tables** must be frozen for real: a proxy can still be written through `rawset`.
@@ -193,7 +193,7 @@ Browser storage as checked in October 2026:
 - **WebKit's downloads turn spaces into `_`** in the name Playwright reports: the page's `Untitled level.editable` arrives as `Untitled_level.editable` (2026-11-16). Tests accept both.
 - **One tab.** Web Locks: one exclusive lock for the level, `ifAvailable` to detect the other tab. Whether a crashed tab releases its lock is only implied by the spec. Test it.
 - **Import in a worker**, to keep the page responsive and contain hostile files. Decode images only after the checks pass. Zip bombs must be refused without freezing the page.
-- **Reading script settings** means running the top of a script in a throwaway Lua state on load. That state needs the same safety as play, which is why importing a level counts as running untrusted code.
+- **Reading the variables a script needs** means running the script in a throwaway Lua state on load. Lua can't run only the top of a file, so every top-level line runs, `on(...)` calls included: that state needs stand-ins for the Lua API that do nothing. It also needs the same safety as play, which is why importing a level counts as running untrusted code.
 - **Never roll back a shipped file format version.** Saved levels would become unreadable. Roll forward.
 - **Offline.** An editor that opens offline needs a service worker. That brings old open tabs after an update: a tab that finds a level saved by a newer version should offer Reload, not an error.
 - **Read a level with a memory bound.** The 256 MB limit counts the unpacked size, so import stops unpacking as soon as it passes the limit.

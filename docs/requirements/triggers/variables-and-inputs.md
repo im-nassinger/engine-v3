@@ -2,31 +2,35 @@
 
 ## TL;DR
 
-Two lists on the World that triggers and scripts share. **Variables** are named values during play, such as `coins = 5`. **Inputs** are names such as `jump` with keys mapped to them. **v2:** variables (a number, a string or a boolean) with a starting value, raw keys, and inputs on the World's InputComponent, five of them in a new level. **v3:** variables kept between runs, gamepads, players remapping inputs, and scripts reading the mouse. Core rules: a variable is the one concept for level values (it replaces "data" and "saved data"), and players can remap inputs but not raw keys.
+Two kinds of lists that triggers and scripts share. **Variables** are named values during play, such as `coins = 5`: the World's are the level's, and any other entity can have its own, such as an enemy's `health`. **Inputs** are names such as `jump` with keys mapped to them. **v2:** variables of nine types with a starting value, on any entity, number limits, raw keys, and inputs on the World's InputComponent, five of them in a new level. **v3:** variables kept between runs, gamepads, players remapping inputs, and scripts reading the mouse. Core rules: a variable is the one concept for named values (it replaces "data", "saved data" and the values scripts used to keep on the ScriptComponent), and players can remap inputs but not raw keys.
 
 ## Variables
 
-### Variables on the World · v2
+### Variables · v2
 
-- The World has a **VariablesComponent** listing each variable: a name and a starting value. Example: `coins = 0`.
-- **Each variable has one type, picked when you create it: number, string or boolean.** Example: `coins = 0`, `player_name = "Ada"`, `door_open = false`. *Why: the owner wants text in v2 (owner: 2026-11-13), and named the three types (owner: 2026-11-14).*
+- **Any entity can have a VariablesComponent**, listing each variable: a name, a type and a starting value. **The World's variables are the level's**, such as `coins = 0`. Any other entity's are its own, such as an enemy's `health = 3`. *Why: one concept for every named value. A script's values are variables on its entity, so triggers can read and change them too (owner: 2026-11-16).*
+- **Each variable has one type, picked when you create it: number, string, boolean, entity, asset, colour, vector, angle or tags.** Examples: `coins = 0`, `player_name = "Ada"`, `door_open = false`, `door` set to the entity "Door 2". *Why: the owner wants text in v2 (owner: 2026-11-13) and named the first three types (owner: 2026-11-14). The others are the types scripts need, such as the door a button opens (owner: 2026-11-16).*
+- **A number variable can have limits:** a minimum, a maximum and a unit, such as `speed` from 0 to 1,500 px/s. Its value stays inside them, in the Inspector and during play: a value past a limit is held at it (standing yes, 2026-11-16).
+- Scripts add the variables they need from a warning on the ScriptComponent's card, see [scripts](../scripts/scripts.md#the-scriptcomponent--v2).
 - **What a trigger can do with each type:**
   - **number:** Change value sets, adds or subtracts. An If compares it, such as "If coins is 10 or more".
   - **string:** Change value only sets it. An If only checks "is" or "is not".
   - **boolean:** Change value sets it or **flips** it: true becomes false, false becomes true. An If only checks "is" or "is not", such as "If lamp_on is true". Example: a light switch is one trigger, "When something starts touching this, Flip lamp_on". *Why: with only Set, a switch needs two triggers that both fire on the same touch and undo each other (owner: 2026-11-14).*
+  - **entity, asset, colour, vector, angle, tags:** Change value only sets them. An If only checks "is" or "is not".
   - *Why: adding 1 to a string or asking whether a boolean is "10 or more" means nothing.*
 - Triggers and scripts read and change variables. A trigger changes one with Change value: set, add, subtract or flip, as its type allows.
 - A trigger can react to a variable with the event "a variable changes", and check one in an If.
-- Restarting the level puts every variable back to its starting value.
+- Restarting the level puts every variable back to its starting value, every entity's included. A spawned entity's variables start from its `.entity` file.
 - *Why: variables replace the older "data" and "saved data", which were two concepts for one thing. A score needs one.*
 
-Source: scope VA1; round 2: O2; round 4: T2; round 5: T5; round 9: 09 2.4b; owner: 2026-11-13; owner: 2026-11-14
+Source: scope VA1; round 2: O2; round 4: T2; round 5: T5; round 9: 09 2.4b; owner: 2026-11-13; owner: 2026-11-14; owner: 2026-11-16
 
 ### Keep between runs · v3
 
 - Each variable has a **Keep between runs** checkbox. A kept variable saves its value in the browser for that level, and the next run starts from the saved value.
 - The VariablesComponent has a **Reset kept values** button. *Why: it lets you test from a clean start.*
 - Test play and playing use the same saved value.
+- Whether an entity's own variables can be kept is still open, see [progress](../../progress.md#open-questions-for-the-owner).
 - *Why v3: it is for best times and unlocks, which matter once other people try your levels.*
 
 Source: scope VA2; round 2: O2; round 11: KV1

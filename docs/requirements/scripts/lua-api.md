@@ -12,7 +12,7 @@ The Status column says which functions the review named and which the owner deci
 - **Functions take ids, never objects.** An id is a number. A destroyed entity's id no longer exists: functions given one do nothing, and `exists(id)` returns false.
 - Positions are **level positions in pixels**, y pointing down. Angles are **degrees, clockwise on screen**. Speeds are px/s and °/s. Time is the level's time in seconds. Gravity alone is m/s², as in the Inspector.
 - **A script's own entity is `this`**, and a handler receives `other`, the words triggers use.
-- **A point is two numbers:** `local x, y = get_position(this)`. There is no vector type.
+- **A point is two numbers:** `local x, y = get_position(this)`. There is no vector type. Only a vector variable reads as a table, see [variables](#variables--v2).
 - **Attributes use the Inspector's field names in snake_case:** the field "Linear damping" is the attribute `"linear_damping"`.
 - Colours are text, such as `"#4A90D9"`.
 - A function of its own exists only when it does more than change one value: velocity, level position, tags, spawning.
@@ -94,7 +94,7 @@ Source: round 9: 10 2.7; owner: 2026-11-13
 
 | Function | Does | Status |
 |---|---|---|
-| `get_variable(name)`, `set_variable(name, value)` | The level's variables | Owner |
+| `get_variable(name)`, `set_variable(name, value)` | The level's variables, on the World. A script reads its own entity's through `variables`, see [variables](#variables--v2) | Owner |
 | `is_down(input)`, `is_key_down(key)` | Whether an input or a raw key is held | Review |
 | `win()`, `lose()`, `restart()` | End or restart the run, at the end of the tick | Owner |
 | `get_time()` | The level's time in seconds | Owner |
@@ -105,17 +105,23 @@ Source: round 9: 10 2.7; owner: 2026-11-13
 
 Source: round 9: 10 2.5, 10 2.7; round 11: CL1; owner: 2026-11-13
 
-### Settings · v2
+### Variables · v2
 
-| Function | Field type in the Inspector | Status |
+| Function | Type of the variable | Status |
 |---|---|---|
-| `number_field(default, options)` | Number. `options` may hold `min`, `max` and `unit` | Owner |
-| `text_field`, `checkbox_field`, `choice_field`, `colour_field`, `vector_field`, `angle_field` | Text, checkbox, choice, colour, vector, angle | Owner |
-| `entity_field`, `asset_field`, `variable_field`, `tags_field`, `list_field` | Entity, asset, variable, tags, a list | Owner |
+| `number_variable(start, options)` | Number. `options` may hold `min`, `max` and `unit` | Owner |
+| `string_variable`, `boolean_variable`, `angle_variable`, `colour_variable` | String, boolean, angle, colour | Owner |
+| `entity_variable`, `asset_variable`, `vector_variable`, `tags_variable` | Entity, asset, vector, tags | Owner |
 
-A script declares its settings in a `settings` table at its top. The Inspector shows them in that order, labelled from the name (`run_speed` reads "Run speed"), and the script reads each entity's own values from the same table.
+- **A script lists the variables it needs in a `variables` table at its top**, such as `speed = number_variable(400, { min = 0, unit = "px/s" })`. The list only describes them: the values are the entity's own, on its VariablesComponent, where the Inspector shows them.
+- **During play the same table reads and writes them:** `variables.speed` reads, `variables.speed = 500` writes, and triggers see the change. There are no functions inside it. *Why: functions are top level, and plain reads and writes match the rest of Lua (owner: 2026-11-16).*
+- The level's variables, on the World, keep `get_variable(name)` and `set_variable(name, value)`.
+- **What each type reads as:** a number or an angle (in degrees) is a number; a string or a colour is text; a boolean is `true` or `false`; an entity is its id, or `nil` when none is picked; an asset is its file path; tags are a list of text; a vector is a table such as `{ x = 10, y = 20 }`.
+- **A vector or tags variable reads as a read-only copy.** `variables.offset.x = 5` stops the script with "A vector variable is changed as a whole: `variables.offset = { x = 5, y = 20 }`". *Why: a copy that wrote through would also change every older copy kept in a local, with no error (owner: 2026-11-16).*
+- Writing a value of another type stops the script with an error, like any script error (standing yes, 2026-11-16).
+- A name the entity doesn't have reads as `nil` and puts one warning in the Console, like an unknown input name (standing yes, 2026-11-16).
 
-Source: round 10: SC1; owner: 2026-11-13
+Source: round 10: SC1; owner: 2026-11-13; owner: 2026-11-16
 
 ### Comes with v3 features · v3
 

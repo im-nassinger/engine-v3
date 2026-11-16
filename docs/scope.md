@@ -38,7 +38,8 @@ These versions were decided during the requirements review, or by the owner afte
 | The Trigger tool (tool 7): a rectangle that notices touching, with a trigger | v2 | Triggers are v2. It was in the tool list with no version (owner: 2026-11-13) |
 | The camera follows a tag | v2 | A spawned player can't be picked in the editor, so following its tag finds it without a script (owner: 2026-11-13) |
 | A new level starts with the inputs left, right, up, down and jump | v2 | Inputs are v2, and most games need these five (owner: 2026-11-13) |
-| Variables are a number, a string or a boolean | v2 | Variables are v2. The owner wants text too (owner: 2026-11-13) and named the three types (owner: 2026-11-14) |
+| Variables are a number, a string, a boolean, an entity, an asset, a colour, a vector, an angle or tags | v2 | Variables are v2. The owner wants text too (owner: 2026-11-13), named the first three types (owner: 2026-11-14), and added the rest when variables replaced the values scripts kept (owner: 2026-11-16) |
+| Variables on any entity, number limits, and a warning on the ScriptComponent's card that adds the variables a script needs | v2 | They replace the values scripts kept on the ScriptComponent, which were v2 (owner: 2026-11-16) |
 | Flip a boolean variable in a trigger | v2 | A light switch is then one trigger (owner: 2026-11-14) |
 | Sensors noticing touches, the random seed | v2 | Only triggers and scripts use them (owner: 2026-11-13) |
 | Weld, Rod, Slider and Wheel joints | v3 | Merging shapes into one body already glues them, and Rod is Rope that can't go slack |
@@ -202,7 +203,7 @@ Rules: [requirements/triggers](requirements/triggers/README.md)
 | TR7 | Actions: Change value, Spawn, Destroy, Push, Fire custom event, Wait, Win, Lose, Restart. | v2 | Logic comes in v2. Was v1 in the scope review: The full set except sound and camera shake. |
 | TR8 | The Repeat setting: every time, once per run, or at most once every N seconds. Example: a spike that hurts at most once a second. | v2 | Logic comes in v2. Was v1 in the scope review: Small, and without it a trigger can fire every tick. |
 | TR9 | Arrows from the selected entity to what its triggers affect. | v3 | Helps reading big levels. |
-| VA1 | Variables on the World: a name and a starting value, which triggers and scripts read and change. Example: coins = 0. | v2 | Logic comes in v2. Was v1 in the scope review: A score needs one. |
+| VA1 | Variables on the World, and from 2026-11-16 on any entity: a name and a starting value, which triggers and scripts read and change. Example: coins = 0. | v2 | Logic comes in v2. Was v1 in the scope review: A score needs one. |
 | VA2 | Keep between runs: a variable remembers its value for the next run, with a Reset button. | v3 | For best times and unlocks, which matter once other people try your levels. |
 
 ## Keys and mouse
@@ -222,7 +223,7 @@ Rules: [requirements/scripts](requirements/scripts/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
-| LU1 | The ScriptComponent: a list of .lua files, each showing the settings it declares as fields. | v2 | Logic comes in v2. Was v1 in the scope review: Scripts are a core idea, and the builtin player is one. |
+| LU1 | The ScriptComponent: a list of .lua files. From 2026-11-16 each file lists the variables it needs on its entity, instead of showing its own fields. | v2 | Logic comes in v2. Was v1 in the scope review: Scripts are a core idea, and the builtin player is one. |
 | LU2 | The Monaco code editor, with colours and find and replace. | v2 | Only scripts need a code editor. Was v1 in the scope review: Writing scripts needs an editor, and Monaco gives this for free. |
 | LU3 | Suggestions and hover help for the game's own functions in the code editor. | v3 | Needs a written description of every function in the Lua API, which is easier once it settles. |
 | LU4 | Script help and short tutorial levels, built in and offline. | v3 | Comes after the Lua API settles. |

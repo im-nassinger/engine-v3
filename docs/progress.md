@@ -84,6 +84,10 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 - **Points is one list field** (owner): a polygon's or line's points show in the Inspector as one Points field, a list of vectors, instead of a read-only count. The list field type moves from v2 to v1 and is built in stage 8. A path's points become a list of **path points**, a new field type that comes with v2's pen. See [field types](requirements/editor/inspector-and-undo.md#one-fixed-list-of-field-types--v1).
 - **The level file is nested** (owner): `level.json` holds one `world` entity, and each entity holds its `children` instead of naming its parent, so the file can't describe a broken tree and the World is the one entity at the top. The clipboard and undo copies are nested the same way. Stage 9 gained step 2 to change the code built in stages 2 and 5. See [persistence](architecture/persistence.md#leveljson).
 
+### Settled on 2026-11-16
+
+- **Variables replace the values scripts kept** (owner): any entity can have a VariablesComponent; variables gain the entity, asset, colour, vector, angle and tags types and number limits; a script lists what it needs in a `variables` table and a warning on its card adds what is missing; scripts read and write `variables.speed`. Scripts never run in the editor. All v2, so no v1 code changes. See [decisions.md](decisions.md#2026-11-16-variables-replace-the-values-scripts-kept).
+
 ### Settled under the standing yes, 2026-11-14
 
 - **Round 10**, every card at Claude's pick: see [decisions.md](decisions.md#decided-under-the-standing-yes).
@@ -216,4 +220,12 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 
 ## Open questions for the owner
 
-None waiting. Under the owner's standing yes (2026-11-14), Claude decides what the docs don't answer and lists it in [decisions.md](decisions.md#decided-under-the-standing-yes) for the owner to review whenever they like. The [review page](review.html) holds only round 10's record.
+Under the owner's standing yes (2026-11-14), Claude decides what the docs don't answer and lists it in [decisions.md](decisions.md#decided-under-the-standing-yes) for the owner to review whenever they like. The [review page](review.html) holds only round 10's record.
+
+Left open by 2026-11-16's variables change, all for v2 unless marked. None blocks v1:
+
+- **Which variable a trigger means.** Each check and action picks a target (`this`, `other`, a name, a tag). For "If coins is 10 or more", must the creator pick the World, or are the level's variables always offered beside the target's?
+- **Who hears "a variable changes"** for an entity's own variable: only that entity, or every entity, with the entity in the event?
+- **Reading another entity's variables from a script**, such as an enemy's `health` for a health bar.
+- **Keep between runs for an entity's variables** (v3).
+- **Choice, variable and list types** for variables. The examples now name the level's `coins` directly instead of letting the creator pick it.

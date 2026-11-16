@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-A script is a `.lua` file from the Assets panel, attached to an entity through its ScriptComponent. **v2:** the ScriptComponent with a list of `.lua` files and their settings as Inspector fields, `on(name, function)` for events, handles for entities, `spawn(path)`, `wait(2)`, reading and changing component values, and Lua 5.4 with only its safe parts. **v3:** functions that come with v3 features, such as sound and the mouse. Core rules: **handles, not references**; scripts and triggers share one list of events; and **once a function ships it never changes**. Every function is in [lua-api.md](lua-api.md), and example scripts in [lua-examples.md](lua-examples.md).
+A script is a `.lua` file from the Assets panel, attached to an entity through its ScriptComponent. **v2:** the ScriptComponent with a list of `.lua` files, each listing the variables it needs on its entity, `on(name, function)` for events, handles for entities, `spawn(path)`, `wait(2)`, reading and changing component values, and Lua 5.4 with only its safe parts. **v3:** functions that come with v3 features, such as sound and the mouse. Core rules: **handles, not references**; scripts and triggers share one list of events; and **once a function ships it never changes**. Every function is in [lua-api.md](lua-api.md), and example scripts in [lua-examples.md](lua-examples.md).
 
 ## Attaching scripts
 
@@ -10,16 +10,19 @@ A script is a `.lua` file from the Assets panel, attached to an entity through i
 
 - **An entity has one ScriptComponent, holding a list of `.lua` files** from the Assets panel. *Why one: an entity has at most one component of each type, so "its ScriptComponent" always means one thing, in the Inspector and in Lua.*
 - The `.lua` files are plain assets the component points to. Fixing a file fixes every entity that uses it.
-- **Each file shows its own settings as fields:** values the script declares at its top, such as a speed or an entity. The fields come from the same fixed list of field types as components: number, text, checkbox, choice, colour, vector, angle, entity, asset, variable, tags, and lists of these.
-- **Settings are a `settings` table at the top of the file, built with one `<type>_field` function per field type**, such as `speed = number_field(400, { min = 0, max = 1500, unit = "px/s" })`. The Inspector shows them in the order written, labelled from the name: `run_speed` reads "Run speed".
-- Each entity keeps its own values for those settings, and the script reads them from the same table, such as `settings.run_speed`.
+- **A script's values are the entity's variables.** The ScriptComponent holds only the list of files; the values, such as a speed or a door, live on the entity's VariablesComponent. *Why: one concept for named values, so nothing is stored in two places, and triggers can read and change a script's values too (owner: 2026-11-16).*
+- **A script lists the variables it needs in a `variables` table at its top, built with one `<type>_variable` function per type**, such as `speed = number_variable(400, { min = 0, max = 1500, unit = "px/s" })`. The table only describes them. The rules for reading and writing them are in [lua-api.md](lua-api.md#variables--v2).
+- **When the entity lacks some of them, the ScriptComponent's card shows a warning with a button:** "This script needs `speed` and `jump_height`. [Add variables]". The button adds a VariablesComponent if there is none, then only the missing variables, with the script's types, starting values and limits, as one Undo step. With several entities selected, it adds them to each. *Why: nothing happens behind the user's back, and editor messages never block, so a script changed later or added to many entities is covered too (owner: 2026-11-16).*
+- **A variable with the same name and another type is left as it is**, and the warning says so: "`speed` is a string here, but this script needs a number."
+- Scripts on one entity share its variables: two scripts that both need `speed` read the same one.
+- A variable the script no longer needs stays on the entity until the creator removes it. *Why: the creator added it, so only the creator removes it (standing yes, 2026-11-16).*
 - Each entity runs its own copy of a script, so twenty enemies never share state by accident.
 - Any entity can have scripts, joints and the camera included.
 - Scripts in the list run top to bottom. Across entities they run in Entities panel order, see [triggers](../triggers/triggers.md).
 - A script on a hidden entity still runs.
 - A new `.lua` file is made in the Assets panel. The builtin `.lua` files can be read as examples.
 
-Source: scope LU1; round 1: C12; round 3: S2; round 4: FT1; round 5: R45; round 9: 10 2.1; round 10: SC1, OR1; old: LU-01, LU-02, LU-04, LU-50; owner: 2026-11-13
+Source: scope LU1; round 1: C12; round 3: S2; round 4: FT1; round 5: R45; round 9: 10 2.1; round 10: SC1, OR1; old: LU-01, LU-02, LU-04, LU-50; owner: 2026-11-13; owner: 2026-11-16
 
 ## How a script works
 
@@ -42,7 +45,7 @@ Source: scope LU1; round 9: 10 2.3; round 10: EV1; round 1: D4; old: LU-22, LU-2
 
 - **Scripts work with entity and component ids, through functions.** `get_entity_by_name("car")` returns an id. `get_component(id, "NameComponent")` and `get_attribute(...)` read from it.
 - **A destroyed id simply no longer exists.** There are no object references to keep alive. *Why: the owner rejected an object-style API.*
-- Scripts find entities three ways: by name, by tag, or through an entity setting the script declares, picked in the Inspector.
+- Scripts find entities three ways: by name, by tag, or through an entity variable the script needs, picked in the Inspector.
 - An id is never reused during a run, so a stored id can never point at a newer entity.
 - **A script's own entity is `this`**, the id of the entity the script is on, such as `destroy(this)`. A handler receives `other`. *Why: the same words as triggers, and each entity runs its own copy, so `this` is always right.*
 
@@ -150,8 +153,7 @@ Small features from the old draft and review that the scope review never asked a
 | Open point | What is known | Version |
 |---|---|---|
 | More ways to wait | Waiting a number of ticks, waiting until something is true, running a function later or every N seconds | v3 |
-| Running a script once more for each list entry | The same file listed twice on one entity runs twice | v2 |
+| Running a script once more for each list entry | The same file listed twice on one entity runs twice. Both copies share the entity's variables | v2 |
 | Switching a script off | A checkbox on each file in the list | v3 |
-| Old settings after a script changes | A removed setting keeps its value under "Unused settings". A renamed one can say what it was called before | v3 |
 
 Source: old: LU-05 to LU-12, LU-43 to LU-49, LU-51 to LU-56; owner: 2026-11-14

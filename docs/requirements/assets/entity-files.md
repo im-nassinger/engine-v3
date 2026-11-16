@@ -9,7 +9,7 @@ An `.entity` file is a saved entity with its children and components, as a text 
 ### Save and place · v2
 
 - **There is no "prefab".** A saved entity is a text file with the `.entity` extension, kept in the Assets panel. *Why: if something is just a file, it stays a file.*
-- **Save as .entity file** saves the selection: the entity with its children and all their components, triggers, script settings and tags. Several selected entities are wrapped in a new group. The World and the camera can't be saved this way.
+- **Save as .entity file** saves the selection: the entity with its children and all their components, triggers, scripts, variables and tags. Several selected entities are wrapped in a new group. The World and the camera can't be saved this way.
 - **Overwrite file** replaces an `.entity` file's contents with the selection.
 - Saving warns about links to things outside the selection, listing each one. Those links become missing in the file. A joint keeps the rule for copying: an end that points outside the selection becomes missing.
 - **Dragging an `.entity` file into the level places a copy**: the entity with its children and components, in the group you are inside, on top, selected. One undo step.

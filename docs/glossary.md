@@ -124,7 +124,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Custom event | An event you name yourself, such as `open`. A trigger or script fires it on an entity, and that entity's triggers and scripts react. It can carry one number. |
 | Action | One step in a trigger's Do list, such as Change value or Spawn. Only ever used for triggers. |
 | `this` and `other` | In a trigger: `this` is the entity holding the trigger, `other` is the entity that caused the event, when there is one. In a script: `this` is the id of the entity the script is on, and `other` is what a handler receives. |
-| Variable | A named value during play, such as `coins = 5`, listed on the World's VariablesComponent. Its type is **number**, **string** (text, such as `"Ada"`) or **boolean** (`true` or `false`). |
+| Variable | A named value during play, such as `coins = 5`, listed on a VariablesComponent. The World's variables are the level's; any other entity's are its own, such as an enemy's `health`. Its type is **number**, **string** (text, such as `"Ada"`), **boolean** (`true` or `false`), **entity**, **asset**, **colour**, **vector**, **angle** or **tags**. A script lists the variables it needs in a `variables` table at its top. |
 | Keep between runs | A variable setting: its value is saved in the browser and the next run starts from it. |
 | Input | A name such as `jump`, with the keys and gamepad buttons mapped to it, listed on the World's InputComponent. Players can remap inputs. |
 | Raw key | A key used directly, such as Space, without going through an input. |
@@ -213,10 +213,10 @@ Component names end in `Component`, the TransformComponent included (owner: 2026
 | CameraComponent | The camera's size, mode and follow settings | The camera |
 | FlexComponent | Arranges children in a row or column (v3) | Any entity |
 | TriggerComponent | A list of triggers (v2) | Any entity, the World included |
-| ScriptComponent | A list of `.lua` files, each with its settings (v2) | Any entity |
+| ScriptComponent | A list of `.lua` files (v2). Their values are the entity's variables | Any entity |
 | AssetComponent | Marks a linked copy and records its `.entity` file (v3) | A linked copy |
 | PhysicsWorldComponent | Gravity, game speed, the collision grid | The World |
-| VariablesComponent | The level's variables (v2) | The World |
+| VariablesComponent | Variables (v2): the level's on the World, an entity's own on any other entity | Any entity, the World included |
 | InputComponent | The level's inputs (v2) | The World |
 
 ## Dropped words
@@ -239,6 +239,7 @@ Don't use these. Each was replaced in the requirements review.
 | Collision category, layer (physics) | Tag in the collision grid | One label system |
 | Physics overlay | Physics view | Renamed |
 | Input action, action (for keys) | Input | "Action" belongs to triggers |
+| Script setting, `settings` table | Variable, the `variables` table | Variables replaced them: one concept for named values (owner: 2026-11-16) |
 | Diagnostic, lint | Warning | The word everyone knows |
 | World position | Level position | World is the top entity |
 | Template | Component preset | One idea for every component |

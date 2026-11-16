@@ -136,5 +136,5 @@ The editor never calls `Date.now`, `setTimeout` or `requestAnimationFrame` itsel
 
 ## Lua (v2) and audio (v3)
 
-- **Lua:** `WasmoonScriptEngine` fulfils core's `ScriptEngine`: compile a file once, run it once per entity with a fresh environment, call handlers, and stop a script on an error. It also runs in a second, throwaway worker in the editor to check syntax and read a script's `settings` table, as the tech notes advise. The safe library rules (no `io`, `os`, `load`, frozen library tables, no `__gc` or `__mode`) live in that adapter.
+- **Lua:** `WasmoonScriptEngine` fulfils core's `ScriptEngine`: compile a file once, run it once per entity with a fresh environment, call handlers, and stop a script on an error. It also runs in a second, throwaway worker in the editor to check syntax and read a script's `variables` table, as the tech notes advise. The safe library rules (no `io`, `os`, `load`, frozen library tables, no `__gc` or `__mode`) live in that adapter.
 - **Audio:** `WebAudioSoundPlayer` fulfils core's `SoundPlayer`. Whether a sound is still playing is worked out by the simulation from ticks and the file's length, never asked from the real audio, as the tech notes require.

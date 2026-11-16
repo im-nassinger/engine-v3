@@ -80,7 +80,7 @@ Source: scope TR5; round 8: 09 2.2; old: TR-12, TR-22
 ### If checks · v2
 
 - **`other` has a tag:** "If other is tagged player". The tag may be on the touching entity or on any group above it, so tagging the player's group is enough.
-- **A variable compared with a value:** "If coins is 10 or more". A string or boolean variable is only checked with "is" or "is not", see [variables](variables-and-inputs.md).
+- **A variable compared with a value:** "If coins is 10 or more". Only a number variable is compared: the other types are only checked with "is" or "is not", see [variables](variables-and-inputs.md).
 - **A component value compared with a number:** "If this BodyComponent speed is more than 200".
 - All checks must be true. Anything more complex is a script.
 - *Why v2: a coin that only the player can pick up needs the tag check.*
@@ -100,7 +100,7 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27; owner: 2026-11-13
 | Win, Lose | Ends the run as won or lost |
 | Restart | Restarts the level |
 
-- **If it's data, change it with Change value.** One action covers teleporting (the TransformComponent's position), variables (on the World's VariablesComponent), tags, switching triggers on or off, a joint's motor, the camera's zoom and follow target, gravity. *Why: the owner pointed out that teleporting is just changing a component value. What is left on the list does something no value can.*
+- **If it's data, change it with Change value.** One action covers teleporting (the TransformComponent's position), variables (on the World's VariablesComponent for the level's, or on any entity's for its own), tags, switching triggers on or off, a joint's motor, the camera's zoom and follow target, gravity. *Why: the owner pointed out that teleporting is just changing a component value. What is left on the list does something no value can.*
 - Change value only offers values that are allowed to change during play.
 - **Spawn asks for TransformComponent values and has no target.** *Why: you say exactly where the new entity appears and how it is turned and sized (owner: 2026-11-14).*
   - **Position and rotation are measured from the entity the trigger is on.** Example: a cannon tilted 30° spawns a bullet at 40, 0: the bullet appears 40 px along the cannon, tilted 30°, wherever the cannon is. A trigger on the World measures from the level's origin. *Why: a moving cannon then works without a script (owner: 2026-11-14).*

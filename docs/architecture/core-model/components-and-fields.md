@@ -255,7 +255,7 @@ export function createV1Registry(): ComponentRegistry;
 | Later need | Where it plugs in | Changes to v1 code |
 |---|---|---|
 | TriggerComponent, ScriptComponent, VariablesComponent, InputComponent, TextComponent, TagsComponent (v2) | New component folders, registered in the registry | None |
-| Script settings shown as fields (v2) | A script's `settings` table becomes `FieldDefinition`s built at run time from the same field types | None |
+| Variables of nine types on any entity (v2) | Each variable on a VariablesComponent is drawn with its type's field type, limits included. A script's `variables` table is only read to offer [Add variables] | None |
 | `get_attribute`, `set_attribute`, Change value (v2) | `schema.findFieldByAttribute`, `writeValue`, guarded by `changeableInPlay` | None |
 | Gradients, images as fills (v2, v3) | `FillFieldType` replaces `SolidFillFieldType` on StyleComponent | One line in the StyleComponent schema |
 | Linked copies (v3) | AssetComponent, and the Inspector's read-only mode, which play already uses | None in the model |

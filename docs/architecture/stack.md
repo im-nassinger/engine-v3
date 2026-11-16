@@ -56,7 +56,7 @@ Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed*
 
 | Package | Version today | Job |
 |---|---|---|
-| `wasmoon` | 1.16.0 | Lua 5.4 in wasm, for scripts and for reading a script's settings |
+| `wasmoon` | 1.16.0 | Lua 5.4 in wasm, for scripts and for reading the variables a script needs |
 | `monaco-editor` | 0.57.0 | The code editor |
 
 Their versions are checked again when v2 starts.

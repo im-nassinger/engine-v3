@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Logic without code. **Nothing here is in v1.** **In v2** an entity's TriggerComponent holds triggers shaped as When, If, Do, with events for touching, keys, timers, level start, custom events, destroyed and variables, nine actions led by Change value, and a Repeat setting. The World holds the level's variables and inputs. **In v3** come mouse events, two more touch events, sound and camera actions, arrows to what a trigger affects, kept variables, gamepads, remapping and the mouse for scripts. Core rules: if it's data, change it with Change value, triggers and scripts share one list of events, and the order you see is the order things run.
+Logic without code. **Nothing here is in v1.** **In v2** an entity's TriggerComponent holds triggers shaped as When, If, Do, with events for touching, keys, timers, level start, custom events, destroyed and variables, nine actions led by Change value, and a Repeat setting. The World holds the level's variables and inputs, and any entity can hold variables of its own. **In v3** come mouse events, two more touch events, sound and camera actions, arrows to what a trigger affects, kept variables, gamepads, remapping and the mouse for scripts. Core rules: if it's data, change it with Change value, triggers and scripts share one list of events, and the order you see is the order things run.
 
 ## Files
 
@@ -23,7 +23,7 @@ Logic without code. **Nothing here is in v1.** **In v2** an entity's TriggerComp
 | Repeat | v2 | triggers |
 | The Trigger tool | v2 | triggers |
 | Custom events | v2 | triggers |
-| Variables on the World | v2 | variables-and-inputs |
+| Variables on the World and on any entity, nine types, number limits | v2 | variables-and-inputs |
 | Raw keys and inputs | v2 | variables-and-inputs |
 | Mouse events | v3 | triggers |
 | "While touching" and "left the level" | v3 | triggers |
