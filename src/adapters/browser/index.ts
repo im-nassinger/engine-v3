@@ -1,4 +1,5 @@
 export { ClipboardBridge } from './clipboard/ClipboardBridge.ts';
+export { FileDownload } from './files/FileDownload.ts';
 export { KeyboardInput } from './keyboard/KeyboardInput.ts';
 export { keyboardPlatform } from './keyboard/keyboardPlatform.ts';
 export { PointerInput } from './pointer/PointerInput.ts';

@@ -3,6 +3,7 @@ import {
     BrowserTimer,
     ClipboardBridge,
     DevicePixelRatio,
+    FileDownload,
     KeyboardInput,
     keyboardPlatform,
     PointerInput,
@@ -10,12 +11,14 @@ import {
 } from '../adapters/browser/index.ts';
 import { PixiLevelView } from '../adapters/pixi/index.ts';
 import { LocalStorageSettings } from '../adapters/storage/index.ts';
+import { FflateZipCodec } from '../adapters/zip/index.ts';
 import { levelBoundsOf } from '../core/derived/index.ts';
 import { Level } from '../core/level/index.ts';
+import { LevelWriter } from '../core/level-data/index.ts';
 import { EditorClipboard } from '../editor/clipboard/index.ts';
 import { ClipboardEvents, CommandRunner, createCommandRegistry } from '../editor/commands/index.ts';
 import type { CommandRegistry } from '../editor/commands/index.ts';
-import { EditorSettings } from '../editor/saving/index.ts';
+import { EditorSettings, LevelExport, ProjectFile } from '../editor/saving/index.ts';
 import { EditorSession } from '../editor/session/index.ts';
 import { ShortcutDispatcher } from '../editor/shortcuts/index.ts';
 import type { KeyboardPlatform } from '../editor/shortcuts/index.ts';
@@ -89,7 +92,14 @@ export class EditorComposition {
         });
         const mouse = new MousePosition(frames);
         const clipboard = new EditorClipboard(systemClipboard());
-        const commands = createCommandRegistry(session, { clipboard, mouse });
+        const levelExport = new LevelExport({
+            session,
+            // Autosave joins the page with the saved level's opening; until then nothing is saved first.
+            saving: { saveNow: () => Promise.resolve() },
+            projectFile: new ProjectFile(new LevelWriter(), new FflateZipCodec()),
+            exporter: new FileDownload(window),
+        });
+        const commands = createCommandRegistry(session, { clipboard, mouse }, { levelExport });
         const runner = new CommandRunner(session.status);
         const platform = keyboardPlatform(navigator.platform);
         const levelView = await PixiLevelView.create({

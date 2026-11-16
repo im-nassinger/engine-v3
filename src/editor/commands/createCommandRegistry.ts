@@ -12,6 +12,8 @@ import { PasteCommand } from './clipboard/PasteCommand.ts';
 import { CommandRegistry } from './CommandRegistry.ts';
 import type { EditorCommand } from './EditorCommand.ts';
 import { DeleteCommand } from './edit/DeleteCommand.ts';
+import { ExportCommand } from './file/ExportCommand.ts';
+import type { FileParts } from './file/FileParts.ts';
 import { AboutCommand } from './help/AboutCommand.ts';
 import { HideOrShowCommand } from './edit/HideOrShowCommand.ts';
 import { RedoCommand } from './edit/RedoCommand.ts';
@@ -30,12 +32,16 @@ import { ZoomToActualSizeCommand } from './view/ZoomToActualSizeCommand.ts';
 
 // Every command built so far, each reading the session's open level when it runs, so replacing the
 // open level needs no new registry. Without clipboard parts, as in most tests, copies stay in memory and
-// the mouse is never over the level view.
-export function createCommandRegistry(session: EditorSession, clipboardParts?: ClipboardParts) {
+// the mouse is never over the level view. Without file parts the File menu's commands aren't registered.
+export function createCommandRegistry(session: EditorSession, clipboardParts?: ClipboardParts, fileParts?: FileParts) {
     const registry = new CommandRegistry();
     const clipboard = clipboardParts ?? { clipboard: new EditorClipboard(), mouse: { current: undefined } };
     // In a read-only tab these are disabled with the reason; the rest only look, select or copy.
     const registerEditing = (command: EditorCommand) => registry.register(new ReadOnlyGuard(session, command));
+
+    if (fileParts !== undefined) {
+        registry.register(new ExportCommand(session, fileParts));
+    }
 
     registerEditing(new UndoCommand(session));
     registerEditing(new RedoCommand(session));

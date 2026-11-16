@@ -3,6 +3,7 @@ import type { Page } from '@playwright/test';
 
 // Every command registered so far, as the main menu should list it, with its first shortcut.
 const MAIN_MENU: Record<string, [string, string][]> = {
+    File: [['Export', 'Ctrl+S']],
     Edit: [
         ['Undo', 'Ctrl+Z'],
         ['Redo', 'Ctrl+Shift+Z'],

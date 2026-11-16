@@ -19,3 +19,14 @@ export type { StoragePersistence } from './contracts/StoragePersistence.ts';
 export { EditorSettings } from './settings/EditorSettings.ts';
 export type { SavedView } from './settings/settingsValues.ts';
 export type { TabGuard } from './contracts/TabGuard.ts';
+export type { ExportedFile, FileExporter } from './contracts/FileExporter.ts';
+export type { ZipCodec, ZipEntry } from './contracts/ZipCodec.ts';
+export { LevelExport } from './project-file/LevelExport.ts';
+export type { LevelExportOptions, SavesNow } from './project-file/LevelExport.ts';
+export {
+    LEVEL_JSON_PATH,
+    PROJECT_FILE_EXTENSION,
+    PROJECT_FILE_MEDIA_TYPE,
+    ProjectFile,
+} from './project-file/ProjectFile.ts';
+export { projectFileName } from './project-file/projectFileName.ts';

@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 12, step 7 of 13: `LevelOpener` is built: the lock, then the saved record read like an import; no record gives a new level, storage that can't open a new level with `Nothing will be saved in this browser`, a record that won't open is kept as `damaged` and offered as raw data, and a crash gives the note with the last save's time. Next is step 8, `ProjectFile` and Export. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 12, step 8 of 13: `ProjectFile` and Export are built: `fflate` packs `level.json` into the `.editable` zip, the file is named after the level, and Export and Ctrl+S in the File menu save first, then download, even when the save failed or the tab is read-only. Next is step 9, the import worker. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

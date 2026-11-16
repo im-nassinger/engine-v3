@@ -16,6 +16,8 @@ export { createCommandRegistry } from './createCommandRegistry.ts';
 export { createShape } from './draw/createShape.ts';
 export type { CreateShapeOutcome, ShapeDrawing } from './draw/createShape.ts';
 export { DeleteCommand } from './edit/DeleteCommand.ts';
+export { EXPORT_FAILED_TEXT, ExportCommand, exportedText } from './file/index.ts';
+export type { FileParts } from './file/index.ts';
 export { AboutCommand, GAME_NAME } from './help/AboutCommand.ts';
 export { toggleEntityHidden } from './hide/toggleEntityHidden.ts';
 export { HideOrShowCommand } from './edit/HideOrShowCommand.ts';
