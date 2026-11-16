@@ -150,7 +150,7 @@ The Select tool holds one **drag state** at a time (the State pattern):
 | `ResizeState` | Pressing one of the eight handles | One step. One shape: width and height. A group: scale. The World's rectangle always resizes from its centre, as if Alt were held, because the World never moves |
 | `RotateState` | Pressing just outside a corner | One step. Shift snaps to 15° |
 | `BoxSelectState` | Pressing empty space and moving | Selects everything the box touches |
-| `PointEditState` | Double-clicking a polygon or line | Esc. Each point drag, add or delete is one step |
+| `PointEditState` | Double-clicking a polygon or line | Esc. Each point drag, add or delete is one step, see [drawing-and-points.md](drawing-and-points.md#point-editing) |
 
 - **`IdleState`, `PressState` and `BoxSelectState` as built** (standing yes, 2026-11-15):
   - **An unselected entity is selected on the press**, so the drag that follows moves it; a selected one narrows on release, as the press table says. Shift waits for the release and toggles; Shift+click on empty space changes nothing. *Why: the table selects an unselected entity for both a click and a drag, so doing it at once makes the Inspector follow at once.*
@@ -183,10 +183,7 @@ The Select tool holds one **drag state** at a time (the State pattern):
 
 ## The Shape tool
 
-- One tool, four kinds: rectangle, circle, polygon and line. **Its options strip offers Rectangle, Circle and Polygon** (owner, 2026-11-15); a line is a polygon drawing finished open. The tool remembers the kind used last, a rectangle at first.
-- **Choosing it clears the selection and hides the Inspector** (owner, 2026-11-15). `InspectorModel` only ever describes entities in the level, never a shape being drawn, so it needs no case for something that isn't an entity. The Inspector shows again when the tool is left: after a shape is finished the tool returns to Select with the shape selected.
-- A faded preview follows the mouse; a click places it at the remembered size, a drag sets a new size. A circle's drag gives the circle that fits the box, as if Shift were held. Resizing a circle with the Select tool's handles keeps it round: the radius follows the larger stretch.
-- Polygon: each click adds a point; clicking the first point closes it into a polygon; Enter, Esc, double-click, choosing another tool or Play finish it open, as a line (fewer than 2 points is dropped); Ctrl+Z or Backspace removes the last point. - Finishing runs `CreateShapeCommand`: a TransformComponent, a ShapeComponent and a StyleComponent with the v1 default look, in the current group, on top, named by `EntityNamer` ("Rectangle 1": one more than the highest number already used with that word), and selected.
+The Shape tool and point editing are in [drawing-and-points.md](drawing-and-points.md).
 
 ## The Joint tool
 

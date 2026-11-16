@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 9, step 17 of 17: stage 9, the Select tool, is written up: what the build showed is in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices) and [performance.md](architecture/performance.md#targets-and-their-tests), and its summary below. Next is stage 10, the Shape tool and point editing, step 1: write its steps into [plan.md](plan.md) and its choices into the architecture docs. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 10, step 1 of 11: stage 10's steps are in [plan.md](plan.md#stage-10-in-steps) and its choices in [drawing-and-points.md](architecture/editor/drawing-and-points.md#stage-10s-choices). Next is step 2: `EntityNamer` and `createShape` in `editor/commands/draw`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -30,7 +30,7 @@
 | Stage 7, the Entities panel | Done on 2026-11-15. See below |
 | Stage 8, the Inspector | Done on 2026-11-15. See below |
 | Stage 9, the Select tool | Done on 2026-11-16. See below |
-| Code | Stages 0 to 9 done. Stage 10, the Shape tool and point editing, is next |
+| Code | Stages 0 to 9 done. Stage 10, the Shape tool and point editing, is under way: its steps are written |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -172,7 +172,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 10 of [plan.md](plan.md): the Shape tool and point editing.** Its first step writes its steps into the plan and its choices into the architecture docs.
+1. **Stage 10 of [plan.md](plan.md#stage-10-in-steps): the Shape tool and point editing.** Step 1 is done; step 2 builds `EntityNamer` and `createShape`.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

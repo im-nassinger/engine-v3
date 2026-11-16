@@ -9,7 +9,8 @@
 | File | Covers |
 |---|---|
 | [history.md](history.md) | Changes, edit transactions, history steps, joining, drags, what is and isn't a step |
-| [selection-and-tools.md](selection-and-tools.md) | The selection, the current group, hit testing, the tool contract, the Select, Shape and Joint tools, snapping, Esc |
+| [selection-and-tools.md](selection-and-tools.md) | The selection, the current group, hit testing, the tool contract, the Select and Joint tools, snapping, Esc |
+| [drawing-and-points.md](drawing-and-points.md) | The Shape tool, point editing, and stage 10's choices |
 | [inspector-and-entities.md](inspector-and-entities.md) | What the Inspector shows and how a typed value becomes a change, editor messages, the Entities panel's rows and drops |
 | [clipboard-and-shortcuts.md](clipboard-and-shortcuts.md) | Copy, cut, paste and duplicate, commands and the main menu, shortcuts and keys |
 
