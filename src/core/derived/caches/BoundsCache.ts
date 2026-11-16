@@ -77,6 +77,12 @@ export class BoundsCache {
         return bounds;
     }
 
+    // A body's pose changed during play, which moves it and its descendants like a new TransformComponent.
+    markBodyMoved(entity: Entity) {
+        this.markMoved(entity);
+        this.markParentsOf(entity);
+    }
+
     get cachedCount() {
         return this.ownBounds.size + this.subtreeBounds.size;
     }

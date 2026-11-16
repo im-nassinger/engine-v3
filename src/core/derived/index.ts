@@ -1,3 +1,4 @@
+export type { BodyMatrixSource } from './caches/BodyMatrixSource.ts';
 export { BoundsCache } from './caches/BoundsCache.ts';
 export { DerivedCaches } from './DerivedCaches.ts';
 export { HiddenCache } from './caches/HiddenCache.ts';

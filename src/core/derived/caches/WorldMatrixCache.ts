@@ -3,21 +3,31 @@ import type { Entity, Level, LevelUpdate } from '../../level/index.ts';
 import type { Unsubscribe } from '../../events/index.ts';
 import { Matrix2D } from '../../geometry/index.ts';
 
+import type { BodyMatrixSource } from './BodyMatrixSource.ts';
 import { PerEntityValues } from './PerEntityValues.ts';
 
 // Each entity's matrix from its own space to level positions. Marking is cheap and computing is lazy:
-// a change marks the subtree, and a matrix is worked out only when asked for.
+// a change marks the subtree, and a matrix is worked out only when asked for. During play, a body
+// entity's matrix comes from the body matrix source instead, and children follow it as usual.
 export class WorldMatrixCache {
     private readonly matrices = new PerEntityValues<Matrix2D>();
+    private readonly bodyMatrices: BodyMatrixSource | undefined;
     private readonly unsubscribe: Unsubscribe;
 
-    constructor(level: Level) {
+    constructor(level: Level, bodyMatrices?: BodyMatrixSource) {
+        this.bodyMatrices = bodyMatrices;
         this.unsubscribe = level.signals.updated.subscribe((update) => this.markStale(update));
     }
 
     matrixOf(entity: Entity): Matrix2D {
         const cached = this.matrices.find(entity);
         if (cached !== undefined) return cached;
+
+        const bodyMatrix = this.bodyMatrices?.matrixOf(entity);
+        if (bodyMatrix !== undefined) {
+            this.matrices.store(entity, bodyMatrix);
+            return bodyMatrix;
+        }
 
         const ownMatrix = this.ownMatrixOf(entity);
         const parent = entity.parent;
@@ -31,6 +41,11 @@ export class WorldMatrixCache {
         this.matrices.store(entity, matrix);
 
         return matrix;
+    }
+
+    // A body's pose changed in the body matrix source, so its matrix and its descendants' are stale.
+    markBodyMoved(entity: Entity) {
+        this.matrices.markSubtree(entity);
     }
 
     get cachedCount() {

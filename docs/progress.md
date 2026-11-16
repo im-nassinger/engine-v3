@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 13, step 6 of 11: `PhysicsSceneBuilder` in `core/physics/scene/` builds the play copy into bodies and surfaces in Entities panel order, with one Static ground body for loose surfaces and the Walls, each member's pieces moved into its body's space, with 8 tests against a recording `PhysicsWorld`. Next is step 7, `Simulation`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 13, step 7 of 11: `Simulation` in `core/simulation/` runs `InputPhase`, `PhysicsPhase` and `EndOfTickPhase` each tick, with body poses as the play copy's state through `BodyMatrices`, `takeReport()`, `stateHash()` and `startSimulation`, with 7 tests against a scripted `PhysicsWorld` and 2 with Box2D. Next is step 8, `LevelBoundsPhase`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -205,7 +205,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 13 of [plan.md](plan.md#stage-13-in-steps): physics and the determinism test.** Steps 1 to 6 are done; step 7, `Simulation` and its phases, is next.
+1. **Stage 13 of [plan.md](plan.md#stage-13-in-steps): physics and the determinism test.** Steps 1 to 7 are done; step 8, `LevelBoundsPhase` with the hard limit and the maximum level size, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

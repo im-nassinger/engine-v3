@@ -3,7 +3,8 @@ import { describe, expect, test } from 'vitest';
 import { TransformComponent } from '../../components/index.ts';
 import type { Entity } from '../../level/index.ts';
 import { Level } from '../../level/index.ts';
-import type { Matrix2D, TransformValues } from '../../geometry/index.ts';
+import { Matrix2D } from '../../geometry/index.ts';
+import type { TransformValues } from '../../geometry/index.ts';
 
 import { WorldMatrixCache } from './WorldMatrixCache.ts';
 
@@ -130,5 +131,34 @@ describe('WorldMatrixCache', () => {
         transform.set('skew', newValues.skew);
 
         expectMatricesClose(cache.matrixOf(moved), oldLevelMatrix, 1e-9);
+    });
+
+    test("a body's matrix comes from the body matrix source, and its children follow it", () => {
+        const level = Level.createNew();
+        const group = placeAt(level, level.world, 100, 50);
+        const body = placeAt(level, group, 10, 5);
+        const child = placeAt(level, body, 1, 2);
+        let bodyMatrix = Matrix2D.fromTransform({
+            position: { x: 300, y: 0 },
+            rotation: 0,
+            scale: { x: 1, y: 1 },
+            skew: 0,
+        });
+        const source = { matrixOf: (entity: Entity) => (entity === body ? bodyMatrix : undefined) };
+        const cache = new WorldMatrixCache(level, source);
+
+        expect(cache.matrixOf(child).apply({ x: 0, y: 0 })).toEqual({ x: 301, y: 2 });
+
+        bodyMatrix = Matrix2D.fromTransform({
+            position: { x: 400, y: 0 },
+            rotation: 0,
+            scale: { x: 1, y: 1 },
+            skew: 0,
+        });
+        expect(cache.matrixOf(child).apply({ x: 0, y: 0 })).toEqual({ x: 301, y: 2 });
+
+        cache.markBodyMoved(body);
+        expect(cache.matrixOf(child).apply({ x: 0, y: 0 })).toEqual({ x: 401, y: 2 });
+        expect(cache.matrixOf(group).apply({ x: 0, y: 0 })).toEqual({ x: 100, y: 50 });
     });
 });
