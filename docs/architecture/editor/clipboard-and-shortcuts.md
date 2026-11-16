@@ -204,3 +204,8 @@ Made under the standing yes (2026-11-16), before building. The [plan](../../plan
 - **`ClipboardBridge`** in `adapters/browser/clipboard/` listens on the window in the capture phase, like `KeyboardInput`, and leaves the events to the browser when `focusPlaceOf` says a text field or the code editor has the keyboard. It stops the default only when the editor used the event: a refused copy or cut (the World alone, nothing selected) shows its reason and lets the browser copy whatever text is selected on the page.
 - **The menu entries' asynchronous clipboard and the mouse position for paste** were already wired in step 5 (`navigator.clipboard` and `MousePosition`); `EditorComposition` now also connects the bridge.
 - **The browser tests give a made-up event its `DataTransfer` directly**, since Firefox copies the data handed to an event's constructor and keeps a made-up paste's data unreadable. Real events are readable and writable in all three browsers.
+
+**As built, step 8 (standing yes, 2026-11-16):**
+
+- **The Playwright tests press the real keys** (`ControlOrMeta+C`, `X`, `V`, `D`): all three browsers send real `copy`, `cut` and `paste` events, and a copy's text comes back on the next paste, so no test makes up an event. *Why: it proves the dispatcher really leaves the keys to the browser.*
+- **Plain and damaged text reach the clipboard as a person's would:** typed into a text field the test adds, selected and copied with the keys, which a text field leaves to the browser. The damaged text is valid JSON with the tag and the two versions but no entities, so it is `refused` rather than `notOurs`.
