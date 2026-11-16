@@ -5,6 +5,7 @@ import type {
     BodyHandle,
     BodyPose,
     BodyPoses,
+    JointHandle,
     PhysicsEngine,
     PhysicsWorld,
 } from '../../physics/index.ts';
@@ -19,14 +20,16 @@ type ScriptedBody = {
 };
 
 // A PhysicsWorld where every Dynamic body falls 10 px a step and nothing else moves, unless a test sets a
-// body's next pose itself. A destroyed body stops moving and is listed.
+// body's next pose itself. A destroyed body stops moving and is listed, and so is a destroyed joint.
 export class ScriptedWorld implements PhysicsWorld {
     static readonly FALL_PER_STEP = FALL_PER_STEP;
     readonly destroyedEntities: EntityId[] = [];
+    readonly destroyedJoints: JointHandle[] = [];
     falling = true;
     private readonly bodies: ScriptedBody[] = [];
     private readonly movedLastStep: ScriptedBody[] = [];
     private readonly nextPoses = new Map<EntityId, BodyPose>();
+    private jointCount = 0;
 
     createBody(definition: BodyDefinition): BodyHandle {
         const pose = { x: definition.position.x, y: definition.position.y, angle: definition.angle };
@@ -40,10 +43,16 @@ export class ScriptedWorld implements PhysicsWorld {
     }
 
     addSurface() {}
-    createJoint() {
-        return 0;
+    createJoint(): JointHandle {
+        this.jointCount += 1;
+
+        return this.jointCount - 1;
     }
-    destroyJoint() {}
+
+    destroyJoint(joint: JointHandle) {
+        this.destroyedJoints.push(joint);
+    }
+
     setGravity() {}
 
     step() {

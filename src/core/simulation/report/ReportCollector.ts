@@ -1,17 +1,19 @@
 import type { EntityId } from '../../fields/index.ts';
-import type { Point } from '../../geometry/index.ts';
+import type { PathGeometry, Point } from '../../geometry/index.ts';
 import type { BodyPose } from '../../physics/index.ts';
 
 import type { RemovalCause } from '../removal/RemovalMarks.ts';
 
 import { POSE_STRIDE } from './TickReport.ts';
-import type { TickReport } from './TickReport.ts';
+import type { JointPath, TickReport } from './TickReport.ts';
 
-// Gathers what changed over the ticks since the last report, keeping only each body's latest pose.
+// Gathers what changed over the ticks since the last report, keeping only each body's latest pose and each
+// joint's latest path.
 export class ReportCollector {
     private readonly movedPoses = new Map<EntityId, BodyPose>();
     private readonly removed: EntityId[] = [];
     private readonly removedPastHardLimit: EntityId[] = [];
+    private readonly changedPaths = new Map<EntityId, PathGeometry>();
 
     bodyMoved(entity: EntityId, pose: BodyPose) {
         this.movedPoses.set(entity, pose);
@@ -22,9 +24,21 @@ export class ReportCollector {
         this.movedPoses.delete(entity);
     }
 
+    pathChanged(joint: EntityId, path: PathGeometry) {
+        this.changedPaths.set(joint, path);
+    }
+
+    // A joint that went with the body at one of its ends. Only bodies go past the hard limit, so it is
+    // never in removedPastHardLimit.
+    jointRemoved(joint: EntityId) {
+        this.changedPaths.delete(joint);
+        this.removed.push(joint);
+    }
+
     // The entity at the top of what was removed; the page removes everything inside it too.
     entityRemoved(entity: EntityId, cause: RemovalCause) {
         this.movedPoses.delete(entity);
+        this.changedPaths.delete(entity);
         this.removed.push(entity);
         if (cause === 'pastHardLimit') {
             this.removedPastHardLimit.push(entity);
@@ -45,10 +59,15 @@ export class ReportCollector {
 
         const removed = [...this.removed];
         const removedPastHardLimit = [...this.removedPastHardLimit];
+        const paths: JointPath[] = [];
+        for (const [entity, path] of this.changedPaths) {
+            paths.push({ entity, path });
+        }
         this.movedPoses.clear();
         this.removed.length = 0;
         this.removedPastHardLimit.length = 0;
+        this.changedPaths.clear();
 
-        return { lastTick, poses, removed, removedPastHardLimit, camera };
+        return { lastTick, poses, removed, removedPastHardLimit, paths, camera };
     }
 }

@@ -1,6 +1,7 @@
 import type { TickContext, TickPhase } from '../run/TickPhase.ts';
 
-// One physics step of 1/60 s, then the moved bodies' poses, which their entities and children follow.
+// One physics step of 1/60 s, then the moved bodies' poses, which their entities, their children and the
+// joints moving with them follow.
 export class PhysicsPhase implements TickPhase {
     run(tick: TickContext) {
         const { scene, poses, bodyMatrices, caches } = tick.run;
@@ -14,6 +15,9 @@ export class PhysicsPhase implements TickPhase {
             if (entity === undefined) continue;
 
             caches.bodyMoved(entity);
+            for (const follower of bodyMatrices.followersOf(entity)) {
+                caches.bodyMoved(follower);
+            }
         }
     }
 }

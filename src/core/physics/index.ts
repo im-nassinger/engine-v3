@@ -14,6 +14,7 @@ export type {
 } from './contracts/JointDefinition.ts';
 export type { PhysicsWorld } from './contracts/PhysicsWorld.ts';
 export type { SurfaceDefinition, SurfacePiece } from './contracts/SurfaceDefinition.ts';
+export { jointPathPoints } from './joint-paths/jointPathPoints.ts';
 export { countBodyChanges } from './merging/bodyChanges.ts';
 export type { PlannedMove } from './merging/bodyChanges.ts';
 export { mergesInto } from './merging/mergesInto.ts';

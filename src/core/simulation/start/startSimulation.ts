@@ -6,8 +6,10 @@ import { BodyPoses, PhysicsSceneBuilder } from '../../physics/index.ts';
 import type { PhysicsEngine } from '../../physics/index.ts';
 
 import { BodyMatrices } from '../bodies/BodyMatrices.ts';
+import { PlayJoints } from '../joints/PlayJoints.ts';
 import { EndOfTickPhase } from '../phases/EndOfTickPhase.ts';
 import { InputPhase } from '../phases/InputPhase.ts';
+import { JointPathPhase } from '../phases/JointPathPhase.ts';
 import { LevelBoundsPhase } from '../phases/LevelBoundsPhase.ts';
 import { PhysicsPhase } from '../phases/PhysicsPhase.ts';
 import { RemovalMarks } from '../removal/RemovalMarks.ts';
@@ -36,9 +38,27 @@ export function startSimulation(levelData: LevelData, engine: PhysicsEngine, sta
         caches.bodyMoved(body.entity);
     }
 
+    // Read before any joint follows its body, from the joints' level matrices at the start.
+    const joints = PlayJoints.fromScene(scene.joints, caches.worldMatrices, bodyMatrices);
+
+    // Each joint moves with its A's body; a joint whose A is the ground stays where it is.
+    for (const joint of scene.joints) {
+        if (joint.bodyA === undefined) continue;
+
+        const levelMatrix = caches.worldMatrices.matrixOf(joint.entity);
+        bodyMatrices.addFollower(joint.entity, joint.bodyA, levelMatrix);
+        caches.bodyMoved(joint.entity);
+    }
+
     const removals = new RemovalMarks();
-    const run = { level, caches, scene, poses, bodyMatrices, removals, report: new ReportCollector() };
-    const phases = [new InputPhase(), new PhysicsPhase(), new LevelBoundsPhase(), new EndOfTickPhase()];
+    const run = { level, caches, scene, poses, bodyMatrices, joints, removals, report: new ReportCollector() };
+    const phases = [
+        new InputPhase(),
+        new PhysicsPhase(),
+        new JointPathPhase(),
+        new LevelBoundsPhase(),
+        new EndOfTickPhase(),
+    ];
     const simulation = new Simulation(run, start, phases);
 
     return { ok: true, value: simulation };
