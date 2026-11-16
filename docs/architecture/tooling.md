@@ -105,7 +105,7 @@ tests/
 | `node` | `src/**/*.test.ts` and `tests/guards/**/*.test.ts`, without the browser ones | Node |
 | `browser` | `**/*.browser.test.ts` | Chromium, Firefox and WebKit, headless |
 
-- **`playwright.config.ts`:** runs `tests/e2e/` against `vite preview` of the built page, in Chromium. More browsers when the journeys of stage 17 need them.
+- **`playwright.config.ts`:** runs `tests/e2e/` against `vite preview` of the built page, in Chromium, Firefox and WebKit, from stage 10 (standing yes, 2026-11-16: stage 10's plan asked for three browsers, and drawing leans on each browser's mouse and keys).
 - **Prettier:** 4 spaces, single quotes, 120 columns, as the stack says. It skips `docs/` (the tables and `review.html` are laid out by hand), `tools/*.js`, `dist/` and `package-lock.json`.
 
 ## Which tool keeps which rule
@@ -213,7 +213,7 @@ One workflow, `.github/workflows/ci.yml`:
 |---|---|---|---|
 | check | `ubuntu-24.04` and `ubuntu-24.04-arm` | `npm ci`, `npm run check` | Every push |
 | browser | `ubuntu-24.04` | Installs the three browsers, `npm run test:browser`, `npm run test:performance`, `npm run build` | Every push |
-| journeys | `ubuntu-24.04` | `npm run test:e2e` | Pushes to master |
+| journeys | `ubuntu-24.04` | Installs the three browsers, `npm run test:e2e` | Pushes to master |
 
 - Node comes from `.node-version`. The actions are `actions/checkout@v7` and `actions/setup-node@v7`, with npm's cache.
 - `npx playwright install --with-deps` installs the browsers' system packages on the runner. On the laptop WebKit needed three (`libevent-2.1-7t64`, `libavif16`, `libmanette-0.2-0`), installed once with apt.

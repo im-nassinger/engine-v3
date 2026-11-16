@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 10, step 9 of 11: the page, with the Shape tool in the toolbar (key 4), the `ToolOptions` strip of Rectangle, Circle and Polygon, the Inspector hidden while the Shape tool is active, and the three tool hints in the status bar. Next is step 10: the Playwright tests. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 10, step 10 of 11: the Playwright tests of the Shape tool and point editing, eight of them, with Playwright now running in Chromium, Firefox and WebKit (114 tests pass in the three). Next is step 11: the docs. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
