@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 11, step 3 of 9: `IdRemapping` and `LevelReader.checkSubtree` are built, with 1,338 tests in Node. Next is step 4: `PastePlacement` and the paste edit. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 11, step 4 of 9: `PastePlacement` and the paste edit `pasteEntities` are built, and the clipboard text holds the copied set's box instead of its centre, with 1,357 tests in Node. Next is step 5: `EditorClipboard` and the Cut, Copy and Paste commands. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -31,7 +31,7 @@
 | Stage 8, the Inspector | Done on 2026-11-15. See below |
 | Stage 9, the Select tool | Done on 2026-11-16. See below |
 | Stage 10, the Shape tool and point editing | Done on 2026-11-16. See below |
-| Code | Stages 0 to 10 done. Stage 11, copy and paste, is under way: steps 1 to 3 are done |
+| Code | Stages 0 to 10 done. Stage 11, copy and paste, is under way: steps 1 to 4 are done |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 

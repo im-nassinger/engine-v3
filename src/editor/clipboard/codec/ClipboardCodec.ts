@@ -1,4 +1,3 @@
-import { TransformComponent } from '../../../core/components/index.ts';
 import type { DerivedCaches } from '../../../core/derived/index.ts';
 import { Bounds } from '../../../core/geometry/index.ts';
 import type { Entity, Level } from '../../../core/level/index.ts';
@@ -9,6 +8,7 @@ import { isPlainObject } from '../../../core/fields/index.ts';
 import { CLIPBOARD_KEYS, CLIPBOARD_TAG, CLIPBOARD_TAG_KEY } from './ClipboardText.ts';
 import type { ClipboardDecodeResult } from './ClipboardText.ts';
 import { copiedRoots } from './copiedRoots.ts';
+import { withRootTransform } from '../placement/rootTransform.ts';
 
 // The open level a copy is made from: an OpenLevel is one.
 export type CopySource = {
@@ -18,8 +18,6 @@ export type CopySource = {
 };
 
 type RawRecord = Readonly<Record<string, unknown>>;
-
-const TRANSFORM_TYPE_NAME = TransformComponent.schema.typeName;
 
 function isWholeNumber(raw: unknown): raw is number {
     return typeof raw === 'number' && Number.isSafeInteger(raw);
@@ -63,7 +61,7 @@ export class ClipboardCodec {
             formatVersion: CURRENT_FORMAT_VERSION,
             physicsVersion: PhysicsVersions.current,
             sourceToken: source.sourceToken,
-            centre: centreOf(roots, source),
+            box: boxText(roots, source),
             entities: entitiesData,
         };
 
@@ -91,18 +89,13 @@ export class ClipboardCodec {
         if (worldInverse === undefined) throw new Error("The World's TransformComponent is never changed.");
 
         const levelTransform = worldInverse.multiply(worldMatrices.matrixOf(root)).decompose();
-        const transform = new TransformComponent(levelTransform);
-        const transformData = this.writer.writeNewEntity(root.id, [transform]).components[TRANSFORM_TYPE_NAME];
-        if (transformData === undefined) throw new Error('writeNewEntity writes every component it is given.');
 
-        const components = { ...data.components, [TRANSFORM_TYPE_NAME]: transformData };
-
-        return { ...data, components };
+        return withRootTransform(data, levelTransform, this.writer);
     }
 }
 
-// The middle of the roots' box in level positions. A root that draws nothing counts as its origin.
-function centreOf(roots: readonly Entity[], source: CopySource) {
+// The roots' box in level positions. A root that draws nothing counts as its origin.
+function boxText(roots: readonly Entity[], source: CopySource) {
     const { bounds, worldMatrices } = source.caches;
     let box: Bounds | undefined;
 
@@ -114,7 +107,7 @@ function centreOf(roots: readonly Entity[], source: CopySource) {
 
     if (box === undefined) throw new Error('A copy has at least one root.');
 
-    return box.centre;
+    return { left: box.left, top: box.top, right: box.right, bottom: box.bottom };
 }
 
 function decodeTagged(raw: RawRecord): ClipboardDecodeResult {
@@ -131,17 +124,34 @@ function decodeTagged(raw: RawRecord): ClipboardDecodeResult {
     const sourceToken = raw['sourceToken'];
     if (typeof sourceToken !== 'string') return damaged('the source token is not text');
 
-    const centre = raw['centre'];
-    const isPoint = isPlainObject(centre) && Object.keys(centre).length === 2;
-    const x = isPoint ? centre['x'] : undefined;
-    const y = isPoint ? centre['y'] : undefined;
-    if (!isFiniteNumber(x) || !isFiniteNumber(y)) return damaged('the centre is not a point');
+    const box = readBox(raw['box']);
+    if (box === undefined) return damaged('the box is not a box');
 
     const entities = raw['entities'];
     if (!Array.isArray(entities)) return damaged('the entities are not a list');
     if (entities.length === 0) return damaged('the entities are an empty list');
 
-    return { kind: 'entities', fragment: { sourceToken, centre: { x, y }, entities } };
+    return { kind: 'entities', fragment: { sourceToken, box, entities } };
+}
+
+const BOX_KEYS = ['left', 'top', 'right', 'bottom'];
+
+// Four finite numbers, no more, the right not left of the left and the bottom not above the top.
+function readBox(raw: unknown) {
+    if (!isPlainObject(raw)) return undefined;
+
+    const keys = Object.keys(raw);
+    const hasBoxKeys = keys.length === BOX_KEYS.length && BOX_KEYS.every((key) => keys.includes(key));
+    if (!hasBoxKeys) return undefined;
+
+    const { left, top, right, bottom } = raw;
+    if (!isFiniteNumber(left) || !isFiniteNumber(top) || !isFiniteNumber(right) || !isFiniteNumber(bottom)) {
+        return undefined;
+    }
+
+    if (right < left || bottom < top) return undefined;
+
+    return new Bounds(left, top, right, bottom);
 }
 
 // The same rules as a level file's: only a newer game writes a version above this one's.

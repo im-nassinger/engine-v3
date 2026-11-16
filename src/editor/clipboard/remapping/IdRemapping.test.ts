@@ -9,6 +9,7 @@ import {
     createV1Registry,
 } from '../../../core/components/index.ts';
 import { DerivedCaches } from '../../../core/derived/index.ts';
+import { Bounds } from '../../../core/geometry/index.ts';
 import { Level } from '../../../core/level/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { FormatUpgrader, LevelReader, LevelWriter, V1_LEVEL_LIMITS } from '../../../core/level-data/index.ts';
@@ -165,7 +166,7 @@ describe('IdRemapping', () => {
         const level = Level.createNew();
         const fragment: EntityFragment = {
             sourceToken: 'opening-1',
-            centre: { x: 0, y: 0 },
+            box: new Bounds(0, 0, 0, 0),
             entities: [
                 {
                     id: 7,
@@ -201,7 +202,7 @@ describe('IdRemapping', () => {
             { id: 'ten', components: { JointComponent: { a: { entity: -1 }, b: 'none' } }, children: {} },
             unknownComponent,
         ];
-        const fragment: EntityFragment = { sourceToken: 'opening-1', centre: { x: 0, y: 0 }, entities: damaged };
+        const fragment: EntityFragment = { sourceToken: 'opening-1', box: new Bounds(0, 0, 0, 0), entities: damaged };
 
         const data = remapping.remap(fragment, { level, sourceToken: 'opening-2' });
 

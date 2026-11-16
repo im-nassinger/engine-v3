@@ -125,7 +125,7 @@ The text is JSON with a tag, as the tech notes suggest:
   "formatVersion": 1,
   "physicsVersion": 1,
   "sourceToken": "k3x9...",
-  "centre": { "x": 1200, "y": 640 },
+  "box": { "left": 1160, "top": 620, "right": 1240, "bottom": 660 },
   "entities": [ { "id": 41, "hidden": false, "locked": false, "components": { "...": {} }, "children": [] } ]
 }
 ```
@@ -145,7 +145,7 @@ Made under the standing yes (2026-11-16), before building. The [plan](../../plan
 - **The commands live in a new `editor/commands/clipboard/`**: `CutCommand`, `CopyCommand`, `PasteCommand` and `DuplicateCommand`, in the Edit menu's second section before Delete (orders 10 to 40), with Ctrl+X, Ctrl+C, Ctrl+V and Ctrl+D. `ClipboardCodec`, `IdRemapping`, `PastePlacement` and `EditorClipboard` are in `editor/clipboard/`, as [parts-and-folders.md](../parts-and-folders.md) places them. *Why: the commands are what the menu and the keys run, the rest is the clipboard's own rules, and each folder keeps one job.*
 - **What is copied:** the selection, without the World and the camera (the skip rule), and without any entity inside another selected one, since its parent brings it. The roots keep panel order. Joints come only when selected, as the requirement says, so a crate copied with its hinge unselected pastes without the hinge.
 - **Each copied root's TransformComponent is written as if its parent were the World**: from its level matrix, decomposed, so a child of a rotated, skewed group copies as it looks on screen. On paste the roots are put in the current group's space with the same maths as moving between groups in place (`transformUnder`). *Why: a paste can land in any group, so the text must not depend on where the copy came from.*
-- **The clipboard's `centre`** is the middle of the copied set's level box (`BoundsCache`), which `PastePlacement` moves to the mouse or the view's centre.
+- **The clipboard's `box`** is the copied set's level box (`BoundsCache`), whose middle `PastePlacement` moves to the mouse or the view's centre. (Step 4 changed this from a `centre`, below.)
 - **Grid snapping on paste** moves the set so its box's top left lands on the nearest grid point, after centring (*proposal*). *Why: a drawn shape's corners snap to the grid, so a pasted copy of it lines up with the others; snapping the centre would put grid-sized shapes half a step off.*
 - **The token:** `OpenLevel.sourceToken` comes from a token maker the session is given (`crypto.randomUUID` in `app`), made each time a level is opened, never saved. *Why: `editor` can't reach the browser's random numbers, and a test needs a known token.*
 - **`IdRemapping`'s links pointing outside the pasted set:** from the same opening, the original id is kept, whether its entity still exists or was deleted (it then reads `missing entity`, and undo of the delete brings the link back, since ids are never reused in a session). From another opening, the field gets a fresh id from the level's allocator that no entity has, so it reads `missing entity`. *Why: the requirement says such a link becomes missing; keeping the old number could point at an unrelated entity in this level, and `null` would read as none instead of missing.*
@@ -161,10 +161,10 @@ Made under the standing yes (2026-11-16), before building. The [plan](../../plan
 **As built, step 2 (standing yes, 2026-11-16):**
 
 - **`ClipboardCodec` takes only the `LevelWriter`**, and `encode(entities, source)` takes a `CopySource` (`level`, `caches`, `sourceToken`), which an `OpenLevel` is. *Why: encoding needs the level matrices and the boxes, and decoding checks only the text's own shape; the entities inside are checked by `LevelReader` against the level and group they are pasted into (step 3), since only then are the ids in use and the depth known.*
-- **`decode`'s refusal carries the reader's `ReadRefusal`**, not a sentence: `{ kind: 'refused', refusal }`. *Why: the limits and the damaged text each get their own status text, which the paste writes, as `editor/saving` writes the file's.* A version above the game's is `newerVersion`, a missing or unknown key, a bad source token or centre, and an empty or missing entity list are `damaged`.
+- **`decode`'s refusal carries the reader's `ReadRefusal`**, not a sentence: `{ kind: 'refused', refusal }`. *Why: the limits and the damaged text each get their own status text, which the paste writes, as `editor/saving` writes the file's.* A version above the game's is `newerVersion`, a missing or unknown key, a bad source token or box, and an empty or missing entity list are `damaged`.
 - **`copiedRoots(level, entities)`** is its own function in `editor/clipboard/codec/`, so the commands can tell what is left before they encode; `encode` throws when nothing is. The fragment's `entities` stay `unknown` until the paste reads them.
 - **The token maker** is `TokenMaker` in `editor/session`; `EditorSession` counts `opening-1`, `opening-2` when none is given, which only tests rely on, and `EditorComposition` passes `crypto.randomUUID`.
-- **A root that draws nothing counts as its origin** for the centre, as it does for Group's.
+- **A root that draws nothing counts as its origin** for the box, as it does for Group's.
 
 **As built, step 3 (standing yes, 2026-11-16):**
 
@@ -172,3 +172,11 @@ Made under the standing yes (2026-11-16), before building. The [plan](../../plan
 - **It works on the raw data, before the reader checks it**, and passes anything not shaped as an entity on as it is, so the reader refuses it with its own reason. *Why: the reader stays the only code that checks data, and remapping first lets it check the ids the level will really get.*
 - **Only fields of the `entity` kind are rewired**, found through the registry's schemas, so a v2 component with an entity field needs nothing here. Two links to the same outside entity from another opening get the same fresh id. A `null` link stays empty.
 - **`LevelReader.checkSubtree(level, raw, parent)`** gives a `ReadCheck` (`{ ok: true }` or the refusal) by running `readSubtree`'s reading and checks without building.
+
+**As built, step 4 (standing yes, 2026-11-16):**
+
+- **The clipboard text holds the set's `box`** (`left`, `top`, `right`, `bottom`), not its `centre`. *Why: snapping the box's top left to the grid needs the box, and its middle is the centre.* A box with a missing or extra side, a side that isn't a finite number, or a right left of its left is `damaged`.
+- **`PastePlacement`** in `editor/clipboard/placement/` takes the box, the destination and the grid size (undefined with snapping off) and gives the `offset`; `placeRoot` turns a root's copied values into values inside the current group from the World's and the group's level matrices. `PastePlacement.destinationOf(mouse, viewMiddle)` picks the mouse when it is over the level view. *Why: the maths is the paste's own, so it doesn't reach into `editor/commands` for `transformUnder`.*
+- **`readRootTransform` and `withRootTransform`** read and replace a root's TransformComponent in its data; the codec writes its root's TransformComponent as if its parent were the World through the same `withRootTransform`.
+- **`pasteEntities(openLevel, tools, fragment, spot)`** in `editor/commands/clipboard/` is the paste edit, as `createShape` is the Shape tool's: remap, `checkSubtree`, place, then one `AddEntitiesChange` at index 0 of the current group, the roots selected. The command (step 5) passes the `PasteSpot` (destination and grid size). The step names a single root from its data's NameComponent, `Entity` when it has none.
+- **`pasteRefusalText`** writes the status text: the three limits with the reader's own number (`A level holds at most 100,000 entities`), `The pasted entities can't be read: they come from a newer version of the game`, and `...: they are damaged` for anything else. *Why: the reader's damaged detail is for developers, never shown.*

@@ -5,3 +5,5 @@ export type { ClipboardDecodeResult, EntityFragment } from './codec/ClipboardTex
 export { copiedRoots } from './codec/copiedRoots.ts';
 export { IdRemapping } from './remapping/IdRemapping.ts';
 export type { PasteTarget } from './remapping/IdRemapping.ts';
+export { PastePlacement } from './placement/PastePlacement.ts';
+export { readRootTransform, withRootTransform } from './placement/rootTransform.ts';

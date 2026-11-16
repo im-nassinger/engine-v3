@@ -12,6 +12,7 @@ import {
     createV1Registry,
 } from '../../../core/components/index.ts';
 import { DerivedCaches } from '../../../core/derived/index.ts';
+import { Bounds } from '../../../core/geometry/index.ts';
 import type { Matrix2D } from '../../../core/geometry/index.ts';
 import { Level } from '../../../core/level/index.ts';
 import {
@@ -115,7 +116,7 @@ function largestDifference(first: Matrix2D, second: Matrix2D) {
 }
 
 describe('ClipboardCodec.encode', () => {
-    test('writes the tag, the two versions, the source token, the centre and the entities', () => {
+    test('writes the tag, the two versions, the source token, the box and the entities', () => {
         const { source, crate } = buildLevel();
         const record = parsedText(codec.encode([crate], source));
 
@@ -124,14 +125,14 @@ describe('ClipboardCodec.encode', () => {
             'formatVersion',
             'physicsVersion',
             'sourceToken',
-            'centre',
+            'box',
             'entities',
         ]);
         expect(record['engine-v3']).toBe('entities');
         expect(record['formatVersion']).toBe(CURRENT_FORMAT_VERSION);
         expect(record['physicsVersion']).toBe(PhysicsVersions.current);
         expect(record['sourceToken']).toBe('opening-1');
-        expect(record['centre']).toEqual({ x: 300, y: 0 });
+        expect(record['box']).toEqual({ left: 279, top: -11, right: 321, bottom: 11 });
     });
 
     test('leaves out the World, the camera and anything inside another copied entity, in panel order', () => {
@@ -190,14 +191,19 @@ describe('ClipboardCodec.encode', () => {
         expect(largestDifference(levelMatrixOfRoot(fragment, 0), onScreen)).toBeLessThan(1e-9);
     });
 
-    test("the centre is the middle of the copied set's box, a root that draws nothing counting as its origin", () => {
+    test("the box is the copied set's box, a root that draws nothing counting as its origin", () => {
         const { source, crate, rope } = buildLevel();
         const record = parsedText(codec.encode([crate, rope], source));
 
         // The rope draws nothing, so its origin at 0, 0 counts, and the crate's box is the right end.
         const crateBox = source.caches.bounds.subtreeBoundsOf(crate);
 
-        expect(record['centre']).toEqual({ x: (crateBox?.right ?? Number.NaN) / 2, y: 0 });
+        expect(record['box']).toEqual({
+            left: 0,
+            top: crateBox?.top,
+            right: crateBox?.right,
+            bottom: crateBox?.bottom,
+        });
     });
 });
 
@@ -212,12 +218,12 @@ describe('ClipboardCodec.decode', () => {
         return JSON.stringify(record);
     }
 
-    test('gives the source token, the centre and the entities', () => {
+    test('gives the source token, the box and the entities', () => {
         const { source, crate } = buildLevel();
         const fragment = requireFragment(codec.decode(codec.encode([crate], source)));
 
         expect(fragment.sourceToken).toBe('opening-1');
-        expect(fragment.centre).toEqual({ x: 300, y: 0 });
+        expect(fragment.box).toEqual(new Bounds(279, -11, 321, 11));
         expect(fragment.entities).toHaveLength(1);
     });
 
@@ -235,13 +241,14 @@ describe('ClipboardCodec.decode', () => {
 
     test.each([
         ['an unknown key', tagged({ extra: 1 })],
-        ['a missing key', tagged({}, ['centre'])],
+        ['a missing key', tagged({}, ['box'])],
         ['a format version that is not a whole number', tagged({ formatVersion: 1.5 })],
         ['a physics version of 0', tagged({ physicsVersion: 0 })],
         ['a source token that is not text', tagged({ sourceToken: 7 })],
-        ['a centre that is not a point', tagged({ centre: { x: 1 } })],
-        ['a centre with an extra value', tagged({ centre: { x: 1, y: 2, z: 3 } })],
-        ['a centre that is not finite', tagged({ centre: { x: 'a', y: 2 } })],
+        ['a box with a missing side', tagged({ box: { left: 1, top: 2, right: 3 } })],
+        ['a box with an extra value', tagged({ box: { left: 1, top: 2, right: 3, bottom: 4, z: 5 } })],
+        ['a box side that is not a number', tagged({ box: { left: 'a', top: 2, right: 3, bottom: 4 } })],
+        ['a box whose right is left of its left', tagged({ box: { left: 3, top: 2, right: 1, bottom: 4 } })],
         ['entities that are not a list', tagged({ entities: {} })],
         ['an empty list of entities', tagged({ entities: [] })],
     ])('a damaged text, %s, is refused', (_what, text) => {
