@@ -4,7 +4,7 @@ import type { MouseEvent, PointerEvent } from 'react';
 import type { EntityId } from '../../../../core/level/index.ts';
 import type { EntitiesRow } from '../../../../editor/entities-panel/index.ts';
 import type { OpenLevel } from '../../../../editor/session/index.ts';
-import { useEditorSession } from '../../../EditorContext.tsx';
+import { useCommands } from '../../../commands/index.ts';
 import { useVersion } from '../../../hooks/index.ts';
 import { DropLine } from './DropLine/index.ts';
 import { EntitiesListRow } from './EntitiesListRow/index.ts';
@@ -35,7 +35,7 @@ export function EntitiesList({ openLevel }: EntitiesListProps) {
     useVersion(entitiesRows.version);
     const rows = entitiesRows.rows;
 
-    const session = useEditorSession();
+    const { runner } = useCommands();
     const scrollElement = useRef<HTMLDivElement>(null);
     const contentElement = useRef<HTMLDivElement>(null);
     // eslint-disable-next-line react-hooks/incompatible-library -- the component opts out of the compiler above.
@@ -92,7 +92,7 @@ export function EntitiesList({ openLevel }: EntitiesListProps) {
 
     const endRenaming = () => setRenamingId(undefined);
 
-    const [rowDrag] = useState(() => new RowDrag(session.status));
+    const [rowDrag] = useState(() => new RowDrag(runner));
     useVersion(rowDrag.version);
     useEffect(() => () => rowDrag.dispose(), [rowDrag]);
     const dropTarget = rowDrag.target;

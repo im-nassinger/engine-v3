@@ -26,6 +26,7 @@ export { CommandRunner } from './running/CommandRunner.ts';
 export { OpenDialog } from './running/OpenDialog.ts';
 export type { Dialog } from './running/OpenDialog.ts';
 export { moveEntities } from './move/moveEntities.ts';
+export type { MoveOutcome } from './move/moveEntities.ts';
 export { SelectionMove } from './move/SelectionMove.ts';
 export { nudgeSelection } from './move/nudgeSelection.ts';
 export { RenameCommand } from './rename/RenameCommand.ts';

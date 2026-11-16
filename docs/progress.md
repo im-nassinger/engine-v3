@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 9, step 10 of 16 is done: `RotateState`: one shape or group turns around its frame's centre by dragging just outside a corner, as one step `Rotate <name>`, Shift snapping the Rotation to 15°; and `SelectTool.readout` with the texts for moving, resizing and rotating, with 1141 tests in Node. Next is step 11: asking first when a move between groups changes an entity's body. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 9, step 11 of 16 is done: a move between groups, by the Entities panel's drop or by Group, that changes which body an entity belongs to asks `Move into another body?` first, counted by `countBodyChanges` in `core/physics`; Cancel changes nothing and Move is one step kept in place on screen, with 1154 tests in Node. Next is step 12: `PointerInput`, the level view's pointer events and the wheel, wired in `EditorComposition`. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

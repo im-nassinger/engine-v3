@@ -2,10 +2,10 @@ import { VersionCounter } from '../../../../../core/events/index.ts';
 import type { Unsubscribe } from '../../../../../core/events/index.ts';
 import type { EntityId } from '../../../../../core/level/index.ts';
 import { moveEntities } from '../../../../../editor/commands/index.ts';
+import type { CommandRunner, MoveOutcome } from '../../../../../editor/commands/index.ts';
 import { EntitiesDrop } from '../../../../../editor/entities-panel/index.ts';
 import type { DropTarget } from '../../../../../editor/entities-panel/index.ts';
 import type { OpenLevel } from '../../../../../editor/session/index.ts';
-import type { StatusText } from '../../../../../editor/status/index.ts';
 import { dropEntityRowAt } from '../../../../shared/index.ts';
 import { autoScrollSpeed } from './autoScrollSpeed.ts';
 import { dropPointerAt } from './dropPointerAt.ts';
@@ -39,7 +39,7 @@ type Drag = {
 export class RowDrag {
     readonly version = new VersionCounter();
 
-    private readonly status: StatusText;
+    private readonly runner: CommandRunner;
     private press: Press | undefined;
     private drag: Drag | undefined;
     private pointerX = 0;
@@ -50,8 +50,8 @@ export class RowDrag {
     // it. That click must not change the selection.
     private swallowsNextClick = false;
 
-    constructor(status: StatusText) {
-        this.status = status;
+    constructor(runner: CommandRunner) {
+        this.runner = runner;
     }
 
     get target() {
@@ -117,13 +117,12 @@ export class RowDrag {
             return;
         }
 
-        // The panel selects the moved rows itself: a drop into a folded group leaves it folded.
+        // The panel selects the moved rows itself: a drop into a folded group leaves it folded. A drop
+        // that changes an entity's body asks first, and its OK moves them the same way.
         const { openLevel } = press;
         const target = drag.target;
         const outcome = openLevel.selectionReveal.fromPanel(() => moveEntities(openLevel, drag.draggedIds, target));
-        if (outcome.kind !== 'refused') return;
-
-        this.status.show(outcome.reason);
+        this.runner.showOutcome(confirmedFromPanel(press.openLevel, outcome));
     };
 
     private readonly handleCancel = () => {
@@ -247,6 +246,14 @@ export class RowDrag {
             this.version.increment();
         }
     }
+}
+
+function confirmedFromPanel(openLevel: OpenLevel, outcome: MoveOutcome): MoveOutcome {
+    if (outcome.kind !== 'needsConfirmation') return outcome;
+
+    const confirm = () => openLevel.selectionReveal.fromPanel(() => outcome.confirm());
+
+    return { ...outcome, confirm };
 }
 
 function isSameTarget(first: DropTarget | undefined, second: DropTarget | undefined) {

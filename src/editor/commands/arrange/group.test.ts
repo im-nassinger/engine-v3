@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'vitest';
 
-import { NameComponent, ShapeComponent, TransformComponent } from '../../../core/components/index.ts';
+import {
+    BodyComponent,
+    NameComponent,
+    ShapeComponent,
+    SurfaceComponent,
+    TransformComponent,
+} from '../../../core/components/index.ts';
 import { Level } from '../../../core/level/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { buildCommandTestSession, expectRoundTrip } from '../testing/commandTestSession.ts';
@@ -149,5 +155,41 @@ describe('Group', () => {
         session.openLevel.selection.replace([secondDeepest.id]);
         expect(requireCommand('arrange.group').run()).toMatchObject({ kind: 'done' });
         expect(secondDeepest.depth).toBe(Level.maxDepth);
+    });
+
+    // The floor is the frontmost member, so the group goes into the World and the lid leaves its crate.
+    test('asks first when a member leaves its body for the group’s parent, and OK groups in one step', () => {
+        const { session, requireCommand, level } = buildSession();
+        const crate = addBox(level, 0, 0);
+        crate.addComponent(new BodyComponent());
+        const lid = level.createEntity(crate, 0);
+        lid.addComponent(new TransformComponent());
+        lid.addComponent(new SurfaceComponent());
+        const floor = addBox(level, 50, 0);
+        floor.addComponent(new SurfaceComponent());
+        session.openLevel.selection.replace([lid.id, floor.id]);
+
+        const outcome = requireCommand('arrange.group').run();
+
+        if (outcome.kind !== 'needsConfirmation') throw new Error('No question.');
+        expect(outcome.question.text).toBe('1 entity will move with a different body in play.');
+        expect(session.openLevel.history.undoCount).toBe(0);
+
+        expect(outcome.confirm()).toMatchObject({ kind: 'done' });
+        expect(lid.parent?.parent).toBe(level.world);
+        expect(floor.parent).toBe(lid.parent);
+        expect(session.openLevel.history.undoCount).toBe(1);
+    });
+
+    test('grouping inside one body asks nothing', () => {
+        const { session, requireCommand, level } = buildSession();
+        const crate = addBox(level, 0, 0);
+        crate.addComponent(new BodyComponent());
+        const lid = level.createEntity(crate, 0);
+        lid.addComponent(new TransformComponent());
+        lid.addComponent(new SurfaceComponent());
+        session.openLevel.selection.replace([lid.id]);
+
+        expect(requireCommand('arrange.group').run()).toMatchObject({ kind: 'done' });
     });
 });

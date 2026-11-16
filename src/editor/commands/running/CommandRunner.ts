@@ -24,7 +24,7 @@ export class CommandRunner {
         }
 
         const outcome = command.run();
-        this.show(outcome);
+        this.showOutcome(outcome);
     }
 
     // The open question's go-ahead button. Closing a notice with OK is closeDialog.
@@ -35,7 +35,7 @@ export class CommandRunner {
 
         this.dialog.closeCurrent();
         const outcome = dialog.confirm();
-        this.show(outcome);
+        this.showOutcome(outcome);
     }
 
     // Cancel on a question, OK on a notice, or Esc on either: closes it and changes nothing.
@@ -43,7 +43,8 @@ export class CommandRunner {
         this.dialog.closeCurrent();
     }
 
-    private show(outcome: CommandOutcome) {
+    // Also for the few edits that aren't commands but can ask first: the Entities panel's drop.
+    showOutcome(outcome: CommandOutcome) {
         if (outcome.kind === 'needsConfirmation') {
             const confirm = () => outcome.confirm();
             this.dialog.open({ kind: 'question', question: outcome.question, confirm });

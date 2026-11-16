@@ -4,10 +4,12 @@ import type { Point, TransformValues } from '../../../core/geometry/index.ts';
 import { Level } from '../../../core/level/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { LevelWriter } from '../../../core/level-data/index.ts';
+import { countBodyChanges } from '../../../core/physics/index.ts';
 import { AddEntitiesChange, MoveEntityChange } from '../../history/index.ts';
 import type { EditTransaction } from '../../history/index.ts';
 import type { EditorSession } from '../../session/index.ts';
 import type { Availability, CommandOutcome, EditorCommand } from '../EditorCommand.ts';
+import { bodyQuestion } from '../shared/bodyQuestion.ts';
 import { EntityNamer } from '../shared/EntityNamer.ts';
 import { heightBelow } from '../shared/heightBelow.ts';
 import { inPanelOrder } from '../shared/inPanelOrder.ts';
@@ -28,7 +30,8 @@ type GroupPlan = {
 };
 
 // Puts the selection into a new group where the frontmost selected entity was, each entity kept in place
-// on screen. The World and the camera are skipped.
+// on screen. The World and the camera are skipped. A Group that changes the body a member moves with in
+// play asks first.
 export class GroupCommand implements EditorCommand {
     readonly id = 'arrange.group';
     readonly label = 'Group';
@@ -49,6 +52,12 @@ export class GroupCommand implements EditorCommand {
     }
 
     run(): CommandOutcome {
+        const asksFirst = true;
+
+        return this.group(asksFirst);
+    }
+
+    private group(asksFirst: boolean): CommandOutcome {
         const split = this.splitSelection();
         const refusal = refusalReason(split);
         if (refusal !== undefined) return { kind: 'refused', reason: refusal };
@@ -58,6 +67,15 @@ export class GroupCommand implements EditorCommand {
         if (!fitsInDepth(members)) return { kind: 'refused', reason: TOO_DEEP };
 
         const plan = this.planGroup(members);
+        // The new group has no body, so the members end up with the bodies of the group's parent.
+        const bodyChanges = countBodyChanges(members.map((entity) => ({ entity, newParent: plan.parent })));
+        if (asksFirst && bodyChanges > 0) {
+            // Worked out again on OK, from the level and selection as they are then.
+            const confirm = () => this.group(false);
+
+            return { kind: 'needsConfirmation', question: bodyQuestion(bodyChanges), confirm };
+        }
+
         const changedDrawOrder = !isOneRunOfRows(members);
         const label = stepLabel('Group', members);
 

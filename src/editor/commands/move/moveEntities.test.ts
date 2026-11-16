@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { NameComponent, TransformComponent } from '../../../core/components/index.ts';
+import { BodyComponent, NameComponent, SurfaceComponent, TransformComponent } from '../../../core/components/index.ts';
 import { Level } from '../../../core/level/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
@@ -21,6 +21,21 @@ function addNamed(level: Level, parent: Entity, name: string) {
     entity.addComponent(new NameComponent({ name }));
 
     return entity;
+}
+
+// A car turned and moved, and a crate with a lid, both in the World.
+function addCarAndCrate(level: Level) {
+    const car = addNamed(level, level.world, 'Car');
+    car.requireComponent(TransformComponent).set('position', { x: 200, y: 100 });
+    car.requireComponent(TransformComponent).set('rotation', 30);
+    car.addComponent(new BodyComponent());
+    const crate = addNamed(level, level.world, 'Crate');
+    crate.addComponent(new BodyComponent());
+    const lid = addNamed(level, crate, 'Lid');
+    lid.requireComponent(TransformComponent).set('position', { x: 4, y: -8 });
+    lid.addComponent(new SurfaceComponent());
+
+    return { car, crate, lid };
 }
 
 describe('moveEntities', () => {
@@ -153,5 +168,64 @@ describe('moveEntities', () => {
         moveEntities(session.openLevel, [level.camera.id], { parentId: level.world.id, index: 0 });
 
         expect(level.world.children[0]).toBe(level.camera);
+    });
+
+    test("asks first when a crate's child goes into a car, and changes nothing until OK", () => {
+        const { session, level } = buildSession();
+        const { car, crate, lid } = addCarAndCrate(level);
+
+        const outcome = moveEntities(session.openLevel, [lid.id], { parentId: car.id, index: 0 });
+
+        expect(outcome).toMatchObject({
+            kind: 'needsConfirmation',
+            question: {
+                title: 'Move into another body?',
+                text: '1 entity will move with a different body in play.',
+                confirmLabel: 'Move',
+            },
+        });
+        expect(lid.parent).toBe(crate);
+        expect(session.openLevel.history.undoCount).toBe(0);
+    });
+
+    test('OK moves it in one step, kept in place on screen, and undo puts it back without asking', () => {
+        const { session, level } = buildSession();
+        const { car, crate, lid } = addCarAndCrate(level);
+        const lidBefore = levelMatrixOf(session, lid);
+
+        const outcome = moveEntities(session.openLevel, [lid.id], { parentId: car.id, index: 0 });
+        if (outcome.kind !== 'needsConfirmation') throw new Error('No question.');
+
+        expect(outcome.confirm()).toEqual({ kind: 'done', selectAfter: [lid.id] });
+        expect(lid.parent).toBe(car);
+        expect(matrixDifference(levelMatrixOf(session, lid), lidBefore)).toBeLessThan(1e-9);
+        expect(session.openLevel.history.undoCount).toBe(1);
+        expect(session.openLevel.history.undoLabel).toBe('Move Lid');
+
+        session.openLevel.editor.undo();
+        expect(lid.parent).toBe(crate);
+    });
+
+    test('counts what moves inside a dragged body', () => {
+        const { session, level } = buildSession();
+        const { car, crate } = addCarAndCrate(level);
+
+        const outcome = moveEntities(session.openLevel, [crate.id], { parentId: car.id, index: 0 });
+
+        expect(outcome).toMatchObject({
+            kind: 'needsConfirmation',
+            question: { text: '2 entities will move with a different body in play.' },
+        });
+    });
+
+    test('a move that keeps the body asks nothing', () => {
+        const { session, level } = buildSession();
+        const { crate, lid } = addCarAndCrate(level);
+        const box = addNamed(level, crate, 'Box');
+
+        const outcome = moveEntities(session.openLevel, [lid.id], { parentId: box.id, index: 0 });
+
+        expect(outcome).toEqual({ kind: 'done', selectAfter: [lid.id] });
+        expect(lid.parent).toBe(box);
     });
 });
