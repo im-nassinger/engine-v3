@@ -12,6 +12,7 @@ How the editor looks. **Settled before any code, and approved by the owner on 20
 | [controls.md](controls.md) | How each control looks in each state: buttons, tools, fields, cards, rows, menus, dialogs, bars; the icons v1 needs |
 | [level-view.md](level-view.md) | What the editor draws over the level: the grid, the camera frame, joint icons, selections, the drawing preview, the physics view |
 | [mockups/index.html](mockups/index.html) | Six views of v1 with a sample level: five moments and a sheet of every state. Open it in a browser. Nothing in it works |
+| [mockups/collision-grid.html](mockups/collision-grid.html) | A v3 example made to show a friend (owner, 2026-11-16): the World's "Edit collision grid" button and the collision grid window, which works. Claude's proposal for the look, not decided. The rules come from [world.md](../requirements/physics/world.md#the-collision-grid--v3) |
 
 ## Decided in round 8
 
