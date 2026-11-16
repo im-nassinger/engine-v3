@@ -1,4 +1,4 @@
-import type { Point } from '../../../../core/geometry/index.ts';
+import type { Point } from '../../../core/geometry/index.ts';
 
 // One decimal at most, so a drag at a high zoom still reads plainly.
 const DECIMALS = 1;
@@ -24,4 +24,9 @@ export function sizeReadout(size: Point) {
 // The new Rotation: `45°`.
 export function angleReadout(degrees: number) {
     return `${numberText(degrees)}°`;
+}
+
+// A circle's size, across: `⌀ 100 px`.
+export function diameterReadout(diameter: number) {
+    return `⌀ ${numberText(diameter)} px`;
 }

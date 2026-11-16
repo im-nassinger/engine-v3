@@ -274,6 +274,9 @@ function buildContext(services: ToolServices, finished: (created: readonly Entit
         get status() {
             return services.status;
         },
+        get reader() {
+            return services.reader;
+        },
         finished,
     };
 }

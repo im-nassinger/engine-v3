@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 10, step 2 of 11: `createShape` in `editor/commands/draw` makes a named shape with the default look in the current group, as one step, refused in a locked group. Next is step 3: the Shape tool's rectangle and circle in `editor/tools/shape`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 10, step 3 of 11: `ShapeTool` in `editor/tools/shape` draws a rectangle or circle by click or drag, with Shift, Alt, snapping and Ctrl, the remembered size, the size readout and Esc, and returns to Select. The tool isn't on the page yet (step 9). Next is step 4: the Shape tool's polygon and line. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

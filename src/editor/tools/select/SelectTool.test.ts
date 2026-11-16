@@ -59,6 +59,7 @@ function buildSelectTest() {
         snapper: NO_SNAPPING,
         commands: createCommandRegistry(session),
         status: session.status,
+        reader: session.reader,
         finished: () => {},
     });
     const { selection, currentGroup } = session.openLevel;

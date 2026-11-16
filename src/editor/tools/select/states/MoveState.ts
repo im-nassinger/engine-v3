@@ -1,7 +1,7 @@
 import type { Point } from '../../../../core/geometry/index.ts';
 import type { SelectionMove } from '../../../commands/index.ts';
 import type { LevelPointerInput } from '../../Tool.ts';
-import { moveReadout } from '../readout/readoutText.ts';
+import { moveReadout } from '../../readout/readoutText.ts';
 
 import type { SelectState, SelectStateHost } from './SelectState.ts';
 

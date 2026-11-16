@@ -1,6 +1,7 @@
 import type { VersionCounter } from '../../core/events/index.ts';
 import type { Point } from '../../core/geometry/index.ts';
 import type { EntityId } from '../../core/level/index.ts';
+import type { LevelReader } from '../../core/level-data/index.ts';
 import type { CommandRegistry } from '../commands/index.ts';
 import type { OpenLevel } from '../session/index.ts';
 import type { Snapper } from '../snapping/index.ts';
@@ -48,6 +49,8 @@ export type ToolContext = {
     readonly snapper: Snapper;
     readonly commands: CommandRegistry;
     readonly status: StatusText;
+    // Reads a new entity's data into the level, for the edits that add one.
+    readonly reader: LevelReader;
     // Selects what the tool made and returns to Select, unless the tool is locked.
     finished(created: readonly EntityId[]): void;
 };

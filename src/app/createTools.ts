@@ -24,6 +24,7 @@ export function createTools(session: EditorSession, commands: CommandRegistry) {
         view: session.view,
         commands,
         status: session.status,
+        reader: session.reader,
     };
     const pan = new PanGesture(session.view);
 

@@ -18,6 +18,7 @@ export function buildEditorTools(session: EditorSession, commands: CommandRegist
         view: session.view,
         commands,
         status: session.status,
+        reader: session.reader,
     };
     const pan = new PanGesture(session.view);
     const controller = new ToolController([new SelectTool()], services, pan);

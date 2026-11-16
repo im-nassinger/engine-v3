@@ -3,7 +3,7 @@ import { VersionCounter } from '../../../core/events/index.ts';
 import type { LevelPointerInput, Tool, ToolContext } from '../Tool.ts';
 
 import { SelectionFrame } from './frame/SelectionFrame.ts';
-import type { DragReadout } from './readout/DragReadout.ts';
+import type { DragReadout } from '../readout/DragReadout.ts';
 import { SelectionPicker } from './SelectionPicker.ts';
 import { IdleState } from './states/IdleState.ts';
 import type { SelectState, SelectStateHost } from './states/SelectState.ts';

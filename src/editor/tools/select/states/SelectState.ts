@@ -1,6 +1,6 @@
 import type { Bounds } from '../../../../core/geometry/index.ts';
 import type { LevelPointerInput, ToolContext } from '../../Tool.ts';
-import type { DragReadout } from '../readout/DragReadout.ts';
+import type { DragReadout } from '../../readout/DragReadout.ts';
 import type { SelectionPicker } from '../SelectionPicker.ts';
 
 // What a drag state is given by the Select tool.

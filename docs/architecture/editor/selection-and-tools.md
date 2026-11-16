@@ -100,6 +100,7 @@ export type ToolContext = {
     readonly snapper: Snapper;
     readonly commands: CommandRegistry;
     readonly status: StatusText;
+    readonly reader: LevelReader;                    // reads a new entity in, for createShape
     finished(created: readonly EntityId[]): void;   // return to Select, unless the tool is locked
 };
 ```

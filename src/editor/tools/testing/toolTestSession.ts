@@ -112,6 +112,7 @@ export function buildToolTestSession() {
         snapper: NO_SNAPPING,
         commands,
         status: session.status,
+        reader: session.reader,
     };
     const controller = new ToolController([select, shape], services, pan);
 

@@ -1,7 +1,7 @@
 import type { Point } from '../../../../core/geometry/index.ts';
 import type { LevelPointerInput } from '../../Tool.ts';
 import type { SelectionFrame } from '../frame/SelectionFrame.ts';
-import { angleReadout } from '../readout/readoutText.ts';
+import { angleReadout } from '../../readout/readoutText.ts';
 import type { EntityRotate } from '../rotate/EntityRotate.ts';
 
 import type { SelectState, SelectStateHost } from './SelectState.ts';

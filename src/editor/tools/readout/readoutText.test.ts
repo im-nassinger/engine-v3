@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { angleReadout, moveReadout, sizeReadout } from './readoutText.ts';
+import { angleReadout, diameterReadout, moveReadout, sizeReadout } from './readoutText.ts';
 
 describe("the readouts' texts", () => {
     test('moving shows the distance with a minus sign', () => {
@@ -9,6 +9,10 @@ describe("the readouts' texts", () => {
 
     test('resizing shows the new size', () => {
         expect(sizeReadout({ x: 200, y: 100 })).toBe('200 × 100 px');
+    });
+
+    test('a circle shows how wide it is across', () => {
+        expect(diameterReadout(100)).toBe('⌀ 100 px');
     });
 
     test('rotating shows the angle', () => {

@@ -70,6 +70,7 @@ function buildRotateTest() {
         snapper: new GridSnapper(level.editorData, session.viewSettings),
         commands: createCommandRegistry(session),
         status: session.status,
+        reader: session.reader,
         finished: () => {},
     });
     const { selection, history, liveEdit } = session.openLevel;
