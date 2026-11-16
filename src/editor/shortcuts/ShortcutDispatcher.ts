@@ -71,6 +71,8 @@ export class ShortcutDispatcher {
 
         const command = this.registry.find(shortcut.commandId);
         if (command === undefined) return false;
+        // The browser goes on to send its cut, copy or paste event, which ClipboardBridge answers.
+        if (command.shortcutsAsBrowserEvents === true) return false;
 
         if (press.repeat && !command.repeatsWhileHeld) return true;
         if (command.id === UNDO_COMMAND_ID && this.toolKeys?.tools.undoDrawingStep() === true) return true;

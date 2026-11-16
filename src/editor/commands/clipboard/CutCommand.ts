@@ -18,6 +18,7 @@ export class CutCommand implements EditorCommand {
     readonly label = 'Cut';
     readonly menu = { menu: 'Edit', section: 2, order: 10 } as const;
     readonly shortcuts = ['Ctrl+X'];
+    readonly shortcutsAsBrowserEvents = true;
     private readonly session: EditorSession;
     private readonly parts: ClipboardParts;
     private readonly codec = new ClipboardCodec(new LevelWriter());

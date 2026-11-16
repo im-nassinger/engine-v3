@@ -2,6 +2,7 @@ export { GoIntoGroupCommand } from './arrange/GoIntoGroupCommand.ts';
 export { GroupCommand } from './arrange/GroupCommand.ts';
 export { UngroupCommand } from './arrange/UngroupCommand.ts';
 export {
+    ClipboardEvents,
     CopyCommand,
     CutCommand,
     DuplicateCommand,

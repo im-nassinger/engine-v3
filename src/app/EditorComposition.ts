@@ -1,6 +1,7 @@
 import {
     AnimationFrames,
     BrowserTimer,
+    ClipboardBridge,
     DevicePixelRatio,
     KeyboardInput,
     keyboardPlatform,
@@ -11,7 +12,7 @@ import { PixiLevelView } from '../adapters/pixi/index.ts';
 import { levelBoundsOf } from '../core/derived/index.ts';
 import { Level } from '../core/level/index.ts';
 import { EditorClipboard } from '../editor/clipboard/index.ts';
-import { CommandRunner, createCommandRegistry } from '../editor/commands/index.ts';
+import { ClipboardEvents, CommandRunner, createCommandRegistry } from '../editor/commands/index.ts';
 import type { CommandRegistry } from '../editor/commands/index.ts';
 import { EditorSession } from '../editor/session/index.ts';
 import { ShortcutDispatcher } from '../editor/shortcuts/index.ts';
@@ -33,6 +34,7 @@ type EditorParts = {
     readonly levelView: PixiLevelView;
     readonly keyboard: KeyboardInput;
     readonly pointer: PointerInput;
+    readonly clipboardBridge: ClipboardBridge;
     readonly tools: ToolController;
     readonly mouse: MousePosition;
     readonly openWindows: OpenWindowCount;
@@ -52,6 +54,7 @@ export class EditorComposition {
     readonly openWindows: OpenWindowCount;
     private readonly keyboard: KeyboardInput;
     private readonly pointer: PointerInput;
+    private readonly clipboardBridge: ClipboardBridge;
 
     private constructor(parts: EditorParts) {
         this.session = parts.session;
@@ -61,6 +64,7 @@ export class EditorComposition {
         this.levelView = parts.levelView;
         this.keyboard = parts.keyboard;
         this.pointer = parts.pointer;
+        this.clipboardBridge = parts.clipboardBridge;
         this.tools = parts.tools;
         this.mouse = parts.mouse;
         this.openWindows = parts.openWindows;
@@ -94,6 +98,7 @@ export class EditorComposition {
         const keyboard = new KeyboardInput(dispatcher, window);
         const pointerParts = { tools, escape, mouse, view: session.view, platform };
         const pointer = new PointerInput(pointerParts, levelView.canvas, window);
+        const clipboardBridge = new ClipboardBridge(new ClipboardEvents(commands, runner), window);
 
         const composition = new EditorComposition({
             session,
@@ -103,6 +108,7 @@ export class EditorComposition {
             levelView,
             keyboard,
             pointer,
+            clipboardBridge,
             tools,
             mouse,
             openWindows,
@@ -116,9 +122,11 @@ export class EditorComposition {
         this.levelView.follow(this.session);
         this.levelView.showSelection(new EditorSelectionSource(this.session, this.tools));
         this.levelView.showDrawing(new EditorDrawingSource(this.tools));
-        // The editor lives as long as the page, so the keyboard and the pointer are never disconnected.
+        // The editor lives as long as the page, so the keyboard, the pointer and the clipboard events
+        // are never disconnected.
         this.keyboard.connect();
         this.pointer.connect();
+        this.clipboardBridge.connect();
         this.limitPanToOpenLevel();
         this.session.openLevelChanged.subscribe(() => this.limitPanToOpenLevel());
         this.fitCameraFrameOnceSized();

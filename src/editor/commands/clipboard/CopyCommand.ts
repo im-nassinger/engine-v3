@@ -15,6 +15,7 @@ export class CopyCommand implements EditorCommand {
     readonly label = 'Copy';
     readonly menu = { menu: 'Edit', section: 2, order: 20 } as const;
     readonly shortcuts = ['Ctrl+C'];
+    readonly shortcutsAsBrowserEvents = true;
     private readonly session: EditorSession;
     private readonly parts: ClipboardParts;
     private readonly codec = new ClipboardCodec(new LevelWriter());

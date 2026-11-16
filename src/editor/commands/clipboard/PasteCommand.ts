@@ -20,6 +20,7 @@ export class PasteCommand implements EditorCommand {
     readonly label = 'Paste';
     readonly menu = { menu: 'Edit', section: 2, order: 30 } as const;
     readonly shortcuts = ['Ctrl+V'];
+    readonly shortcutsAsBrowserEvents = true;
     private readonly session: EditorSession;
     private readonly parts: ClipboardParts;
     private readonly codec: ClipboardCodec;

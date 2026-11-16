@@ -54,6 +54,10 @@ export type EditorCommand = {
     // Only the zoom keys: holding the key runs the command again with each key repeat. Every other
     // command runs once per press, so holding Ctrl+Z doesn't undo 30 steps a second.
     readonly repeatsWhileHeld?: boolean;
+    // Only Cut, Copy and Paste: the browser sends its own cut, copy and paste events for their keys,
+    // which need no permission, so ShortcutDispatcher leaves the keys to the browser and ClipboardBridge
+    // answers the events. The menu still shows the shortcuts.
+    readonly shortcutsAsBrowserEvents?: boolean;
     availability(): Availability;
     // Only a switch has it: true shows a tick next to the menu entry.
     checked?(): boolean;

@@ -219,4 +219,24 @@ describe('ShortcutDispatcher', () => {
 
         expect(session.view.zoom).toBe(zoomBefore * 4);
     });
+
+    test('Ctrl+C, Ctrl+X and Ctrl+V are left to the browser, which sends its clipboard events', () => {
+        const timer = new ManualTimer();
+        const level = Level.createNew();
+        const session = new EditorSession({ level, clock: timer.clock, timer, frames: new ManualFrames() });
+        const registry = createCommandRegistry(session);
+        const runner = new CommandRunner(session.status);
+        const dispatcher = new ShortcutDispatcher(registry, runner, 'other');
+        session.openLevel.selection.replace([level.world.id]);
+        const ctrl = { ctrlKey: true };
+
+        const usedC = dispatcher.handleKeyDown(recordedKey('KeyC', 'c', ctrl), 'level', true);
+        const usedX = dispatcher.handleKeyDown(recordedKey('KeyX', 'x', ctrl), 'level', true);
+        const usedV = dispatcher.handleKeyDown(recordedKey('KeyV', 'v', ctrl), 'level', true);
+        const usedD = dispatcher.handleKeyDown(recordedKey('KeyD', 'd', ctrl), 'level', true);
+
+        expect([usedC, usedX, usedV]).toEqual([false, false, false]);
+        expect(usedD).toBe(true);
+        expect(session.status.current).toBe("The World can't be duplicated");
+    });
 });

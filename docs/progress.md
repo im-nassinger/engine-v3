@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 11, step 6 of 9: Duplicate is built, in the Edit menu with Ctrl+D, each copy directly above its own original with no offset, links inside the set rewired and links outside kept, refused whole over a limit or in a locked group, with 1,387 tests in Node. Next is step 7: `ClipboardBridge`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 11, step 7 of 9: `ClipboardBridge` is built: the browser's `cut`, `copy` and `paste` events outside text fields run the clipboard commands with the event's data, and `ShortcutDispatcher` leaves Ctrl+C, Ctrl+X and Ctrl+V to the browser, with 1,393 tests in Node and 537 in the browsers. Next is step 8: the Playwright tests. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -31,7 +31,7 @@
 | Stage 8, the Inspector | Done on 2026-11-15. See below |
 | Stage 9, the Select tool | Done on 2026-11-16. See below |
 | Stage 10, the Shape tool and point editing | Done on 2026-11-16. See below |
-| Code | Stages 0 to 10 done. Stage 11, copy and paste, is under way: steps 1 to 6 are done |
+| Code | Stages 0 to 10 done. Stage 11, copy and paste, is under way: steps 1 to 7 are done |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -181,7 +181,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 11 of [plan.md](plan.md#stage-11-in-steps): copy and paste.** Steps 1 to 3 are done; step 4 builds `PastePlacement` and the paste edit.
+1. **Stage 11 of [plan.md](plan.md#stage-11-in-steps): copy and paste.** Steps 1 to 7 are done; step 8 adds the Playwright tests.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

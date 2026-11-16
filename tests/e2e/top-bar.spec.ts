@@ -9,6 +9,7 @@ const MAIN_MENU: Record<string, [string, string][]> = {
         ['Cut', 'Ctrl+X'],
         ['Copy', 'Ctrl+C'],
         ['Paste', 'Ctrl+V'],
+        ['Duplicate', 'Ctrl+D'],
         ['Delete', 'Del'],
         ['Select all', 'Ctrl+A'],
         ['Rename', 'F2'],

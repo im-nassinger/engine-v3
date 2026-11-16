@@ -80,7 +80,7 @@ src/
     storage/           IndexedDbLevelStore, LocalStorageSettings, WebLockTabGuard, BrowserPersistence
     browser/           keyboard/ (KeyboardInput), pointer/ (PointerInput, ClickCounter, wheelPixels),
                        time/ (SystemClock, BrowserTimer, AnimationFrames),
-                       screen/ (DevicePixelRatio), and later ClipboardBridge,
+                       screen/ (DevicePixelRatio), clipboard/ (ClipboardBridge), and later
                        FileDownload, BrowserFilePicker, PageVisibility, LeavePrompt in their own areas
     worker/            WorkerGameRunner, GameWorkerHost, ImportWorkerClient, ImportWorkerHost, protocol/
     zip/               FflateZipCodec
