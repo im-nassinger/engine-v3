@@ -78,7 +78,7 @@ Each check that keeps an architecture rule (the type check, ESLint, dependency-c
 
 ## Speed tests
 
-Described in [performance.md](performance.md#targets-and-their-tests). They run on demand and before a stage closes, not on every commit.
+Described in [performance.md](performance.md#targets-and-their-tests). They run on demand and before a stage closes, not on every commit, with `npm run test:performance`, and in CI only to catch a large slowdown.
 
 ## In CI
 

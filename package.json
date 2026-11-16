@@ -19,7 +19,8 @@
         "test": "vitest run --project node",
         "check": "npm run typecheck && npm run lint && npm run format:check && npm run deps && npm test && npm run docs:check",
         "test:browser": "vitest run --project browser",
-        "test:e2e": "playwright test"
+        "test:e2e": "playwright test",
+        "test:performance": "vitest run --project performance"
     },
     "devDependencies": {
         "@babel/core": "8.1.2",

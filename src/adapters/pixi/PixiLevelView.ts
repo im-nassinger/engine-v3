@@ -48,8 +48,9 @@ export class PixiLevelView {
     private readonly parts: PixiLevelViewParts;
     private readonly renderer: Renderer;
     private readonly stage = new Container();
-    // Holds the level, moved and zoomed by ViewState's matrix.
-    private readonly levelLayer = new Container();
+    // Holds the level, moved and zoomed by ViewState's matrix. Its own render group, so an overlay drawn
+    // again never makes PixiJS rebuild the level's draw instructions: at 10,000 entities that took 27 ms a frame.
+    private readonly levelLayer = new Container({ isRenderGroup: true });
     // In front of the level and unzoomed: overlays draw in screen pixels, so they keep their size at any zoom.
     // The grid is over the level, since the World's fill, drawn first in the level, is the background.
     private readonly gridOverlay = new GridOverlay();

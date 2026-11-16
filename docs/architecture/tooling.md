@@ -52,6 +52,7 @@ tests/
 | `npm run deps` | dependency-cruiser | |
 | `npm test` | Vitest in Node: the unit tests and the guard tests | |
 | `npm run test:browser` | Vitest in Chromium, Firefox and WebKit | Before a stage closes, and in CI |
+| `npm run test:performance` | Vitest's speed tests in Chromium alone, with the GPU, one at a time (see [performance.md](performance.md#targets-and-their-tests)) | Before a stage closes, and in CI |
 | `npm run test:e2e` | Playwright against the built page | Before a stage closes, and in CI on master |
 | `npm run docs:check` | `node tools/check-docs.js` | |
 | **`npm run check`** | `typecheck`, `lint`, `format:check`, `deps`, `test`, `docs:check`, in that order | **Before every commit** |
@@ -211,7 +212,7 @@ One workflow, `.github/workflows/ci.yml`:
 | Job | Runs on | Does | When |
 |---|---|---|---|
 | check | `ubuntu-24.04` and `ubuntu-24.04-arm` | `npm ci`, `npm run check` | Every push |
-| browser | `ubuntu-24.04` | Installs the three browsers, `npm run test:browser`, `npm run build` | Every push |
+| browser | `ubuntu-24.04` | Installs the three browsers, `npm run test:browser`, `npm run test:performance`, `npm run build` | Every push |
 | journeys | `ubuntu-24.04` | `npm run test:e2e` | Pushes to master |
 
 - Node comes from `.node-version`. The actions are `actions/checkout@v7` and `actions/setup-node@v7`, with npm's cache.

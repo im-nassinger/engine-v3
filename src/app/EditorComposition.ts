@@ -15,16 +15,10 @@ import type { CommandRegistry } from '../editor/commands/index.ts';
 import { EditorSession } from '../editor/session/index.ts';
 import { ShortcutDispatcher } from '../editor/shortcuts/index.ts';
 import type { KeyboardPlatform } from '../editor/shortcuts/index.ts';
-import { GridSnapper } from '../editor/snapping/index.ts';
-import {
-    EscapeChain,
-    MousePosition,
-    OpenWindowCount,
-    PanGesture,
-    SelectTool,
-    ToolController,
-} from '../editor/tools/index.ts';
+import { EscapeChain, MousePosition, OpenWindowCount } from '../editor/tools/index.ts';
+import type { ToolController } from '../editor/tools/index.ts';
 
+import { createTools } from './createTools.ts';
 import { EditorSelectionSource } from './EditorSelectionSource.ts';
 
 const FIT_CAMERA_FRAME = 'view.fitCameraFrame';
@@ -153,31 +147,4 @@ export class EditorComposition {
 
         this.runner.run(command);
     }
-}
-
-// v1's tools: Select now, Shape and Joint with their stages. The snapper is made again for each
-// level that opens, since it reads that level's grid.
-function createTools(session: EditorSession, commands: CommandRegistry) {
-    let snapperLevel = session.openLevel.level;
-    let snapper = new GridSnapper(snapperLevel.editorData, session.viewSettings);
-    const services = {
-        get openLevel() {
-            return session.openLevel;
-        },
-        get snapper() {
-            const level = session.openLevel.level;
-            if (level !== snapperLevel) {
-                snapperLevel = level;
-                snapper = new GridSnapper(level.editorData, session.viewSettings);
-            }
-
-            return snapper;
-        },
-        view: session.view,
-        commands,
-        status: session.status,
-    };
-    const pan = new PanGesture(session.view);
-
-    return new ToolController([new SelectTool()], services, pan);
 }
