@@ -70,7 +70,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 
 ## Physics and joints
 
-**These notes were written against Box2D v2.4.1.** Stage 13 rechecked each one against Box2D 3.2 (`box2d3-wasm` 6.0.0), with a small test against the real build in `src/adapters/box2d/box2dFacts.test.ts` unless another test is named. Each note ends with what that showed. The joint notes wait for stage 14, which builds joints.
+**These notes were written against Box2D v2.4.1.** Stage 13 rechecked each one against Box2D 3.2 (`box2d3-wasm` 6.0.0), with a small test against the real build in `src/adapters/box2d/box2dFacts.test.ts` unless another test is named. Each note ends with what that showed. Stage 14 rechecked the joint notes the same way, in `src/adapters/box2d/box2dJointFacts.test.ts`.
 
 | Limit | Box2D value | At 50 px per metre |
 |---|---|---|
@@ -91,16 +91,16 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Game speed.** Scale the time step, keeping 60 ticks per second. 2× gives 1/30 s, the coarsest step Box2D's docs suggest. Determinism holds because the step comes from level state.
 - **Far from the origin.** Float precision at 2,000 m is about 0.1 mm, well below Box2D's slop, so ±100,000 px is safe. **Holds in 3.2:** a box rests on the ground 4,000 m (200,000 px) out within 0.01 px of where it rests at the origin (`box2dFacts.test.ts`).
 - **Circles scaled unevenly** need more than 8 sides to roll smoothly, so several convex pieces. Pin the side count, because it affects determinism.
-- **Joint ends.** Box2D measures angles of body B against body A and keeps slider and wheel axes in body A's frame. Decide the mapping of fields A and B once. An empty end maps to the ground body.
+- **Joint ends.** Box2D measures angles of body B against body A and keeps slider and wheel axes in body A's frame. Decide the mapping of fields A and B once. An empty end maps to the ground body. **Holds in 3.2:** a Hinge's angle is body B's turn against body A (`box2dJointFacts.test.ts`). Each end is now a frame on its body, and a slider's or wheel's axis is the x axis of body A's frame, as the definitions have no axis of their own. The adapter makes field A Box2D's body B, so A turns against B, and puts the start angle in B's frame so a placed Hinge reads 0 and its limits count from there (`Box2dPhysicsWorld.hinge.test.ts`).
 - **Clockwise.** Box2D's counter-clockwise positive reads as clockwise on screen when y points down. **Confirmed in 3.2:** a positive spin turns a body's x axis towards +y, downwards on screen (`box2dFacts.test.ts`).
-- **Rod, Rope, Spring** are one distance joint: Rod sets min and max to the length, Rope sets no stiffness and only a max, Spring sets a rest length with stiffness and damping.
-- **Stiffness.** Users enter bounces per second and a 0 to 1 damping. Converting needs the bodies' mass, and is plain arithmetic. Box2D advises staying under a quarter of the step rate, hence the cap of 15.
-- **Resistance** is a motor at speed 0 with a small strength, so a real motor replaces it.
-- **Limits must include zero**, or the joint lurches at the start. The editor guarantees it, and import must clamp it.
-- **Skip joints that do nothing:** both ends on one body (Box2D asserts they differ), or neither end able to move.
-- **Breaking.** Compare the joint's reaction force against the limit after the physics step and before queued destroys. Only check joints with Breakable on.
-- **Disabling a joint** doesn't exist in Box2D. Disconnect means destroy.
-- **Scaling a group with joints.** For uneven scale use the geometric mean for distances. A mirrored parent shows in the sign of the matrix determinant.
+- **Rod, Rope, Spring** are one distance joint: Rod sets min and max to the length, Rope sets no stiffness and only a max, Spring sets a rest length with stiffness and damping. **Changed in 3.2:** the distance joint is rigid unless its spring is on, so a Rod is the default, a Rope turns the spring on with 0 bounces per second and a limit from 0 to its length, and a Spring turns the spring on without a limit (`box2dJointFacts.test.ts`).
+- **Stiffness.** Users enter bounces per second and a 0 to 1 damping. Converting needs the bodies' mass, and is plain arithmetic. Box2D advises staying under a quarter of the step rate, hence the cap of 15. **Simpler in 3.2:** Box2D takes bounces per second (`hertz`) and the damping ratio itself, so no mass is needed: 2 bounces per second turn a 1 kg and a 4 kg weight back on the same steps (`box2dJointFacts.test.ts`). The cap of 15 is advice, not checked.
+- **Resistance** is a motor at speed 0 with a small strength, so a real motor replaces it. **Holds in 3.2:** Resistance slows a spinning wheel, and does nothing while Motor is on (`Box2dPhysicsWorld.hinge.test.ts`).
+- **Limits must include zero**, or the joint lurches at the start. The editor guarantees it, and import must clamp it. **Holds in 3.2:** a Hinge limited to 30° to 60° jumps past 15° in its first step and sits at 30° after ten (`box2dJointFacts.test.ts`).
+- **Skip joints that do nothing:** both ends on one body (Box2D asserts they differ), or neither end able to move. **3.2 doesn't stop either:** the release build has no asserts, so a joint with both ends on one body is made and stepped without an error, and so is one between two Static bodies (`box2dJointFacts.test.ts`). The game must skip both itself; `createJoint` refuses one body at both ends.
+- **Breaking.** Compare the joint's reaction force against the limit after the physics step and before queued destroys. Only check joints with Breakable on. **New in 3.2:** a joint has a force and a torque threshold, off by default (the largest float), and going past one sends a joint event after the step, carrying the joint's user data, while the joint stays (`box2dJointFacts.test.ts`). Breaking is v3; it can read those events instead of comparing forces itself.
+- **Disabling a joint** doesn't exist in Box2D. Disconnect means destroy. **Holds in 3.2:** a joint has no switch, only its spring, limit and motor do (`box2dJointFacts.test.ts`). Destroying a body destroys its joints, and their ids then read as not valid (`box2dJointFacts.test.ts`), so `destroyJoint` checks first.
+- **Scaling a group with joints.** For uneven scale use the geometric mean for distances. A mirrored parent shows in the sign of the matrix determinant. Not a Box2D fact: the game's own `PhysicsSceneBuilder` does this before Box2D sees the joint (stage 14, step 5).
 - **Editor mass estimates** for warnings come from area and density, since the editor doesn't run physics.
 
 **`box2d3-wasm` 6.0.0 (Box2D 3.2) as found in stage 13** (2026-11-16). Step 4 rechecked the v2.4 notes above one by one (2026-11-16).
