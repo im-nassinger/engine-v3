@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 10, step 6 of 11: `PointEditState` edits a polygon's or line's points after a double-click: a click, Shift+click and a box select them, and Esc, another entity, empty space outside the frame, a selection change or the shape going away end it; undo and redo clear the selected points. Next is step 7: the point edits. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 10, step 7 of 11: the point edits: dragging, nudging with the arrows, adding a point by double-clicking an edge and deleting points with Delete or Backspace, each one step through `LiveEdit`, with a polygon kept at 3 points and a line at 2. Next is step 8: `DrawingPreviewOverlay` and the point handles. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

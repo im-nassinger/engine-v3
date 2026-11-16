@@ -1,6 +1,6 @@
 import type { Bounds } from '../../../core/geometry/index.ts';
 import { VersionCounter } from '../../../core/events/index.ts';
-import type { LevelPointerInput, Tool, ToolContext } from '../Tool.ts';
+import type { LevelPointerInput, Tool, ToolContext, ToolKey } from '../Tool.ts';
 
 import { SelectionFrame } from './frame/SelectionFrame.ts';
 import type { DragReadout } from '../readout/DragReadout.ts';
@@ -96,8 +96,11 @@ export class SelectTool implements Tool {
         this.state?.pointerUp(input);
     }
 
-    keyDown() {
-        return false;
+    // Only point editing uses keys: the arrows and Delete. The tool's other keys are the commands'.
+    keyDown(key: ToolKey) {
+        if (!(this.state instanceof PointEditState)) return false;
+
+        return this.state.keyDown(key);
     }
 
     keyUp() {}

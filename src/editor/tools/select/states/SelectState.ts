@@ -11,7 +11,7 @@ export type SelectStateHost = {
     // Also hides the readout. Returns the new IdleState, for a press it should answer.
     goIdle(): SelectState;
     showBox(box: Bounds | undefined): void;
-    showReadout(readout: DragReadout): void;
+    showReadout(readout: DragReadout | undefined): void;
     // The overlay draws again: the selected points changed.
     redraw(): void;
 };

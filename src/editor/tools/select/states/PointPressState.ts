@@ -1,12 +1,14 @@
+import { PointsMove } from '../../../commands/index.ts';
 import type { LevelPointerInput } from '../../Tool.ts';
 
 import { PointBoxState } from './PointBoxState.ts';
+import { PointDragState } from './PointDragState.ts';
 import type { PointEditing } from './PointEditing.ts';
 import { DRAG_START_PX } from './PressState.ts';
 import type { SelectState, SelectStateHost } from './SelectState.ts';
 
 // A left press while editing points, until it moves 3 screen px (a drag) or is released (a click).
-// A drag from a point waits for stage 10 step 7; a drag from anywhere else selects points with a box.
+// A drag from a point moves the selected points with it; a drag from anywhere else selects points with a box.
 export class PointPressState implements SelectState {
     readonly editing: PointEditing;
     private readonly host: SelectStateHost;
@@ -32,7 +34,10 @@ export class PointPressState implements SelectState {
         if (this.hasDragged || !this.hasMovedFarEnough(input)) return;
 
         this.hasDragged = true;
-        if (this.pointIndex !== undefined) return;
+        if (this.pointIndex !== undefined) {
+            this.dragPoints(this.pointIndex, input);
+            return;
+        }
 
         const box = new PointBoxState(this.host, this.editing, this.press.levelPosition, this.press.modifiers.shift);
         this.host.goTo(box);
@@ -50,6 +55,27 @@ export class PointPressState implements SelectState {
         this.host.goTo(this.editing);
 
         return true;
+    }
+
+    // A Shift+press on an unselected point wasn't selected on the press, so it joins the selected points now.
+    private dragPoints(pointIndex: number, input: LevelPointerInput) {
+        const { points } = this.editing;
+        points.add([pointIndex]);
+
+        const { openLevel, status } = this.host.context;
+        const move = PointsMove.of(openLevel, points.entity, points.selectedIndexes);
+        if (!(move instanceof PointsMove)) {
+            status.show(move.reason);
+            return;
+        }
+
+        const pressedStart = move.startLevelPosition(pointIndex);
+        if (pressedStart === undefined) return;
+
+        openLevel.liveEdit.begin(move.targets);
+        const drag = new PointDragState(this.host, this.editing, move, pressedStart, this.press.levelPosition);
+        this.host.goTo(drag);
+        drag.pointerMove(input);
     }
 
     private click() {

@@ -1,7 +1,11 @@
 import type { Entity } from '../../../../core/level/index.ts';
 import type { Unsubscribe } from '../../../../core/events/index.ts';
-import type { LevelPointerInput } from '../../Tool.ts';
+import { addPoint, deletePoints, nudgePoints } from '../../../commands/index.ts';
+import type { CommandOutcome } from '../../../commands/index.ts';
+import type { LevelPointerInput, ToolKey } from '../../Tool.ts';
 import { EditedPoints } from '../points/EditedPoints.ts';
+import type { EdgeHit } from '../points/PointHits.ts';
+import { pointNudgeOffset } from '../points/pointNudgeOffset.ts';
 
 import { PointPressState } from './PointPressState.ts';
 import type { SelectState, SelectStateHost } from './SelectState.ts';
@@ -52,6 +56,15 @@ export class PointEditState implements SelectState {
         const pointIndex = this.points.hits().pointAt(input.levelPosition, zoom);
 
         // An unselected point is selected on the press, so a drag moves it; a selected one narrows on release.
+        const addsOnEdge = input.clickCount === 2 && pointIndex === undefined;
+        if (addsOnEdge) {
+            const edge = this.points.hits().edgeAt(input.levelPosition, zoom);
+            if (edge !== undefined) {
+                this.addPointOn(edge);
+                return;
+            }
+        }
+
         const selectsNow = pointIndex !== undefined && !input.modifiers.shift && !this.points.isSelected(pointIndex);
         if (selectsNow) {
             this.points.selectOnly(pointIndex);
@@ -64,6 +77,27 @@ export class PointEditState implements SelectState {
 
     // The release of the double-click that started point editing.
     pointerUp() {}
+
+    // The arrows nudge the selected points and Delete or Backspace deletes them. Point editing takes these
+    // keys even with no point selected, so they never move or delete the whole shape by surprise.
+    keyDown(key: ToolKey) {
+        if (!this.isEditing) return false;
+
+        const isDelete = key.code === 'Delete' || key.code === 'Backspace';
+        const hasModifier = key.ctrl || key.shift || key.alt;
+        if (isDelete && !hasModifier) {
+            this.deleteSelected();
+            return true;
+        }
+
+        const { gridSize } = this.host.context.openLevel.level.editorData;
+        const offset = pointNudgeOffset(key, gridSize);
+        if (offset === undefined) return false;
+
+        this.nudgeSelected(offset);
+
+        return true;
+    }
 
     // Esc goes back to IdleState with the entity still selected.
     cancel() {
@@ -84,6 +118,43 @@ export class PointEditState implements SelectState {
         this.host.showBox(undefined);
 
         return this.host.goIdle();
+    }
+
+    private addPointOn(edge: EdgeHit) {
+        const { openLevel, status } = this.host.context;
+        const outcome = addPoint(openLevel, this.points.entity, edge.startIndex, edge.position);
+        if (outcome.kind === 'refused') {
+            status.show(outcome.reason);
+            return;
+        }
+
+        this.points.selectOnly(outcome.index);
+    }
+
+    private nudgeSelected(offset: { x: number; y: number }) {
+        const selected = this.points.selectedIndexes;
+        if (selected.length === 0) return;
+
+        const outcome = nudgePoints(this.host.context.openLevel, this.points.entity, selected, offset);
+        this.showRefusal(outcome);
+    }
+
+    // The points after the deleted ones move down, so none stays selected.
+    private deleteSelected() {
+        const selected = this.points.selectedIndexes;
+        if (selected.length === 0) return;
+
+        const outcome = deletePoints(this.host.context.openLevel, this.points.entity, selected);
+        if (outcome.kind === 'done') {
+            this.points.clear();
+        }
+        this.showRefusal(outcome);
+    }
+
+    private showRefusal(outcome: CommandOutcome) {
+        if (outcome.kind !== 'refused') return;
+
+        this.host.context.status.show(outcome.reason);
     }
 
     // Another entity under the mouse and not one of the edited shape's points: the press is the Select tool's.
