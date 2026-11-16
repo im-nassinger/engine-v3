@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 14, step 6 of 12: joints in play: a joint moves with its A's body, Rope and Spring paths follow their ends, and a joint goes with its body. Next is step 7, the determinism test's joint levels. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 14, step 7 of 12: the determinism test's joint levels, a rope bridge, springs and a hinged car, match their hashes in Node and three browsers, and each joint setting changes a run. Next is step 8, `CreateJointCommand`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -34,8 +34,8 @@
 | Stage 11, copy and paste | Done on 2026-11-16. See below |
 | Stage 12, saving | Done on 2026-11-16. See below |
 | Stage 13, physics and the determinism test | Done on 2026-11-16. See below |
-| Stage 14, joints | Being built (step 6 of 12). See the [plan](plan.md#stage-14-in-steps) |
-| Code | Stages 0 to 13 done. Stage 14, joints, is being built: step 7 is next |
+| Stage 14, joints | Being built (step 7 of 12). See the [plan](plan.md#stage-14-in-steps) |
+| Code | Stages 0 to 13 done. Stage 14, joints, is being built: step 8 is next |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 

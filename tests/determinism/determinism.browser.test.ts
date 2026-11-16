@@ -44,8 +44,8 @@ beforeAll(async () => {
 
 describe('the determinism test in the browser', () => {
     test('every level file has its recorded hashes', () => {
-        expect(names).toHaveLength(7);
-        expect(Object.keys(hashFiles)).toHaveLength(7);
+        expect(names).toHaveLength(10);
+        expect(Object.keys(hashFiles)).toHaveLength(10);
     });
 
     test.each(names)('%s matches its recorded hashes', (name) => {

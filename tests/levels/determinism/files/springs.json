@@ -1,0 +1,654 @@
+{
+    "format": "engine-v3-level",
+    "formatVersion": 1,
+    "physicsVersion": 1,
+    "name": "springs",
+    "editor": {
+        "gridSize": 50,
+        "foldedRows": []
+    },
+    "world": {
+        "id": 1,
+        "hidden": false,
+        "locked": false,
+        "components": {
+            "NameComponent": {
+                "name": "World"
+            },
+            "TransformComponent": {
+                "position": {
+                    "x": 0,
+                    "y": 0
+                },
+                "rotation": 0,
+                "scale": {
+                    "x": 1,
+                    "y": 1
+                },
+                "skew": 0
+            },
+            "ShapeComponent": {
+                "geometry": {
+                    "kind": "rectangle",
+                    "width": 20000,
+                    "height": 10000
+                }
+            },
+            "StyleComponent": {
+                "fill": {
+                    "kind": "solid",
+                    "colour": "#BFE3F5FF"
+                },
+                "outline_colour": "#1F3552FF",
+                "outline_width": 0,
+                "opacity": 1
+            },
+            "PhysicsWorldComponent": {
+                "gravity": {
+                    "x": 0,
+                    "y": 9.8
+                },
+                "walls": false
+            }
+        },
+        "children": [
+            {
+                "id": 2,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Camera"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "CameraComponent": {
+                        "width": 1920,
+                        "height": 1080,
+                        "follow": null,
+                        "smoothing": 0.3,
+                        "mode": "fixedSize"
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 3,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Ceiling"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": -200
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 600,
+                            "height": 20
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 4,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Weight 1"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -150,
+                            "y": 50
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 40,
+                            "height": 40
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 5,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Spring 1"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -150,
+                            "y": -80
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "PathComponent": {
+                        "path": {
+                            "closed": false,
+                            "points": [
+                                {
+                                    "x": 0,
+                                    "y": 110,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -8,
+                                    "y": 96.25,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 8,
+                                    "y": 68.75,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -8,
+                                    "y": 41.25,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 8,
+                                    "y": 13.75,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -8,
+                                    "y": -13.75,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 8,
+                                    "y": -41.25,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -8,
+                                    "y": -68.75,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 8,
+                                    "y": -96.25,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 0,
+                                    "y": -110,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                }
+                            ]
+                        }
+                    },
+                    "JointComponent": {
+                        "type": "spring",
+                        "a": {
+                            "entity": 4
+                        },
+                        "b": {
+                            "entity": 3
+                        },
+                        "let_connected_objects_collide": true,
+                        "limit_rotation": false,
+                        "min_angle": -45,
+                        "max_angle": 45,
+                        "motor": false,
+                        "motor_speed": 180,
+                        "motor_strength": 50,
+                        "resistance": 0,
+                        "match_drawn_distance": false,
+                        "length": 220,
+                        "rest_length": 150,
+                        "stiffness": 1,
+                        "damping": 0.1,
+                        "ends": {
+                            "a": {
+                                "x": 0,
+                                "y": 110
+                            },
+                            "b": {
+                                "x": 0,
+                                "y": -110
+                            }
+                        }
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 6,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Weight 2"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 50
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 40,
+                            "height": 40
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 7,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Spring 2"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": -80
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "PathComponent": {
+                        "path": {
+                            "closed": false,
+                            "points": [
+                                {
+                                    "x": 0,
+                                    "y": 110,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -8,
+                                    "y": 96.25,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 8,
+                                    "y": 68.75,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -8,
+                                    "y": 41.25,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 8,
+                                    "y": 13.75,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -8,
+                                    "y": -13.75,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 8,
+                                    "y": -41.25,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -8,
+                                    "y": -68.75,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 8,
+                                    "y": -96.25,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 0,
+                                    "y": -110,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                }
+                            ]
+                        }
+                    },
+                    "JointComponent": {
+                        "type": "spring",
+                        "a": {
+                            "entity": 6
+                        },
+                        "b": {
+                            "entity": 3
+                        },
+                        "let_connected_objects_collide": true,
+                        "limit_rotation": false,
+                        "min_angle": -45,
+                        "max_angle": 45,
+                        "motor": false,
+                        "motor_speed": 180,
+                        "motor_strength": 50,
+                        "resistance": 0,
+                        "match_drawn_distance": false,
+                        "length": 220,
+                        "rest_length": 150,
+                        "stiffness": 4,
+                        "damping": 0.30000000000000004,
+                        "ends": {
+                            "a": {
+                                "x": 0,
+                                "y": 110
+                            },
+                            "b": {
+                                "x": 0,
+                                "y": -110
+                            }
+                        }
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 8,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Weight 3"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 150,
+                            "y": 50
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 40,
+                            "height": 40
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 9,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Spring 3"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 150,
+                            "y": -80
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "PathComponent": {
+                        "path": {
+                            "closed": false,
+                            "points": [
+                                {
+                                    "x": 0,
+                                    "y": 110,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -8,
+                                    "y": 96.25,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 8,
+                                    "y": 68.75,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -8,
+                                    "y": 41.25,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 8,
+                                    "y": 13.75,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -8,
+                                    "y": -13.75,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 8,
+                                    "y": -41.25,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -8,
+                                    "y": -68.75,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 8,
+                                    "y": -96.25,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": 0,
+                                    "y": -110,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                }
+                            ]
+                        }
+                    },
+                    "JointComponent": {
+                        "type": "spring",
+                        "a": {
+                            "entity": 8
+                        },
+                        "b": {
+                            "entity": 3
+                        },
+                        "let_connected_objects_collide": true,
+                        "limit_rotation": false,
+                        "min_angle": -45,
+                        "max_angle": 45,
+                        "motor": false,
+                        "motor_speed": 180,
+                        "motor_strength": 50,
+                        "resistance": 0,
+                        "match_drawn_distance": false,
+                        "length": 220,
+                        "rest_length": 150,
+                        "stiffness": 10,
+                        "damping": 0.5,
+                        "ends": {
+                            "a": {
+                                "x": 0,
+                                "y": 110
+                            },
+                            "b": {
+                                "x": 0,
+                                "y": -110
+                            }
+                        }
+                    }
+                },
+                "children": []
+            }
+        ]
+    }
+}

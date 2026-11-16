@@ -1,8 +1,10 @@
+import type { Point } from '../../../../src/core/geometry/index.ts';
 import { Level } from '../../../../src/core/level/index.ts';
 
 import {
     addBody,
     addEntity,
+    addJoint,
     addSurface,
     at,
     circle,
@@ -155,7 +157,106 @@ function transformedGroup() {
     return level;
 }
 
-// The determinism test's levels in stage 13. Stage 14 adds joints and stage 15 the camera.
+const PLANKS = 8;
+const PLANK = 50;
+const PLANK_GAP = 10;
+
+// Eight planks hung by Ropes between two Static posts, sagging, with a crate dropped on the middle.
+function ropeBridge() {
+    const level = Level.createNew();
+    const span = PLANKS * PLANK + (PLANKS + 1) * PLANK_GAP;
+    const left = -span / 2;
+    const leftPost = addSurface(addEntity(level, level.world, 'Left post', at(left - 10, 50)), rectangle(20, 100));
+    const rightPost = addSurface(addEntity(level, level.world, 'Right post', at(-left + 10, 50)), rectangle(20, 100));
+    const planks = [];
+
+    for (let index = 0; index < PLANKS; index += 1) {
+        const x = left + PLANK_GAP + PLANK / 2 + index * (PLANK + PLANK_GAP);
+        planks.push(
+            addBody(addSurface(addEntity(level, level.world, `Plank ${index + 1}`, at(x, 5)), rectangle(PLANK, 10))),
+        );
+    }
+    const ends = [leftPost, ...planks, rightPost];
+
+    for (let index = 0; index + 1 < ends.length; index += 1) {
+        const x = left + index * (PLANK + PLANK_GAP);
+        const a = ends[index + 1]?.id ?? null;
+        const b = ends[index]?.id ?? null;
+        // A slack Rope from the right edge of one to the left edge of the next, A on the right.
+        addJoint(
+            level,
+            `Rope ${index + 1}`,
+            { type: 'rope', a, b, matchDrawnDistance: false, length: PLANK_GAP * 1.5 },
+            {
+                x: x + PLANK_GAP,
+                y: 0,
+            },
+            { x, y: 0 },
+        );
+    }
+    addBody(addSurface(addEntity(level, level.world, 'Crate', at(15, -150)), rectangle(40, 40), { density: 2 }));
+
+    return level;
+}
+
+const STIFFNESSES = [1, 4, 10];
+
+// Three weights hung from a Static ceiling by Springs of three stiffnesses, each pulled down past its rest length.
+function springs() {
+    const level = Level.createNew();
+    const ceiling = addSurface(addEntity(level, level.world, 'Ceiling', at(0, -200)), rectangle(600, 20));
+
+    STIFFNESSES.forEach((stiffness, index) => {
+        const x = -150 + index * 150;
+        const weight = addEntity(level, level.world, `Weight ${index + 1}`, at(x, 50));
+        addBody(addSurface(weight, rectangle(40, 40)));
+        const joint = { type: 'spring' as const, a: weight.id, b: ceiling.id, stiffness, damping: 0.1 + index * 0.2 };
+        addJoint(
+            level,
+            `Spring ${index + 1}`,
+            { ...joint, matchDrawnDistance: false, restLength: 150 },
+            point(x, 30),
+            point(x, -190),
+        );
+    });
+
+    return level;
+}
+
+const WHEEL = 20;
+
+// A car of one body whose back wheel is driven clockwise by a Hinge's motor and whose front wheel turns freely.
+function hingedCar() {
+    const level = Level.createNew();
+    addSurface(addEntity(level, level.world, 'Floor', at(0, 300)), rectangle(1600, 20));
+    addSurface(
+        addEntity(level, level.world, 'Bump', { position: { x: 100, y: 290 }, rotation: 45 }),
+        rectangle(30, 30),
+    );
+    const car = addEntity(level, level.world, 'Car', at(-300, 230));
+    addBody(addSurface(car, rectangle(140, 30)));
+    const back = addBody(
+        addSurface(addEntity(level, level.world, 'Back wheel', at(-350, 260)), circle(WHEEL), { friction: 0.9 }),
+    );
+    const front = addBody(
+        addSurface(addEntity(level, level.world, 'Front wheel', at(-250, 260)), circle(WHEEL), { friction: 0.9 }),
+    );
+    addJoint(
+        level,
+        'Back hinge',
+        { type: 'hinge', a: back.id, b: car.id, motor: true, motorSpeed: 180, motorStrength: 200 },
+        point(-350, 260),
+    );
+    addJoint(level, 'Front hinge', { type: 'hinge', a: front.id, b: car.id }, point(-250, 260));
+
+    return level;
+}
+
+function point(x: number, y: number): Point {
+    return { x, y };
+}
+
+// The determinism test's levels: stage 13's seven and stage 14's three with joints. Stage 15 adds the camera.
 export const DETERMINISM_LEVELS: readonly DeterminismLevel[] = [
     { name: 'crate-pyramid', build: cratePyramid },
     { name: 'merged-car', build: mergedCar },
@@ -164,4 +265,7 @@ export const DETERMINISM_LEVELS: readonly DeterminismLevel[] = [
     { name: 'bouncing-balls', build: bouncingBalls },
     { name: 'body-settings', build: bodySettings },
     { name: 'transformed-group', build: transformedGroup },
+    { name: 'rope-bridge', build: ropeBridge },
+    { name: 'springs', build: springs },
+    { name: 'hinged-car', build: hingedCar },
 ];

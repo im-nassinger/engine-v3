@@ -1,0 +1,1248 @@
+{
+    "format": "engine-v3-level",
+    "formatVersion": 1,
+    "physicsVersion": 1,
+    "name": "rope-bridge",
+    "editor": {
+        "gridSize": 50,
+        "foldedRows": []
+    },
+    "world": {
+        "id": 1,
+        "hidden": false,
+        "locked": false,
+        "components": {
+            "NameComponent": {
+                "name": "World"
+            },
+            "TransformComponent": {
+                "position": {
+                    "x": 0,
+                    "y": 0
+                },
+                "rotation": 0,
+                "scale": {
+                    "x": 1,
+                    "y": 1
+                },
+                "skew": 0
+            },
+            "ShapeComponent": {
+                "geometry": {
+                    "kind": "rectangle",
+                    "width": 20000,
+                    "height": 10000
+                }
+            },
+            "StyleComponent": {
+                "fill": {
+                    "kind": "solid",
+                    "colour": "#BFE3F5FF"
+                },
+                "outline_colour": "#1F3552FF",
+                "outline_width": 0,
+                "opacity": 1
+            },
+            "PhysicsWorldComponent": {
+                "gravity": {
+                    "x": 0,
+                    "y": 9.8
+                },
+                "walls": false
+            }
+        },
+        "children": [
+            {
+                "id": 2,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Camera"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "CameraComponent": {
+                        "width": 1920,
+                        "height": 1080,
+                        "follow": null,
+                        "smoothing": 0.3,
+                        "mode": "fixedSize"
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 3,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Left post"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -255,
+                            "y": 50
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 20,
+                            "height": 100
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 4,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Right post"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 255,
+                            "y": 50
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 20,
+                            "height": 100
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 5,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Plank 1"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -210,
+                            "y": 5
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 50,
+                            "height": 10
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 6,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Plank 2"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -150,
+                            "y": 5
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 50,
+                            "height": 10
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 7,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Plank 3"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -90,
+                            "y": 5
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 50,
+                            "height": 10
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 8,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Plank 4"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -30,
+                            "y": 5
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 50,
+                            "height": 10
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 9,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Plank 5"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 30,
+                            "y": 5
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 50,
+                            "height": 10
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 10,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Plank 6"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 90,
+                            "y": 5
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 50,
+                            "height": 10
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 11,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Plank 7"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 150,
+                            "y": 5
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 50,
+                            "height": 10
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 12,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Plank 8"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 210,
+                            "y": 5
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 50,
+                            "height": 10
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 13,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Rope 1"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -240,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "PathComponent": {
+                        "path": {
+                            "closed": false,
+                            "points": [
+                                {
+                                    "x": 5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                }
+                            ]
+                        }
+                    },
+                    "JointComponent": {
+                        "type": "rope",
+                        "a": {
+                            "entity": 5
+                        },
+                        "b": {
+                            "entity": 3
+                        },
+                        "let_connected_objects_collide": true,
+                        "limit_rotation": false,
+                        "min_angle": -45,
+                        "max_angle": 45,
+                        "motor": false,
+                        "motor_speed": 180,
+                        "motor_strength": 50,
+                        "resistance": 0,
+                        "match_drawn_distance": false,
+                        "length": 15,
+                        "rest_length": 10,
+                        "stiffness": 2,
+                        "damping": 0.3,
+                        "ends": {
+                            "a": {
+                                "x": 5,
+                                "y": 0
+                            },
+                            "b": {
+                                "x": -5,
+                                "y": 0
+                            }
+                        }
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 14,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Rope 2"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -180,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "PathComponent": {
+                        "path": {
+                            "closed": false,
+                            "points": [
+                                {
+                                    "x": 5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                }
+                            ]
+                        }
+                    },
+                    "JointComponent": {
+                        "type": "rope",
+                        "a": {
+                            "entity": 6
+                        },
+                        "b": {
+                            "entity": 5
+                        },
+                        "let_connected_objects_collide": true,
+                        "limit_rotation": false,
+                        "min_angle": -45,
+                        "max_angle": 45,
+                        "motor": false,
+                        "motor_speed": 180,
+                        "motor_strength": 50,
+                        "resistance": 0,
+                        "match_drawn_distance": false,
+                        "length": 15,
+                        "rest_length": 10,
+                        "stiffness": 2,
+                        "damping": 0.3,
+                        "ends": {
+                            "a": {
+                                "x": 5,
+                                "y": 0
+                            },
+                            "b": {
+                                "x": -5,
+                                "y": 0
+                            }
+                        }
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 15,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Rope 3"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -120,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "PathComponent": {
+                        "path": {
+                            "closed": false,
+                            "points": [
+                                {
+                                    "x": 5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                }
+                            ]
+                        }
+                    },
+                    "JointComponent": {
+                        "type": "rope",
+                        "a": {
+                            "entity": 7
+                        },
+                        "b": {
+                            "entity": 6
+                        },
+                        "let_connected_objects_collide": true,
+                        "limit_rotation": false,
+                        "min_angle": -45,
+                        "max_angle": 45,
+                        "motor": false,
+                        "motor_speed": 180,
+                        "motor_strength": 50,
+                        "resistance": 0,
+                        "match_drawn_distance": false,
+                        "length": 15,
+                        "rest_length": 10,
+                        "stiffness": 2,
+                        "damping": 0.3,
+                        "ends": {
+                            "a": {
+                                "x": 5,
+                                "y": 0
+                            },
+                            "b": {
+                                "x": -5,
+                                "y": 0
+                            }
+                        }
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 16,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Rope 4"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -60,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "PathComponent": {
+                        "path": {
+                            "closed": false,
+                            "points": [
+                                {
+                                    "x": 5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                }
+                            ]
+                        }
+                    },
+                    "JointComponent": {
+                        "type": "rope",
+                        "a": {
+                            "entity": 8
+                        },
+                        "b": {
+                            "entity": 7
+                        },
+                        "let_connected_objects_collide": true,
+                        "limit_rotation": false,
+                        "min_angle": -45,
+                        "max_angle": 45,
+                        "motor": false,
+                        "motor_speed": 180,
+                        "motor_strength": 50,
+                        "resistance": 0,
+                        "match_drawn_distance": false,
+                        "length": 15,
+                        "rest_length": 10,
+                        "stiffness": 2,
+                        "damping": 0.3,
+                        "ends": {
+                            "a": {
+                                "x": 5,
+                                "y": 0
+                            },
+                            "b": {
+                                "x": -5,
+                                "y": 0
+                            }
+                        }
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 17,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Rope 5"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "PathComponent": {
+                        "path": {
+                            "closed": false,
+                            "points": [
+                                {
+                                    "x": 5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                }
+                            ]
+                        }
+                    },
+                    "JointComponent": {
+                        "type": "rope",
+                        "a": {
+                            "entity": 9
+                        },
+                        "b": {
+                            "entity": 8
+                        },
+                        "let_connected_objects_collide": true,
+                        "limit_rotation": false,
+                        "min_angle": -45,
+                        "max_angle": 45,
+                        "motor": false,
+                        "motor_speed": 180,
+                        "motor_strength": 50,
+                        "resistance": 0,
+                        "match_drawn_distance": false,
+                        "length": 15,
+                        "rest_length": 10,
+                        "stiffness": 2,
+                        "damping": 0.3,
+                        "ends": {
+                            "a": {
+                                "x": 5,
+                                "y": 0
+                            },
+                            "b": {
+                                "x": -5,
+                                "y": 0
+                            }
+                        }
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 18,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Rope 6"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 60,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "PathComponent": {
+                        "path": {
+                            "closed": false,
+                            "points": [
+                                {
+                                    "x": 5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                }
+                            ]
+                        }
+                    },
+                    "JointComponent": {
+                        "type": "rope",
+                        "a": {
+                            "entity": 10
+                        },
+                        "b": {
+                            "entity": 9
+                        },
+                        "let_connected_objects_collide": true,
+                        "limit_rotation": false,
+                        "min_angle": -45,
+                        "max_angle": 45,
+                        "motor": false,
+                        "motor_speed": 180,
+                        "motor_strength": 50,
+                        "resistance": 0,
+                        "match_drawn_distance": false,
+                        "length": 15,
+                        "rest_length": 10,
+                        "stiffness": 2,
+                        "damping": 0.3,
+                        "ends": {
+                            "a": {
+                                "x": 5,
+                                "y": 0
+                            },
+                            "b": {
+                                "x": -5,
+                                "y": 0
+                            }
+                        }
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 19,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Rope 7"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 120,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "PathComponent": {
+                        "path": {
+                            "closed": false,
+                            "points": [
+                                {
+                                    "x": 5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                }
+                            ]
+                        }
+                    },
+                    "JointComponent": {
+                        "type": "rope",
+                        "a": {
+                            "entity": 11
+                        },
+                        "b": {
+                            "entity": 10
+                        },
+                        "let_connected_objects_collide": true,
+                        "limit_rotation": false,
+                        "min_angle": -45,
+                        "max_angle": 45,
+                        "motor": false,
+                        "motor_speed": 180,
+                        "motor_strength": 50,
+                        "resistance": 0,
+                        "match_drawn_distance": false,
+                        "length": 15,
+                        "rest_length": 10,
+                        "stiffness": 2,
+                        "damping": 0.3,
+                        "ends": {
+                            "a": {
+                                "x": 5,
+                                "y": 0
+                            },
+                            "b": {
+                                "x": -5,
+                                "y": 0
+                            }
+                        }
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 20,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Rope 8"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 180,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "PathComponent": {
+                        "path": {
+                            "closed": false,
+                            "points": [
+                                {
+                                    "x": 5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                }
+                            ]
+                        }
+                    },
+                    "JointComponent": {
+                        "type": "rope",
+                        "a": {
+                            "entity": 12
+                        },
+                        "b": {
+                            "entity": 11
+                        },
+                        "let_connected_objects_collide": true,
+                        "limit_rotation": false,
+                        "min_angle": -45,
+                        "max_angle": 45,
+                        "motor": false,
+                        "motor_speed": 180,
+                        "motor_strength": 50,
+                        "resistance": 0,
+                        "match_drawn_distance": false,
+                        "length": 15,
+                        "rest_length": 10,
+                        "stiffness": 2,
+                        "damping": 0.3,
+                        "ends": {
+                            "a": {
+                                "x": 5,
+                                "y": 0
+                            },
+                            "b": {
+                                "x": -5,
+                                "y": 0
+                            }
+                        }
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 21,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Rope 9"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 240,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "PathComponent": {
+                        "path": {
+                            "closed": false,
+                            "points": [
+                                {
+                                    "x": 5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                },
+                                {
+                                    "x": -5,
+                                    "y": 0,
+                                    "handle_in": null,
+                                    "handle_out": null,
+                                    "corner": "sharp"
+                                }
+                            ]
+                        }
+                    },
+                    "JointComponent": {
+                        "type": "rope",
+                        "a": {
+                            "entity": 4
+                        },
+                        "b": {
+                            "entity": 12
+                        },
+                        "let_connected_objects_collide": true,
+                        "limit_rotation": false,
+                        "min_angle": -45,
+                        "max_angle": 45,
+                        "motor": false,
+                        "motor_speed": 180,
+                        "motor_strength": 50,
+                        "resistance": 0,
+                        "match_drawn_distance": false,
+                        "length": 15,
+                        "rest_length": 10,
+                        "stiffness": 2,
+                        "damping": 0.3,
+                        "ends": {
+                            "a": {
+                                "x": 5,
+                                "y": 0
+                            },
+                            "b": {
+                                "x": -5,
+                                "y": 0
+                            }
+                        }
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 22,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Crate"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 15,
+                            "y": -150
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 40,
+                            "height": 40
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 2,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            }
+        ]
+    }
+}
