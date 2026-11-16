@@ -160,3 +160,48 @@ describe('LevelReader.readSubtree', () => {
         expect(read).toThrow(`Index ${outOfRange} is not a place among entity ${level.world.id}'s children.`);
     });
 });
+
+describe('LevelReader.checkSubtree', () => {
+    test('accepts what readSubtree accepts and leaves the level as it was', () => {
+        const { level, group } = buildLevel();
+        const writer = new LevelWriter();
+        const before = writer.write(level);
+        const data = [plainEntity(10, { NameComponent: { name: 'Pasted' } }, [plainEntity(11)])];
+
+        expect(createReader().checkSubtree(level, data, group)).toEqual({ ok: true });
+        expect(writer.write(level)).toEqual(before);
+        expect(level.findEntity(10)).toBeUndefined();
+    });
+
+    test('refuses what readSubtree refuses, with the same refusal, and changes nothing', () => {
+        const { level, square, group } = buildLevel();
+        const first = group.children[0];
+        if (first === undefined) throw new Error('The test level has no first child.');
+        const writer = new LevelWriter();
+        const before = writer.write(level);
+        const reader = createReader(SMALL_LIMITS);
+        const cases: { data: unknown; parent: Entity }[] = [
+            { data: [], parent: level.world },
+            { data: [plainEntity(square.id)], parent: level.world },
+            { data: [plainEntity(10), plainEntity(10)], parent: level.world },
+            { data: [plainEntity(10, { [CameraComponent.schema.typeName]: {} })], parent: level.world },
+            { data: [plainEntity(10, { NameComponent: { name: '' } })], parent: level.world },
+            { data: [plainEntity(10)], parent: first },
+            { data: [plainEntity(10), plainEntity(11)], parent: level.world },
+        ];
+
+        for (const { data, parent } of cases) {
+            const checked = reader.checkSubtree(level, data, parent);
+            const countBefore = level.entityCount;
+            const read = reader.readSubtree(level, data, parent, 0);
+
+            expect(checked.ok).toBe(false);
+            expect(read.ok).toBe(false);
+            if (checked.ok || read.ok) continue;
+            expect(checked.refusal).toEqual(read.refusal);
+            expect(level.entityCount).toBe(countBefore);
+        }
+
+        expect(writer.write(level)).toEqual(before);
+    });
+});

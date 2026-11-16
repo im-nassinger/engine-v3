@@ -19,7 +19,7 @@ import type { FormatUpgrader } from '../versions/FormatUpgrader.ts';
 import { LEVEL_FORMAT } from '../LevelData.ts';
 import type { LevelLimits } from '../LevelLimits.ts';
 import { PhysicsVersions } from '../versions/PhysicsVersions.ts';
-import type { ReadOutcome } from './ReadOutcome.ts';
+import type { ReadCheck, ReadOutcome } from './ReadOutcome.ts';
 import { ReadRefused } from './ReadRefused.ts';
 
 type RawRecord = Readonly<Record<string, unknown>>;
@@ -160,6 +160,19 @@ export class LevelReader {
             const entities = this.readSubtreeEntities(level, raw, parent);
             const roots = this.buildSubtree(level, entities, parent, index);
             return { ok: true, value: roots };
+        } catch (error) {
+            if (error instanceof ReadRefused) return { ok: false, refusal: error.refusal };
+
+            throw error;
+        }
+    }
+
+    // Every check readSubtree runs on the same roots, parent and level, without changing anything: a paste
+    // asks before it builds the change that adds them, so it is refused whole with the reader's own reason.
+    checkSubtree(level: Level, raw: unknown, parent: Entity): ReadCheck {
+        try {
+            this.readSubtreeEntities(level, raw, parent);
+            return { ok: true };
         } catch (error) {
             if (error instanceof ReadRefused) return { ok: false, refusal: error.refusal };
 

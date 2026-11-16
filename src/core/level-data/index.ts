@@ -8,4 +8,4 @@ export { LevelReader } from './reading/LevelReader.ts';
 export { LevelWriter } from './writing/LevelWriter.ts';
 export { PhysicsVersions } from './versions/PhysicsVersions.ts';
 export type { PhysicsBuild } from './versions/PhysicsVersions.ts';
-export type { ReadOutcome, ReadRefusal } from './reading/ReadOutcome.ts';
+export type { ReadCheck, ReadOutcome, ReadRefusal } from './reading/ReadOutcome.ts';

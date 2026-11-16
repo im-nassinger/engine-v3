@@ -165,3 +165,10 @@ Made under the standing yes (2026-11-16), before building. The [plan](../../plan
 - **`copiedRoots(level, entities)`** is its own function in `editor/clipboard/codec/`, so the commands can tell what is left before they encode; `encode` throws when nothing is. The fragment's `entities` stay `unknown` until the paste reads them.
 - **The token maker** is `TokenMaker` in `editor/session`; `EditorSession` counts `opening-1`, `opening-2` when none is given, which only tests rely on, and `EditorComposition` passes `crypto.randomUUID`.
 - **A root that draws nothing counts as its origin** for the centre, as it does for Group's.
+
+**As built, step 3 (standing yes, 2026-11-16):**
+
+- **`IdRemapping.remap(fragment, target)`** in `editor/clipboard/remapping/` takes a `PasteTarget` (`level`, `sourceToken`), which an `OpenLevel` is, and gives the entities ready for `LevelReader`, leaving the fragment as it was. New ids come from `Level.allocateId`, parents first in panel order, and are used up even when the paste is refused. *Why: ids are never reused in a session, so a refused paste wasting a few is harmless.*
+- **It works on the raw data, before the reader checks it**, and passes anything not shaped as an entity on as it is, so the reader refuses it with its own reason. *Why: the reader stays the only code that checks data, and remapping first lets it check the ids the level will really get.*
+- **Only fields of the `entity` kind are rewired**, found through the registry's schemas, so a v2 component with an entity field needs nothing here. Two links to the same outside entity from another opening get the same fresh id. A `null` link stays empty.
+- **`LevelReader.checkSubtree(level, raw, parent)`** gives a `ReadCheck` (`{ ok: true }` or the refusal) by running `readSubtree`'s reading and checks without building.

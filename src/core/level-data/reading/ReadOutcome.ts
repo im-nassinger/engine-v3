@@ -9,3 +9,6 @@ export type ReadRefusal =
 
 export type ReadOutcome<T> =
     { readonly ok: true; readonly value: T } | { readonly ok: false; readonly refusal: ReadRefusal };
+
+// A check that builds nothing: LevelReader.checkSubtree.
+export type ReadCheck = { readonly ok: true } | { readonly ok: false; readonly refusal: ReadRefusal };
