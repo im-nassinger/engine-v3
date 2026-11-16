@@ -8,6 +8,7 @@ import {
     runFrames,
     screenMiddleOf,
     timeMs,
+    waitForDrawing,
 } from './testing/levelViewPage.ts';
 import type { LevelViewPage } from './testing/levelViewPage.ts';
 
@@ -54,6 +55,7 @@ describe('the Select tool at 10,000 entities', () => {
                 runFrames(opened.frames);
             });
             times.push(elapsed);
+            waitForDrawing(opened);
 
             expect(opened.session.openLevel.selection.entities).toEqual([crate]);
             expect(opened.levelView.overlays.selection.drawn.outlines).toBe(1);
@@ -89,6 +91,7 @@ describe('the Select tool at 10,000 entities', () => {
                     runFrames(opened.frames);
                 }),
             );
+            waitForDrawing(opened);
         }
         const end = { x: from.x + DRAG_FRAMES, y: from.y + DRAG_FRAMES / 2 };
         opened.tools.pointerUp(pointerAt(opened, end));

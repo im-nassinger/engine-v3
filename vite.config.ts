@@ -43,7 +43,8 @@ export default defineConfig({
                     include: [PERFORMANCE_TESTS],
                     // One test at a time in one browser, so nothing else competes for the processor.
                     fileParallelism: false,
-                    testTimeout: 60_000,
+                    // CI draws without a GPU: a test waits for each frame's drawing, about 0.5 s there.
+                    testTimeout: 180_000,
                     browser: {
                         enabled: true,
                         headless: true,

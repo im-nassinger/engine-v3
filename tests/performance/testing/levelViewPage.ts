@@ -70,6 +70,19 @@ export function runFrames(frames: ManualFrames) {
     }
 }
 
+// Waits until the GPU has drawn every frame run so far. A browser shows a frame only once it is drawn, so
+// it never queues more; a test running frames back to back would. Without a GPU the drawing is slow, and
+// the queue it left would hold up the next frame timed, or the renderer's destroy, by many seconds.
+export function waitForDrawing(page: LevelViewPage) {
+    const canvas = page.levelView.canvas;
+    if (!(canvas instanceof HTMLCanvasElement)) throw new Error('The level view draws off screen.');
+    const context = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
+    if (context === null) throw new Error('The level view draws without WebGL.');
+
+    // Reading a pixel back waits for the drawing before it; gl.finish() returns at once in Chromium.
+    context.readPixels(0, 0, 1, 1, context.RGBA, context.UNSIGNED_BYTE, new Uint8Array(4));
+}
+
 // Where an entity's middle is on screen.
 export function screenMiddleOf(page: LevelViewPage, entity: Entity): Point {
     const bounds = page.session.openLevel.caches.bounds.subtreeBoundsOf(entity);
