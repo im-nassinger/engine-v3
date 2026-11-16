@@ -1,5 +1,6 @@
 import { VersionCounter } from '../../../core/events/index.ts';
 import type { Matrix2D, Point } from '../../../core/geometry/index.ts';
+import { V1_LEVEL_LIMITS } from '../../../core/level-data/index.ts';
 import { createShape } from '../../commands/index.ts';
 import type { ShapeDrawing } from '../../commands/index.ts';
 import type { DragReadout } from '../readout/DragReadout.ts';
@@ -8,6 +9,7 @@ import type { LevelPointerInput, Modifiers, Tool, ToolContext, ToolKey } from '.
 
 import { atLeastOnePixel, draggedBox, placedDrawing } from './boxDrawing.ts';
 import type { BoxKind, BoxSize } from './boxDrawing.ts';
+import { angleLocked, pointsDrawing, samePoint } from './polygonDrawing.ts';
 
 // The options strip's three kinds. A line is a polygon finished open.
 export type ShapeToolKind = BoxKind | 'polygon';
@@ -19,8 +21,24 @@ export type ShapePreview = {
     readonly toLevel: Matrix2D;
 };
 
+// A polygon or line being drawn point by point, in the current group's own space, and the matrix from
+// that space to level positions. next is where a click adds the next point, or the first point when a
+// click there closes the polygon. Before the first click there are no points, only next.
+export type PolygonPreview = {
+    readonly points: readonly Point[];
+    readonly next: Point | undefined;
+    readonly closing: boolean;
+    readonly toLevel: Matrix2D;
+};
+
 // The requirement's "a press that moves less than 4 px is a click", in screen pixels.
 export const DRAW_START_PX = 4;
+
+// A click this close to the first point's middle closes the polygon: the 12 px ring with a little room.
+export const CLOSE_PX = 8;
+
+const MAX_POINTS = V1_LEVEL_LIMITS.maxPoints;
+const TOO_MANY_POINTS = `A polygon holds at most ${MAX_POINTS.toLocaleString('en-US')} points`;
 
 const LOCKED = 'This group is locked';
 
@@ -48,9 +66,20 @@ type Press = {
     dragging: boolean;
 };
 
-// Draws the four kinds a ShapeComponent holds. This step builds the rectangle and the circle: a click places
-// the remembered size centred on the mouse, a drag sets a new size. Finishing runs createShape, one step,
-// and the controller selects the shape and returns to Select unless the tool is locked.
+// The points placed so far, kept in the space the first point was placed in.
+type PolygonInProgress = {
+    readonly points: readonly Point[];
+    readonly space: GroupSpace;
+};
+
+// What finishing does next: the controller selects the shape and returns to Select, or the tool only
+// keeps the shape, for Esc and for deactivate, which the controller calls while it switches tools.
+type FinishWay = 'return' | 'keep';
+
+// Draws the four kinds a ShapeComponent holds. A rectangle or a circle: a click places the remembered size
+// centred on the mouse, a drag sets a new size. A polygon: each click a point, closed by clicking the first
+// point, finished open as a line by Enter, a double-click, Esc or another tool. Finishing runs createShape,
+// one step, and the controller selects the shape and returns to Select unless the tool is locked.
 export class ShapeTool implements Tool {
     readonly id = 'shape';
     readonly preview = new VersionCounter();
@@ -65,9 +94,15 @@ export class ShapeTool implements Tool {
     private lastInput: LevelPointerInput | undefined;
     private shown: ShapePreview | undefined;
     private shownReadout: DragReadout | undefined;
+    private polygon: PolygonInProgress | undefined;
+    // A left press for a polygon's point, until it is released.
+    private polygonPress: LevelPointerInput | undefined;
+    private shownPolygon: PolygonPreview | undefined;
 
     get hint() {
-        return this.chosenKind === 'polygon' ? POLYGON_HINT : BOX_HINT;
+        const isPolygon = this.chosenKind === 'polygon' || this.polygon !== undefined;
+
+        return isPolygon ? POLYGON_HINT : BOX_HINT;
     }
 
     get kind() {
@@ -84,7 +119,12 @@ export class ShapeTool implements Tool {
         return this.shownReadout;
     }
 
-    // The options strip. A drag in progress keeps its kind.
+    // The polygon or line being drawn, for the overlay.
+    get polygonDrawing() {
+        return this.shownPolygon;
+    }
+
+    // The options strip. A drag or a polygon in progress keeps its kind.
     chooseKind(kind: ShapeToolKind) {
         if (kind === this.chosenKind) return;
 
@@ -100,24 +140,27 @@ export class ShapeTool implements Tool {
         context.openLevel.selection.clear();
     }
 
-    // A drag in progress makes nothing, as with Esc: nothing is placed until the release.
+    // A drag in progress makes nothing, as with Esc: nothing is placed until the release. A polygon in
+    // progress is finished open and kept.
     deactivate() {
         this.press = undefined;
+        this.polygonPress = undefined;
+        this.finishPolygon(false, 'keep');
         this.lastInput = undefined;
-        this.show(undefined, undefined);
+        this.clearPreview();
     }
 
     pointerDown(input: LevelPointerInput) {
         const context = this.context;
         if (context === undefined || input.button !== 'left') return;
-        if (this.press !== undefined) return;
+        if (this.press !== undefined || this.polygonPress !== undefined) return;
 
         const kind = this.chosenKind;
-        if (kind === 'polygon') return;
+        if (this.polygon === undefined && this.refusedAsLocked(context)) return;
 
-        const { currentGroup, caches } = context.openLevel;
-        if (caches.hidden.isLocked(currentGroup.group)) {
-            context.status.show(LOCKED);
+        if (kind === 'polygon' || this.polygon !== undefined) {
+            this.polygonPress = input;
+            this.lastInput = input;
             return;
         }
 
@@ -127,14 +170,14 @@ export class ShapeTool implements Tool {
         const start = space.toGroup.apply(this.snapped(input.levelPosition, input.modifiers));
         this.press = { kind, screenPosition: input.screenPosition, start, space, dragging: false };
         this.lastInput = input;
-        this.show({ drawing: placedDrawing(kind, this.sizes[kind], start), toLevel: space.toLevel }, undefined);
+        this.show({ shape: { drawing: placedDrawing(kind, this.sizes[kind], start), toLevel: space.toLevel } });
     }
 
     pointerMove(input: LevelPointerInput) {
         this.lastInput = input;
         const press = this.press;
         if (press === undefined) {
-            this.showHover();
+            this.showHover(input.modifiers);
             return;
         }
 
@@ -145,21 +188,42 @@ export class ShapeTool implements Tool {
     }
 
     pointerUp(input: LevelPointerInput) {
+        if (input.button !== 'left') return;
+
+        const polygonPress = this.polygonPress;
+        if (polygonPress !== undefined) {
+            this.polygonPress = undefined;
+            this.polygonClick(polygonPress);
+            return;
+        }
+
         const press = this.press;
-        if (press === undefined || input.button !== 'left') return;
+        if (press === undefined) return;
 
         this.press = undefined;
         this.lastInput = input;
         const drawing = press.dragging
             ? this.release(press, input)
             : placedDrawing(press.kind, this.sizes[press.kind], press.start);
-        this.show(undefined, undefined);
-        this.finish(drawing);
+        this.clearPreview();
+        this.make(drawing, 'return');
     }
 
-    // Shift, Alt and Ctrl change a drag at once, without waiting for the mouse to move. No key is used.
+    // Shift, Alt and Ctrl change a drag or the polygon's next point at once, without waiting for the mouse
+    // to move. While a polygon is drawn, Enter finishes it as a line and Backspace removes the last point.
     keyDown(key: ToolKey) {
         this.redrawFor(key);
+        if (this.polygon === undefined) return false;
+
+        if (key.code === 'Enter' || key.code === 'NumpadEnter') {
+            this.finishPolygon(false, 'return');
+            return true;
+        }
+
+        if (key.code === 'Backspace') {
+            this.removeLastPoint();
+            return true;
+        }
 
         return false;
     }
@@ -168,12 +232,133 @@ export class ShapeTool implements Tool {
         this.redrawFor(key);
     }
 
-    // Esc during a drag ends it with nothing made.
-    cancel() {
-        if (this.press === undefined) return false;
+    // Ctrl+Z removes the polygon's last point and makes no step. A box drag holds the mouse, so Ctrl+Z
+    // does nothing then, as it does during the Select tool's drags.
+    undoDrawingStep() {
+        if (this.press !== undefined) return true;
+        if (this.polygon === undefined) return false;
 
-        this.press = undefined;
+        this.removeLastPoint();
+
+        return true;
+    }
+
+    // Esc during a drag ends it with nothing made, and during a press for a polygon's point drops that
+    // point. Esc during a polygon finishes it open and keeps it: no key throws work away.
+    cancel() {
+        if (this.press !== undefined) {
+            this.press = undefined;
+            this.showHover();
+            return true;
+        }
+
+        if (this.polygonPress !== undefined) {
+            this.polygonPress = undefined;
+            return true;
+        }
+
+        if (this.polygon === undefined) return false;
+
+        this.finishPolygon(false, 'keep');
+
+        return true;
+    }
+
+    // The second click of a double-click adds no point and finishes the drawing open. A click on the
+    // first point closes it from 3 points on, and is ignored before that.
+    private polygonClick(input: LevelPointerInput) {
+        this.lastInput = input;
+        const polygon = this.polygon;
+        if (polygon === undefined) {
+            this.startPolygon(input);
+            return;
+        }
+
+        if (input.clickCount >= 2) {
+            this.finishPolygon(false, 'return');
+            return;
+        }
+
+        if (this.isNearFirst(polygon, input.levelPosition)) {
+            if (polygon.points.length >= 3) {
+                this.finishPolygon(true, 'return');
+            }
+            return;
+        }
+
+        if (polygon.points.length >= MAX_POINTS) {
+            this.context?.status.show(TOO_MANY_POINTS);
+            return;
+        }
+
+        const point = this.nextPoint(polygon, input.levelPosition, input.modifiers);
+        const last = polygon.points.at(-1);
+        // A second click in the same place would make a segment of no length.
+        if (last !== undefined && samePoint(last, point)) return;
+
+        this.polygon = { points: [...polygon.points, point], space: polygon.space };
         this.showHover();
+    }
+
+    private startPolygon(input: LevelPointerInput) {
+        const space = this.groupSpace();
+        if (space === undefined) return;
+
+        const first = space.toGroup.apply(this.snapped(input.levelPosition, input.modifiers));
+        this.polygon = { points: [first], space };
+        this.showHover();
+    }
+
+    // A closed polygon needs 3 points and a line 2; with fewer, nothing is made.
+    private finishPolygon(closed: boolean, way: FinishWay) {
+        const polygon = this.polygon;
+        if (polygon === undefined) return;
+
+        this.polygon = undefined;
+        this.showHover();
+        const fewest = closed ? 3 : 2;
+        if (polygon.points.length < fewest) return;
+
+        this.make(pointsDrawing(polygon.points, closed), way);
+    }
+
+    // Removing the only point ends the drawing with nothing made.
+    private removeLastPoint() {
+        const polygon = this.polygon;
+        if (polygon === undefined) return;
+
+        const points = polygon.points.slice(0, -1);
+        this.polygon = points.length === 0 ? undefined : { points, space: polygon.space };
+        this.showHover();
+    }
+
+    // Measured on screen, so the ring is as easy to hit at any zoom.
+    private isNearFirst(polygon: PolygonInProgress, levelPosition: Point) {
+        const first = polygon.points[0];
+        const context = this.context;
+        if (first === undefined || context === undefined) return false;
+
+        const firstInLevel = polygon.space.toLevel.apply(first);
+        const distance = Math.hypot(levelPosition.x - firstInLevel.x, levelPosition.y - firstInLevel.y);
+
+        return distance * context.view.zoom <= CLOSE_PX;
+    }
+
+    // Snapped as a point, or with Shift at a multiple of 15° from the last point, unsnapped.
+    private nextPoint(polygon: PolygonInProgress, levelPosition: Point, modifiers: Modifiers) {
+        const last = polygon.points.at(-1);
+        if (modifiers.shift && last !== undefined) {
+            return angleLocked(last, polygon.space.toGroup.apply(levelPosition));
+        }
+
+        return polygon.space.toGroup.apply(this.snapped(levelPosition, modifiers));
+    }
+
+    private refusedAsLocked(context: ToolContext) {
+        const { currentGroup, caches } = context.openLevel;
+        if (!caches.hidden.isLocked(currentGroup.group)) return false;
+
+        context.status.show(LOCKED);
 
         return true;
     }
@@ -186,7 +371,7 @@ export class ShapeTool implements Tool {
             kind === 'circle'
                 ? diameterReadout(box.size.width)
                 : sizeReadout({ x: box.size.width, y: box.size.height });
-        this.show({ drawing, toLevel: press.space.toLevel }, { text, at: input.levelPosition });
+        this.show({ shape: { drawing, toLevel: press.space.toLevel }, readout: { text, at: input.levelPosition } });
     }
 
     private release(press: Press, input: LevelPointerInput) {
@@ -203,7 +388,8 @@ export class ShapeTool implements Tool {
         return draggedBox({ kind: press.kind, start: press.start, corner, shift: modifiers.shift, alt: modifiers.alt });
     }
 
-    private finish(drawing: ShapeDrawing) {
+    // createShape selects the new shape; 'return' also hands it to the controller.
+    private make(drawing: ShapeDrawing, way: FinishWay) {
         const context = this.context;
         if (context === undefined) return;
 
@@ -213,29 +399,74 @@ export class ShapeTool implements Tool {
             return;
         }
 
-        context.finished([outcome.id]);
+        if (way === 'return') {
+            context.finished([outcome.id]);
+        }
     }
 
     private redrawFor(key: ToolKey) {
+        const input = this.lastInput;
+        if (!MODIFIER_CODES.has(key.code) || input === undefined) return;
+
+        const modifiers = { shift: key.shift, alt: key.alt, ctrl: key.ctrl };
         const press = this.press;
-        const input = this.lastInput;
-        if (!MODIFIER_CODES.has(key.code) || press === undefined || input === undefined || !press.dragging) return;
-
-        this.drag(press, input, { shift: key.shift, alt: key.alt, ctrl: key.ctrl });
-    }
-
-    // The faded shape a click would place, centred on the snapped mouse.
-    private showHover() {
-        const input = this.lastInput;
-        const kind = this.chosenKind;
-        const space = this.groupSpace();
-        if (input === undefined || kind === 'polygon' || space === undefined) {
-            this.show(undefined, undefined);
+        if (press === undefined) {
+            this.showHover(modifiers);
             return;
         }
 
-        const centre = space.toGroup.apply(this.snapped(input.levelPosition, input.modifiers));
-        this.show({ drawing: placedDrawing(kind, this.sizes[kind], centre), toLevel: space.toLevel }, undefined);
+        if (press.dragging) {
+            this.drag(press, input, modifiers);
+        }
+    }
+
+    // The faded shape a click would place, centred on the snapped mouse, or the polygon so far and where
+    // the next click adds a point.
+    private showHover(modifiers?: Modifiers) {
+        const input = this.lastInput;
+        const kind = this.chosenKind;
+        const held = modifiers ?? input?.modifiers;
+        if (input === undefined || held === undefined) {
+            this.show({ polygon: this.polygonPreview(undefined, undefined) });
+            return;
+        }
+
+        if (kind === 'polygon' || this.polygon !== undefined) {
+            this.show({ polygon: this.polygonPreview(input.levelPosition, held) });
+            return;
+        }
+
+        const space = this.groupSpace();
+        if (space === undefined) {
+            this.clearPreview();
+            return;
+        }
+
+        const centre = space.toGroup.apply(this.snapped(input.levelPosition, held));
+        this.show({ shape: { drawing: placedDrawing(kind, this.sizes[kind], centre), toLevel: space.toLevel } });
+    }
+
+    private polygonPreview(levelPosition: Point | undefined, modifiers: Modifiers | undefined) {
+        const polygon = this.polygon;
+        if (polygon === undefined) {
+            const space = this.groupSpace();
+            if (levelPosition === undefined || modifiers === undefined || space === undefined) return undefined;
+            if (this.chosenKind !== 'polygon') return undefined;
+
+            const next = space.toGroup.apply(this.snapped(levelPosition, modifiers));
+
+            return { points: [], next, closing: false, toLevel: space.toLevel };
+        }
+
+        const toLevel = polygon.space.toLevel;
+        if (levelPosition === undefined || modifiers === undefined) {
+            return { points: polygon.points, next: undefined, closing: false, toLevel };
+        }
+
+        const closing = polygon.points.length >= 3 && this.isNearFirst(polygon, levelPosition);
+        const next = closing ? polygon.points[0] : this.nextPoint(polygon, levelPosition, modifiers);
+
+        return { points: polygon.points, next, closing, toLevel };
     }
 
     private snapped(levelPosition: Point, modifiers: Modifiers) {
@@ -259,19 +490,29 @@ export class ShapeTool implements Tool {
         return { toLevel, toGroup };
     }
 
-    private show(drawing: ShapePreview | undefined, readout: DragReadout | undefined) {
-        const unchanged =
-            drawing === undefined &&
-            this.shown === undefined &&
-            readout === undefined &&
-            this.shownReadout === undefined;
-        if (unchanged) return;
+    private clearPreview() {
+        this.show({});
+    }
 
-        this.shown = drawing;
-        this.shownReadout = readout;
+    // What isn't given is no longer drawn.
+    private show(next: Shown) {
+        const nothingBefore =
+            this.shown === undefined && this.shownReadout === undefined && this.shownPolygon === undefined;
+        const nothingNow = next.shape === undefined && next.readout === undefined && next.polygon === undefined;
+        if (nothingBefore && nothingNow) return;
+
+        this.shown = next.shape;
+        this.shownReadout = next.readout;
+        this.shownPolygon = next.polygon;
         this.preview.increment();
     }
 }
+
+type Shown = {
+    readonly shape?: ShapePreview | undefined;
+    readonly readout?: DragReadout | undefined;
+    readonly polygon?: PolygonPreview | undefined;
+};
 
 function hasMovedFarEnough(press: Press, input: LevelPointerInput) {
     const dx = input.screenPosition.x - press.screenPosition.x;

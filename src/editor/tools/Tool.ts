@@ -72,6 +72,9 @@ export type Tool = {
     // True when the tool used the key (Enter, Backspace, Shift).
     keyDown(key: ToolKey): boolean;
     keyUp(key: ToolKey): void;
+    // Ctrl+Z, before Undo: removes the last step of an unfinished drawing, a polygon's last point. True
+    // when the tool used it.
+    undoDrawingStep(): boolean;
     // Esc: the drag in progress or the unfinished drawing. True when there was something to cancel.
     cancel(): boolean;
 };

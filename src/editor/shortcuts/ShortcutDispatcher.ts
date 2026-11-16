@@ -28,6 +28,9 @@ type ToolChord = {
 
 const ESCAPE_KEY = 'Escape';
 
+// Ctrl+Z, whatever the layout puts it on, reaches a drawing in progress before Undo does.
+const UNDO_COMMAND_ID = 'edit.undo';
+
 // The narrowest scope wins when one press matches in several.
 const SCOPES_IN_ORDER: readonly ShortcutScope[] = ['levelView', 'editor', 'everywhere'];
 
@@ -70,6 +73,7 @@ export class ShortcutDispatcher {
         if (command === undefined) return false;
 
         if (press.repeat && !command.repeatsWhileHeld) return true;
+        if (command.id === UNDO_COMMAND_ID && this.toolKeys?.tools.undoDrawingStep() === true) return true;
 
         this.runner.run(command);
 

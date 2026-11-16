@@ -19,6 +19,8 @@ export class RecordingTool implements Tool {
     readonly moves: LevelPointerInput[] = [];
     readonly usedKeys = new Set<string>();
     cancelAnswers: boolean[] = [];
+    // Whether undoDrawingStep() used Ctrl+Z.
+    hasDrawingStep = false;
     context: ToolContext | undefined;
 
     constructor(id: ToolId) {
@@ -56,6 +58,12 @@ export class RecordingTool implements Tool {
 
     keyUp(key: ToolKey) {
         this.heard.push(`keyUp ${key.code}`);
+    }
+
+    undoDrawingStep() {
+        this.heard.push('undoDrawingStep');
+
+        return this.hasDrawingStep;
     }
 
     cancel() {

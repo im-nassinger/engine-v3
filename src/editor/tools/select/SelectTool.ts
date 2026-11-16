@@ -83,6 +83,11 @@ export class SelectTool implements Tool {
 
     keyUp() {}
 
+    // The Select tool draws nothing, so Ctrl+Z goes on to Undo.
+    undoDrawingStep() {
+        return false;
+    }
+
     cancel() {
         return this.state?.cancel() ?? false;
     }

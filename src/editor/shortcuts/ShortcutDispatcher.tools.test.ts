@@ -5,7 +5,7 @@ import { EscapeChain } from '../tools/index.ts';
 import { buildToolTestSession, pointerAt } from '../tools/testing/toolTestSession.ts';
 
 import { ShortcutDispatcher } from './ShortcutDispatcher.ts';
-import { recordedKey, US_KEYS } from './testing/recordedKeys.ts';
+import { GERMAN_KEYS, recordedKey, US_KEYS } from './testing/recordedKeys.ts';
 
 const ESC = recordedKey('Escape', 'Escape');
 const SPACE = recordedKey('Space', ' ');
@@ -120,5 +120,28 @@ describe('ShortcutDispatcher with the tools', () => {
         expect(dispatcher.handleKeyDown(ENTER, 'level', true)).toBe(true);
 
         expect(session.openLevel.currentGroup.group).toBe(group);
+    });
+
+    test('Ctrl+Z reaches a drawing in progress before Undo, and makes no step', () => {
+        const { dispatcher, controller, session, shape } = buildDispatcher();
+        controller.pick('shape');
+        shape.hasDrawingStep = true;
+        const undoCount = session.openLevel.history.undoCount;
+
+        expect(dispatcher.handleKeyDown(US_KEYS.ctrlZ, 'level', true)).toBe(true);
+
+        expect(shape.heard).toContain('undoDrawingStep');
+        expect(session.openLevel.history.undoCount).toBe(undoCount);
+    });
+
+    test('Ctrl+Z with no drawing undoes as usual, on a German layout too', () => {
+        const { dispatcher, session, square } = buildDispatcher();
+        session.openLevel.selection.replace([square.id]);
+        dispatcher.handleKeyDown(recordedKey('Delete', 'Delete'), 'level', true);
+        expect(session.openLevel.history.undoCount).toBe(1);
+
+        dispatcher.handleKeyDown(GERMAN_KEYS.ctrlZ, 'level', true);
+
+        expect(session.openLevel.history.undoCount).toBe(0);
     });
 });

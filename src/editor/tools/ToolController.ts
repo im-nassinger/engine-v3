@@ -164,6 +164,13 @@ export class ToolController {
         this.current.keyUp(key);
     }
 
+    // Ctrl+Z, before Undo: the active tool's unfinished drawing loses its last step.
+    undoDrawingStep() {
+        if (this.pickWaiting !== undefined) return false;
+
+        return this.current.undoDrawingStep();
+    }
+
     // The window lost focus, so Space's key up goes elsewhere.
     releaseKeys() {
         this.pan.spaceUp();

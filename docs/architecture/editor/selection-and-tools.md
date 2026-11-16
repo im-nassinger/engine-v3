@@ -91,6 +91,7 @@ export type Tool = {
     pointerUp(input: LevelPointerInput): void;
     keyDown(key: KeyChord): boolean;          // true when the tool used it (Enter, Backspace, Shift)
     keyUp(key: KeyChord): void;
+    undoDrawingStep(): boolean;               // Ctrl+Z before Undo: a drawing's last step; true when used
     cancel(): boolean;                        // Esc steps 1 and 3; true when there was something to cancel
 };
 
