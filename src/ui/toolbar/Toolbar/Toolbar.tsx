@@ -3,8 +3,8 @@ import { useEditorTools } from '../../tools/index.ts';
 import { ToolButton } from './ToolButton/index.ts';
 import './Toolbar.css';
 
-// One button per tool ToolController holds, in its order: Select in v1 until the Shape and Joint tools
-// come with their stages. Clicking a tool picks it; clicking the active one again locks it.
+// One button per tool ToolController holds, in its order: Select and Shape in v1 until the Joint tool
+// comes with its stage. Clicking a tool picks it; clicking the active one again locks it.
 export function Toolbar() {
     // The active tool and the lock are read from the same controller object each time it moves, so the
     // React Compiler must not keep an old answer.

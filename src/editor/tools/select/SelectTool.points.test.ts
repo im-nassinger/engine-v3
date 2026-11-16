@@ -22,6 +22,24 @@ describe('SelectTool point editing', () => {
         expect(tool.editedPoints?.entity).toBe(line);
     });
 
+    test("the hint is point editing's while points are edited, and the preview moves when it changes", () => {
+        const { tool, doubleClick } = buildPointTest();
+        expect(tool.hint).toContain('Click to select.');
+        let moves = 0;
+        tool.preview.subscribe(() => {
+            moves += 1;
+        });
+
+        doubleClick({ x: 250, y: 250 });
+        expect(tool.hint).toBe('Drag points to move them. Double-click an edge to add one. Esc goes back.');
+        const movesWhileEditing = moves;
+        expect(movesWhileEditing).toBeGreaterThan(0);
+
+        tool.cancel();
+        expect(tool.hint).toContain('Click to select.');
+        expect(moves).toBeGreaterThan(movesWhileEditing);
+    });
+
     test('a double-click on a rectangle only selects it', () => {
         const { square, session, tool, doubleClick } = buildPointTest();
 

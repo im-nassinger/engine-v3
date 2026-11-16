@@ -19,7 +19,7 @@ export function StatusBar() {
     const readSummary = () => selectionSummary(openLevel.selection.entities);
 
     const statusText = useReading(session.status.version, readStatusText);
-    const hint = useReading(controller.version, readHint);
+    const hint = useReading(controller.hintVersion, readHint);
     // Moves at most once a frame, however fast the mouse goes.
     const mousePosition = useReading(mouse.version, readMousePosition);
     // The summary follows the selection and the names. Each reading redraws only when the text

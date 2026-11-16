@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 10, step 8 of 11: `DrawingPreviewOverlay` with `planDrawing`, drawing the Shape tool's faded preview, its placed points as 8 px handles and the first point as a 12 px ring, and the point handles in `SelectionOverlay` while editing points. Next is step 9: the page, with the Shape button, the `ToolOptions` strip and the Inspector hidden while drawing. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 10, step 9 of 11: the page, with the Shape tool in the toolbar (key 4), the `ToolOptions` strip of Rectangle, Circle and Polygon, the Inspector hidden while the Shape tool is active, and the three tool hints in the status bar. Next is step 10: the Playwright tests. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

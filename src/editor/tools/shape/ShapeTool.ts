@@ -133,6 +133,8 @@ export class ShapeTool implements Tool {
         if (this.press === undefined) {
             this.showHover();
         }
+        // The hint may follow the kind even when the preview drew nothing new.
+        this.preview.increment();
     }
 
     activate(context: ToolContext) {

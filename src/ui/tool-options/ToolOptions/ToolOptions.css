@@ -1,0 +1,12 @@
+.tool-options {
+    position: absolute;
+    top: var(--space-8);
+    left: var(--space-8);
+    display: flex;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--panel);
+    box-shadow: var(--shadow-options);
+    pointer-events: auto;
+}

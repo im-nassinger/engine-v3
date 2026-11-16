@@ -1,0 +1,126 @@
+import { createElement } from 'react';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { page, userEvent } from 'vitest/browser';
+import { Level } from '../../../core/level/index.ts';
+import { OpenWindowCount, ShapeTool } from '../../../editor/tools/index.ts';
+import type { LevelPointerInput } from '../../../editor/tools/index.ts';
+import { LevelViewMountContext } from '../../level-view-host/index.ts';
+import type { LevelViewMount } from '../../level-view-host/index.ts';
+import { OpenWindowsContext } from '../../open-windows/index.ts';
+import { closeEditorPage, editorPageContainer, openEditorPage, showWithEditor } from '../../testing/editorPage.ts';
+import { EditorShell } from './EditorShell.tsx';
+
+// The shell without a canvas: the level view isn't what these tests look at.
+const NO_LEVEL_VIEW: LevelViewMount = {
+    mount: () => {},
+    unmount: () => {},
+};
+
+// Wide enough that the free area isn't covered by the Entities panel, as on a real screen.
+beforeEach(async () => {
+    await page.viewport(1280, 800);
+    openEditorPage();
+});
+
+afterEach(() => {
+    closeEditorPage();
+});
+
+function showShell() {
+    const shell = createElement(EditorShell);
+    const withView = createElement(LevelViewMountContext, { value: NO_LEVEL_VIEW }, shell);
+    const withWindows = createElement(OpenWindowsContext, { value: new OpenWindowCount() }, withView);
+
+    return showWithEditor(Level.createNew(), withWindows);
+}
+
+function find(selector: string) {
+    return editorPageContainer().querySelector<HTMLElement>(selector);
+}
+
+function inspector() {
+    return find('section[aria-label="Inspector"]');
+}
+
+function optionButton(label: string) {
+    const options = find('.tool-options');
+    const button = [...(options?.querySelectorAll('button') ?? [])].find((each) => each.textContent === label);
+    if (button === undefined) throw new Error(`The options strip has no ${label}.`);
+
+    return button;
+}
+
+function nameBoxValue() {
+    return inspector()?.querySelector('input')?.value ?? '';
+}
+
+function statusText() {
+    return find('.status-text')?.textContent ?? '';
+}
+
+function leftClickAt(x: number, y: number): LevelPointerInput {
+    return {
+        levelPosition: { x, y },
+        screenPosition: { x, y },
+        button: 'left',
+        modifiers: { shift: false, alt: false, ctrl: false },
+        clickCount: 1,
+    };
+}
+
+describe('EditorShell', () => {
+    test('the Shape tool hides the Inspector, and the free area reaches the toolbar', async () => {
+        const { tools } = showShell();
+        await expect.poll(() => inspector()).not.toBeNull();
+        expect(find('.tool-options')).toBeNull();
+
+        tools.controller.pick('shape');
+
+        await expect.poll(() => inspector()).toBeNull();
+        const toolbarBox = find('section[aria-label="Tools"]')?.getBoundingClientRect();
+        const freeBox = find('.free-area')?.getBoundingClientRect();
+        expect(freeBox?.left).toBe(toolbarBox?.right);
+        expect(find('.tool-options')).not.toBeNull();
+    });
+
+    test('the options strip shows the three kinds, the chosen one on, and changes the kind', async () => {
+        const { tools } = showShell();
+        tools.controller.pick('shape');
+        await expect.poll(() => find('.tool-options')).not.toBeNull();
+        expect(optionButton('Rectangle').getAttribute('aria-pressed')).toBe('true');
+        expect(optionButton('Circle').getAttribute('aria-pressed')).toBe('false');
+        expect(optionButton('Polygon').getAttribute('aria-pressed')).toBe('false');
+
+        await userEvent.click(optionButton('Polygon'));
+
+        const shapeTool = tools.controller.active;
+        expect(shapeTool instanceof ShapeTool && shapeTool.kind).toBe('polygon');
+        await expect.poll(() => optionButton('Polygon').getAttribute('aria-pressed')).toBe('true');
+        expect(optionButton('Rectangle').getAttribute('aria-pressed')).toBe('false');
+    });
+
+    test('the status bar shows each tool hint, following the kind', async () => {
+        const { tools } = showShell();
+        await expect.poll(statusText).toContain('Click to select.');
+
+        tools.controller.pick('shape');
+        await expect.poll(statusText).toContain('Click to place, drag to size.');
+
+        await userEvent.click(optionButton('Polygon'));
+        await expect.poll(statusText).toContain('Click to add points.');
+    });
+
+    test('the Inspector shows again, with the new shape, once a shape is finished', async () => {
+        const { session, tools } = showShell();
+        tools.controller.pick('shape');
+        await expect.poll(() => inspector()).toBeNull();
+
+        tools.controller.pointerDown(leftClickAt(0, 0));
+        tools.controller.pointerUp(leftClickAt(0, 0));
+
+        expect(tools.controller.active.id).toBe('select');
+        expect(session.openLevel.selection.entities.length).toBe(1);
+        await expect.poll(nameBoxValue).toBe('Rectangle 1');
+        expect(find('.tool-options')).toBeNull();
+    });
+});

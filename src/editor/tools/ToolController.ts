@@ -18,6 +18,8 @@ export type PickEntity = (entityId: EntityId | undefined) => void;
 // makes something.
 export class ToolController {
     readonly version = new VersionCounter();
+    // Moves whenever the hint may have changed: the active tool, the picker, or a tool's preview.
+    readonly hintVersion = new VersionCounter();
     private readonly toolsById = new Map<ToolId, Tool>();
     private readonly context: ToolContext;
     private readonly pan: PanGesture;
@@ -33,7 +35,9 @@ export class ToolController {
             if (this.toolsById.has(tool.id)) throw new Error(`Two tools have the id ${tool.id}.`);
 
             this.toolsById.set(tool.id, tool);
+            tool.preview.subscribe(() => this.hintVersion.increment());
         }
+        this.version.subscribe(() => this.hintVersion.increment());
 
         this.context = buildContext(services, (created) => this.finish(created));
         this.pan = pan;

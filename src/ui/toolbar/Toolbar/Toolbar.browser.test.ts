@@ -2,6 +2,8 @@ import { createElement } from 'react';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { Level } from '../../../core/level/index.ts';
+import { ShortcutDispatcher } from '../../../editor/shortcuts/index.ts';
+import { EscapeChain, OpenWindowCount } from '../../../editor/tools/index.ts';
 import { closeEditorPage, editorPageContainer, openEditorPage, showWithEditor } from '../../testing/editorPage.ts';
 import { Toolbar } from './Toolbar.tsx';
 
@@ -13,18 +15,40 @@ afterEach(() => {
     closeEditorPage();
 });
 
-function selectPlace() {
-    const place = editorPageContainer().querySelector<HTMLElement>('.tool-button[data-tool="select"]');
-    if (place === null) throw new Error('No Select button is shown.');
+function toolPlace(toolId: string) {
+    const place = editorPageContainer().querySelector<HTMLElement>(`.tool-button[data-tool="${toolId}"]`);
+    if (place === null) throw new Error(`No ${toolId} button is shown.`);
 
     return place;
 }
 
-function selectButton() {
-    const button = selectPlace().querySelector('button');
-    if (button === null) throw new Error('The Select place holds no button.');
+function toolButton(toolId: string) {
+    const button = toolPlace(toolId).querySelector('button');
+    if (button === null) throw new Error(`The ${toolId} place holds no button.`);
 
     return button;
+}
+
+function selectPlace() {
+    return toolPlace('select');
+}
+
+function selectButton() {
+    return toolButton('select');
+}
+
+// A number key going down with the mouse over the level view, as the page's keyboard reports it.
+function digitPress(digit: string) {
+    return {
+        code: `Digit${digit}`,
+        key: digit,
+        ctrlKey: false,
+        shiftKey: false,
+        altKey: false,
+        metaKey: false,
+        altGraph: false,
+        repeat: false,
+    };
 }
 
 describe('Toolbar', () => {
@@ -33,8 +57,34 @@ describe('Toolbar', () => {
 
         await expect.poll(() => selectButton().getAttribute('aria-pressed')).toBe('true');
         const buttons = editorPageContainer().querySelectorAll('.tool-button');
-        expect(buttons.length).toBe(1);
+        expect(buttons.length).toBe(2);
         expect(selectButton().getAttribute('aria-label')).toBe('Select');
+        expect(toolButton('shape').getAttribute('aria-label')).toBe('Shape');
+        expect(toolButton('shape').getAttribute('aria-pressed')).toBe('false');
+    });
+
+    test('key 4 picks the Shape tool, and its button shows it on', async () => {
+        const { session, commands, tools } = showWithEditor(Level.createNew(), createElement(Toolbar));
+        const escape = new EscapeChain(session, tools.controller, new OpenWindowCount());
+        const toolKeys = { tools: tools.controller, escape };
+        const dispatcher = new ShortcutDispatcher(commands.registry, commands.runner, 'other', toolKeys);
+        await expect.poll(() => selectButton().getAttribute('aria-pressed')).toBe('true');
+
+        const used = dispatcher.handleKeyDown(digitPress('4'), 'level', true);
+
+        expect(used).toBe(true);
+        expect(tools.controller.active.id).toBe('shape');
+        await expect.poll(() => toolButton('shape').getAttribute('aria-pressed')).toBe('true');
+        expect(selectButton().getAttribute('aria-pressed')).toBe('false');
+    });
+
+    test('clicking the Shape button picks it', async () => {
+        const { tools } = showWithEditor(Level.createNew(), createElement(Toolbar));
+        await expect.poll(() => toolButton('shape').getAttribute('aria-pressed')).toBe('false');
+
+        await userEvent.click(toolButton('shape'));
+
+        expect(tools.controller.active.id).toBe('shape');
     });
 
     test('double-clicking Select locks it, shown by its dot, and Esc ends the lock', async () => {

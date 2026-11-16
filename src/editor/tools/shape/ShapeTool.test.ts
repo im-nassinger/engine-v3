@@ -248,8 +248,14 @@ describe('the Shape tool', () => {
         const setup = buildShapeTest();
         expect(setup.controller.hint).toContain('Click to place, drag to size.');
 
+        let hintMoves = 0;
+        setup.controller.hintVersion.subscribe(() => {
+            hintMoves += 1;
+        });
+
         setup.tool.chooseKind('polygon');
 
         expect(setup.controller.hint).toContain('Click to add points.');
+        expect(hintMoves).toBeGreaterThan(0);
     });
 });

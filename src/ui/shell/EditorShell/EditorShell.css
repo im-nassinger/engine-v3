@@ -9,4 +9,12 @@
         'top-bar top-bar top-bar top-bar'
         'toolbar inspector free entities'
         'status-bar status-bar status-bar status-bar';
+
+    &[data-inspector-hidden='true'] {
+        grid-template-columns: var(--toolbar) 1fr var(--entities);
+        grid-template-areas:
+            'top-bar top-bar top-bar'
+            'toolbar free entities'
+            'status-bar status-bar status-bar';
+    }
 }
