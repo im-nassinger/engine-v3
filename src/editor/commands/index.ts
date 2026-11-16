@@ -3,6 +3,8 @@ export { GroupCommand } from './arrange/GroupCommand.ts';
 export { UngroupCommand } from './arrange/UngroupCommand.ts';
 export { CommandRegistry } from './CommandRegistry.ts';
 export { createCommandRegistry } from './createCommandRegistry.ts';
+export { createShape } from './draw/createShape.ts';
+export type { CreateShapeOutcome, ShapeDrawing } from './draw/createShape.ts';
 export { DeleteCommand } from './edit/DeleteCommand.ts';
 export { AboutCommand, GAME_NAME } from './help/AboutCommand.ts';
 export { toggleEntityHidden } from './hide/toggleEntityHidden.ts';

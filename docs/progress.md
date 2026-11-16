@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 10, step 1 of 11: stage 10's steps are in [plan.md](plan.md#stage-10-in-steps) and its choices in [drawing-and-points.md](architecture/editor/drawing-and-points.md#stage-10s-choices). Next is step 2: `EntityNamer` and `createShape` in `editor/commands/draw`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 10, step 2 of 11: `createShape` in `editor/commands/draw` makes a named shape with the default look in the current group, as one step, refused in a locked group. Next is step 3: the Shape tool's rectangle and circle in `editor/tools/shape`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -172,7 +172,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 10 of [plan.md](plan.md#stage-10-in-steps): the Shape tool and point editing.** Step 1 is done; step 2 builds `EntityNamer` and `createShape`.
+1. **Stage 10 of [plan.md](plan.md#stage-10-in-steps): the Shape tool and point editing.** Steps 1 and 2 are done; step 3 builds the Shape tool's rectangle and circle.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
