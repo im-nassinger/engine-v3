@@ -1,0 +1,200 @@
+{
+    "format": "engine-v3-level",
+    "formatVersion": 1,
+    "physicsVersion": 1,
+    "name": "self-crossing-polygon",
+    "editor": {
+        "gridSize": 50,
+        "foldedRows": []
+    },
+    "world": {
+        "id": 1,
+        "hidden": false,
+        "locked": false,
+        "components": {
+            "NameComponent": {
+                "name": "World"
+            },
+            "TransformComponent": {
+                "position": {
+                    "x": 0,
+                    "y": 0
+                },
+                "rotation": 0,
+                "scale": {
+                    "x": 1,
+                    "y": 1
+                },
+                "skew": 0
+            },
+            "ShapeComponent": {
+                "geometry": {
+                    "kind": "rectangle",
+                    "width": 20000,
+                    "height": 10000
+                }
+            },
+            "StyleComponent": {
+                "fill": {
+                    "kind": "solid",
+                    "colour": "#BFE3F5FF"
+                },
+                "outline_colour": "#1F3552FF",
+                "outline_width": 0,
+                "opacity": 1
+            },
+            "PhysicsWorldComponent": {
+                "gravity": {
+                    "x": 0,
+                    "y": 9.8
+                },
+                "walls": false
+            }
+        },
+        "children": [
+            {
+                "id": 2,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Camera"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "CameraComponent": {
+                        "width": 1920,
+                        "height": 1080,
+                        "follow": null,
+                        "smoothing": 0.3,
+                        "mode": "fixedSize"
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 3,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Ground"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "line",
+                            "points": [
+                                {
+                                    "x": -400,
+                                    "y": 200
+                                },
+                                {
+                                    "x": -100,
+                                    "y": 300
+                                },
+                                {
+                                    "x": 150,
+                                    "y": 260
+                                },
+                                {
+                                    "x": 400,
+                                    "y": 320
+                                }
+                            ]
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 4,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Bow tie"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -60,
+                            "y": 0
+                        },
+                        "rotation": 20,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "polygon",
+                            "points": [
+                                {
+                                    "x": -50,
+                                    "y": -40
+                                },
+                                {
+                                    "x": 50,
+                                    "y": 40
+                                },
+                                {
+                                    "x": 50,
+                                    "y": -40
+                                },
+                                {
+                                    "x": -50,
+                                    "y": 40
+                                }
+                            ]
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            }
+        ]
+    }
+}

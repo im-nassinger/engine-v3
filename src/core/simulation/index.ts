@@ -1,4 +1,8 @@
 export { BodyMatrices } from './bodies/BodyMatrices.ts';
+export { bodyHashes } from './hash/bodyHashes.ts';
+export type { BodyHash } from './hash/bodyHashes.ts';
+export { runHeadless } from './headless/runHeadless.ts';
+export type { HeadlessOptions, HeadlessTick } from './headless/runHeadless.ts';
 export { stateHash } from './hash/stateHash.ts';
 export { EndOfTickPhase } from './phases/EndOfTickPhase.ts';
 export { InputPhase } from './phases/InputPhase.ts';

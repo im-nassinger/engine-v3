@@ -1,0 +1,392 @@
+{
+    "format": "engine-v3-level",
+    "formatVersion": 1,
+    "physicsVersion": 1,
+    "name": "body-settings",
+    "editor": {
+        "gridSize": 50,
+        "foldedRows": []
+    },
+    "world": {
+        "id": 1,
+        "hidden": false,
+        "locked": false,
+        "components": {
+            "NameComponent": {
+                "name": "World"
+            },
+            "TransformComponent": {
+                "position": {
+                    "x": 0,
+                    "y": 0
+                },
+                "rotation": 0,
+                "scale": {
+                    "x": 1,
+                    "y": 1
+                },
+                "skew": 0
+            },
+            "ShapeComponent": {
+                "geometry": {
+                    "kind": "rectangle",
+                    "width": 20000,
+                    "height": 10000
+                }
+            },
+            "StyleComponent": {
+                "fill": {
+                    "kind": "solid",
+                    "colour": "#BFE3F5FF"
+                },
+                "outline_colour": "#1F3552FF",
+                "outline_width": 0,
+                "opacity": 1
+            },
+            "PhysicsWorldComponent": {
+                "gravity": {
+                    "x": 0,
+                    "y": 9.8
+                },
+                "walls": false
+            }
+        },
+        "children": [
+            {
+                "id": 2,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Camera"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "CameraComponent": {
+                        "width": 1920,
+                        "height": 1080,
+                        "follow": null,
+                        "smoothing": 0.3,
+                        "mode": "fixedSize"
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 3,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Floor"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 300
+                        },
+                        "rotation": 5,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 1000,
+                            "height": 20
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 4,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Static post"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -300,
+                            "y": 200
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 20,
+                            "height": 180
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "static",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 5,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Kinematic block"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -150,
+                            "y": 100
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 80,
+                            "height": 20
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "kinematic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 6,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Rising"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -50,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 30,
+                            "height": 30
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": -0.5,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 7,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Damped"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 50,
+                            "y": -100
+                        },
+                        "rotation": 30,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 30,
+                            "height": 30
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 2,
+                        "angular_damping": 5,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 8,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Upright"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 150,
+                            "y": 0
+                        },
+                        "rotation": 45,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 30,
+                            "height": 60
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": true,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 9,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Bullet"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 250,
+                            "y": -300
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "circle",
+                            "radius": 5
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 4,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": true,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 5,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            }
+        ]
+    }
+}

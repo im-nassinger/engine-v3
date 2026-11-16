@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 13, step 8 of 11: `LevelBoundsPhase` marks bodies fully outside open bounds once they have been inside, and bodies past the 100,000 px hard limit; `EndOfTickPhase` removes them with their subtrees and bodies; the report names them in `removed` and `removedPastHardLimit`; the reader refuses a World over 200,000 px and Width, Height and the World's handles stop there. Next is step 9, `runHeadless` and the determinism test. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 13, step 9 of 11: `runHeadless` records each tick's `stateHash` and one hash per body; the seven determinism levels are `level.json` files with their 600 recorded hashes, written by `npm run determinism:record`; `tests/determinism/determinism.test.ts` runs in `npm run check`, so CI runs it on x86 and ARM, and a failure names the first tick and body that differ. Next is step 10, the determinism test in three browsers. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -205,7 +205,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 13 of [plan.md](plan.md#stage-13-in-steps): physics and the determinism test.** Steps 1 to 8 are done; step 9, `runHeadless` and the determinism test in Node, is next.
+1. **Stage 13 of [plan.md](plan.md#stage-13-in-steps): physics and the determinism test.** Steps 1 to 9 are done; step 10, the determinism test in Chromium, Firefox and WebKit, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

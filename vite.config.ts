@@ -17,7 +17,12 @@ export default defineConfig({
                 extends: true,
                 test: {
                     name: 'node',
-                    include: ['src/**/*.test.ts', 'tests/guards/**/*.test.ts', 'tests/levels/**/*.test.ts'],
+                    include: [
+                        'src/**/*.test.ts',
+                        'tests/guards/**/*.test.ts',
+                        'tests/levels/**/*.test.ts',
+                        'tests/determinism/**/*.test.ts',
+                    ],
                     exclude: ['**/*.browser.test.ts', '**/node_modules/**'],
                     environment: 'node',
                 },

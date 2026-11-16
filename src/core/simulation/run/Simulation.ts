@@ -1,3 +1,4 @@
+import { bodyHashes } from '../hash/bodyHashes.ts';
 import { stateHash } from '../hash/stateHash.ts';
 import type { TickReport } from '../report/TickReport.ts';
 
@@ -56,6 +57,11 @@ export class Simulation {
         const camera = this.cameraPosition();
 
         return stateHash(this.currentTick, this.run.scene, this.run.poses, camera);
+    }
+
+    // One hash per body still in the run, in Entities panel order, to name the first body that differs.
+    bodyHashes() {
+        return bodyHashes(this.run.scene, this.run.poses);
     }
 
     // Ends the run: the physics world is freed and the caches stop following the play copy.
