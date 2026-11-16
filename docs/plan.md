@@ -200,7 +200,7 @@ Written under the standing yes (2026-11-16), and all eleven built that day. Each
 
 ## Stage 11 in steps
 
-Written under the standing yes (2026-11-16). Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [clipboard-and-shortcuts.md](architecture/editor/clipboard-and-shortcuts.md#stage-11s-choices).
+Written under the standing yes (2026-11-16), and all nine built that day. Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [clipboard-and-shortcuts.md](architecture/editor/clipboard-and-shortcuts.md#stage-11s-choices).
 
 | # | Step | Module | Ends with |
 |---|---|---|---|
@@ -212,7 +212,7 @@ Written under the standing yes (2026-11-16). Each step ends with its tests, `npm
 | 6 | Duplicate (Ctrl+D): each copied root directly above its original in the same group, with no offset, links inside the set rewired and links outside kept, the copies selected, one step `Duplicate 3 entities`, refused whole over a limit | `editor/commands/clipboard` | Duplicating entities in two groups puts each copy above its own original; a duplicated joint and its bodies are joined to each other; undo removes the copies. **Done** |
 | 7 | `ClipboardBridge`: the `copy`, `cut` and `paste` events outside text fields run the commands with the event's data, `ShortcutDispatcher` leaving Ctrl+C, Ctrl+X and Ctrl+V to the browser so those events come; the menu entries write and read through the asynchronous clipboard API; the mouse position for paste; wired in `EditorComposition` | `adapters/browser/clipboard`, `editor/shortcuts`, `app` | Browser tests: a `copy` event carries the tagged text and a `paste` event of it adds the entities; in a text field both are the browser's; a refused read falls back to the last copy. **Done** |
 | 8 | Playwright: draw a shape, copy and paste it at the mouse with the keys, duplicate it, cut it and undo; pasting plain text says `Nothing to paste`; pasting damaged tagged text changes nothing | `tests/e2e` | The tests pass in three browsers. **Done** |
-| 9 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes |
+| 9 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes. **Done** |
 
 ## After v1
 
