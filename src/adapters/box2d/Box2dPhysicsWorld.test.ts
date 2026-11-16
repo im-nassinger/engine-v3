@@ -1,12 +1,10 @@
 import { beforeAll, describe, expect, test } from 'vitest';
 
-import type { BodyDefinition, PhysicsWorld } from '../../core/physics/index.ts';
 import { BodyPoses } from '../../core/physics/index.ts';
 
 import { Box2dPhysicsEngine } from './Box2dPhysicsEngine.ts';
+import { EARTH_GRAVITY, NO_GRAVITY, bodyDefinition, stepTimes } from './testing/worldTesting.ts';
 
-const EARTH_GRAVITY = { x: 0, y: 9.8 };
-const NO_GRAVITY = { x: 0, y: 0 };
 // Box2D puts a body to sleep after half a second at rest.
 const STEPS_TO_FALL_ASLEEP = 60;
 
@@ -15,32 +13,6 @@ const engine = new Box2dPhysicsEngine();
 beforeAll(async () => {
     await engine.load();
 });
-
-function bodyDefinition(changes: Partial<BodyDefinition>): BodyDefinition {
-    return {
-        entity: 1,
-        type: 'dynamic',
-        position: { x: 0, y: 0 },
-        angle: 0,
-        gravityScale: 1,
-        linearDamping: 0,
-        angularDamping: 0,
-        fixedRotation: false,
-        bullet: false,
-        ...changes,
-    };
-}
-
-// Steps the world, keeping every pose it reports, and returns the moves of the last step.
-function stepTimes(world: PhysicsWorld, poses: BodyPoses, steps: number) {
-    for (let i = 0; i < steps; i++) {
-        poses.clearMoved();
-        world.step();
-        world.readMovedBodies(poses);
-    }
-
-    return [...poses.moved];
-}
 
 describe('Box2dPhysicsEngine', () => {
     test('loading twice loads Box2D once', async () => {

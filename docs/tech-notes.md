@@ -77,7 +77,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 | Moving shapes | 0.1 to 10 m | 5 to 500 px |
 | Static shapes "without trouble" | up to 50 m | 2,500 px |
 | Most movement per step | 2 m | 6,000 px/s |
-| Most rotation per step | 90° | 5,400 °/s, 15 turns per second |
+| Most rotation per step | 90° in v2.4.1; **45° in 3.2** | 2,700 °/s, 7.5 turns per second |
 | Polygon skin | 0.01 m | 0.5 px |
 
 - **Degenerate polygons.** In v2.4.1 a polygon with under 3 usable points silently became a 2×2 m box. Shapes too small to collide must be skipped before they reach physics.
@@ -112,6 +112,12 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **A Kinematic body with no speed is still reported as moved** in the body events while awake, at the same pose.
 - **The body events** list only bodies that moved in the last step, Static bodies never, and a body that has fallen asleep stops appearing. `b2World_SetGravity` doesn't wake a sleeping body.
 - **The default world** has gravity `0, -10`, `maximumLinearSpeed` 400 m/s and sleeping on.
+- **Spin is held to 45° a step**, 2,700 °/s at 60 steps a second, whatever the sub-steps or the body's size. A body set spinning at 9,000 °/s turns at 2,699.9998 °/s after one step. There is no setting for it. (`Box2dPhysicsWorld.surfaces.test.ts`)
+- **`maximumLinearSpeed`** holds speed exactly, keeping the direction: 120 m/s gives 6,000 px/s.
+- **Shape ids are plain values**, not wasm objects: `b2CreatePolygonShape` and the others return something with no `delete()`.
+- **`b2ComputeHull` takes a plain array of `{ x, y }`**, and gives a hull with `count` 0 for fewer than 3 usable points. `b2MakePolygon(hull, 0)` then makes the polygon; the hull's order doesn't matter.
+- **Segments never collide with segments**, so a line on a falling body passes through a Static line. A segment collides from both sides, whichever way it was drawn.
+- **A box comes to rest less than 1 px into or above** the Static box under it.
 
 ## Camera
 

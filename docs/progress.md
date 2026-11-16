@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 13, step 2 of 11: `box2d3-wasm` 6.0.0 is installed, with the physics contracts, `BodyPoses`, `Box2dPhysicsEngine` loading in Node and three browsers, and `Box2dPhysicsWorld`'s bodies. Next is step 3, `Box2dPhysicsWorld`'s surfaces. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 13, step 3 of 11: `Box2dPhysicsWorld` has its bodies and surfaces: polygons, circles, lines as two-sided segments, sensors, the 1 kg rule and the speed cap. **The spin cap is 7.5 turns per second, not the owner's 15**, because Box2D 3.2 holds spin to 45° a step; see below. Next is step 4, rechecking the tech notes' Box2D facts against 3.2. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -88,6 +88,8 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 - **Round 10**, every card at Claude's pick: see [decisions.md](decisions.md#decided-under-the-standing-yes).
 - **An owner decision built differently** (2026-11-14): the owner said to ask again if `clipper2-ts` failed. Its fill works, but **its triangulation drops areas** (a one-stroke star loses its middle) while reporting success. The unattended runner can't ask, so it took the closest fix: `clipper2-ts` only fills, and the game's own `EarClipping` triangulates. See [geometry.md](architecture/core-model/geometry.md#the-polygon-pipeline); the owner can overturn it.
+
+- **An owner decision built differently** (2026-11-16): the requirement capped spin at 15 turns per second, but Box2D 3.2 turns a body at most 45° a step, 7.5 turns per second, with no setting to raise it. The closest fix is Box2D's own cap: [bodies.md](requirements/physics/bodies.md#body-settings--v1) now says 7.5, and the Hinge's motor speed range is ±2,700 °/s instead of ±5,400. See [adapters.md](architecture/adapters.md#physics); the owner can overturn it.
 
 ### Stage 12, built on 2026-11-16
 
@@ -199,7 +201,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 13 of [plan.md](plan.md#stage-13-in-steps): physics and the determinism test.** Step 1, the steps and the [choices](architecture/simulation.md#stage-13s-choices), is done; step 2, the physics contracts and `Box2dPhysicsWorld`'s bodies, is next.
+1. **Stage 13 of [plan.md](plan.md#stage-13-in-steps): physics and the determinism test.** Steps 1 to 3 are done; step 4, rechecking the tech notes' Box2D facts against 3.2, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

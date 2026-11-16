@@ -44,7 +44,8 @@ Source: scope PH1; round 1: C6, D36, D39; round 2: O8; round 6: 05 2.1, 05 2.2, 
 - *Why these names: the owner wanted common terms. These are Box2D's (Unity and Godot are nearly the same), so the Inspector, the Lua API and tutorials match.*
 - Only the fields that matter for the chosen type are enabled. The others are greyed, with their values kept.
 - All of these can change during play.
-- Speed is capped at 6,000 px/s and spin at 15 turns per second. Higher values are quietly limited.
+- Speed is capped at 6,000 px/s and spin at 7.5 turns per second (2,700 °/s). Higher values are quietly limited.
+- *Why 7.5 turns, not the 15 first written: Box2D 3.2 turns a body at most 45° a step, so 15 turns per second can't happen. The closest fix to the owner's cap is Box2D's own (standing yes, 2026-11-16).*
 
 Source: scope PH2; round 3: P1; round 7: 05 2.4; old: PH-17 to PH-19
 

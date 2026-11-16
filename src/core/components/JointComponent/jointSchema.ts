@@ -131,7 +131,7 @@ export const jointSchema = new ComponentSchema<JointValues>({
         {
             key: 'motorSpeed',
             label: 'Motor speed',
-            type: new NumberFieldType({ min: -5_400, max: 5_400 }),
+            type: new NumberFieldType({ min: -2_700, max: 2_700 }),
             defaultValue: 180,
             description: 'The speed the motor aims for, in °/s.',
             unit: '°/s',

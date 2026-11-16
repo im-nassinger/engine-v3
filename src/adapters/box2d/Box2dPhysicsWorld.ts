@@ -1,15 +1,27 @@
-import type { Box2DModule, b2BodyId, b2BodyType, b2WorldId } from 'box2d3-wasm/compat';
+import type { Box2DModule, b2BodyId, b2BodyType, b2ShapeDef, b2WorldId } from 'box2d3-wasm/compat';
 
 import type { BodyType } from '../../core/components/index.ts';
 import type { Point } from '../../core/geometry/index.ts';
 import { DeterministicMath, Units } from '../../core/math/index.ts';
-import type { BodyDefinition, BodyHandle, BodyPoses, PhysicsWorld, WorldSettings } from '../../core/physics/index.ts';
+import type {
+    BodyDefinition,
+    BodyHandle,
+    BodyPoses,
+    BodyVelocity,
+    PhysicsWorld,
+    SurfaceDefinition,
+    SurfacePiece,
+    WorldSettings,
+} from '../../core/physics/index.ts';
 
 const STEP_SECONDS = 1 / 60;
 // Box2D's recommended number of sub-steps for one step.
 const SUB_STEPS = 4;
 // Box2D gives a Dynamic body without mass none at all, and it never moves. The requirements give it 1 kg.
 const MASS_WITHOUT_SURFACES = 1;
+// The requirements' speed cap. Spin needs no setting: Box2D 3.2 holds it to 45° a step, 7.5 turns per
+// second, which is the requirements' spin cap (tech-notes.md).
+const MAX_SPEED_PIXELS_PER_SECOND = 6000;
 
 type CreatedBody = {
     readonly bodyId: b2BodyId;
@@ -35,6 +47,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         const gravity = new box2d.b2Vec2(settings.gravity.x, settings.gravity.y);
         worldDefinition.gravity = gravity;
         gravity.delete();
+        worldDefinition.maximumLinearSpeed = Units.toMetres(MAX_SPEED_PIXELS_PER_SECOND);
 
         this.worldId = box2d.b2CreateWorld(worldDefinition);
         worldDefinition.delete();
@@ -74,6 +87,30 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         this.bodies.push({ bodyId, type: definition.type });
 
         return this.bodies.length - 1;
+    }
+
+    addSurface(body: BodyHandle, surface: SurfaceDefinition) {
+        this.checkAlive();
+        const createdBody = this.bodyAt(body);
+
+        const shapeDefinition = this.box2d.b2DefaultShapeDef();
+        // A sensor weighs nothing, so it never changes how its body moves.
+        shapeDefinition.density = surface.sensor ? 0 : surface.density;
+        shapeDefinition.material.friction = surface.friction;
+        shapeDefinition.material.restitution = surface.restitution;
+        shapeDefinition.isSensor = surface.sensor;
+        shapeDefinition.userData = surface.entity;
+
+        for (const piece of surface.pieces) {
+            this.addPiece(createdBody.bodyId, shapeDefinition, piece);
+        }
+
+        shapeDefinition.delete();
+
+        // Surfaces that weigh nothing leave a Dynamic body with no mass, and it would never move.
+        if (createdBody.type === 'dynamic' && this.box2d.b2Body_GetMass(createdBody.bodyId) === 0) {
+            this.giveMassWithoutSurfaces(createdBody.bodyId);
+        }
     }
 
     setGravity(gravity: Point) {
@@ -122,14 +159,34 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         bodyEvents.delete();
     }
 
+    velocityOf(body: BodyHandle): BodyVelocity {
+        this.checkAlive();
+        const bodyId = this.bodyAt(body).bodyId;
+
+        const box2dLinear = this.box2d.b2Body_GetLinearVelocity(bodyId);
+        const linear = { x: Units.toPixels(box2dLinear.x), y: Units.toPixels(box2dLinear.y) };
+        box2dLinear.delete();
+        const spin = Units.toDegrees(this.box2d.b2Body_GetAngularVelocity(bodyId));
+
+        return { linear, spin };
+    }
+
+    // Not part of PhysicsWorld: the tests use it to throw and spin bodies, until scripts (v2) need it.
+    setVelocity(body: BodyHandle, velocity: BodyVelocity) {
+        this.checkAlive();
+        const box2d = this.box2d;
+        const bodyId = this.bodyAt(body).bodyId;
+
+        const linear = new box2d.b2Vec2(Units.toMetres(velocity.linear.x), Units.toMetres(velocity.linear.y));
+        box2d.b2Body_SetLinearVelocity(bodyId, linear);
+        linear.delete();
+        box2d.b2Body_SetAngularVelocity(bodyId, Units.toRadians(velocity.spin));
+    }
+
     destroyBody(body: BodyHandle) {
         this.checkAlive();
 
-        const createdBody = this.bodies[body];
-        if (createdBody === undefined) {
-            throw new Error(`Body ${body} doesn't exist in this world.`);
-        }
-
+        const createdBody = this.bodyAt(body);
         this.box2d.b2DestroyBody(createdBody.bodyId);
         this.bodies[body] = undefined;
     }
@@ -146,6 +203,86 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         if (this.destroyed) {
             throw new Error('This physics world was destroyed.');
         }
+    }
+
+    private bodyAt(body: BodyHandle) {
+        const createdBody = this.bodies[body];
+        if (createdBody === undefined) {
+            throw new Error(`Body ${body} doesn't exist in this world.`);
+        }
+
+        return createdBody;
+    }
+
+    private addPiece(bodyId: b2BodyId, shapeDefinition: b2ShapeDef, piece: SurfacePiece) {
+        switch (piece.kind) {
+            case 'circle':
+                this.addCircle(bodyId, shapeDefinition, piece.center, piece.radius);
+                return;
+            case 'polygon':
+                this.addPolygon(bodyId, shapeDefinition, piece.points);
+                return;
+            case 'line':
+                this.addLine(bodyId, shapeDefinition, piece.points);
+                return;
+        }
+    }
+
+    private addCircle(bodyId: b2BodyId, shapeDefinition: b2ShapeDef, center: Point, radius: number) {
+        const box2d = this.box2d;
+
+        const circle = new box2d.b2Circle();
+        const box2dCenter = this.toBox2dPoint(center);
+        circle.center = box2dCenter;
+        box2dCenter.delete();
+        circle.radius = Units.toMetres(radius);
+
+        box2d.b2CreateCircleShape(bodyId, shapeDefinition, circle);
+        circle.delete();
+    }
+
+    // Box2D builds a polygon from its hull, which also puts the points in its own order. A hull of
+    // fewer than 3 points, from points too close together or in a row, has no area and is skipped.
+    private addPolygon(bodyId: b2BodyId, shapeDefinition: b2ShapeDef, points: readonly Point[]) {
+        const box2d = this.box2d;
+
+        const pointsInMetres = points.map((point) => ({ x: Units.toMetres(point.x), y: Units.toMetres(point.y) }));
+        const hull = box2d.b2ComputeHull(pointsInMetres);
+
+        if (hull.count >= 3) {
+            const polygon = box2d.b2MakePolygon(hull, 0);
+            box2d.b2CreatePolygonShape(bodyId, shapeDefinition, polygon);
+            polygon.delete();
+        }
+
+        hull.delete();
+    }
+
+    // A line is one two-sided segment per edge, not a chain: chains collide from one side only, and
+    // Box2D never makes segments collide with segments, so lines never hit each other.
+    private addLine(bodyId: b2BodyId, shapeDefinition: b2ShapeDef, points: readonly Point[]) {
+        const box2d = this.box2d;
+
+        for (let i = 0; i + 1 < points.length; i++) {
+            const start = points[i];
+            const end = points[i + 1];
+            if (start === undefined || end === undefined) continue;
+
+            const segment = new box2d.b2Segment();
+            const box2dStart = this.toBox2dPoint(start);
+            const box2dEnd = this.toBox2dPoint(end);
+            segment.point1 = box2dStart;
+            segment.point2 = box2dEnd;
+            box2dStart.delete();
+            box2dEnd.delete();
+
+            box2d.b2CreateSegmentShape(bodyId, shapeDefinition, segment);
+            segment.delete();
+        }
+    }
+
+    private toBox2dPoint(point: Point) {
+        return new this.box2d.b2Vec2(Units.toMetres(point.x), Units.toMetres(point.y));
     }
 
     private box2dBodyType(type: BodyType): b2BodyType {

@@ -81,7 +81,7 @@ Hinge:
 | Limit rotation | Stops A turning too far | On or off | Off |
 | Min angle, Max angle | How far it can turn each way from how it is placed | −360 to 0, 0 to 360 | −45, 45 |
 | Motor | Turns A by itself | On or off | Off |
-| Motor speed | Target speed | −5,400 to 5,400 °/s | 180 |
+| Motor speed | Target speed. At most the spin cap, see [bodies](bodies.md#body-settings--v1) (standing yes, 2026-11-16) | −2,700 to 2,700 °/s | 180 |
 | Motor strength | How hard it pushes. Too low and it never reaches speed | 0 to 100,000 | 50 (tune) |
 | Resistance | Stiffness in the joint, so limbs and doors slow and settle | 0 to 100,000 | 0 |
 
