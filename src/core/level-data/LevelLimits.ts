@@ -7,6 +7,8 @@ export type LevelLimits = {
     readonly maxPoints: number;
     // Counted unpacked, checked where the bytes exist: the import worker and the save.
     readonly maxBytes: number;
+    // The World's rectangle, each side, in px. Centred on the origin, so its edge is at most half of it out.
+    readonly maxLevelSize: number;
 };
 
 export const V1_LEVEL_LIMITS: LevelLimits = {
@@ -14,4 +16,5 @@ export const V1_LEVEL_LIMITS: LevelLimits = {
     maxDepth: 256,
     maxPoints: 1_000,
     maxBytes: 256 * 1024 * 1024,
+    maxLevelSize: 200_000,
 };

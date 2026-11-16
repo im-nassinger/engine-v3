@@ -1,4 +1,4 @@
-import type { ReadRefusal } from '../../../core/level-data/index.ts';
+import type { LimitName, ReadRefusal } from '../../../core/level-data/index.ts';
 import type { TimeOfDay } from '../../time/index.ts';
 
 export const NOTHING_SAVED_TEXT = 'Nothing will be saved in this browser';
@@ -31,7 +31,7 @@ function refusalReason(refusal: ReadRefusal) {
     }
 }
 
-export function overLimitReason(limit: 'entities' | 'depth' | 'points' | 'size', max: number) {
+export function overLimitReason(limit: LimitName, max: number) {
     switch (limit) {
         case 'entities':
             return `it has more than ${groupDigits(max)} entities`;
@@ -41,6 +41,8 @@ export function overLimitReason(limit: 'entities' | 'depth' | 'points' | 'size',
             return `a shape has more than ${groupDigits(max)} points`;
         case 'size':
             return `it is over ${groupDigits(Math.round(max / MEGABYTE))} MB`;
+        case 'levelSize':
+            return `its level bounds are wider or taller than ${groupDigits(max)} px`;
     }
 }
 

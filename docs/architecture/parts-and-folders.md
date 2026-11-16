@@ -55,7 +55,7 @@ src/
     physics/           PhysicsWorld contract, PhysicsSceneBuilder (merging), BodyMass, JointEnds
       merging/           mergesInto: which body a shape merges into
       mass/              BodyMass: a body's mass from its surfaces
-    simulation/        Simulation, the tick phases, BodyPoses, CameraFollow, TickReport
+    simulation/        run/ (Simulation, PlayRun), phases/ (the tick phases), bodies/ (BodyMatrices), removal/ (RemovalMarks), report/ (TickReport), hash/, start/ (startSimulation), testing/ (a scripted PhysicsWorld, test levels); CameraFollow
   editor/
     session/           EditorSession (the editor's root object), OpenLevel, CurrentGroup
     history/           History, HistoryStep, EditTransaction, changes/

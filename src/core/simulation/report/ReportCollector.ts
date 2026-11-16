@@ -2,6 +2,8 @@ import type { EntityId } from '../../fields/index.ts';
 import type { Point } from '../../geometry/index.ts';
 import type { BodyPose } from '../../physics/index.ts';
 
+import type { RemovalCause } from '../removal/RemovalMarks.ts';
+
 import { POSE_STRIDE } from './TickReport.ts';
 import type { TickReport } from './TickReport.ts';
 
@@ -9,14 +11,24 @@ import type { TickReport } from './TickReport.ts';
 export class ReportCollector {
     private readonly movedPoses = new Map<EntityId, BodyPose>();
     private readonly removed: EntityId[] = [];
+    private readonly removedPastHardLimit: EntityId[] = [];
 
     bodyMoved(entity: EntityId, pose: BodyPose) {
         this.movedPoses.set(entity, pose);
     }
 
-    entityRemoved(entity: EntityId) {
+    // A body left the run, so its pose is no longer sent.
+    bodyRemoved(entity: EntityId) {
+        this.movedPoses.delete(entity);
+    }
+
+    // The entity at the top of what was removed; the page removes everything inside it too.
+    entityRemoved(entity: EntityId, cause: RemovalCause) {
         this.movedPoses.delete(entity);
         this.removed.push(entity);
+        if (cause === 'pastHardLimit') {
+            this.removedPastHardLimit.push(entity);
+        }
     }
 
     // Hands over everything gathered and starts again from nothing.
@@ -32,9 +44,11 @@ export class ReportCollector {
         }
 
         const removed = [...this.removed];
+        const removedPastHardLimit = [...this.removedPastHardLimit];
         this.movedPoses.clear();
         this.removed.length = 0;
+        this.removedPastHardLimit.length = 0;
 
-        return { lastTick, poses, removed, camera };
+        return { lastTick, poses, removed, removedPastHardLimit, camera };
     }
 }

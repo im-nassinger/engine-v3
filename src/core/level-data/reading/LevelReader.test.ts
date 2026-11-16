@@ -19,7 +19,7 @@ type EditableLevel = Record<string, unknown> & {
     world: EditableEntity;
 };
 
-const SMALL_LIMITS: LevelLimits = { maxEntities: 4, maxDepth: 2, maxPoints: 4, maxBytes: 1000 };
+const SMALL_LIMITS: LevelLimits = { maxEntities: 4, maxDepth: 2, maxPoints: 4, maxBytes: 1000, maxLevelSize: 200_000 };
 
 const DEFAULT_TRANSFORM = {
     position: { x: 0, y: 0 },

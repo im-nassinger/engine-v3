@@ -1,4 +1,4 @@
-import type { ReadRefusal } from '../../../core/level-data/index.ts';
+import type { LimitName, ReadRefusal } from '../../../core/level-data/index.ts';
 
 const CANT_READ = "The pasted entities can't be read";
 
@@ -11,7 +11,7 @@ export function pasteRefusalText(refusal: ReadRefusal) {
     return `${CANT_READ}: they are damaged`;
 }
 
-function limitText(limit: 'entities' | 'depth' | 'points' | 'size', max: number) {
+function limitText(limit: LimitName, max: number) {
     const maxText = max.toLocaleString('en-US');
 
     if (limit === 'entities') return `A level holds at most ${maxText} entities`;

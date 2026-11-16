@@ -338,6 +338,11 @@ export class LevelReader {
         const worldGeometry = worldShape?.get('geometry');
         if (worldGeometry?.kind !== 'rectangle') throw ReadRefused.damaged("the World's shape is not a rectangle");
 
+        const { maxLevelSize } = this.limits;
+        if (worldGeometry.width > maxLevelSize || worldGeometry.height > maxLevelSize) {
+            throw new ReadRefused({ reason: 'overLimit', limit: 'levelSize', max: maxLevelSize });
+        }
+
         const elsewhere = [...entityAndInside(world)].slice(1);
         const physicsWorldElsewhere = elsewhere.some((entity) => hasComponent(entity, PhysicsWorldComponent));
         if (physicsWorldElsewhere) throw ReadRefused.damaged('a PhysicsWorldComponent is not on the World');

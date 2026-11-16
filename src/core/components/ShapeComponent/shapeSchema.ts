@@ -21,8 +21,10 @@ const kindType = new ChoiceFieldType<ShapeKind>([
     { value: 'line', label: 'Line' },
 ]);
 // A rectangle is at least 1 px each side, and a typed size for a polygon or line too. A circle is at least
-// 1 px across.
-const sizeType = new NumberFieldType({ min: 1 });
+// 1 px across. A typed size stops at 200,000 px, LevelLimits' maxLevelSize, so the World's Width and Height
+// fields can't make a level the reader refuses; no shape needs to be bigger than the largest level.
+const MAX_SIZE = 200_000;
+const sizeType = new NumberFieldType({ min: 1, max: MAX_SIZE });
 const radiusType = new NumberFieldType({ min: 0.5 });
 // A line needs 2 points and a polygon 3, which the write checks. 1,000 is LevelLimits' maxPoints.
 const MIN_LINE_POINTS = 2;

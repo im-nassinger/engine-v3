@@ -5,16 +5,18 @@ const NUMBERS_PER_BODY = 7;
 const FNV_OFFSET_BASIS = 0x811c9dc5;
 const FNV_PRIME = 0x01000193;
 
-// FNV-1a over the bytes of the tick, then each body's id, position, angle, speed and spin in Entities
-// panel order, then the camera, as 8 hex digits. Any one bit that differs changes it.
+// FNV-1a over the bytes of the tick, then each body still in the run's id, position, angle, speed and spin
+// in Entities panel order, then the camera, as 8 hex digits. Any one bit that differs changes it.
 export function stateHash(tick: number, scene: PhysicsScene, poses: BodyPoses, camera: Point) {
-    const numbers = new Float64Array(1 + scene.bodies.length * NUMBERS_PER_BODY + 2);
+    // A removed body has no pose.
+    const bodies = scene.bodies.filter((body) => poses.poseOf(body.entity.id) !== undefined);
+    const numbers = new Float64Array(1 + bodies.length * NUMBERS_PER_BODY + 2);
     numbers[0] = tick;
     let offset = 1;
 
-    for (const body of scene.bodies) {
+    for (const body of bodies) {
         const pose = poses.poseOf(body.entity.id);
-        if (pose === undefined) throw new Error(`Body ${body.entity.id} has no pose.`);
+        if (pose === undefined) continue;
 
         const velocity = scene.world.velocityOf(body.handle);
         const { linear, spin } = velocity;

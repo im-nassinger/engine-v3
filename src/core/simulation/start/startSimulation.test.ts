@@ -1,136 +1,25 @@
 import { describe, expect, test } from 'vitest';
 
-import { BodyComponent, ShapeComponent, SurfaceComponent, TransformComponent } from '../../components/index.ts';
-import type { BodyType } from '../../components/index.ts';
-import type { EntityId } from '../../fields/index.ts';
-import type { TransformValues } from '../../geometry/index.ts';
+import { TransformComponent } from '../../components/index.ts';
 import { LevelWriter } from '../../level-data/index.ts';
-import type { Entity } from '../../level/index.ts';
 import { Level } from '../../level/index.ts';
-import type {
-    BodyDefinition,
-    BodyHandle,
-    BodyPose,
-    BodyPoses,
-    PhysicsEngine,
-    PhysicsWorld,
-} from '../../physics/index.ts';
 
 import { POSE_STRIDE } from '../report/TickReport.ts';
+import { ScriptedEngine } from '../testing/ScriptedPhysics.ts';
+import { place, placeBody, runTicks, transform } from '../testing/scriptedLevel.ts';
 
 import { startSimulation } from './startSimulation.ts';
 
-const FALL_PER_STEP = 10;
-const NOTHING_HELD = { heldKeys: [] };
 const START = { clockTimeMs: 0 };
 
-type ScriptedBody = {
-    readonly entity: EntityId;
-    readonly type: BodyType;
-    pose: BodyPose;
-};
-
-// A PhysicsWorld where every Dynamic body falls 10 px a step and nothing else moves, unless a test sets a
-// body's next pose itself.
-class ScriptedWorld implements PhysicsWorld {
-    private readonly bodies: ScriptedBody[] = [];
-    private readonly movedLastStep: ScriptedBody[] = [];
-    private readonly nextPoses = new Map<EntityId, BodyPose>();
-    falling = true;
-
-    createBody(definition: BodyDefinition): BodyHandle {
-        const pose = { x: definition.position.x, y: definition.position.y, angle: definition.angle };
-        this.bodies.push({ entity: definition.entity, type: definition.type, pose });
-
-        return this.bodies.length - 1;
-    }
-
-    setNextPose(entity: EntityId, pose: BodyPose) {
-        this.nextPoses.set(entity, pose);
-    }
-
-    addSurface() {}
-    setGravity() {}
-
-    step() {
-        this.movedLastStep.length = 0;
-
-        for (const body of this.bodies) {
-            const nextPose = this.nextPoses.get(body.entity);
-            const falls = this.falling && body.type === 'dynamic';
-
-            if (nextPose !== undefined) {
-                body.pose = nextPose;
-            } else if (falls) {
-                body.pose = { ...body.pose, y: body.pose.y + FALL_PER_STEP };
-            } else {
-                continue;
-            }
-            this.movedLastStep.push(body);
-        }
-        this.nextPoses.clear();
-    }
-
-    readMovedBodies(into: BodyPoses) {
-        for (const body of this.movedLastStep) {
-            into.recordMove(body.entity, body.pose);
-        }
-    }
-
-    velocityOf() {
-        return { linear: { x: 0, y: 0 }, spin: 0 };
-    }
-
-    destroyBody() {}
-    destroy() {}
-}
-
-class ScriptedEngine implements PhysicsEngine {
-    readonly world = new ScriptedWorld();
-
-    async load() {}
-
-    createWorld() {
-        return this.world;
-    }
-}
-
-function transform(x: number, y: number, rotation = 0, scaleX = 1): TransformValues {
-    return { position: { x, y }, rotation, scale: { x: scaleX, y: 1 }, skew: 0 };
-}
-
-function place(level: Level, parent: Entity, values: TransformValues) {
-    const entity = level.createEntity(parent, parent.children.length);
-    entity.addComponent(new TransformComponent(values));
-
-    return entity;
-}
-
-function placeBody(level: Level, parent: Entity, values: TransformValues, type: BodyType = 'dynamic') {
-    const entity = place(level, parent, values);
-    entity.addComponent(new ShapeComponent({ geometry: { kind: 'rectangle', width: 20, height: 20 } }));
-    entity.addComponent(new SurfaceComponent());
-    const body = new BodyComponent();
-    body.set('type', type);
-    body.set('merge', false);
-    entity.addComponent(body);
-
-    return entity;
-}
-
-function start(level: Level) {
+// The level written and read back, as the game worker will get it, run on a ScriptedWorld.
+function startScripted(level: Level) {
     const engine = new ScriptedEngine();
     const levelData = new LevelWriter().write(level);
     const started = startSimulation(levelData, engine, START);
     if (!started.ok) throw new Error(`The level was refused: ${JSON.stringify(started.refusal)}`);
 
     return { simulation: started.value, world: engine.world };
-}
-
-function runTicks(simulation: { runTick(inputs: typeof NOTHING_HELD): void }, count: number) {
-    for (let i = 0; i < count; i++) {
-        simulation.runTick(NOTHING_HELD);
-    }
 }
 
 function reportedIds(poses: Float64Array) {
@@ -149,7 +38,7 @@ describe('Simulation', () => {
         const group = place(level, level.world, transform(100, 0));
         const crate = placeBody(level, group, transform(0, 50, 90, 2));
         const label = place(level, crate, transform(5, 0));
-        const { simulation } = start(level);
+        const { simulation } = startScripted(level);
         const playLabel = simulation.level.requireEntity(label.id);
 
         const labelAtStart = simulation.caches.worldMatrices.matrixOf(playLabel).apply({ x: 0, y: 0 });
@@ -167,7 +56,7 @@ describe('Simulation', () => {
     test("a body's bounds follow it", () => {
         const level = Level.createNew();
         const crate = placeBody(level, level.world, transform(0, 0));
-        const { simulation } = start(level);
+        const { simulation } = startScripted(level);
         const playCrate = simulation.level.requireEntity(crate.id);
         const bounds = simulation.caches.bounds;
 
@@ -180,7 +69,7 @@ describe('Simulation', () => {
         const level = Level.createNew();
         const floor = placeBody(level, level.world, transform(0, 300), 'static');
         const crate = placeBody(level, level.world, transform(40, 0));
-        const { simulation } = start(level);
+        const { simulation } = startScripted(level);
 
         runTicks(simulation, 3);
         const report = simulation.takeReport();
@@ -195,7 +84,7 @@ describe('Simulation', () => {
     test('a report after no ticks is empty', () => {
         const level = Level.createNew();
         placeBody(level, level.world, transform(0, 0));
-        const { simulation } = start(level);
+        const { simulation } = startScripted(level);
 
         runTicks(simulation, 2);
         simulation.takeReport();
@@ -208,7 +97,7 @@ describe('Simulation', () => {
     test("the report's camera is the camera entity's level position", () => {
         const level = Level.createNew();
         level.camera.requireComponent(TransformComponent).set('position', { x: 320, y: 180 });
-        const { simulation } = start(level);
+        const { simulation } = startScripted(level);
 
         expect(simulation.takeReport().camera).toEqual({ x: 320, y: 180 });
     });
@@ -216,7 +105,7 @@ describe('Simulation', () => {
     test('stateHash changes when one body moves by one bit, and not when nothing moves', () => {
         const level = Level.createNew();
         const crate = placeBody(level, level.world, transform(0, 1));
-        const { simulation, world } = start(level);
+        const { simulation, world } = startScripted(level);
         world.falling = false;
 
         runTicks(simulation, 1);

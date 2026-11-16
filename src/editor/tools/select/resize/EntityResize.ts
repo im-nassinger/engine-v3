@@ -10,6 +10,8 @@ import type { Stretch } from './resizeFactor.ts';
 // A size never rests below this, in the units the Inspector shows: a shape's width and height, a group's
 // box in its parent's pixels.
 const MIN_SIDE_PX = 1;
+// The World's rectangle stops at LevelLimits' maxLevelSize on each side, as its Width and Height fields do.
+const MAX_LEVEL_SIDE_PX = 200_000;
 // The StyleComponent's Outline width field allows up to this.
 const MAX_OUTLINE_WIDTH = 200;
 
@@ -132,22 +134,25 @@ export class EntityResize {
         };
     }
 
+    // The World's sides also stop at the largest level.
     private atLeastOnePixel(factor: Point): Point {
         const size = this.sizeBefore();
+        const atMost = this.frame.kind === 'world' ? MAX_LEVEL_SIDE_PX : Infinity;
 
-        return { x: atLeast(factor.x, size.x), y: atLeast(factor.y, size.y) };
+        return { x: within(factor.x, size.x, atMost), y: within(factor.y, size.y, atMost) };
     }
 }
 
-// A factor that leaves a side of size under 1 px grows it to 1 px, keeping the mirror. A side with no size
-// isn't stretched.
-function atLeast(factor: number, size: number) {
+// A factor that leaves a side of size under 1 px grows it to 1 px, and one past atMost shrinks it to
+// atMost, keeping the mirror. A side with no size isn't stretched.
+function within(factor: number, size: number, atMost: number) {
     if (size === 0) return 1;
 
     const smallest = MIN_SIDE_PX / size;
-    if (Math.abs(factor) >= smallest) return factor;
+    const largest = atMost / size;
+    const length = Math.min(Math.max(Math.abs(factor), smallest), largest);
 
-    return factor < 0 ? -smallest : smallest;
+    return factor < 0 ? -length : length;
 }
 
 // Stretched around the shape's own origin. A rectangle or a circle stays centred, so mirroring changes

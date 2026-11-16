@@ -8,7 +8,9 @@ import type { PhysicsEngine } from '../../physics/index.ts';
 import { BodyMatrices } from '../bodies/BodyMatrices.ts';
 import { EndOfTickPhase } from '../phases/EndOfTickPhase.ts';
 import { InputPhase } from '../phases/InputPhase.ts';
+import { LevelBoundsPhase } from '../phases/LevelBoundsPhase.ts';
 import { PhysicsPhase } from '../phases/PhysicsPhase.ts';
+import { RemovalMarks } from '../removal/RemovalMarks.ts';
 import { ReportCollector } from '../report/ReportCollector.ts';
 
 import type { RunStart } from '../run/RunStart.ts';
@@ -34,8 +36,9 @@ export function startSimulation(levelData: LevelData, engine: PhysicsEngine, sta
         caches.bodyMoved(body.entity);
     }
 
-    const run = { level, caches, scene, poses, bodyMatrices, report: new ReportCollector() };
-    const phases = [new InputPhase(), new PhysicsPhase(), new EndOfTickPhase()];
+    const removals = new RemovalMarks();
+    const run = { level, caches, scene, poses, bodyMatrices, removals, report: new ReportCollector() };
+    const phases = [new InputPhase(), new PhysicsPhase(), new LevelBoundsPhase(), new EndOfTickPhase()];
     const simulation = new Simulation(run, start, phases);
 
     return { ok: true, value: simulation };

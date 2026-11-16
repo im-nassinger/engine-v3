@@ -302,6 +302,15 @@ describe('SelectTool resizing', () => {
         expect(transformOf(level.world, 'position')).toEqual({ x: 0, y: 0 });
     });
 
+    test("the World's rectangle stops at 200,000 px wide", () => {
+        const { level, tool, selection } = buildResizeTest();
+        selection.replace([level.world.id]);
+
+        dragHandle(tool, RIGHT, { x: 500_000, y: 0 });
+
+        expect(geometryOf(level.world)).toMatchObject({ width: 200_000 });
+    });
+
     test('the handle snaps to the grid unless Ctrl is held', () => {
         const { square, tool, selection } = buildResizeTest();
         selection.replace([square.id]);

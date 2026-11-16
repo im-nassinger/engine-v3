@@ -63,6 +63,15 @@ describe('setFieldValue', () => {
         expect(session.openLevel.history.undoCount).toBe(0);
     });
 
+    test('a typed Width stops at 200,000 px, the largest level', () => {
+        const { session } = buildSession();
+        const world = session.openLevel.level.world;
+
+        setFieldValue(session.openLevel, [world.id], 'ShapeComponent', 'width', 200_001);
+
+        expect(world.requireComponent(ShapeComponent).get('geometry')).toMatchObject({ width: 200_000 });
+    });
+
     test('writes a derived field through its write, as one step', () => {
         const { session, square } = buildSession();
 

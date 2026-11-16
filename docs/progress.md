@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 13, step 7 of 11: `Simulation` in `core/simulation/` runs `InputPhase`, `PhysicsPhase` and `EndOfTickPhase` each tick, with body poses as the play copy's state through `BodyMatrices`, `takeReport()`, `stateHash()` and `startSimulation`, with 7 tests against a scripted `PhysicsWorld` and 2 with Box2D. Next is step 8, `LevelBoundsPhase`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 13, step 8 of 11: `LevelBoundsPhase` marks bodies fully outside open bounds once they have been inside, and bodies past the 100,000 px hard limit; `EndOfTickPhase` removes them with their subtrees and bodies; the report names them in `removed` and `removedPastHardLimit`; the reader refuses a World over 200,000 px and Width, Height and the World's handles stop there. Next is step 9, `runHeadless` and the determinism test. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -205,7 +205,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 13 of [plan.md](plan.md#stage-13-in-steps): physics and the determinism test.** Steps 1 to 7 are done; step 8, `LevelBoundsPhase` with the hard limit and the maximum level size, is next.
+1. **Stage 13 of [plan.md](plan.md#stage-13-in-steps): physics and the determinism test.** Steps 1 to 8 are done; step 9, `runHeadless` and the determinism test in Node, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
@@ -230,14 +230,6 @@ Left open by 2026-11-16's variables change, all for v2 unless marked. None block
 - **Keep between runs for an entity's variables** (v3).
 - **Choice, variable and list types** for variables. The examples now name the level's `coins` directly instead of letting the creator pick it.
 
-## Pending owner change: resizing changes the scale (owner, 2026-11-16)
+## Before v2
 
-Not written into the docs yet. The owner decided:
-
-- Polygons and lines have no Width or Height, only their points.
-- Resizing any shape with the handles changes its TransformComponent (its scale), never its shape values (width, height, radius, points).
-- The code must be changed to match before v2 starts.
-
-Still open: outlines. With resizing changing the scale, an uneven resize stretches the outline unevenly. The owner asked whether this can be a setting on the StyleComponent. Claude's answer: yes, a checkbox such as "Scale outline" that, when off, keeps the outline's width whatever the scale. Its name, its default, and whether it also ignores a parent group's scale still need the owner's answer.
-
-To update once that's settled: `requirements/drawing.md` ("Width and height, not scale"), `requirements/editor/selection.md`, `architecture/core-model/components-and-fields.md`, `architecture/editor/selection-and-tools.md` (`EntityResize`, the readout), `architecture/core-model/geometry.md` (outline bounds), `glossary.md`, `scope.md`, `decisions.md`, and a stage before v2 in `plan.md`. The World keeps resizing its rectangle, because its TransformComponent is fixed.
+The owner's changes to build after v1's stages and before v2 starts (resizing changes the scale, Z and X rotate, Ctrl+Shift resizes from the centre) are listed in [before-v2.md](before-v2.md), with their open questions.

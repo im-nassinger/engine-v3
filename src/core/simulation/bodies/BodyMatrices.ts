@@ -10,7 +10,7 @@ const NO_SCALE = { x: 1, y: 1 };
 // split off at the start, so children follow the body through WorldMatrixCache as usual.
 export class BodyMatrices implements BodyMatrixSource {
     private readonly poses: BodyPoses;
-    private readonly restsByEntity = new Map<Entity, Matrix2D>();
+    private readonly bodiesByEntity = new Map<Entity, SceneBody>();
     private readonly entitiesById = new Map<EntityId, Entity>();
 
     constructor(poses: BodyPoses) {
@@ -18,8 +18,19 @@ export class BodyMatrices implements BodyMatrixSource {
     }
 
     add(body: SceneBody) {
-        this.restsByEntity.set(body.entity, body.rest);
+        this.bodiesByEntity.set(body.entity, body);
         this.entitiesById.set(body.entity.id, body.entity);
+    }
+
+    // Forgets the entity's body, which the caller destroys, and gives it back; undefined when it had none.
+    remove(entity: Entity) {
+        const body = this.bodiesByEntity.get(entity);
+        if (body === undefined) return undefined;
+
+        this.bodiesByEntity.delete(entity);
+        this.entitiesById.delete(entity.id);
+
+        return body;
     }
 
     entityOf(id: EntityId) {
@@ -27,7 +38,7 @@ export class BodyMatrices implements BodyMatrixSource {
     }
 
     matrixOf(entity: Entity) {
-        const rest = this.restsByEntity.get(entity);
+        const rest = this.bodiesByEntity.get(entity)?.rest;
         if (rest === undefined) return undefined;
 
         const pose = this.poses.poseOf(entity.id);
