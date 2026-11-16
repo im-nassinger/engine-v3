@@ -41,8 +41,10 @@ export class LiveEdit {
         return this.active;
     }
 
+    // False, with nothing begun, when the level is read-only: the caller starts no drag.
     begin(targets: readonly ValueTarget[]) {
         if (this.active) throw new Error('A live edit is already running.');
+        if (this.editor.isReadOnly) return false;
 
         const started = new Map<string, StartedValue>();
         for (const target of targets) {
@@ -56,6 +58,8 @@ export class LiveEdit {
         this.started = started;
         this.active = true;
         this.activeChanged.increment();
+
+        return true;
     }
 
     // Writes the value now, without history. A value the field refuses is left out and the old one kept,

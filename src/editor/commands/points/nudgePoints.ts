@@ -1,5 +1,6 @@
 import type { Point } from '../../../core/geometry/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
+import { READ_ONLY_REASON } from '../../history/index.ts';
 import type { OpenLevel } from '../../session/index.ts';
 import type { CommandOutcome } from '../EditorCommand.ts';
 
@@ -18,7 +19,8 @@ export function nudgePoints(
     if (!(move instanceof PointsMove)) return move;
 
     const { liveEdit } = openLevel;
-    liveEdit.begin(move.targets);
+    if (!liveEdit.begin(move.targets)) return { kind: 'refused', reason: READ_ONLY_REASON };
+
     move.moveBy(offset);
     liveEdit.commit(move.label, `nudgePoints:${entity.id}`);
 

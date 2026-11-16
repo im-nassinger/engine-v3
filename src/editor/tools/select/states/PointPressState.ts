@@ -1,4 +1,5 @@
 import { PointsMove } from '../../../commands/index.ts';
+import { READ_ONLY_REASON } from '../../../history/index.ts';
 import type { LevelPointerInput } from '../../Tool.ts';
 
 import { PointBoxState } from './PointBoxState.ts';
@@ -72,7 +73,11 @@ export class PointPressState implements SelectState {
         const pressedStart = move.startLevelPosition(pointIndex);
         if (pressedStart === undefined) return;
 
-        openLevel.liveEdit.begin(move.targets);
+        if (!openLevel.liveEdit.begin(move.targets)) {
+            status.show(READ_ONLY_REASON);
+            return;
+        }
+
         const drag = new PointDragState(this.host, this.editing, move, pressedStart, this.press.levelPosition);
         this.host.goTo(drag);
         drag.pointerMove(input);

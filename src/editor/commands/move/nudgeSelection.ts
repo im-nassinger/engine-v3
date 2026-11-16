@@ -1,4 +1,5 @@
 import type { Point } from '../../../core/geometry/index.ts';
+import { READ_ONLY_REASON } from '../../history/index.ts';
 import type { OpenLevel } from '../../session/index.ts';
 import type { CommandOutcome } from '../EditorCommand.ts';
 
@@ -13,7 +14,8 @@ export function nudgeSelection(openLevel: OpenLevel, offset: Point): CommandOutc
     const move = SelectionMove.ofSelection(openLevel);
     if (!(move instanceof SelectionMove)) return move;
 
-    liveEdit.begin(move.targets);
+    if (!liveEdit.begin(move.targets)) return { kind: 'refused', reason: READ_ONLY_REASON };
+
     move.moveBy(offset);
     liveEdit.commit(move.label, `nudge:${selection.ids.join(',')}`);
 

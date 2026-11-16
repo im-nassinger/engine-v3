@@ -10,6 +10,7 @@ import { CutCommand } from './clipboard/CutCommand.ts';
 import { DuplicateCommand } from './clipboard/DuplicateCommand.ts';
 import { PasteCommand } from './clipboard/PasteCommand.ts';
 import { CommandRegistry } from './CommandRegistry.ts';
+import type { EditorCommand } from './EditorCommand.ts';
 import { DeleteCommand } from './edit/DeleteCommand.ts';
 import { AboutCommand } from './help/AboutCommand.ts';
 import { HideOrShowCommand } from './edit/HideOrShowCommand.ts';
@@ -23,6 +24,7 @@ import { VIEW_SWITCH_ENTRIES, ViewSwitchCommand } from './view/ViewSwitchCommand
 import { ZoomInCommand } from './view/ZoomInCommand.ts';
 import { ZoomOutCommand } from './view/ZoomOutCommand.ts';
 import { NudgeCommand } from './move/NudgeCommand.ts';
+import { ReadOnlyGuard } from './ReadOnlyGuard.ts';
 import { RenameCommand } from './rename/RenameCommand.ts';
 import { ZoomToActualSizeCommand } from './view/ZoomToActualSizeCommand.ts';
 
@@ -32,23 +34,26 @@ import { ZoomToActualSizeCommand } from './view/ZoomToActualSizeCommand.ts';
 export function createCommandRegistry(session: EditorSession, clipboardParts?: ClipboardParts) {
     const registry = new CommandRegistry();
     const clipboard = clipboardParts ?? { clipboard: new EditorClipboard(), mouse: { current: undefined } };
+    // In a read-only tab these are disabled with the reason; the rest only look, select or copy.
+    const registerEditing = (command: EditorCommand) => registry.register(new ReadOnlyGuard(session, command));
 
-    registry.register(new UndoCommand(session));
-    registry.register(new RedoCommand(session));
+    registerEditing(new UndoCommand(session));
+    registerEditing(new RedoCommand(session));
+    // Cut and Paste check for a read-only level themselves: the browser's events call them directly.
     registry.register(new CutCommand(session, clipboard));
     registry.register(new CopyCommand(session, clipboard));
     registry.register(new PasteCommand(session, clipboard));
-    registry.register(new DuplicateCommand(session));
-    registry.register(new DeleteCommand(session));
+    registerEditing(new DuplicateCommand(session));
+    registerEditing(new DeleteCommand(session));
     registry.register(new SelectAllCommand(session));
-    registry.register(new RenameCommand(session));
-    registry.register(new HideOrShowCommand(session));
-    registry.register(new GroupCommand(session));
-    registry.register(new UngroupCommand(session));
+    registerEditing(new RenameCommand(session));
+    registerEditing(new HideOrShowCommand(session));
+    registerEditing(new GroupCommand(session));
+    registerEditing(new UngroupCommand(session));
     registry.register(new GoIntoGroupCommand(session));
 
     for (const nudge of NudgeCommand.all(session)) {
-        registry.register(nudge);
+        registerEditing(nudge);
     }
 
     for (const entry of VIEW_SWITCH_ENTRIES) {

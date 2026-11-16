@@ -73,7 +73,7 @@ export class FieldSlide {
 
         this.label = storedField.label;
         this.targets = holders.map((held) => ({ entityId: held.entity.id, schema: held.component.schema, key }));
-        liveEdit.begin(this.targets);
+        if (!liveEdit.begin(this.targets)) return false;
         this.isLive = true;
 
         return true;

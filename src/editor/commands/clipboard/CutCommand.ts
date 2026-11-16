@@ -1,5 +1,6 @@
 import { LevelWriter } from '../../../core/level-data/index.ts';
 import { ClipboardCodec } from '../../clipboard/index.ts';
+import { READ_ONLY_REASON } from '../../history/index.ts';
 import type { EditorSession } from '../../session/index.ts';
 import type { Availability, CommandOutcome, EditorCommand } from '../EditorCommand.ts';
 import { removeEntities } from '../shared/removeEntities.ts';
@@ -12,7 +13,8 @@ import { copySelection, selectionSplit } from './copySelection.ts';
 const CUT = 'cut';
 
 // Copy, then Delete, in one step "Cut 3 entities": the joints attached to what is removed go too, as
-// Delete's rule says, though they were not copied.
+// Delete's rule says, though they were not copied. It checks for a read-only level itself, without a
+// ReadOnlyGuard, because the browser's cut event calls cut() directly.
 export class CutCommand implements EditorCommand {
     readonly id = 'edit.cut';
     readonly label = 'Cut';
@@ -29,6 +31,8 @@ export class CutCommand implements EditorCommand {
     }
 
     availability(): Availability {
+        if (this.session.readOnly) return { enabled: false, reason: READ_ONLY_REASON };
+
         const split = selectionSplit(this.session);
         const refusal = skippedRefusal(split, CUT);
         if (refusal !== undefined) return { enabled: false, reason: refusal };
@@ -39,6 +43,8 @@ export class CutCommand implements EditorCommand {
     // The outcome and the clipboard text, kept as the last copy, for a caller that writes the text
     // somewhere itself: the browser's cut event.
     cut() {
+        if (this.session.readOnly) return { outcome: readOnlyRefusal(), text: undefined };
+
         const copied = copySelection(this.session, this.codec, CUT);
         if (copied.kind === 'refused') return { outcome: copied, text: undefined };
 
@@ -52,4 +58,9 @@ export class CutCommand implements EditorCommand {
     run(): CommandOutcome {
         return this.cut().outcome;
     }
+}
+
+// Nothing is copied either: a cut that only copies would look as if it had deleted.
+function readOnlyRefusal(): CommandOutcome {
+    return { kind: 'refused', reason: READ_ONLY_REASON };
 }

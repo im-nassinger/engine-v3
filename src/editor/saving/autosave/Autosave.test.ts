@@ -474,4 +474,33 @@ describe('Autosave', () => {
 
         expect(store.saveCount).toBe(0);
     });
+
+    describe('in a read-only tab', () => {
+        test('never saves: not on a change, not on saveNow, not on a level opened later', async () => {
+            const { timer, session, store, autosave, statuses, position } = buildAutosave();
+            session.makeReadOnly();
+            const square = session.openLevel.level.requireEntity(position.entityId);
+
+            // Nothing in a read-only tab can edit, so the level is changed past the editor.
+            square.requireComponent(TransformComponent).set('position', { x: 5, y: 5 });
+            await advance(timer, 30_000);
+            await autosave.saveNow();
+            session.replaceOpenLevel(Level.createNew());
+            await advance(timer, 30_000);
+
+            expect(store.saveCount).toBe(0);
+            expect(autosave.state.status).toBe('saved');
+            expect(statuses).toEqual([]);
+        });
+
+        test('a save due when the tab turns read-only is not written', async () => {
+            const { timer, session, store, change } = buildAutosave();
+            change();
+
+            session.makeReadOnly();
+            await advance(timer, 30_000);
+
+            expect(store.saveCount).toBe(0);
+        });
+    });
 });

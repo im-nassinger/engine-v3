@@ -1,5 +1,6 @@
 import { LevelWriter } from '../../../core/level-data/index.ts';
 import { ClipboardCodec, IdRemapping, PastePlacement } from '../../clipboard/index.ts';
+import { READ_ONLY_REASON } from '../../history/index.ts';
 import type { EditOutcome } from '../../history/index.ts';
 import type { EditorSession } from '../../session/index.ts';
 import { outcomeText } from '../../status/index.ts';
@@ -14,7 +15,8 @@ const NOTHING_TO_PASTE = 'Nothing to paste';
 
 // Pastes the clipboard's entities centred on the mouse over the level view, else on the view's middle.
 // From the menu the read is asynchronous: run() starts it, and the paste happens when the text arrives,
-// with its outcome shown in the status bar then.
+// with its outcome shown in the status bar then. It checks for a read-only level itself, without a
+// ReadOnlyGuard, because the browser's paste event calls pasteText() directly.
 export class PasteCommand implements EditorCommand {
     readonly id = 'edit.paste';
     readonly label = 'Paste';
@@ -37,10 +39,14 @@ export class PasteCommand implements EditorCommand {
 
     // Whether there is something to paste is only known once the clipboard is read.
     availability(): Availability {
+        if (this.session.readOnly) return { enabled: false, reason: READ_ONLY_REASON };
+
         return { enabled: true };
     }
 
     run(): CommandOutcome {
+        if (this.session.readOnly) return { kind: 'refused', reason: READ_ONLY_REASON };
+
         void this.readAndPaste();
 
         return { kind: 'done' };
@@ -59,6 +65,7 @@ export class PasteCommand implements EditorCommand {
     // Pastes the text at once: the browser's paste event carries it. Plain text and other JSON are
     // "Nothing to paste".
     pasteText(text: string | undefined): EditOutcome {
+        if (this.session.readOnly) return { kind: 'refused', reason: READ_ONLY_REASON };
         if (text === undefined) return { kind: 'refused', reason: NOTHING_TO_PASTE };
 
         const decoded = this.codec.decode(text);

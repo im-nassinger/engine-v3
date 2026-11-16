@@ -75,12 +75,16 @@ export class PointsTarget {
         return { kind: this.kind, points };
     }
 
-    // Writes the points and makes one step from what the geometry held before.
+    // Writes the points and makes one step from what the geometry held before. False, with nothing
+    // written, when the level is read-only.
     write(openLevel: OpenLevel, points: readonly Point[], label: string, joinKey?: string) {
         const { liveEdit } = openLevel;
-        liveEdit.begin([this.target]);
+        if (!liveEdit.begin([this.target])) return false;
+
         liveEdit.update(this.target, this.geometryWith(points));
         liveEdit.commit(label, joinKey);
+
+        return true;
     }
 }
 

@@ -1,5 +1,6 @@
 import { labelName } from '../../../core/level/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
+import { READ_ONLY_REASON } from '../../history/index.ts';
 import type { OpenLevel } from '../../session/index.ts';
 import type { CommandOutcome } from '../EditorCommand.ts';
 
@@ -21,7 +22,7 @@ export function deletePoints(openLevel: OpenLevel, entity: Entity, indexes: read
     }
 
     const label = `Delete points of ${labelName(entity)}`;
-    points.write(openLevel, remaining, label);
+    if (!points.write(openLevel, remaining, label)) return { kind: 'refused', reason: READ_ONLY_REASON };
 
     return { kind: 'done' };
 }

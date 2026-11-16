@@ -1,4 +1,5 @@
 import { SelectionMove } from '../../../commands/index.ts';
+import { READ_ONLY_REASON } from '../../../history/index.ts';
 import type { LevelPointerInput } from '../../Tool.ts';
 import type { PressTarget } from '../SelectionPicker.ts';
 
@@ -80,7 +81,12 @@ export class PressState implements SelectState {
             return;
         }
 
-        openLevel.liveEdit.begin(move.targets);
+        if (!openLevel.liveEdit.begin(move.targets)) {
+            this.host.context.status.show(READ_ONLY_REASON);
+            this.host.goIdle();
+            return;
+        }
+
         const moving = new MoveState(this.host, move, this.press.levelPosition);
         this.host.goTo(moving);
         moving.pointerMove(input);

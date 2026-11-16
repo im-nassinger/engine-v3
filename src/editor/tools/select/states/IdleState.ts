@@ -1,3 +1,4 @@
+import { READ_ONLY_REASON } from '../../../history/index.ts';
 import type { LevelPointerInput } from '../../Tool.ts';
 
 import { SelectionFrame } from '../frame/SelectionFrame.ts';
@@ -61,7 +62,8 @@ export class IdleState implements SelectState {
         const resize = EntityResize.of(openLevel, frame);
         if (resize === undefined || openLevel.liveEdit.isActive) return false;
 
-        openLevel.liveEdit.begin(resize.targets);
+        if (!openLevel.liveEdit.begin(resize.targets)) return this.refusedAsReadOnly();
+
         this.host.goTo(new ResizeState(this.host, frame, resize, handle, input.levelPosition));
 
         return true;
@@ -77,8 +79,16 @@ export class IdleState implements SelectState {
         const rotate = EntityRotate.of(openLevel, frame);
         if (rotate === undefined || openLevel.liveEdit.isActive) return false;
 
-        openLevel.liveEdit.begin(rotate.targets);
+        if (!openLevel.liveEdit.begin(rotate.targets)) return this.refusedAsReadOnly();
+
         this.host.goTo(new RotateState(this.host, frame, rotate, input.levelPosition));
+
+        return true;
+    }
+
+    // The press is used up: a handle in a read-only level starts nothing.
+    private refusedAsReadOnly() {
+        this.host.context.status.show(READ_ONLY_REASON);
 
         return true;
     }

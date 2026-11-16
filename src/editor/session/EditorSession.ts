@@ -3,6 +3,7 @@ import type { ComponentRegistry } from '../../core/components/index.ts';
 import type { Level } from '../../core/level/index.ts';
 import { FormatUpgrader, LevelReader, V1_LEVEL_LIMITS } from '../../core/level-data/index.ts';
 import { VersionCounter } from '../../core/events/index.ts';
+import { ReadOnlyMode } from '../history/index.ts';
 import { CardFolds, ListFolds } from '../inspector/index.ts';
 import type { FoldStore } from '../inspector/index.ts';
 import { StatusText } from '../status/index.ts';
@@ -43,6 +44,8 @@ export class EditorSession {
     readonly cardFolds: CardFolds;
     readonly listFolds = new ListFolds();
     readonly openLevelChanged = new VersionCounter();
+    // Turned on by the page when another tab holds the level's lock.
+    readonly readOnlyMode = new ReadOnlyMode();
     private readonly services: OpenLevelServices;
     private current: OpenLevel;
 
@@ -59,8 +62,18 @@ export class EditorSession {
             cardFolds: this.cardFolds,
             viewSettings: this.viewSettings,
             makeToken: options.makeToken ?? countingTokens(),
+            readOnly: this.readOnlyMode,
         };
         this.current = new OpenLevel(options.level, this.services);
+    }
+
+    // Selecting, panning, zooming, the View menu and Copy still work; every edit is refused.
+    get readOnly() {
+        return this.readOnlyMode.isOn;
+    }
+
+    makeReadOnly() {
+        this.readOnlyMode.turnOn();
     }
 
     get openLevel() {

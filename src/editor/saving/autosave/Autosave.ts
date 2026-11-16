@@ -40,7 +40,8 @@ type Followed = {
 // Saves the open level to the browser on its own: 2 s after the last change, and at most 20 s after the first
 // unsaved one. A save due during a drag waits for the drag's end, and one save runs at a time. It follows the
 // session, so New and Import need no new Autosave. A failed save shows a level-wide editor message and is
-// tried again every 10 s until one works.
+// tried again every 10 s until one works. A read-only tab never saves, so it can't overwrite the level
+// another tab is editing.
 export class Autosave {
     static readonly quietDelayMs = 2_000;
     static readonly longestWaitMs = 20_000;
@@ -85,6 +86,7 @@ export class Autosave {
     // For what can't wait for the timers: the tab hidden, test play starting, an export. Waits for a running
     // save, then saves if anything is unsaved, even during a drag. Resolves when it is written or failed.
     async saveNow(): Promise<void> {
+        if (this.session.readOnly) return;
         if (this.running !== undefined) {
             await this.running;
         }
@@ -124,6 +126,8 @@ export class Autosave {
 
     // A failed save stays failed until a save works, whatever changes meanwhile.
     private changed() {
+        if (this.session.readOnly) return;
+
         if (this.running === undefined && this.state.status !== 'failed') {
             this.state.set('unsaved');
         }
@@ -146,6 +150,7 @@ export class Autosave {
     }
 
     private startIfDue() {
+        if (this.session.readOnly) return;
         if (!this.due || this.running !== undefined) return;
         if (this.followed.openLevel.liveEdit.isActive) return;
 

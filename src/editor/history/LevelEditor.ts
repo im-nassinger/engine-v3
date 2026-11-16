@@ -4,6 +4,7 @@ import type { LevelChange } from './changes/index.ts';
 import type { EditOutcome } from './EditOutcome.ts';
 import { EditTransaction } from './EditTransaction.ts';
 import type { History } from './History.ts';
+import { READ_ONLY_REASON, ReadOnlyMode } from './ReadOnlyMode.ts';
 
 // What LevelEditor needs of the Selection. A shape, not the class, so editor/history never imports
 // editor/selection or editor/session, which import history in turn.
@@ -23,6 +24,8 @@ export type LevelEditorOptions = {
     readonly history: History;
     readonly selection: EditedSelection;
     readonly currentGroup: EditedGroup;
+    // The session's. Never read-only when left out.
+    readonly readOnly?: ReadOnlyMode;
 };
 
 // The one way to change the level as a step: every command's edit, undo and redo go through here, so
@@ -32,16 +35,25 @@ export class LevelEditor {
     private readonly history: History;
     private readonly selection: EditedSelection;
     private readonly currentGroup: EditedGroup;
+    private readonly readOnly: ReadOnlyMode;
 
     constructor(options: LevelEditorOptions) {
         this.level = options.level;
         this.history = options.history;
         this.selection = options.selection;
         this.currentGroup = options.currentGroup;
+        this.readOnly = options.readOnly ?? new ReadOnlyMode();
+    }
+
+    // In a tab without the level's lock: every edit, undo and redo is refused and changes nothing.
+    get isReadOnly() {
+        return this.readOnly.isOn;
     }
 
     // A refused or throwing command leaves the level, the selection and the current group as before.
-    edit(label: string, work: (transaction: EditTransaction) => EditOutcome) {
+    edit(label: string, work: (transaction: EditTransaction) => EditOutcome): EditOutcome {
+        if (this.isReadOnly) return { kind: 'refused', reason: READ_ONLY_REASON };
+
         const selectionBefore = this.selection.ids;
         const groupPathBefore = this.currentGroup.path;
         const transaction = new EditTransaction(this.level);
@@ -82,6 +94,7 @@ export class LevelEditor {
     // For changes already in place: a drag's values or a nudge, written live. The selection didn't change.
     recordApplied(label: string, changes: readonly LevelChange[], joinKey?: string) {
         if (changes.length === 0) return;
+        if (this.isReadOnly) throw new Error('A read-only level records no step.');
 
         const selectionIds = this.selection.ids;
         const groupPath = this.currentGroup.path;
@@ -98,6 +111,8 @@ export class LevelEditor {
     }
 
     undo() {
+        if (this.isReadOnly) return undefined;
+
         const step = this.history.undo(this.level);
         if (step === undefined) return undefined;
 
@@ -107,6 +122,8 @@ export class LevelEditor {
     }
 
     redo() {
+        if (this.isReadOnly) return undefined;
+
         const step = this.history.redo(this.level);
         if (step === undefined) return undefined;
 

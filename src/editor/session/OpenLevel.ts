@@ -3,6 +3,7 @@ import { DerivedCaches } from '../../core/derived/index.ts';
 import type { Level } from '../../core/level/index.ts';
 import { EntitiesRows, RenameRequest, RowClicks, SelectionReveal } from '../entities-panel/index.ts';
 import { History, LevelEditor, LiveEdit } from '../history/index.ts';
+import type { ReadOnlyMode } from '../history/index.ts';
 import { HitTester, LinearSpatialIndex } from '../hit-testing/index.ts';
 import { InspectorModel } from '../inspector/index.ts';
 import type { CardFolds } from '../inspector/index.ts';
@@ -25,6 +26,8 @@ export type OpenLevelServices = {
     readonly viewSettings: ViewSettings;
     // Makes this opening's source token.
     readonly makeToken: TokenMaker;
+    // Whether this tab may change the level, the same for every level it opens.
+    readonly readOnly: ReadOnlyMode;
 };
 
 // The level open in the editor with everything that belongs to it. New and Import replace it as one
@@ -67,6 +70,7 @@ export class OpenLevel {
             history: this.history,
             selection: this.selection,
             currentGroup: this.currentGroup,
+            readOnly: services.readOnly,
         });
         this.liveEdit = new LiveEdit(level, this.editor);
         this.messages = new EditorMessages(level, createV1Rules(), services.frames);

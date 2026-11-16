@@ -53,6 +53,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Tip | An editor message with a blue icon: this works, but there is an easier way. |
 | Used by | The list at the bottom of the Inspector of every entity that points to the selected one. |
 | Component preset | A saved set of values for one component, picked from a menu on its card. Not in v1. |
+| Read-only tab | A tab opened while another tab has the level open. You can look, select, pan, zoom and copy, but every edit is refused with "The level is open in another tab", and nothing is saved. |
 
 ## Drawing
 

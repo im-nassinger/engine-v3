@@ -22,5 +22,6 @@ export { History } from './History.ts';
 export type { HistoryStep, NewHistoryStep } from './HistoryStep.ts';
 export { LevelEditor } from './LevelEditor.ts';
 export { LiveEdit } from './LiveEdit.ts';
+export { READ_ONLY_REASON, ReadOnlyMode } from './ReadOnlyMode.ts';
 export type { ValueTarget } from './LiveEdit.ts';
 export type { EditedGroup, EditedSelection, LevelEditorOptions } from './LevelEditor.ts';

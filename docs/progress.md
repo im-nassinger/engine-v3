@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 12, step 5 of 13: `EditorSettings` is built: the view's position and zoom, the View menu's switches with the grid, the folded cards and `persistAsked` are read from `localStorage` before the first draw and written when they change, and a reload shows the same place. Next is step 6, read-only. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 12, step 6 of 13: read-only is built: `EditorSession.makeReadOnly()` makes every edit, undo, redo, drag and drawing refuse with `The level is open in another tab`, the commands that edit are disabled with it, `Autosave` never saves, and selecting, panning, zooming, the View menu and Copy still work. Next is step 7, `LevelOpener`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

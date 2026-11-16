@@ -1,6 +1,7 @@
 import type { Point } from '../../../core/geometry/index.ts';
 import { labelName } from '../../../core/level/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
+import { READ_ONLY_REASON } from '../../history/index.ts';
 import type { OpenLevel } from '../../session/index.ts';
 
 import { isPointsRefusal, PointsTarget } from './PointsTarget.ts';
@@ -32,7 +33,8 @@ export function addPoint(
     const before = points.points.slice(0, index);
     const after = points.points.slice(index);
     const label = `Add a point to ${labelName(entity)}`;
-    points.write(openLevel, [...before, newPoint, ...after], label);
+    const isWritten = points.write(openLevel, [...before, newPoint, ...after], label);
+    if (!isWritten) return { kind: 'refused', reason: READ_ONLY_REASON };
 
     return { kind: 'added', index };
 }

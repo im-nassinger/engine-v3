@@ -3,6 +3,7 @@ import type { Matrix2D, Point } from '../../../core/geometry/index.ts';
 import { V1_LEVEL_LIMITS } from '../../../core/level-data/index.ts';
 import { createShape } from '../../commands/index.ts';
 import type { ShapeDrawing } from '../../commands/index.ts';
+import { READ_ONLY_REASON } from '../../history/index.ts';
 import type { DragReadout } from '../readout/DragReadout.ts';
 import { diameterReadout, sizeReadout } from '../readout/readoutText.ts';
 import type { LevelPointerInput, Modifiers, Tool, ToolContext, ToolKey } from '../Tool.ts';
@@ -158,7 +159,7 @@ export class ShapeTool implements Tool {
         if (this.press !== undefined || this.polygonPress !== undefined) return;
 
         const kind = this.chosenKind;
-        if (this.polygon === undefined && this.refusedAsLocked(context)) return;
+        if (this.polygon === undefined && this.refusesNewShape(context)) return;
 
         if (kind === 'polygon' || this.polygon !== undefined) {
             this.polygonPress = input;
@@ -356,11 +357,12 @@ export class ShapeTool implements Tool {
         return polygon.space.toGroup.apply(this.snapped(levelPosition, modifiers));
     }
 
-    private refusedAsLocked(context: ToolContext) {
-        const { currentGroup, caches } = context.openLevel;
-        if (!caches.hidden.isLocked(currentGroup.group)) return false;
+    // A read-only level, or a locked current group, takes no new shape, so no drawing starts.
+    private refusesNewShape(context: ToolContext) {
+        const reason = lockedReason(context);
+        if (reason === undefined) return false;
 
-        context.status.show(LOCKED);
+        context.status.show(reason);
 
         return true;
     }
@@ -521,4 +523,12 @@ function hasMovedFarEnough(press: Press, input: LevelPointerInput) {
     const dy = input.screenPosition.y - press.screenPosition.y;
 
     return Math.hypot(dx, dy) >= DRAW_START_PX;
+}
+
+function lockedReason(context: ToolContext) {
+    const { currentGroup, caches, editor } = context.openLevel;
+    if (editor.isReadOnly) return READ_ONLY_REASON;
+    if (caches.hidden.isLocked(currentGroup.group)) return LOCKED;
+
+    return undefined;
 }
