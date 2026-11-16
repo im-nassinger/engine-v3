@@ -1,6 +1,6 @@
 import { BodyComponent, SurfaceComponent } from '../../components/index.ts';
 import type { Entity } from '../../level/index.ts';
-import { mergesInto } from './mergesInto.ts';
+import { bodyOf } from './bodyOf.ts';
 import type { ParentOf } from './mergesInto.ts';
 
 // One entity about to go into another parent. None of the moved entities is inside another one.
@@ -27,15 +27,6 @@ export function countBodyChanges(moves: readonly PlannedMove[]) {
     }
 
     return count;
-}
-
-// The body the entity moves with in play: the one it merges into, else its own; undefined for a surface
-// with no body on it or above it, which is Static.
-function bodyOf(entity: Entity, parentOf?: ParentOf) {
-    const mergedInto = mergesInto(entity, parentOf);
-    if (mergedInto !== undefined) return mergedInto;
-
-    return entity.hasComponent(BodyComponent) ? entity : undefined;
 }
 
 function takesPartInPhysics(entity: Entity) {

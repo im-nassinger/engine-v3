@@ -11,3 +11,5 @@ export { countBodyChanges } from './merging/bodyChanges.ts';
 export type { PlannedMove } from './merging/bodyChanges.ts';
 export { mergesInto } from './merging/mergesInto.ts';
 export type { ParentOf } from './merging/mergesInto.ts';
+export { BodyMembership } from './membership/BodyMembership.ts';
+export type { SurfaceTarget } from './membership/BodyMembership.ts';

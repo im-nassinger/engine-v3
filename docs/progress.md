@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 13, step 4 of 11: the tech notes' Box2D facts are rechecked against 3.2, each with a test in `box2dFacts.test.ts`. Most hold; in 3.2 there is no fixed movement cap per step and no polygon skin, and **a sensor sees Static and Kinematic bodies too**, with sensor events off by default (matters for v2's triggers). Next is step 5, `BodyMembership`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 13, step 5 of 11: `BodyMembership` in `core/physics/membership/` says which body each entity moves with, whether play builds a body for it, and where its surface goes (a body, Static, or skipped for a line on a Dynamic body), with 8 tests. Next is step 6, `PhysicsSceneBuilder`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
