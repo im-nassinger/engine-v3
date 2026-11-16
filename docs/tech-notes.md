@@ -7,7 +7,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 ## Settled by the owner
 
 - **Box2D v3 and Lua both run in the browser with wasm.** No proof is needed. (owner, 2026-11-13)
-- **The first attempt used box2d-wasm 7.0.0, which is Box2D v2.4.1.** That is why the physics notes below are still against v2.4.
+- **The first attempt used box2d-wasm 7.0.0, which is Box2D v2.4.1.** That is why the physics notes below were written against v2.4. Stage 13 rechecked them against Box2D 3.2, and each says what it showed.
 - **Box2D v3 has its own recording and replay support.** Whether it helps the game is looked at later, not now. See replays in [later.md](requirements/later.md).
 
 ## Editor
@@ -22,7 +22,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Scrubbing.** Pointer capture is enough. Pointer Lock would allow endless scrubbing but shows a browser banner.
 - **Cursors.** Rotated resize cursors must be generated, because CSS has only eight fixed directions.
 - **Sharp drawing.** The canvas must follow `devicePixelRatio` and watch its container size so browser zoom stays sharp. Pinch arrives as Ctrl+wheel in some browsers.
-- **Limits far from the origin.** The zoom limits, pan margin and any position limit should be checked against how Box2D behaves far from the origin.
+- **Limits far from the origin.** The zoom limits, pan margin and any position limit should be checked against how Box2D behaves far from the origin. **3.2:** a box rests the same 200,000 px from the origin as at it; see far from the origin under physics.
 - **Swipe back.** `overscroll-behavior` stops scroll chaining, but its effect on swipe navigation at the page root isn't documented. Test on a Mac.
 - **Hit testing and hover** need a spatial index over level bounds to meet the speed targets. Bounds are derived, so a move must invalidate a subtree cheaply.
 - **Hide and lock from parents** are derived by walking up the tree. Cache per subtree. The play copy must carry the hidden state so play draws the same thing.
@@ -36,7 +36,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Rounded rectangles** have more than 8 points, so they go through the same splitting as any polygon. The splits are internal and add no seams.
 - **Self-crossing polygons.** A polygon library must cut the outline at its crossings before the convex split. Check how the renderer fills a self-crossing closed path: fills based on ear clipping may show artefacts.
 - **Bad polygon input.** Treat a point lying on an edge, and duplicate points, as errors. Godot users report convex decomposition failing on exactly these.
-- **Lines in Box2D.** Chains assume no self-crossing for their ghost collision handling, and points very close together cause problems. Clean lines up before they reach physics.
+- **Lines in Box2D.** Chains assume no self-crossing for their ghost collision handling, and points very close together cause problems. Clean lines up before they reach physics. **3.2:** the game builds lines from segments, not chains, so this no longer applies; chain points 0.2 px apart still held a body (`box2dFacts.test.ts`).
 - **Converted polygons are stored results**, so how the points are sampled can't affect determinism.
 - **Sharp text.** Text drawn as a bitmap blurs when scaled above 1. Editor zoom, camera zoom and group scale all count, so text must be redrawn at its real size or drawn another way. Text that a script changes every tick needs a speed test.
 - **Text can't be measured off the main thread**, which is one reason a text has a rectangle as its box.
@@ -63,36 +63,36 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Split polygons ahead of time** for every `.entity` file, so spawning does no polygon splitting during a tick.
 - **Preload** every image an `.entity` file uses when Play starts, or spawned art pops in.
 - **Moving a Kinematic body along a path:** set its velocity to (next point minus position) divided by the tick length, don't teleport it, so contacts stay valid. Path sampling must use only arithmetic and square roots, so every computer gets the same result.
-- **Speed limit.** Box2D caps movement per step, about 6,000 px/s at 60 ticks per second and 50 px per metre. Setting ranges stay below this.
-- **Ground contacts.** A Box2D contact can exist without touching, so use its touching state.
+- **Speed limit.** Box2D caps movement per step, about 6,000 px/s at 60 ticks per second and 50 px per metre. Setting ranges stay below this. **Not so in 3.2:** there is no fixed cap per step; the world's `maximumLinearSpeed` (400 m/s by default) holds speed, and the adapter sets it to 6,000 px/s (`box2dFacts.test.ts`).
+- **Ground contacts.** A Box2D contact can exist without touching, so use its touching state. **Holds in 3.2**, and Box2D filters for it: a contact 1 px apart exists, but sends no begin event and isn't in `b2Body_GetContactData` (`box2dFacts.test.ts`).
 - **Order of custom events.** Define a stable delivery order, and whether an event fired inside a handler arrives in the same tick. The 32-step limit for trigger chains should cover events fired by scripts too.
 - **Jump feel.** The platformer defaults come from Celeste's published values (0.1 s of grace, 0.65 air control) scaled to 1080p, and from the idea of falling faster than rising.
 
 ## Physics and joints
 
-**These notes were written against Box2D v2.4.1.** The review assumes Box2D v3 (64 collision bits, the same result on every computer). Recheck each one against v3 before relying on it.
+**These notes were written against Box2D v2.4.1.** Stage 13 rechecked each one against Box2D 3.2 (`box2d3-wasm` 6.0.0), with a small test against the real build in `src/adapters/box2d/box2dFacts.test.ts` unless another test is named. Each note ends with what that showed. The joint notes wait for stage 14, which builds joints.
 
 | Limit | Box2D value | At 50 px per metre |
 |---|---|---|
-| Moving shapes | 0.1 to 10 m | 5 to 500 px |
-| Static shapes "without trouble" | up to 50 m | 2,500 px |
-| Most movement per step | 2 m | 6,000 px/s |
+| Moving shapes (advice, not checked) | 0.1 to 10 m | 5 to 500 px |
+| Static shapes "without trouble" (advice, not checked) | up to 50 m | 2,500 px |
+| Most movement per step | 2 m in v2.4.1; **none in 3.2**, only `maximumLinearSpeed`, 400 m/s by default | 6,000 px/s, set by the adapter |
 | Most rotation per step | 90° in v2.4.1; **45° in 3.2** | 2,700 °/s, 7.5 turns per second |
-| Polygon skin | 0.01 m | 0.5 px |
+| Polygon skin | 0.01 m in v2.4.1; **none in 3.2** (radius 0) | 0.5 px; a box rests within 0.01 px |
 
-- **Degenerate polygons.** In v2.4.1 a polygon with under 3 usable points silently became a 2×2 m box. Shapes too small to collide must be skipped before they reach physics.
-- **Two-sided lines.** Chains were one-sided in v2.4.1. Options were two chains in opposite directions, or plain two-sided edges. Chain points must be more than 0.25 px apart, and chains can't cross themselves.
-- **Zero mass.** A Dynamic body with no mass may hang motionless. Give it an explicit 1 kg.
-- **Sensor mass.** Give sensors density 0 when building bodies.
-- **Changing gravity** only stores the value. Wake every body explicitly.
+- **Degenerate polygons.** In v2.4.1 a polygon with under 3 usable points silently became a 2×2 m box. Shapes too small to collide must be skipped before they reach physics. **3.2:** `b2ComputeHull` gives an empty hull instead, and the adapter skips it. It welds points closer than 0.25 px (its slop) and drops a point within 0.5 px of the line through its neighbours, so a piece thinner than 0.5 px has no hull, even a long one; a triangle with 1 px sides is kept. Skipping before physics still holds.
+- **Two-sided lines.** Chains were one-sided in v2.4.1. Options were two chains in opposite directions, or plain two-sided edges. Chain points must be more than 0.25 px apart, and chains can't cross themselves. **3.2:** chains are still one-sided, holding a body only on the right of the way they were drawn, so the adapter uses segments, which collide from both sides (`Box2dPhysicsWorld.surfaces.test.ts`). box2d3-wasm's chain definition also needs its two ghost points set, or the chain is refused.
+- **Zero mass.** A Dynamic body with no mass may hang motionless. Give it an explicit 1 kg. **Holds in 3.2:** it has mass 0 and never moves (`box2dFacts.test.ts`); the adapter gives it 1 kg.
+- **Sensor mass.** Give sensors density 0 when building bodies. **Holds in 3.2:** a sensor with density 1 adds 1 kg per m² (`box2dFacts.test.ts`); the adapter gives sensors density 0.
+- **Changing gravity** only stores the value. Wake every body explicitly. **Holds in 3.2:** a sleeping body stays asleep and still (`box2dFacts.test.ts`); the adapter wakes every body.
 - **One-way platforms** aren't a Box2D feature. Keep the pass or block decision per pair of bodies, not per pair of surfaces, make it when contact begins, keep it stable, and send no events for passing contacts. Allow a small tolerance for bodies at rest.
 - **Mass and centre of mass in the editor** must come from shared geometry code, not from the physics engine, and must match what play produces.
 - **Level bound walls** can be static surfaces that collide with everything.
 - **Game speed.** Scale the time step, keeping 60 ticks per second. 2× gives 1/30 s, the coarsest step Box2D's docs suggest. Determinism holds because the step comes from level state.
-- **Far from the origin.** Float precision at 2,000 m is about 0.1 mm, well below Box2D's slop, so ±100,000 px is safe.
+- **Far from the origin.** Float precision at 2,000 m is about 0.1 mm, well below Box2D's slop, so ±100,000 px is safe. **Holds in 3.2:** a box rests on the ground 4,000 m (200,000 px) out within 0.01 px of where it rests at the origin (`box2dFacts.test.ts`).
 - **Circles scaled unevenly** need more than 8 sides to roll smoothly, so several convex pieces. Pin the side count, because it affects determinism.
 - **Joint ends.** Box2D measures angles of body B against body A and keeps slider and wheel axes in body A's frame. Decide the mapping of fields A and B once. An empty end maps to the ground body.
-- **Clockwise.** Box2D's counter-clockwise positive reads as clockwise on screen when y points down. Confirm.
+- **Clockwise.** Box2D's counter-clockwise positive reads as clockwise on screen when y points down. **Confirmed in 3.2:** a positive spin turns a body's x axis towards +y, downwards on screen (`box2dFacts.test.ts`).
 - **Rod, Rope, Spring** are one distance joint: Rod sets min and max to the length, Rope sets no stiffness and only a max, Spring sets a rest length with stiffness and damping.
 - **Stiffness.** Users enter bounces per second and a 0 to 1 damping. Converting needs the bodies' mass, and is plain arithmetic. Box2D advises staying under a quarter of the step rate, hence the cap of 15.
 - **Resistance** is a motor at speed 0 with a small strength, so a real motor replaces it.
@@ -103,7 +103,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Scaling a group with joints.** For uneven scale use the geometric mean for distances. A mirrored parent shows in the sign of the matrix determinant.
 - **Editor mass estimates** for warnings come from area and density, since the editor doesn't run physics.
 
-**`box2d3-wasm` 6.0.0 (Box2D 3.2) as found in stage 13** (2026-11-16). Step 4 rechecks the v2.4 notes above one by one.
+**`box2d3-wasm` 6.0.0 (Box2D 3.2) as found in stage 13** (2026-11-16). Step 4 rechecked the v2.4 notes above one by one (2026-11-16).
 
 - **Loading.** `box2d3-wasm/compat`'s factory fetches its `.wasm` beside the module with `import.meta.url`. It loads with no options in Node and in Vitest's Chromium, Firefox and WebKit.
 - **Who frees what.** An object a binding *function* returns (`b2World_GetBodyEvents`, `GetMoveEvent`, `b2Body_GetPosition`, `new b2Vec2`) is a fresh copy in wasm memory and must be `delete()`d, or it leaks. An object read from a *field* (`moveEvent.transform`, `transform.p`, `bodyDef.motionLocks`, `bodyDef.rotation`) is a view into its parent: deleting it frees the parent's memory and crashes later with "memory access out of bounds". Write fields through the view and delete only the parent.
@@ -117,7 +117,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Shape ids are plain values**, not wasm objects: `b2CreatePolygonShape` and the others return something with no `delete()`.
 - **`b2ComputeHull` takes a plain array of `{ x, y }`**, and gives a hull with `count` 0 for fewer than 3 usable points. `b2MakePolygon(hull, 0)` then makes the polygon; the hull's order doesn't matter.
 - **Segments never collide with segments**, so a line on a falling body passes through a Static line. A segment collides from both sides, whichever way it was drawn.
-- **A box comes to rest less than 1 px into or above** the Static box under it.
+- **A box comes to rest within 0.01 px** of the Static box under it: polygons have no skin (`box2dFacts.test.ts`).
 
 ## Camera
 
@@ -133,8 +133,8 @@ Facts and warnings for the architecture work, collected from the old research. *
 ## Triggers
 
 - **Counting touches.** Counts must be kept per trigger owner and per touching entity, not per pair of shapes, because one entity may be built from several shapes.
-- **Box2D facts behind the rules (v2.4, recheck for v3):** sensors make no contact points, and a contact forms only if one body is Dynamic. Contact begin happens inside the step. Contact end can happen outside it when a body is destroyed, so those must be queued for the next round of events.
-- **Two sensors** must be filtered in our own code.
+- **Box2D facts behind the rules (v2.4):** sensors make no contact points, and a contact forms only if one body is Dynamic. Contact begin happens inside the step. Contact end can happen outside it when a body is destroyed, so those must be queued for the next round of events. **3.2** (`box2dFacts.test.ts`): a sensor makes no contact, and a contact still forms only if one body is Dynamic, but **a sensor sees bodies of every type**, Static and Kinematic too, from its first step. Both the sensor and the visitor need `enableSensorEvents`, off by default, as are contact events. Destroying a body sends its contact ends and sensor ends with the next step's events, not at once, so Box2D does the queueing.
+- **Two sensors** must be filtered in our own code. **Holds in 3.2:** two overlapping sensors each see the other (`box2dFacts.test.ts`).
 - **One-way platforms:** collision events must use the stored pass-or-block decision, since contact begin has already happened when a contact is disabled.
 - **Clicks on entities inside the camera.** With Flex against the screen, positions there depend on the window's width, which the game never learns. The drawing side should resolve which entity was hit and send it as recorded input, with the mouse position and buttons. Replays in Happy Wheels do the same.
 - **Waiting runs are game state.** They belong in the determinism check, and should be plain data.

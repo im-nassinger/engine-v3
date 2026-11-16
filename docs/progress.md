@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 13, step 3 of 11: `Box2dPhysicsWorld` has its bodies and surfaces: polygons, circles, lines as two-sided segments, sensors, the 1 kg rule and the speed cap. **The spin cap is 7.5 turns per second, not the owner's 15**, because Box2D 3.2 holds spin to 45° a step; see below. Next is step 4, rechecking the tech notes' Box2D facts against 3.2. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 13, step 4 of 11: the tech notes' Box2D facts are rechecked against 3.2, each with a test in `box2dFacts.test.ts`. Most hold; in 3.2 there is no fixed movement cap per step and no polygon skin, and **a sensor sees Static and Kinematic bodies too**, with sensor events off by default (matters for v2's triggers). Next is step 5, `BodyMembership`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
