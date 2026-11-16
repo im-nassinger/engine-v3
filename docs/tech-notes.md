@@ -103,6 +103,16 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Scaling a group with joints.** For uneven scale use the geometric mean for distances. A mirrored parent shows in the sign of the matrix determinant.
 - **Editor mass estimates** for warnings come from area and density, since the editor doesn't run physics.
 
+**`box2d3-wasm` 6.0.0 (Box2D 3.2) as found in stage 13** (2026-11-16). Step 4 rechecks the v2.4 notes above one by one.
+
+- **Loading.** `box2d3-wasm/compat`'s factory fetches its `.wasm` beside the module with `import.meta.url`. It loads with no options in Node and in Vitest's Chromium, Firefox and WebKit.
+- **Who frees what.** An object a binding *function* returns (`b2World_GetBodyEvents`, `GetMoveEvent`, `b2Body_GetPosition`, `new b2Vec2`) is a fresh copy in wasm memory and must be `delete()`d, or it leaks. An object read from a *field* (`moveEvent.transform`, `transform.p`, `bodyDef.motionLocks`, `bodyDef.rotation`) is a view into its parent: deleting it frees the parent's memory and crashes later with "memory access out of bounds". Write fields through the view and delete only the parent.
+- **`b2MakeRot` and `b2Rot_GetAngle` are approximations**, off by up to about 0.03° at 30°. The adapter builds a rotation's cosine and sine with `DeterministicMath.sinCos` and reads the angle back with `DeterministicMath.atan2`. Box2D still stores 32-bit floats, so a 30° angle comes back as 30.0000004°.
+- **A Dynamic body with no surfaces has no mass and never moves**, even under gravity. `b2Body_SetMassData` with 1 kg makes it fall.
+- **A Kinematic body with no speed is still reported as moved** in the body events while awake, at the same pose.
+- **The body events** list only bodies that moved in the last step, Static bodies never, and a body that has fallen asleep stops appearing. `b2World_SetGravity` doesn't wake a sleeping body.
+- **The default world** has gravity `0, -10`, `maximumLinearSpeed` 400 m/s and sleeping on.
+
 ## Camera
 
 - **Two camera positions.** The game keeps a logical camera, limited using the camera's own box. This is what scripts read, so it is the same on every computer. The drawing side derives the shown camera by limiting again to the real window and adding shake. The shown view always contains the camera's own box.

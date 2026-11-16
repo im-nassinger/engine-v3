@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 13, step 1 of 11: the steps and their choices are written. Next is step 2, the physics contracts and `Box2dPhysicsWorld`'s bodies. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 13, step 2 of 11: `box2d3-wasm` 6.0.0 is installed, with the physics contracts, `BodyPoses`, `Box2dPhysicsEngine` loading in Node and three browsers, and `Box2dPhysicsWorld`'s bodies. Next is step 3, `Box2dPhysicsWorld`'s surfaces. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

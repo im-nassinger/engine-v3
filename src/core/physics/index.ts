@@ -1,5 +1,10 @@
 export { BodyMass } from './mass/BodyMass.ts';
 export type { BodyMassCaches } from './mass/BodyMass.ts';
+export type { BodyDefinition } from './contracts/BodyDefinition.ts';
+export type { BodyPose } from './contracts/BodyPose.ts';
+export { BodyPoses } from './contracts/BodyPoses.ts';
+export type { PhysicsEngine, WorldSettings } from './contracts/PhysicsEngine.ts';
+export type { BodyHandle, PhysicsWorld } from './contracts/PhysicsWorld.ts';
 export { countBodyChanges } from './merging/bodyChanges.ts';
 export type { PlannedMove } from './merging/bodyChanges.ts';
 export { mergesInto } from './merging/mergesInto.ts';
