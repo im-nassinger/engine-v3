@@ -216,7 +216,7 @@ Written under the standing yes (2026-11-16), and all nine built that day. Each s
 
 ## Stage 12 in steps
 
-Written under the standing yes (2026-11-16). Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [persistence.md](architecture/persistence.md#stage-12s-choices).
+Written under the standing yes (2026-11-16), and all thirteen built that day. Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [persistence.md](architecture/persistence.md#stage-12s-choices).
 
 | # | Step | Module | Ends with |
 |---|---|---|---|
@@ -232,7 +232,7 @@ Written under the standing yes (2026-11-16). Each step ends with its tests, `npm
 | 10 | New, Import (Ctrl+O) and dropping a file: the question `Replace the open level? Export it first if you want to keep it.`, `BrowserFilePicker`, the refusal's plain message in a dialog, the open level replaced all or nothing and saved at once, the view fitted to the new camera frame | `editor/commands/file`, `adapters/browser/files`, `ui/level-view-host`, `app` | Cancel changes nothing; each refusal has its message and leaves the level as it was; an import replaces the level, clears the history and saves; browser test: dropping a file asks, then imports. **Done** |
 | 11 | The page: the save state in the top bar with its explanation on click, the tab title's `*` while not saved, the leave prompt armed only while not saved, saving when the tab is hidden, the read-only notice, the crash note and the storage notices in the status text; `EditorComposition` opens the saved level instead of a new one | `ui/top-bar`, `adapters/browser`, `app` | Browser tests: each save state's label; the title gains and loses `*`; `beforeunload` is cancelled only while unsaved; a hidden tab saves at once. **Done** |
 | 12 | Playwright: draw a shape, reload, and it is there; a second tab is read-only and its edits are refused; export and import back; a full disk (a quota error the test injects) shows `Save failed` and Export still downloads; a zip bomb is refused while the page keeps drawing | `tests/e2e` | The tests pass in three browsers. **Done** |
-| 13 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes |
+| 13 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes. **Done** |
 
 ## After v1
 
