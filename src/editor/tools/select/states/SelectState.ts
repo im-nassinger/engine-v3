@@ -1,5 +1,6 @@
 import type { Bounds } from '../../../../core/geometry/index.ts';
 import type { LevelPointerInput, ToolContext } from '../../Tool.ts';
+import type { DragReadout } from '../readout/DragReadout.ts';
 import type { SelectionPicker } from '../SelectionPicker.ts';
 
 // What a drag state is given by the Select tool.
@@ -7,8 +8,10 @@ export type SelectStateHost = {
     readonly context: ToolContext;
     readonly picker: SelectionPicker;
     goTo(state: SelectState): void;
+    // Also hides the readout.
     goIdle(): void;
     showBox(box: Bounds | undefined): void;
+    showReadout(readout: DragReadout): void;
 };
 
 // One of the Select tool's drag states (the State pattern). Only one is active at a time.

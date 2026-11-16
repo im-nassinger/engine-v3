@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 9, step 9 of 16 is done: `SelectionFrame` and `ResizeState`: one shape, group or the World resizes by its eight handles along its own sides, live through `EntityResize` and `LiveEdit` as one step, with Shift, Alt, Ctrl, mirroring, a circle kept round and at least 1 px, with 1124 tests in Node. Next is step 10: `RotateState` and the readouts' texts. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 9, step 10 of 16 is done: `RotateState`: one shape or group turns around its frame's centre by dragging just outside a corner, as one step `Rotate <name>`, Shift snapping the Rotation to 15°; and `SelectTool.readout` with the texts for moving, resizing and rotating, with 1141 tests in Node. Next is step 11: asking first when a move between groups changes an entity's body. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

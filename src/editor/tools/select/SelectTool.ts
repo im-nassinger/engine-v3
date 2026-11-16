@@ -3,27 +3,34 @@ import { VersionCounter } from '../../../core/events/index.ts';
 import type { LevelPointerInput, Tool, ToolContext } from '../Tool.ts';
 
 import { SelectionFrame } from './frame/SelectionFrame.ts';
+import type { DragReadout } from './readout/DragReadout.ts';
 import { SelectionPicker } from './SelectionPicker.ts';
 import { IdleState } from './states/IdleState.ts';
 import type { SelectState, SelectStateHost } from './states/SelectState.ts';
 
 const SELECT_HINT =
-    'Click to select. Drag to move. Drag a handle to resize. Drag on empty space to select with a box. Double-click goes into a group.';
+    'Click to select. Drag to move. Drag a handle to resize, or just outside a corner to rotate. Drag on empty space to select with a box. Double-click goes into a group.';
 
 // Picks entities by click, Shift+click and the selection box, moves them by dragging, resizes one entity by
-// its handles, and goes into and out of groups by double-click. It holds one drag state at a time; rotating
-// comes next.
+// its handles and rotates it just outside a corner, and goes into and out of groups by double-click. It
+// holds one drag state at a time.
 export class SelectTool implements Tool {
     readonly id = 'select';
     readonly hint = SELECT_HINT;
     readonly preview = new VersionCounter();
     private state: SelectState | undefined;
     private box: Bounds | undefined;
+    private shownReadout: DragReadout | undefined;
     private context: ToolContext | undefined;
 
     // The selection box being dragged, in level positions, for the overlay.
     get selectionBox() {
         return this.box;
+    }
+
+    // The distance, size or angle of the drag in progress, for the overlay.
+    get readout() {
+        return this.shownReadout;
     }
 
     // The handles' frame of the one selected entity, for the overlay. Handles hide during a drag.
@@ -44,8 +51,10 @@ export class SelectTool implements Tool {
             },
             goIdle: () => {
                 this.state = new IdleState(host);
+                this.showReadout(undefined);
             },
             showBox: (box) => this.showBox(box),
+            showReadout: (readout) => this.showReadout(readout),
         };
 
         this.state = new IdleState(host);
@@ -82,6 +91,13 @@ export class SelectTool implements Tool {
         if (box === undefined && this.box === undefined) return;
 
         this.box = box;
+        this.preview.increment();
+    }
+
+    private showReadout(readout: DragReadout | undefined) {
+        if (readout === undefined && this.shownReadout === undefined) return;
+
+        this.shownReadout = readout;
         this.preview.increment();
     }
 }

@@ -67,10 +67,11 @@ export class EntityResize {
         return this.start.geometry?.kind === 'circle';
     }
 
-    // Writes the stretch, each side kept at least 1 px. scalesOutline (Shift) multiplies a shape's outline
-    // width by the larger stretch too.
-    apply(stretch: Stretch, scalesOutline: boolean) {
+    // Writes the stretch, each side kept at least 1 px, and gives the new size in the Inspector's units.
+    // scalesOutline (Shift) multiplies a shape's outline width by the larger stretch too.
+    apply(stretch: Stretch, scalesOutline: boolean): Point {
         const factor = this.atLeastOnePixel(stretch.factor);
+        const size = this.sizeBefore();
         const { liveEdit } = this.openLevel;
         const id = this.frame.entity.id;
         const larger = Math.max(Math.abs(factor.x), Math.abs(factor.y));
@@ -97,6 +98,8 @@ export class EntityResize {
             const position = this.parentInverse.apply(this.frame.matrix.apply(shift));
             liveEdit.update({ entityId: id, schema: TransformComponent.schema, key: 'position' }, position);
         }
+
+        return { x: size.x * Math.abs(factor.x), y: size.y * Math.abs(factor.y) };
     }
 
     private targetsOf(): ValueTarget[] {
@@ -118,13 +121,21 @@ export class EntityResize {
         return targets;
     }
 
-    private atLeastOnePixel(factor: Point): Point {
+    // A shape's width and height, a group's box times its scale.
+    private sizeBefore(): Point {
         const { box } = this.frame;
         const scalesTheGroup = this.start.geometry === undefined;
-        const width = box.width * (scalesTheGroup ? Math.abs(this.start.scale.x) : 1);
-        const height = box.height * (scalesTheGroup ? Math.abs(this.start.scale.y) : 1);
 
-        return { x: atLeast(factor.x, width), y: atLeast(factor.y, height) };
+        return {
+            x: box.width * (scalesTheGroup ? Math.abs(this.start.scale.x) : 1),
+            y: box.height * (scalesTheGroup ? Math.abs(this.start.scale.y) : 1),
+        };
+    }
+
+    private atLeastOnePixel(factor: Point): Point {
+        const size = this.sizeBefore();
+
+        return { x: atLeast(factor.x, size.x), y: atLeast(factor.y, size.y) };
     }
 }
 

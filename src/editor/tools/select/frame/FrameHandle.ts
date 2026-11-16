@@ -23,3 +23,6 @@ export const FRAME_HANDLES: readonly FrameHandle[] = [
 // The stage 9 choice: 8 screen px squares, grabbed within 4 px of their edge.
 export const HANDLE_SIZE_PX = 8;
 export const HANDLE_GRAB_PX = 4;
+// The rotate area: a square this big just outside each corner, measured from the corner outward along the
+// frame's own sides. A handle in it wins.
+export const ROTATE_AREA_PX = 16;

@@ -5,7 +5,7 @@ import type { Matrix2D, Point, ShapeGeometry } from '../../../../core/geometry/i
 import type { Entity } from '../../../../core/level/index.ts';
 import type { OpenLevel } from '../../../session/index.ts';
 
-import { FRAME_HANDLES, HANDLE_GRAB_PX, HANDLE_SIZE_PX } from './FrameHandle.ts';
+import { FRAME_HANDLES, HANDLE_GRAB_PX, HANDLE_SIZE_PX, ROTATE_AREA_PX } from './FrameHandle.ts';
 import type { FrameHandle } from './FrameHandle.ts';
 
 // What a resize changes: a shape its width and height, a group its scale, the World its rectangle from
@@ -91,6 +91,27 @@ export class SelectionFrame {
         }
 
         return nearest;
+    }
+
+    // Whether the point lies in the 16 screen px square just outside a corner, and on no handle. The World
+    // never turns, so it has none.
+    isOnRotateArea(point: Point, zoom: number): boolean {
+        if (this.kind === 'world') return false;
+        if (this.handleAt(point, zoom) !== undefined) return false;
+
+        // Screen px per own unit along each own axis.
+        const { a, b, c, d } = this.matrix;
+        const across = Math.hypot(a, b) * zoom;
+        const down = Math.hypot(c, d) * zoom;
+        const own = this.inverse.apply(point);
+        const { box } = this;
+
+        // Outward from the nearest side on each axis, in screen px: below 0 is inside the frame.
+        const outX = Math.max(box.left - own.x, own.x - box.right) * across;
+        const outY = Math.max(box.top - own.y, own.y - box.bottom) * down;
+        const isNearCorner = outX >= 0 && outY >= 0;
+
+        return isNearCorner && outX <= ROTATE_AREA_PX && outY <= ROTATE_AREA_PX;
     }
 }
 
