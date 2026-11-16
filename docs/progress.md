@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 12, step 9 of 13: the import worker is built: `ImportCheck` reads the zip's directory, unpacks with a running count that stops a zip bomb just past 256 MB, and reads `level.json` like every level; `ImportWorkerClient` runs it in a new worker for each file, tested in three browsers. Next is step 10, New, Import and dropping a file. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 12, step 10 of 13: New, Import (Ctrl+O) and dropping a file are built: each asks `Replace the open level?` first, a refused file gets its plain message in a notice and changes nothing, and an import replaces the level, clears the history, saves and fits the camera frame. Next is step 11, the page. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

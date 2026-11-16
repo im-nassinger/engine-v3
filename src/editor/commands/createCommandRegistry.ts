@@ -14,6 +14,8 @@ import type { EditorCommand } from './EditorCommand.ts';
 import { DeleteCommand } from './edit/DeleteCommand.ts';
 import { ExportCommand } from './file/ExportCommand.ts';
 import type { FileParts } from './file/FileParts.ts';
+import { ImportCommand } from './file/ImportCommand.ts';
+import { NewCommand } from './file/NewCommand.ts';
 import { AboutCommand } from './help/AboutCommand.ts';
 import { HideOrShowCommand } from './edit/HideOrShowCommand.ts';
 import { RedoCommand } from './edit/RedoCommand.ts';
@@ -40,6 +42,9 @@ export function createCommandRegistry(session: EditorSession, clipboardParts?: C
     const registerEditing = (command: EditorCommand) => registry.register(new ReadOnlyGuard(session, command));
 
     if (fileParts !== undefined) {
+        registerEditing(new NewCommand(session, fileParts));
+        // Import checks for a read-only tab itself: dropping a file calls it directly.
+        registry.register(new ImportCommand(session, fileParts));
         registry.register(new ExportCommand(session, fileParts));
     }
 

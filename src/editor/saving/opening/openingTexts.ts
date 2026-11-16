@@ -31,7 +31,7 @@ function refusalReason(refusal: ReadRefusal) {
     }
 }
 
-function overLimitReason(limit: 'entities' | 'depth' | 'points' | 'size', max: number) {
+export function overLimitReason(limit: 'entities' | 'depth' | 'points' | 'size', max: number) {
     switch (limit) {
         case 'entities':
             return `it has more than ${groupDigits(max)} entities`;

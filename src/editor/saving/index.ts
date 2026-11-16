@@ -34,3 +34,7 @@ export type { Unpacked, ZipDirectoryEntry, ZipReader } from './contracts/ZipRead
 export type { FileImporter } from './contracts/FileImporter.ts';
 export { ImportCheck } from './import/ImportCheck.ts';
 export type { ImportCheckOptions } from './import/ImportCheck.ts';
+export type { FilePicker, PickedFile } from './contracts/FilePicker.ts';
+export { LevelImport } from './import/LevelImport.ts';
+export type { LevelImportOptions } from './import/LevelImport.ts';
+export { importRefusalText } from './import/importRefusalText.ts';

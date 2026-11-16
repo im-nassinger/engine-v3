@@ -15,7 +15,7 @@ Every detail is reached through **one small contract declared where it is needed
 | `TabGuard` | editor/saving | `WebLockTabGuard` | `FakeTabGuard` |
 | `StoragePersistence` | editor/saving | `BrowserPersistence` (`navigator.storage.persist()`) | `FakePersistence` |
 | `ZipCodec` | editor/saving | `FflateZipCodec` | the real one: it is pure |
-| `FileExporter`, `FilePicker` | editor/saving | `FileDownload`, `BrowserFilePicker` | `FakeFiles` |
+| `FileExporter`, `FilePicker` | editor/saving | `FileDownload`, `BrowserFilePicker` | `FakeFiles`, `FakeFilePicker` |
 | `LevelFileImporter` | editor/saving | `ImportWorkerClient` | `DirectImporter` (same code, no worker) |
 | `GameRunner` | editor/play | `WorkerGameRunner` | `DirectGameRunner` (the simulation in the same thread) |
 | `Clock`, `Timer`, `FrameScheduler` | editor/time | `SystemClock`, `BrowserTimer`, `AnimationFrames` | `ManualClock`, `ManualTimer`, `ManualFrames` |

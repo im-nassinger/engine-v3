@@ -1,5 +1,7 @@
 export { ClipboardBridge } from './clipboard/ClipboardBridge.ts';
+export { BrowserFilePicker } from './files/BrowserFilePicker.ts';
 export { FileDownload } from './files/FileDownload.ts';
+export { FileDropTarget } from './files/FileDropTarget.ts';
 export { KeyboardInput } from './keyboard/KeyboardInput.ts';
 export { keyboardPlatform } from './keyboard/keyboardPlatform.ts';
 export { PointerInput } from './pointer/PointerInput.ts';

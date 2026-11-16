@@ -6,3 +6,5 @@ export { FakeFiles } from './FakeFiles.ts';
 export { StoredZipCodec } from './StoredZipCodec.ts';
 export { FakeZipReader } from './FakeZipReader.ts';
 export type { FakeZipFile } from './FakeZipReader.ts';
+export { FakeFileImporter } from './FakeFileImporter.ts';
+export { FakeFilePicker, pickedFile } from './FakeFilePicker.ts';

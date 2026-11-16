@@ -1,30 +1,34 @@
 import {
     AnimationFrames,
+    BrowserFilePicker,
     BrowserTimer,
     ClipboardBridge,
     DevicePixelRatio,
     FileDownload,
+    FileDropTarget,
     KeyboardInput,
     keyboardPlatform,
     PointerInput,
     SystemClock,
 } from '../adapters/browser/index.ts';
 import { PixiLevelView } from '../adapters/pixi/index.ts';
+import { ImportWorkerClient } from '../adapters/worker/index.ts';
 import { LocalStorageSettings } from '../adapters/storage/index.ts';
 import { FflateZipCodec } from '../adapters/zip/index.ts';
 import { levelBoundsOf } from '../core/derived/index.ts';
 import { Level } from '../core/level/index.ts';
 import { LevelWriter } from '../core/level-data/index.ts';
 import { EditorClipboard } from '../editor/clipboard/index.ts';
-import { ClipboardEvents, CommandRunner, createCommandRegistry } from '../editor/commands/index.ts';
+import { ClipboardEvents, CommandRunner, createCommandRegistry, FileDropEvents } from '../editor/commands/index.ts';
 import type { CommandRegistry } from '../editor/commands/index.ts';
-import { EditorSettings, LevelExport, ProjectFile } from '../editor/saving/index.ts';
+import { EditorSettings, LevelExport, LevelImport, ProjectFile } from '../editor/saving/index.ts';
 import { EditorSession } from '../editor/session/index.ts';
 import { ShortcutDispatcher } from '../editor/shortcuts/index.ts';
 import type { KeyboardPlatform } from '../editor/shortcuts/index.ts';
 import { EscapeChain, MousePosition, OpenWindowCount } from '../editor/tools/index.ts';
 import type { ToolController } from '../editor/tools/index.ts';
 
+import { createImportWorker } from './createImportWorker.ts';
 import { createTools } from './createTools.ts';
 import { EditorDrawingSource } from './EditorDrawingSource.ts';
 import { EditorSelectionSource } from './EditorSelectionSource.ts';
@@ -41,6 +45,7 @@ type EditorParts = {
     readonly keyboard: KeyboardInput;
     readonly pointer: PointerInput;
     readonly clipboardBridge: ClipboardBridge;
+    readonly fileDrop: FileDropTarget;
     readonly tools: ToolController;
     readonly mouse: MousePosition;
     readonly openWindows: OpenWindowCount;
@@ -62,6 +67,7 @@ export class EditorComposition {
     private readonly keyboard: KeyboardInput;
     private readonly pointer: PointerInput;
     private readonly clipboardBridge: ClipboardBridge;
+    private readonly fileDrop: FileDropTarget;
 
     private constructor(parts: EditorParts) {
         this.session = parts.session;
@@ -73,6 +79,7 @@ export class EditorComposition {
         this.keyboard = parts.keyboard;
         this.pointer = parts.pointer;
         this.clipboardBridge = parts.clipboardBridge;
+        this.fileDrop = parts.fileDrop;
         this.tools = parts.tools;
         this.mouse = parts.mouse;
         this.openWindows = parts.openWindows;
@@ -92,15 +99,20 @@ export class EditorComposition {
         });
         const mouse = new MousePosition(frames);
         const clipboard = new EditorClipboard(systemClipboard());
+        // Autosave joins the page with the saved level's opening in step 11; until then nothing is saved.
+        const saving = { saveNow: () => Promise.resolve() };
         const levelExport = new LevelExport({
             session,
-            // Autosave joins the page with the saved level's opening; until then nothing is saved first.
-            saving: { saveNow: () => Promise.resolve() },
+            saving,
             projectFile: new ProjectFile(new LevelWriter(), new FflateZipCodec()),
             exporter: new FileDownload(window),
         });
-        const commands = createCommandRegistry(session, { clipboard, mouse }, { levelExport });
+        const importer = new ImportWorkerClient(createImportWorker);
+        const levelImport = new LevelImport({ importer, reader: session.reader });
+        const picker = new BrowserFilePicker(window);
         const runner = new CommandRunner(session.status);
+        const fileParts = { levelExport, levelImport, picker, saving, outcomes: runner };
+        const commands = createCommandRegistry(session, { clipboard, mouse }, fileParts);
         const platform = keyboardPlatform(navigator.platform);
         const levelView = await PixiLevelView.create({
             view: session.view,
@@ -117,6 +129,7 @@ export class EditorComposition {
         const pointerParts = { tools, escape, mouse, view: session.view, platform };
         const pointer = new PointerInput(pointerParts, levelView.canvas, window);
         const clipboardBridge = new ClipboardBridge(new ClipboardEvents(commands, runner), window);
+        const fileDrop = new FileDropTarget(new FileDropEvents(commands, runner), window);
 
         const composition = new EditorComposition({
             session,
@@ -128,6 +141,7 @@ export class EditorComposition {
             keyboard,
             pointer,
             clipboardBridge,
+            fileDrop,
             tools,
             mouse,
             openWindows,
@@ -143,11 +157,12 @@ export class EditorComposition {
         this.levelView.follow(this.session);
         this.levelView.showSelection(new EditorSelectionSource(this.session, this.tools));
         this.levelView.showDrawing(new EditorDrawingSource(this.tools));
-        // The editor lives as long as the page, so the keyboard, the pointer and the clipboard events
+        // The editor lives as long as the page, so the keyboard, the pointer, the clipboard events and file drops
         // are never disconnected.
         this.keyboard.connect();
         this.pointer.connect();
         this.clipboardBridge.connect();
+        this.fileDrop.connect();
         this.limitPanToOpenLevel();
         this.session.openLevelChanged.subscribe(() => this.limitPanToOpenLevel());
         if (!viewRestored) {

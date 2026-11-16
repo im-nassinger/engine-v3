@@ -1,12 +1,11 @@
 import { describe, expect, test } from 'vitest';
 
 import { Level } from '../../../core/level/index.ts';
-import { LevelWriter } from '../../../core/level-data/index.ts';
-import { LevelExport, ProjectFile } from '../../saving/index.ts';
-import { FakeFiles, StoredZipCodec } from '../../saving/testing/index.ts';
+import { StoredZipCodec } from '../../saving/testing/index.ts';
 import { EditorSession } from '../../session/index.ts';
 import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { createCommandRegistry } from '../createCommandRegistry.ts';
+import { buildFileTestParts, settle } from './testing/fileTestParts.ts';
 
 import { EXPORT_FAILED_TEXT, ExportCommand } from './ExportCommand.ts';
 
@@ -18,23 +17,10 @@ function buildCommand(zip = new StoredZipCodec()) {
         timer,
         frames: new ManualFrames(),
     });
-    const files = new FakeFiles();
-    const levelExport = new LevelExport({
-        session,
-        saving: { saveNow: () => Promise.resolve() },
-        projectFile: new ProjectFile(new LevelWriter(), zip),
-        exporter: files,
-    });
-    const command = new ExportCommand(session, { levelExport });
+    const { parts, files } = buildFileTestParts(session, zip);
+    const command = new ExportCommand(session, parts);
 
-    return { session, files, command, levelExport };
-}
-
-// Lets the export's promises run.
-async function settle() {
-    for (let turn = 0; turn < 5; turn += 1) {
-        await Promise.resolve();
-    }
+    return { session, files, command, parts };
 }
 
 describe('ExportCommand', () => {
@@ -69,9 +55,9 @@ describe('ExportCommand', () => {
     });
 
     test('is enabled in a read-only tab', () => {
-        const { session, command, levelExport } = buildCommand();
+        const { session, command, parts } = buildCommand();
         session.makeReadOnly();
-        const registry = createCommandRegistry(session, undefined, { levelExport });
+        const registry = createCommandRegistry(session, undefined, parts);
 
         expect(command.availability()).toEqual({ enabled: true });
         expect(registry.find('file.export')?.availability()).toEqual({ enabled: true });
