@@ -22,4 +22,4 @@ export { BodyMembership } from './membership/BodyMembership.ts';
 export type { SurfaceTarget } from './membership/BodyMembership.ts';
 export { PhysicsSceneBuilder } from './scene/PhysicsSceneBuilder.ts';
 export type { SceneCaches } from './scene/PhysicsSceneBuilder.ts';
-export type { PhysicsScene, SceneBody } from './scene/PhysicsScene.ts';
+export type { JointSkipReason, PhysicsScene, SceneBody, SceneJoint, SkippedJoint } from './scene/PhysicsScene.ts';

@@ -1,4 +1,5 @@
-import { BodyComponent, PhysicsWorldComponent, SurfaceComponent } from '../../components/index.ts';
+import { BodyComponent, JointComponent, PhysicsWorldComponent, SurfaceComponent } from '../../components/index.ts';
+import type { EntityId } from '../../fields/index.ts';
 import type { PiecesCache, WorldMatrixCache } from '../../derived/index.ts';
 import { levelBoundsOf } from '../../derived/index.ts';
 import type { Matrix2D, Point } from '../../geometry/index.ts';
@@ -11,7 +12,8 @@ import type { PhysicsWorld } from '../contracts/PhysicsWorld.ts';
 import type { SurfaceDefinition, SurfacePiece } from '../contracts/SurfaceDefinition.ts';
 import { BodyMembership } from '../membership/BodyMembership.ts';
 
-import type { PhysicsScene, SceneBody } from './PhysicsScene.ts';
+import type { JointSkipReason, PhysicsScene, SceneBody, SceneJoint, SkippedJoint } from './PhysicsScene.ts';
+import { jointDefinitionOf } from './jointDefinitionOf.ts';
 import { piecesInBodySpace } from './piecesInBodySpace.ts';
 import { splitBodyMatrix } from './splitBodyMatrix.ts';
 
@@ -26,8 +28,11 @@ type BuiltBody = SceneBody & {
     readonly fromLevel: Matrix2D;
 };
 
+// The body one end of a joint goes to: a built body, the ground, or none when the end has no physics.
+type JointEnd = BuiltBody | 'ground' | undefined;
+
 // Turns the play copy into the physics world's bodies and surfaces, in Entities panel order, so Box2D
-// receives everything in the same order on every computer. Joints come with stage 14.
+// receives everything in the same order on every computer, then the joints, so both their bodies exist.
 export class PhysicsSceneBuilder {
     private readonly level: Level;
     private readonly caches: SceneCaches;
@@ -35,6 +40,8 @@ export class PhysicsSceneBuilder {
     private readonly world: PhysicsWorld;
     private readonly bodies = new Map<Entity, BuiltBody>();
     private readonly skippedLines: Entity[] = [];
+    private readonly joints: SceneJoint[] = [];
+    private readonly skippedJoints: SkippedJoint[] = [];
     private ground: BodyHandle | undefined;
 
     private constructor(level: Level, caches: SceneCaches, world: PhysicsWorld) {
@@ -61,6 +68,11 @@ export class PhysicsSceneBuilder {
             this.addSurfaceOf(entity);
         }
         this.addWalls();
+        for (const entity of this.level.entitiesInPanelOrder()) {
+            if (entity.hasComponent(JointComponent)) {
+                this.addJoint(entity);
+            }
+        }
 
         const bodies = [...this.bodies.values()].map(({ entity, handle, pose, rest }) => ({
             entity,
@@ -69,7 +81,14 @@ export class PhysicsSceneBuilder {
             rest,
         }));
 
-        return { world: this.world, bodies, ground: this.ground, skippedLines: this.skippedLines };
+        return {
+            world: this.world,
+            bodies,
+            ground: this.ground,
+            skippedLines: this.skippedLines,
+            joints: this.joints,
+            skippedJoints: this.skippedJoints,
+        };
     }
 
     private buildBody(entity: Entity) {
@@ -157,6 +176,53 @@ export class PhysicsSceneBuilder {
         }
     }
 
+    private addJoint(entity: Entity) {
+        const joint = entity.requireComponent(JointComponent);
+        if (this.level.camera.isAncestorOf(entity)) {
+            this.skipJoint(entity, 'insideCamera');
+            return;
+        }
+
+        const endA = this.jointEndOf(joint.get('a'));
+        const endB = this.jointEndOf(joint.get('b') ?? 'ground');
+        if (endA === undefined || endB === undefined) {
+            this.skipJoint(entity, 'noPhysics');
+            return;
+        }
+        const reason = skipReasonOf(endA, endB);
+        if (reason !== undefined) {
+            this.skipJoint(entity, reason);
+            return;
+        }
+
+        const bodies = { bodyA: this.handleOf(endA), bodyB: this.handleOf(endB) };
+        const levelMatrix = this.caches.worldMatrices.matrixOf(entity);
+        const handle = this.world.createJoint(jointDefinitionOf(entity.id, joint, levelMatrix, bodies));
+        this.joints.push({ entity, handle, bodyA: bodyEntityOf(endA), bodyB: bodyEntityOf(endB) });
+    }
+
+    // An end's body: the one it moves with, else the ground for a surface with no body on it or above it.
+    private jointEndOf(id: EntityId | null | 'ground'): JointEnd {
+        if (id === 'ground') return 'ground';
+        if (id === null) return undefined;
+
+        const entity = this.level.findEntity(id);
+        if (entity === undefined) return undefined;
+
+        const body = this.membership.bodyOf(entity);
+        if (body !== undefined) return this.bodies.get(body);
+
+        return this.membership.surfaceTargetOf(entity)?.kind === 'static' ? 'ground' : undefined;
+    }
+
+    private handleOf(end: BuiltBody | 'ground') {
+        return end === 'ground' ? this.requireGround() : end.handle;
+    }
+
+    private skipJoint(entity: Entity, reason: JointSkipReason) {
+        this.skippedJoints.push({ entity, reason });
+    }
+
     private requireGround() {
         this.ground ??= this.world.createBody(groundDefinition(this.level.world.id));
 
@@ -205,4 +271,19 @@ function groundDefinition(world: number): BodyDefinition {
         fixedRotation: false,
         bullet: false,
     };
+}
+
+function skipReasonOf(endA: BuiltBody | 'ground', endB: BuiltBody | 'ground'): JointSkipReason | undefined {
+    if (endA === endB) return 'sameBody';
+    if (!canMove(endA) && !canMove(endB)) return 'cannotMove';
+
+    return undefined;
+}
+
+function canMove(end: BuiltBody | 'ground') {
+    return end !== 'ground' && end.entity.requireComponent(BodyComponent).get('type') === 'dynamic';
+}
+
+function bodyEntityOf(end: BuiltBody | 'ground') {
+    return end === 'ground' ? undefined : end.entity;
 }

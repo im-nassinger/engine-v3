@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 14, step 4 of 12: the joint tech notes are rechecked against Box2D 3.2, each with its test. Next is step 5, `PhysicsSceneBuilder`'s joints. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 14, step 5 of 12: `PhysicsSceneBuilder` builds joints after every body, with a reason for each one it skips. Next is step 6, joints in play. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -34,8 +34,8 @@
 | Stage 11, copy and paste | Done on 2026-11-16. See below |
 | Stage 12, saving | Done on 2026-11-16. See below |
 | Stage 13, physics and the determinism test | Done on 2026-11-16. See below |
-| Stage 14, joints | Being built (step 4 of 12). See the [plan](plan.md#stage-14-in-steps) |
-| Code | Stages 0 to 13 done. Stage 14, joints, is being built: step 5 is next |
+| Stage 14, joints | Being built (step 5 of 12). See the [plan](plan.md#stage-14-in-steps) |
+| Code | Stages 0 to 13 done. Stage 14, joints, is being built: step 6 is next |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 

@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import {
     BodyComponent,
+    JointComponent,
     PhysicsWorldComponent,
     ShapeComponent,
     SurfaceComponent,
@@ -10,12 +11,14 @@ import {
 import { DerivedCaches } from '../../derived/index.ts';
 import { Matrix2D, ShapePieces } from '../../geometry/index.ts';
 import type { Point, ShapeGeometry, TransformValues } from '../../geometry/index.ts';
+import type { JointValues } from '../../components/index.ts';
 import type { Entity } from '../../level/index.ts';
 import { Level } from '../../level/index.ts';
 
 import type { BodyDefinition } from '../contracts/BodyDefinition.ts';
 import type { PhysicsEngine, WorldSettings } from '../contracts/PhysicsEngine.ts';
-import type { BodyHandle } from '../contracts/Handles.ts';
+import type { BodyHandle, JointHandle } from '../contracts/Handles.ts';
+import type { JointDefinition } from '../contracts/JointDefinition.ts';
 import type { PhysicsWorld } from '../contracts/PhysicsWorld.ts';
 import type { SurfaceDefinition } from '../contracts/SurfaceDefinition.ts';
 
@@ -23,7 +26,8 @@ import { PhysicsSceneBuilder } from './PhysicsSceneBuilder.ts';
 
 type RecordedCall =
     | { readonly call: 'createBody'; readonly handle: BodyHandle; readonly definition: BodyDefinition }
-    | { readonly call: 'addSurface'; readonly body: BodyHandle; readonly surface: SurfaceDefinition };
+    | { readonly call: 'addSurface'; readonly body: BodyHandle; readonly surface: SurfaceDefinition }
+    | { readonly call: 'createJoint'; readonly handle: JointHandle; readonly definition: JointDefinition };
 
 // A PhysicsWorld that only records what the builder hands it.
 class RecordingWorld implements PhysicsWorld {
@@ -54,8 +58,15 @@ class RecordingWorld implements PhysicsWorld {
         return this.calls.filter((call) => call.call === 'createBody');
     }
 
-    createJoint() {
-        return 0;
+    joints() {
+        return this.calls.filter((call) => call.call === 'createJoint');
+    }
+
+    createJoint(definition: JointDefinition) {
+        const handle = this.nextHandle++;
+        this.calls.push({ call: 'createJoint', handle, definition });
+
+        return handle;
     }
     destroyJoint() {}
     setGravity() {}
@@ -106,6 +117,27 @@ function withBody(entity: Entity) {
     return entity;
 }
 
+function withJoint(entity: Entity, values: Partial<JointValues>) {
+    entity.addComponent(new JointComponent({ ...JointComponent.schema.defaults(), ...values }));
+
+    return entity;
+}
+
+function staticBody(entity: Entity) {
+    entity.requireComponent(BodyComponent).set('type', 'static');
+
+    return entity;
+}
+
+function onlyJoint(world: RecordingWorld) {
+    const joints = world.joints();
+    expect(joints).toHaveLength(1);
+    const call = joints[0];
+    if (call === undefined) throw new Error('No joint was built.');
+
+    return call;
+}
+
 function build(level: Level) {
     const engine = new RecordingEngine();
     const scene = PhysicsSceneBuilder.build(level, new DerivedCaches(level), engine);
@@ -138,7 +170,7 @@ describe('PhysicsSceneBuilder', () => {
         const { world, scene } = build(level);
 
         const order = world.calls.map((call) =>
-            call.call === 'createBody' ? `body ${call.definition.entity}` : `surface ${call.surface.entity}`,
+            call.call === 'addSurface' ? `surface ${call.surface.entity}` : `body ${call.definition.entity}`,
         );
         expect(order).toEqual([
             `body ${first.id}`,
@@ -257,6 +289,173 @@ describe('PhysicsSceneBuilder', () => {
                 { x: -geometry.width / 2, y: -geometry.height / 2 },
                 { x: geometry.width / 2, y: -geometry.height / 2 },
             ],
+        });
+    });
+});
+
+describe("PhysicsSceneBuilder's joints", () => {
+    test("a car's two hinged wheels are two joints to the car's one body, after every body", () => {
+        const level = Level.createNew();
+        const car = withSurface(withBody(place(level, level.world, transform(0, 0))));
+        const chassis = withSurface(place(level, car, transform(0, -20)));
+        const wheels = [-30, 30].map((x) => {
+            const wheel = withSurface(withBody(place(level, car, transform(x, 20))), { kind: 'circle', radius: 10 });
+            wheel.requireComponent(BodyComponent).set('merge', false);
+
+            return wheel;
+        });
+        const hinges = wheels.map((wheel, position) =>
+            withJoint(place(level, car, transform(position === 0 ? -30 : 30, 20)), { a: wheel.id, b: chassis.id }),
+        );
+        const { world, scene } = build(level);
+
+        const carHandle = world.bodies()[0]?.handle;
+        const wheelHandles = world
+            .bodies()
+            .slice(1)
+            .map((call) => call.handle);
+        expect(world.bodies()).toHaveLength(3);
+        expect(world.calls.slice(-2).map((call) => call.call)).toEqual(['createJoint', 'createJoint']);
+        expect(world.joints().map((call) => [call.definition.bodyA, call.definition.bodyB])).toEqual([
+            [wheelHandles[0], carHandle],
+            [wheelHandles[1], carHandle],
+        ]);
+        expect(world.joints().map((call) => call.definition.endA)).toEqual([
+            { x: -30, y: 20 },
+            { x: 30, y: 20 },
+        ]);
+        expect(scene.joints.map((joint) => [joint.entity, joint.bodyA, joint.bodyB])).toEqual([
+            [hinges[0], wheels[0], car],
+            [hinges[1], wheels[1], car],
+        ]);
+        expect(scene.ground).toBeUndefined();
+    });
+
+    test('an empty B, and a B that is a surface without a body, go to the ground body', () => {
+        const level = Level.createNew();
+        const box = withSurface(withBody(place(level, level.world, transform(0, 0))));
+        const floor = withSurface(place(level, level.world, transform(0, 300)));
+        withJoint(place(level, level.world, transform(0, 0)), { a: box.id });
+        withJoint(place(level, level.world, transform(0, 0)), { type: 'rope', a: box.id, b: floor.id });
+        const { world, scene } = build(level);
+
+        expect(scene.ground).toBeDefined();
+        expect(world.joints().map((call) => call.definition.bodyB)).toEqual([scene.ground, scene.ground]);
+        expect(scene.joints.map((joint) => joint.bodyB)).toEqual([undefined, undefined]);
+    });
+
+    test('a hidden joint is built', () => {
+        const level = Level.createNew();
+        const box = withSurface(withBody(place(level, level.world, transform(0, 0))));
+        const hinge = withJoint(place(level, level.world, transform(0, 0)), { a: box.id });
+        hinge.setHidden(true);
+
+        expect(build(level).scene.joints.map((joint) => joint.entity)).toEqual([hinge]);
+    });
+
+    test('each joint play leaves out has its reason, and a skipped pin makes no ground', () => {
+        const level = Level.createNew();
+        const box = withSurface(withBody(place(level, level.world, transform(0, 0))));
+        const part = withSurface(place(level, box, transform(10, 0)));
+        const decoration = place(level, level.world, transform(50, 0));
+        const wall = staticBody(withSurface(withBody(place(level, level.world, transform(100, 0)))));
+        const post = staticBody(withSurface(withBody(place(level, level.world, transform(200, 0)))));
+        const skipped = [
+            withJoint(place(level, level.world, transform(0, 0)), { a: decoration.id }),
+            withJoint(place(level, level.world, transform(0, 0)), { a: 9_999 }),
+            withJoint(place(level, level.world, transform(0, 0)), { a: null, b: box.id }),
+            withJoint(place(level, level.world, transform(0, 0)), { a: box.id, b: part.id }),
+            withJoint(place(level, level.world, transform(0, 0)), { a: wall.id, b: post.id }),
+            withJoint(place(level, level.world, transform(0, 0)), { a: wall.id }),
+            withJoint(place(level, level.camera, transform(0, 0)), { a: box.id }),
+        ];
+        const { world, scene } = build(level);
+
+        expect(world.joints()).toHaveLength(0);
+        expect(scene.joints).toHaveLength(0);
+        expect(scene.ground).toBeUndefined();
+        const reasons = new Map(scene.skippedJoints.map((skip) => [skip.entity, skip.reason]));
+        expect(skipped.map((joint) => reasons.get(joint))).toEqual([
+            'noPhysics',
+            'noPhysics',
+            'noPhysics',
+            'sameBody',
+            'cannotMove',
+            'cannotMove',
+            'insideCamera',
+        ]);
+        expect(scene.skippedJoints).toHaveLength(skipped.length);
+    });
+
+    test("a group scaled by 2 doubles a Rope's typed Length and its drawn gap", () => {
+        const level = Level.createNew();
+        const group = place(level, level.world, transform(0, 0, 0, { x: 2, y: 2 }));
+        const weight = withSurface(withBody(place(level, group, transform(0, 50))));
+        const ends = { a: { x: 0, y: 25 }, b: { x: 0, y: -25 } };
+        withJoint(place(level, group, transform(0, 0)), {
+            type: 'rope',
+            a: weight.id,
+            matchDrawnDistance: false,
+            length: 80,
+            ends,
+        });
+        withJoint(place(level, group, transform(0, 0)), { type: 'spring', a: weight.id, ends });
+        const { world } = build(level);
+
+        const [rope, spring] = world.joints().map((call) => call.definition);
+        if (rope?.type !== 'rope' || spring?.type !== 'spring') throw new Error('Expected a Rope and a Spring.');
+        expect(rope.length).toBeCloseTo(160, 9);
+        expect(rope.endA).toEqual({ x: 0, y: 50 });
+        expect(rope.endB).toEqual({ x: 0, y: -50 });
+        expect(spring.restLength).toBeCloseTo(100, 9);
+        expect(spring.stiffness).toBe(2);
+        expect(spring.damping).toBe(0.3);
+    });
+
+    test("a mirrored group swaps and negates a Hinge's limits and its motor speed", () => {
+        const level = Level.createNew();
+        const values = {
+            limitRotation: true,
+            minAngle: -30,
+            maxAngle: 60,
+            motor: true,
+            motorSpeed: 90,
+            ends: { a: { x: 5, y: 0 }, b: { x: 0, y: 0 } },
+        };
+        const plain = place(level, level.world, transform(0, 0));
+        const mirrored = place(level, level.world, transform(500, 0, 0, { x: -1, y: 1 }));
+        for (const group of [plain, mirrored]) {
+            const wheel = withSurface(withBody(place(level, group, transform(0, 0))), { kind: 'circle', radius: 10 });
+            withJoint(place(level, group, transform(0, 0)), { ...values, a: wheel.id });
+        }
+        const { world } = build(level);
+
+        const [kept, flipped] = world.joints().map((call) => call.definition);
+        if (kept?.type !== 'hinge' || flipped?.type !== 'hinge') throw new Error('Expected two Hinges.');
+        expect([kept.minAngle, kept.maxAngle, kept.motorSpeed]).toEqual([-30, 60, 90]);
+        expect([flipped.minAngle, flipped.maxAngle, flipped.motorSpeed]).toEqual([-60, 30, -90]);
+        expect(flipped.endA).toEqual({ x: 495, y: 0 });
+        expect(flipped.endB).toEqual(flipped.endA);
+    });
+
+    test("a Hinge's settings reach the world as they are", () => {
+        const level = Level.createNew();
+        const door = withSurface(withBody(place(level, level.world, transform(0, 0))));
+        withJoint(place(level, level.world, transform(0, 0)), {
+            a: door.id,
+            letConnectedObjectsCollide: true,
+            motorStrength: 70,
+            resistance: 12,
+        });
+        const call = onlyJoint(build(level).world);
+
+        expect(call.definition).toMatchObject({
+            type: 'hinge',
+            letConnectedObjectsCollide: true,
+            limitRotation: false,
+            motor: false,
+            motorStrength: 70,
+            resistance: 12,
         });
     });
 });
