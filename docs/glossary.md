@@ -178,6 +178,7 @@ Words for how the game is built, used in [architecture/](architecture/README.md)
 | Status text | The short result the status bar's left slot shows for 4 seconds, such as "Undid: Move 3 entities". |
 | Browser event | Something the browser reports to the page, such as a key press or a paste. Never a game event. |
 | Body pose | A body's position and angle during play, as the physics engine reports it. |
+| Render chunk | A run of the World's children, next to each other in the draw order, that PixiJS draws as its own render group. Moving an entity uploads again only the shapes of its render chunk, not the whole level's. |
 | Runner | The script that builds the plan without the owner: it starts one fresh Claude session per step and reports to Discord. See [runner/](runner/README.md). |
 
 ## The look

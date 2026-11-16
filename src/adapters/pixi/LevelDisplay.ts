@@ -41,6 +41,12 @@ export class LevelDisplay {
     private readonly parts: LevelDisplayParts;
     private readonly nodes = new Map<Entity, EntityNode>();
     private readonly staleDrawings = new Set<Entity>();
+    // Entities whose bounds may have changed since the last cull. While the visible area stays the same,
+    // culling visits only these, their subtrees and their parents: a drag of 1,000 entities at 10,000
+    // took 4 ms a frame walking them all.
+    private readonly changedSinceCull = new Set<Entity>();
+    private needsFullCull = true;
+    private lastCullArea: Bounds | undefined;
     private readonly unsubscribe: Unsubscribe;
     private readonly worldNode: EntityNode;
     private drawingBuilds = 0;
@@ -86,8 +92,22 @@ export class LevelDisplay {
     // skipped as one, so its descendants are not even visited. Hidden subtrees are not visited either:
     // showing one again is a change, and every change renders, which culls again first.
     cull(visibleArea: Bounds) {
-        const world = this.parts.level.world;
-        this.cullSubtree(world, visibleArea);
+        const sameArea = this.lastCullArea !== undefined && this.lastCullArea.equals(visibleArea);
+        const manyChanged = this.changedSinceCull.size * 2 > this.nodes.size;
+        const cullAll = this.needsFullCull || !sameArea || manyChanged;
+
+        if (cullAll) {
+            const world = this.parts.level.world;
+            this.cullSubtree(world, visibleArea);
+        } else {
+            for (const entity of this.changedSinceCull) {
+                this.cullChanged(entity, visibleArea);
+            }
+        }
+
+        this.lastCullArea = visibleArea;
+        this.needsFullCull = false;
+        this.changedSinceCull.clear();
     }
 
     dispose() {
@@ -95,6 +115,7 @@ export class LevelDisplay {
         this.worldNode.destroy();
         this.nodes.clear();
         this.staleDrawings.clear();
+        this.changedSinceCull.clear();
     }
 
     private buildSubtree(entity: Entity) {
@@ -132,7 +153,39 @@ export class LevelDisplay {
         }
     }
 
+    // Culls one changed entity's subtree. Its parents' subtree bounds changed with it, so each is culled on
+    // the way down; one that comes back on screen is culled whole, since its subtree was skipped while off it.
+    private cullChanged(entity: Entity, visibleArea: Bounds) {
+        if (!this.nodes.has(entity)) return;
+
+        const parentsFromWorld: Entity[] = [];
+        for (let parent = entity.parent; parent !== undefined; parent = parent.parent) {
+            parentsFromWorld.unshift(parent);
+        }
+
+        const bounds = this.parts.caches.bounds;
+        for (const parent of parentsFromWorld) {
+            if (parent.isHidden) return;
+
+            const container = this.requireNode(parent).container;
+            const subtreeBounds = bounds.subtreeBoundsOf(parent);
+            const subtreeOnScreen = subtreeBounds !== undefined && subtreeBounds.overlaps(visibleArea);
+            const comesBackOnScreen = subtreeOnScreen && !container.renderable;
+            if (comesBackOnScreen) {
+                this.cullSubtree(parent, visibleArea);
+                return;
+            }
+
+            container.renderable = subtreeOnScreen;
+            if (!subtreeOnScreen) return;
+        }
+
+        this.cullSubtree(entity, visibleArea);
+    }
+
     private handleUpdate(update: LevelUpdate) {
+        this.noteCullingChange(update);
+
         switch (update.kind) {
             case 'entityAdded':
                 this.addNode(update.entity);
@@ -158,6 +211,27 @@ export class LevelDisplay {
         }
 
         this.parts.onChange();
+    }
+
+    // A component's change can change the entity's bounds; a change to the tree or a hidden switch can
+    // change what is visited at all.
+    private noteCullingChange(update: LevelUpdate) {
+        switch (update.kind) {
+            case 'componentAdded':
+            case 'componentRemoved':
+            case 'valueChanged':
+                this.changedSinceCull.add(update.entity);
+                return;
+            case 'switchChanged':
+                if (update.switchName === 'hidden') {
+                    this.needsFullCull = true;
+                }
+                return;
+            case 'levelRenamed':
+                return;
+            default:
+                this.needsFullCull = true;
+        }
     }
 
     private addNode(entity: Entity) {

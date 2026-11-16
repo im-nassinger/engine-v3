@@ -2,6 +2,7 @@ import { Container, Graphics, Matrix } from 'pixi.js';
 import { TransformComponent } from '../../core/components/index.ts';
 import type { Entity } from '../../core/level/index.ts';
 import { Matrix2D } from '../../core/geometry/index.ts';
+import { ChunkedChildren } from './ChunkedChildren.ts';
 
 // One entity on screen: a Container that carries its matrix from its parent and its own hidden switch,
 // holding its children's nodes and one Graphics for what it draws. PixiJS multiplies the matrices and
@@ -10,15 +11,24 @@ export class EntityNode {
     readonly entity: Entity;
     readonly container = new Container();
     readonly graphics = new Graphics();
-    // Children's nodes, the top row last so it is drawn in front.
-    readonly childrenLayer = new Container();
+    // Holds the children's nodes, the top row last so it is drawn in front.
+    readonly childrenLayer: Container;
+    // Only the World's children are split into render chunks: they hold the whole level.
+    private readonly chunkedChildren: ChunkedChildren | undefined;
 
     // The draw order is the panel order backwards: an entity is drawn in front of its children. The
     // World is the exception, drawn first, because its fill is the background.
-    constructor(entity: Entity, drawsBehindChildren: boolean) {
+    constructor(entity: Entity, isWorld: boolean) {
         this.entity = entity;
 
-        if (drawsBehindChildren) {
+        if (isWorld) {
+            this.chunkedChildren = new ChunkedChildren();
+            this.childrenLayer = this.chunkedChildren.container;
+        } else {
+            this.childrenLayer = new Container();
+        }
+
+        if (isWorld) {
             this.container.addChild(this.graphics, this.childrenLayer);
         } else {
             this.container.addChild(this.childrenLayer, this.graphics);
@@ -29,7 +39,16 @@ export class EntityNode {
     }
 
     get childNodeCount() {
+        if (this.chunkedChildren !== undefined) return this.chunkedChildren.count;
+
         return this.childrenLayer.children.length;
+    }
+
+    // The children's containers in draw order, the first drawn first.
+    get drawnChildren(): readonly Container[] {
+        if (this.chunkedChildren !== undefined) return this.chunkedChildren.children;
+
+        return this.childrenLayer.children;
     }
 
     applyTransform() {
@@ -56,6 +75,11 @@ export class EntityNode {
 
     // Adds a child's node in front of the ones already there, for building a subtree bottom row first.
     appendChild(child: EntityNode) {
+        if (this.chunkedChildren !== undefined) {
+            this.chunkedChildren.append(child.container);
+            return;
+        }
+
         this.childrenLayer.addChild(child.container);
     }
 
@@ -68,8 +92,13 @@ export class EntityNode {
 
         child.container.removeFromParent();
 
-        const siblingCount = this.childrenLayer.children.length;
+        const siblingCount = this.childNodeCount;
         const drawIndex = siblingCount - panelIndex;
+        if (this.chunkedChildren !== undefined) {
+            this.chunkedChildren.insertAt(drawIndex, child.container);
+            return;
+        }
+
         this.childrenLayer.addChildAt(child.container, drawIndex);
     }
 

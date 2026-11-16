@@ -42,6 +42,14 @@ describe('Bounds', () => {
         expect(square.overlaps(new Bounds(0, -10, 10, -0.5))).toBe(false);
     });
 
+    test('equals bounds with the same four sides only', () => {
+        const square = new Bounds(0, 0, 10, 10);
+
+        expect(square.equals(new Bounds(0, 0, 10, 10))).toBe(true);
+        expect(square.equals(new Bounds(0, 0, 10, 11))).toBe(false);
+        expect(square.equals(new Bounds(1, 0, 10, 10))).toBe(false);
+    });
+
     test('contains points inside and on its edge', () => {
         const square = new Bounds(0, 0, 10, 10);
 

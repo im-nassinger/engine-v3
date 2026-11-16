@@ -64,7 +64,7 @@ function expectNodesLikeTree(display: LevelDisplay, level: Level) {
         const node = display.nodeOf(entity);
         if (node === undefined) throw new Error(`Entity ${entity.id} has no node.`);
 
-        const drawnChildren = node.childrenLayer.children.map((container) => {
+        const drawnChildren = node.drawnChildren.map((container) => {
             const childNode = [...entity.children].find((child) => display.nodeOf(child)?.container === container);
             return childNode;
         });
@@ -121,6 +121,25 @@ describe('LevelDisplay', () => {
         level.removeEntity(firstGroup);
         expectNodesLikeTree(display, level);
         expect(display.nodeOf(firstGroup)).toBeUndefined();
+    });
+
+    test('a World with hundreds of children keeps them like the tree across its render chunks', () => {
+        const level = Level.createNew();
+        const squares: Entity[] = [];
+        for (let index = 0; index < 300; index += 1) {
+            squares.push(addShape(level, level.world, SQUARE, index));
+        }
+        const group = addGroup(level, level.world, 150);
+        const { display } = makeDisplay(level);
+        expectNodesLikeTree(display, level);
+
+        const [first, second, third] = squares;
+        if (first === undefined || second === undefined || third === undefined) throw new Error('No squares.');
+        level.moveEntity(first, level.world, 299);
+        level.moveEntity(second, group, 0);
+        level.removeEntity(third);
+        addShape(level, level.world, SQUARE, 200);
+        expectNodesLikeTree(display, level);
     });
 
     test('a style change rebuilds only that entity drawing', () => {
@@ -350,6 +369,48 @@ describe('LevelDisplay culling', () => {
         square.requireComponent(TransformComponent).set('position', { x: 0, y: 0 });
         display.cull(VISIBLE_AREA);
         expect(node.container.renderable).toBe(true);
+    });
+
+    test('a move with the area unchanged culls the moved entity, its subtree and its parents', () => {
+        const level = Level.createNew();
+        const group = addGroup(level, level.world);
+        const child = addShape(level, group, SQUARE);
+        const grandchild = addShape(level, child, SQUARE);
+        const sibling = addShape(level, group, SQUARE, 1);
+        group.requireComponent(TransformComponent).set('position', { x: 1000, y: 0 });
+        sibling.requireComponent(TransformComponent).set('position', { x: 500, y: 0 });
+        const { display } = makeDisplay(level);
+        display.cull(VISIBLE_AREA);
+        expect(nodeOf(display, group).container.renderable).toBe(false);
+
+        // The child comes on screen inside an off-screen group: the group is culled whole, so the
+        // sibling it had skipped is set too.
+        child.requireComponent(TransformComponent).set('position', { x: -1000, y: 0 });
+        display.cull(VISIBLE_AREA);
+        expect(nodeOf(display, group).container.renderable).toBe(true);
+        expect(nodeOf(display, child).container.renderable).toBe(true);
+        expect(nodeOf(display, grandchild).container.renderable).toBe(true);
+        expect(nodeOf(display, sibling).container.renderable).toBe(false);
+
+        child.requireComponent(TransformComponent).set('position', { x: 0, y: 0 });
+        display.cull(VISIBLE_AREA);
+        expect(nodeOf(display, group).container.renderable).toBe(false);
+    });
+
+    test('showing a hidden group again culls its subtree', () => {
+        const level = Level.createNew();
+        const group = addGroup(level, level.world);
+        const child = addShape(level, group, SQUARE);
+        const { display } = makeDisplay(level);
+        group.setHidden(true);
+        display.cull(VISIBLE_AREA);
+
+        child.requireComponent(TransformComponent).set('position', { x: 900, y: 0 });
+        display.cull(VISIBLE_AREA);
+        group.setHidden(false);
+        display.cull(VISIBLE_AREA);
+
+        expect(nodeOf(display, group).container.renderable).toBe(false);
     });
 
     test('a group that draws nothing in its subtree is skipped', () => {

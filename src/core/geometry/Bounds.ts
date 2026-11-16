@@ -81,6 +81,13 @@ export class Bounds {
         return !apartHorizontally && !apartVertically;
     }
 
+    equals(other: Bounds) {
+        const sameHorizontally = this.left === other.left && this.right === other.right;
+        const sameVertically = this.top === other.top && this.bottom === other.bottom;
+
+        return sameHorizontally && sameVertically;
+    }
+
     contains(point: Point) {
         const insideHorizontally = point.x >= this.left && point.x <= this.right;
         const insideVertically = point.y >= this.top && point.y <= this.bottom;
