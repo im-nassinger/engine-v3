@@ -50,7 +50,9 @@
   .inp { flex: 1; min-width: 0; height: 22px; background: var(--field); border-radius: var(--radius); padding: 0 6px; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; font-variant-numeric: tabular-nums; }
   .inp .ax, .inp .unit { color: var(--muted); }
   .inp .unit { margin-left: auto; opacity: .75; }
-  .cb { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--muted); display: inline-flex; }
+  .cb { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--muted); display: inline-flex; flex-shrink: 0; }
+  .vals .state { color: var(--muted); align-self: center; }
+  .f .vals:has(.cb) { align-items: center; gap: 8px; }
   .open-grid {
     margin: 6px 12px 4px; width: calc(100% - 24px); height: 28px; font: inherit; color: var(--text);
     background: var(--accent-soft); border: 1px solid var(--accent); border-radius: var(--radius);
@@ -138,7 +140,7 @@
       <div class="card">
         <div class="chead" data-fold><span class="t">PhysicsWorldComponent</span></div>
         <div class="f"><span>Gravity</span><div class="vals"><div class="inp"><span class="ax">x</span>0</div><div class="inp"><span class="ax">y</span>9.8<span class="unit">m/s&sup2;</span></div></div></div>
-        <div class="f"><span>Walls</span><span class="cb"></span></div>
+        <div class="f"><span>Walls</span><div class="vals"><span class="cb"></span><span class="state">Edges are open</span></div></div>
         <button class="open-grid" id="open-grid" type="button" aria-controls="win">Edit collision grid</button>
       </div>
     </section>
@@ -168,7 +170,7 @@
       <li>An entity with two grid tags hits something if either tag does.</li>
       <li>Changing an entity's tags during play changes its collisions at once.</li>
       <li>Up to 64 tags fit in the grid, Box2D's limit.</li>
-      <li>A ragdoll needs nothing extra: give its parts tags that don't hit each other.</li>
+      <li>A ragdoll needs nothing here. Its hinges have <b>Let connected objects collide</b> off, so joined parts don't bump into each other, and two copies of it still hit each other.</li>
       <li>Right-click two entities and pick <b>Why do these collide?</b> to see which rule decides.</li>
     </ul>
   </section>
