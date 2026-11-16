@@ -170,7 +170,7 @@
       <li>An entity with two grid tags hits something if either tag does.</li>
       <li>Changing an entity's tags during play changes its collisions at once.</li>
       <li>Up to 64 tags fit in the grid, Box2D's limit.</li>
-      <li>A ragdoll needs nothing here. Its hinges have <b>Let connected objects collide</b> off, so joined parts don't bump into each other, and two copies of it still hit each other.</li>
+      <li>Ragdolls don't need tags. The parts of a ragdoll are held together by hinges, and a hinge stops the two parts it joins from hitting each other. Two ragdolls still hit each other.</li>
       <li>Right-click two entities and pick <b>Why do these collide?</b> to see which rule decides.</li>
     </ul>
   </section>
