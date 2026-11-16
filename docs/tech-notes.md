@@ -171,6 +171,7 @@ Browser storage as checked in October 2026:
 - **One address.** Saved levels belong to the exact website address. `localhost` and a staging address are separate stores. This is why the address is chosen before public launch.
 - **Save writes.** Use strict durability, or a save may be lost on a power cut. A save started while the page unloads may not finish, so the timed saves are the guarantee, plus a save when the tab is hidden.
 - **Save cost.** Store each file once by hash. If full saves make the editor stutter, write only what changed.
+- **Firefox's `persist()` asks the user** and its promise stays pending until they answer (seen in stage 12's browser tests, 2026-11-16). Never await it before anything else.
 - **One tab.** Web Locks: one exclusive lock for the level, `ifAvailable` to detect the other tab. Whether a crashed tab releases its lock is only implied by the spec. Test it.
 - **Import in a worker**, to keep the page responsive and contain hostile files. Decode images only after the checks pass. Zip bombs must be refused without freezing the page.
 - **Reading script settings** means running the top of a script in a throwaway Lua state on load. That state needs the same safety as play, which is why importing a level counts as running untrusted code.

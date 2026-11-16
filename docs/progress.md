@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 12, step 3 of 13: `Autosave`'s failures are built: `failed` with its level-wide message and a retry every 10 s, the 256 MB check, site data cleared, and asking to persist once. Next is step 4, the storage adapters. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 12, step 4 of 13: the storage adapters are built: `IndexedDbLevelStore` with `idb` 8.0.4, `LocalStorageSettings`, `WebLockTabGuard` and `BrowserPersistence`, tested in three browsers. Next is step 5, `EditorSettings`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -190,7 +190,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 12 of [plan.md](plan.md#stage-12-in-steps): saving.** Step 1, the steps and the [choices](architecture/persistence.md#stage-12s-choices), is done; step 2, `Autosave`'s timing, is next.
+1. **Stage 12 of [plan.md](plan.md#stage-12-in-steps): saving.** Steps 1 to 4 are done: the steps and the [choices](architecture/persistence.md#stage-12s-choices), `Autosave`'s timing and failures, and the storage adapters. Step 5, `EditorSettings`, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
