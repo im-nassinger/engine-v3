@@ -82,8 +82,9 @@ src/
                        time/ (SystemClock, LocalTimeOfDay, BrowserTimer, AnimationFrames),
                        screen/ (DevicePixelRatio), clipboard/ (ClipboardBridge), and later
                        FileDownload, BrowserFilePicker, PageVisibility, LeavePrompt in their own areas
-    worker/            WorkerGameRunner, GameWorkerHost, ImportWorkerClient, ImportWorkerHost, protocol/
-    zip/               FflateZipCodec
+    worker/            import/ (ImportWorkerClient, ImportWorkerHost, importProtocol), and later
+                       WorkerGameRunner, GameWorkerHost and their protocol
+    zip/               FflateZipCodec, FflateZipReader
   ui/
     EditorContext.tsx  hands the editor session to components
     commands/          context/ (CommandsContext: the registry, CommandRunner and the platform),

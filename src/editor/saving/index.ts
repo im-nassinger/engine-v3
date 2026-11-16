@@ -30,3 +30,7 @@ export {
     ProjectFile,
 } from './project-file/ProjectFile.ts';
 export { projectFileName } from './project-file/projectFileName.ts';
+export type { Unpacked, ZipDirectoryEntry, ZipReader } from './contracts/ZipReader.ts';
+export type { FileImporter } from './contracts/FileImporter.ts';
+export { ImportCheck } from './import/ImportCheck.ts';
+export type { ImportCheckOptions } from './import/ImportCheck.ts';

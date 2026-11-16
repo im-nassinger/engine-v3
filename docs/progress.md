@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 12, step 8 of 13: `ProjectFile` and Export are built: `fflate` packs `level.json` into the `.editable` zip, the file is named after the level, and Export and Ctrl+S in the File menu save first, then download, even when the save failed or the tab is read-only. Next is step 9, the import worker. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 12, step 9 of 13: the import worker is built: `ImportCheck` reads the zip's directory, unpacks with a running count that stops a zip bomb just past 256 MB, and reads `level.json` like every level; `ImportWorkerClient` runs it in a new worker for each file, tested in three browsers. Next is step 10, New, Import and dropping a file. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

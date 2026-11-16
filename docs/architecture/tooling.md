@@ -96,7 +96,7 @@ tests/
 
 - **Every module of the [folder tree](parts-and-folders.md#the-folder-tree)** is created in stage 0, with an `index.ts` holding `export {};`: 47 files, 10 in core, 17 in editor, 6 in adapters, 14 in ui. Folders inside modules (one per component, one per React component, `testing/`, `rules/`) come with the stage that writes their first file.
 - **`src/app/main.tsx`** finds `#root` and renders the project's name inside React's `StrictMode`, until `EditorShell` replaces it in stage 6. `EditorComposition.ts` comes with stage 5.
-- **`src/app/workers/game.worker.ts` and `import.worker.ts`** hold `export {};` until stages 16 and 12.
+- **`src/app/workers/game.worker.ts` and `import.worker.ts`** held `export {};` until stages 16 and 12; `import.worker.ts` is built (stage 12 step 9).
 - **`index.html`:** a `#root` element and one script tag for `src/app/main.tsx`. No styles until `theme.css` in stage 6.
 - **`vite.config.ts`:** `react()` plus `babel({ presets: [reactCompilerPreset()] })`. The tests are set up in the same file as two Vitest projects, so tests see the same code as the app:
 
