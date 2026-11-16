@@ -208,24 +208,26 @@
     key('player', 'enemy'), key('enemy', 'enemy'), key('zone', 'zone'),
     key('zone', 'enemy'), key('zone', 'shot'), key('shot', 'shot')
   ]);
-  let hot = ['enemy', 'player'];
+  let hot = ['player', 'enemy'];
 
   const grid = document.getElementById('grid');
   const sentence = document.getElementById('sentence');
   const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-  // The sentence for a pair: column tag first, so the default hover reads "player and enemy".
+  // The sentence for a pair: row tag first, so the default hover reads "player and enemy".
   const say = (a, b) => {
     const on = !off.has(key(a, b));
     const verb = on ? 'collide' : "don't collide";
     const html = a === b
       ? `Two <code>${esc(a)}</code> entities ${verb}`
-      : `<code>${esc(b)}</code> and <code>${esc(a)}</code> ${verb}`;
+      : `<code>${esc(a)}</code> and <code>${esc(b)}</code> ${verb}`;
     return { on, html, text: html.replace(/<\/?code>/g, '') };
   };
 
   function render() {
-    // A triangle: each pair once, row tag against every column tag up to it.
-    let h = '<thead><tr><th></th>' + tags.map((t, c) =>
+    // A triangle: each pair once, row tag against itself and every tag after it. The columns run
+    // in reverse, so every row's boxes start at its name and every column's boxes at its name.
+    const columns = tags.map((t, c) => ({ t, c })).reverse();
+    let h = '<thead><tr><th></th>' + columns.map(({ t, c }) =>
       `<th scope="col" data-c="${c}"><span class="tagname${t === 'Default' ? ' def' : ''}">${esc(t)}</span></th>`).join('') + '</tr></thead><tbody>';
     tags.forEach((r, ri) => {
       h += `<tr><th scope="row" data-r="${ri}"><span class="rowname">` +
@@ -233,8 +235,8 @@
           ? `<span class="ib rm spacer" aria-hidden="true"></span>`
           : `<button class="ib rm" type="button" data-rm="${esc(r)}" aria-label="Remove ${esc(r)} from the grid">${ic('x')}</button>`) +
         `<span class="tagname${r === 'Default' ? ' def' : ''}">${esc(r)}</span></span></th>`;
-      tags.forEach((c, ci) => {
-        if (ci > ri) { h += '<td></td>'; return; }
+      columns.forEach(({ t: c, c: ci }) => {
+        if (ci < ri) { h += '<td></td>'; return; }
         const s = say(r, c);
         h += `<td data-r="${ri}" data-c="${ci}"><button class="cell" type="button" data-a="${esc(r)}" data-b="${esc(c)}" aria-pressed="${s.on}" aria-label="${esc(s.text)}">${ic('check')}</button></td>`;
       });
@@ -259,7 +261,7 @@
     grid.querySelectorAll(`th[data-r="${ri}"], th[data-c="${ci}"]`).forEach((e) => e.classList.add('hl'));
     grid.querySelectorAll('td[data-r]').forEach((td) => {
       const r = +td.dataset.r, c = +td.dataset.c;
-      if ((r === ri && c <= ci) || (c === ci && r >= ri)) td.classList.add('hl');
+      if ((r === ri && c >= ci) || (c === ci && r <= ri)) td.classList.add('hl');
     });
     const cell = grid.querySelector(`.cell[data-a="${CSS.escape(a)}"][data-b="${CSS.escape(b)}"]`);
     if (cell) cell.classList.add('hot');
@@ -314,7 +316,7 @@
     const b = e.target.closest('[data-add]');
     if (!b) return;
     tags.push(b.dataset.add);
-    hot = [b.dataset.add, 'player'];
+    hot = ['player', b.dataset.add];
     setMenu(false);
     render();
   });
