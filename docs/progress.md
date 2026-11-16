@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 10, step 4 of 11: `ShapeTool` also draws a polygon point by point, closed on the first point or finished as a line by Enter, a double-click, Esc, another tool or `deactivate`, with snapping, Shift's 15°, Ctrl+Z and Backspace removing points, and the 1,000 point limit. The tool isn't on the page yet (step 9). Next is step 5: `HighDetailRule`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 10, step 5 of 11: `HighDetailRule` gives a polygon or line over 200 points the tip `High detail may slow physics` under its Points field, and the tip goes when points are deleted down to 200. Next is step 6: `PointEditState`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

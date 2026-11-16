@@ -245,4 +245,18 @@ describe('EditorMessages', () => {
         expect(frames.pendingCount).toBe(0);
         expect(messages.all()).toEqual([]);
     });
+
+    test("a polygon's high detail tip goes when its points are deleted down to 200", () => {
+        const { crate, frames, messages } = build();
+        const shape = crate.requireComponent(ShapeComponent);
+        const points = Array.from({ length: 201 }, (_, index) => ({ x: index, y: index % 2 }));
+        shape.set('geometry', { kind: 'polygon', points });
+        frames.runFrame();
+        expect(texts(messages.forEntity(crate.id))).toEqual(['ShapeComponent: High detail may slow physics']);
+
+        shape.writeDerived('points', points.slice(0, 200));
+        frames.runFrame();
+
+        expect(messages.forEntity(crate.id)).toEqual([]);
+    });
 });
