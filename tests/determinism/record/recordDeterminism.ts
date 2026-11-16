@@ -10,14 +10,8 @@ import { runHeadless } from '../../../src/core/simulation/index.ts';
 import { DETERMINISM_LEVELS } from '../../levels/determinism/build/determinismLevels.ts';
 
 import { writeHashFile } from '../hash-files/hashFile.ts';
-import {
-    DETERMINISM_START,
-    DETERMINISM_TICKS,
-    hashFile,
-    LEVEL_FILES,
-    levelFile,
-    RECORDED_HASHES,
-} from '../level-files/determinismFiles.ts';
+import { hashFile, LEVEL_FILES, levelFile, RECORDED_HASHES } from '../level-files/determinismFiles.ts';
+import { DETERMINISM_START, DETERMINISM_TICKS } from '../run/determinismRun.ts';
 
 const engine = new Box2dPhysicsEngine();
 await engine.load();

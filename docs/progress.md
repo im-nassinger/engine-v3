@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 13, step 9 of 11: `runHeadless` records each tick's `stateHash` and one hash per body; the seven determinism levels are `level.json` files with their 600 recorded hashes, written by `npm run determinism:record`; `tests/determinism/determinism.test.ts` runs in `npm run check`, so CI runs it on x86 and ARM, and a failure names the first tick and body that differ. Next is step 10, the determinism test in three browsers. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 13, step 10 of 11: `tests/determinism/determinism.browser.test.ts` runs the seven determinism levels against the same recorded hashes in Chromium, Firefox and WebKit, reading the files through Vite's `import.meta.glob`, and the CI's browser job runs it on every push. Next is step 11, the docs. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -205,7 +205,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 13 of [plan.md](plan.md#stage-13-in-steps): physics and the determinism test.** Steps 1 to 9 are done; step 10, the determinism test in Chromium, Firefox and WebKit, is next.
+1. **Stage 13 of [plan.md](plan.md#stage-13-in-steps): physics and the determinism test.** Steps 1 to 10 are done; step 11, the docs of what the build showed, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
