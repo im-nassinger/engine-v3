@@ -4,6 +4,7 @@ export { OpenWindowCount } from './escape/OpenWindowCount.ts';
 export type { CloseWindow } from './escape/OpenWindowCount.ts';
 export type { OpenWindows } from './escape/OpenWindows.ts';
 export { PanGesture } from './pan/PanGesture.ts';
+export { HANDLE_SIZE_PX } from './select/frame/FrameHandle.ts';
 export { SelectTool } from './select/SelectTool.ts';
 export type { LevelPointerInput, Modifiers, PointerButton, Tool, ToolContext, ToolId, ToolKey } from './Tool.ts';
 export { ToolController } from './ToolController.ts';

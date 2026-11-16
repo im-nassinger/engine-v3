@@ -18,6 +18,8 @@ import type { KeyboardPlatform } from '../editor/shortcuts/index.ts';
 import { GridSnapper } from '../editor/snapping/index.ts';
 import { EscapeChain, OpenWindowCount, PanGesture, SelectTool, ToolController } from '../editor/tools/index.ts';
 
+import { EditorSelectionSource } from './EditorSelectionSource.ts';
+
 const FIT_CAMERA_FRAME = 'view.fitCameraFrame';
 
 type EditorParts = {
@@ -102,6 +104,7 @@ export class EditorComposition {
 
     private start() {
         this.levelView.follow(this.session);
+        this.levelView.showSelection(new EditorSelectionSource(this.session, this.tools));
         // The editor lives as long as the page, so the keyboard and the pointer are never disconnected.
         this.keyboard.connect();
         this.pointer.connect();

@@ -9,3 +9,8 @@ export { FINE_LINES_PER_STEP, MIN_LINE_SPACING_PX, gridSpacingAt, planGrid } fro
 export type { GridLine, GridLineStrength, GridPlan, GridSpacing } from './grid/GridPlan.ts';
 export type { OverlayCaches, OverlayScene } from './OverlayScene.ts';
 export { PhysicsViewOverlay } from './PhysicsViewOverlay.ts';
+export { MAX_OUTLINED_ENTITIES, planSelection } from './selection/selectionPlan.ts';
+export type { SelectionPlan, SelectionPlanCaches } from './selection/selectionPlan.ts';
+export { SelectionOverlay } from './selection/SelectionOverlay.ts';
+export type { DrawnSelection } from './selection/SelectionOverlay.ts';
+export type { SelectionSource, ShownFrame, ShownReadout } from './selection/SelectionSource.ts';

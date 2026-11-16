@@ -68,6 +68,11 @@ export class SelectionFrame {
         return this.matrix.apply(this.handleInBox(handle));
     }
 
+    // The eight handles' middles in level positions, in FRAME_HANDLES' order.
+    get handles(): Point[] {
+        return FRAME_HANDLES.map((handle) => this.handlePosition(handle));
+    }
+
     // The four corners in level positions, clockwise from the top left of the entity's own space.
     get corners(): Point[] {
         return this.box.corners().map((corner) => this.matrix.apply(corner));

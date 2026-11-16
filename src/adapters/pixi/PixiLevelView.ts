@@ -13,8 +13,9 @@ import {
     GridOverlay,
     JointIconOverlay,
     PhysicsViewOverlay,
+    SelectionOverlay,
 } from './overlays/index.ts';
-import type { OverlayScene } from './overlays/index.ts';
+import type { OverlayScene, SelectionSource } from './overlays/index.ts';
 
 // Culling grows the visible area by this many screen pixels, so the editor's 1 px line around an unstyled
 // shape, which BoundsCache doesn't count, is never cut at the view's edge.
@@ -57,6 +58,10 @@ export class PixiLevelView {
     // On top of everything, since it shows what collides whatever the drawing hides.
     private readonly physicsViewOverlay = new PhysicsViewOverlay();
     private readonly jointIconOverlay = new JointIconOverlay();
+    // In front of the joint icons, since a selected joint's ring goes around its icon.
+    private readonly selectionOverlay = new SelectionOverlay();
+    private selection: SelectionSource | undefined;
+    private stopFollowingSelection: Unsubscribe | undefined;
     private readonly stopListening: Unsubscribe[] = [];
     private stopListeningToLevel: Unsubscribe | undefined;
     private stopFollowing: Unsubscribe | undefined;
@@ -78,6 +83,7 @@ export class PixiLevelView {
             this.cameraFrameOverlay.container,
             this.physicsViewOverlay.graphics,
             this.jointIconOverlay.graphics,
+            this.selectionOverlay.container,
         );
         this.applyViewMatrix();
 
@@ -122,6 +128,7 @@ export class PixiLevelView {
             cameraFrame: this.cameraFrameOverlay,
             physicsView: this.physicsViewOverlay,
             jointIcons: this.jointIconOverlay,
+            selection: this.selectionOverlay,
         };
     }
 
@@ -187,6 +194,14 @@ export class PixiLevelView {
         this.stopFollowing = source.openLevelChanged.subscribe(showOpenLevel);
     }
 
+    // Draws this selection from now on, and again each time it changes. Play shows none.
+    showSelection(source: SelectionSource | undefined) {
+        this.stopFollowingSelection?.();
+        this.selection = source;
+        this.stopFollowingSelection = source?.subscribe(() => this.markDirty());
+        this.markDirty();
+    }
+
     // Asks for one render on the next frame. Several changes before it still draw once.
     markDirty() {
         if (this.cancelFrame !== undefined) return;
@@ -209,6 +224,9 @@ export class PixiLevelView {
         this.stopListeningToLevel = undefined;
         this.stopFollowing?.();
         this.stopFollowing = undefined;
+        this.stopFollowingSelection?.();
+        this.stopFollowingSelection = undefined;
+        this.selection = undefined;
 
         this.display?.dispose();
         this.display = undefined;
@@ -274,6 +292,7 @@ export class PixiLevelView {
         this.cameraFrameOverlay.update(scene);
         this.physicsViewOverlay.update(scene);
         this.jointIconOverlay.update(scene);
+        this.selectionOverlay.update(scene, this.selection);
     }
 
     private render() {

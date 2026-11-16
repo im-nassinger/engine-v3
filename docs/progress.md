@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 9, step 12 of 16 is done: `PointerInput` in `adapters/browser/pointer/` hands the level view's presses, moves, releases and double-clicks to `ToolController` in level positions, zooms at the mouse with the wheel, pans with Shift+wheel, stops the middle button's autoscroll and cancels a drag when the window loses focus; `EditorComposition` now wires Select, `PanGesture`, `EscapeChain` and key ups, and the menus and the row drag count themselves open for Esc. The e2e tests left from step 5's `Grid snapping` were fixed; all 25 pass. Next is step 13: `SelectionOverlay`. The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 9, step 13 of 16 is done: `SelectionOverlay` in `adapters/pixi/overlays/selection/` draws the selection table (a shape's outline and its frame with handles, a group's frame, several outlines and one shared box, a joint's ring, the camera's 3 px frame, a padlock for locked ones, a dashed box when all are hidden), the rest of a selected body, the selection box being dragged and the readout, and over 500 only the box and a count; `app/EditorSelectionSource` feeds it from the session and the tools. Next is step 14: the page (toolbar, snapping switch, status bar hint and mouse position, `Back to level`, the entity picker, the slider through `LiveEdit`). The steps are in [plan.md](plan.md#stage-9-in-steps) and the choices in [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-9s-choices). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
