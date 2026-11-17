@@ -72,6 +72,8 @@ The tech notes ask for keyboard layout tests (US, Brazilian ABNT2, and one AltGr
 3. Reload the page: the level is still there.
 4. Open a second tab: it says the level is open elsewhere and is read-only.
 
+Journey 1 is in `test-play.spec.ts`, 2 in `car-journey.spec.ts` (stage 17), 3 and 4 in `saving.spec.ts`. Journey 2 checks every entity and value by exporting the imported level again and comparing its `level.json` with the first export's.
+
 ## Guard tests (`tests/guards/`)
 
 Each check that keeps an architecture rule (the type check, ESLint, dependency-cruiser) is handed a small file that breaks its rule and must refuse it. They run with the unit tests. The list is in [tooling.md](tooling.md#guard-tests) (owner, 2026-11-14).

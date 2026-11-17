@@ -14,8 +14,10 @@ export type Versioned = {
 };
 
 export function useVersion(source: Versioned): number {
-    const subscribe = (listener: () => void) => source.subscribe(listener);
-    const readVersion = () => source.version;
+    'use no memo';
+
+    const subscribe = useCallback((listener: () => void) => source.subscribe(listener), [source]);
+    const readVersion = useCallback(() => source.version, [source]);
 
     return useSyncExternalStore(subscribe, readVersion);
 }
@@ -37,6 +39,7 @@ export function EntitiesRow({ entityId }: EntitiesRowProps) {
 
 - **A component subscribes to the smallest thing it shows:** an Entities panel row to its entity's version, the Inspector to `InspectorModel.version`, the top bar's Undo button to `History.version`. Dragging one crate wakes its row and its card, not the panel.
 - **The version is the snapshot.** The component then reads current values straight from the class. React never stores a copy that could fall behind.
+- **`useVersion` opts out of the React Compiler and keeps its two functions per source** (stage 17 step 5, standing yes, 2026-11-17). *Why: the compiler kept `() => source.version` for as long as `source.version` was the same number, not the same source. After New then Import, both levels' `InspectorModel`s were at version 0, so React kept reading the New level's model, and the Inspector showed the World whatever was selected until the page was reloaded. Journey 2 found it.* The same holds for a `useReading` read written in place: `() => level.name` is kept while the name is the same, so `LevelName` reads through `nameOf(level)`, a call, which the compiler keeps per `level`.
 - **Changes go the other way through commands:** a button calls `session.commands.find(id).run()`, a field calls its `FieldModel`'s commit. Components never change a core class directly.
 - Pure display state (a menu being open, a hovered button, a field's uncommitted text) stays in React state, because nothing outside the component needs it.
 

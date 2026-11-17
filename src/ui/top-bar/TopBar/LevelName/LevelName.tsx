@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { renameLevel } from '../../../../editor/commands/index.ts';
+import type { Level } from '../../../../core/level/index.ts';
 import { useEditorSession } from '../../../EditorContext.tsx';
 import { useReading, useVersion } from '../../../hooks/index.ts';
 import './LevelName.css';
@@ -13,7 +14,7 @@ export function LevelName() {
     useVersion(session.openLevelChanged);
     const openLevel = session.openLevel;
     const level = openLevel.level;
-    const name = useReading(level.signals.nameVersion, () => level.name);
+    const name = useReading(level.signals.nameVersion, () => nameOf(level));
 
     const [draft, setDraft] = useState<string | undefined>(undefined);
     const skipsCommit = useRef(false);
@@ -68,4 +69,11 @@ export function LevelName() {
             onKeyDown={handleKeyDown}
         />
     );
+}
+
+// A call, not level.name read in place: the React Compiler would keep a closure reading level.name while
+// the name stays the same, so after New swaps in a level of the same name an Undo of a rename would be
+// read from the old level and never shown.
+function nameOf(level: Level) {
+    return level.name;
 }

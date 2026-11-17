@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 17, step 4 of 10: test play with 1,000 Dynamic crates is timed: the first tick drawn 229 to 246 ms after Play, 95% of frames within 3.3 to 3.6 ms and 601 to 603 ticks in 10 s, so off-screen bodies updated less often isn't built, see [performance.md](architecture/performance.md#targets-and-their-tests). Next is step 5, the journeys. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 17, step 5 of 10: journey 2, a car of a group, a body and two hinged wheels exported and imported back whole, passes in three browsers; it found the Inspector stuck on the World after New then Import, fixed in `useVersion`, see [ui.md](architecture/ui.md#how-a-component-reads-core-state). The Inspector's and the Select tool's Playwright tests now use a drawn crate. Next is step 6, the layout checks. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

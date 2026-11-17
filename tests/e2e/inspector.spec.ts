@@ -1,13 +1,17 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
-// A new level holds only the World and the camera until stage 10's Shape tool draws, so these tests give
-// the camera the components a crate would have. Select all skips the camera, so the row is clicked.
-async function openEditorWithCameraSelected(page: Page) {
+// Opens the editor and draws a crate with the Shape tool, which selects it with its ShapeComponent.
+async function openEditorWithCrateSelected(page: Page) {
     await page.goto('/');
     await expect(page.getByRole('button', { name: 'Main menu' })).toBeVisible();
+    const free = await page.locator('.free-area').boundingBox();
+    if (!free) throw new Error('The free area has no size.');
 
-    await page.getByRole('tree', { name: 'Entities' }).getByRole('treeitem').filter({ hasText: 'Camera' }).click();
+    await page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name: 'Shape' }).click();
+    await page.getByRole('toolbar', { name: 'Tool options' }).getByRole('button', { name: 'Rectangle' }).click();
+    await page.mouse.click(free.x + free.width / 2, free.y + free.height / 2);
+    await expect(card(page, 'ShapeComponent')).toHaveCount(1);
 }
 
 function inspector(page: Page) {
@@ -29,8 +33,7 @@ function messagesCount(page: Page) {
 }
 
 test("a body on a shape shows the SurfaceComponent's note and the count, and its fix clears both", async ({ page }) => {
-    await openEditorWithCameraSelected(page);
-    await addComponent(page, 'ShapeComponent');
+    await openEditorWithCrateSelected(page);
     await expect(messagesCount(page)).toHaveCount(0);
 
     await addComponent(page, 'BodyComponent');
@@ -40,7 +43,7 @@ test("a body on a shape shows the SurfaceComponent's note and the count, and its
     await expect(messagesCount(page)).toHaveText('1 warning');
 
     await messagesCount(page).click();
-    const listed = page.getByRole('menuitem', { name: 'Camera: Needs a SurfaceComponent to collide.' });
+    const listed = page.getByRole('menuitem', { name: 'Rectangle 1: Needs a SurfaceComponent to collide.' });
     await expect(listed).toBeVisible();
     await page.keyboard.press('Escape');
 
@@ -52,21 +55,20 @@ test("a body on a shape shows the SurfaceComponent's note and the count, and its
 });
 
 test('picking a message from the count selects its entity', async ({ page }) => {
-    await openEditorWithCameraSelected(page);
-    await addComponent(page, 'ShapeComponent');
+    await openEditorWithCrateSelected(page);
     await addComponent(page, 'BodyComponent');
 
     await page.getByRole('tree', { name: 'Entities' }).getByRole('treeitem').filter({ hasText: 'World' }).click();
     await expect(card(page, 'BodyComponent')).toHaveCount(0);
 
     await messagesCount(page).click();
-    await page.getByRole('menuitem', { name: 'Camera: Needs a SurfaceComponent to collide.' }).click();
+    await page.getByRole('menuitem', { name: 'Rectangle 1: Needs a SurfaceComponent to collide.' }).click();
 
     await expect(card(page, 'BodyComponent')).toHaveCount(1);
 });
 
 test('a typed Linear damping is one step, and Ctrl+Z puts it back', async ({ page }) => {
-    await openEditorWithCameraSelected(page);
+    await openEditorWithCrateSelected(page);
     await addComponent(page, 'BodyComponent');
 
     const damping = card(page, 'BodyComponent').getByRole('textbox', { name: 'Linear damping' });
@@ -81,8 +83,7 @@ test('a typed Linear damping is one step, and Ctrl+Z puts it back', async ({ pag
 });
 
 test('Kind changes a rectangle to a circle in one step', async ({ page }) => {
-    await openEditorWithCameraSelected(page);
-    await addComponent(page, 'ShapeComponent');
+    await openEditorWithCrateSelected(page);
 
     const kind = card(page, 'ShapeComponent').getByRole('button', { name: 'Kind' });
     await expect(kind).toHaveText('Rectangle');

@@ -1,28 +1,43 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
-// A new level's camera's size, and ViewState's FIT_MARGIN_PX.
-const CAMERA_WIDTH = 1920;
-const CAMERA_HEIGHT = 1080;
-const FIT_MARGIN_PX = 40;
-// Away from the frame's middle handle, which a selected camera shows on its left edge.
-const BELOW_HANDLE_PX = 80;
-// A press within 4 px of the last one, and within 500 ms, is a double-click, so a drag after a click
-// starts further away.
-const AWAY_FROM_CLICK_PX = 20;
-
 type ScreenPoint = { x: number; y: number };
 
-// A new level holds only the World and the camera until stage 10's Shape tool draws, so these tests
-// select, move and go into the camera, which its frame's edge selects.
-async function openEditor(page: Page) {
+// A click with the Shape tool places a rectangle of 100 by 100 px in the level, about 60 px on screen at
+// a new level's zoom, so a point this far from its middle is still on it.
+const ON_CRATE_PX = 15;
+// Far enough from the crate's middle to be off it, and inside the empty camera frame.
+const OFF_CRATE_PX = 150;
+// A press within 4 px of the last one, and within 500 ms, is a double-click, so a drag after a click
+// starts further away.
+const AWAY_FROM_CLICK_PX = 10;
+
+// Opens the editor and draws a crate in the middle of the part no panel covers, then clears the selection.
+async function openEditorWithCrate(page: Page): Promise<ScreenPoint> {
     await page.goto('/');
     await expect(page.getByRole('button', { name: 'Main menu' })).toBeVisible();
     await expect(page.locator('.level-view-host canvas')).toBeVisible();
+
+    const free = await page.locator('.free-area').boundingBox();
+    if (!free) throw new Error('The free area has no size.');
+    const middle = { x: free.x + free.width / 2, y: free.y + free.height / 2 };
+
+    await page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name: 'Shape' }).click();
+    await page.getByRole('toolbar', { name: 'Tool options' }).getByRole('button', { name: 'Rectangle' }).click();
+    await page.mouse.click(middle.x, middle.y);
+    await expect(crateRow(page)).toHaveAttribute('aria-selected', 'true');
+
+    await page.keyboard.press('Escape');
+    await expect(crateRow(page)).toHaveAttribute('aria-selected', 'false');
+
+    return middle;
 }
 
-function cameraRow(page: Page) {
-    return page.getByRole('tree', { name: 'Entities' }).getByRole('treeitem').filter({ hasText: 'Camera' });
+function crateRow(page: Page) {
+    return page
+        .getByRole('tree', { name: 'Entities' })
+        .getByRole('treeitem')
+        .filter({ has: page.locator('.name', { hasText: 'Rectangle 1' }) });
 }
 
 function positionX(page: Page) {
@@ -33,21 +48,6 @@ function positionX(page: Page) {
     return transform.getByRole('textbox', { name: 'Position X' });
 }
 
-// The fitted camera frame's left edge, in the middle of the part no panel covers, as level-view.spec.ts
-// works it out.
-async function cameraFrameLeftEdge(page: Page): Promise<ScreenPoint> {
-    const free = await page.locator('.free-area').boundingBox();
-    if (!free) throw new Error('The free area has no size.');
-
-    const availableWidth = free.width - 2 * FIT_MARGIN_PX;
-    const availableHeight = free.height - 2 * FIT_MARGIN_PX;
-    const zoom = Math.min(availableWidth / CAMERA_WIDTH, availableHeight / CAMERA_HEIGHT);
-    const middleX = free.x + free.width / 2;
-    const middleY = free.y + free.height / 2;
-
-    return { x: middleX - (CAMERA_WIDTH * zoom) / 2, y: middleY + BELOW_HANDLE_PX };
-}
-
 async function drag(page: Page, from: ScreenPoint, to: ScreenPoint) {
     await page.mouse.move(from.x, from.y);
     await page.mouse.down();
@@ -56,55 +56,31 @@ async function drag(page: Page, from: ScreenPoint, to: ScreenPoint) {
     await page.mouse.up();
 }
 
-test('a click on the camera frame selects it, a drag moves it, and Ctrl+Z puts it back', async ({ page }) => {
-    await openEditor(page);
-    const edge = await cameraFrameLeftEdge(page);
+test('a click on a drawn crate selects it, a drag moves it, and Ctrl+Z puts it back', async ({ page }) => {
+    const crate = await openEditorWithCrate(page);
 
-    await page.mouse.click(edge.x, edge.y);
-    await expect(cameraRow(page)).toHaveAttribute('aria-selected', 'true');
+    await page.mouse.click(crate.x, crate.y);
+    await expect(crateRow(page)).toHaveAttribute('aria-selected', 'true');
     const before = await positionX(page).inputValue();
 
-    const grab = { x: edge.x, y: edge.y + AWAY_FROM_CLICK_PX };
+    const grab = { x: crate.x - AWAY_FROM_CLICK_PX, y: crate.y + AWAY_FROM_CLICK_PX };
     await drag(page, grab, { x: grab.x + 120, y: grab.y });
     await expect(positionX(page)).not.toHaveValue(before);
 
     await page.keyboard.press('Control+z');
     await expect(positionX(page)).toHaveValue(before);
-    await expect(cameraRow(page)).toHaveAttribute('aria-selected', 'true');
+    await expect(crateRow(page)).toHaveAttribute('aria-selected', 'true');
 });
 
-test('a click inside the frame selects nothing, and a selection box across its edge selects the camera', async ({
-    page,
-}) => {
-    await openEditor(page);
-    const edge = await cameraFrameLeftEdge(page);
-    const inside = { x: edge.x + 100, y: edge.y };
+test('a click on empty space selects nothing, and a selection box touching the crate selects it', async ({ page }) => {
+    const crate = await openEditorWithCrate(page);
+    const empty = { x: crate.x + OFF_CRATE_PX, y: crate.y + OFF_CRATE_PX };
 
-    await page.mouse.click(inside.x, inside.y);
-    await expect(cameraRow(page)).toHaveAttribute('aria-selected', 'false');
+    await page.mouse.click(empty.x, empty.y);
+    await expect(crateRow(page)).toHaveAttribute('aria-selected', 'false');
 
-    const boxStart = { x: inside.x, y: inside.y + AWAY_FROM_CLICK_PX };
-    await drag(page, boxStart, { x: edge.x - 40, y: boxStart.y + 40 });
-    await expect(cameraRow(page)).toHaveAttribute('aria-selected', 'true');
-});
-
-test('a double-click on the frame goes into the camera, and Esc goes up, selecting it, then clears', async ({
-    page,
-}) => {
-    await openEditor(page);
-    const edge = await cameraFrameLeftEdge(page);
-
-    // At the World, with nothing selected, Esc has nothing to do.
-    await page.mouse.click(edge.x + 100, edge.y);
-    await page.keyboard.press('Escape');
-    await expect(cameraRow(page)).toHaveAttribute('aria-selected', 'false');
-
-    await page.mouse.dblclick(edge.x, edge.y);
-    await expect(cameraRow(page)).toHaveAttribute('aria-selected', 'false');
-
-    await page.keyboard.press('Escape');
-    await expect(cameraRow(page)).toHaveAttribute('aria-selected', 'true');
-
-    await page.keyboard.press('Escape');
-    await expect(cameraRow(page)).toHaveAttribute('aria-selected', 'false');
+    // From empty space to a point on the crate, so the box only touches it.
+    const boxStart = { x: empty.x + AWAY_FROM_CLICK_PX, y: empty.y + AWAY_FROM_CLICK_PX };
+    await drag(page, boxStart, { x: crate.x + ON_CRATE_PX, y: crate.y + ON_CRATE_PX });
+    await expect(crateRow(page)).toHaveAttribute('aria-selected', 'true');
 });

@@ -200,4 +200,19 @@ describe('Inspector', () => {
         await expect.poll(() => headTitle()).toBe('Barrel');
         expect(labelName(crate)).toBe('Barrel');
     });
+
+    test('after New then Import it follows the imported level, whose model starts at the same version', async () => {
+        const { session } = showInspector(Level.createNew());
+        await expect.poll(() => headTitle()).toBe('World');
+
+        session.replaceOpenLevel(Level.createNew());
+        const imported = Level.createNew();
+        const crate = addCrate(imported, 'Crate');
+        session.replaceOpenLevel(imported);
+        await expect.poll(() => headTitle()).toBe('World');
+
+        select(session, [crate]);
+        await expect.poll(() => headTitle()).toBe('Crate');
+        expect(shownCardTypes()).toContain('BodyComponent');
+    });
 });
