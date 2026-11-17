@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 15, step 1 of 7: the steps and choices for the camera are written. Next is step 2, the camera's rules as plain functions. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 15, step 2 of 7: the camera's rules are plain functions in `core/simulation/camera/`: `smoothTowards`, `limitToBounds` and `keepInSafetyMargin`. Next is step 3, `CameraPhase` and `CameraState`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

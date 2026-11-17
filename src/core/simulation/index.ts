@@ -1,6 +1,10 @@
 export { BodyMatrices } from './bodies/BodyMatrices.ts';
 export { PlayJoints } from './joints/PlayJoints.ts';
 export type { PlayJoint, PlayJointEnd } from './joints/PlayJoints.ts';
+export type { CameraBox } from './camera/CameraBox.ts';
+export { keepInSafetyMargin } from './camera/keepInSafetyMargin.ts';
+export { limitToBounds } from './camera/limitToBounds.ts';
+export { smoothTowards } from './camera/smoothTowards.ts';
 export { bodyHashes } from './hash/bodyHashes.ts';
 export type { BodyHash } from './hash/bodyHashes.ts';
 export { runHeadless } from './headless/runHeadless.ts';
