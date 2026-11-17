@@ -273,7 +273,7 @@ Written under the standing yes (2026-11-16), and all twelve built that day. Each
 
 ## Stage 15 in steps
 
-Written under the standing yes (2026-11-16). Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [simulation.md](architecture/simulation.md#stage-15s-choices). The Play bar and the page that shows a run come with stage 16, so this stage builds the camera's rules in the game and the drawing of a run through the camera, without a page that uses it yet. Offset, dead zone, look-ahead, zoom, Fill window and moves by scripts are v3, and following a tag v2, so this stage builds none of them.
+Written under the standing yes (2026-11-16), and all seven built that day. Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [simulation.md](architecture/simulation.md#stage-15s-choices). The Play bar and the page that shows a run come with stage 16, so this stage builds the camera's rules in the game and the drawing of a run through the camera, without a page that uses it yet. Offset, dead zone, look-ahead, zoom, Fill window and moves by scripts are v3, and following a tag v2, so this stage builds none of them.
 
 | # | Step | Module | Ends with |
 |---|---|---|---|
@@ -283,7 +283,7 @@ Written under the standing yes (2026-11-16). Each step ends with its tests, `npm
 | 4 | The determinism test's camera level, `camera-follow`: a ball rolling down slopes towards a level edge, followed with the default 0.3 s of smoothing, in a level only a little wider than the camera; its hashes recorded, and the other ten recorded again, which changes only those whose camera starts outside the bounds; headless tests that a followed body stays inside the camera's box and the box never leaves the bounds | `tests/levels/determinism`, `tests/determinism` | All eleven levels match their hashes in Node and in three browsers; the two headless rules hold on every tick of `camera-follow`. **Done** |
 | 5 | `fixedSizeView(cameraBox, windowSize)`: the zoom that fits the camera's box in the window, its middle, and the black bars as up to two screen rectangles, centred | `editor/play/fixed-size` | Unit tests: a 16:9 box in a 16:9 window has no bars; in a 4:3 window bars above and below; in a 21:9 window bars at the sides; the box fills the window exactly in the other direction. **Done** |
 | 6 | `PixiLevelView` showing a level through the camera: `showThroughCamera(position, box)` sets the view from `fixedSizeView` and draws `LetterboxOverlay`'s bars in black over everything; no selection or handles, and the grid, camera frame, joint icons and physics view only when their View menu switch is on, as [adapters.md](architecture/adapters.md#rendering) says; the window's size changing fits it again | `adapters/pixi`, `adapters/pixi/overlays/letterbox` | Browser tests in three browsers: at 16:9, 4:3 and 21:9 the camera's box fills the canvas between the bars and nothing of the level is drawn on a bar. **Done** |
-| 7 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes |
+| 7 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes. **Done** |
 
 ## After v1
 
