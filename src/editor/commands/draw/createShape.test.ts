@@ -13,6 +13,7 @@ import type { ShapeDrawing } from './createShape.ts';
 const RECTANGLE: ShapeDrawing = {
     geometry: { kind: 'rectangle', width: 200, height: 100 },
     position: { x: 30, y: 40 },
+    rotation: 0,
 };
 
 function buildSession() {
@@ -71,7 +72,7 @@ describe('createShape', () => {
         ];
 
         const names = geometries.map((geometry) => {
-            const id = requireCreated(draw(session, { geometry, position: { x: 0, y: 0 } }));
+            const id = requireCreated(draw(session, { geometry, position: { x: 0, y: 0 }, rotation: 0 }));
 
             return labelName(level.requireEntity(id));
         });

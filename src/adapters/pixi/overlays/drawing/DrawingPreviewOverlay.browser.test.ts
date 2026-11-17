@@ -89,7 +89,10 @@ describe('DrawingPreviewOverlay', () => {
     test('a rectangle preview is filled and outlined, and goes away with the preview', async () => {
         const { frames, drawing, drawn } = await showLevel();
         const geometry = { kind: 'rectangle' as const, width: 20, height: 20 };
-        drawing.show({ drawing: { geometry, position: { x: 0, y: 0 } }, toLevel: Matrix2D.identity() }, undefined);
+        drawing.show(
+            { drawing: { geometry, position: { x: 0, y: 0 }, rotation: 0 }, toLevel: Matrix2D.identity() },
+            undefined,
+        );
         frames.runFrame();
 
         expect(drawn().filled).toBe(true);

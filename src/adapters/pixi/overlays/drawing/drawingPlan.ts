@@ -37,9 +37,10 @@ export function planDrawing(shape: ShownShapePreview | undefined, polygon: Shown
 }
 
 function planShape(shape: ShownShapePreview): DrawingPlan {
-    const { geometry, position } = shape.drawing;
-    // The shape's own origin sits at position in the group's space.
-    const outline = shapeOutline(geometry, shape.toLevel.multiply(new Matrix2D(1, 0, 0, 1, position.x, position.y)));
+    const { geometry, position, rotation } = shape.drawing;
+    // The shape's own origin sits at position in the group's space, turned as its TransformComponent will be.
+    const ownSpace = Matrix2D.fromTransform({ position, rotation, scale: { x: 1, y: 1 }, skew: 0 });
+    const outline = shapeOutline(geometry, shape.toLevel.multiply(ownSpace));
 
     return { ...NOTHING, fill: outline.isClosed ? outline.points : undefined, solid: outline };
 }

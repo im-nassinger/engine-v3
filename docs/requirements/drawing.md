@@ -31,11 +31,12 @@ Source: round 1: D39; round 5: 03 2.1; old: DR-01 to DR-09
 - **Polygon:** each click adds a point. **Clicking the first point closes it into a polygon.** A polygon is always closed and can be any outline.
 - **Line:** **Enter finishes the polygon being drawn open, as a line**: an open chain of straight segments, 2 points or more. A single segment is a line with 2 points. Curved lines are paths. Esc, double-click, choosing another tool and Play finish it open too, so only clicking the first point closes it (standing yes, 2026-11-15: the owner named Enter; one rule for every other way of finishing). *Why a line is its own kind: Box2D calls it a chain and it is the usual way to make platformer ground. Why it isn't in the strip: an open polygon is a line, so one choice draws both (owner: 2026-11-15).*
 - The size in px shows beside the mouse during a drag.
+- **Z and X turn the preview** around its centre (owner: 2026-11-17): Z counter-clockwise and X clockwise on screen, 1° a press, Shift+Z and Shift+X 10°, as they turn a selection. The shape is made at that rotation, its TransformComponent's Rotation, and a drag measures the box along the turned sides. A polygon or line being drawn turns its placed points with it, and its points stay where they were placed. Turning makes no undo step. Choosing the Shape tool starts the preview straight; with tool lock on, the next shape keeps the turn.
 - A rectangle is at least 1 px on each side, and a circle at least 1 px across.
 - **A line drawn perfectly flat has a height of 0**, and typing a height for it is refused with a status text, because points all on one row can't be spread. To slope it, move a point. The same goes for its width when drawn perfectly upright (standing yes, 2026-11-14).
 - Limits: 1,000 points in a polygon or line. Above 200 a note says "High detail may slow physics".
 
-Source: scope DR1; round 5: TK2; round 7: SH1; old: DR-10 to DR-16; owner: 2026-11-14, 2026-11-15
+Source: scope DR1; round 5: TK2; round 7: SH1; old: DR-10 to DR-16; owner: 2026-11-14, 2026-11-15, 2026-11-17
 
 ### Changing a shape's kind · v1
 

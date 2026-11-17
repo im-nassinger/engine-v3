@@ -54,6 +54,7 @@ describe('the Shape tool', () => {
         expect(setup.tool.drawing?.drawing).toEqual({
             geometry: { kind: 'rectangle', width: 100, height: 100 },
             position: { x: 70, y: 80 },
+            rotation: 0,
         });
         setup.tool.chooseKind('circle');
         expect(setup.tool.drawing?.drawing.geometry).toEqual({ kind: 'circle', radius: 50 });

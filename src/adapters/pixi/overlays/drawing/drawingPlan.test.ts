@@ -26,6 +26,7 @@ describe('planDrawing', () => {
         const drawing = {
             geometry: { kind: 'rectangle' as const, width: 20, height: 10 },
             position: { x: 100, y: 50 },
+            rotation: 0,
         };
         const plan = planDrawing({ drawing, toLevel: IDENTITY }, undefined);
 
@@ -42,13 +43,30 @@ describe('planDrawing', () => {
     });
 
     test('a circle goes through the group space’s matrix to level positions', () => {
-        const drawing = { geometry: { kind: 'circle' as const, radius: 10 }, position: { x: 0, y: 0 } };
+        const drawing = { geometry: { kind: 'circle' as const, radius: 10 }, position: { x: 0, y: 0 }, rotation: 0 };
         const toLevel = new Matrix2D(2, 0, 0, 2, 300, 0);
         const plan = planDrawing({ drawing, toLevel }, undefined);
 
         const xs = plan.solid?.points.map((point) => point.x) ?? [];
         expect(Math.min(...xs)).toBeCloseTo(280);
         expect(Math.max(...xs)).toBeCloseTo(320);
+    });
+
+    test('a turned rectangle is outlined at its rotation around its position', () => {
+        const drawing = {
+            geometry: { kind: 'rectangle' as const, width: 20, height: 10 },
+            position: { x: 100, y: 50 },
+            rotation: 90,
+        };
+        const plan = planDrawing({ drawing, toLevel: IDENTITY }, undefined);
+
+        const points = plan.solid?.points ?? [];
+        const xs = points.map((point) => point.x);
+        const ys = points.map((point) => point.y);
+        expect(Math.min(...xs)).toBeCloseTo(95);
+        expect(Math.max(...xs)).toBeCloseTo(105);
+        expect(Math.min(...ys)).toBeCloseTo(40);
+        expect(Math.max(...ys)).toBeCloseTo(60);
     });
 
     test('before the first click only the next point shows, as a handle', () => {

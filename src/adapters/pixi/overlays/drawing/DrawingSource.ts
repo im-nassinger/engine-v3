@@ -2,9 +2,10 @@ import type { Unsubscribe } from '../../../../core/events/index.ts';
 import type { Matrix2D, Point, ShapeGeometry } from '../../../../core/geometry/index.ts';
 
 // A rectangle or circle a click or the drag in progress would make: its geometry around its own origin,
-// where that origin goes in the current group's own space, and the matrix from that space to level positions.
+// where that origin goes in the current group's own space, turned by rotation degrees clockwise, and the
+// matrix from that space to level positions.
 export type ShownShapePreview = {
-    readonly drawing: { readonly geometry: ShapeGeometry; readonly position: Point };
+    readonly drawing: { readonly geometry: ShapeGeometry; readonly position: Point; readonly rotation: number };
     readonly toLevel: Matrix2D;
 };
 

@@ -30,7 +30,7 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 | Arrows | Move the selection 1 px | Editor | Handles, v1 |
 | Shift+arrows | Move the selection 10 px | Editor | Handles, v1 |
 | Ctrl+Shift+arrows | Move the selection one grid step | Editor | Handles, v1 |
-| Z, X | Rotate the selection 1° counter-clockwise, clockwise (owner, 2026-11-17) | Editor | Handles, v1 |
+| Z, X | Rotate the selection 1° counter-clockwise, clockwise; with the Shape tool, turn its preview (owner, 2026-11-17) | Editor | Handles, v1; the Shape tool, v1 |
 | Shift+Z, Shift+X | Rotate the selection 10° counter-clockwise, clockwise (owner, 2026-11-17) | Editor | Handles, v1 |
 | Ctrl+G, Ctrl+Shift+G | Group, ungroup | Editor | Groups, v1 |
 | Enter | Go into the selected group | Editor | Groups, v1 |

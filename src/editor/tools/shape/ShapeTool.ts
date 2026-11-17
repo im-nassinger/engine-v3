@@ -11,7 +11,8 @@ import type { LevelPointerInput, Modifiers, Tool, ToolContext, ToolKey } from '.
 
 import { atLeastOnePixel, draggedBox, placedDrawing } from './boxDrawing.ts';
 import type { BoxKind, BoxSize } from './boxDrawing.ts';
-import { angleLocked, pointsDrawing, samePoint } from './polygonDrawing.ts';
+import { angleLocked, pointsDrawing, samePoint, turnedPoints } from './polygonDrawing.ts';
+import { previewTurnOf } from './previewTurn.ts';
 
 // The options strip's three kinds. A line is a polygon finished open.
 export type ShapeToolKind = BoxKind | 'polygon';
@@ -44,8 +45,10 @@ const TOO_MANY_POINTS = `A polygon holds at most ${MAX_POINTS.toLocaleString('en
 
 const LOCKED = 'This group is locked';
 
-const BOX_HINT = 'Click to place, drag to size. Shift keeps proportions, Ctrl+Shift or Alt draws from the centre.';
-const POLYGON_HINT = 'Click to add points. Click the first point to close it, Enter to finish as a line.';
+const BOX_HINT =
+    'Click to place, drag to size. Shift keeps proportions, Ctrl+Shift or Alt draws from the centre. Z and X turn it.';
+const POLYGON_HINT =
+    'Click to add points. Click the first point to close it, Enter to finish as a line. Z and X turn it.';
 
 // 100 x 100 px at first, a circle 50 px in radius.
 const FIRST_SIZE: BoxSize = { width: 100, height: 100 };
@@ -90,6 +93,9 @@ export class ShapeTool implements Tool {
     private chosenKind: ShapeToolKind = 'rectangle';
     // Remembered for the session, each kind its own.
     private readonly sizes: Record<BoxKind, BoxSize> = { rectangle: FIRST_SIZE, circle: FIRST_SIZE };
+    // How far Z and X turned the preview, in degrees clockwise in the current group's own space. Picking
+    // the tool starts it straight again; a locked tool keeps it from one shape to the next.
+    private turn = 0;
     private context: ToolContext | undefined;
     private press: Press | undefined;
     // The last mouse position heard, so Shift, Alt and Ctrl redraw the drag without a move.
@@ -141,6 +147,7 @@ export class ShapeTool implements Tool {
 
     activate(context: ToolContext) {
         this.context = context;
+        this.turn = 0;
         context.openLevel.selection.clear();
     }
 
@@ -174,7 +181,9 @@ export class ShapeTool implements Tool {
         const start = space.toGroup.apply(this.snapped(input.levelPosition, sizingModifiers(input.modifiers)));
         this.press = { kind, screenPosition: input.screenPosition, start, space, dragging: false };
         this.lastInput = input;
-        this.show({ shape: { drawing: placedDrawing(kind, this.sizes[kind], start), toLevel: space.toLevel } });
+        this.show({
+            shape: { drawing: placedDrawing(kind, this.sizes[kind], start, this.turn), toLevel: space.toLevel },
+        });
     }
 
     pointerMove(input: LevelPointerInput) {
@@ -208,15 +217,23 @@ export class ShapeTool implements Tool {
         this.lastInput = input;
         const drawing = press.dragging
             ? this.release(press, input)
-            : placedDrawing(press.kind, this.sizes[press.kind], press.start);
+            : placedDrawing(press.kind, this.sizes[press.kind], press.start, this.turn);
         this.clearPreview();
         this.make(drawing, 'return');
     }
 
     // Shift, Alt and Ctrl change a drag or the polygon's next point at once, without waiting for the mouse
-    // to move. While a polygon is drawn, Enter finishes it as a line and Backspace removes the last point.
+    // to move. Z and X turn the preview. While a polygon is drawn, Enter finishes it as a line and Backspace
+    // removes the last point.
     keyDown(key: ToolKey) {
         this.redrawFor(key);
+
+        const degrees = previewTurnOf(key);
+        if (degrees !== undefined) {
+            this.turnBy(degrees);
+            return true;
+        }
+
         if (this.polygon === undefined) return false;
 
         if (key.code === 'Enter' || key.code === 'NumpadEnter') {
@@ -323,7 +340,7 @@ export class ShapeTool implements Tool {
         const fewest = closed ? 3 : 2;
         if (polygon.points.length < fewest) return;
 
-        this.make(pointsDrawing(polygon.points, closed), way);
+        this.make(pointsDrawing(polygon.points, closed, this.turn), way);
     }
 
     // Removing the only point ends the drawing with nothing made.
@@ -371,7 +388,7 @@ export class ShapeTool implements Tool {
     private drag(press: Press, input: LevelPointerInput, modifiers: Modifiers) {
         const kind = press.kind;
         const box = this.boxOf(press, input, modifiers);
-        const drawing = placedDrawing(kind, box.size, box.centre);
+        const drawing = placedDrawing(kind, box.size, box.centre, this.turn);
         const text =
             kind === 'circle'
                 ? diameterReadout(box.size.width)
@@ -384,7 +401,7 @@ export class ShapeTool implements Tool {
         const size = atLeastOnePixel(box.size);
         this.sizes[press.kind] = size;
 
-        return placedDrawing(press.kind, size, box.centre);
+        return placedDrawing(press.kind, size, box.centre, this.turn);
     }
 
     // Ctrl+Shift draws from the centre, as Alt does, with snapping on.
@@ -392,7 +409,40 @@ export class ShapeTool implements Tool {
         const modifiers = sizingModifiers(held);
         const corner = press.space.toGroup.apply(this.snapped(input.levelPosition, modifiers));
 
-        return draggedBox({ kind: press.kind, start: press.start, corner, shift: modifiers.shift, alt: modifiers.alt });
+        const { shift, alt } = modifiers;
+
+        return draggedBox({ kind: press.kind, start: press.start, corner, shift, alt, rotation: this.turn });
+    }
+
+    // Z or X: the preview turns around its centre, clockwise on screen when the degrees are positive, so in
+    // a mirrored group the turn is stored the other way. A polygon's placed points turn with it.
+    private turnBy(degrees: number) {
+        const space = this.press?.space ?? this.polygon?.space ?? this.groupSpace();
+        const direction = space !== undefined && space.toLevel.determinant() < 0 ? -1 : 1;
+        const turn = degrees * direction;
+        const polygon = this.polygon;
+        if (polygon !== undefined) {
+            this.polygon = { points: turnedPoints(polygon.points, this.turn, turn), space: polygon.space };
+        }
+        this.turn += turn;
+        this.redrawTurned();
+    }
+
+    private redrawTurned() {
+        const press = this.press;
+        const input = this.lastInput;
+        if (press === undefined) {
+            this.showHover();
+            return;
+        }
+
+        if (press.dragging && input !== undefined) {
+            this.drag(press, input, input.modifiers);
+            return;
+        }
+
+        const drawing = placedDrawing(press.kind, this.sizes[press.kind], press.start, this.turn);
+        this.show({ shape: { drawing, toLevel: press.space.toLevel } });
     }
 
     // createShape selects the new shape; 'return' also hands it to the controller.
@@ -450,7 +500,9 @@ export class ShapeTool implements Tool {
         }
 
         const centre = space.toGroup.apply(this.snapped(input.levelPosition, sizingModifiers(held)));
-        this.show({ shape: { drawing: placedDrawing(kind, this.sizes[kind], centre), toLevel: space.toLevel } });
+        this.show({
+            shape: { drawing: placedDrawing(kind, this.sizes[kind], centre, this.turn), toLevel: space.toLevel },
+        });
     }
 
     private polygonPreview(levelPosition: Point | undefined, modifiers: Modifiers | undefined) {

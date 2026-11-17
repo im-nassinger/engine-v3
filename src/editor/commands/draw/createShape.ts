@@ -19,17 +19,18 @@ const KIND_WORDS: Readonly<Record<ShapeKind, string>> = {
 };
 
 // What the Shape tool drew, in the current group's own space: the shape's geometry around its own
-// origin, and where that origin goes.
+// origin, where that origin goes, and how far Z and X turned it, in degrees clockwise.
 export type ShapeDrawing = {
     readonly geometry: ShapeGeometry;
     readonly position: Point;
+    readonly rotation: number;
 };
 
 export type CreateShapeOutcome =
     { readonly kind: 'created'; readonly id: EntityId } | { readonly kind: 'refused'; readonly reason: string };
 
 // Finishing a drawing: a new shape with v1's default look, in the current group, on top, named
-// "Rectangle 1" and selected, in one step "Draw Rectangle 1". An edit, not a registered command, since
+// "Rectangle 1" and selected, in one step "Draw Rectangle 1", at the drawing's rotation. An edit, not a registered command, since
 // only the Shape tool runs it. Refused inside a locked group, or when the group is as deep as a level goes.
 export function createShape(openLevel: OpenLevel, reader: LevelReader, drawing: ShapeDrawing): CreateShapeOutcome {
     const { level, editor, currentGroup, caches } = openLevel;
@@ -40,7 +41,12 @@ export function createShape(openLevel: OpenLevel, reader: LevelReader, drawing: 
     const name = new EntityNamer(level).nextName(KIND_WORDS[drawing.geometry.kind]);
     const id = level.allocateId();
     const components = [
-        new TransformComponent({ position: drawing.position, rotation: 0, scale: { x: 1, y: 1 }, skew: 0 }),
+        new TransformComponent({
+            position: drawing.position,
+            rotation: drawing.rotation,
+            scale: { x: 1, y: 1 },
+            skew: 0,
+        }),
         new NameComponent({ name }),
         new ShapeComponent({ geometry: drawing.geometry }),
         new StyleComponent(),

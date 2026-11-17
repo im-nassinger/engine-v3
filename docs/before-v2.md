@@ -9,7 +9,7 @@ Changes the owner asked for that must be built **after v1's 18 stages and before
 | # | Change | Asked | State |
 |---|---|---|---|
 | 1 | **Resizing changes the scale**, not the shape's values. Polygons and lines lose Width and Height | owner, 2026-11-16 | **Built** on 2026-11-17, steps 7 and 8 |
-| 2 | **Z and X rotate the selection and the Shape tool's preview**, Shift+Z and Shift+X by 10° | owner, 2026-11-16 and 2026-11-17 | Settled, with Claude's picks for the owner to change; steps 10 and 11 |
+| 2 | **Z and X rotate the selection and the Shape tool's preview**, Shift+Z and Shift+X by 10° | owner, 2026-11-16 and 2026-11-17 | **Built** on 2026-11-17, steps 10 and 11 |
 | 3 | **Ctrl+Shift while resizing resizes from the centre** | owner, 2026-11-16 | **Built** on 2026-11-17, step 9 |
 | 4 | **The Joint tool says why an entity can't take a joint** | owner, 2026-11-16 | **Built** on 2026-11-17, step 5 |
 | 5 | **Unstyled joints are invisible in play**, joint icons included | owner, 2026-11-17 | **Built** on 2026-11-17, step 4 |
@@ -50,6 +50,8 @@ To build, matching the arrow keys' nudges (*proposal*, Claude's picks, for the o
 - **With the Shape tool, Z and X turn the preview** around its centre, by the same steps, and the shape is made at that rotation (its TransformComponent's rotation).
 
 To update when planned: `requirements/editor/selection.md` (Handles and arrow keys), `requirements/drawing.md` (the Shape tool), `scope.md` (SE2), `architecture/editor/selection-and-tools.md` and `clipboard-and-shortcuts.md`, and the main menu's command list.
+
+**Built** (2026-11-17, steps 10 and 11): Z and X turn the selection, each entity around its own box's centre through the rotate drag's own code, a run of presses one `Rotate` step, with the World and the camera skipped. With the Shape tool they turn the preview, and the shape is made at that rotation; a turned drag is measured along its own sides, and a polygon's or line's placed points turn with it. The main menu's command list is unchanged: the turns have no menu place, as the nudges have none. Tests cover the run, undo and redo, the skip rule's texts, each kind made turned, a mirrored group and Ctrl+Z and Ctrl+X staying Undo and Cut.
 
 ## 3. Ctrl+Shift resizes from the centre
 

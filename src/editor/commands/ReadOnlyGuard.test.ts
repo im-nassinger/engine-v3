@@ -66,7 +66,7 @@ describe('a read-only tab', () => {
         const { session, level, square } = buildReadOnly();
         const { openLevel } = session;
         const before = levelSnapshot(level);
-        const drawing = { geometry: { kind: 'circle', radius: 10 }, position: { x: 0, y: 0 } } as const;
+        const drawing = { geometry: { kind: 'circle', radius: 10 }, position: { x: 0, y: 0 }, rotation: 0 } as const;
 
         const moved = setFieldValue(openLevel, [square.id], 'TransformComponent', 'position', { x: 9, y: 9 });
 
