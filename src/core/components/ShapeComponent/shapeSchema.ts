@@ -12,7 +12,7 @@ import { ComponentSchema } from '../schema/ComponentSchema.ts';
 import { derivedField } from '../schema/DerivedFieldDefinition.ts';
 
 import type { ShapeValues } from './ShapeValues.ts';
-import { heightOf, radiusOf, resizedAlong, widthOf } from './shapeSize.ts';
+import { MAX_SHAPE_SIZE, MIN_SHAPE_SIZE, heightOf, radiusOf, resizedAlong, widthOf } from './shapeSize.ts';
 
 const kindType = new ChoiceFieldType<ShapeKind>([
     { value: 'rectangle', label: 'Rectangle' },
@@ -20,11 +20,10 @@ const kindType = new ChoiceFieldType<ShapeKind>([
     { value: 'polygon', label: 'Polygon' },
     { value: 'line', label: 'Line' },
 ]);
-// A rectangle is at least 1 px each side. A circle is at least 1 px across. A typed size stops at 200,000 px, LevelLimits' maxLevelSize, so the World's Width and Height
-// fields can't make a level the reader refuses; no shape needs to be bigger than the largest level.
-const MAX_SIZE = 200_000;
-const sizeType = new NumberFieldType({ min: 1, max: MAX_SIZE });
-const radiusType = new NumberFieldType({ min: 0.5 });
+// A typed size stops at MAX_SHAPE_SIZE, so the World's Width and Height fields can't make a level the
+// reader refuses.
+const sizeType = new NumberFieldType({ min: MIN_SHAPE_SIZE, max: MAX_SHAPE_SIZE });
+const radiusType = new NumberFieldType({ min: MIN_SHAPE_SIZE / 2 });
 // A line needs 2 points and a polygon 3, which the write checks. 1,000 is LevelLimits' maxPoints.
 const MIN_LINE_POINTS = 2;
 const MIN_POLYGON_POINTS = 3;

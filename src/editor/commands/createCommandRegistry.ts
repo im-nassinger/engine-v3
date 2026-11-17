@@ -29,6 +29,7 @@ import { VIEW_SWITCH_ENTRIES, ViewSwitchCommand } from './view/ViewSwitchCommand
 import { ZoomInCommand } from './view/ZoomInCommand.ts';
 import { ZoomOutCommand } from './view/ZoomOutCommand.ts';
 import { NudgeCommand } from './move/NudgeCommand.ts';
+import { ResizeCommand } from './move/ResizeCommand.ts';
 import { RotateCommand } from './move/RotateCommand.ts';
 import { PauseOrResumeCommand } from './play/PauseOrResumeCommand.ts';
 import { PlayOrStopCommand } from './play/PlayOrStopCommand.ts';
@@ -79,6 +80,9 @@ export function createCommandRegistry(
     }
     for (const rotate of RotateCommand.all(session)) {
         registerEditing(rotate);
+    }
+    for (const resize of ResizeCommand.all(session)) {
+        registerEditing(resize);
     }
 
     for (const entry of VIEW_SWITCH_ENTRIES) {

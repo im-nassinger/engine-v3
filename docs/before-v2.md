@@ -151,6 +151,8 @@ To build (*proposal*, Claude's picks, for the owner to change):
 
 To update when planned: "W, A, S, D set the preview size" in `requirements/drawing.md` (its version and the selection), `requirements/editor/selection.md` (Handles and arrow keys), `requirements/editor/shortcuts.md` (the new rows and Shift+S), `scope.md` (DR4), `architecture/editor/selection-and-tools.md` and `clipboard-and-shortcuts.md`, and the main menu's command list.
 
+**Built for the selection** (2026-11-17, step 12): W, A, S and D resize the selected shapes' values, a run one `Resize` step, with the World and the camera skipped. The Shape tool's preview is step 13.
+
 ## 9. Nothing in the editor is covered
 
 The problem the owner found: many parts of the editor don't show in full, because other parts cover them. There are many, so finding them is part of the work: the owner gave no list.

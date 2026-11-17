@@ -103,6 +103,24 @@ describe("the editor's shortcut map", () => {
         expect(commandsFor(US_KEYS.ctrlZ)).toEqual(['edit.undo']);
         expect(commandsFor(recordedKey('KeyX', 'x', { ctrlKey: true }))).toEqual(['edit.cut']);
     });
+
+    test("resizes with W, A, S and D, Shift for 10 px, while Ctrl+A stays Select all and Ctrl+S isn't a resize", () => {
+        const map = editorShortcutMap();
+        const commandsFor = (data: KeyboardInputData) => {
+            const press = KeyPress.fromKeyboard(data, 'other');
+            if (press === undefined) throw new Error('A key press.');
+
+            return map.matching(press).map((shortcut) => shortcut.commandId);
+        };
+
+        expect(commandsFor(recordedKey('KeyD', 'd'))).toEqual(['edit.resizeWider1']);
+        expect(commandsFor(recordedKey('KeyA', 'a'))).toEqual(['edit.resizeNarrower1']);
+        expect(commandsFor(recordedKey('KeyW', 'w'))).toEqual(['edit.resizeTaller1']);
+        expect(commandsFor(recordedKey('KeyS', 'S', { shiftKey: true }))).toEqual(['edit.resizeShorter10']);
+        expect(commandsFor(recordedKey('KeyA', 'a', { ctrlKey: true }))).toEqual(['edit.selectAll']);
+        // Export joins the registry only with saving, which this map is built without.
+        expect(commandsFor(recordedKey('KeyS', 's', { ctrlKey: true }))).toEqual([]);
+    });
 });
 
 describe('ShortcutMap.fromRegistry', () => {

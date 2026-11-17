@@ -43,7 +43,7 @@ export class CommandRegistry {
 ```
 
 - One class per command, grouped by menu: `commands/file/`, `edit/`, `arrange/`, `view/`, `play/`, `help/`. `CommandRunner` and `OpenDialog` are in `commands/running/`. Each takes what it needs through its constructor (the session's `OpenLevel`, the clipboard, the saving coordinator).
-- **Z and X** (stage 18) are plain one-key chords in the editor scope; a chord matches only its own modifiers, so Ctrl+Z and Ctrl+X still find only Undo and Cut, as `ShortcutMap`'s test checks.
+- **Z and X** (stage 18) are plain one-key chords in the editor scope; a chord matches only its own modifiers, so Ctrl+Z and Ctrl+X still find only Undo and Cut, as `ShortcutMap`'s test checks. **W, A, S and D** (stage 18 step 12) are the same, and Ctrl+A still finds only Select all.
 - **The skip rule** from the requirements is shared: a command filters out the entities that don't allow it, returns them as `skipped`, and is disabled only when nothing would be left. The status text says what was skipped.
 - `needsConfirmation` covers the requirement's questions: "Replace the open level?" before New and Import, and the warning before a move that changes which body an entity belongs to. The UI shows the question and calls `confirm()`.
 

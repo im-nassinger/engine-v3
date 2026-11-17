@@ -32,6 +32,7 @@ export { PhysicsWorldComponent } from './PhysicsWorldComponent/PhysicsWorldCompo
 export type { PhysicsWorldValues } from './PhysicsWorldComponent/PhysicsWorldValues.ts';
 export { ShapeComponent } from './ShapeComponent/ShapeComponent.ts';
 export type { ShapeValues } from './ShapeComponent/ShapeValues.ts';
+export { steppedAlong } from './ShapeComponent/shapeSize.ts';
 export { StyleComponent } from './StyleComponent/StyleComponent.ts';
 export { DEFAULT_FILL_COLOUR, DEFAULT_OUTLINE_COLOUR } from './StyleComponent/styleSchema.ts';
 export type { StyleValues } from './StyleComponent/StyleValues.ts';
