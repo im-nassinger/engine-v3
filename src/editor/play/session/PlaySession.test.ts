@@ -477,6 +477,27 @@ describe('PlaySession', () => {
         expect(drawnCount).toBe(2);
     });
 
+    test('while paused nothing is drawn again, until Step brings a tick', async () => {
+        const { play, nextFrame } = setUp();
+        play.play();
+        await settle();
+        await nextFrame();
+        play.pause();
+        await nextFrame();
+        let drawnCount = 0;
+        play.drawn.subscribe(() => (drawnCount += 1));
+
+        await nextFrame();
+        await nextFrame();
+        expect(drawnCount).toBe(0);
+
+        play.step();
+        await nextFrame();
+        await nextFrame();
+        expect(play.mirror?.tick).toBe(2);
+        expect(drawnCount).toBeGreaterThan(0);
+    });
+
     test('a hidden tab pauses the run, and its ticks stay at what they were', async () => {
         const { play, page, nextFrame } = setUp();
         play.play();

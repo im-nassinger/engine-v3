@@ -39,6 +39,8 @@
 | Stage 16, test play | Done on 2026-11-17. See below |
 | Code | Stages 0 to 16 done. Stage 17 is going: its [steps](steps/stage-17.md) are written |
 
+**CI failed on 2026-11-17** after stage 17's step 10: the test-play journey's Pause test ran past 30 s in Chromium. A paused run still drew the whole level every frame, which without a GPU holds Chromium at 36 frames a second and slows each screenshot from 37 ms to 240 ms. `PlaySession` now draws only on a frame where the mirror would move; the test takes about 7 s here, not 14 s. See [simulation.md](architecture/simulation.md).
+
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
 ### Settled on 2026-11-13

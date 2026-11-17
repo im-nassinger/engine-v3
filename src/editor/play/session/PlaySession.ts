@@ -68,6 +68,8 @@ export class PlaySession {
     private run = 0;
     private batchInFlight = false;
     private cancelFrame: Cancel | undefined;
+    // What the mirror was last drawn at, so a frame where nothing moved, as while paused, draws nothing.
+    private drawnInterpolation: number | undefined;
 
     constructor(options: PlaySessionOptions) {
         this.options = options;
@@ -249,8 +251,12 @@ export class PlaySession {
 
         this.sendTicksDue();
 
-        mirror.drawAt(this.pacer.interpolation);
-        this.drawn.increment();
+        const interpolation = this.pacer.interpolation;
+        if (interpolation !== this.drawnInterpolation) {
+            this.drawnInterpolation = interpolation;
+            mirror.drawAt(interpolation);
+            this.drawn.increment();
+        }
         this.askForFrame();
     }
 
@@ -295,6 +301,8 @@ export class PlaySession {
 
         const warning = hardLimitWarning(mirror, report.removedPastHardLimit);
         mirror.apply(report);
+        // The bodies are at the report's last tick now, so the next frame draws them again.
+        this.drawnInterpolation = undefined;
 
         if (warning !== undefined) {
             this.hint.show(warning);
@@ -333,6 +341,7 @@ export class PlaySession {
         this.batchInFlight = false;
         this.currentMirror?.destroy();
         this.currentMirror = undefined;
+        this.drawnInterpolation = undefined;
         this.currentNotice = undefined;
         this.currentEndedMessage = undefined;
         this.currentEndedDetail = undefined;
