@@ -254,7 +254,7 @@ Written under the standing yes (2026-11-16), and all eleven built that day. Each
 
 ## Stage 14 in steps
 
-Written under the standing yes (2026-11-16). Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [simulation.md](architecture/simulation.md#stage-14s-choices) for play and [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-14s-choices) for the Joint tool. The joint warnings, dragging limits, re-attaching an end and breaking are v3, so this stage builds none of them.
+Written under the standing yes (2026-11-16), and all twelve built that day. Each step ends with its tests, `npm run check` and a commit. The choices behind them are in [simulation.md](architecture/simulation.md#stage-14s-choices) for play and [selection-and-tools.md](architecture/editor/selection-and-tools.md#stage-14s-choices) for the Joint tool. The joint warnings, dragging limits, re-attaching an end and breaking are v3, so this stage builds none of them.
 
 | # | Step | Module | Ends with |
 |---|---|---|---|
@@ -269,7 +269,7 @@ Written under the standing yes (2026-11-16). Each step ends with its tests, `npm
 | 9 | `JointTool`: the bodies under the mouse through `HitTester.allAt` and `BodyMembership`, merged shapes as one, those without physics skipped; one click for a Hinge, two for a Rope or Spring; `pickBodyA`, the smaller body by area as A; `PointSnapper`, the centres and corners of the entities under the mouse within 6 screen px, then the grid, Ctrl turning both off; the preview with its label `Hinge: Wheel to Car`; the hint on an empty click; Esc dropping a first click; tool lock | `editor/tools/joint`, `editor/snapping` | Two overlapping bodies give a Hinge with the smaller as A; one gives a pin; two clicks give a Rope with each end where clicked; a click on nothing makes nothing and shows the hint; an end lands on a corner 4 screen px away. **Done** |
 | 10 | The page: the Joint button (key 6) in the toolbar, the `ToolOptions` strip of the three types with tooltips such as `Hinge (revolute joint)`, `JointPreviewOverlay` with `planJointPreview` drawing the preview and its label, thin lines from a hovered or selected joint to its two entities, the tool hints | `ui/toolbar`, `ui/tool-options`, `adapters/pixi/overlays`, `app` | `planJointPreview` in Node; browser tests: key 6 picks the Joint tool, the strip changes the type, the preview and the lines draw at three zooms. **Done**: the overlay is `JointPreviewOverlay` in `adapters/pixi/overlays/joint-preview/`, fed by the app's `EditorJointPreviewSource` |
 | 11 | Playwright: pin a box with a Hinge, join two overlapping boxes, place a Rope and a Spring with two clicks each, undo one, copy a joint with its bodies and paste it | `tests/e2e` | The tests pass in three browsers. **Done**: five tests in `tests/e2e/joint-tool.spec.ts`, with a click on nothing as the fifth |
-| 12 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes |
+| 12 | The docs: what the build showed, `progress.md` | `docs/` | `node tools/check-docs.js` passes. **Done** |
 
 ## After v1
 
