@@ -211,6 +211,25 @@ test('a drawn Dynamic box falls during play, and after Stop the level is exactly
     expect(errors).toEqual([]);
 });
 
+test('Shift+T plays and stops, and types a T in a field', async ({ page }) => {
+    await openEditor(page);
+
+    await page.keyboard.press('Shift+T');
+    await expect(playBar(page)).toHaveAttribute('data-state', 'playing');
+    await expect(page.locator('.top-bar')).toBeHidden();
+
+    await page.keyboard.press('Shift+T');
+    await expect(playBar(page)).toHaveCount(0);
+    await expect(page.locator('.top-bar')).toBeVisible();
+
+    const nameBox = page.getByRole('textbox', { name: 'Level name' });
+    await nameBox.click();
+    await nameBox.press('End');
+    await nameBox.press('Shift+T');
+    await expect(nameBox).toHaveValue('Untitled levelT');
+    await expect(playBar(page)).toHaveCount(0);
+});
+
 test('Pause holds the box still, and Step moves it one tick', async ({ page }) => {
     await openEditor(page);
     await drawFallingBox(page);

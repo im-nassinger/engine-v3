@@ -40,7 +40,8 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 | Shift+C | Camera frame on or off (standing yes, 2026-11-15) | Editor | One camera, v1 |
 | Ctrl+S | Export the project file | Everywhere | Saving, v1 |
 | Ctrl+O | Import a project file | Editor | Saving, v1 |
-| Ctrl+Enter | Play, or Stop while playing. In a field it commits the field first | Everywhere | Test play, v1 |
+| Shift+T | Play, or Stop while playing. During play the editor takes it before the game, so a level can't use it (owner, 2026-11-17) | Editor | Test play, v1 |
+| Ctrl+Enter | Play, or Stop while playing, the second way. In a field it commits the field first | Everywhere | Test play, v1 |
 | F8 | Pause or resume test play | Everywhere | Pause and Step, v1 |
 | F9 | Step one tick while paused | Everywhere | Pause and Step, v1 |
 | ? | The shortcut list | Editor | Shortcut list, v2 |

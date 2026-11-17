@@ -11,7 +11,7 @@ Keys, inputs and remapping are in [variables and inputs](../triggers/variables-a
 ### Play and Stop · v1
 
 - **Play runs a copy of the level. Stop throws the copy away.** The level and the undo history are never touched.
-- Ctrl+Enter starts and stops, also from inside the code editor. F5 is left to the browser's reload.
+- **Shift+T starts and stops** (owner, 2026-11-17), wherever the editor's single-letter keys work; in a field or the code editor it types a T. During play the editor takes Shift+T before the game, so it always stops the run. Ctrl+Enter is the second way, and works also from inside a field or the code editor. F5 is left to the browser's reload.
 - Play first commits anything half-typed, such as an open field or text in the code editor, so the run matches what you see. Play is ignored in the middle of a drag or while a dialog is open.
 - **Play starts as fast as possible**, with no fixed number. *Why: the owner's rule. It should start as soon as you hit Play.* Stop during loading cancels the start.
 - **Play hides every panel**, so the game looks as it will for players. A small **Play bar** stays, with Stop, Pause, Step and (from v2) Panels. A coloured frame and a PLAYING or PAUSED label sit on the Play bar, and the browser tab title says the game is running. *Why: the game should look like the real thing, but debugging needs the panels somewhere.*

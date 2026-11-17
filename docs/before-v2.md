@@ -14,7 +14,7 @@ Changes the owner asked for that must be built **after v1's 18 stages and before
 | 4 | **The Joint tool says why an entity can't take a joint** | owner, 2026-11-16 | **Built** on 2026-11-17, step 5 |
 | 5 | **Unstyled joints are invisible in play**, joint icons included | owner, 2026-11-17 | **Built** on 2026-11-17, step 4 |
 | 6 | **+ zooms in without Shift**, as - zooms out | owner, 2026-11-17 | Settled; step 3 |
-| 7 | **Shift+T plays and stops** | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change; step 6 |
+| 7 | **Shift+T plays and stops** | owner, 2026-11-17 | **Built** on 2026-11-17, step 6 |
 | 8 | **W, A, S and D resize the selection and the Shape tool's preview**, changing the shape's values | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change; steps 12 and 13 |
 | 9 | **No part of the editor is covered by another**: find every case and fix it | owner, 2026-11-17 | Settled; steps 14 and 15 |
 | 10 | **"Let connected objects collide" has no description** | owner, 2026-11-17 | **Built** on 2026-11-17, step 2 |
@@ -122,6 +122,8 @@ To build:
 - The Play button's tooltip and the main menu show Shift+T.
 
 To update when planned: the Play row of `requirements/editor/shortcuts.md`, "Ctrl+Enter starts and stops" in `requirements/play-and-save/test-play.md`, `requirements/triggers/variables-and-inputs.md` (Shift+T is not a key a level can use), `architecture/editor/clipboard-and-shortcuts.md` (the Play row), the Play command's shortcuts and its tests.
+
+**Built** (2026-11-17, step 6): Play or Stop's keys are Shift+T, then Ctrl+Enter, so the menu, the Play button's tooltip and the Play bar's Stop show Shift+T. A command's shortcut can now have its own scope, so Shift+T works where the single-letter keys do while Ctrl+Enter still works everywhere. Unit tests cover each focus place and play, and a Playwright test in three browsers plays and stops with Shift+T and types a T in the level's name.
 
 ## 8. W, A, S and D resize
 

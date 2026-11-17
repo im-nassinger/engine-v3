@@ -13,7 +13,7 @@ describe('the Play commands', () => {
         const entries = registry.menu('Play').map((command) => [command.label, command.shortcuts]);
 
         expect(entries).toEqual([
-            ['Play', ['Ctrl+Enter']],
+            ['Play', ['Shift+T', 'Ctrl+Enter']],
             ['Pause', ['F8']],
             ['Step', ['F9']],
         ]);

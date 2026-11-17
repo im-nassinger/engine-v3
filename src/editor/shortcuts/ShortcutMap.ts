@@ -23,10 +23,11 @@ export class ShortcutMap {
         const shortcuts: Shortcut[] = [];
 
         for (const command of registry.all) {
-            const scope = command.shortcutScope ?? 'editor';
+            const commandScope = command.shortcutScope ?? 'editor';
 
             for (const chordText of command.shortcuts) {
                 const chord = KeyChord.parse(chordText);
+                const scope = command.shortcutScopes?.[chordText] ?? commandScope;
                 const shortcut = { chord, commandId: command.id, scope };
 
                 throwIfTaken(shortcuts, shortcut, chordText);

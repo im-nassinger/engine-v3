@@ -53,6 +53,9 @@ export type EditorCommand = {
     readonly shortcuts: readonly string[];
     // 'editor' when missing.
     readonly shortcutScope?: ShortcutScope;
+    // A shortcut whose scope differs from shortcutScope, by its text. Only Play's Shift+T, a letter that
+    // must still type a T in a field while Ctrl+Enter plays from anywhere.
+    readonly shortcutScopes?: Readonly<Record<string, ShortcutScope>>;
     // Only the zoom keys: holding the key runs the command again with each key repeat. Every other
     // command runs once per press, so holding Ctrl+Z doesn't undo 30 steps a second.
     readonly repeatsWhileHeld?: boolean;

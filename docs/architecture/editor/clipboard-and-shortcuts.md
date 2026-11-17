@@ -52,7 +52,7 @@ export class CommandRegistry {
 | Edit | Undo, Redo, Cut, Copy, Paste, Duplicate, Delete, Select all, Rename (F2), Hide or show (Ctrl+Shift+H) |
 | Arrange | Group (Ctrl+G), Ungroup (Ctrl+Shift+G), Go into group (Enter) |
 | View | Grid (G), Grid snapping (Shift+G), Joint icons, Camera frame, Physics view (Shift+P), Zoom in, Zoom out, 100% (Shift+0), Whole level, Selection (F), Camera frame (Shift+3) |
-| Play | Play or Stop (Ctrl+Enter), Pause (F8), Step (F9) |
+| Play | Play or Stop (Shift+T, Ctrl+Enter), Pause (F8), Step (F9) |
 | Tools | Select (1), Shape (4), Joint (6) |
 | Help | Keyboard shortcuts, About |
 
@@ -96,7 +96,7 @@ export class ShortcutDispatcher {
 - **The recorded key data** for US, ABNT2, German, Russian and a Mac is in `editor/shortcuts/testing/recordedKeys.ts`; the browser's keys are in `browserKeys.ts`, from the requirement's table.
 
 - **Matching** follows the tech notes: digits (and Shift+digit) by the physical key, `?` and `+` by the typed character, letters by the typed letter so Ctrl+Z stays on Z in every layout, falling back to the physical key when the layout types no Latin letter. On a Mac, Cmd is Ctrl and Option is Alt. **A chord that names its key wins a press over one found by the typed character**: `ShortcutMap.matching` lists them first, so Shift+0 on a German keyboard, which types `=`, is 100% and not Zoom in (standing yes, 2026-11-17).
-- **Scopes:** "everywhere" works even while typing (Ctrl+Enter, Ctrl+S, Esc, F8, F9). "editor" is skipped while the focus is in a text field or the code editor. "levelView" needs the mouse over the level view.
+- **Scopes:** "everywhere" works even while typing (Ctrl+Enter, Ctrl+S, Esc, F8, F9). "editor" is skipped while the focus is in a text field or the code editor. "levelView" needs the mouse over the level view. **A command's shortcut can have its own scope** in `shortcutScopes`, by the shortcut's text: only Play or Stop's Shift+T is "editor" while its Ctrl+Enter is "everywhere", so Shift+T types a T in a field (standing yes, 2026-11-17). During play the dispatcher runs the Play commands before the game gets a key, and Shift+T stops the run.
 - **Ctrl+Alt is refused when the browser reports AltGr**, and no shortcut other than the two the requirement names uses Ctrl+Alt.
 - **A test checks the shortcut map** against the requirement's list of keys the editor never uses (Ctrl+N, Ctrl+W, Ctrl+0, F5 and the rest).
 - The browser adapter `KeyboardInput` listens once on the window, early and not passive, calls `handleKeyDown`, and stops the browser's default only when it returns true. It also releases every held key when the window loses focus, so keys never stick.

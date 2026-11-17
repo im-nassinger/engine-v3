@@ -5,6 +5,7 @@ import { buildPlayTestSession, editorSnapshot, settle } from '../commands/play/t
 import { ShortcutDispatcher } from './ShortcutDispatcher.ts';
 import { recordedKey } from './testing/recordedKeys.ts';
 
+const SHIFT_T = recordedKey('KeyT', 'T', { shiftKey: true });
 const CTRL_ENTER = recordedKey('Enter', 'Enter', { ctrlKey: true });
 const F8 = recordedKey('F8', 'F8');
 const F9 = recordedKey('F9', 'F9');
@@ -32,6 +33,38 @@ describe('ShortcutDispatcher during test play', () => {
         expect(play.state).toBe('playing');
 
         dispatcher.handleKeyDown(CTRL_ENTER, 'textField', false);
+        expect(play.state).toBe('idle');
+    });
+
+    test('Shift+T plays and stops wherever the single-letter keys work', async () => {
+        const { dispatcher, play } = buildDispatcher();
+
+        expect(dispatcher.handleKeyDown(SHIFT_T, 'level', false)).toBe(true);
+        expect(play.state).toBe('starting');
+
+        await settle();
+        expect(play.state).toBe('playing');
+
+        expect(dispatcher.handleKeyDown(SHIFT_T, 'panel', true)).toBe(true);
+        expect(play.state).toBe('idle');
+    });
+
+    test('Shift+T in a text field or the code editor is left to it, to type a T', () => {
+        const { dispatcher, play, calls } = buildDispatcher();
+
+        expect(dispatcher.handleKeyDown(SHIFT_T, 'textField', false)).toBe(false);
+        expect(dispatcher.handleKeyDown(SHIFT_T, 'codeEditor', true)).toBe(false);
+
+        expect(play.state).toBe('idle');
+        expect(calls).toEqual([]);
+    });
+
+    test('during play Shift+T stops the run, so the game never gets it', async () => {
+        const built = buildDispatcher();
+        const { dispatcher, play } = built;
+        await built.startPlaying();
+
+        expect(dispatcher.handleKeyDown(SHIFT_T, 'level', true)).toBe(true);
         expect(play.state).toBe('idle');
     });
 

@@ -87,7 +87,7 @@ Small features from the old draft and review that the scope review never asked a
 
 | Feature | Rule | Version |
 |---|---|---|
-| Keys that can't be bound | Esc, Tab, Ctrl, Alt and Cmd in any combination, F1 to F12, Caps Lock, Num Lock | v2 |
+| Keys that can't be bound | Esc, Tab, Ctrl, Alt and Cmd in any combination, F1 to F12, Caps Lock, Num Lock, and Shift+T, which stops the run (owner, 2026-11-17). A plain T and Shift alone stay free | v2 |
 | Menus without a mouse | Every built-in menu works with the keyboard, and later a gamepad | v3 |
 | Touch controls | On-screen controls mapped to inputs | Later |
 

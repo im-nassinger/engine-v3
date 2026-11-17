@@ -39,7 +39,7 @@ const MAIN_MENU: Record<string, [string, string][]> = {
         ['Camera frame', 'Shift+3'],
     ],
     Play: [
-        ['Play', 'Ctrl+Enter'],
+        ['Play', 'Shift+T'],
         ['Pause', 'F8'],
         ['Step', 'F9'],
     ],

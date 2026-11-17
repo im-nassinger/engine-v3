@@ -149,7 +149,7 @@ export class PlaySession {
         this.setState('idle');
     }
 
-    // Play or Stop, for Ctrl+Enter and the one button.
+    // Play or Stop, for Shift+T, Ctrl+Enter and the one button.
     playOrStop() {
         if (this.isRunGoing) {
             this.stop();
