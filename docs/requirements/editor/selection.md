@@ -95,8 +95,9 @@ Source: round 6: LY2; old: SG-39 to SG-42
 - Arrow keys move the selection 1 px. Shift+arrow moves 10 px. **Ctrl+Shift+arrow moves one grid step.** Moves follow the level's axes whatever the rotation.
 - A handle always follows the mouse on screen, whatever the rotation or scale of the parents.
 - The box of one rotated entity follows its rotation, so resizing works along the entity's own sides.
-- **Resizing a single shape changes its width and height, not its scale. Resizing a group changes its scale.**
-- Resizing a single shape leaves its outline width alone.
+- **Resizing changes the entity's scale, never its shape's values**, for a shape and a group alike (owner: 2026-11-16). The World is the one exception: its rectangle changes, from its centre.
+- Resizing never changes the outline width; the StyleComponent's Scale outline says whether the scale stretches it.
+- The readout shows the size the entity is drawn at, its scale counted.
 - Dragging a handle past the opposite side mirrors the entity. A size never rests at zero: on release each side is at least 1 px.
 - A whole drag is one undo step.
 - A locked entity never moves through handles or arrow keys. A locked child still moves with its unlocked parent.
@@ -107,7 +108,7 @@ Source: round 6: LY2; old: SG-39 to SG-42
 | Resizing | Keep proportions | Resize from the centre | Turn snapping off | Cancel |
 | Rotating | Snap to 15° steps | | | Cancel |
 
-Source: scope SE2; round 1: D21; round 4: 02 2.7; round 5: 03 2.4; old: SG-43 to SG-48, SG-52, SG-53, SG-55, SG-56
+Source: scope SE2; round 1: D21; round 4: 02 2.7; round 5: 03 2.4; old: SG-43 to SG-48, SG-52, SG-53, SG-55, SG-56; owner: 2026-11-16
 
 ### Several entities together · v3
 

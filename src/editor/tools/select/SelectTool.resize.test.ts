@@ -29,6 +29,22 @@ function addShape(level: Level, parent: Entity, position: Point, geometry: Shape
 }
 
 const SQUARE: ShapeGeometry = { kind: 'rectangle', width: 100, height: 100 };
+const TRIANGLE: ShapeGeometry = {
+    kind: 'polygon',
+    points: [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 0, y: 50 },
+    ],
+};
+const LINE: ShapeGeometry = {
+    kind: 'line',
+    points: [
+        { x: -50, y: 0 },
+        { x: 0, y: -20 },
+        { x: 50, y: 20 },
+    ],
+};
 
 // A 100 px square at 100, 100, a second one at 300, 100, and a group at 600, 300, turned, stretched and
 // skewed, holding a square at its origin. Snapping is the real grid's, 50 px. Screen and level are the
@@ -165,21 +181,36 @@ describe('SelectionFrame', () => {
 });
 
 describe('SelectTool resizing', () => {
-    test('a side handle changes the width, keeps the opposite side, and is one step that undo puts back', () => {
+    test('a side handle changes the scale, never the width, keeps the opposite side, and is one step that undo puts back', () => {
         const { square, tool, selection, history, session } = buildResizeTest();
         selection.replace([square.id]);
 
         dragHandle(tool, RIGHT, { x: 50, y: 30 });
 
-        expect(geometryOf(square)).toEqual({ kind: 'rectangle', width: 150, height: 100 });
+        expect(geometryOf(square)).toEqual(SQUARE);
+        expect(transformOf(square, 'scale')).toEqual({ x: 1.5, y: 1 });
         expect(transformOf(square, 'position')).toEqual({ x: 125, y: 100 });
-        expect(transformOf(square, 'scale')).toEqual({ x: 1, y: 1 });
         expect(history.undoCount).toBe(1);
         expect(history.undoLabel).toBe('Resize Entity');
 
         session.openLevel.editor.undo();
-        expect(geometryOf(square)).toEqual(SQUARE);
+        expect(transformOf(square, 'scale')).toEqual({ x: 1, y: 1 });
         expect(transformOf(square, 'position')).toEqual({ x: 100, y: 100 });
+    });
+
+    test('the readout says the size the shape is drawn at, its scale counted', () => {
+        const { square, tool, selection } = buildResizeTest();
+        square.requireComponent(TransformComponent).set('scale', { x: 2, y: 0.5 });
+        selection.replace([square.id]);
+        const from = tool.frame?.handlePosition(BOTTOM_RIGHT);
+        if (from === undefined) throw new Error('No handles to drag.');
+
+        tool.pointerDown(pointer(from));
+        tool.pointerMove(pointer({ x: from.x + 100, y: from.y + 50 }));
+
+        // 200 × 50 drawn, stretched to 300 × 100.
+        expect(tool.readout?.text).toBe('300 × 100 px');
+        expect(transformOf(square, 'scale')).toEqual({ x: 3, y: 1 });
     });
 
     test('a handle follows the mouse on screen under a turned, stretched, skewed parent', () => {
@@ -195,17 +226,18 @@ describe('SelectTool resizing', () => {
         expectClose(frame.handlePosition(TOP_LEFT), oppositeBefore);
     });
 
-    test('a free resize keeps the outline width, and Shift keeps proportions and stretches the outline', () => {
+    test('the outline width never changes, and Shift keeps proportions', () => {
         const { square, other, tool, selection } = buildResizeTest();
         selection.replace([square.id]);
         dragHandle(tool, BOTTOM_RIGHT, { x: 100, y: 20 });
-        expect(geometryOf(square)).toEqual({ kind: 'rectangle', width: 200, height: 120 });
+        expect(transformOf(square, 'scale')).toEqual({ x: 2, y: 1.2 });
         expect(square.requireComponent(StyleComponent).get('outlineWidth')).toBe(2);
 
         selection.replace([other.id]);
         dragHandle(tool, BOTTOM_RIGHT, { x: 100, y: 20 }, { shift: true });
-        expect(geometryOf(other)).toEqual({ kind: 'rectangle', width: 200, height: 200 });
-        expect(other.requireComponent(StyleComponent).get('outlineWidth')).toBe(4);
+        expect(geometryOf(other)).toEqual(SQUARE);
+        expect(transformOf(other, 'scale')).toEqual({ x: 2, y: 2 });
+        expect(other.requireComponent(StyleComponent).get('outlineWidth')).toBe(2);
         expect(transformOf(other, 'position')).toEqual({ x: 350, y: 150 });
     });
 
@@ -215,37 +247,19 @@ describe('SelectTool resizing', () => {
 
         dragHandle(tool, RIGHT, { x: 50, y: 0 }, { alt: true });
 
-        expect(geometryOf(square)).toEqual({ kind: 'rectangle', width: 200, height: 100 });
+        expect(transformOf(square, 'scale')).toEqual({ x: 2, y: 1 });
         expect(transformOf(square, 'position')).toEqual({ x: 100, y: 100 });
     });
 
-    test('dragging past the opposite side mirrors the shape', () => {
+    test('dragging past the opposite side mirrors the shape through its scale, its points kept', () => {
         const { level, tool, selection } = buildResizeTest();
-        const triangle = addShape(
-            level,
-            level.world,
-            { x: 0, y: 0 },
-            {
-                kind: 'polygon',
-                points: [
-                    { x: 0, y: 0 },
-                    { x: 100, y: 0 },
-                    { x: 0, y: 50 },
-                ],
-            },
-        );
+        const triangle = addShape(level, level.world, { x: 0, y: 0 }, TRIANGLE);
         selection.replace([triangle.id]);
 
         dragHandle(tool, RIGHT, { x: -150, y: 0 });
 
-        expect(geometryOf(triangle)).toEqual({
-            kind: 'polygon',
-            points: [
-                { x: -0, y: 0 },
-                { x: -50, y: 0 },
-                { x: -0, y: 50 },
-            ],
-        });
+        expect(geometryOf(triangle)).toEqual(TRIANGLE);
+        expect(transformOf(triangle, 'scale')).toEqual({ x: -0.5, y: 1 });
         expect(transformOf(triangle, 'position')).toEqual({ x: 0, y: 0 });
     });
 
@@ -255,20 +269,34 @@ describe('SelectTool resizing', () => {
 
         dragHandle(tool, RIGHT, { x: -100, y: 0 });
 
-        expect(geometryOf(square)).toEqual({ kind: 'rectangle', width: 1, height: 100 });
+        expect(geometryOf(square)).toEqual(SQUARE);
+        expect(transformOf(square, 'scale')).toEqual({ x: 0.01, y: 1 });
         expect(transformOf(square, 'position')).toEqual({ x: 50.5, y: 100 });
     });
 
-    test('a circle stays round, its radius following the larger stretch', () => {
+    test('a circle keeps its radius and stays round, its scale following the larger stretch', () => {
         const { level, tool, selection } = buildResizeTest();
         const circle = addShape(level, level.world, { x: 0, y: 0 }, { kind: 'circle', radius: 50 });
         selection.replace([circle.id]);
 
         dragHandle(tool, BOTTOM_RIGHT, { x: 50, y: 10 });
 
-        expect(geometryOf(circle)).toEqual({ kind: 'circle', radius: 75 });
+        expect(geometryOf(circle)).toEqual({ kind: 'circle', radius: 50 });
+        expect(transformOf(circle, 'scale')).toEqual({ x: 1.5, y: 1.5 });
         expect(transformOf(circle, 'position')).toEqual({ x: 25, y: 25 });
         expect(circle.requireComponent(StyleComponent).get('outlineWidth')).toBe(2);
+    });
+
+    test('a line keeps its points and gets the scale', () => {
+        const { level, tool, selection } = buildResizeTest();
+        const line = addShape(level, level.world, { x: 0, y: 0 }, LINE);
+        selection.replace([line.id]);
+
+        dragHandle(tool, BOTTOM_RIGHT, { x: 100, y: 40 });
+
+        expect(geometryOf(line)).toEqual(LINE);
+        expect(transformOf(line, 'scale')).toEqual({ x: 2, y: 2 });
+        expect(transformOf(line, 'position')).toEqual({ x: 50, y: 20 });
     });
 
     test("a group's resize changes its scale and leaves its children alone", () => {
@@ -317,7 +345,7 @@ describe('SelectTool resizing', () => {
 
         dragHandle(tool, RIGHT, { x: 47, y: 0 }, { ctrl: false });
 
-        expect(geometryOf(square)).toEqual({ kind: 'rectangle', width: 150, height: 100 });
+        expect(transformOf(square, 'scale')).toEqual({ x: 1.5, y: 1 });
     });
 
     test('handles hide during the drag, and Esc puts everything back with no step', () => {
@@ -327,13 +355,13 @@ describe('SelectTool resizing', () => {
         tool.pointerDown(pointer({ x: 150, y: 100 }));
         tool.pointerMove(pointer({ x: 220, y: 100 }));
         expect(tool.frame).toBeUndefined();
-        expect(geometryOf(square)).toEqual({ kind: 'rectangle', width: 170, height: 100 });
+        expect(transformOf(square, 'scale')).toEqual({ x: 1.7, y: 1 });
 
         expect(tool.cancel()).toBe(true);
         tool.pointerUp(pointer({ x: 220, y: 100 }));
 
         expect(liveEdit.isActive).toBe(false);
-        expect(geometryOf(square)).toEqual(SQUARE);
+        expect(transformOf(square, 'scale')).toEqual({ x: 1, y: 1 });
         expect(history.undoCount).toBe(0);
         expect(tool.frame).toBeDefined();
     });

@@ -1,4 +1,4 @@
-import { ShapeComponent, StyleComponent, TransformComponent } from '../../../../core/components/index.ts';
+import { ShapeComponent, TransformComponent } from '../../../../core/components/index.ts';
 import type { Matrix2D, Point, ShapeGeometry } from '../../../../core/geometry/index.ts';
 import { labelName } from '../../../../core/level/index.ts';
 import type { ValueTarget } from '../../../history/index.ts';
@@ -7,31 +7,24 @@ import type { SelectionFrame } from '../frame/SelectionFrame.ts';
 
 import type { Stretch } from './resizeFactor.ts';
 
-// A size never rests below this, in the units the Inspector shows: a shape's width and height, a group's
-// box in its parent's pixels.
+// A size never rests below this: the size an entity is drawn at in its parent's pixels, the World's
+// rectangle in level pixels.
 const MIN_SIDE_PX = 1;
 // The World's rectangle stops at LevelLimits' maxLevelSize on each side, as its Width and Height fields do.
 const MAX_LEVEL_SIDE_PX = 200_000;
-// The StyleComponent's Outline width field allows up to this.
-const MAX_OUTLINE_WIDTH = 200;
 
-// What the entity held before the drag.
-type StartValues = {
-    readonly geometry: ShapeGeometry | undefined;
-    readonly scale: Point;
-    readonly outlineWidth: number | undefined;
-};
-
-// One entity resized through LiveEdit, which the caller begins with the targets: a shape's geometry, a
-// group's scale, and the position that keeps the anchor in place on screen. The World resizes only its
-// rectangle, from its centre, and never moves.
+// One entity resized through LiveEdit, which the caller begins with the targets: a shape's or a group's
+// scale, and the position that keeps the anchor in place on screen. A shape's values and its outline width
+// never change. The World resizes only its rectangle, from its centre, and never moves.
 export class EntityResize {
     readonly label: string;
     readonly targets: readonly ValueTarget[];
     private readonly openLevel: OpenLevel;
     private readonly frame: SelectionFrame;
     private readonly parentInverse: Matrix2D | undefined;
-    private readonly start: StartValues;
+    // The World's rectangle before the drag, or the entity's scale.
+    private readonly startWorld: ShapeGeometry | undefined;
+    private readonly startScale: Point;
 
     private constructor(openLevel: OpenLevel, frame: SelectionFrame, parentInverse: Matrix2D | undefined) {
         this.openLevel = openLevel;
@@ -40,14 +33,8 @@ export class EntityResize {
         this.label = `Resize ${labelName(frame.entity)}`;
 
         const entity = frame.entity;
-        const shape = entity.getComponent(ShapeComponent);
-        const style = entity.getComponent(StyleComponent);
-        const transform = entity.getComponent(TransformComponent);
-        this.start = {
-            geometry: frame.kind === 'group' ? undefined : shape?.get('geometry'),
-            scale: transform?.get('scale') ?? { x: 1, y: 1 },
-            outlineWidth: frame.kind === 'shape' ? style?.get('outlineWidth') : undefined,
-        };
+        this.startWorld = frame.kind === 'world' ? entity.getComponent(ShapeComponent)?.get('geometry') : undefined;
+        this.startScale = entity.getComponent(TransformComponent)?.get('scale') ?? { x: 1, y: 1 };
         this.targets = this.targetsOf();
     }
 
@@ -64,33 +51,26 @@ export class EntityResize {
         return new EntityResize(openLevel, frame, parentInverse);
     }
 
-    // A circle stays round: its radius follows the larger stretch, as if Shift were held.
+    // A circle stays round: its scale takes the larger stretch on both axes, as if Shift were held.
     get keepsRound() {
-        return this.start.geometry?.kind === 'circle';
+        const shape = this.frame.kind === 'shape' ? this.frame.entity.getComponent(ShapeComponent) : undefined;
+
+        return shape?.get('geometry').kind === 'circle';
     }
 
-    // Writes the stretch, each side kept at least 1 px, and gives the new size in the Inspector's units.
-    // scalesOutline (Shift) multiplies a shape's outline width by the larger stretch too.
-    apply(stretch: Stretch, scalesOutline: boolean): Point {
+    // Writes the stretch, each side kept at least 1 px, and gives the size the entity is now drawn at.
+    apply(stretch: Stretch): Point {
         const factor = this.atLeastOnePixel(stretch.factor);
         const size = this.sizeBefore();
         const { liveEdit } = this.openLevel;
         const id = this.frame.entity.id;
-        const larger = Math.max(Math.abs(factor.x), Math.abs(factor.y));
 
-        if (this.start.geometry !== undefined) {
+        if (this.startWorld !== undefined) {
             const target = { entityId: id, schema: ShapeComponent.schema, key: 'geometry' };
-            liveEdit.update(target, stretchedGeometry(this.start.geometry, factor));
+            liveEdit.update(target, stretchedRectangle(this.startWorld, factor));
         } else {
-            const scale = { x: this.start.scale.x * factor.x, y: this.start.scale.y * factor.y };
+            const scale = { x: this.startScale.x * factor.x, y: this.startScale.y * factor.y };
             liveEdit.update({ entityId: id, schema: TransformComponent.schema, key: 'scale' }, scale);
-        }
-
-        if (this.start.outlineWidth !== undefined) {
-            const outlineWidth = scalesOutline
-                ? Math.min(this.start.outlineWidth * larger, MAX_OUTLINE_WIDTH)
-                : this.start.outlineWidth;
-            liveEdit.update({ entityId: id, schema: StyleComponent.schema, key: 'outlineWidth' }, outlineWidth);
         }
 
         if (this.parentInverse !== undefined) {
@@ -106,16 +86,9 @@ export class EntityResize {
 
     private targetsOf(): ValueTarget[] {
         const entityId = this.frame.entity.id;
-        const targets: ValueTarget[] = [];
+        if (this.startWorld !== undefined) return [{ entityId, schema: ShapeComponent.schema, key: 'geometry' }];
 
-        if (this.start.geometry !== undefined) {
-            targets.push({ entityId, schema: ShapeComponent.schema, key: 'geometry' });
-        } else {
-            targets.push({ entityId, schema: TransformComponent.schema, key: 'scale' });
-        }
-        if (this.start.outlineWidth !== undefined) {
-            targets.push({ entityId, schema: StyleComponent.schema, key: 'outlineWidth' });
-        }
+        const targets: ValueTarget[] = [{ entityId, schema: TransformComponent.schema, key: 'scale' }];
         if (this.parentInverse !== undefined) {
             targets.push({ entityId, schema: TransformComponent.schema, key: 'position' });
         }
@@ -123,15 +96,12 @@ export class EntityResize {
         return targets;
     }
 
-    // A shape's width and height, a group's box times its scale.
+    // The size the entity is drawn at: its box times its scale, the World's rectangle as it is.
     private sizeBefore(): Point {
         const { box } = this.frame;
-        const scalesTheGroup = this.start.geometry === undefined;
+        if (this.startWorld !== undefined) return { x: box.width, y: box.height };
 
-        return {
-            x: box.width * (scalesTheGroup ? Math.abs(this.start.scale.x) : 1),
-            y: box.height * (scalesTheGroup ? Math.abs(this.start.scale.y) : 1),
-        };
+        return { x: box.width * Math.abs(this.startScale.x), y: box.height * Math.abs(this.startScale.y) };
     }
 
     // The World's sides also stop at the largest level.
@@ -155,23 +125,13 @@ function within(factor: number, size: number, atMost: number) {
     return factor < 0 ? -length : length;
 }
 
-// Stretched around the shape's own origin. A rectangle or a circle stays centred, so mirroring changes
-// nothing in it; a circle takes the larger stretch, which the drag already made the same on both axes.
-function stretchedGeometry(geometry: ShapeGeometry, factor: Point): ShapeGeometry {
-    switch (geometry.kind) {
-        case 'rectangle':
-            return {
-                kind: 'rectangle',
-                width: Math.abs(geometry.width * factor.x),
-                height: Math.abs(geometry.height * factor.y),
-            };
-        case 'circle':
-            return { kind: 'circle', radius: geometry.radius * Math.max(Math.abs(factor.x), Math.abs(factor.y)) };
-        case 'polygon':
-        case 'line':
-            return {
-                kind: geometry.kind,
-                points: geometry.points.map((point) => ({ x: point.x * factor.x, y: point.y * factor.y })),
-            };
-    }
+// The World's rectangle, stretched around its centre. It is always a rectangle; anything else is left as it is.
+function stretchedRectangle(geometry: ShapeGeometry, factor: Point): ShapeGeometry {
+    if (geometry.kind !== 'rectangle') return geometry;
+
+    return {
+        kind: 'rectangle',
+        width: Math.abs(geometry.width * factor.x),
+        height: Math.abs(geometry.height * factor.y),
+    };
 }

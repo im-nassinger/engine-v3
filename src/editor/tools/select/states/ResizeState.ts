@@ -64,7 +64,7 @@ export class ResizeState implements SelectState {
             proportional: modifiers.shift || this.resize.keepsRound,
         });
 
-        const size = this.resize.apply(stretch, modifiers.shift);
+        const size = this.resize.apply(stretch);
         this.host.showReadout({ text: sizeReadout(size), at: input.levelPosition });
     }
 }

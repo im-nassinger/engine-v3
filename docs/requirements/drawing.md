@@ -62,15 +62,14 @@ Source: owner: 2026-11-15
 
 Source: scope DR4; round 8: SH3
 
-### Width and height, not scale · v1
+### Resizing changes the scale · v1
 
-- **Resize changes what a thing measures. Scale stretches it like a picture.** Resizing a single shape changes its width and height and leaves its scale at 1. Resizing a group changes the group's scale.
-- Polygons, lines and paths resize by moving their points.
-- A free resize of a single shape leaves its outline width alone. A resize with Shift (proportional) multiplies width, height and outline width together.
+- **Resizing with the handles changes the TransformComponent's scale, never the shape's values** (owner: 2026-11-16): a rectangle keeps its width and height, a circle its radius, a polygon or line its points. A group's resize changes the group's scale too. Typing Width, Height, Radius or Points changes what the shape measures.
+- A resize never changes the outline's width. Whether the new scale stretches the outline is the StyleComponent's **Scale outline** checkbox, below, with or without Shift.
 - Inside a scaled group everything stretches, outlines and text included. An uneven group scale gives uneven outlines. That is what "like a picture" means.
 - The Inspector shows Width and Height for a rectangle and Radius for a circle. **A polygon or line has no Width or Height, only its points** (owner: 2026-11-16).
 - **Points is one list field** in the Inspector: a polygon's or line's points are a list of vectors, a path's a list of path points. Typing a point moves it. A polygon keeps 3 to 1,000 points, a line 2 to 1,000 (owner: 2026-11-15).
-- **A circle stays round when resized:** its radius follows the larger stretch, as if Shift were held. Only its TransformComponent's scale stretches it (owner: 2026-11-15).
+- **A circle stays round when resized with the handles:** its scale takes the larger stretch on both axes, as if Shift were held. Typing an uneven scale in its TransformComponent makes an ellipse (owner: 2026-11-15; with resizing changing the scale, standing yes, 2026-11-17).
 
 Source: round 1: D21; round 5: 03 2.4; old: DR-21 to DR-30; owner: 2026-11-15, 2026-11-16
 

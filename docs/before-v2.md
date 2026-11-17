@@ -8,7 +8,7 @@ Changes the owner asked for that must be built **after v1's 18 stages and before
 
 | # | Change | Asked | State |
 |---|---|---|---|
-| 1 | **Resizing changes the scale**, not the shape's values. Polygons and lines lose Width and Height | owner, 2026-11-16 | Settled, with Claude's picks for the owner to change; steps 7 (built on 2026-11-17: Width and Height, Scale outline) and 8 |
+| 1 | **Resizing changes the scale**, not the shape's values. Polygons and lines lose Width and Height | owner, 2026-11-16 | **Built** on 2026-11-17, steps 7 and 8 |
 | 2 | **Z and X rotate the selection and the Shape tool's preview**, Shift+Z and Shift+X by 10° | owner, 2026-11-16 and 2026-11-17 | Settled, with Claude's picks for the owner to change; steps 10 and 11 |
 | 3 | **Ctrl+Shift while resizing resizes from the centre** | owner, 2026-11-16 | Settled, with Claude's picks for the owner to change; step 9 |
 | 4 | **The Joint tool says why an entity can't take a joint** | owner, 2026-11-16 | **Built** on 2026-11-17, step 5 |
@@ -34,7 +34,7 @@ Outlines: with resizing changing the scale, an uneven resize stretches the outli
 - **It covers only the entity's own scale.** With it off, the outline is as wide as its width says, measured in the parent's space, however the entity's own TransformComponent scales it. A scaled group still stretches everything inside it, outlines included, as "Width and height, not scale" says ("like a picture"). *Why: that rule is the owner's (round 1: D21), and ignoring a group's scale would override it.*
 - **Shift no longer multiplies the outline's width.** A proportional resize is an even scale, so the outline follows the checkbox like any other resize.
 
-To update once that's settled: `requirements/drawing.md` ("Width and height, not scale"), `requirements/editor/selection.md`, `architecture/core-model/components-and-fields.md`, `architecture/editor/selection-and-tools.md` (`EntityResize`, the readout), `architecture/core-model/geometry.md` (outline bounds), `glossary.md`, `scope.md`, `decisions.md`, and a stage before v2 in `plan.md`. The World keeps resizing its rectangle, because its TransformComponent is fixed.
+To update once that's settled: `requirements/drawing.md` ("Width and height, not scale", now "Resizing changes the scale"), `requirements/editor/selection.md`, `architecture/core-model/components-and-fields.md`, `architecture/editor/selection-and-tools.md` (`EntityResize`, the readout), `architecture/core-model/geometry.md` (outline bounds), `glossary.md`, `scope.md`, `decisions.md`, and a stage before v2 in `plan.md`. The World keeps resizing its rectangle, because its TransformComponent is fixed.
 
 ## 2. Rotating with Z and X
 

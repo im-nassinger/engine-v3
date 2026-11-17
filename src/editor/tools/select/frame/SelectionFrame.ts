@@ -8,8 +8,7 @@ import type { OpenLevel } from '../../../session/index.ts';
 import { FRAME_HANDLES, HANDLE_GRAB_PX, HANDLE_SIZE_PX, ROTATE_AREA_PX } from './FrameHandle.ts';
 import type { FrameHandle } from './FrameHandle.ts';
 
-// What a resize changes: a shape its width and height, a group its scale, the World its rectangle from
-// the centre.
+// What a resize changes: a shape's or a group's scale, the World its rectangle from the centre.
 export type FrameKind = 'shape' | 'group' | 'world';
 
 // The box with the eight handles around one selected entity, along its own sides: a box in the entity's
