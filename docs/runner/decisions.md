@@ -21,4 +21,5 @@ What the owner decided about the runner, newest last. The changes the runner mad
 | 2026-11-15 | Keep the webhook for now; the Discord bot comes later | The owner's choice. The bot's open questions are in [progress.md](progress.md) |
 | 2026-11-15 | Every session loads `working-with-me`, `typescript-style` and `clean-architecture`, and checks the folders it added files to before committing | No session had loaded `clean-architecture`, so the folder rule in it never applied |
 | 2026-11-15 | Only one runner, and one of its sessions, may run at a time | The owner's rule: two sessions must never work on the same thing at once |
+| 2026-11-16 | After stage 17 the runner builds the changes in `before-v2.md` as stage 18, then stops; nothing of v2 is built | The owner still has things to decide before v2 starts |
 | 2026-11-16 | Keep CI, and the runner acts on it: it waits for CI after each push, the next session fixes a failure before a new step, and three failed fixes pause it | CI had failed on every push since stage 9's speed tests, and no session knew; removing CI would hide breakage that `npm run check` doesn't catch |

@@ -5,6 +5,7 @@ Your job: do the next step, commit it, and stop.
 1. Follow CLAUDE.md. Start at `docs/progress.md`: its **Runner:** line says which step is next.
 2. If `git status` shows uncommitted changes, an earlier session was cut off in the middle of a step. Finish that step first.
 3. Do the next step of the current stage in `docs/plan.md`, whose steps are in `docs/steps/`, one file per stage. If the stage has no steps written yet, writing them is the step. Decide open questions yourself under the standing yes.
+   After stage 17 comes **stage 18, Before v2**: every change listed in `docs/before-v2.md`. Its first step adds it as row `| 18 | **Before v2** | ...` to the stages table in `docs/plan.md` and writes its steps in `docs/steps/`, as `docs/before-v2.md` says. Nothing of v2 is built: no stage after 18.
 4. Run `npm run check` and fix things until it passes. Then commit, with the **Runner:** line in `docs/progress.md` updated in the same commit. Don't stop before the step is committed.
 5. The **Runner:** line always starts `**Runner:** stage N, step S of T`, where S is the step you just finished; the runner works out v1's % from it. After a stage's last step, that is `stage N, step T of T`, never `stage N is done`.
 
@@ -16,4 +17,4 @@ STATUS: <done | blocked | finished>
 SUMMARY: <what the step did, in one plain sentence under 20 words>
 NEEDS: <a command that needs sudo, or what you need from the owner; otherwise none>
 
-done: the step is committed. blocked: no step of any stage can be done without the owner. finished: stage 17 is done.
+done: the step is committed. blocked: no step of any stage can be done without the owner. finished: stage 18 is done, every change in `docs/before-v2.md` is built, and `docs/before-v2.md` marks each one built.

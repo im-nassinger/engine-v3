@@ -163,6 +163,17 @@ function readStageName(stage: number) {
     return match?.[1] ?? '';
 }
 
+// Stage 18, the changes in docs/before-v2.md, is the last; the runner stops before v2.
+const LAST_STAGE = 18;
+
+function isLastStageDone() {
+    const runnerLine = parseRunnerLine(fs.readFileSync(progressFile, 'utf8'));
+    if (runnerLine === undefined) return false;
+    if (runnerLine.stage > LAST_STAGE) return true;
+
+    return runnerLine.stage === LAST_STAGE && runnerLine.stepCount > 0 && runnerLine.step === runnerLine.stepCount;
+}
+
 // The stage and step come from the **Runner:** line sessions keep in docs/progress.md.
 function readStageText(runnerLine: RunnerLine) {
     let stageText = `Stage ${runnerLine.stage}: ${readStageName(runnerLine.stage)}`;
@@ -377,6 +388,10 @@ async function main() {
 
         failuresInARow = 0;
         const report = outcome.report;
+        if (report.status === 'finished' && !isLastStageDone()) {
+            // Only the end of stage 18, the before-v2 changes, finishes the run.
+            report.status = 'done';
+        }
         await reportStep(report, outcome.newCommits);
 
         if (report.status === 'done' && hasNeeds(report)) {
@@ -391,8 +406,10 @@ async function main() {
             const finalCiFailure = await checkCi();
             if (finalCiFailure !== undefined) continue;
 
-            statusFile.setState('Finished: v1 is done, and the runner has stopped.');
-            await announce('🎉 **v1 is finished.** Every stage of the plan is done. The runner stops.');
+            statusFile.setState('Finished: v1 and the before-v2 changes are done, and the runner has stopped.');
+            await announce(
+                '🎉 **v1 is finished**, with the before-v2 changes. Every stage of the plan is done. The runner stops before v2.',
+            );
             return;
         }
     }
