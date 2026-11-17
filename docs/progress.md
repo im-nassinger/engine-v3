@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 15, step 4 of 7: the `camera-follow` determinism level is recorded, all eleven levels match in Node and three browsers, and the ball stays in the camera's box inside the bounds on every tick. Next is step 5, `fixedSizeView`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 15, step 5 of 7: `fixedSizeView` in `editor/play/fixed-size/` works out Fixed size's zoom, middle and black bars, with unit tests at 16:9, 4:3 and 21:9. Next is step 6, `PixiLevelView.showThroughCamera` with `LetterboxOverlay`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
