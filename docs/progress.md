@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 14, step 12 of 12: the docs, so stage 14 is built. Next is stage 15, the camera, whose first step writes its steps. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 15, step 1 of 7: the steps and choices for the camera are written. Next is step 2, the camera's rules as plain functions. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -35,7 +35,7 @@
 | Stage 12, saving | Done on 2026-11-16. See below |
 | Stage 13, physics and the determinism test | Done on 2026-11-16. See below |
 | Stage 14, joints | Done on 2026-11-16. See below |
-| Code | Stages 0 to 14 done. Stage 15, the camera, is next: its steps aren't written yet |
+| Code | Stages 0 to 14 done. Stage 15, the camera, is being built: its [steps](plan.md#stage-15-in-steps) are written |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -224,7 +224,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 15 of [plan.md](plan.md): the camera.** Its first step writes its steps and choices into the docs, as stage 14's did.
+1. **Stage 15 of [plan.md](plan.md#stage-15-in-steps): the camera.** Step 1 wrote its seven steps and the [choices](architecture/simulation.md#stage-15s-choices); step 2, the camera's rules as plain functions, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
