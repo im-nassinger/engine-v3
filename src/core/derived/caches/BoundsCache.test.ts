@@ -75,11 +75,34 @@ describe('BoundsCache own bounds', () => {
         expect(sidesOf(cache.ownBoundsOf(crate))).toEqual([-25, -15, 25, 15]);
     });
 
-    test('the outline is stretched by the matrix like the shape', () => {
+    test("with Scale outline off, the entity's own scale stretches the shape but not its outline", () => {
         const level = Level.createNew();
         const crate = addShape(level, level.world, 0, 0, { kind: 'rectangle', width: 40, height: 20 });
         crate.addComponent(new StyleComponent());
         crate.requireComponent(TransformComponent).set('scale', { x: 3, y: 1 });
+        const cache = buildCache(level);
+
+        expect(sidesOf(cache.ownBoundsOf(crate))).toEqual([-61, -11, 61, 11]);
+    });
+
+    test('with Scale outline on, the outline is stretched by the matrix like the shape', () => {
+        const level = Level.createNew();
+        const crate = addShape(level, level.world, 0, 0, { kind: 'rectangle', width: 40, height: 20 });
+        const style = new StyleComponent();
+        style.set('scaleOutline', true);
+        crate.addComponent(style);
+        crate.requireComponent(TransformComponent).set('scale', { x: 3, y: 1 });
+        const cache = buildCache(level);
+
+        expect(sidesOf(cache.ownBoundsOf(crate))).toEqual([-63, -13, 63, 13]);
+    });
+
+    test('a scaled group still stretches the outline inside it, whatever Scale outline says', () => {
+        const level = Level.createNew();
+        const group = placeAt(level, level.world, 0, 0);
+        group.requireComponent(TransformComponent).set('scale', { x: 3, y: 1 });
+        const crate = addShape(level, group, 0, 0, { kind: 'rectangle', width: 40, height: 20 });
+        crate.addComponent(new StyleComponent());
         const cache = buildCache(level);
 
         expect(sidesOf(cache.ownBoundsOf(crate))).toEqual([-63, -13, 63, 13]);

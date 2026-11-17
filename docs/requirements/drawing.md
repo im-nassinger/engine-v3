@@ -68,11 +68,11 @@ Source: scope DR4; round 8: SH3
 - Polygons, lines and paths resize by moving their points.
 - A free resize of a single shape leaves its outline width alone. A resize with Shift (proportional) multiplies width, height and outline width together.
 - Inside a scaled group everything stretches, outlines and text included. An uneven group scale gives uneven outlines. That is what "like a picture" means.
-- The Inspector shows Width and Height for a rectangle, polygon, line or path, and Radius for a circle. Typing a size on a polygon, line or path rescales its points.
+- The Inspector shows Width and Height for a rectangle and Radius for a circle. **A polygon or line has no Width or Height, only its points** (owner: 2026-11-16).
 - **Points is one list field** in the Inspector: a polygon's or line's points are a list of vectors, a path's a list of path points. Typing a point moves it. A polygon keeps 3 to 1,000 points, a line 2 to 1,000 (owner: 2026-11-15).
 - **A circle stays round when resized:** its radius follows the larger stretch, as if Shift were held. Only its TransformComponent's scale stretches it (owner: 2026-11-15).
 
-Source: round 1: D21; round 5: 03 2.4; old: DR-21 to DR-30; owner: 2026-11-15
+Source: round 1: D21; round 5: 03 2.4; old: DR-21 to DR-30; owner: 2026-11-15, 2026-11-16
 
 ### The Bézier pen · v2
 
@@ -145,13 +145,14 @@ Source: scope DR5; round 1: D22, D58; round 5: 03 2.8; old: DR-64 to DR-79
 - A path's fill paints only when the path is closed. A line has no fill.
 - On text, the fill colours the letters and the outline traces them.
 - Colours can be see-through. Outline width goes from 0 to 200, and 0 means no outline.
+- **Scale outline**, a checkbox under the outline's width, off by default: off, the outline stays as wide as its width however the entity's own scale stretches it; on, it stretches with the shape. A scaled group still stretches the outlines inside it. A level saved before the checkbox reads with it off. *Why: an uneven scale would otherwise stretch the outline unevenly (owner: 2026-11-16; name, default and reach: standing yes, 2026-11-17).*
 - **A shape or path with no StyleComponent is invisible in play.** The editor still shows it as a thin outline. Text always shows.
 - The plain colour picker: a colour square, a hue slider, a see-through slider, a colour code field and a fixed palette. One drag in the picker is one undo step.
 - In v1 new shapes start with one default look: fill `#4A90D9`, outline `#1F3552`, width 2.
 - **In v1 the fill is a colour field that can be emptied.** An empty fill paints nothing. *Why: v1 has only solid colours, so the fixed list of field types needs nothing new yet (owner: 2026-11-13).*
 - **Every StyleComponent value can change during play.** *Why: they only change the look, and the background colour, the World's fill, already changes during play (standing yes, 2026-11-14).*
 
-Source: round 1: D23; round 6: ST2; old: DR-90 to DR-94; owner: 2026-11-13, 2026-11-14
+Source: round 1: D23; round 6: ST2; old: DR-90 to DR-94; owner: 2026-11-13, 2026-11-14, 2026-11-16
 
 ### Gradients · v2
 

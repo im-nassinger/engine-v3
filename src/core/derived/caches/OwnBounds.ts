@@ -8,6 +8,7 @@ import {
 import type { Entity } from '../../level/index.ts';
 import type { Matrix2D, PathGeometry, Point, ShapeGeometry } from '../../geometry/index.ts';
 import { Bounds } from '../../geometry/index.ts';
+import { outlineScaleOf } from '../outlineStretchOf.ts';
 
 // Not Math.hypot, which IEEE 754 doesn't define exactly, so it may differ between browsers.
 function lengthOf(x: number, y: number) {
@@ -80,14 +81,14 @@ function cameraBounds(camera: CameraComponent, matrix: Matrix2D) {
     return boundsOfMovedPoints(corners, matrix);
 }
 
-// The outline is drawn in the entity's own space, so the matrix stretches it like the shape, at most by its
-// largest stretch. With round joins it stays within half its width of the edge.
+// The matrix stretches the outline at most by its largest stretch, leaving out the entity's own scale when
+// Scale outline is off. With round joins it stays within half its width of the edge.
 function withOutline(edgeBounds: Bounds, entity: Entity, matrix: Matrix2D) {
     const style = entity.getComponent(StyleComponent);
     if (style === undefined) return edgeBounds;
 
     const halfOutline = style.get('outlineWidth') / 2;
-    const margin = halfOutline * matrix.largestStretch();
+    const margin = halfOutline * outlineScaleOf(entity, matrix);
 
     return edgeBounds.expandedBy(margin);
 }

@@ -68,7 +68,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Path | A curved line drawn with the Bézier pen or the Pencil. It is only drawn. It never collides. |
 | Path point | One point of a path: its position, its two curve handles and its corner. A field type of its own (v2). |
 | Fill | What paints the inside of a shape, path or text: nothing, a solid colour, a gradient or an image. |
-| Outline | The line drawn around a shape, path or text: a colour and a width. |
+| Outline | The line drawn around a shape, path or text: a colour and a width. With **Scale outline** off, the entity's own scale doesn't stretch it. |
 | Image | Not a kind of entity: a shape whose fill is an image file. |
 | Text | An entity with a TextComponent, typed on the level. |
 | TransformComponent | The component holding an entity's position, rotation, scale and skew, measured from its parent. |

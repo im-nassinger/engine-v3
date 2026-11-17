@@ -1,4 +1,4 @@
-import { ColourFieldType, NumberFieldType, SolidFillFieldType } from '../../fields/index.ts';
+import { CheckboxFieldType, ColourFieldType, NumberFieldType, SolidFillFieldType } from '../../fields/index.ts';
 
 import { ComponentSchema } from '../schema/ComponentSchema.ts';
 
@@ -38,6 +38,16 @@ export const styleSchema = new ComponentSchema<StyleValues>({
             defaultValue: 2,
             description: 'How thick the outline is, in pixels. 0 means no outline.',
             unit: 'px',
+            changeableInPlay: true,
+        },
+        {
+            key: 'scaleOutline',
+            label: 'Scale outline',
+            type: new CheckboxFieldType(),
+            // Off, so an uneven resize keeps the outline as wide as its width says (standing yes, 2026-11-17).
+            // A level saved before the checkbox reads it as this default.
+            defaultValue: false,
+            description: "Stretches the outline with the entity's own scale. Off keeps it as wide as its width.",
             changeableInPlay: true,
         },
         {

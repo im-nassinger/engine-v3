@@ -20,8 +20,7 @@ const kindType = new ChoiceFieldType<ShapeKind>([
     { value: 'polygon', label: 'Polygon' },
     { value: 'line', label: 'Line' },
 ]);
-// A rectangle is at least 1 px each side, and a typed size for a polygon or line too. A circle is at least
-// 1 px across. A typed size stops at 200,000 px, LevelLimits' maxLevelSize, so the World's Width and Height
+// A rectangle is at least 1 px each side. A circle is at least 1 px across. A typed size stops at 200,000 px, LevelLimits' maxLevelSize, so the World's Width and Height
 // fields can't make a level the reader refuses; no shape needs to be bigger than the largest level.
 const MAX_SIZE = 200_000;
 const sizeType = new NumberFieldType({ min: 1, max: MAX_SIZE });
@@ -44,8 +43,9 @@ function isCircle(values: ShapeValues) {
     return values.geometry.kind === 'circle';
 }
 
-function isNotCircle(values: ShapeValues) {
-    return !isCircle(values);
+// Only a rectangle has a Width and Height: a polygon or line is only its points (owner, 2026-11-16).
+function isRectangle(values: ShapeValues) {
+    return values.geometry.kind === 'rectangle';
 }
 
 export const shapeSchema = new ComponentSchema<ShapeValues>({
@@ -86,33 +86,37 @@ export const shapeSchema = new ComponentSchema<ShapeValues>({
             key: 'width',
             label: 'Width',
             type: sizeType,
-            description:
-                'How wide the shape is, in pixels, before scale. On a polygon or line, typing moves the points.',
+            description: 'How wide the rectangle is, in pixels, before scale.',
             unit: 'px',
             read: (values) => widthOf(values.geometry),
             write: (values, width) => {
+                // Width is hidden on every other kind, so only a mistake in the code writes it there.
+                if (!isRectangle(values)) throw new Error('Only a rectangle has a Width.');
+
                 const resized = resizedAlong(values.geometry, 'x', width);
                 if (!resized.ok) return resized;
 
                 return { ok: true, value: { geometry: resized.value } };
             },
-            appliesWhen: isNotCircle,
+            appliesWhen: isRectangle,
         }),
         derivedField<ShapeValues, number>({
             key: 'height',
             label: 'Height',
             type: sizeType,
-            description:
-                'How tall the shape is, in pixels, before scale. On a polygon or line, typing moves the points.',
+            description: 'How tall the rectangle is, in pixels, before scale.',
             unit: 'px',
             read: (values) => heightOf(values.geometry),
             write: (values, height) => {
+                // Height is hidden on every other kind, so only a mistake in the code writes it there.
+                if (!isRectangle(values)) throw new Error('Only a rectangle has a Height.');
+
                 const resized = resizedAlong(values.geometry, 'y', height);
                 if (!resized.ok) return resized;
 
                 return { ok: true, value: { geometry: resized.value } };
             },
-            appliesWhen: isNotCircle,
+            appliesWhen: isRectangle,
         }),
         derivedField<ShapeValues, number>({
             key: 'radius',

@@ -5,6 +5,7 @@ import {
     ShapeComponent,
     StyleComponent,
 } from '../../../core/components/index.ts';
+import { outlineScaleOf } from '../../../core/derived/index.ts';
 import type { DerivedCaches } from '../../../core/derived/index.ts';
 import type { Matrix2D, Point } from '../../../core/geometry/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
@@ -33,12 +34,13 @@ function hasFill(style: StyleComponent | undefined) {
 
 // The drawn outline's half width in level pixels, or the tolerance when that is wider, so a thin line is
 // still easy to hit at any zoom.
-function edgeReachOf(style: StyleComponent | undefined, matrix: Matrix2D, context: HitAreaContext) {
+function edgeReachOf(entity: Entity, matrix: Matrix2D, context: HitAreaContext) {
     const tolerance = context.tolerancePx * context.levelPerScreenPx;
+    const style = entity.getComponent(StyleComponent);
     if (style === undefined) return tolerance;
 
     const halfOutline = style.get('outlineWidth') / 2;
-    const drawnHalfOutline = halfOutline * matrix.largestStretch();
+    const drawnHalfOutline = halfOutline * outlineScaleOf(entity, matrix);
 
     return Math.max(drawnHalfOutline, tolerance);
 }
@@ -85,7 +87,7 @@ function pathArea(entity: Entity, path: PathComponent, context: HitAreaContext) 
     const matrix = context.caches.worldMatrices.matrixOf(entity);
     const geometry = path.get('path');
     const outlines = LocalOutlines.path(geometry, hasFill(style));
-    const edgeReach = edgeReachOf(style, matrix, context);
+    const edgeReach = edgeReachOf(entity, matrix, context);
 
     return outlineArea(outlines, matrix, edgeReach);
 }
@@ -98,7 +100,7 @@ function shapeArea(entity: Entity, shape: ShapeComponent, context: HitAreaContex
     const matrix = context.caches.worldMatrices.matrixOf(entity);
     const geometry = shape.get('geometry');
     const outlines = LocalOutlines.shape(geometry, pieces, hasFill(style));
-    const edgeReach = edgeReachOf(style, matrix, context);
+    const edgeReach = edgeReachOf(entity, matrix, context);
 
     return outlineArea(outlines, matrix, edgeReach);
 }

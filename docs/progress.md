@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 18, step 6 of 16: Shift+T plays and stops wherever the single-letter keys work, Ctrl+Enter stays, and the menu and tooltips show Shift+T. Next is step 7, polygons and lines lose Width and Height, and the Scale outline checkbox. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 18, step 7 of 16: polygons and lines lose Width and Height, and the StyleComponent's Scale outline checkbox, off by default, keeps outlines unstretched by the entity's own scale. Next is step 8, resizing with the handles changes the scale. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -38,7 +38,7 @@
 | Stage 15, the camera | Done on 2026-11-16. See below |
 | Stage 16, test play | Done on 2026-11-17. See below |
 | Stage 17, the speed pass and the browser checks | Done on 2026-11-17. See below |
-| Stage 18, Before v2 | Planned on 2026-11-17 in [16 steps](steps/stage-18.md); steps 1 to 6 done |
+| Stage 18, Before v2 | Planned on 2026-11-17 in [16 steps](steps/stage-18.md); steps 1 to 7 done |
 | Code | Stages 0 to 17 done. Stage 18, Before v2, is being built |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.

@@ -204,6 +204,69 @@ describe('LevelDisplay', () => {
         expect(bounds?.maxY).toBeCloseTo(32);
     });
 
+    // In the group's space, the one just outside the shape: Scale outline measures the outline there.
+    function drawnBoundsInGroup(scaleOutline: boolean, geometry: ShapeGeometry) {
+        const level = Level.createNew();
+        const group = addGroup(level, level.world);
+        const shape = addShape(level, group, geometry);
+        const style = shape.requireComponent(StyleComponent);
+        style.set('outlineWidth', 4);
+        style.set('scaleOutline', scaleOutline);
+        shape.requireComponent(TransformComponent).set('scale', { x: 3, y: 1 });
+        const { display } = makeDisplay(level);
+        display.prepare();
+
+        const groupContainer = display.nodeOf(group)?.container;
+        const bounds = () => groupContainer?.getLocalBounds();
+
+        return { display, shape, bounds };
+    }
+
+    test('a rectangle scaled 3 by 1 keeps its outline 4 px wide with Scale outline off', () => {
+        const { bounds } = drawnBoundsInGroup(false, { kind: 'rectangle', width: 40, height: 20 });
+
+        expect(bounds()?.minX).toBeCloseTo(-62);
+        expect(bounds()?.maxX).toBeCloseTo(62);
+        expect(bounds()?.minY).toBeCloseTo(-12);
+        expect(bounds()?.maxY).toBeCloseTo(12);
+    });
+
+    test('a rectangle scaled 3 by 1 stretches its outline to 12 px across with Scale outline on', () => {
+        const { bounds } = drawnBoundsInGroup(true, { kind: 'rectangle', width: 40, height: 20 });
+
+        expect(bounds()?.minX).toBeCloseTo(-66);
+        expect(bounds()?.maxX).toBeCloseTo(66);
+        expect(bounds()?.minY).toBeCloseTo(-12);
+        expect(bounds()?.maxY).toBeCloseTo(12);
+    });
+
+    test('a circle stretched into an ellipse keeps its outline width with Scale outline off', () => {
+        const { bounds } = drawnBoundsInGroup(false, { kind: 'circle', radius: 10 });
+
+        expect(bounds()?.minX).toBeCloseTo(-32, 1);
+        expect(bounds()?.maxX).toBeCloseTo(32, 1);
+        expect(bounds()?.minY).toBeCloseTo(-12, 1);
+        expect(bounds()?.maxY).toBeCloseTo(12, 1);
+    });
+
+    test('with Scale outline off, a change of scale rebuilds the drawing, and a move does not', () => {
+        const { display, shape, bounds } = drawnBoundsInGroup(false, { kind: 'rectangle', width: 40, height: 20 });
+        const transform = shape.requireComponent(TransformComponent);
+        const buildsBefore = display.drawingBuildCount;
+
+        transform.set('position', { x: 5, y: 0 });
+        display.prepare();
+        const buildsAfterMove = display.drawingBuildCount;
+
+        transform.set('scale', { x: 1, y: 1 });
+        display.prepare();
+
+        expect(buildsAfterMove).toBe(buildsBefore);
+        expect(display.drawingBuildCount).toBe(buildsBefore + 1);
+        expect(bounds()?.minX).toBeCloseTo(-17);
+        expect(bounds()?.maxX).toBeCloseTo(27);
+    });
+
     test('opacity is the drawing alpha, and hiding an entity hides its node', () => {
         const level = Level.createNew();
         const square = addShape(level, level.world, SQUARE);

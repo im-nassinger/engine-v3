@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'vitest';
 
-import { BodyComponent, createV1Registry, JointComponent, NameComponent } from '../../components/index.ts';
+import {
+    BodyComponent,
+    createV1Registry,
+    JointComponent,
+    NameComponent,
+    StyleComponent,
+} from '../../components/index.ts';
 import type { Level } from '../../level/index.ts';
 
 import { FormatUpgrader } from '../versions/FormatUpgrader.ts';
@@ -165,6 +171,18 @@ describe('LevelReader missing values', () => {
 
         expect(body.get('type')).toBe('static');
         expect(body.get('gravityScale')).toBe(1);
+    });
+
+    test('reads a level saved before Scale outline with the checkbox off', () => {
+        const levelData = newLevelData();
+        const savedStyle = { outline_colour: '#1F3552FF', outline_width: 4, opacity: 1 };
+        levelData.world.children.push(plainEntity(3, { StyleComponent: savedStyle }));
+
+        const level = expectRead(levelData);
+        const style = level.requireEntity(3).requireComponent(StyleComponent);
+
+        expect(style.get('outlineWidth')).toBe(4);
+        expect(style.get('scaleOutline')).toBe(false);
     });
 
     test('gives an entity without a TransformComponent or a NameComponent the defaults', () => {

@@ -17,23 +17,20 @@ describe('ShapeComponent', () => {
         expect(shape.readDerived('width')).toBe(100);
     });
 
-    test("a polygon's Width and Height are its points' extent, and typing them rescales the points", () => {
-        const shape = new ShapeComponent({ geometry: { kind: 'polygon', points: triangle } });
+    test('a polygon or line has no Width or Height, only its points', () => {
+        const widthField = ShapeComponent.schema.findDerivedField('width');
+        const heightField = ShapeComponent.schema.findDerivedField('height');
+        const polygon = new ShapeComponent({ geometry: { kind: 'polygon', points: triangle } });
+        const line = new ShapeComponent({ geometry: { kind: 'line', points: triangle.slice(0, 2) } });
 
-        expect(shape.readDerived('width')).toBe(100);
-        expect(shape.readDerived('height')).toBe(80);
-
-        shape.writeDerived('width', 200);
-        shape.writeDerived('height', 40);
-
-        expect(shape.get('geometry')).toEqual({
-            kind: 'polygon',
-            points: [
-                { x: -100, y: -20 },
-                { x: 100, y: -20 },
-                { x: 0, y: 20 },
-            ],
-        });
+        for (const shape of [polygon, line]) {
+            const values = { geometry: shape.get('geometry') };
+            expect(widthField?.appliesWhen?.(values)).toBe(false);
+            expect(heightField?.appliesWhen?.(values)).toBe(false);
+            expect(() => shape.writeDerived('width', 200)).toThrow();
+            expect(() => shape.writeDerived('height', 40)).toThrow();
+        }
+        expect(polygon.get('geometry')).toEqual({ kind: 'polygon', points: triangle });
     });
 
     test('typing a size for a rectangle changes it, at least 1 px', () => {
@@ -43,20 +40,6 @@ describe('ShapeComponent', () => {
         shape.writeDerived('height', 0.25);
 
         expect(shape.get('geometry')).toEqual({ kind: 'rectangle', width: 250, height: 1 });
-    });
-
-    test('a flat line shows Height 0, and typing a height for it is refused', () => {
-        const floor = [
-            { x: -150, y: 0 },
-            { x: 150, y: 0 },
-        ];
-        const shape = new ShapeComponent({ geometry: { kind: 'line', points: floor } });
-
-        const outcome = shape.writeDerived('height', 20);
-
-        expect(shape.readDerived('height')).toBe(0);
-        expect(outcome).toEqual({ ok: false, problem: { reason: 'flatShape' } });
-        expect(shape.get('geometry')).toEqual({ kind: 'line', points: floor });
     });
 
     test('Points lists the points, and applies only to a polygon or line', () => {

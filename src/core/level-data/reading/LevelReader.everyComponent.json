@@ -40,6 +40,7 @@
                 },
                 "outline_colour": "#000000FF",
                 "outline_width": 0,
+                "scale_outline": false,
                 "opacity": 1
             },
             "PhysicsWorldComponent": {
@@ -97,6 +98,7 @@
                         },
                         "outline_colour": "#2ECC7180",
                         "outline_width": 5,
+                        "scale_outline": true,
                         "opacity": 0.5
                     },
                     "BodyComponent": {
@@ -239,6 +241,7 @@
                         },
                         "outline_colour": "#1F3552FF",
                         "outline_width": 3,
+                        "scale_outline": false,
                         "opacity": 1
                     },
                     "JointComponent": {

@@ -1,5 +1,6 @@
 import { PathComponent, ShapeComponent, StyleComponent, TransformComponent } from '../../core/components/index.ts';
 import type { AnyComponent } from '../../core/components/index.ts';
+import { outlineStretchOf } from '../../core/derived/index.ts';
 import type { BoundsCache, PiecesCache, WorldMatrixCache } from '../../core/derived/index.ts';
 import type { Entity, Level, LevelUpdate } from '../../core/level/index.ts';
 import type { Unsubscribe } from '../../core/events/index.ts';
@@ -43,6 +44,12 @@ function changesDrawing(component: AnyComponent) {
 
 function changesMatrix(component: AnyComponent) {
     return component.schema === TransformComponent.schema;
+}
+
+function sameStretch(first: Matrix2D | undefined, second: Matrix2D | undefined) {
+    if (first === undefined || second === undefined) return first === second;
+
+    return first.a === second.a && first.b === second.b && first.c === second.c && first.d === second.d;
 }
 
 // One EntityNode per entity, nested like the entity tree. A move changes only a node's matrix; a shape,
@@ -98,6 +105,7 @@ export class LevelDisplay {
             if (node === undefined) continue;
 
             EntityDrawing.draw(node.graphics, entity, this.parts.caches.pieces, this.parts.options);
+            node.drawnOutlineStretch = outlineStretchOf(entity)?.stretch;
             this.drawingBuilds += 1;
         }
 
@@ -318,12 +326,23 @@ export class LevelDisplay {
 
     private handleComponentChange(entity: Entity, component: AnyComponent) {
         if (changesMatrix(component)) {
-            this.requireNode(entity).applyTransform();
+            const node = this.requireNode(entity);
+            node.applyTransform();
+            this.noteOutlineStretch(entity, node);
         }
 
         if (changesDrawing(component)) {
             this.staleDrawings.add(entity);
         }
+    }
+
+    // With Scale outline off, the drawing holds the entity's own scale and skew, so a change to them rebuilds
+    // it. A move or a turn doesn't, so dragging many entities still only changes their matrices.
+    private noteOutlineStretch(entity: Entity, node: EntityNode) {
+        const stretch = outlineStretchOf(entity)?.stretch;
+        if (sameStretch(stretch, node.drawnOutlineStretch)) return;
+
+        this.staleDrawings.add(entity);
     }
 
     private requireNode(entity: Entity) {
