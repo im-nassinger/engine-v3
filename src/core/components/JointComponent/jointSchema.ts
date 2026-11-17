@@ -86,7 +86,6 @@ export const jointSchema = new ComponentSchema<JointValues>({
             type: new CheckboxFieldType(),
             // Off for a Hinge. The Joint tool turns it on for a Rope or Spring, whose ends act at a distance.
             defaultValue: false,
-            description: 'Lets the two bodies bump into each other.',
             changeableInPlay: false,
         },
         {

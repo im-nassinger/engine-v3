@@ -65,7 +65,7 @@ export type FieldDefinition<Values, Key extends keyof Values> = {
     readonly label: string;                  // "Linear damping". The Lua attribute is its snake_case
     readonly type: FieldType<Values[Key]>;
     readonly defaultValue: Values[Key];
-    readonly description: string;            // shown when hovering the label
+    readonly description?: string;           // shown when hovering the label; none when the label says enough
     readonly unit?: Unit;
     readonly displayScale?: number;          // opacity is stored 0 to 1 and shown 0 to 100 %
     readonly precision?: number;             // decimals shown, 2 when not given

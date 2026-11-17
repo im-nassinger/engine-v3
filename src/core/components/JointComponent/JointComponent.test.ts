@@ -23,6 +23,13 @@ describe('JointComponent', () => {
         expect(joint.get('length')).toBe(100);
     });
 
+    test('Let connected objects collide has no description, its label says enough', () => {
+        const setting = JointComponent.schema.fields.find((field) => field.key === 'letConnectedObjectsCollide');
+
+        expect(setting?.label).toBe('Let connected objects collide');
+        expect(setting?.description).toBeUndefined();
+    });
+
     test('limits always include the placed position', () => {
         const joint = new JointComponent();
 

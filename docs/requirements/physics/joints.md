@@ -70,9 +70,11 @@ Source: round 6: 06 2.2; round 7: 06 2.3; round 5: TK2; old: JT-04 to JT-25; own
 
 Every joint:
 
-| Setting | What it does | Default |
-|---|---|---|
-| Let connected objects collide | Lets the two bodies bump into each other | Off for Hinge. On for Rope and Spring, because their ends act at a distance |
+| Setting | Default |
+|---|---|
+| Let connected objects collide | Off for Hinge. On for Rope and Spring, because their ends act at a distance |
+
+Its name is enough, and it has no description (owner: 2026-11-17). It covers the joint's two bodies only: bodies joined through other bodies, as in a ragdoll, still collide.
 
 Hinge:
 

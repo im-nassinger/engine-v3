@@ -16,7 +16,7 @@ How values are edited and how mistakes are reversed. **v1:** the Inspector shows
 - Cards appear in one fixed order, the same on every entity: TransformComponent, shape, path, text, style, body, surface, joint, camera, tags, scripts, triggers. Users can't reorder them.
 - Clicking a card's title folds it. The folded state is remembered per component type, in the browser.
 - TransformComponent fields are measured from the parent, and the tooltip says so. The level position of the selection is in the status bar.
-- Hovering a field's label shows its description. The TransformComponent's and the name's (owner: 2026-11-14):
+- Hovering a field's label shows its description, when it has one; a label that says enough, such as "Let connected objects collide", has none (owner: 2026-11-17). The TransformComponent's and the name's (owner: 2026-11-14):
 
 | Field | Description |
 |---|---|

@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { JointComponent } from '../../../core/components/index.ts';
 import { labelName, Level } from '../../../core/level/index.ts';
 import {
     addBareEntity,
@@ -175,6 +176,25 @@ describe('Inspector', () => {
         expect(remove.getAttribute('aria-disabled')).toBe('true');
         hover(remove);
         await expect.poll(() => shownTooltip(), TOOLTIP_WAIT).toBe('The World needs it');
+    });
+
+    test('the joint card\'s "Let connected objects collide" has no description, and B still has one', async () => {
+        const level = Level.createNew();
+        const hinge = addBareEntity(level, 'Hinge 1');
+        hinge.addComponent(new JointComponent());
+        const { session } = showInspector(level);
+        select(session, [hinge]);
+        await expect.poll(() => shownCardTypes()).toContain('JointComponent');
+
+        const card = requireCard('JointComponent');
+        hover(requireElement(card, '[data-key="letConnectedObjectsCollide"] .label'));
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        expect(shownTooltip()).toBeUndefined();
+
+        hover(requireElement(card, '[data-key="b"] .label'));
+        await expect
+            .poll(() => shownTooltip(), TOOLTIP_WAIT)
+            .toBe('The second entity. Empty pins A to the background.');
     });
 
     test("the header's name box renames the entity in one step, and Esc keeps the old name", async () => {

@@ -17,7 +17,7 @@ Changes the owner asked for that must be built **after v1's 18 stages and before
 | 7 | **Shift+T plays and stops** | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change; step 6 |
 | 8 | **W, A, S and D resize the selection and the Shape tool's preview**, changing the shape's values | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change; steps 12 and 13 |
 | 9 | **No part of the editor is covered by another**: find every case and fix it | owner, 2026-11-17 | Settled; steps 14 and 15 |
-| 10 | **"Let connected objects collide" has no description** | owner, 2026-11-17 | Settled; step 2 |
+| 10 | **"Let connected objects collide" has no description** | owner, 2026-11-17 | **Built** on 2026-11-17, step 2 |
 
 ## 1. Resizing changes the scale
 
@@ -156,3 +156,5 @@ To update when planned: `architecture/ui.md` (the stacking order), the layout ch
 The owner's words: just call it "Let connected objects collide". The name is enough, and the description under it ("Lets the two bodies bump into each other.") goes. *Why: in a ragdoll the description led the owner to expect limbs joined through other limbs to stop colliding too, and they don't: the setting covers the joint's two bodies only. Ragdolls are for the collision grid in v3 (`requirements/physics/world.md`).*
 
 To update when planned: "Settings of each joint" in `requirements/physics/joints.md`, `jointSchema.ts` and its tests.
+
+**Built** (2026-11-17, step 2): the setting has no description, a field's description became optional for it, and the Inspector shows no tooltip on its label.

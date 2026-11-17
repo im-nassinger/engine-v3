@@ -19,7 +19,7 @@ export type CardFieldProps = {
     field: FieldModel;
 };
 
-// One field's row: its label, whose hover shows the description, and the field type's control. A
+// One field's row: its label, whose hover shows the description if it has one, and the field type's control. A
 // committed value is one step on every shown entity; a refused one gives its reason as status text. A
 // slider changes the level while dragged and makes its one step when let go.
 export function CardField({ openLevel, typeName, entityIds, field }: CardFieldProps) {
@@ -66,12 +66,17 @@ export function CardField({ openLevel, typeName, entityIds, field }: CardFieldPr
     };
 
     const subject = { openLevel, typeName, entityIds };
+    const labelText = <span className="label">{label}</span>;
 
     return (
         <div className="card-field" data-key={key} data-enabled={field.isEnabled}>
-            <Tooltip label={description} isLong>
-                <span className="label">{label}</span>
-            </Tooltip>
+            {description === undefined ? (
+                labelText
+            ) : (
+                <Tooltip label={description} isLong>
+                    {labelText}
+                </Tooltip>
+            )}
             <span className="control">
                 <FieldControl
                     field={field}

@@ -5,6 +5,8 @@ import { createV1Registry } from './registry/createV1Registry.ts';
 
 const registry = createV1Registry();
 const SCHEMAS = registry.all().map((componentClass) => componentClass.schema);
+// Fields with no description, because the owner found the label enough (2026-11-17).
+const LABEL_ONLY_FIELDS = new Set(['JointComponent.letConnectedObjectsCollide']);
 
 describe.each(SCHEMAS)('the $typeName schema', (schema) => {
     test('each key is the camelCase of its label', () => {
@@ -38,9 +40,11 @@ describe.each(SCHEMAS)('the $typeName schema', (schema) => {
         }
     });
 
-    test('each field and derived field has a description', () => {
+    test('each field and derived field has a description, but the ones whose label says enough', () => {
         for (const field of [...schema.fields, ...schema.derivedFields]) {
-            expect(field.description.length).toBeGreaterThan(0);
+            if (LABEL_ONLY_FIELDS.has(`${schema.typeName}.${field.key}`)) continue;
+
+            expect(field.description?.length).toBeGreaterThan(0);
         }
     });
 

@@ -7,8 +7,8 @@ export type FieldDefinition<Values, Key extends keyof Values> = {
     readonly label: string;
     readonly type: FieldType<Values[Key]>;
     readonly defaultValue: Values[Key];
-    // Shown when hovering the label.
-    readonly description: string;
+    // Shown when hovering the label. A field whose label says enough has none.
+    readonly description?: string;
     readonly unit?: Unit;
     // Opacity is stored 0 to 1 and shown 0 to 100 %.
     readonly displayScale?: number;
