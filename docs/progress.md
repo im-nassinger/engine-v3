@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 16, step 4 of 12: `TickPacer` is built, pacing 60 ticks a second in batches of at most 4 with the backlog capped at 15 ticks, Pause, Step and `interpolation`. Next is step 5, `Watchdog`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 16, step 5 of 12: `Watchdog` is built, checked once a frame: the notice after 2 s unanswered, `hung` after 5 s, and a frame gap over 1 s starting the wait again. Next is step 6, `PlayMirror`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
