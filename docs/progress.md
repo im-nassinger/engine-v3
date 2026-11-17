@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 16, step 10 of 12: the page is built: Play in the top bar, the Play bar with its states, buttons and messages, the panels hidden during a run, the pointer off, and the level view drawing the running game through the camera, each body at its pose. Next is step 11, the Playwright tests. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 16, step 11 of 12: the Playwright tests are built: a drawn Dynamic box falls during play and the level is exactly as before after Stop, Pause holds it and Step moves it one tick, and a hidden tab pauses the run, in three browsers, 56 Playwright tests in all. Next is step 12, the docs. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -233,7 +233,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 16 of [plan.md](steps/stage-16.md): test play.** Step 1 wrote its twelve steps and the [choices](architecture/simulation.md#stage-16s-choices); steps 2 to 9 are built, and step 10, the page with the Play button and the Play bar, is next.
+1. **Stage 16 of [plan.md](steps/stage-16.md): test play.** Step 1 wrote its twelve steps and the [choices](architecture/simulation.md#stage-16s-choices); steps 2 to 11 are built, and step 12, the docs, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
