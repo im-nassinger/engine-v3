@@ -16,8 +16,8 @@ export const HIT_TOLERANCE_PX = 5;
 const WIDEST_REACH_PX = Math.max(HIT_TOLERANCE_PX, JOINT_ICON_RADIUS_PX);
 
 // Answers "what is under this point" and "what does this box touch" with the requirement's hit areas.
-// Clicks pass through the World, hidden and locked entities, and entities inside the camera unless you are
-// inside the camera. What is inside the camera is drawn over the level, so it is in front there.
+// Clicks pass through the World, hidden and locked entities unless the probe asks for them, and entities
+// inside the camera unless you are inside the camera. What is inside the camera is drawn over the level, so it is in front there.
 export class HitTester {
     private readonly level: Level;
     private readonly caches: DerivedCaches;
@@ -117,13 +117,16 @@ export class HitTester {
         const bounds = this.caches.bounds.ownBoundsOf(entity);
         if (bounds === undefined || !bounds.overlaps(searchArea)) return false;
 
-        if (this.caches.hidden.isHidden(entity)) return false;
-        if (this.caches.hidden.isLocked(entity)) return false;
+        if (probe.reachHiddenAndLocked !== true && this.isHiddenOrLocked(entity)) return false;
 
         const reachesTheCamera = this.isInsideOrIsTheCamera(probe.currentGroup);
         if (this.isInsideTheCamera(entity) && !reachesTheCamera) return false;
 
         return true;
+    }
+
+    private isHiddenOrLocked(entity: Entity) {
+        return this.caches.hidden.isHidden(entity) || this.caches.hidden.isLocked(entity);
     }
 
     private isInsideTheCamera(entity: Entity) {

@@ -60,11 +60,14 @@ Source: round 1: D41, D42; round 6: 06 2.1; round 8: JV2; decisions: D46; old: J
 - Ends snap to centres and corners when close. It is the same snapping used everywhere else.
 - Two merged shapes of one car count as one body. Entities without physics, hidden entities and locked entities are skipped.
 - A preview shows what will be connected before you click, with a label such as "Hinge: Wheel to Car".
-- Clicking with no physics entity under the mouse does nothing and shows a hint.
+- **Over an entity it skips, the preview's label says why**, when there is no physics entity to use there: "Platform has no BodyComponent", "Platform is hidden", "Platform is locked". Clicking does nothing and the status text repeats the reason. *Why: "Nothing with physics here", small and far from the mouse, didn't say which entity or why (owner: 2026-11-16).*
+- **A Rope's or Spring's second click on an entity it skips is refused** with the same reason, instead of pinning that end to the background. *Why: a joint to the background there is not the one the user meant (owner: 2026-11-16).*
+- No fix button in the preview: it can't be clicked. A fix belongs in an editor message on the card.
+- Clicking with nothing under the mouse does nothing and shows a hint.
 - Making a joint is one undo step. The new joint is selected.
 - **Joints come only from the Joint tool.** The JointComponent is in the Add Component menu, disabled, with "Use the Joint tool to place a joint." *Why: added by hand, a joint would have no ends and no A, and would do nothing until deleted and placed again, since re-attaching an end is v3 (standing yes, 2026-11-14).*
 
-Source: round 6: 06 2.2; round 7: 06 2.3; round 5: TK2; old: JT-04 to JT-25; owner: 2026-11-14
+Source: round 6: 06 2.2; round 7: 06 2.3; round 5: TK2; old: JT-04 to JT-25; owner: 2026-11-14; owner: 2026-11-16
 
 ### Settings of each joint · v1
 

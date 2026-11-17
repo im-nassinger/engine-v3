@@ -248,6 +248,19 @@ describe('HitTester passing through', () => {
         expect(tester.topmostAt({ x: 100, y: 100 }, probeAt(level))).toBe(back);
     });
 
+    test('a probe that reaches hidden and locked entities finds them, front to back', () => {
+        const { level, tester } = buildTester();
+        const back = addFilledSquare(level, level.world, { x: 100, y: 100 });
+        const hidden = addFilledSquare(level, level.world, { x: 100, y: 100 });
+        const locked = addFilledSquare(level, level.world, { x: 100, y: 100 });
+        hidden.setHidden(true);
+        locked.setLocked(true);
+
+        const probe = { ...probeAt(level), reachHiddenAndLocked: true };
+
+        expect(tester.allAt({ x: 100, y: 100 }, probe)).toEqual([locked, hidden, back]);
+    });
+
     test('entities inside the camera are passed through, unless you are inside the camera', () => {
         const { level, tester } = buildTester();
         const back = addFilledSquare(level, level.world, { x: 100, y: 100 });

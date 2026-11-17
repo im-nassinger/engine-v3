@@ -43,12 +43,14 @@ const CTRL_CODES = new Set(['ControlLeft', 'ControlRight', 'MetaLeft', 'MetaRigh
 
 // What a click at the mouse would do.
 type ClickPlan =
-    // Nothing under the mouse to start a joint on.
-    | { readonly kind: 'nothing'; readonly at: Point }
+    // Nothing under the mouse to start a joint on; skipped says why, when an entity there is skipped.
+    | { readonly kind: 'nothing'; readonly at: Point; readonly skipped: string | undefined }
     // A Rope or Spring's first end.
     | { readonly kind: 'first'; readonly end: JointEnd }
     // A second click on the first end's body, which does nothing and keeps waiting.
     | { readonly kind: 'wait'; readonly at: Point }
+    // A second click on an entity the tool skips, refused rather than pinning that end to the background.
+    | { readonly kind: 'refused'; readonly at: Point; readonly reason: string }
     // An empty b is the background, its end at the mouse.
     | { readonly kind: 'place'; readonly at: Point; readonly a: JointEnd; readonly b: JointEnd | undefined };
 
@@ -56,6 +58,8 @@ type PlacePlan = Extract<ClickPlan, { readonly kind: 'place' }>;
 
 // Places a Hinge with one click, where two bodies overlap or on one to pin it, and a Rope or Spring with
 // two, one on each body, or the second on empty space to hang from the background. The smaller body is A.
+// Over an entity it skips, with no body to use there, the preview's label and a click's status text say
+// why, such as "Platform is locked", and a second end there is refused.
 // Ends snap to the centres and corners of the entities under the mouse, then the grid; Ctrl turns both
 // off. Placing runs placeJoint, one step, and the controller selects the joint and returns to Select
 // unless the tool is locked.
@@ -178,7 +182,10 @@ export class JointTool implements Tool {
         const plan = this.planAt(input.levelPosition, input.modifiers);
         switch (plan.kind) {
             case 'nothing':
-                context.status.show(NOTHING_HERE);
+                context.status.show(plan.skipped ?? NOTHING_HERE);
+                return;
+            case 'refused':
+                context.status.show(plan.reason);
                 return;
             case 'wait':
                 return;
@@ -217,7 +224,7 @@ export class JointTool implements Tool {
     // are used.
     private planAt(levelPosition: Point, modifiers: Modifiers): ClickPlan {
         const context = this.context;
-        if (context === undefined) return { kind: 'nothing', at: levelPosition };
+        if (context === undefined) return { kind: 'nothing', at: levelPosition, skipped: undefined };
 
         const { openLevel, view, snapper } = context;
         const under = bodiesUnder(openLevel, levelPosition, view.zoom);
@@ -231,11 +238,12 @@ export class JointTool implements Tool {
             const other = under.bodies.find((body) => body !== first.body);
             if (other !== undefined) return { kind: 'place', at, ...pickBodyA(first, { body: other, at }, caches) };
             if (front !== undefined) return { kind: 'wait', at };
+            if (under.skipped !== undefined) return { kind: 'refused', at, reason: under.skipped };
 
             return { kind: 'place', at, a: first, b: undefined };
         }
 
-        if (front === undefined) return { kind: 'nothing', at };
+        if (front === undefined) return { kind: 'nothing', at, skipped: under.skipped };
         if (this.chosenType !== 'hinge') return { kind: 'first', end: { body: front, at } };
         if (behind === undefined) return { kind: 'place', at, a: { body: front, at }, b: undefined };
 
@@ -268,7 +276,9 @@ export class JointTool implements Tool {
 
         switch (plan.kind) {
             case 'nothing':
-                return { ...waiting, mouse: plan.at, a: undefined, label: undefined };
+                return { ...waiting, mouse: plan.at, a: undefined, label: plan.skipped };
+            case 'refused':
+                return { ...waiting, mouse: plan.at, a: this.first?.body.id, label: plan.reason };
             case 'first':
                 return { ...waiting, mouse: plan.end.at, a: plan.end.body.id, label: `${word}: ${nameOf(plan.end)}` };
             case 'wait': {

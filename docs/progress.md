@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 18, step 4 of 16: unstyled joints are invisible in play, since the joint icons are never drawn through the camera. Next is step 5, the Joint tool says why. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 18, step 5 of 16: the Joint tool says why it skips an entity, in the preview's label and the status text, and refuses a second end there. Next is step 6, Shift+T plays and stops. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -38,7 +38,7 @@
 | Stage 15, the camera | Done on 2026-11-16. See below |
 | Stage 16, test play | Done on 2026-11-17. See below |
 | Stage 17, the speed pass and the browser checks | Done on 2026-11-17. See below |
-| Stage 18, Before v2 | Planned on 2026-11-17 in [16 steps](steps/stage-18.md); steps 1 to 4 done |
+| Stage 18, Before v2 | Planned on 2026-11-17 in [16 steps](steps/stage-18.md); steps 1 to 5 done |
 | Code | Stages 0 to 17 done. Stage 18, Before v2, is being built |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.

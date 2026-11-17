@@ -50,6 +50,7 @@ export class HitTester {
 export type HitProbe = {
     readonly zoom: number;             // for the sizes that stay the same on screen
     readonly currentGroup: Entity;     // decides whether entities inside the camera are reached
+    readonly reachHiddenAndLocked?: boolean;   // the Joint tool, to say why it skips them
 };
 
 export type SpatialIndex = {
@@ -190,7 +191,8 @@ The Shape tool and point editing are in [drawing-and-points.md](drawing-and-poin
 ## The Joint tool
 
 - The joint type comes from its options strip, Hinge by default.
-- Under the mouse it looks for entities with physics, skipping hidden and locked ones. Shapes merged into one body count as one, through `BodyMembership` from [the physics module](../simulation.md#bodies-and-their-entities).
+- Under the mouse it looks for entities with physics, skipping hidden and locked ones and those without physics. Shapes merged into one body count as one, through `BodyMembership` from [the physics module](../simulation.md#bodies-and-their-entities).
+- **It says why it skips an entity** (owner, 2026-11-16): with no body to use under the mouse, the preview's label names the frontmost skipped entity and the reason, `Platform has no BodyComponent`, `Platform is hidden` or `Platform is locked`; a click shows the same text as the status text, and a Rope's or Spring's second click there is refused instead of pinning that end to the background.
 - **One-point joints** (Hinge) take one click: two bodies under the mouse are A and B; one body pins it to the background (B empty). **Two-ended joints** (Rope, Spring) take two clicks, one per entity, each end exactly where clicked.
 - **Which body is A:** the smaller of the two.
 - Ends snap to the centres and corners of the entities under the mouse, through a `PointSnapper` that v3's snapping to entities extends.
@@ -256,7 +258,8 @@ Made under the standing yes (2026-11-15), before building. The [plan](../../step
 Made under the standing yes (2026-11-16), before building. The [plan](../../steps/stage-14.md) has the steps; how joints play is in [simulation.md](../simulation.md#stage-14s-choices).
 
 - **Where things live:** `CreateJointCommand` in `editor/commands/joints/`; `JointTool` and `pickBodyA` in `editor/tools/joint/`; `PointSnapper` in `editor/snapping/point/` beside `grid/`; `JointPreviewOverlay` and `planJointPreview` in `adapters/pixi/overlays/joint-preview/`.
-- **What the tool finds under the mouse:** `HitTester.allAt` with the tool's probe, front to back, so hidden and locked entities are already passed through. Each hit becomes its body through `BodyMembership.bodyOf`, or itself for a surface with no body; hits without either are skipped, and two shapes of one body count once. The two frontmost bodies are used; choosing among three is v3.
+- **What the tool finds under the mouse:** `HitTester.allAt` with the tool's probe, front to back. Each hit becomes its body through `BodyMembership.bodyOf`, or itself for a surface with no body; hits without either are skipped, and two shapes of one body count once. The two frontmost bodies are used; choosing among three is v3.
+- **As built in stage 18 step 5** (standing yes, 2026-11-17): the probe sets `reachHiddenAndLocked`, so `bodiesUnder` sees hidden and locked hits and returns, beside the bodies, `skipped`: the frontmost skipped hit's reason, hidden before locked before no BodyComponent, named by the hit itself, not its group. Joints are skipped without a reason, since their icons sit over the bodies they join. A body under the mouse still wins over any skipped entity, in front of it or not. The plan `nothing` carries the reason, shown as the label and, on a click, instead of `Nothing with physics here`; a new plan `refused` is a second end with no body but a skipped entity, whose preview keeps the first end and A. *Why: the reason is only news when the click would otherwise do nothing or pin to the background; a hidden entity is not drawn, but the owner asked to name it.*
 - **`pickBodyA`:** the body with the smaller area is A, from `BodyMass`'s area or, for a surface with no body, its own pieces'; on a tie the frontmost is A. For a Rope or Spring swapping A and B swaps their ends too. *Why: the requirement says the smaller becomes A whatever the draw order, and area is what "smaller" looks like; density would make a small heavy wheel the bigger one.*
 - **A Hinge** is one click: two bodies make a Hinge between them, one pins it, none does nothing and shows `Nothing with physics here` (*proposal*). **A Rope or Spring** is two clicks: the first needs a body, like a Hinge; the second on another body joins them, on the same body does nothing and keeps waiting, and **on empty space attaches B to the background at that point**. *Why: "one on each entity" leaves a rope hanging from the ceiling with no way to make it, and an empty B is the requirement's background pin.*
 - **`PointSnapper`** snaps a click to the centres (of their own bounds) and corners (each piece's points in level positions) of the bodies under the mouse within 6 screen px, the nearest winning; failing that, the grid, as `GridSnapper.snapPoint` does when drawing; Ctrl turns both off. v3's snapping to entities replaces its first half.

@@ -181,6 +181,92 @@ describe('JointTool, a Rope or Spring', () => {
     });
 });
 
+type Skip = 'no body' | 'hidden' | 'locked';
+
+const SKIPS: readonly { readonly skip: Skip; readonly reason: string }[] = [
+    { skip: 'no body', reason: 'Platform has no BodyComponent' },
+    { skip: 'hidden', reason: 'Platform is hidden' },
+    { skip: 'locked', reason: 'Platform is locked' },
+];
+
+// A square named Platform at (400, 300) that the Joint tool skips for the given reason.
+function addSkipped(setup: ReturnType<typeof buildJointTest>, skip: Skip) {
+    const physics = skip === 'no body' ? 'none' : 'body';
+    const platform = addSquare(setup, { name: 'Platform', at: { x: 400, y: 300 }, size: 100, physics });
+    platform.setHidden(skip === 'hidden');
+    platform.setLocked(skip === 'locked');
+
+    return platform;
+}
+
+describe('JointTool says why it skips an entity', () => {
+    test.each(SKIPS)('a Hinge over $skip: the label and the click say "$reason"', ({ skip, reason }) => {
+        const setup = buildJointTest();
+        addSkipped(setup, skip);
+
+        setup.controller.pointerMove(pointer({ x: 400, y: 300 }));
+        expect(setup.tool.drawing?.label).toBe(reason);
+        expect(setup.tool.drawing?.a).toBeUndefined();
+
+        click(setup, { x: 400, y: 300 });
+        expect(joints(setup)).toEqual([]);
+        expect(setup.session.status.current).toBe(reason);
+        expect(setup.controller.active.id).toBe('joint');
+    });
+
+    test.each(SKIPS)('a Rope\'s first end over $skip says "$reason" and starts nothing', ({ skip, reason }) => {
+        const setup = buildJointTest();
+        addSkipped(setup, skip);
+        setup.tool.chooseType('rope');
+
+        setup.controller.pointerMove(pointer({ x: 400, y: 300 }));
+        expect(setup.tool.drawing?.label).toBe(reason);
+
+        click(setup, { x: 400, y: 300 });
+        expect(setup.session.status.current).toBe(reason);
+        expect(setup.tool.hint).toBe('Click the first entity, then the second.');
+    });
+
+    test.each(SKIPS)('a Spring\'s second end over $skip is refused with "$reason"', ({ skip, reason }) => {
+        const setup = buildJointTest();
+        const lamp = addSquare(setup, { name: 'Lamp', at: { x: 100, y: 100 }, size: 60 });
+        addSkipped(setup, skip);
+        setup.tool.chooseType('spring');
+        click(setup, { x: 100, y: 100 });
+
+        setup.controller.pointerMove(pointer({ x: 400, y: 300 }));
+        expect(setup.tool.drawing?.label).toBe(reason);
+        expect(setup.tool.drawing?.a).toBe(lamp.id);
+        expect(setup.tool.drawing?.ends).toEqual([{ x: 100, y: 100 }]);
+
+        click(setup, { x: 400, y: 300 });
+        expect(joints(setup)).toEqual([]);
+        expect(setup.session.status.current).toBe(reason);
+
+        click(setup, { x: 700, y: 550 });
+        const joint = onlyJoint(setup).requireComponent(JointComponent);
+        expect(joint.get('a')).toBe(lamp.id);
+        expect(joint.get('b')).toBeNull();
+    });
+
+    test('a body under the mouse is still used, and the frontmost skipped entity is named', () => {
+        const setup = buildJointTest();
+        const box = addSquare(setup, { name: 'Box', at: { x: 400, y: 300 }, size: 200 });
+        addSkipped(setup, 'locked');
+
+        setup.controller.pointerMove(pointer({ x: 400, y: 300 }));
+        expect(setup.tool.drawing?.label).toBe('Hinge: Box to background');
+
+        setup.controller.pointerMove(pointer({ x: 50, y: 50 }));
+        expect(setup.tool.drawing?.label).toBeUndefined();
+
+        addSquare(setup, { name: 'Picture', at: { x: 400, y: 300 }, size: 20, physics: 'none' });
+        box.setHidden(true);
+        setup.controller.pointerMove(pointer({ x: 400, y: 300 }));
+        expect(setup.tool.drawing?.label).toBe('Picture has no BodyComponent');
+    });
+});
+
 describe('JointTool snapping', () => {
     test('an end lands on a corner 4 screen px away', () => {
         const setup = buildJointTest(TENS_SNAPPER);

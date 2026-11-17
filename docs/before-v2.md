@@ -11,7 +11,7 @@ Changes the owner asked for that must be built **after v1's 18 stages and before
 | 1 | **Resizing changes the scale**, not the shape's values. Polygons and lines lose Width and Height | owner, 2026-11-16 | Settled, with Claude's picks for the owner to change; steps 7 and 8 |
 | 2 | **Z and X rotate the selection and the Shape tool's preview**, Shift+Z and Shift+X by 10° | owner, 2026-11-16 and 2026-11-17 | Settled, with Claude's picks for the owner to change; steps 10 and 11 |
 | 3 | **Ctrl+Shift while resizing resizes from the centre** | owner, 2026-11-16 | Settled, with Claude's picks for the owner to change; step 9 |
-| 4 | **The Joint tool says why an entity can't take a joint** | owner, 2026-11-16 | Settled; step 5 |
+| 4 | **The Joint tool says why an entity can't take a joint** | owner, 2026-11-16 | **Built** on 2026-11-17, step 5 |
 | 5 | **Unstyled joints are invisible in play**, joint icons included | owner, 2026-11-17 | **Built** on 2026-11-17, step 4 |
 | 6 | **+ zooms in without Shift**, as - zooms out | owner, 2026-11-17 | Settled; step 3 |
 | 7 | **Shift+T plays and stops** | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change; step 6 |
@@ -76,6 +76,8 @@ To build:
 - No fix button in the preview: the preview can't be clicked, and a fix button belongs in an editor message on the card.
 
 To update when planned: "The Joint tool" in `requirements/physics/joints.md` (the skip and hint rules), `architecture/editor/selection-and-tools.md` if it describes the Joint tool's preview, and `JointTool.ts` with its tests.
+
+**Built** (2026-11-17, step 5): the hit test can now reach hidden and locked entities when asked, and the Joint tool names the frontmost entity it skips, with no body to use there, in the label and the status text, and refuses a second end on it. A body under the mouse still wins over a skipped entity, and joints are skipped without a reason. Tests cover each reason before and on the click, for a Hinge and for a first and a second end.
 
 ## 5. Unstyled joints are invisible in play
 
