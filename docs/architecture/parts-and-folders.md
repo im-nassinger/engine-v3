@@ -52,7 +52,7 @@ src/
       caches/            WorldMatrixCache, BoundsCache, HiddenCache, PiecesCache
     level-data/        LevelData types, limits
       reading/           LevelReader and what it returns
-      writing/           LevelWriter
+      writing/           LevelWriter, LevelText
       versions/          FormatUpgrader, PhysicsVersions
     physics/           PhysicsWorld contract, PhysicsSceneBuilder (merging), BodyMass, JointEnds
       merging/           mergesInto: which body a shape merges into

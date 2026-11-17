@@ -4,17 +4,26 @@ import type { EntityId, JsonValue } from '../../fields/index.ts';
 
 import { CURRENT_FORMAT_VERSION, LEVEL_FORMAT } from '../LevelData.ts';
 import type { ComponentData, EntityData, LevelData } from '../LevelData.ts';
+
+// An entity's data without what is inside it, and the level's without its World: the pieces
+// LevelText puts together around the text it keeps.
+export type OwnEntityData = Omit<EntityData, 'children'>;
+export type LevelHeaderData = Omit<LevelData, 'world'>;
 import { PhysicsVersions } from '../versions/PhysicsVersions.ts';
 
 // The only code that turns a level into data. Every value is written, defaults included, by its type's
 // serialize, so the file says exactly what the level held.
 export class LevelWriter {
     write(level: Level): LevelData {
+        return { ...this.writeHeader(level), world: this.writeEntity(level.world) };
+    }
+
+    // Everything write gives but the World, its keys in the same order, the World's place being last.
+    writeHeader(level: Level): LevelHeaderData {
         const editor = {
             gridSize: level.editorData.gridSize,
             foldedRows: level.editorData.foldedRows(),
         };
-        const world = this.writeEntity(level.world);
 
         return {
             format: LEVEL_FORMAT,
@@ -22,8 +31,18 @@ export class LevelWriter {
             physicsVersion: PhysicsVersions.current,
             name: level.name,
             editor,
-            world,
         };
+    }
+
+    // One entity as writeSubtree gives it but its children, its keys in the same order, children's being last.
+    writeOwnEntity(entity: Entity): OwnEntityData {
+        const components: Record<string, ComponentData> = {};
+
+        for (const component of entity.components) {
+            components[component.schema.typeName] = this.writeComponent(component);
+        }
+
+        return { id: entity.id, hidden: entity.isHidden, locked: entity.isLocked, components };
     }
 
     // Each given entity with everything inside it, one nested EntityData per given entity.
@@ -46,21 +65,9 @@ export class LevelWriter {
 
     // Recursion is safe: the level is never deeper than the depth limit.
     private writeEntity(entity: Entity): EntityData {
-        const components: Record<string, ComponentData> = {};
-
-        for (const component of entity.components) {
-            components[component.schema.typeName] = this.writeComponent(component);
-        }
-
         const children = entity.children.map((child) => this.writeEntity(child));
 
-        return {
-            id: entity.id,
-            hidden: entity.isHidden,
-            locked: entity.isLocked,
-            components,
-            children,
-        };
+        return { ...this.writeOwnEntity(entity), children };
     }
 
     private writeComponent(component: AnyComponent): ComponentData {

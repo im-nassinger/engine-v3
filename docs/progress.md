@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 17, step 8 of 11: the speed pass ran three times on the owner's laptop, every number in [performance.md](architecture/performance.md#targets-and-their-tests): selecting, the panel's opening and test play meet their targets, the drag's one 0.1 ms miss is counted as met, and the Entities panel's scrolling misses (19.3 to 25.3 ms), so a new step 10 fixes it. Next is step 9, saving only what changed. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 17, step 9 of 11: saving only what changed is built: `LevelText` keeps each entity's `level.json` text until it changes, so a 10,000-entity save after one change takes 25 to 27 ms against 50 ms, each equal to a full write. Next is step 10, the Entities panel's scrolling. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -243,7 +243,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 17 of [plan.md](plan.md): the speed pass and the browser checks.** Its steps aren't written yet; writing them is the next step.
+1. **Stage 17 of [plan.md](plan.md): the speed pass and the browser checks.** Its [steps](steps/stage-17.md) are written; the **Runner:** line above says which is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

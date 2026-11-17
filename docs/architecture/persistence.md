@@ -55,6 +55,16 @@ export class LevelWriter {
     write(level: Level): LevelData;
     writeSubtree(entities: readonly Entity[]): readonly EntityData[];   // one nested EntityData per root
     writeNewEntity(id: EntityId, components: readonly AnyComponent[]): EntityData;  // not in a level yet, no children
+    writeHeader(level: Level): Omit<LevelData, 'world'>;               // for LevelText
+    writeOwnEntity(entity: Entity): Omit<EntityData, 'children'>;      // for LevelText
+}
+
+// level.json's text, equal to JSON.stringify(writer.write(level)), each entity's subtree text kept
+// until it changes (stage 17's step 9, performance.md)
+export class LevelText {
+    constructor(level: Level, writer: LevelWriter);
+    text(): string;
+    dispose(): void;
 }
 
 export class LevelReader {
@@ -153,6 +163,7 @@ export class Autosave {
 ```
 
 - It watches `levelVersion`. A change starts the quiet delay (2 s, restarted by each change) and, if not already running, the longest wait (20 s from the first unsaved change). It waits while a drag is in progress, read from `LiveEdit`. It also saves when the tab is hidden, on Play and before an export.
+- **A save writes again only what changed:** `Autosave` keeps a `LevelText` for the level it follows, so a save after a change writes only the changed entities and their parents. See [performance.md](performance.md#targets-and-their-tests) *(standing yes, 2026-11-17)*.
 - **A save is all or nothing:** the whole `level.json` is written in one IndexedDB transaction with strict durability, so it either fully replaces the last save or leaves it as it was.
 - **A failed save** sets `SaveState` to `failed`, adds the level-wide editor message, and keeps retrying every 10 seconds. Export still works because it doesn't touch storage.
 - **The leave prompt** is armed only while `SaveState` isn't `saved`, as the requirement says.

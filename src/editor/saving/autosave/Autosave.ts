@@ -1,5 +1,5 @@
 import type { Unsubscribe } from '../../../core/events/index.ts';
-import { V1_LEVEL_LIMITS } from '../../../core/level-data/index.ts';
+import { LevelText, V1_LEVEL_LIMITS } from '../../../core/level-data/index.ts';
 import type { LevelLimits, LevelWriter } from '../../../core/level-data/index.ts';
 import type { EditorMessage } from '../../messages/index.ts';
 import type { EditorSession, OpenLevel } from '../../session/index.ts';
@@ -30,9 +30,11 @@ export const DATA_CLEARED_TEXT = "The browser's saved data was cleared. The leve
 // The source of Autosave's level-wide editor message.
 export const SAVING_MESSAGE_SOURCE = 'saving';
 
-// What Autosave follows of the open level: its version, and its drags, which hold a save until they end.
+// What Autosave follows of the open level: its version, its text, kept per entity so a save writes again
+// only what changed, and its drags, which hold a save until they end.
 type Followed = {
     readonly openLevel: OpenLevel;
+    readonly text: LevelText;
     readonly stop: Unsubscribe;
     savedVersion: number;
 };
@@ -111,12 +113,14 @@ export class Autosave {
     private follow(openLevel: OpenLevel): Followed {
         const stopLevel = openLevel.level.signals.levelVersion.subscribe(() => this.changed());
         const stopDrag = openLevel.liveEdit.activeChanged.subscribe(() => this.dragChanged());
+        const text = new LevelText(openLevel.level, this.writer);
         const stop = () => {
             stopLevel();
             stopDrag();
+            text.dispose();
         };
 
-        return { openLevel, stop, savedVersion: -1 };
+        return { openLevel, text, stop, savedVersion: -1 };
     }
 
     // A new level is unsaved until it is saved: the store still holds the old one.
@@ -170,7 +174,7 @@ export class Autosave {
 
         const followed = this.followed;
         const version = this.levelVersion();
-        const levelJson = JSON.stringify(this.writer.write(followed.openLevel.level));
+        const levelJson = followed.text.text();
         if (!this.fits(levelJson)) {
             this.fail(OVER_SIZE_TEXT);
             return;

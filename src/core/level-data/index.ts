@@ -5,7 +5,9 @@ export type { ComponentData, EditorData, EntityData, LevelData } from './LevelDa
 export { V1_LEVEL_LIMITS } from './LevelLimits.ts';
 export type { LevelLimits } from './LevelLimits.ts';
 export { LevelReader } from './reading/LevelReader.ts';
+export { LevelText } from './writing/LevelText.ts';
 export { LevelWriter } from './writing/LevelWriter.ts';
+export type { LevelHeaderData, OwnEntityData } from './writing/LevelWriter.ts';
 export { PhysicsVersions } from './versions/PhysicsVersions.ts';
 export type { PhysicsBuild } from './versions/PhysicsVersions.ts';
 export type { LimitName, ReadCheck, ReadOutcome, ReadRefusal } from './reading/ReadOutcome.ts';
