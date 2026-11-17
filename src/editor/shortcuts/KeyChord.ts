@@ -87,6 +87,12 @@ export class KeyChord {
         return this.keyMatches(press);
     }
 
+    // A chord found by the typed character, which some layouts type on a key another chord names: Shift+0
+    // types '=' on a German keyboard. The chord that names its key wins such a press.
+    get isTypedCharacter() {
+        return this.chordKey.kind === 'character';
+    }
+
     // Two chords with the same keys would fight over one press.
     sameKeysAs(other: KeyChord) {
         const sameModifiers = this.ctrl === other.ctrl && this.shift === other.shift && this.alt === other.alt;

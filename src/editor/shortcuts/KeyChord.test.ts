@@ -34,6 +34,9 @@ describe('KeyChord on a US layout', () => {
         expect(chordMatches('+', US_KEYS.plus)).toBe(true);
         expect(chordMatches('+', US_KEYS.numpadPlus)).toBe(true);
         expect(chordMatches('+', US_KEYS.equals)).toBe(false);
+        expect(chordMatches('=', US_KEYS.equals)).toBe(true);
+        expect(chordMatches('=', US_KEYS.ctrlEquals)).toBe(false);
+        expect(chordMatches('-', US_KEYS.numpadMinus)).toBe(true);
         expect(chordMatches('Ctrl+=', US_KEYS.ctrlEquals)).toBe(true);
         expect(chordMatches('-', US_KEYS.minus)).toBe(true);
         expect(chordMatches('-', US_KEYS.ctrlMinus)).toBe(false);

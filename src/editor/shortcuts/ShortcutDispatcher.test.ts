@@ -9,13 +9,25 @@ import { ManualFrames, ManualTimer } from '../time/testing/index.ts';
 
 import type { KeyboardInputData } from './KeyboardInputData.ts';
 import { ShortcutDispatcher } from './ShortcutDispatcher.ts';
-import { GERMAN_KEYS, MAC_KEYS, US_KEYS, recordedKey } from './testing/recordedKeys.ts';
+import { ABNT2_KEYS, GERMAN_KEYS, MAC_KEYS, US_KEYS, recordedKey } from './testing/recordedKeys.ts';
 
 type FakeOptions = {
     readonly scope?: ShortcutScope;
     readonly repeatsWhileHeld?: boolean;
     readonly availability?: Availability;
 };
+
+// The editor's own registry behind a dispatcher, on a layout-neutral computer.
+function buildEditorDispatcher() {
+    const timer = new ManualTimer();
+    const level = Level.createNew();
+    const session = new EditorSession({ level, clock: timer.clock, timer, frames: new ManualFrames() });
+    const registry = createCommandRegistry(session);
+    const runner = new CommandRunner(session.status);
+    const dispatcher = new ShortcutDispatcher(registry, runner, 'other');
+
+    return { session, dispatcher };
+}
 
 // A command with the test's keys and scope, counting how often it ran.
 function fakeCommand(id: string, shortcuts: readonly string[], options: FakeOptions = {}) {
@@ -218,6 +230,35 @@ describe('ShortcutDispatcher', () => {
         dispatcher.handleKeyDown(repeated(US_KEYS.plus), 'level', false);
 
         expect(session.view.zoom).toBe(zoomBefore * 4);
+    });
+
+    test.each([
+        ['= alone', US_KEYS.equals, 2],
+        ['Shift+= (+)', US_KEYS.plus, 2],
+        ["the numpad's +", US_KEYS.numpadPlus, 2],
+        ['Ctrl+=', US_KEYS.ctrlEquals, 2],
+        ['= alone on ABNT2', ABNT2_KEYS.equals, 2],
+        ['+ on a German keyboard', GERMAN_KEYS.plus, 2],
+        ['- alone', US_KEYS.minus, 0.5],
+        ["the numpad's -", US_KEYS.numpadMinus, 0.5],
+        ['Ctrl+-', US_KEYS.ctrlMinus, 0.5],
+    ])('%s zooms by %s', (_name, key, zoomFactor) => {
+        const { session, dispatcher } = buildEditorDispatcher();
+        const zoomBefore = session.view.zoom;
+
+        const used = dispatcher.handleKeyDown(key, 'level', false);
+
+        expect(used).toBe(true);
+        expect(session.view.zoom).toBe(zoomBefore * zoomFactor);
+    });
+
+    test("Shift+0 on a German keyboard, which types '=', is 100% and not Zoom in", () => {
+        const { session, dispatcher } = buildEditorDispatcher();
+        session.view.zoomAboutMiddle(4);
+
+        dispatcher.handleKeyDown(GERMAN_KEYS.shift0, 'level', false);
+
+        expect(session.view.zoom).toBe(1);
     });
 
     test('Ctrl+C, Ctrl+X and Ctrl+V are left to the browser, which sends its clipboard events', () => {

@@ -104,6 +104,8 @@ To build:
 
 To update when planned: the zoom row of `requirements/editor/shortcuts.md`, `ZoomInCommand.ts` and its tests, and `architecture/editor/clipboard-and-shortcuts.md` if it lists the zoom keys.
 
+**Built** (2026-11-17, step 3): Zoom in's keys are +, = and Ctrl+=; the menu still shows +. On a German keyboard Shift+0 types =, so a chord that names its key now wins over one found by the typed character, and Shift+0 stays 100% there.
+
 ## 7. Shift+T plays and stops
 
 The owner's words: to play or stop a level, the T key should be used. Then Ctrl+T, which the browser keeps for a new tab and never gives the page (see the keys left to the browser in `requirements/editor/shortcuts.md`), so the owner settled on Shift+T.

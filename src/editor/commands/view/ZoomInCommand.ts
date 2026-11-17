@@ -4,12 +4,13 @@ import type { Availability, CommandOutcome, EditorCommand } from '../EditorComma
 
 const ZOOMED_IN_FULLY = 'Already at 1000%';
 
-// Doubles the zoom about the view's middle. Never a step.
+// Doubles the zoom about the view's middle. Never a step. '=' is the key that holds '+' on most
+// layouts, so it zooms in with or without Shift, as '-' zooms out.
 export class ZoomInCommand implements EditorCommand {
     readonly id = 'view.zoomIn';
     readonly label = 'Zoom in';
     readonly menu = { menu: 'View', section: 2, order: 10 } as const;
-    readonly shortcuts = ['+', 'Ctrl+='];
+    readonly shortcuts = ['+', '=', 'Ctrl+='];
     readonly repeatsWhileHeld = true;
     private readonly session: EditorSession;
 

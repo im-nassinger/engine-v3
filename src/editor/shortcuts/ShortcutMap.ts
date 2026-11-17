@@ -41,9 +41,14 @@ export class ShortcutMap {
         return this.shortcuts;
     }
 
-    // Every shortcut the press matches, one per scope at most; the dispatcher picks by focus.
+    // Every shortcut the press matches, the ones naming their key before the typed characters, so a
+    // scope's first is the one meant: Shift+0 on a German keyboard is 100%, not the '=' it types.
     matching(press: KeyPress) {
-        return this.shortcuts.filter((shortcut) => shortcut.chord.matches(press));
+        const matching = this.shortcuts.filter((shortcut) => shortcut.chord.matches(press));
+        const namingTheirKey = matching.filter((shortcut) => !shortcut.chord.isTypedCharacter);
+        const byCharacter = matching.filter((shortcut) => shortcut.chord.isTypedCharacter);
+
+        return [...namingTheirKey, ...byCharacter];
     }
 
     // The first shortcut of a command, for its menu entry.
