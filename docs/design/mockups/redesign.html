@@ -89,7 +89,10 @@
   .lc-sub { display: flex; gap: 12px; align-items: center; }
   .lc-sub .savestate { padding: 0; }
   .lc-meta { color: var(--faint); }
-  .lcard .lc-row:last-child { margin-top: auto; }
+  .lcard > .lc-row:last-child { margin-top: 10px; }
+  .leftcol { position: absolute; display: flex; flex-direction: column; gap: 10px; z-index: 2; }
+  .leftcol > .insp { flex: 1; min-height: 0; }
+  .leftcol > .opts { position: static; align-self: flex-start; }
   .zoomg { display: inline-flex; align-items: center; gap: 2px; background: var(--field); border-radius: 999px; padding: 0 2px; }
   .zoomg .ib { min-width: 26px; height: 26px; border-radius: 999px; }
   .zoomg .num { min-width: 36px; text-align: center; }
@@ -102,7 +105,7 @@
   .zslider i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); border-radius: 2px; }
   .zslider b { position: absolute; top: -5px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--text); }
   .zval { width: 42px; text-align: right; padding-right: 4px; }
-  .lcard.preview { padding: 0; }
+  .lcard.preview { padding: 0; height: 170px; position: relative; }
   .lc-map { position: absolute; inset: 0; }
   .lc-map svg { position: absolute; left: 0; top: 0; }
   .lc-over { position: absolute; left: 0; right: 0; padding: 6px 8px; }
@@ -300,7 +303,7 @@ const CHEV = ic('down', 'class="i chev"');
 
 // Each choice that changes the look, with its variants. The number of a variant is its place in the list.
 const KINDS = [
-  ['lcard', 'Level card', 'A card the width of the Entities panel, above it, for the level and the view. The dock at the bottom holds the tools, Undo, Redo, snapping and Play.', [['basic', 'Name and zoom'], ['preview', 'Preview of the level'], ['info', 'Name, numbers and zoom'], ['toggles', 'Name and the view\'s switches']]],
+  ['lcard', 'Level card', 'A card the width of the Inspector, above it, for the level and the view. The dock at the bottom holds the tools, Undo, Redo, snapping and Play.', [['basic', 'Name and zoom'], ['preview', 'Preview of the level'], ['info', 'Name, numbers and zoom'], ['toggles', 'Name and the view\'s switches']]],
   ['layout', 'Entities panel height', '', [['hug', 'Fits its rows'], ['float', 'Full height']]],
   ['head', 'Panel titles', '', [['title', 'Title'], ['caps', 'Small caps']]],
   ['card', 'Inspector cards', 'How one component\'s card is told apart from the next.', [['space', 'Space only'], ['tile', 'Tiles'], ['inset', 'Sunken tiles'], ['island', 'Each card an island']]],
@@ -322,7 +325,7 @@ const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,2
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: '0 10px 40px rgba(0,0,0,.35)' };
 const dir = (id, name, desc, s) => ({ id, name, desc, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'Level card', 'A card above the Entities panel, as wide as it: the menu and Help at its top, the level\'s name large with Saved under it, and View and the zoom at its foot. The status text is a chip above the dock. Four islands and a chip.', {}),
+  dir('1', 'Level card', 'A card above the Inspector, as wide as it and only as tall as its content: the menu and Help at its top, the level\'s name large with Saved under it, and View and the zoom at its foot. The status text is a chip above the dock. Four islands and a chip.', {}),
   dir('2', 'Preview card', 'The card shows a small preview of the whole level, with the part on screen outlined in blue. The name sits on the preview\'s top, View and the zoom on its foot. A preview is a new idea, not in the requirements.', { lcard: 'preview' }),
   dir('3', 'Info card', 'The card gathers what the status bar showed: the mouse position, the selection and the warning count, under the level\'s name, with the zoom at its foot. Only the tool hint stays as a chip above the dock.', { lcard: 'info' }),
   dir('4', 'View switches card', 'The View menu\'s switches (grid, level bounds, camera frame, joint icons, physics view) are buttons on the card, with the zoom as a slider under them. The View menu stays for the rest.', { lcard: 'toggles' })
@@ -354,12 +357,11 @@ const pos = ([x, y, w, h]) => `left:${x}px;top:${y}px;width:${w}px;${h == null ?
 // Where each part sits, in window pixels. The panels' widths are the requirement's.
 const W = 1440, H = 900, M = 10, GP = 10;
 function geo() {
-  const cardH = 164, ex = W - M - 260;
-  const insp = [M, M, 300, H - 2 * M];
-  const card = [ex, M, 260, cardH];
-  const ents = [ex, M + cardH + GP, 260, S.layout === 'hug' ? null : H - M - (M + cardH + GP)];
+  const ex = W - M - 260;
+  const left = [M, M, 300, H - 2 * M];
+  const ents = [ex, M, 260, S.layout === 'hug' ? null : H - 2 * M];
   const rx0 = M + 300 + GP, rx1 = ex - GP, cx = (rx0 + rx1) / 2;
-  return { insp, card, ents, rx0, rx1, cx, strip: [M, M] };
+  return { left, ents, rx0, rx1, cx };
 }
 
 // The sample level, in level pixels. The origin is the middle of the level, y points down.
@@ -478,7 +480,7 @@ const card = (title, body) => `<div class="card ${S.card}"><div class="chead">${
 function inspector(o) {
   const g = geo(), bare = S.card === 'island', head = '';
   if (o.noInspector) return '';
-  return `<div class="abs panel insp${bare ? ' bare' : ' blk'}" style="${pos(g.insp)}">${bare ? '<div class="blk" style="border-radius:var(--rl)">' : ''}${head}<div class="ph ${S.head}">Inspector</div>
+  return `<div class="panel insp${bare ? ' bare' : ' blk'}">${bare ? '<div class="blk" style="border-radius:var(--rl)">' : ''}${head}<div class="ph ${S.head}">Inspector</div>
     <div class="ihead"><span style="color:var(--muted);display:flex">${ic('rect')}</span><div class="nm ${S.field === 'filled' ? '' : S.field}">Rectangle 1</div><span class="ib eye">${ic('eye')}</span></div>${bare ? '</div>' : ''}
     <div style="overflow:${bare ? 'visible' : 'hidden'}">
     ${card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°') + F.vec('Scale', '1', '1') + F.num('Skew', '0', '°'))}
@@ -489,14 +491,14 @@ function inspector(o) {
     </div></div>`;
 }
 
-function topbars(o) {
+function levelCard(o) {
   const g = geo(), k = S.lcard;
   const zoom = `<span class="zoomg"><span class="ib">${ic('minus')}</span><span class="num">40%</span><span class="ib">${ic('plus')}</span></span>`;
   const saved = `<span class="savestate">${ic('check', sm)}Saved</span>`;
   let body;
   if (k === 'preview') {
-    const mini = scene(260, 164, 0.085, 130, 78, { grid: false });
-    body = `<div class="lc-map">${mini}<svg class="lc-view" width="260" height="164"><rect x="58" y="30" width="144" height="100" rx="3" fill="rgba(79,140,255,.08)" style="stroke:var(--accent)" stroke-width="1.5"/></svg></div>
+    const mini = scene(300, 170, 0.095, 150, 80, { grid: false });
+    body = `<div class="lc-map">${mini}<svg class="lc-view" width="300" height="170"><rect x="68" y="30" width="164" height="106" rx="3" fill="rgba(79,140,255,.08)" style="stroke:var(--accent)" stroke-width="1.5"/></svg></div>
       <div class="lc-over top">${C.menu(o)}<span class="lc-name sm">Car test</span><span class="grow"></span>${saved}</div>
       <div class="lc-over bot"><span class="ib">View${CHEV}</span><span class="grow"></span>${zoom}</div>`;
   } else if (k === 'info') {
@@ -513,7 +515,7 @@ function topbars(o) {
       <div class="lc-name">Car test</div><div class="lc-sub">${saved}<span class="lc-meta">17 entities</span></div>
       <div class="lc-row"><span class="ib">View${CHEV}</span><span class="grow"></span>${zoom}</div>`;
   }
-  return `<div class="abs blk lcard ${k}" style="${pos(g.card)}">${body}</div>`;
+  return `<div class="blk lcard ${k}">${body}</div>`;
 }
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
@@ -529,23 +531,22 @@ function view(opts) {
 }
 function editor(o) {
   o = Object.assign({ tool: 'select', hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Nothing selected' }, o, o.top);
-  return view(o.scene || {}) + topbars(o) + entities(o) + inspector(o) + bottom(o) + (o.extra || '');
+  return view(o.scene || {}) + `<div class="leftcol" style="${pos(geo().left)}">${levelCard(o)}${o.noInspector ? shapeStrip() : inspector(o)}</div>` + entities(o) + bottom(o) + (o.extra || '');
 }
 
 function shapeStrip() {
-  const [x, y] = geo().strip;
   const kinds = [['rect', 'Rectangle'], ['circle', 'Circle'], ['polygon', 'Polygon']];
-  return `<div class="opts" style="left:${x}px;top:${y}px">${kinds.map(([icon, name]) => `<span class="ib${icon === 'polygon' ? ' on' : ''}">${ic(icon)}${name}</span>`).join('')}</div>`;
+  return `<div class="opts">${kinds.map(([icon, name]) => `<span class="ib${icon === 'polygon' ? ' on' : ''}">${ic(icon)}${name}</span>`).join('')}</div>`;
 }
 function menuBody(items) {
   return items.map((m) => m === '-' ? '<div class="msep"></div>' :
     `<div class="mi${m[2] ? ' ' + m[2] : ''}"><span class="l">${m[0]}</span>${m[1] === '>' ? ic('right', 'class="i chev"') : `<span class="k">${m[1] || ''}</span>`}</div>`).join('');
 }
 function mainMenu() {
-  const g = geo(), x = g.card[0], y = M + 50;
+  const x = M, y = M + 50;
   const top = [['File', '>'], ['Edit', '>', 'hover'], ['Arrange', '>'], ['View', '>'], ['Help', '>']];
   const edit = [['Undo Move 1 entity', 'Ctrl+Z'], ['Redo', 'Ctrl+Shift+Z', 'dis'], '-', ['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C'], ['Paste', 'Ctrl+V', 'hover'], ['Duplicate', 'Ctrl+D'], ['Delete', 'Del'], '-', ['Select all', 'Ctrl+A'], ['Rename', 'F2'], ['Hide or show', 'Ctrl+Shift+H']];
-  return `<div class="menu ${S.menu}" style="left:${x}px;top:${y}px">${menuBody(top)}</div><div class="menu ${S.menu}" style="left:${x - 256}px;top:${y + 38}px;min-width:250px">${menuBody(edit)}</div>`;
+  return `<div class="menu ${S.menu}" style="left:${x}px;top:${y}px">${menuBody(top)}</div><div class="menu ${S.menu}" style="left:${x + 206}px;top:${y + 38}px;min-width:250px">${menuBody(edit)}</div>`;
 }
 const dialogBody = () => `<h3>Replace the open level?</h3><p>Export it first if you want to keep it.</p><div class="row"><span class="btn ${S.btn}">Cancel</span><span class="btn primary ${S.btn}">Replace</span></div>`;
 function playbar(paused, extraCls = '') {
@@ -557,7 +558,7 @@ function playbar(paused, extraCls = '') {
 
 const MOMENTS = {
   shape: () => editor({ sel: 'Rectangle 1', hover: 'Crate 2', scene: { selected: 'rect1' } }),
-  draw: () => editor({ tool: 'shape', noInspector: true, extra: shapeStrip(), scene: { drawing: true }, hint: 'Shape · click to add a point, click the first point to close, Enter to finish as a line', pos: 'x −640, y −40' }),
+  draw: () => editor({ tool: 'shape', noInspector: true, scene: { drawing: true }, hint: 'Shape · click to add a point, click the first point to close, Enter to finish as a line', pos: 'x −640, y −40' }),
   menu: () => editor({ sel: 'Rectangle 1', scene: { selected: 'rect1' }, top: { menuOpen: true }, extra: mainMenu() }),
   dialog: () => editor({ extra: `<div class="scrim"></div><div class="dialog">${dialogBody()}</div>`, hint: 'Select · click to select, drag to move', pos: 'x 412, y −96' }),
   play: () => `<div class="game"><div style="position:absolute;left:0;top:45px">${scene(1440, 810, 0.75, 720, 405, { play: true })}</div></div>${playbar(false)}`,
@@ -569,7 +570,7 @@ function schematic() {
   return `<div class="schem"><div class="ed float" style="${tokensCss(T)}position:absolute;left:0;top:0;transform:scale(.2);transform-origin:0 0">${editor({ sel: 'Rectangle 1', scene: { selected: 'rect1' } })}</div></div>`;
 }
 const PARTS = {
-  lcard: () => `<div class="inl">${withS({}, () => topbars({ tool: "select", pos: "x 20, y 340", sel: "Rectangle 1" }).replace(/class="abs /, "class=\"").replace(/style="left[^"]*"/, "style=\"position:relative;width:260px;height:164px\""))}</div>`,
+  lcard: () => `<div class="inl"><div style="width:300px">${levelCard({ tool: 'select', pos: 'x 20, y 340', sel: 'Rectangle 1' })}</div></div>`,
   layout: schematic,
   head: () => `<div class="ph ${S.head}">Inspector</div>`,
   card: () => card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°')) + card('ShapeComponent', F.choice('Kind', 'Rectangle') + F.num('Width', '160', 'px')),
