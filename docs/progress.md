@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 17, step 7 of 10: the phone checks, `tests/e2e/phone/`, pass: the determinism page in `tests/determinism/page/` matches every level's recorded hashes in Chromium as a Pixel 7 and WebKit as an iPhone 15, and CI's `phone-arm` job runs it in Chromium on ARM; the editor opens at phone size with nothing scrolled. Next is step 8, the speed pass. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 17, step 8 of 11: the speed pass ran three times on the owner's laptop, every number in [performance.md](architecture/performance.md#targets-and-their-tests): selecting, the panel's opening and test play meet their targets, the drag's one 0.1 ms miss is counted as met, and the Entities panel's scrolling misses (19.3 to 25.3 ms), so a new step 10 fixes it. Next is step 9, saving only what changed. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
