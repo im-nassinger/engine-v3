@@ -67,6 +67,8 @@ export { OpenDialog } from './running/OpenDialog.ts';
 export type { Dialog } from './running/OpenDialog.ts';
 export { moveEntities } from './move/moveEntities.ts';
 export type { MoveOutcome } from './move/moveEntities.ts';
+export { EntityRotate } from './move/EntityRotate.ts';
+export { geometryBox, ownBox } from './move/ownBox.ts';
 export { SelectionMove } from './move/SelectionMove.ts';
 export { nudgeSelection } from './move/nudgeSelection.ts';
 export { placeJoint } from './joints/placeJoint.ts';

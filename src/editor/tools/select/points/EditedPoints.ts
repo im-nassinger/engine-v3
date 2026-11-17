@@ -2,7 +2,7 @@ import { ShapeComponent } from '../../../../core/components/index.ts';
 import type { Bounds, Point } from '../../../../core/geometry/index.ts';
 import type { Entity } from '../../../../core/level/index.ts';
 import type { OpenLevel } from '../../../session/index.ts';
-import { geometryBox } from '../frame/SelectionFrame.ts';
+import { geometryBox } from '../../../commands/index.ts';
 
 import { PointHits } from './PointHits.ts';
 

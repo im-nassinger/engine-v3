@@ -93,6 +93,7 @@ Source: round 6: LY2; old: SG-39 to SG-42
 
 - One Select tool moves, resizes and rotates, with no separate modes. Eight handles resize: four corners, four sides. Dragging just outside a corner rotates. There are no skew handles.
 - Arrow keys move the selection 1 px. Shift+arrow moves 10 px. **Ctrl+Shift+arrow moves one grid step.** Moves follow the level's axes whatever the rotation.
+- **Z and X rotate the selection** (owner: 2026-11-17): Z counter-clockwise and X clockwise on screen, 1° a press, Shift+Z and Shift+X 10°. Each entity turns around the centre of its own box, as the rotate drag does, until v3 turns several entities around the selection box's centre. A run of presses within 1 s is one undo step, `Rotate <name>`. The World and the camera are skipped with the skip rule's text; locked entities are left out. Ctrl+Z and Ctrl+X stay Undo and Cut.
 - A handle always follows the mouse on screen, whatever the rotation or scale of the parents.
 - The box of one rotated entity follows its rotation, so resizing works along the entity's own sides.
 - **Resizing changes the entity's scale, never its shape's values**, for a shape and a group alike (owner: 2026-11-16). The World is the one exception: its rectangle changes, from its centre.

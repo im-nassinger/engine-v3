@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 18, step 9 of 16: Ctrl+Shift resizes and draws from the centre, neither keeping proportions nor turning snapping off; Alt stays a second way. Next is step 10, Z and X rotate the selection. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 18, step 10 of 16: Z and X rotate the selection 1°, Shift 10°, each entity around its own box's centre, a run of presses one step. Next is step 11, Z and X turn the Shape tool's preview. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -38,7 +38,7 @@
 | Stage 15, the camera | Done on 2026-11-16. See below |
 | Stage 16, test play | Done on 2026-11-17. See below |
 | Stage 17, the speed pass and the browser checks | Done on 2026-11-17. See below |
-| Stage 18, Before v2 | Planned on 2026-11-17 in [16 steps](steps/stage-18.md); steps 1 to 9 done |
+| Stage 18, Before v2 | Planned on 2026-11-17 in [16 steps](steps/stage-18.md); steps 1 to 10 done |
 | Code | Stages 0 to 17 done. Stage 18, Before v2, is being built |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.

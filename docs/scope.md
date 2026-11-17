@@ -80,7 +80,7 @@ Rules: [requirements/editor](requirements/editor/README.md)
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
 | SE1 | Click to select, drag a selection box, Shift+click to add, Ctrl+A to select all. The selection box selects every entity it touches. | v1 | Basic editing. |
-| SE2 | Move, resize and rotate with handles, and nudge with the arrow keys. Arrows move 1 px, Shift+arrow 10 px, Ctrl+Shift+arrow one grid step. | v1 | Basic editing. |
+| SE2 | Move, resize and rotate with handles, and nudge with the arrow keys. Arrows move 1 px, Shift+arrow 10 px, Ctrl+Shift+arrow one grid step. Z and X rotate 1°, Shift+Z and Shift+X 10° (owner, 2026-11-17). | v1 | Basic editing. |
 | SE3 | Resize and rotate several selected entities together, around the centre of the selection box. Example: select five platforms and turn them as one block. | v3 | Moving several at once is enough to build. To turn them together you can group them first, since a group resizes and rotates. |
 | SE4 | Group and ungroup with Ctrl+G and Ctrl+Shift+G. Double-click to go into a group, Esc to go back up. Example: a car is a group of a body and two wheels. | v1 | Groups are how a car or a player becomes one body. |
 | SE5 | A bar above the level view showing which group you're inside, such as World › Car › Wheel. Click a name to jump there. Inkscape has the same bar. | v3 | Esc already goes back up one group at a time. |

@@ -48,7 +48,7 @@ export type ShortcutScope = 'everywhere' | 'editor' | 'levelView';
 export type EditorCommand = {
     readonly id: CommandId;
     readonly label: string;
-    // Missing for a command only a shortcut runs: the twelve nudges would crowd the Edit menu.
+    // Missing for a command only a shortcut runs: the twelve nudges and four turns would crowd the Edit menu.
     readonly menu?: MenuPlace;
     readonly shortcuts: readonly string[];
     // 'editor' when missing.
@@ -56,8 +56,8 @@ export type EditorCommand = {
     // A shortcut whose scope differs from shortcutScope, by its text. Only Play's Shift+T, a letter that
     // must still type a T in a field while Ctrl+Enter plays from anywhere.
     readonly shortcutScopes?: Readonly<Record<string, ShortcutScope>>;
-    // Only the zoom keys: holding the key runs the command again with each key repeat. Every other
-    // command runs once per press, so holding Ctrl+Z doesn't undo 30 steps a second.
+    // Only the zoom keys, the nudges and Z and X: holding the key runs the command again with each key
+    // repeat. Every other command runs once per press, so holding Ctrl+Z doesn't undo 30 steps a second.
     readonly repeatsWhileHeld?: boolean;
     // Only Cut, Copy and Paste: the browser sends its own cut, copy and paste events for their keys,
     // which need no permission, so ShortcutDispatcher leaves the keys to the browser and ClipboardBridge

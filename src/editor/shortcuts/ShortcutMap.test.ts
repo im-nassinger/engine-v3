@@ -10,7 +10,8 @@ import { BROWSER_KEYS, CTRL_ALT_ALLOWED } from './browserKeys.ts';
 import { KeyChord } from './KeyChord.ts';
 import { KeyPress } from './KeyPress.ts';
 import { ShortcutMap } from './ShortcutMap.ts';
-import { US_KEYS } from './testing/recordedKeys.ts';
+import type { KeyboardInputData } from './KeyboardInputData.ts';
+import { recordedKey, US_KEYS } from './testing/recordedKeys.ts';
 
 function editorShortcutMap() {
     const timer = new ManualTimer();
@@ -84,6 +85,23 @@ describe("the editor's shortcut map", () => {
         expect(matching.map((shortcut) => shortcut.commandId)).toEqual(['edit.undo']);
         expect(matching[0]?.scope).toBe('editor');
         expect(redoShortcut?.chord.text('other')).toBe('Ctrl+Shift+Z');
+    });
+
+    test('turns with Z and X, Shift for 10°, while Ctrl+Z and Ctrl+X stay Undo and Cut', () => {
+        const map = editorShortcutMap();
+        const commandsFor = (data: KeyboardInputData) => {
+            const press = KeyPress.fromKeyboard(data, 'other');
+            if (press === undefined) throw new Error('A key press.');
+
+            return map.matching(press).map((shortcut) => shortcut.commandId);
+        };
+
+        expect(commandsFor(recordedKey('KeyZ', 'z'))).toEqual(['edit.rotateLeft1']);
+        expect(commandsFor(recordedKey('KeyZ', 'Z', { shiftKey: true }))).toEqual(['edit.rotateLeft10']);
+        expect(commandsFor(recordedKey('KeyX', 'x'))).toEqual(['edit.rotateRight1']);
+        expect(commandsFor(recordedKey('KeyX', 'X', { shiftKey: true }))).toEqual(['edit.rotateRight10']);
+        expect(commandsFor(US_KEYS.ctrlZ)).toEqual(['edit.undo']);
+        expect(commandsFor(recordedKey('KeyX', 'x', { ctrlKey: true }))).toEqual(['edit.cut']);
     });
 });
 

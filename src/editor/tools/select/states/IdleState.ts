@@ -1,9 +1,9 @@
+import { EntityRotate } from '../../../commands/index.ts';
 import { READ_ONLY_REASON } from '../../../history/index.ts';
 import type { LevelPointerInput } from '../../Tool.ts';
 
 import { SelectionFrame } from '../frame/SelectionFrame.ts';
 import { EntityResize } from '../resize/EntityResize.ts';
-import { EntityRotate } from '../rotate/EntityRotate.ts';
 
 import { doubleClick } from './doubleClick.ts';
 import { PressState } from './PressState.ts';
@@ -76,7 +76,7 @@ export class IdleState implements SelectState {
         const isOnRotateArea = frame?.isOnRotateArea(input.levelPosition, view.zoom) ?? false;
         if (frame === undefined || !isOnRotateArea) return false;
 
-        const rotate = EntityRotate.of(openLevel, frame);
+        const rotate = EntityRotate.of(openLevel, frame.entity, frame.box.centre);
         if (rotate === undefined || openLevel.liveEdit.isActive) return false;
 
         if (!openLevel.liveEdit.begin(rotate.targets)) return this.refusedAsReadOnly();

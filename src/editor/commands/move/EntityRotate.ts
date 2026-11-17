@@ -1,14 +1,14 @@
-import { TransformComponent } from '../../../../core/components/index.ts';
-import { Matrix2D } from '../../../../core/geometry/index.ts';
-import type { Point, TransformValues } from '../../../../core/geometry/index.ts';
-import type { EntityId } from '../../../../core/level/index.ts';
-import { labelName } from '../../../../core/level/index.ts';
-import type { ValueTarget } from '../../../history/index.ts';
-import type { OpenLevel } from '../../../session/index.ts';
-import type { SelectionFrame } from '../frame/SelectionFrame.ts';
+import { TransformComponent } from '../../../core/components/index.ts';
+import { Matrix2D } from '../../../core/geometry/index.ts';
+import type { Point, TransformValues } from '../../../core/geometry/index.ts';
+import type { Entity, EntityId } from '../../../core/level/index.ts';
+import { labelName } from '../../../core/level/index.ts';
+import type { ValueTarget } from '../../history/index.ts';
+import type { OpenLevel } from '../../session/index.ts';
 
 // One entity turned through LiveEdit, which the caller begins with the targets: its Rotation, and its
-// position moved so the centre of its frame stays in place on screen. The World never turns.
+// position moved so a centre in its own space stays in place on screen. The World never turns. The Select
+// tool's rotate drag and the Z and X keys share it.
 export class EntityRotate {
     readonly label: string;
     readonly targets: readonly ValueTarget[];
@@ -18,18 +18,24 @@ export class EntityRotate {
     private readonly openLevel: OpenLevel;
     private readonly entityId: EntityId;
     private readonly start: TransformValues;
-    // The frame's centre, in the entity's own space and in its parent's.
+    // The centre, in the entity's own space and in its parent's.
     private readonly centre: Point;
     private readonly centreInParent: Point;
 
-    private constructor(openLevel: OpenLevel, frame: SelectionFrame, start: TransformValues, screenDirection: 1 | -1) {
+    private constructor(
+        openLevel: OpenLevel,
+        entity: Entity,
+        centre: Point,
+        start: TransformValues,
+        screenDirection: 1 | -1,
+    ) {
         this.openLevel = openLevel;
-        this.entityId = frame.entity.id;
-        this.label = `Rotate ${labelName(frame.entity)}`;
+        this.entityId = entity.id;
+        this.label = `Rotate ${labelName(entity)}`;
         this.start = start;
         this.startRotation = start.rotation;
         this.screenDirection = screenDirection;
-        this.centre = frame.box.centre;
+        this.centre = centre;
         this.centreInParent = Matrix2D.fromTransform(start).apply(this.centre);
         this.targets = [this.rotationTarget, this.positionTarget];
     }
@@ -43,11 +49,11 @@ export class EntityRotate {
     }
 
     // undefined for the World, and under a parent flattened to a line, where no turn shows.
-    static of(openLevel: OpenLevel, frame: SelectionFrame): EntityRotate | undefined {
-        if (frame.kind === 'world') return undefined;
+    static of(openLevel: OpenLevel, entity: Entity, centre: Point): EntityRotate | undefined {
+        if (entity === openLevel.level.world) return undefined;
 
-        const parent = frame.entity.parent;
-        const transform = frame.entity.getComponent(TransformComponent);
+        const parent = entity.parent;
+        const transform = entity.getComponent(TransformComponent);
         if (parent === undefined || transform === undefined) return undefined;
 
         const parentDeterminant = openLevel.caches.worldMatrices.matrixOf(parent).determinant();
@@ -60,10 +66,10 @@ export class EntityRotate {
             skew: transform.get('skew'),
         };
 
-        return new EntityRotate(openLevel, frame, start, parentDeterminant > 0 ? 1 : -1);
+        return new EntityRotate(openLevel, entity, centre, start, parentDeterminant > 0 ? 1 : -1);
     }
 
-    // Writes the Rotation, and the position that keeps the frame's centre where it was.
+    // Writes the Rotation, and the position that keeps the centre where it was.
     apply(rotation: number) {
         const turnedInPlace = Matrix2D.fromTransform({ ...this.start, position: { x: 0, y: 0 }, rotation });
         const centreOffset = turnedInPlace.apply(this.centre);
