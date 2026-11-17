@@ -112,6 +112,8 @@
   .lc-over.top { top: 0; background: linear-gradient(rgba(16,19,24,.92), rgba(16,19,24,0)); padding-bottom: 18px; }
   .lc-over.bot { bottom: 0; background: linear-gradient(rgba(16,19,24,0), rgba(16,19,24,.92)); padding-top: 18px; }
   .lc-over .zoomg { background: rgba(16,19,24,.75); }
+  .minimap { position: absolute; z-index: 2; padding: 6px; }
+  .minimap svg { display: block; border-radius: 10px; }
   .dock { position: absolute; transform: translateX(-50%); height: 46px; z-index: 3; }
   .onebar .hint { color: var(--muted); font-size: 11.5px; white-space: nowrap; }
   .barnums { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 11px; margin-right: 14px; }
@@ -358,10 +360,21 @@ const W = 1440, H = 900, M = 10, GP = 10;
 function geo() {
   const ex = W - M - 260;
   const left = [M, M, 300, H - 2 * M];
-  const ents = [ex, M, 260, S.layout === 'hug' ? null : H - 2 * M];
+  const mapW = 260, mapH = Math.round((mapW - 12) * MAP_AREA[3] / MAP_AREA[2]) + 12;
+  const map = [W - M - mapW, H - M - mapH, mapW, mapH];
+  const ents = [ex, M, 260, S.layout === 'hug' ? null : H - 2 * M - mapH - GP];
   const rx0 = M + 300 + GP, rx1 = ex - GP, cx = (rx0 + rx1) / 2;
-  return { left, ents, rx0, rx1, cx };
+  return { left, ents, map, rx0, rx1, cx };
 }
+
+// The level view's zoom and centre, in window pixels, and the part of the level it shows between the panels.
+const VIEW_Z = 0.38, VIEW_CY = (54 + H) / 2;
+function visibleArea() {
+  const g = geo(), cx = (g.rx0 + g.rx1) / 2;
+  return [(g.rx0 - cx) / VIEW_Z, (0 - VIEW_CY) / VIEW_Z, (g.rx1 - g.rx0) / VIEW_Z, H / VIEW_Z];
+}
+// The minimap shows the level's bounds (the World's rectangle) and outlines the part on screen, in level pixels: [x, y, w, h].
+const MAP_AREA = [-1400, -800, 2800, 1600];
 
 // The sample level, in level pixels. The origin is the middle of the level, y points down.
 const BG = '#cde3f2';
@@ -520,11 +533,18 @@ function bottom(o) {
 }
 function view(opts) {
   const g = geo();
-  return `<div class="abs viewbox" style="${pos([0, 0, W, H])}">${scene(W, H, 0.38, (g.rx0 + g.rx1) / 2, (54 + H) / 2, Object.assign({ grid: true, cameraFrame: true, joints: true }, opts))}</div>`;
+  return `<div class="abs viewbox" style="${pos([0, 0, W, H])}">${scene(W, H, VIEW_Z, (g.rx0 + g.rx1) / 2, VIEW_CY, Object.assign({ grid: true, cameraFrame: true, joints: true }, opts))}</div>`;
+}
+function minimap() {
+  const g = geo(), [ax, ay, aw] = MAP_AREA, w = g.map[2] - 12, h = g.map[3] - 12, z = w / aw;
+  const [vx, vy, vw, vh] = visibleArea(), X = (x) => (x - ax) * z, Y = (y) => (y - ay) * z;
+  const frame = `<rect x="${X(vx)}" y="${Y(vy)}" width="${vw * z}" height="${vh * z}" rx="3" fill="rgba(79,140,255,.1)" style="stroke:var(--accent)" stroke-width="1.5"/>`;
+  const map = scene(w, h, z, -ax * z, -ay * z, { grid: false }).replace('</svg>', frame + '</svg>');
+  return `<div class="blk minimap" style="${pos(g.map)}">${map}</div>`;
 }
 function editor(o) {
   o = Object.assign({ tool: 'select', hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Nothing selected' }, o, o.top);
-  return view(o.scene || {}) + `<div class="leftcol" style="${pos(geo().left)}">${levelCard(o)}${o.noInspector ? shapeStrip() : inspector(o)}</div>` + entities(o) + bottom(o) + (o.extra || '');
+  return view(o.scene || {}) + `<div class="leftcol" style="${pos(geo().left)}">${levelCard(o)}${o.noInspector ? shapeStrip() : inspector(o)}</div>` + entities(o) + minimap() + bottom(o) + (o.extra || '');
 }
 
 function shapeStrip() {
