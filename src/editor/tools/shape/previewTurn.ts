@@ -2,14 +2,15 @@ import { Matrix2D } from '../../../core/geometry/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
 import type { ToolKey } from '../Tool.ts';
 
+import { typedLetter } from './typedLetter.ts';
+
 // As the Z and X commands turn a selection: 1° a press, 10° with Shift.
 const SMALL_TURN_DEGREES = 1;
 const LARGE_TURN_DEGREES = 10;
 
 // The degrees Z or X turns the preview by, clockwise on screen when positive, or undefined for any other key.
 // Z sits left of X, so it turns counter-clockwise. Ctrl+Z and Ctrl+X stay Undo and Cut, and Alt is left
-// alone. The letter is read as the shortcuts read it: what the layout types, or the physical key when the
-// layout types no Latin letter there.
+// alone.
 export function previewTurnOf(key: ToolKey): number | undefined {
     if (key.ctrl || key.alt) return undefined;
 
@@ -36,10 +37,4 @@ function signOf(letter: string | undefined) {
     if (letter === 'X') return 1;
 
     return undefined;
-}
-
-function typedLetter(key: ToolKey) {
-    if (/^[a-z]$/i.test(key.key)) return key.key.toUpperCase();
-
-    return /^Key([A-Z])$/.exec(key.code)?.[1];
 }

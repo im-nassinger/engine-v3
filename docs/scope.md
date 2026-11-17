@@ -52,7 +52,7 @@ Trigger templates were folded into component presets. Version history was reject
 
 ## Counts
 
-117 features went through the scope review: 51 in v1, 65 in v2, 1 Later. After the owner made v1 smaller, 20 of those 51 moved to v2, and the 65 became v3: **31 in v1, 20 in v2, 65 in v3, 1 Later.**
+117 features went through the scope review: 51 in v1, 65 in v2, 1 Later. After the owner made v1 smaller, 20 of those 51 moved to v2, and the 65 became v3: **31 in v1, 20 in v2, 65 in v3, 1 Later.** Before v2, DR4 came forward from v3 (owner, 2026-11-17), so **32 in v1 and 64 in v3**.
 
 **The small features** at the end of each topic file never went through the scope review. The owner gave all 119 their version in round 7 of the architecture review (owner, 2026-11-14): **14 in v1, 12 in v2, 80 in v3, 13 Later.** They are listed only in their topic files.
 
@@ -102,7 +102,7 @@ Rules: [requirements/drawing](requirements/drawing.md)
 | DR1 | The Shape tool: rectangle, circle, polygon and line, the kind picked in the tool's options strip (a line is a polygon finished open with Enter) and changeable afterwards in the Inspector (owner, 2026-11-15). Shift keeps proportions, Alt draws from the centre. | v1 | Shapes are what levels are made of. |
 | DR2 | Point editing: double-click a polygon, line or path with Select to move its points. Double-click an edge to add a point. | v1 | Without it, one wrong point means drawing the shape again. |
 | DR3 | Polygons may cross themselves. Every enclosed area is filled and collides. Example: a figure-of-eight polygon is filled in both loops. | v1 | People draw them by accident, and a polygon library handles them. Supporting them from the start is less work than deciding what else should happen. |
-| DR4 | W, A, S and D set the size of the Shape tool's preview before you click. D wider, A narrower, W taller, S shorter, 1 px per press. | v3 | Dragging already sets the size. |
+| DR4 | W, A, S and D set the size of the Shape tool's preview before you click. D wider, A narrower, W taller, S shorter, 1 px per press, Shift 10 px (owner, 2026-11-17). | v1 | Was v3: dragging already sets the size. Brought forward before v2, with the same keys resizing a selection (owner, 2026-11-17). |
 | DR5 | Convert a path to a polygon: right-click, then a dialog with a points slider and a live preview. This is how a drawn curve becomes something that collides. | v3 | Paths are drawn in v1, and collision has shapes. Turning one into the other is an extra step. |
 | DR6 | The colour picker's extras: level colours, recent colours and the eyedropper. The plain picker (palette and a colour field) is in v1 either way. | v3 | The plain picker is enough to test. |
 | DR7 | Two colour swatches on the toolbar, so new shapes use the last colours you picked. | v3 | New shapes can start with one default colour. |

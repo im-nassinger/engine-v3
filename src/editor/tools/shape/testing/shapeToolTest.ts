@@ -8,7 +8,7 @@ import type { SnapResult, Snapper } from '../../../snapping/index.ts';
 import { ManualFrames, ManualTimer } from '../../../time/testing/index.ts';
 import { PanGesture } from '../../pan/PanGesture.ts';
 import { SelectTool } from '../../select/SelectTool.ts';
-import type { LevelPointerInput, Modifiers } from '../../Tool.ts';
+import type { LevelPointerInput, Modifiers, ToolKey } from '../../Tool.ts';
 import { ToolController } from '../../ToolController.ts';
 import { ShapeTool } from '../ShapeTool.ts';
 
@@ -101,4 +101,20 @@ export function geometryOf(entity: Entity) {
 
 export function positionOf(entity: Entity) {
     return entity.requireComponent(TransformComponent).get('position');
+}
+
+export const ENTER: ToolKey = { code: 'Enter', key: 'Enter', ctrl: false, shift: false, alt: false, repeat: false };
+
+// A letter key as a US layout sends it, with Shift typing the capital.
+export function letter(key: string, modifiers: Partial<Pick<ToolKey, 'ctrl' | 'shift' | 'alt'>> = {}): ToolKey {
+    const shift = modifiers.shift ?? false;
+
+    return {
+        code: `Key${key.toUpperCase()}`,
+        key: shift ? key.toUpperCase() : key,
+        ctrl: modifiers.ctrl ?? false,
+        shift,
+        alt: modifiers.alt ?? false,
+        repeat: false,
+    };
 }

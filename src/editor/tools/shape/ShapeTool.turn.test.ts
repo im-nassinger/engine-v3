@@ -3,25 +3,19 @@ import { describe, expect, test } from 'vitest';
 import { TransformComponent } from '../../../core/components/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
-import type { ToolKey } from '../Tool.ts';
 
-import { buildShapeTest, click, drag, geometryOf, made, pointer, positionOf } from './testing/shapeToolTest.ts';
+import {
+    ENTER,
+    buildShapeTest,
+    click,
+    drag,
+    geometryOf,
+    letter,
+    made,
+    pointer,
+    positionOf,
+} from './testing/shapeToolTest.ts';
 import type { Setup } from './testing/shapeToolTest.ts';
-
-const ENTER = { code: 'Enter', key: 'Enter', ctrl: false, shift: false, alt: false, repeat: false };
-
-function letter(key: string, modifiers: Partial<Pick<ToolKey, 'ctrl' | 'shift' | 'alt'>> = {}): ToolKey {
-    const shift = modifiers.shift ?? false;
-
-    return {
-        code: `Key${key.toUpperCase()}`,
-        key: shift ? key.toUpperCase() : key,
-        ctrl: modifiers.ctrl ?? false,
-        shift,
-        alt: modifiers.alt ?? false,
-        repeat: false,
-    };
-}
 
 // Shift+X pressed the times, 10° clockwise each.
 function turnClockwise(setup: Setup, presses: number) {

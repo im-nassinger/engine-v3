@@ -13,9 +13,9 @@ Changes the owner asked for that must be built **after v1's 18 stages and before
 | 3 | **Ctrl+Shift while resizing resizes from the centre** | owner, 2026-11-16 | **Built** on 2026-11-17, step 9 |
 | 4 | **The Joint tool says why an entity can't take a joint** | owner, 2026-11-16 | **Built** on 2026-11-17, step 5 |
 | 5 | **Unstyled joints are invisible in play**, joint icons included | owner, 2026-11-17 | **Built** on 2026-11-17, step 4 |
-| 6 | **+ zooms in without Shift**, as - zooms out | owner, 2026-11-17 | Settled; step 3 |
+| 6 | **+ zooms in without Shift**, as - zooms out | owner, 2026-11-17 | **Built** on 2026-11-17, step 3 |
 | 7 | **Shift+T plays and stops** | owner, 2026-11-17 | **Built** on 2026-11-17, step 6 |
-| 8 | **W, A, S and D resize the selection and the Shape tool's preview**, changing the shape's values | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change; steps 12 and 13 |
+| 8 | **W, A, S and D resize the selection and the Shape tool's preview**, changing the shape's values | owner, 2026-11-17 | **Built** on 2026-11-17, steps 12 and 13, with Claude's picks for the owner to change |
 | 9 | **No part of the editor is covered by another**: find every case and fix it | owner, 2026-11-17 | Settled; steps 14 and 15 |
 | 10 | **"Let connected objects collide" has no description** | owner, 2026-11-17 | **Built** on 2026-11-17, step 2 |
 
@@ -151,7 +151,7 @@ To build (*proposal*, Claude's picks, for the owner to change):
 
 To update when planned: "W, A, S, D set the preview size" in `requirements/drawing.md` (its version and the selection), `requirements/editor/selection.md` (Handles and arrow keys), `requirements/editor/shortcuts.md` (the new rows and Shift+S), `scope.md` (DR4), `architecture/editor/selection-and-tools.md` and `clipboard-and-shortcuts.md`, and the main menu's command list.
 
-**Built for the selection** (2026-11-17, step 12): W, A, S and D resize the selected shapes' values, a run one `Resize` step, with the World and the camera skipped. The Shape tool's preview is step 13.
+**Built** (2026-11-17, steps 12 and 13): W, A, S and D resize the selected shapes' values, a run one `Resize` step, with the World and the camera skipped. With the Shape tool they size the preview, centred on the mouse and along its turned sides: a rectangle's or circle's size is remembered for the next click, a polygon's or line's placed points spread from their middle, and a drag in progress keeps the mouse's size. Sizing the preview makes no undo step.
 
 ## 9. Nothing in the editor is covered
 

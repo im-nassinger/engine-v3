@@ -32,8 +32,8 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 | Ctrl+Shift+arrows | Move the selection one grid step | Editor | Handles, v1 |
 | Z, X | Rotate the selection 1° counter-clockwise, clockwise; with the Shape tool, turn its preview (owner, 2026-11-17) | Editor | Handles, v1; the Shape tool, v1 |
 | Shift+Z, Shift+X | Rotate the selection 10° counter-clockwise, clockwise (owner, 2026-11-17) | Editor | Handles, v1 |
-| D, A, W, S | Resize the selection's shapes 1 px wider, narrower, taller, shorter, changing their values (owner, 2026-11-17) | Editor | Handles, v1 |
-| Shift+D, Shift+A, Shift+W, Shift+S | Resize the selection's shapes 10 px (owner, 2026-11-17) | Editor | Handles, v1 |
+| D, A, W, S | Resize the selection's shapes 1 px wider, narrower, taller, shorter, changing their values; with the Shape tool, size its preview (owner, 2026-11-17) | Editor | Handles, v1; the Shape tool, v1 |
+| Shift+D, Shift+A, Shift+W, Shift+S | Resize the selection's shapes, or the Shape tool's preview, 10 px. Shift+S was v3's Snapping to entities, which gets another key (owner, 2026-11-17) | Editor | Handles, v1; the Shape tool, v1 |
 | Ctrl+G, Ctrl+Shift+G | Group, ungroup | Editor | Groups, v1 |
 | Enter | Go into the selected group | Editor | Groups, v1 |
 | F2 | Rename the selected entity | Editor | Entities panel, v1 |

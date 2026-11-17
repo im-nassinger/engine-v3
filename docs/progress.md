@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 18, step 12 of 16: W, A, S and D resize the selected shapes' values, 1 px, Shift 10 px, each around its own centre. Next is step 13, W, A, S and D size the Shape tool's preview. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 18, step 13 of 16: W, A, S and D size the Shape tool's preview, centred on the mouse and along its turned sides. Next is step 14, a Playwright check that finds every part of the editor covered by another. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -38,7 +38,7 @@
 | Stage 15, the camera | Done on 2026-11-16. See below |
 | Stage 16, test play | Done on 2026-11-17. See below |
 | Stage 17, the speed pass and the browser checks | Done on 2026-11-17. See below |
-| Stage 18, Before v2 | Planned on 2026-11-17 in [16 steps](steps/stage-18.md); steps 1 to 12 done |
+| Stage 18, Before v2 | Planned on 2026-11-17 in [16 steps](steps/stage-18.md); steps 1 to 13 done |
 | Code | Stages 0 to 17 done. Stage 18, Before v2, is being built |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.

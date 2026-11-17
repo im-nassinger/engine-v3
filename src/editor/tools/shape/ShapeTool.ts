@@ -12,6 +12,8 @@ import type { LevelPointerInput, Modifiers, Tool, ToolContext, ToolKey } from '.
 import { atLeastOnePixel, draggedBox, placedDrawing } from './boxDrawing.ts';
 import type { BoxKind, BoxSize } from './boxDrawing.ts';
 import { angleLocked, pointsDrawing, samePoint, turnedPoints } from './polygonDrawing.ts';
+import { previewStepOf, steppedBoxSize, steppedPoints } from './previewSize.ts';
+import type { PreviewStep } from './previewSize.ts';
 import { previewTurnOf } from './previewTurn.ts';
 
 // The options strip's three kinds. A line is a polygon finished open.
@@ -46,9 +48,9 @@ const TOO_MANY_POINTS = `A polygon holds at most ${MAX_POINTS.toLocaleString('en
 const LOCKED = 'This group is locked';
 
 const BOX_HINT =
-    'Click to place, drag to size. Shift keeps proportions, Ctrl+Shift or Alt draws from the centre. Z and X turn it.';
+    'Click to place, drag to size. Shift keeps proportions, Ctrl+Shift or Alt draws from the centre. Z and X turn it, W, A, S and D size it.';
 const POLYGON_HINT =
-    'Click to add points. Click the first point to close it, Enter to finish as a line. Z and X turn it.';
+    'Click to add points. Click the first point to close it, Enter to finish as a line. Z and X turn it, W, A, S and D size it.';
 
 // 100 x 100 px at first, a circle 50 px in radius.
 const FIRST_SIZE: BoxSize = { width: 100, height: 100 };
@@ -223,7 +225,7 @@ export class ShapeTool implements Tool {
     }
 
     // Shift, Alt and Ctrl change a drag or the polygon's next point at once, without waiting for the mouse
-    // to move. Z and X turn the preview. While a polygon is drawn, Enter finishes it as a line and Backspace
+    // to move. Z and X turn the preview, and W, A, S and D size it. While a polygon is drawn, Enter finishes it as a line and Backspace
     // removes the last point.
     keyDown(key: ToolKey) {
         this.redrawFor(key);
@@ -231,6 +233,12 @@ export class ShapeTool implements Tool {
         const degrees = previewTurnOf(key);
         if (degrees !== undefined) {
             this.turnBy(degrees);
+            return true;
+        }
+
+        const step = previewStepOf(key);
+        if (step !== undefined) {
+            this.sizeBy(step);
             return true;
         }
 
@@ -425,10 +433,36 @@ export class ShapeTool implements Tool {
             this.polygon = { points: turnedPoints(polygon.points, this.turn, turn), space: polygon.space };
         }
         this.turn += turn;
-        this.redrawTurned();
+        this.redrawPreview();
     }
 
-    private redrawTurned() {
+    // W, A, S or D: the size a click places grows or shrinks along the preview's own axes, centred on the
+    // mouse, and is remembered as a drag's size is. A polygon's placed points spread from their middle. During
+    // a drag the mouse sets the size, so the keys do nothing then.
+    private sizeBy(step: PreviewStep) {
+        if (this.press?.dragging === true) return;
+
+        const polygon = this.polygon;
+        if (polygon !== undefined) {
+            const points = steppedPoints(polygon.points, this.turn, step);
+            if (points === undefined) return;
+
+            this.polygon = { points, space: polygon.space };
+            this.showHover();
+            return;
+        }
+
+        const kind = this.press?.kind ?? this.chosenKind;
+        if (kind === 'polygon') return;
+
+        const size = steppedBoxSize(kind, this.sizes[kind], step);
+        if (size === undefined) return;
+
+        this.sizes[kind] = size;
+        this.redrawPreview();
+    }
+
+    private redrawPreview() {
         const press = this.press;
         const input = this.lastInput;
         if (press === undefined) {
