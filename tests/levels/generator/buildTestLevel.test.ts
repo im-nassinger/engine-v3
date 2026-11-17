@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { DerivedCaches, levelBoundsOf } from '../../../src/core/derived/index.ts';
-import { V1_LEVEL_LIMITS } from '../../../src/core/level-data/index.ts';
+import { createV1Registry } from '../../../src/core/components/index.ts';
+import { FormatUpgrader, LevelReader, LevelWriter, V1_LEVEL_LIMITS } from '../../../src/core/level-data/index.ts';
 
 import { buildTestLevel } from './buildTestLevel.ts';
 
@@ -63,6 +64,17 @@ describe('buildTestLevel', () => {
         },
         LARGE_LEVEL_TIMEOUT_MS,
     );
+
+    test('is a level the game reads back as it was written', () => {
+        const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+        const writer = new LevelWriter();
+        const written = writer.write(buildTestLevel(25).level);
+
+        const outcome = reader.read(written);
+
+        if (!outcome.ok) throw new Error(`The test level was refused: ${JSON.stringify(outcome.refusal)}`);
+        expect(writer.write(outcome.value)).toEqual(written);
+    });
 
     test('refuses a count that is not a whole number', () => {
         expect(() => buildTestLevel(1.5)).toThrow('A test level holds a whole number of entities, not 1.5.');

@@ -21,8 +21,8 @@ const BLOCK_HEIGHT = 300;
 const CRATE_SIZE = 40;
 const PLATFORM_WIDTH = 240;
 const PLATFORM_HEIGHT = 20;
-const CRATE_COLOUR = '#a0703c';
-const PLATFORM_COLOUR = '#5a6470';
+const CRATE_COLOUR = '#A0703CFF';
+const PLATFORM_COLOUR = '#5A6470FF';
 
 export type TestLevel = {
     readonly level: Level;

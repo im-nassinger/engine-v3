@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 17, step 2 of 9: the Entities panel's speed tests are built: it opens in 45 to 48 ms at 10,000 entities, and scrolling misses 16.7 ms (18 to 20.5 ms), left to step 8's speed pass, see [performance.md](architecture/performance.md#targets-and-their-tests). Next is step 3, the 100,000-entity level's load, save, export and import. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 17, step 3 of 10: the 100,000-entity level is timed: save 0.94 to 1.0 s, load 2.0 to 2.1 s, export 1.5 s, import 5.1 s, and one entity more is refused. A 10,000 save takes 74 to 75 ms, over 50 ms, so a new step 9 builds saving only what changed, see [performance.md](architecture/performance.md#targets-and-their-tests). Next is step 4, the speed of test play. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
