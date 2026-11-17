@@ -14,7 +14,7 @@ Changes the owner asked for that must be built **after v1's 18 stages and before
 | 4 | **The Joint tool says why an entity can't take a joint** | owner, 2026-11-16 | Settled, to plan |
 | 5 | **Unstyled joints are invisible in play**, joint icons included | owner, 2026-11-17 | Settled, to plan |
 | 6 | **+ zooms in without Shift**, as - zooms out | owner, 2026-11-17 | Settled, to plan |
-| 7 | **T plays and stops** | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change, one question open |
+| 7 | **Shift+T plays and stops** | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change |
 
 ## 1. Resizing changes the scale
 
@@ -94,16 +94,15 @@ To build:
 
 To update when planned: the zoom row of `requirements/editor/shortcuts.md`, `ZoomInCommand.ts` and its tests, and `architecture/editor/clipboard-and-shortcuts.md` if it lists the zoom keys.
 
-## 7. T plays and stops
+## 7. Shift+T plays and stops
 
-The owner's words: to play or stop a level, the T key should be used.
+The owner's words: to play or stop a level, the T key should be used. Then Ctrl+T, which the browser keeps for a new tab and never gives the page (see the keys left to the browser in `requirements/editor/shortcuts.md`), so the owner settled on Shift+T.
 
-To build (*proposal*, Claude's picks, for the owner to change):
+To build:
 
-- **T plays, and stops while playing**, wherever the editor's single-letter keys work. In a text field or the code editor, T types a T.
-- **Ctrl+Enter stays** as the second way, since it is the one that works from inside a field or the code editor.
-- The Play button's tooltip and the main menu show T.
+- **Shift+T plays, and stops while playing**, wherever the editor's single-letter keys work. In a text field or the code editor, it types a T.
+- **During play, Shift+T always stops the run**, even once the game reads keys from v2: the editor takes it before the game, so a level can't use Shift+T as an input. *Why: the owner chose one key for both; a plain T stays free for levels.*
+- **Ctrl+Enter stays** as the second way (*proposal*, Claude's pick, for the owner to change), since it is the one that works from inside a field or the code editor.
+- The Play button's tooltip and the main menu show Shift+T.
 
-Open for the owner: from v2 the game reads keys, so a level could use T as one of its inputs. Should T then still stop the run, taking the key from the game, or should only Ctrl+Enter and the Stop button stop it while the game reads keys?
-
-To update when planned: the Play row of `requirements/editor/shortcuts.md`, "Ctrl+Enter starts and stops" in `requirements/play-and-save/test-play.md`, `architecture/editor/clipboard-and-shortcuts.md` (the Play row), the Play command's shortcuts and its tests.
+To update when planned: the Play row of `requirements/editor/shortcuts.md`, "Ctrl+Enter starts and stops" in `requirements/play-and-save/test-play.md`, `requirements/triggers/variables-and-inputs.md` (Shift+T is not a key a level can use), `architecture/editor/clipboard-and-shortcuts.md` (the Play row), the Play command's shortcuts and its tests.
