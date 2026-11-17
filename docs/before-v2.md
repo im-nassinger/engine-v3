@@ -9,12 +9,13 @@ Changes the owner asked for that must be built **after v1's 18 stages and before
 | # | Change | Asked | State |
 |---|---|---|---|
 | 1 | **Resizing changes the scale**, not the shape's values. Polygons and lines lose Width and Height | owner, 2026-11-16 | Outlines still open |
-| 2 | **Z and X rotate the selection**, Shift+Z and Shift+X by 10° | owner, 2026-11-16 | Settled, with Claude's picks for the owner to change |
+| 2 | **Z and X rotate the selection and the Shape tool's preview**, Shift+Z and Shift+X by 10° | owner, 2026-11-16 and 2026-11-17 | Settled, with Claude's picks for the owner to change |
 | 3 | **Ctrl+Shift while resizing resizes from the centre** | owner, 2026-11-16 | Two questions open |
 | 4 | **The Joint tool says why an entity can't take a joint** | owner, 2026-11-16 | Settled, to plan |
 | 5 | **Unstyled joints are invisible in play**, joint icons included | owner, 2026-11-17 | Settled, to plan |
 | 6 | **+ zooms in without Shift**, as - zooms out | owner, 2026-11-17 | Settled, to plan |
 | 7 | **Shift+T plays and stops** | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change |
+| 8 | **W, A, S and D resize the selection and the Shape tool's preview**, changing the shape's values | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change, one question open |
 
 ## 1. Resizing changes the scale
 
@@ -30,7 +31,7 @@ To update once that's settled: `requirements/drawing.md` ("Width and height, not
 
 ## 2. Rotating with Z and X
 
-The owner's words: Z and X rotate the entities; Shift+Z or Shift+X rotate them 10°.
+The owner's words: Z and X rotate the entities; Shift+Z or Shift+X rotate them 10°. Then (2026-11-17): Z and X rotate both while creating a shape and once it exists and is selected, just like W, A, S and D for resizing ([8](#8-w-a-s-and-d-resize)).
 
 To build, matching the arrow keys' nudges (*proposal*, Claude's picks, for the owner to change):
 
@@ -39,8 +40,9 @@ To build, matching the arrow keys' nudges (*proposal*, Claude's picks, for the o
 - A run of presses within 1 s is one step in the undo history, like a run of arrows. The step reads `Rotate <name>`.
 - Each selected entity turns around its own bounds' centre, as the Select tool's rotate drag does, until v3 turns several entities around the selection box's centre. Locked entities, the World and the camera are skipped with the skip rule's status text.
 - Ctrl+Z and Ctrl+X stay Undo and Cut.
+- **With the Shape tool, Z and X turn the preview** around its centre, by the same steps, and the shape is made at that rotation (its TransformComponent's rotation).
 
-To update when planned: `requirements/editor/selection.md` (Handles and arrow keys), `scope.md` (SE2), `architecture/editor/selection-and-tools.md` and `clipboard-and-shortcuts.md`, and the main menu's command list.
+To update when planned: `requirements/editor/selection.md` (Handles and arrow keys), `requirements/drawing.md` (the Shape tool), `scope.md` (SE2), `architecture/editor/selection-and-tools.md` and `clipboard-and-shortcuts.md`, and the main menu's command list.
 
 ## 3. Ctrl+Shift resizes from the centre
 
@@ -106,3 +108,25 @@ To build:
 - The Play button's tooltip and the main menu show Shift+T.
 
 To update when planned: the Play row of `requirements/editor/shortcuts.md`, "Ctrl+Enter starts and stops" in `requirements/play-and-save/test-play.md`, `requirements/triggers/variables-and-inputs.md` (Shift+T is not a key a level can use), `architecture/editor/clipboard-and-shortcuts.md` (the Play row), the Play command's shortcuts and its tests.
+
+## 8. W, A, S and D resize
+
+The owner's words: W, A, S and D resize shapes, as the Shape tool's preview keys in `requirements/drawing.md` do (scope DR4, v3), but for existing entities too: a rectangle's width and height, a circle's radius, a polygon's points. They change the shape's values, as that rule does. Z and X work the same way for rotating ([2](#2-rotating-with-z-and-x)).
+
+This brings DR4 forward from v3 to before v2, and widens it to the selection.
+
+**This differs from [1](#1-resizing-changes-the-scale) on purpose:** dragging a handle changes the scale, while these keys change the shape's values, so an outline keeps its width when resized with the keys (owner, 2026-11-17).
+
+To build (*proposal*, Claude's picks, for the owner to change):
+
+- **D wider, A narrower, W taller, S shorter**, 1 px per press, Shift 10 px, the same steps as the arrow keys. With the Shape tool, they change the preview, centred on the mouse, as DR4 says; with the Select tool, every selected entity.
+- **Each shape keeps its own centre** and grows along its own axes, so a rotated rectangle gets longer along its own width.
+- **A rectangle** changes its width or height. **A circle** grows with D and W and shrinks with A and S, its radius by half a step, so its width changes as a rectangle's would. **A polygon or line** spreads its points out from its bounds' centre, or pulls them in, so its bounds grow by one step; W and S do nothing on a flat line.
+- Sizes stop at the shape's smallest value; a press that changes nothing changes nothing.
+- A run of presses within 1 s is one step in the undo history, like a run of arrows. The step reads `Resize <name>`.
+- Entities without a ShapeComponent, locked entities, the World and the camera are skipped with the skip rule's status text.
+- **No grid step.** DR4 says Ctrl+Shift moves one grid step, but the browser keeps Ctrl+Shift+W (close the window), so W couldn't do it. Snapping still applies to the handles.
+
+Open for the owner: Shift+S is already "Snapping to entities on or off" in v3 (`requirements/editor/shortcuts.md`), and this makes it "10 px shorter". Claude's pick: Shift+S stays a resize key, and snapping to entities gets another key when v3 plans it.
+
+To update when planned: "W, A, S, D set the preview size" in `requirements/drawing.md` (its version and the selection), `requirements/editor/selection.md` (Handles and arrow keys), `requirements/editor/shortcuts.md` (the new rows and Shift+S), `scope.md` (DR4), `architecture/editor/selection-and-tools.md` and `clipboard-and-shortcuts.md`, and the main menu's command list.
