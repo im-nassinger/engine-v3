@@ -72,18 +72,18 @@
   .tip-box { white-space: nowrap; background: var(--tooltip); color: var(--tooltip-text); border-radius: var(--r); padding: 5px 9px; font-size: 11px; display: inline-flex; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.4); }
   .tip-box .k { color: #8a93a3; }
 
-  .prow { height: 44px; display: flex; align-items: center; gap: 2px; padding: 0 8px; flex-shrink: 0; }
-  .prow .grow, .onebar .grow { flex: 1; }
-  .prow .savestate { margin-left: auto; }
-  .pfoot { margin-top: auto; padding: 12px 14px 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; font-size: 11px; color: var(--muted); }
-  .pfoot .hint { flex-basis: 100%; color: var(--text); line-height: 1.45; margin-bottom: 2px; }
-  .pfoot .warn, .barnums .warn { display: flex; align-items: center; gap: 4px; }
-  .pfoot svg.i, .barnums svg.i { width: 13px; height: 13px; }
+  .onebar .grow { flex: 1; }
+  .cnums .warn, .barnums .warn { display: flex; align-items: center; gap: 4px; }
+  .cnums svg.i, .barnums svg.i { width: 13px; height: 13px; }
   .hintchip { position: absolute; transform: translateX(-50%); z-index: 3; white-space: nowrap; background: rgba(13, 15, 19, .8); color: #e4e8ef; border-radius: 999px; padding: 7px 15px; font-size: 11.5px; box-shadow: 0 6px 20px rgba(0,0,0,.25); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  .hintchip { display: flex; gap: 16px; align-items: center; }
+  .cnums { display: flex; gap: 12px; align-items: center; color: #9aa3b2; font-size: 11px; }
+  .titlechip { position: absolute; transform: translateX(-50%); z-index: 3; display: flex; align-items: center; gap: 10px; padding: 7px 14px; border-radius: 999px; background: rgba(13, 15, 19, .8); color: #e4e8ef; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+  .titlechip .savestate { padding: 0; }
   .dock { position: absolute; transform: translateX(-50%); height: 46px; z-index: 3; }
   .onebar .hint { color: var(--muted); font-size: 11.5px; white-space: nowrap; }
   .barnums { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 11px; margin-right: 14px; }
-  .isl .tool, .prow .tool { width: 30px; height: 30px; }
+  .isl .tool { width: 30px; height: 30px; }
 
   /* Panels */
   .panel { display: flex; flex-direction: column; overflow: hidden; z-index: 2; }
@@ -266,8 +266,8 @@ const CHEV = ic('down', 'class="i chev"');
 
 // Each choice that changes the look, with its variants. The number of a variant is its place in the list.
 const KINDS = [
-  ['arrange', 'Arrangement', 'Where the top bar\'s controls and the tools go.', [['split', 'Two top islands and a tool strip'], ['columns', 'Top bar merged into the panels'], ['onebar', 'One top bar'], ['dock', 'Dock at the bottom']]],
-  ['status', 'Status text', 'The tool hint, the mouse position, the selection and the warning count.', [['island', 'Bottom island'], ['chip', 'Hint chip, numbers in the Entities panel'], ['footer', 'All in the Entities panel'], ['bar', 'In the top bar (One top bar only)']]],
+  ['arrange', 'Top of the window', 'The dock at the bottom always holds the tools, Undo, Redo, snapping and Play. This is where the rest of the top bar goes. The panels hold only their own content.', [['corners', 'Two corner islands'], ['bar', 'One bar across the window'], ['between', 'One bar over the level only'], ['twodocks', 'A small dock at the top'], ['title', 'Only the name on top, the rest in the dock']]],
+  ['status', 'Status text', 'The tool hint, the mouse position, the selection and the warning count.', [['chip', 'One chip above the dock'], ['bar', 'In the top bar (bars only)']]],
   ['layout', 'Entities panel height', '', [['hug', 'Fits its rows'], ['float', 'Full height']]],
   ['head', 'Panel titles', '', [['title', 'Title'], ['caps', 'Small caps']]],
   ['card', 'Inspector cards', 'How one component\'s card is told apart from the next.', [['space', 'Space only'], ['tile', 'Tiles'], ['inset', 'Sunken tiles'], ['island', 'Each card an island']]],
@@ -284,17 +284,16 @@ const KINDS = [
 ];
 
 // The directions. Each is a set of tokens and one variant of each kind.
-const BASE = { arrange: 'split', status: 'island', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
+const BASE = { arrange: 'corners', status: 'chip', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
 const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: '0 10px 40px rgba(0,0,0,.35)' };
 const dir = (id, name, desc, s) => ({ id, name, desc, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'Your pick', 'Your screenshot, as it is: two top islands, the tool strip, the two panels and the status bar as a bottom island. Six islands.', {}),
-  dir('2', 'Your pick, hint chip', 'The same, but the status bar is gone. The tool hint is a small dark chip at the bottom of the level view; the mouse position, the selection and the warning count sit at the foot of the Entities panel. Five islands and a chip.', { status: 'chip' }),
-  dir('3', 'Two columns', 'The top bar merges into the panels: the menu, the level\'s name, the tools, Undo, Redo and snapping head the Inspector; Play, View, the zoom and Help head the Entities panel. The status text sits at the Entities panel\'s foot. Two islands in all, and the level is free in the middle.', { arrange: 'columns', status: 'footer', layout: 'float' }),
-  dir('4', 'Two columns, hint chip', 'Two columns, with the tool hint as a chip at the bottom of the level view, where the eye already is, and the numbers at the Entities panel\'s foot.', { arrange: 'columns', status: 'chip', layout: 'float' }),
-  dir('5', 'One top bar', 'Everything at the top in one island across the window, with the tools in it and the status text in its middle. Below it only the two panels. Three islands.', { arrange: 'onebar', status: 'bar' }),
-  dir('6', 'Dock', 'The menu and the level\'s name head the Inspector, View, the zoom and Help head the Entities panel, and a dock at the bottom of the level view holds the tools, Undo, Redo, snapping and Play, with the hint as a chip above it. Three islands.', { arrange: 'dock', status: 'chip' })
+  dir('1', 'Corners', 'The dock you liked at the bottom: the tools, Undo, Redo, snapping and Play. The menu, the level\'s name and Saved in a small island at the top left; View, the zoom and Help at the top right. The status text is one quiet chip above the dock. Five islands and a chip.', {}),
+  dir('2', 'One top bar', 'One bar across the top holds the menu, the name, Saved, View, the zoom and Help, with the status text in its middle. The dock at the bottom. Four islands.', { arrange: 'bar', status: 'bar' }),
+  dir('3', 'Bar over the level', 'The same bar, but only as wide as the gap between the panels, which now reach the top of the window. The bar and the dock frame the level from above and below. Four islands.', { arrange: 'between', status: 'bar' }),
+  dir('4', 'Two docks', 'A small dock at the top middle with the menu, the name, Saved, View, the zoom and Help, matching the dock at the bottom. The panels reach the top of the window. The status text is a chip above the bottom dock. Four islands and a chip.', { arrange: 'twodocks' }),
+  dir('5', 'All in the dock', 'The dock holds the menu at its start and View, the zoom and Help at its end. Only the level\'s name and Saved stay at the top, as a small title. The status text is a chip above the dock. Three islands, a title and a chip.', { arrange: 'title' })
 ];
 
 const FONTS = [
@@ -306,7 +305,7 @@ const FONTS = [
 const VIEWS = [['shape', 'A selected shape'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
 
 let state = { dir: '1', view: 'shape', font: 'mono', over: {} };
-try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-3') || '{}')); } catch (e) {}
+try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-4') || '{}')); } catch (e) {}
 let S, T;
 
 function tokensCss(t) {
@@ -323,15 +322,13 @@ const pos = ([x, y, w, h]) => `left:${x}px;top:${y}px;width:${w}px;${h == null ?
 // Where each part sits, in window pixels. The panels' widths are the requirement's.
 const W = 1440, H = 900, M = 10, GP = 10;
 function geo() {
-  const a = S.arrange, inTop = a === 'split' || a === 'onebar', y = inTop ? M + 44 + GP : M;
-  const ix = a === 'split' ? M + 48 + GP : M;
-  const insp = [ix, y, 300, H - M - y];
+  const a = S.arrange, y = a === 'corners' || a === 'bar' ? M + 44 + GP : M;
+  const insp = [M, y, 300, H - M - y];
   const ents = [W - M - 260, y, 260, S.layout === 'hug' ? null : H - M - y];
-  const rx0 = ix + 300 + GP, rx1 = W - M - 260 - GP;
-  const headH = a === 'columns' ? 88 : a === 'dock' ? 44 : 0;
-  return { insp, ents, rx0, rx1, headH, strip: [ix, y + headH + (headH ? GP : 0)], menu: [M, M + 50] };
-}
-// The sample level, in level pixels. The origin is the middle of the level, y points down.
+  const rx0 = M + 300 + GP, rx1 = W - M - 260 - GP, cx = (rx0 + rx1) / 2;
+  const menu = a === 'between' ? [rx0, M + 50] : a === 'twodocks' ? [cx - 330, M + 50] : [M, M + 50];
+  return { insp, ents, rx0, rx1, cx, strip: [M, y], menu, menuUp: a === 'title' };
+}// The sample level, in level pixels. The origin is the middle of the level, y points down.
 const BG = '#cde3f2';
 const LEVEL = [
   { id: 'ground', t: 'rect', x: -1100, y: 380, w: 2200, h: 260, fill: '#6ba368', line: '#2f5130' },
@@ -425,13 +422,8 @@ const C = {
   view: () => `<span class="ib">View${CHEV}</span><span class="ib num">40%${CHEV}</span><span class="ib">${ic('help')}</span>`
 };
 const nums = (o) => `<span class="num">${o.pos}</span><span>${o.sel}</span><span class="warn">${ic('warning', 'style="color:var(--warning)"')}<span class="num">1</span></span>`;
-const statusMode = () => (S.status === 'bar' && S.arrange !== 'onebar' ? 'chip' : S.status);
-function entities(o) {
-  const head = S.arrange === 'columns' ? `<div class="prow">${C.play()}<span class="grow"></span>${C.view()}</div>` : S.arrange === 'dock' ? `<div class="prow"><span class="grow"></span>${C.view()}</div>` : '';
-  const st = statusMode();
-  const foot = st === 'footer' ? `<div class="pfoot"><span class="hint">${o.hint}</span>${nums(o)}</div>` : st === 'chip' ? `<div class="pfoot">${nums(o)}</div>` : '';
-  return `<div class="abs blk panel ents" style="${pos(geo().ents)}">${head}<div class="ph ${S.head}">Entities</div>${rowsHtml(ROWS, o.sel, o.hover)}${foot}</div>`;
-}
+const statusMode = () => (S.status === 'bar' && (S.arrange === 'bar' || S.arrange === 'between') ? 'bar' : 'chip');
+const entities = (o) => `<div class="abs blk panel ents" style="${pos(geo().ents)}"><div class="ph ${S.head}">Entities</div>${rowsHtml(ROWS, o.sel, o.hover)}</div>`;
 
 // Inspector fields
 const fc = () => `inp ${S.field}`;
@@ -451,10 +443,8 @@ const F = {
 const card = (title, body) => `<div class="card ${S.card}"><div class="chead">${ic('down')}<span class="t">${title}</span>${ic('dots')}</div>${body}</div>`;
 
 function inspector(o) {
-  const g = geo(), bare = S.card === 'island' && !o.noInspector;
-  const head = S.arrange === 'columns' ? `<div class="prow">${C.menu(o)}${C.name()}</div><div class="prow">${C.tools(o)}<span class="grow"></span>${C.edit()}</div>`
-    : S.arrange === 'dock' ? `<div class="prow">${C.menu(o)}${C.name()}</div>` : '';
-  if (o.noInspector) return head ? `<div class="abs blk panel insp" style="${pos([g.insp[0], g.insp[1], 300, null])}">${head}</div>` : '';
+  const g = geo(), bare = S.card === 'island', head = '';
+  if (o.noInspector) return '';
   return `<div class="abs panel insp${bare ? ' bare' : ' blk'}" style="${pos(g.insp)}">${bare ? '<div class="blk" style="border-radius:var(--rl)">' : ''}${head}<div class="ph ${S.head}">Inspector</div>
     <div class="ihead"><span style="color:var(--muted);display:flex">${ic('rect')}</span><div class="nm ${S.field === 'filled' ? '' : S.field}">Rectangle 1</div><span class="ib eye">${ic('eye')}</span></div>${bare ? '</div>' : ''}
     <div style="overflow:${bare ? 'visible' : 'hidden'}">
@@ -467,24 +457,21 @@ function inspector(o) {
 }
 
 function topbars(o) {
-  const a = S.arrange;
-  if (a === 'split') return `<div class="abs top float-top" style="${pos([M, M, W - 2 * M, 44])}"><div class="isl">${C.menu(o)}${C.name()}<span class="sep"></span>${C.edit()}</div><div class="isl">${C.play()}${C.view()}</div></div>`;
-  if (a === 'onebar') {
-    const mid = statusMode() === 'bar' ? `<span class="hint">${o.hint}</span>` : '';
-    const right = statusMode() === 'bar' ? `<span class="barnums">${nums(o)}</span>` : '';
-    return `<div class="abs isl onebar" style="${pos([M, M, W - 2 * M, 44])}">${C.menu(o)}${C.name()}<span class="sep"></span>${C.edit()}<span class="sep"></span>${C.tools(o)}<span class="grow"></span>${mid}<span class="grow"></span>${right}${C.play()}${C.view()}</div>`;
-  }
-  return '';
+  const a = S.arrange, g = geo();
+  const left = `${C.menu(o)}${C.name()}`;
+  const mid = statusMode() === 'bar' ? `<span class="grow"></span><span class="hint">${o.hint}</span><span class="grow"></span><span class="barnums">${nums(o)}</span>` : '<span class="grow"></span>';
+  if (a === 'corners') return `<div class="abs isl" style="left:${M}px;top:${M}px">${left}</div><div class="abs isl" style="right:${M}px;top:${M}px">${C.view()}</div>`;
+  if (a === 'bar') return `<div class="abs isl onebar" style="${pos([M, M, W - 2 * M, 44])}">${left}${mid}${C.view()}</div>`;
+  if (a === 'between') return `<div class="abs isl onebar" style="${pos([g.rx0, M, g.rx1 - g.rx0, 44])}">${left}${mid}${C.view()}</div>`;
+  if (a === 'twodocks') return `<div class="abs isl dock" style="left:${g.cx}px;top:${M}px">${left}<span class="sep"></span>${C.view()}</div>`;
+  return `<div class="abs titlechip" style="left:${g.cx}px;top:${M + 6}px">Car test<span class="savestate">${ic('check', sm)}Saved</span></div>`;
 }
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
-const toolstrip = (o) => (S.arrange === 'split' ? `<div class="abs blk tools" style="${pos([M, M + 44 + GP, 48, null])}">${C.tools(o)}</div>` : '');
 function bottom(o) {
-  const g = geo(), st = statusMode(), cx = (g.rx0 + g.rx1) / 2;
-  let out = '', y = H - M;
-  if (st === 'island') { out += `<div class="abs status blk" style="${pos([g.rx0, H - M - 28, g.rx1 - g.rx0, 28])}"><span class="hint">${o.hint}</span>${nums(o)}</div>`; y -= 28 + GP; }
-  if (S.arrange === 'dock') { out += `<div class="abs isl dock" style="left:${cx}px;top:${y - 46}px">${C.tools(o)}<span class="sep"></span>${C.edit()}<span class="sep"></span>${C.play()}</div>`; y -= 46 + GP; }
-  if (st === 'chip') out += `<div class="hintchip" style="left:${cx}px;top:${y - 30}px">${o.hint}</div>`;
+  const g = geo(), all = S.arrange === 'title';
+  let out = `<div class="abs isl dock" style="left:${g.cx}px;top:${H - M - 46}px">${all ? C.menu(o) + '<span class="sep"></span>' : ''}${C.tools(o)}<span class="sep"></span>${C.edit()}<span class="sep"></span>${C.play()}${all ? '<span class="sep"></span>' + C.view() : ''}</div>`;
+  if (statusMode() === 'chip') out += `<div class="hintchip" style="left:${g.cx}px;top:${H - M - 46 - GP - 30}px"><span>${o.hint}</span><span class="cnums">${nums(o)}</span></div>`;
   return out;
 }
 function view(opts) {
@@ -493,7 +480,7 @@ function view(opts) {
 }
 function editor(o) {
   o = Object.assign({ tool: 'select', hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Nothing selected' }, o, o.top);
-  return view(o.scene || {}) + topbars(o) + toolstrip(o) + entities(o) + inspector(o) + bottom(o) + (o.extra || '');
+  return view(o.scene || {}) + topbars(o) + entities(o) + inspector(o) + bottom(o) + (o.extra || '');
 }
 
 function shapeStrip() {
@@ -506,9 +493,14 @@ function menuBody(items) {
     `<div class="mi${m[2] ? ' ' + m[2] : ''}"><span class="l">${m[0]}</span>${m[1] === '>' ? ic('right', 'class="i chev"') : `<span class="k">${m[1] || ''}</span>`}</div>`).join('');
 }
 function mainMenu() {
-  const [x, y] = geo().menu;
+  const g = geo();
   const top = [['File', '>'], ['Edit', '>', 'hover'], ['Arrange', '>'], ['View', '>'], ['Help', '>']];
   const edit = [['Undo Move 1 entity', 'Ctrl+Z'], ['Redo', 'Ctrl+Shift+Z', 'dis'], '-', ['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C'], ['Paste', 'Ctrl+V', 'hover'], ['Duplicate', 'Ctrl+D'], ['Delete', 'Del'], '-', ['Select all', 'Ctrl+A'], ['Rename', 'F2'], ['Hide or show', 'Ctrl+Shift+H']];
+  if (g.menuUp) {
+    const x = g.cx - 252, b = M + 46 + 8;
+    return `<div class="menu ${S.menu}" style="left:${x}px;bottom:${b}px">${menuBody(top)}</div><div class="menu ${S.menu}" style="left:${x + 206}px;bottom:${b}px;min-width:250px">${menuBody(edit)}</div>`;
+  }
+  const [x, y] = g.menu;
   return `<div class="menu ${S.menu}" style="left:${x}px;top:${y}px">${menuBody(top)}</div><div class="menu ${S.menu}" style="left:${x + 206}px;top:${y + 38}px;min-width:250px">${menuBody(edit)}</div>`;
 }
 const dialogBody = () => `<h3>Replace the open level?</h3><p>Export it first if you want to keep it.</p><div class="row"><span class="btn ${S.btn}">Cancel</span><span class="btn primary ${S.btn}">Replace</span></div>`;
@@ -599,7 +591,7 @@ function render() {
   const cls = ['ed', 'float', parts ? 'tall' : ''].join(' ');
   document.getElementById('frame').innerHTML = `<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
   document.getElementById('stage').classList.toggle('scroll', parts);
-  try { localStorage.setItem('engine-v3-islands-3', JSON.stringify(state)); } catch (e) {}
+  try { localStorage.setItem('engine-v3-islands-4', JSON.stringify(state)); } catch (e) {}
   fit();
 }
 function fit() {
