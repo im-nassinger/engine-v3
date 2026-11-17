@@ -178,13 +178,16 @@ async function openPlayPage(level: Level): Promise<PlayPage> {
 
 // One frame on the clock: the answers that came are applied, then the frame's work runs, the session's
 // ticks and drawing between them and the level view's render. Returns the time the work took; waits,
-// untimed, for the GPU to draw it and for the frame's time to pass.
+// untimed, for the GPU to draw it, for the browser's next animation frame and for the frame's time to pass.
+// Waiting on timers alone starves the worker's messages in a browser drawing without a GPU, as on CI: the
+// game's answers never land and the watchdog ends the run.
 async function timedFrame(opened: PlayPage, frameStartMs: number) {
     const start = performance.now();
     await opened.runner.letAnswersIn();
     opened.frames.runFrame(start);
     const elapsed = performance.now() - start;
     waitForDrawing(opened);
+    await new Promise((resolve) => requestAnimationFrame(resolve));
 
     const wait = frameStartMs + FRAME_MS - performance.now();
     if (wait > 0) {

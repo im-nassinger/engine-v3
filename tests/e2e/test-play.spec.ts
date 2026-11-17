@@ -92,6 +92,8 @@ async function drawFallingBox(page: Page) {
     await damping.press('Enter');
     await expect(damping).toHaveValue(LINEAR_DAMPING);
     await addComponent(page, 'SurfaceComponent');
+    // The editor's messages are checked once a frame, so the BodyComponent's note goes a frame after the card comes.
+    await expect(card(page, 'BodyComponent').getByRole('note')).toHaveCount(0);
 
     return start;
 }

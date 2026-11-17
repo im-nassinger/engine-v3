@@ -169,6 +169,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Frozen pages.** Browsers can freeze or discard hidden pages with no event. Both are safe, because a run holds no unsaved work.
 - **A long stall.** The old draft dropped the backlog after a stall of more than 0.25 seconds, so the game continues from where it was instead of racing to catch up.
 - **Full screen.** Esc, tab switching and Alt+Tab all end it, and going back needs a click.
+- **A page that never waits for an animation frame gets no worker messages.** Found in stage 17 (2026-11-17): in Chromium drawing without a GPU, as on CI, a loop that waits only on `setTimeout` gets the game worker's answers late and in bursts, and soon not at all, so the watchdog ends the run. Waiting for `requestAnimationFrame` each frame lets them in. The editor's frames come from `requestAnimationFrame`, so only a test that runs frames on its own clock must wait for one too (`tests/performance/testPlay.browser.test.ts`).
 
 ## Saving and files
 
