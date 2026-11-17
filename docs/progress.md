@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 15, step 2 of 7: the camera's rules are plain functions in `core/simulation/camera/`: `smoothTowards`, `limitToBounds` and `keepInSafetyMargin`. Next is step 3, `CameraPhase` and `CameraState`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 15, step 3 of 7: `CameraPhase` moves `CameraState` in `PlayRun` each tick, the run starts on the target, and the report and `stateHash` read it. Next is step 4, the `camera-follow` determinism level. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

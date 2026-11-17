@@ -7,8 +7,6 @@ import type { RunStart } from './RunStart.ts';
 import type { TickInputs } from './TickInputs.ts';
 import type { TickPhase } from './TickPhase.ts';
 
-const LEVEL_ORIGIN = { x: 0, y: 0 };
-
 // One run: the play copy, its physics and the tick phases, run in order every tick. startSimulation
 // builds it.
 export class Simulation {
@@ -48,13 +46,13 @@ export class Simulation {
 
     // Everything since the last report, which starts the next one from nothing.
     takeReport(): TickReport {
-        const camera = this.cameraPosition();
+        const camera = this.run.camera.position;
 
         return this.run.report.take(this.currentTick, camera);
     }
 
     stateHash() {
-        const camera = this.cameraPosition();
+        const camera = this.run.camera.position;
 
         return stateHash(this.currentTick, this.run.scene, this.run.poses, camera);
     }
@@ -68,12 +66,5 @@ export class Simulation {
     destroy() {
         this.run.scene.world.destroy();
         this.run.caches.dispose();
-    }
-
-    // The camera entity's level position. The CameraPhase, with following, comes with stage 15.
-    private cameraPosition() {
-        const matrix = this.run.caches.worldMatrices.matrixOf(this.run.level.camera);
-
-        return matrix.apply(LEVEL_ORIGIN);
     }
 }

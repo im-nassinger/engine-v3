@@ -6,7 +6,11 @@ import { BodyPoses, PhysicsSceneBuilder } from '../../physics/index.ts';
 import type { PhysicsEngine } from '../../physics/index.ts';
 
 import { BodyMatrices } from '../bodies/BodyMatrices.ts';
+import { CameraSettings } from '../camera/CameraSettings.ts';
+import { CameraState } from '../camera/CameraState.ts';
+import { startingCameraPosition } from '../camera/startingCameraPosition.ts';
 import { PlayJoints } from '../joints/PlayJoints.ts';
+import { CameraPhase } from '../phases/CameraPhase.ts';
 import { EndOfTickPhase } from '../phases/EndOfTickPhase.ts';
 import { InputPhase } from '../phases/InputPhase.ts';
 import { JointPathPhase } from '../phases/JointPathPhase.ts';
@@ -51,12 +55,17 @@ export function startSimulation(levelData: LevelData, engine: PhysicsEngine, sta
     }
 
     const removals = new RemovalMarks();
-    const run = { level, caches, scene, poses, bodyMatrices, joints, removals, report: new ReportCollector() };
+    const cameraSettings = new CameraSettings(level, caches);
+    const cameraStart = startingCameraPosition(cameraSettings, level);
+    const camera = new CameraState(cameraStart);
+    const report = new ReportCollector();
+    const run = { level, caches, scene, poses, bodyMatrices, joints, removals, camera, report };
     const phases = [
         new InputPhase(),
         new PhysicsPhase(),
         new JointPathPhase(),
         new LevelBoundsPhase(),
+        new CameraPhase(),
         new EndOfTickPhase(),
     ];
     const simulation = new Simulation(run, start, phases);
