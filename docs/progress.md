@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 17, step 9 of 11: saving only what changed is built: `LevelText` keeps each entity's `level.json` text until it changes, so a 10,000-entity save after one change takes 25 to 27 ms against 50 ms, each equal to a full write. Next is step 10, the Entities panel's scrolling. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 17, step 10 of 11: the Entities panel's scrolling meets its target: its slow frames were React's development build, so `npm run test:performance` runs React's production build, and 95% of scroll frames are within 5.1 to 6.6 ms against 16.7 ms. Next is step 11, the docs of what the stage showed. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

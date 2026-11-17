@@ -52,7 +52,7 @@ tests/
 | `npm run deps` | dependency-cruiser | |
 | `npm test` | Vitest in Node: the unit tests and the guard tests | |
 | `npm run test:browser` | Vitest in Chromium, Firefox and WebKit | Before a stage closes, and in CI |
-| `npm run test:performance` | Vitest's speed tests in Chromium alone, with the GPU, one at a time (see [performance.md](performance.md#targets-and-their-tests)) | Before a stage closes, and in CI |
+| `npm run test:performance` | Vitest's speed tests in Chromium alone, with the GPU and React's production build (`NODE_ENV=production`), one at a time (see [performance.md](performance.md#targets-and-their-tests)) | Before a stage closes, and in CI |
 | `npm run test:e2e` | Playwright against the built page | Before a stage closes, and in CI on master |
 | `npm run docs:check` | `node tools/check-docs.js` | |
 | **`npm run check`** | `typecheck`, `lint`, `format:check`, `deps`, `test`, `docs:check`, in that order | **Before every commit** |
