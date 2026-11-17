@@ -2,6 +2,8 @@ import { Dialogs } from '../../dialogs/index.ts';
 import { EntitiesPanel } from '../../entities-panel/index.ts';
 import { Inspector } from '../../inspector/index.ts';
 import { LevelViewHost } from '../../level-view-host/index.ts';
+import { usePlaySession } from '../../play/index.ts';
+import { PlayBar } from '../../play-bar/index.ts';
 import { StatusBar } from '../../status-bar/index.ts';
 import { Toolbar } from '../../toolbar/index.ts';
 import { useReading } from '../../hooks/index.ts';
@@ -16,15 +18,25 @@ import './EditorShell.css';
 const HIDES_INSPECTOR = 'shape';
 
 // The level view fills the window, and the panels sit over it in fixed places. While the Shape tool is
-// active the Inspector's place is gone and the free area reaches the toolbar.
+// active the Inspector's place is gone and the free area reaches the toolbar. During test play every panel
+// and bar is hidden but kept, so Stop shows them as they were, scrolled and folded, and the Play bar floats
+// over the game.
 export function EditorShell() {
     const { controller } = useEditorTools();
+    const play = usePlaySession();
     const readInspectorHidden = () => controller.active.id === HIDES_INSPECTOR;
     const isInspectorHidden = useReading(controller.version, readInspectorHidden);
+    const readPlaying = () => play.isRunGoing;
+    const isPlaying = useReading(play.version, readPlaying);
 
     return (
-        <div className="editor-shell" data-inspector-hidden={isInspectorHidden}>
+        <div className="editor-shell" data-inspector-hidden={isInspectorHidden} data-playing={isPlaying}>
             <LevelViewHost />
+            {isPlaying && (
+                <PanelErrorBoundary>
+                    <PlayBar />
+                </PanelErrorBoundary>
+            )}
             <PanelPlace area="top-bar" label="Top bar" letsMenusOut>
                 <TopBar />
             </PanelPlace>

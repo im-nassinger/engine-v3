@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 16, step 9 of 12: the commands and keys are built: Play or Stop (Ctrl+Enter), Pause (F8) and Step (F9) in the Play menu; `CommandRunner` refuses every other command during a run with "Stop to edit", the keyboard belongs to the game, and the tab title starts `▶`. Next is step 10, the page. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 16, step 10 of 12: the page is built: Play in the top bar, the Play bar with its states, buttons and messages, the panels hidden during a run, the pointer off, and the level view drawing the running game through the camera, each body at its pose. Next is step 11, the Playwright tests. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

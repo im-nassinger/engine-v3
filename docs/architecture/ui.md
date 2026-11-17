@@ -74,7 +74,7 @@ export function useEditorSession() {
 
 - `EditorShell` lays out the panels in fixed places, with the starting sizes from the requirements as CSS tokens in `theme.css`.
 - **`LevelViewHost` fills the whole window under the panels**, as the requirement says ("the level view fills the whole window, with the panels on top"). The panels sit above it; the browser's own stacking keeps clicks on a panel away from the canvas.
-- During play, `EditorShell` hides every panel and bar and shows `PlayBar`, reading `PlaySession.version`.
+- During play, `EditorShell` hides every panel and bar and shows `PlayBar`, reading `PlaySession.version` from `PlayContext`. The panels are hidden with `visibility: hidden`, not removed, so they come back at Stop as they were (stage 16).
 
 ## The level view and React
 
@@ -118,7 +118,7 @@ export function LevelViewHost() {
 | `EntitiesPanel` | `EntitiesRows` | Virtual list, below |
 | `Inspector` | `InspectorModel` | One `Card` per card model, one field component per field type |
 | `StatusBar` | `ToolController`, the mouse position, `Selection`, `EditorMessages`, `StatusText` | |
-| `PlayBar` | `PlaySession` | Stop, Pause, Step |
+| `PlayBar` | `PlaySession` | Pause or Resume, Step, Stop, and one message |
 | `Dialogs` | Questions from commands (`needsConfirmation`), import refusals | One dialog at a time |
 
 **Fields:** `ui/fields/` has one component per field type (`NumberField`, `TextField`, `CheckboxField`, `ChoiceField`, `ColourField`, `VectorField`, `EntityField`). `FieldControl` picks the component from `FieldModel.definition.type.kind` through a lookup table, so a new field type adds one entry and one component. `NumberField` uses `ValueInput` from the editor for parsing and formatting, and serves angles too (standing yes, 2026-11-15).

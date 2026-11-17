@@ -1,4 +1,5 @@
 import { PathComponent } from '../../../core/components/index.ts';
+import { Signal } from '../../../core/events/index.ts';
 import type { EntityId } from '../../../core/fields/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
 import type { LevelData, ReadOutcome } from '../../../core/level-data/index.ts';
@@ -11,7 +12,7 @@ import {
     startingCameraPosition,
     startPlayCopy,
 } from '../../../core/simulation/index.ts';
-import type { PlayCopy, TickReport } from '../../../core/simulation/index.ts';
+import type { CameraBox, PlayCopy, TickReport } from '../../../core/simulation/index.ts';
 
 import { NoPhysicsEngine } from './NoPhysicsEngine.ts';
 
@@ -29,6 +30,10 @@ type BodyMove = {
 // its pose and rest, so after each report its level matrices are the play copy's. Between reports it
 // draws each moved body and the camera part of the way from their last pose to their new one.
 export class PlayMirror {
+    // The camera's box, which the level view fits to the window. It is the same all through a run.
+    readonly cameraBox: CameraBox;
+    // Each body placed at a pose, and each entity that follows it, so the level view draws it there.
+    readonly placed = new Signal<Entity>();
     private readonly copy: PlayCopy;
     private moves = new Map<EntityId, BodyMove>();
     private cameraFrom: Point;
@@ -36,8 +41,9 @@ export class PlayMirror {
     private drawnCamera: Point;
     private lastTick = 0;
 
-    private constructor(copy: PlayCopy, camera: Point) {
+    private constructor(copy: PlayCopy, camera: Point, cameraBox: CameraBox) {
         this.copy = copy;
+        this.cameraBox = cameraBox;
         this.cameraFrom = camera;
         this.cameraTo = camera;
         this.drawnCamera = camera;
@@ -49,9 +55,10 @@ export class PlayMirror {
         if (!started.ok) return started;
 
         const copy = started.value;
-        const camera = startingCameraPosition(new CameraSettings(copy.level, copy.caches), copy.level);
+        const settings = new CameraSettings(copy.level, copy.caches);
+        const camera = startingCameraPosition(settings, copy.level);
 
-        return { ok: true, value: new PlayMirror(copy, camera) };
+        return { ok: true, value: new PlayMirror(copy, camera, settings.box) };
     }
 
     get level() {
@@ -60,6 +67,11 @@ export class PlayMirror {
 
     get caches() {
         return this.copy.caches;
+    }
+
+    // A body's or a follower's level matrix from its pose; undefined for every other entity.
+    matrixOf(entity: Entity) {
+        return this.copy.bodyMatrices.matrixOf(entity);
     }
 
     // The last tick a report reached, 0 before the first.
@@ -140,8 +152,10 @@ export class PlayMirror {
     private place(body: Entity, pose: BodyPose) {
         this.copy.poses.place(body.id, pose);
         this.copy.caches.bodyMoved(body);
+        this.placed.emit(body);
         for (const follower of this.copy.bodyMatrices.followersOf(body)) {
             this.copy.caches.bodyMoved(follower);
+            this.placed.emit(follower);
         }
     }
 

@@ -65,6 +65,11 @@ export class EntityNode {
             matrix = Matrix2D.fromTransform(values);
         }
 
+        this.applyMatrix(matrix);
+    }
+
+    // A matrix from the parent's space that isn't the TransformComponent's: a body's during play.
+    applyMatrix(matrix: Matrix2D) {
         const pixiMatrix = new Matrix(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
         this.container.setFromMatrix(pixiMatrix);
     }

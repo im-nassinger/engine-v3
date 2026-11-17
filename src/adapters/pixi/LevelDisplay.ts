@@ -3,7 +3,7 @@ import type { AnyComponent } from '../../core/components/index.ts';
 import type { BoundsCache, PiecesCache, WorldMatrixCache } from '../../core/derived/index.ts';
 import type { Entity, Level, LevelUpdate } from '../../core/level/index.ts';
 import type { Unsubscribe } from '../../core/events/index.ts';
-import type { Bounds } from '../../core/geometry/index.ts';
+import type { Bounds, Matrix2D } from '../../core/geometry/index.ts';
 import { EntityDrawing } from './EntityDrawing.ts';
 import type { EntityDrawingOptions } from './EntityDrawing.ts';
 import { EntityNode } from './EntityNode.ts';
@@ -17,9 +17,19 @@ export type LevelDisplayCaches = {
     readonly worldMatrices: WorldMatrixCache;
 };
 
+// During play, the entities whose level matrix comes from a body's pose instead of their TransformComponent:
+// the bodies and the joints that follow them. PlayMirror is one, and says each time it places one.
+export type PlayBodies = {
+    // undefined for an entity whose matrix is its TransformComponent's.
+    matrixOf(entity: Entity): Matrix2D | undefined;
+    readonly placed: { subscribe(listener: (entity: Entity) => void): Unsubscribe };
+};
+
 export type LevelDisplayParts = {
     readonly level: Level;
     readonly caches: LevelDisplayCaches;
+    // Given during play only.
+    readonly playBodies?: PlayBodies;
     readonly options: EntityDrawingOptions;
     // Called after every change that shows on screen, so the view can draw once on the next frame.
     readonly onChange: () => void;
@@ -41,6 +51,8 @@ export class LevelDisplay {
     private readonly parts: LevelDisplayParts;
     private readonly nodes = new Map<Entity, EntityNode>();
     private readonly staleDrawings = new Set<Entity>();
+    // Placed by play since the last render, so their nodes' matrices are set from their poses then.
+    private readonly placedSinceRender = new Set<Entity>();
     // Entities whose bounds may have changed since the last cull. While the visible area stays the same,
     // culling visits only these, their subtrees and their parents: a drag of 1,000 entities at 10,000
     // took 4 ms a frame walking them all.
@@ -48,6 +60,7 @@ export class LevelDisplay {
     private needsFullCull = true;
     private lastCullArea: Bounds | undefined;
     private readonly unsubscribe: Unsubscribe;
+    private readonly stopFollowingBodies: Unsubscribe | undefined;
     private readonly worldNode: EntityNode;
     private drawingBuilds = 0;
 
@@ -55,6 +68,7 @@ export class LevelDisplay {
         this.parts = parts;
         this.worldNode = this.buildSubtree(parts.level.world);
         this.unsubscribe = parts.level.signals.updated.subscribe((update) => this.handleUpdate(update));
+        this.stopFollowingBodies = parts.playBodies?.placed.subscribe((entity) => this.bodyPlaced(entity));
     }
 
     // The World's node, which holds every other one.
@@ -75,8 +89,10 @@ export class LevelDisplay {
         return this.nodes.get(entity);
     }
 
-    // Rebuilds the drawings marked since the last render.
+    // Rebuilds the drawings marked since the last render, and places the nodes play moved.
     prepare() {
+        this.placePlayedNodes();
+
         for (const entity of this.staleDrawings) {
             const node = this.nodes.get(entity);
             if (node === undefined) continue;
@@ -112,10 +128,54 @@ export class LevelDisplay {
 
     dispose() {
         this.unsubscribe();
+        this.stopFollowingBodies?.();
+        this.placedSinceRender.clear();
         this.worldNode.destroy();
         this.nodes.clear();
         this.staleDrawings.clear();
         this.changedSinceCull.clear();
+    }
+
+    private bodyPlaced(entity: Entity) {
+        this.placedSinceRender.add(entity);
+        this.changedSinceCull.add(entity);
+        this.parts.onChange();
+    }
+
+    // Each placed entity's node, and every one inside it that play places too, as a body inside a body
+    // that didn't move: its node's matrix is from its parent's space, and the parent moved.
+    private placePlayedNodes() {
+        const playBodies = this.parts.playBodies;
+        if (playBodies === undefined) return;
+
+        for (const placed of this.placedSinceRender) {
+            const waiting = [placed];
+            for (let entity = waiting.pop(); entity !== undefined; entity = waiting.pop()) {
+                waiting.push(...entity.children);
+                this.placeFromPlay(entity, playBodies);
+            }
+        }
+        this.placedSinceRender.clear();
+    }
+
+    private placeFromPlay(entity: Entity, playBodies: PlayBodies) {
+        const node = this.nodes.get(entity);
+        if (node === undefined) return;
+        if (playBodies.matrixOf(entity) === undefined) return;
+
+        const worldMatrices = this.parts.caches.worldMatrices;
+        const levelMatrix = worldMatrices.matrixOf(entity);
+        const parent = entity.parent;
+        if (parent === undefined) {
+            node.applyMatrix(levelMatrix);
+            return;
+        }
+
+        // A parent scaled to nothing can't be undone; the editor refuses a scale of 0, so it never is.
+        const fromLevelToParent = worldMatrices.matrixOf(parent).invert();
+        if (fromLevelToParent === undefined) return;
+
+        node.applyMatrix(fromLevelToParent.multiply(levelMatrix));
     }
 
     private buildSubtree(entity: Entity) {

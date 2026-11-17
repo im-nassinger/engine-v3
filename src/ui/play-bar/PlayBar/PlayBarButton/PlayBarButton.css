@@ -1,0 +1,33 @@
+.play-bar-button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    height: var(--control);
+    padding: 0 var(--space-8);
+    border: none;
+    border-radius: var(--radius);
+    background: none;
+    color: var(--text);
+    cursor: default;
+
+    > .shortcut {
+        color: var(--muted);
+    }
+
+    &:hover {
+        background: var(--hover);
+    }
+
+    &[aria-disabled='true'] {
+        background: none;
+        color: var(--faint);
+
+        > .shortcut {
+            color: var(--faint);
+        }
+    }
+
+    &:focus-visible {
+        outline: 1px solid var(--accent);
+    }
+}

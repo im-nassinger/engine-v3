@@ -65,7 +65,7 @@ A field is a row of `--row` height: the label in `--muted` in a 128 px column, t
 - **Dialog:** 400 px wide, centred, over the `--scrim`. A title in `--text-title` and weight 600, the text in `--muted`, then a line and the buttons at the right: the safe one first, the primary one last.
 - **Options strip** (the Joint tool's types; the Shape tool's Rectangle, Circle and Polygon, owner 2026-11-15): floats over the top left of the level view, 8 px from its corner, with a shadow. Its corner is the free area's: right of the Inspector, or right of the toolbar while the Shape tool hides the Inspector. Each choice is an icon button with its name. The chosen one is on.
 - **Status bar:** `--text-small`. From the left: the tool's hint or a status text in `--text`, then the mouse position, the selection and the warning count in `--muted`. The count's icon is `--warning` when it isn't 0.
-- **Play bar:** floats at the top centre of the window. A 1.5 px frame and a label with a dot: PLAYING in `--playing`, PAUSED in `--paused` (*proposal* for the colours). Then Pause (Resume while paused), Step (disabled while running), Stop, each with its key in `--muted`.
+- **Play bar:** floats at the top centre of the window. A 1.5 px frame and a label with a dot: PLAYING in `--playing`, PAUSED in `--paused` (*proposal* for the colours). Then Pause (Resume while paused), Step (disabled while running), Stop, each with its key in `--muted`. STARTING (in `--playing`) while the game loads and ENDED (in `--muted`) once a run ended (*proposal*, stage 16). One line of `--text-small` under the buttons shows why a run ended, "The game isn't responding", or a hint such as "Stop to edit".
 
 ## Icons
 

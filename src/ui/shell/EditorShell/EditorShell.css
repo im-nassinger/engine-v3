@@ -17,4 +17,9 @@
             'toolbar free entities'
             'status-bar status-bar status-bar';
     }
+
+    /* Hidden, not removed, so the panels keep their scroll and folds and nothing in them is clicked or read. */
+    &[data-playing='true'] > :is(.panel-place, .free-area) {
+        visibility: hidden;
+    }
 }

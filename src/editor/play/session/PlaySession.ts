@@ -331,6 +331,7 @@ export class PlaySession {
         this.cancelFrame = undefined;
         this.watchdog.reset();
         this.batchInFlight = false;
+        this.currentMirror?.destroy();
         this.currentMirror = undefined;
         this.currentNotice = undefined;
         this.currentEndedMessage = undefined;

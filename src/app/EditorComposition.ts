@@ -63,6 +63,7 @@ import { createTools } from './createTools.ts';
 import { EditorDrawingSource } from './EditorDrawingSource.ts';
 import { EditorJointPreviewSource } from './EditorJointPreviewSource.ts';
 import { EditorSelectionSource } from './EditorSelectionSource.ts';
+import { PlayViewLink } from './PlayViewLink.ts';
 
 const FIT_CAMERA_FRAME = 'view.fitCameraFrame';
 
@@ -88,6 +89,7 @@ type EditorParts = {
     readonly gameRunner: GameRunner;
     readonly play: PlaySession;
     readonly pageVisibility: PageVisibility;
+    readonly playView: PlayViewLink;
 };
 
 // The composition root: the only code that knows both the editor's rules and the browser's details.
@@ -117,6 +119,7 @@ export class EditorComposition {
     private readonly clipboardBridge: ClipboardBridge;
     private readonly fileDrop: FileDropTarget;
     private readonly pageVisibility: PageVisibility;
+    private readonly playView: PlayViewLink;
 
     private constructor(parts: EditorParts) {
         this.session = parts.session;
@@ -140,6 +143,7 @@ export class EditorComposition {
         this.gameRunner = parts.gameRunner;
         this.play = parts.play;
         this.pageVisibility = parts.pageVisibility;
+        this.playView = parts.playView;
     }
 
     static async create() {
@@ -231,7 +235,7 @@ export class EditorComposition {
         const escape = new EscapeChain(session, tools, openWindows);
         const dispatcher = new ShortcutDispatcher(commands, runner, platform, { tools, escape });
         const keyboard = new KeyboardInput(dispatcher, window, heldKeys);
-        const pointerParts = { tools, escape, mouse, view: session.view, platform };
+        const pointerParts = { tools, escape, mouse, view: session.view, platform, play };
         const pointer = new PointerInput(pointerParts, levelView.canvas, window);
         const clipboardBridge = new ClipboardBridge(new ClipboardEvents(commands, runner), window);
         const fileDrop = new FileDropTarget(new FileDropEvents(commands, runner), window);
@@ -239,6 +243,7 @@ export class EditorComposition {
         const pageSaving = new PageSavingEvents({ indicator: saveIndicator, saving, settings, sessionOpen }, window);
         const tabTitle = new TabTitle(session, saveIndicator, document, play);
         const pageVisibility = new PageVisibility(window);
+        const playView = new PlayViewLink(play, levelView, session);
 
         const composition = new EditorComposition({
             session,
@@ -262,6 +267,7 @@ export class EditorComposition {
             gameRunner,
             play,
             pageVisibility,
+            playView,
         });
         composition.start();
 
@@ -276,7 +282,7 @@ export class EditorComposition {
         this.levelView.showDrawing(new EditorDrawingSource(this.tools));
         this.levelView.showJointPreview(new EditorJointPreviewSource(this.session, this.tools, this.mouse));
         // The editor lives as long as the page, so the keyboard, the pointer, the clipboard events, file drops,
-        // the page's saving events and its visibility are never disconnected.
+        // the page's saving events, its visibility and test play's view are never disconnected.
         this.keyboard.connect();
         this.pointer.connect();
         this.clipboardBridge.connect();
@@ -284,6 +290,7 @@ export class EditorComposition {
         this.pageSaving.connect();
         this.tabTitle.connect();
         this.play.connectPage(this.pageVisibility);
+        this.playView.connect();
         this.limitPanToOpenLevel();
         this.session.openLevelChanged.subscribe(() => this.limitPanToOpenLevel());
         // A new level has no place of its own yet, so a view kept from an earlier level would show nothing.

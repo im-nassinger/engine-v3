@@ -10,7 +10,7 @@ import type { ViewSettings } from '../../editor/view/index.ts';
 import type { Cancel, FrameScheduler } from '../../editor/time/index.ts';
 import type { EntityDrawingOptions } from './EntityDrawing.ts';
 import { LevelDisplay } from './LevelDisplay.ts';
-import type { LevelDisplayCaches } from './LevelDisplay.ts';
+import type { LevelDisplayCaches, PlayBodies } from './LevelDisplay.ts';
 import {
     BoundsOverlay,
     CameraFrameOverlay,
@@ -200,14 +200,16 @@ export class PixiLevelView {
         this.host = undefined;
     }
 
-    // Draws this level from now on: the editor's, a new or imported one, or the PlayMirror during play.
-    show(level: Level, caches: LevelDisplayCaches) {
+    // Draws this level from now on: the editor's, a new or imported one, or the PlayMirror's during play,
+    // with the mirror as playBodies, so each body is drawn at its pose.
+    show(level: Level, caches: LevelDisplayCaches, playBodies?: PlayBodies) {
         this.display?.dispose();
         this.stopListeningToLevel?.();
 
         const display = new LevelDisplay({
             level,
             caches,
+            playBodies,
             options: this.parts.drawing,
             onChange: () => this.markDirty(),
         });

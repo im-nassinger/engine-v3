@@ -70,6 +70,8 @@ let tools: RecordingTools;
 let escape: RecordingEscape;
 let mouse: RecordingMouse;
 let disconnect: () => void;
+// Whether a test play run is going, as PlaySession tells it.
+let play: { isRunGoing: boolean };
 // Each test's presses come later than the last test's, so no double-click runs across tests.
 let timeMs = 0;
 
@@ -86,7 +88,8 @@ beforeEach(() => {
     tools = new RecordingTools();
     escape = new RecordingEscape();
     mouse = new RecordingMouse();
-    const input = new PointerInput({ tools, escape, mouse, view, platform: 'other' }, element, window);
+    play = { isRunGoing: false };
+    const input = new PointerInput({ tools, escape, mouse, view, platform: 'other', play }, element, window);
     disconnect = input.connect();
     timeMs += 10_000;
 });
@@ -251,5 +254,19 @@ describe('PointerInput', () => {
 
         const expected = view.screenToLevel(viewPoint);
         expect(mouse.positions).toEqual([expected, undefined]);
+    });
+
+    test('during play a press, a move and the wheel do nothing, and a release still ends a drag', () => {
+        pointer('pointerdown', { x: 10, y: 10 }, { buttons: 1 });
+        play.isRunGoing = true;
+
+        pointer('pointerdown', { x: 20, y: 20 }, { button: 2, buttons: 3 });
+        pointer('pointermove', { x: 30, y: 30 }, { buttons: 1 });
+        const event = wheel({ x: 30, y: 30 }, { deltaY: -100 });
+        pointer('pointerup', { x: 30, y: 30 });
+
+        expect(tools.heard).toEqual(['down left', 'up left']);
+        expect(event.defaultPrevented).toBe(true);
+        expect(view.zoom).toBe(1);
     });
 });

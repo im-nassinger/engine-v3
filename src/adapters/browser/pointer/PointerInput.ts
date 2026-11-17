@@ -21,6 +21,9 @@ export type PointerInputParts = {
     readonly mouse: Pick<MousePosition, 'moveTo' | 'leave'>;
     readonly view: ViewState;
     readonly platform: KeyboardPlatform;
+    // Test play: while a run is going, presses, moves and the wheel do nothing, so the editor's view and
+    // tools are as they were at Stop. A release still goes through, ending a drag begun before Play.
+    readonly play?: { readonly isRunGoing: boolean };
 };
 
 // PointerEvent.button's numbers, and the bit each sets in PointerEvent.buttons.
@@ -83,9 +86,17 @@ export class PointerInput {
         };
     }
 
+    private get isRunGoing() {
+        return this.parts.play?.isRunGoing === true;
+    }
+
     private handleDown(event: PointerEvent) {
         const button = buttonOf(event.button);
         if (button === undefined) return;
+        if (this.isRunGoing) {
+            stopAutoscroll(event);
+            return;
+        }
 
         stopAutoscroll(event);
         capture(this.element, event.pointerId);
@@ -98,6 +109,8 @@ export class PointerInput {
 
     // A second button going down or up while one is held comes as a move, not a press or release.
     private handleMove(event: PointerEvent) {
+        if (this.isRunGoing) return;
+
         const button = buttonOf(event.button);
         if (event.button !== NO_BUTTON_CHANGE && button !== undefined) {
             this.handleChord(event, button);
@@ -133,6 +146,8 @@ export class PointerInput {
     // or scrolls.
     private handleWheel(event: WheelEvent) {
         event.preventDefault();
+        if (this.isRunGoing) return;
+
         const view = this.parts.view;
         const pageHeight = view.size.height;
 

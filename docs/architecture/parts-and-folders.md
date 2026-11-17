@@ -27,9 +27,11 @@ src/
   app/                 composition roots, one file each
     main.tsx             the editor page: builds every class, renders <EditorShell>
     EditorComposition.ts the object graph of the editor page, built in one place
+    PlayViewLink.ts      test play in the level view: the PlayMirror through the camera, the editor's level at Stop
     workers/             compiled with the WebWorker types, without DOM
       game.worker.ts       the game worker: core simulation + Box2D adapter
       import.worker.ts     the import worker: unzips and checks a file
+      testing/             silentGame.worker.ts: a game worker that never answers a batch, for the watchdog's test
   core/
     events/            Signal, VersionCounter: how classes announce changes
     level/             Level, Entity, EntityId, LevelTree, LevelUpdate, LevelEditorData
@@ -98,8 +100,10 @@ src/
     dialogs/           Dialogs/ (with DialogBox/)
     open-windows/      OpenWindowsContext: where menus and the row drag report themselves open
     tools/             ToolsContext: ToolController and MousePosition for the toolbar, status bar and picker; testing/
+    play/              PlayContext: the PlaySession for the shell, the Play button and the Play bar
+    play-bar/          PlayBar/ (with PlayBarButton/)
     testing/           editorPage: a component shown with the session, commands and tools, for browser tests
-    top-bar/ main-menu/ tool-options/ level-view-host/ entities-panel/ inspector/ play-bar/
+    top-bar/ main-menu/ tool-options/ level-view-host/ entities-panel/ inspector/
     fields/            one component per field type: NumberField/, ColourField/, ...
     shared/            Button/, IconButton/, Menu/, MenuButton/, Tooltip/, Icon/
 tests/

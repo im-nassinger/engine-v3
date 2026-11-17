@@ -160,4 +160,44 @@ describe('EditorShell', () => {
         await expect.poll(nameBoxValue).toBe('Rectangle 1');
         expect(find('.tool-options')).toBeNull();
     });
+
+    test('Play hides every panel and bar, the Play bar shows, and Stop brings them back as they were', async () => {
+        const { play, tools } = showShell();
+        tools.controller.pick('joint');
+        await expect.poll(() => find('.tool-options')).not.toBeNull();
+        const places = [...editorPageContainer().querySelectorAll<HTMLElement>('.panel-place, .free-area')];
+        expect(places.length).toBeGreaterThan(4);
+
+        play.play();
+
+        await expect.poll(() => find('.play-bar')).not.toBeNull();
+        for (const place of places) {
+            expect(getComputedStyle(place).visibility).toBe('hidden');
+        }
+        expect(getComputedStyle(find('.level-view-host') ?? document.body).visibility).toBe('visible');
+
+        play.stop();
+
+        await expect.poll(() => find('.play-bar')).toBeNull();
+        for (const place of places) {
+            expect(place.isConnected).toBe(true);
+            expect(getComputedStyle(place).visibility).toBe('visible');
+        }
+        expect(tools.controller.active.id).toBe('joint');
+    });
+
+    test("the top bar's Play button starts a run", async () => {
+        const { play } = showShell();
+        await expect.poll(() => playButton()).not.toBeNull();
+
+        await userEvent.click(playButton() ?? document.body);
+
+        await expect.poll(() => play.state).toBe('playing');
+    });
 });
+
+function playButton() {
+    const buttons = [...editorPageContainer().querySelectorAll<HTMLElement>('.top-bar button')];
+
+    return buttons.find((button) => button.textContent === 'Play') ?? null;
+}
