@@ -59,7 +59,7 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--panel-head` | 36 px: a panel's title | |
 | `--inspector-head` | 44 px: the entity's name and its eye | |
 | `--card-head` | 32 px | |
-| `--control` | 28 px: buttons, icon buttons, the zoom and View menus | |
+| `--control` | 28 px: buttons, icon buttons, the zoom's menu | |
 | `--input` | 22 px: the box inside a field | |
 | `--tool` | 32 px: a tool button | |
 | `--menu-item` | 26 px | |

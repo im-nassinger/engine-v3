@@ -265,6 +265,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
+0. **The redesign, before v2** (owner, 2026-11-17): the owner is choosing a new look in [redesign.html](design/mockups/redesign.html), and the choices so far are in [design/](design/README.md). The top bar's View button is dropped from the requirements (the View menu is the main menu's View submenu), but the built editor still has it until the redesign is built.
 1. **The owner decides v2.** Stages 0 to 18 are built; the runner is stopped and nothing of v2 is planned or built.
 2. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
 

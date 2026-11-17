@@ -112,6 +112,7 @@ What we decided against, and why. **Check here before proposing something**: an 
 | An import that compares level ids and asks Keep both or Replace | Import replaces the open level after asking | v1 keeps no list of levels, so there is nothing to compare against | round 11: 12 A11; round 12: LV1 |
 | CodeMirror | Monaco | The owner's choice | round 9: 10 2.13 |
 | A 12-font list | Inter, then Lora, JetBrains Mono and Roboto Mono | The owner's list | decisions: D26; round 3: F1 |
+| A View button in the top bar | The View menu is the main menu's View submenu | The main menu already lists every command, so a second button only repeated it | owner: 2026-11-17 |
 
 ## Left out on purpose
 

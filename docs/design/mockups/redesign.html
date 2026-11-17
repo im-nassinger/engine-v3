@@ -303,7 +303,7 @@ const CHEV = ic('down', 'class="i chev"');
 
 // Each choice that changes the look, with its variants. The number of a variant is its place in the list.
 const KINDS = [
-  ['lcard', 'Level card', 'A card the width of the Inspector, above it, for the level and the view. The dock at the bottom holds the tools, Undo, Redo, snapping and Play.', [['basic', 'Name and zoom'], ['preview', 'Preview of the level'], ['info', 'Name, numbers and zoom'], ['toggles', 'Name and the view\'s switches']]],
+  ['lcard', 'Level card', 'A card the width of the Inspector, above it, for the level and the zoom. The dock at the bottom holds the tools, Undo, Redo, snapping and Play.', [['basic', 'Name and zoom'], ['preview', 'Preview of the level'], ['info', 'Name, numbers and zoom']]],
   ['layout', 'Entities panel height', '', [['hug', 'Fits its rows'], ['float', 'Full height']]],
   ['head', 'Panel titles', '', [['title', 'Title'], ['caps', 'Small caps']]],
   ['card', 'Inspector cards', 'How one component\'s card is told apart from the next.', [['space', 'Space only'], ['tile', 'Tiles'], ['inset', 'Sunken tiles'], ['island', 'Each card an island']]],
@@ -325,10 +325,9 @@ const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,2
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: '0 10px 40px rgba(0,0,0,.35)' };
 const dir = (id, name, desc, s) => ({ id, name, desc, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'Level card', 'A card above the Inspector, as wide as it and only as tall as its content: the menu and Help at its top, the level\'s name large with Saved under it, and View and the zoom at its foot. The status text is a chip above the dock. Four islands and a chip.', {}),
-  dir('2', 'Preview card', 'The card shows a small preview of the whole level, with the part on screen outlined in blue. The name sits on the preview\'s top, View and the zoom on its foot. A preview is a new idea, not in the requirements.', { lcard: 'preview' }),
-  dir('3', 'Info card', 'The card gathers what the status bar showed: the mouse position, the selection and the warning count, under the level\'s name, with the zoom at its foot. Only the tool hint stays as a chip above the dock.', { lcard: 'info' }),
-  dir('4', 'View switches card', 'The View menu\'s switches (grid, level bounds, camera frame, joint icons, physics view) are buttons on the card, with the zoom as a slider under them. The View menu stays for the rest.', { lcard: 'toggles' })
+  dir('1', 'Level card', 'A card above the Inspector, as wide as it and only as tall as its content: the menu and Help at its top, the level\'s name large, with Saved and the zoom under it. The View menu\'s switches are in the main menu\'s View submenu. The status text is a chip above the dock. Four islands and a chip.', {}),
+  dir('2', 'Preview card', 'The card shows a small preview of the whole level, with the part on screen outlined in blue. The name sits on the preview\'s top, the zoom on its foot. A preview is a new idea, not in the requirements.', { lcard: 'preview' }),
+  dir('3', 'Info card', 'The card gathers what the status bar showed: the mouse position, the selection and the warning count, under the level\'s name, with the zoom at its foot. Only the tool hint stays as a chip above the dock.', { lcard: 'info' })
 ];
 
 const FONTS = [
@@ -500,20 +499,14 @@ function levelCard(o) {
     const mini = scene(300, 170, 0.095, 150, 80, { grid: false });
     body = `<div class="lc-map">${mini}<svg class="lc-view" width="300" height="170"><rect x="68" y="30" width="164" height="106" rx="3" fill="rgba(79,140,255,.08)" style="stroke:var(--accent)" stroke-width="1.5"/></svg></div>
       <div class="lc-over top">${C.menu(o)}<span class="lc-name sm">Car test</span><span class="grow"></span>${saved}</div>
-      <div class="lc-over bot"><span class="ib">View${CHEV}</span><span class="grow"></span>${zoom}</div>`;
+      <div class="lc-over bot"><span class="grow"></span>${zoom}</div>`;
   } else if (k === 'info') {
     body = `<div class="lc-top">${C.menu(o)}<span class="lc-name sm">Car test</span><span class="grow"></span><span class="ib">${ic('help')}</span></div>
       <div class="lc-grid"><span>Mouse</span><span class="num">${o.pos}</span><span>Selected</span><span>${o.sel}</span><span>Messages</span><span class="warn">${ic('warning', 'style="color:var(--warning);width:13px;height:13px"')}1 warning</span></div>
-      <div class="lc-row"><span class="ib">View${CHEV}</span>${saved}<span class="grow"></span>${zoom}</div>`;
-  } else if (k === 'toggles') {
-    const t = (icon, on) => `<span class="ib${on ? ' on' : ''}">${ic(icon)}</span>`;
-    body = `<div class="lc-top">${C.menu(o)}<span class="lc-name sm">Car test</span><span class="grow"></span>${saved}</div>
-      <div class="lc-row">${t('grid', true)}${t('bounds', true)}${t('frame', true)}${t('joint', true)}${t('physics', false)}<span class="grow"></span><span class="ib">${CHEV}</span></div>
-      <div class="lc-row"><span class="ib">${ic('minus')}</span><span class="zslider"><i style="width:40%"></i><b style="left:40%"></b></span><span class="ib">${ic('plus')}</span><span class="num zval">40%</span></div>`;
+      <div class="lc-row">${saved}<span class="grow"></span>${zoom}</div>`;
   } else {
     body = `<div class="lc-top">${C.menu(o)}<span class="grow"></span><span class="ib">${ic('help')}</span></div>
-      <div class="lc-name">Car test</div><div class="lc-sub">${saved}<span class="lc-meta">17 entities</span></div>
-      <div class="lc-row"><span class="ib">View${CHEV}</span><span class="grow"></span>${zoom}</div>`;
+      <div class="lc-name">Car test</div><div class="lc-row lc-sub">${saved}<span class="lc-meta">17 entities</span><span class="grow"></span>${zoom}</div>`;
   }
   return `<div class="blk lcard ${k}">${body}</div>`;
 }

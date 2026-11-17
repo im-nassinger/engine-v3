@@ -39,13 +39,12 @@ Left to right:
 
 | Part | What it does |
 |---|---|
-| Main menu | One button with submenus File, Edit, Arrange, View, Help. Every command is here with its shortcut, so it is the full list of commands |
+| Main menu | One button with submenus File, Edit, Arrange, View, Help. Every command is here with its shortcut, so it is the full list of commands. **Its View submenu is the View menu:** the switches for what the editor draws over the level (Grid, Joint icons, Camera frame, Physics view), each with a shortcut, saved in the browser and never in the level. *Why: there will be several such switches, and one menu is where most editors put them. The top bar has no View button of its own (owner: 2026-11-17): the main menu already lists every command, so a second button only repeated it* |
 | Level name | Click to rename in place. Enter commits, Esc cancels, an empty name reverts. Renaming is an undo step |
 | Save state | `Saved`, `Saving`, `Unsaved changes` or `Save failed`. Clicking it explains the state. See [saving](../play-and-save/saving.md) |
 | Undo and Redo | Greyed when empty. The tooltip names the step, such as `Undo: Move 3 entities` |
 | Snapping | Switches for the grid, and in v3 for snapping to entities |
 | Play | Starts test play. During play the editor's bars and panels are hidden and the Play bar takes over, see [test play](../play-and-save/test-play.md) |
-| View menu | Switches what the editor draws over the level: Grid, Joint icons, Camera frame, Physics view. Each has a shortcut. Saved in the browser, never in the level. *Why: there will be several such switches, and one menu is where most editors put them* |
 | Zoom | Shows the percentage. Click to type a value or pick: Zoom in, Zoom out, 100%, Whole level, Selection, Camera frame |
 | Help | Keyboard shortcuts, About |
 
@@ -53,7 +52,7 @@ Left to right:
 - Space at the right end is left free for publishing and account controls later.
 - **The save state and the zoom are in the top bar**, not the status bar (owner: 2026-11-14).
 
-Source: round 3: 01 2.2, 2.3; round 8: VW1; old: WS-16 to WS-27; owner: 2026-11-14
+Source: round 3: 01 2.2, 2.3; round 8: VW1; old: WS-16 to WS-27; owner: 2026-11-14; owner: 2026-11-17
 
 ### Status bar · v1
 
