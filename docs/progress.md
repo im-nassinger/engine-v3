@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 17, step 5 of 10: journey 2, a car of a group, a body and two hinged wheels exported and imported back whole, passes in three browsers; it found the Inspector stuck on the World after New then Import, fixed in `useVersion`, see [ui.md](architecture/ui.md#how-a-component-reads-core-state). The Inspector's and the Select tool's Playwright tests now use a drawn crate. Next is step 6, the layout checks. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 17, step 6 of 10: the layout checks, `tests/e2e/layout/layout.spec.ts`, pass in three browsers at 1280×720, 1440×900, 1920×1080 and 1280×720 zoomed to 150% and 200%, each attaching a screenshot; CI's journeys job keeps the HTML report as an artifact. Next is step 7, the phone checks. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

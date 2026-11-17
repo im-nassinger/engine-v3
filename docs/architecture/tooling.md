@@ -213,7 +213,7 @@ One workflow, `.github/workflows/ci.yml`:
 |---|---|---|---|
 | check | `ubuntu-24.04` and `ubuntu-24.04-arm` | `npm ci`, `npm run check` | Every push |
 | browser | `ubuntu-24.04` | Installs the three browsers, `npm run test:browser`, `npm run test:performance`, `npm run build` | Every push |
-| journeys | `ubuntu-24.04` | Installs the three browsers, `npm run test:e2e` | Pushes to master |
+| journeys | `ubuntu-24.04` | Installs the three browsers, `npm run test:e2e`, and keeps the HTML report with its screenshots for 30 days as the `playwright-report` artifact | Pushes to master |
 
 - Node comes from `.node-version`. The actions are `actions/checkout@v7` and `actions/setup-node@v7`, with npm's cache.
 - `npx playwright install --with-deps` installs the browsers' system packages on the runner. On the laptop WebKit needed three (`libevent-2.1-7t64`, `libavif16`, `libmanette-0.2-0`), installed once with apt.

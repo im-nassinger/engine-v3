@@ -5,6 +5,8 @@ const PREVIEW_PORT = 4173;
 export default defineConfig({
     testDir: 'tests/e2e',
     forbidOnly: Boolean(process.env.CI),
+    // CI keeps the HTML report, with the layout checks' screenshots attached, as the journeys job's artifact.
+    reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
     use: {
         baseURL: `http://localhost:${PREVIEW_PORT}`,
     },
