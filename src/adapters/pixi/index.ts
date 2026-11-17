@@ -8,9 +8,12 @@ export type { OpenLevelSource, PixelRatioSource, PixiLevelViewParts } from './Pi
 export type {
     DrawingSource,
     DrawnDrawing,
+    DrawnJointPreview,
     DrawnSelection,
+    JointPreviewSource,
     SelectionSource,
     ShownFrame,
+    ShownJointPreview,
     ShownPoints,
     ShownPolygonPreview,
     ShownReadout,

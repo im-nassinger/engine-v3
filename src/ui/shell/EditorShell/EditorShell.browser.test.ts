@@ -2,7 +2,7 @@ import { createElement } from 'react';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { Level } from '../../../core/level/index.ts';
-import { OpenWindowCount, ShapeTool } from '../../../editor/tools/index.ts';
+import { JointTool, OpenWindowCount, ShapeTool } from '../../../editor/tools/index.ts';
 import type { LevelPointerInput } from '../../../editor/tools/index.ts';
 import { LevelViewMountContext } from '../../level-view-host/index.ts';
 import type { LevelViewMount } from '../../level-view-host/index.ts';
@@ -108,6 +108,43 @@ describe('EditorShell', () => {
 
         await userEvent.click(optionButton('Polygon'));
         await expect.poll(statusText).toContain('Click to add points.');
+    });
+
+    test('the Joint tool’s strip shows the three types, Hinge on, and changes the type', async () => {
+        const { tools } = showShell();
+        tools.controller.pick('joint');
+        await expect.poll(() => find('.tool-options')).not.toBeNull();
+        expect(optionButton('Hinge').getAttribute('aria-pressed')).toBe('true');
+        expect(optionButton('Rope').getAttribute('aria-pressed')).toBe('false');
+        expect(optionButton('Spring').getAttribute('aria-pressed')).toBe('false');
+        // The Inspector stays, unlike with the Shape tool.
+        expect(inspector()).not.toBeNull();
+
+        await userEvent.click(optionButton('Spring'));
+
+        const jointTool = tools.controller.active;
+        expect(jointTool instanceof JointTool && jointTool.type).toBe('spring');
+        await expect.poll(() => optionButton('Spring').getAttribute('aria-pressed')).toBe('true');
+        expect(optionButton('Hinge').getAttribute('aria-pressed')).toBe('false');
+    });
+
+    test('a joint type’s tooltip adds its physics name', async () => {
+        const { tools } = showShell();
+        tools.controller.pick('joint');
+        await expect.poll(() => find('.tool-options')).not.toBeNull();
+
+        await userEvent.hover(optionButton('Hinge'));
+
+        await expect.poll(() => find('.tool-options [role="tooltip"]')?.textContent).toBe('Hinge (revolute joint)');
+    });
+
+    test('the status bar shows the Joint tool’s hints, following the type', async () => {
+        const { tools } = showShell();
+        tools.controller.pick('joint');
+        await expect.poll(statusText).toContain('Click where two bodies overlap to join them, or on one to pin it.');
+
+        await userEvent.click(optionButton('Rope'));
+        await expect.poll(statusText).toContain('Click the first entity, then the second.');
     });
 
     test('the Inspector shows again, with the new shape, once a shape is finished', async () => {

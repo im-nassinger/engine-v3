@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 14, step 9 of 12: `JointTool` places a Hinge with one click, or a Rope or Spring with two, the smaller body as A, ends snapping to centres and corners through `PointSnapper`. Next is step 10, the page. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 14, step 10 of 12: the page has the Joint button (key 6), the Hinge, Rope and Spring strip with their physics names as tooltips, `JointPreviewOverlay` with the preview and its label, and thin lines from a selected or hovered joint to its two entities. Next is step 11, Playwright. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -34,8 +34,8 @@
 | Stage 11, copy and paste | Done on 2026-11-16. See below |
 | Stage 12, saving | Done on 2026-11-16. See below |
 | Stage 13, physics and the determinism test | Done on 2026-11-16. See below |
-| Stage 14, joints | Being built (step 9 of 12). See the [plan](plan.md#stage-14-in-steps) |
-| Code | Stages 0 to 13 done. Stage 14, joints, is being built: step 10 is next |
+| Stage 14, joints | Being built (step 10 of 12). See the [plan](plan.md#stage-14-in-steps) |
+| Code | Stages 0 to 13 done. Stage 14, joints, is being built: step 11 is next |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -216,7 +216,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 14 of [plan.md](plan.md#stage-14-in-steps): joints.** Steps 1 to 8 are done: the Hinge, Rope and Spring in `Box2dPhysicsWorld`, the tech notes rechecked against 3.2, `PhysicsSceneBuilder`'s joints, joints in play, the three joint determinism levels, and `placeJoint` (the plan's `CreateJointCommand`). Step 9, `JointTool`, is next; it calls `placeJoint` with level positions.
+1. **Stage 14 of [plan.md](plan.md#stage-14-in-steps): joints.** Steps 1 to 10 are done: the Hinge, Rope and Spring in `Box2dPhysicsWorld`, the tech notes rechecked against 3.2, `PhysicsSceneBuilder`'s joints, joints in play, the three joint determinism levels, `placeJoint` (the plan's `CreateJointCommand`), `JointTool` with `PointSnapper`, and the page's Joint button, options strip, preview and thin lines. Step 11, the Playwright tests, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

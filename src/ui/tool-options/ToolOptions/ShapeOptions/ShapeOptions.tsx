@@ -2,7 +2,7 @@ import { Circle, Pentagon, Square } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { ShapeTool, ShapeToolKind } from '../../../../editor/tools/index.ts';
 import { useVersion } from '../../../hooks/index.ts';
-import { OptionButton } from './OptionButton/index.ts';
+import { OptionButton } from '../OptionButton/index.ts';
 import './ShapeOptions.css';
 
 export type ShapeOptionsProps = {

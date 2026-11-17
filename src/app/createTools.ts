@@ -1,9 +1,9 @@
 import type { CommandRegistry } from '../editor/commands/index.ts';
 import type { EditorSession } from '../editor/session/index.ts';
 import { GridSnapper } from '../editor/snapping/index.ts';
-import { PanGesture, SelectTool, ShapeTool, ToolController } from '../editor/tools/index.ts';
+import { JointTool, PanGesture, SelectTool, ShapeTool, ToolController } from '../editor/tools/index.ts';
 
-// v1's tools: Select and Shape now, Joint with its stage. The snapper is made again for each
+// v1's tools: Select, Shape and Joint. The snapper is made again for each
 // level that opens, since it reads that level's grid.
 export function createTools(session: EditorSession, commands: CommandRegistry) {
     let snapperLevel = session.openLevel.level;
@@ -28,5 +28,5 @@ export function createTools(session: EditorSession, commands: CommandRegistry) {
     };
     const pan = new PanGesture(session.view);
 
-    return new ToolController([new SelectTool(), new ShapeTool()], services, pan);
+    return new ToolController([new SelectTool(), new ShapeTool(), new JointTool()], services, pan);
 }

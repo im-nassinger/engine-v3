@@ -13,10 +13,11 @@ import {
     DrawingPreviewOverlay,
     GridOverlay,
     JointIconOverlay,
+    JointPreviewOverlay,
     PhysicsViewOverlay,
     SelectionOverlay,
 } from './overlays/index.ts';
-import type { DrawingSource, OverlayScene, SelectionSource } from './overlays/index.ts';
+import type { DrawingSource, JointPreviewSource, OverlayScene, SelectionSource } from './overlays/index.ts';
 
 // Culling grows the visible area by this many screen pixels, so the editor's 1 px line around an unstyled
 // shape, which BoundsCache doesn't count, is never cut at the view's edge.
@@ -59,6 +60,8 @@ export class PixiLevelView {
     private readonly cameraFrameOverlay = new CameraFrameOverlay();
     // On top of everything, since it shows what collides whatever the drawing hides.
     private readonly physicsViewOverlay = new PhysicsViewOverlay();
+    // Under the joint icons, so a joint's thin lines start beneath its icon.
+    private readonly jointPreviewOverlay = new JointPreviewOverlay();
     private readonly jointIconOverlay = new JointIconOverlay();
     // In front of the joint icons, since a selected joint's ring goes around its icon.
     private readonly selectionOverlay = new SelectionOverlay();
@@ -68,6 +71,8 @@ export class PixiLevelView {
     private stopFollowingSelection: Unsubscribe | undefined;
     private drawing: DrawingSource | undefined;
     private stopFollowingDrawing: Unsubscribe | undefined;
+    private jointPreview: JointPreviewSource | undefined;
+    private stopFollowingJointPreview: Unsubscribe | undefined;
     private readonly stopListening: Unsubscribe[] = [];
     private stopListeningToLevel: Unsubscribe | undefined;
     private stopFollowing: Unsubscribe | undefined;
@@ -88,6 +93,7 @@ export class PixiLevelView {
             this.boundsOverlay.graphics,
             this.cameraFrameOverlay.container,
             this.physicsViewOverlay.graphics,
+            this.jointPreviewOverlay.container,
             this.jointIconOverlay.graphics,
             this.drawingPreviewOverlay.graphics,
             this.selectionOverlay.container,
@@ -135,6 +141,7 @@ export class PixiLevelView {
             cameraFrame: this.cameraFrameOverlay,
             physicsView: this.physicsViewOverlay,
             jointIcons: this.jointIconOverlay,
+            jointPreview: this.jointPreviewOverlay,
             selection: this.selectionOverlay,
             drawingPreview: this.drawingPreviewOverlay,
         };
@@ -218,6 +225,15 @@ export class PixiLevelView {
         this.markDirty();
     }
 
+    // Draws the Joint tool's preview and the joints' thin lines from now on, and again each time they change.
+    // Play shows none.
+    showJointPreview(source: JointPreviewSource | undefined) {
+        this.stopFollowingJointPreview?.();
+        this.jointPreview = source;
+        this.stopFollowingJointPreview = source?.subscribe(() => this.markDirty());
+        this.markDirty();
+    }
+
     // Asks for one render on the next frame. Several changes before it still draw once.
     markDirty() {
         if (this.cancelFrame !== undefined) return;
@@ -246,6 +262,9 @@ export class PixiLevelView {
         this.stopFollowingDrawing?.();
         this.stopFollowingDrawing = undefined;
         this.drawing = undefined;
+        this.stopFollowingJointPreview?.();
+        this.stopFollowingJointPreview = undefined;
+        this.jointPreview = undefined;
 
         this.display?.dispose();
         this.display = undefined;
@@ -310,6 +329,7 @@ export class PixiLevelView {
         this.boundsOverlay.update(scene);
         this.cameraFrameOverlay.update(scene);
         this.physicsViewOverlay.update(scene);
+        this.jointPreviewOverlay.update(scene, this.jointPreview);
         this.jointIconOverlay.update(scene);
         this.drawingPreviewOverlay.update(scene, this.drawing);
         this.selectionOverlay.update(scene, this.selection);

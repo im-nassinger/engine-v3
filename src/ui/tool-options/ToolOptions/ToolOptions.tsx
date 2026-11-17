@@ -1,11 +1,12 @@
-import { ShapeTool } from '../../../editor/tools/index.ts';
+import { JointTool, ShapeTool } from '../../../editor/tools/index.ts';
 import { useVersion } from '../../hooks/index.ts';
 import { useEditorTools } from '../../tools/index.ts';
+import { JointOptions } from './JointOptions/index.ts';
 import { ShapeOptions } from './ShapeOptions/index.ts';
 import './ToolOptions.css';
 
 // The options strip over the level view's top left, for the active tool that has options: the Shape
-// tool's kinds in v1, the Joint tool's types with its stage.
+// tool's kinds and the Joint tool's types in v1.
 export function ToolOptions() {
     // The active tool is read from the same controller object each time it moves, so the React
     // Compiler must not keep an old answer.
@@ -15,11 +16,14 @@ export function ToolOptions() {
     useVersion(controller.version);
 
     const active = controller.active;
-    if (!(active instanceof ShapeTool)) return null;
+    const isShape = active instanceof ShapeTool;
+    const isJoint = active instanceof JointTool;
+    if (!isShape && !isJoint) return null;
 
     return (
         <div className="tool-options" role="toolbar" aria-label="Tool options">
-            <ShapeOptions tool={active} />
+            {isShape && <ShapeOptions tool={active} />}
+            {isJoint && <JointOptions tool={active} />}
         </div>
     );
 }

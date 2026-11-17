@@ -55,6 +55,7 @@ import type { ToolController } from '../editor/tools/index.ts';
 import { createImportWorker } from './createImportWorker.ts';
 import { createTools } from './createTools.ts';
 import { EditorDrawingSource } from './EditorDrawingSource.ts';
+import { EditorJointPreviewSource } from './EditorJointPreviewSource.ts';
 import { EditorSelectionSource } from './EditorSelectionSource.ts';
 
 const FIT_CAMERA_FRAME = 'view.fitCameraFrame';
@@ -239,6 +240,7 @@ export class EditorComposition {
         this.levelView.follow(this.session);
         this.levelView.showSelection(new EditorSelectionSource(this.session, this.tools));
         this.levelView.showDrawing(new EditorDrawingSource(this.tools));
+        this.levelView.showJointPreview(new EditorJointPreviewSource(this.session, this.tools, this.mouse));
         // The editor lives as long as the page, so the keyboard, the pointer, the clipboard events, file drops
         // and the page's saving events are never disconnected.
         this.keyboard.connect();
