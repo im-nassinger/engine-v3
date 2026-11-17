@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* The page around the mockups */
+  :root { --page: #0b0c0e; --page-2: #17181c; --page-3: #222329; --page-text: #d4d7dd; --page-muted: #80858f; --page-on: #eceef2; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--page); color: var(--page-text); font: 13px/1.4 system-ui, sans-serif; }
+  body { display: flex; flex-direction: column; }
+  .hdr { padding: 12px 16px 10px; display: flex; flex-direction: column; gap: 7px; flex-shrink: 0; }
+  .hrow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .hrow > .lbl { color: var(--page-muted); width: 72px; flex-shrink: 0; }
+  .pick { font: inherit; color: var(--page-text); background: var(--page-2); border: 0; border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+  .pick:hover { background: var(--page-3); }
+  .pick.on { background: var(--page-on); color: #111; }
+  .ov { display: inline-flex; align-items: center; gap: 4px; color: var(--page-muted); font-size: 12px; margin-right: 6px; }
+  .ov select { font: inherit; color: var(--page-text); background: var(--page-2); border: 0; border-radius: 6px; padding: 3px 4px; }
+  .ov select.changed { background: #3b331d; color: #ffd98a; }
+  .caption { color: var(--page-muted); max-width: 1180px; }
+  .picks { font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: #a9aeb8; user-select: all; }
+  .stage { flex: 1; position: relative; overflow: hidden; }
+  .stage.scroll { overflow-y: auto; }
+  .frame { position: absolute; left: 50%; top: 8px; width: 1440px; margin-left: -720px; transform-origin: top center; box-shadow: 0 10px 50px rgba(0, 0, 0, .6); border-radius: 10px; overflow: hidden; }
+
+  /* The editor. Its tokens are set per direction on .ed. */
+  .ed { position: relative; width: 1440px; height: 900px; overflow: hidden; background: var(--app); color: var(--text); font-family: var(--font-ui); font-size: var(--fs);
+    --warning: #e5b931; --tip: #5aa9f0; --danger: #e5534b; --playing: #3fb27f; --paused: #e5b931; --tooltip: #0b0d10; --tooltip-text: #e8ebf0; }
+  .ed.tall { height: auto; }
+  .ed svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+  .num { font-family: var(--font-num); }
+  .abs { position: absolute; }
+  .blk { background: var(--panel); }
+  .bar { background: var(--bar); }
+  .bento .blk, .bento .bar, .bento .viewbox { border-radius: var(--rl); }
+  .float .blk, .isl { border-radius: var(--rl); box-shadow: var(--shadow); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+  .isl { background: var(--panel); display: flex; align-items: center; gap: 2px; padding: 0 7px; height: 44px; }
+  .viewbox { overflow: hidden; }
+  .viewbox svg { display: block; }
+
+  /* Today's lines, only in direction 0 */
+  .lines .top { border-bottom: 1px solid var(--line); }
+  .lines .tools { border-right: 1px solid var(--line); }
+  .lines .insp { border-right: 1px solid var(--line); }
+  .lines .ents { border-left: 1px solid var(--line); }
+  .lines .status { border-top: 1px solid var(--line); }
+  .lines .ph, .lines .ihead { border-bottom: 1px solid var(--line); }
+
+  /* The top bar */
+  .top { display: flex; align-items: center; gap: 4px; padding: 0 8px; z-index: 3; }
+  .float .top { background: none; padding: 0; display: grid; grid-template-columns: 1fr auto 1fr; }
+  .float .top > .isl:first-child { justify-self: start; }
+  .float .top > .isl:last-child { justify-self: end; }
+  .grow { flex: 1; }
+  .ib { height: 28px; min-width: 28px; padding: 0 6px; border-radius: var(--r); display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: var(--text); }
+  .ib.hover { background: var(--hover); }
+  .ib.dim { color: var(--faint); }
+  .ib.on { background: var(--soft); color: var(--ink); }
+  .ib .chev { width: 12px; height: 12px; color: var(--muted); }
+  .levelname { padding: 0 8px; height: 28px; display: flex; align-items: center; font-weight: 500; }
+  .savestate { color: var(--muted); display: flex; align-items: center; gap: 4px; padding-right: 6px; }
+  .sep { width: 8px; }
+  .lines .sep { width: 1px; height: 20px; background: var(--line); margin: 0 4px; }
+  .play { height: 30px; padding: 0 16px; border-radius: var(--r); background: var(--grad); color: var(--on); display: inline-flex; align-items: center; gap: 7px; font-weight: 600; }
+  .play svg.i { fill: currentColor; stroke: none; width: 12px; height: 12px; }
+  .play.pill, .btn.pill { border-radius: 999px; }
+
+  /* The toolbar strip */
+  .tools { display: flex; flex-direction: column; align-items: center; padding: 8px 0; gap: 4px; z-index: 2; }
+  .tools.h { flex-direction: row; padding: 6px; display: inline-flex; position: static; border-radius: var(--r2); }
+  .tool { width: 32px; height: 32px; border-radius: var(--r); display: flex; align-items: center; justify-content: center; position: relative; color: var(--muted); }
+  .lines .tool { color: var(--text); }
+  .tool.hover { background: var(--hover); color: var(--text); }
+  .tool.on.fill { background: var(--accent); color: var(--on); }
+  .tool.on.soft { background: var(--soft); color: var(--ink); }
+  .tool.on.glow { background: var(--soft); color: var(--ink); box-shadow: 0 0 18px -3px var(--accent); }
+  .tool.on.grad { background: var(--grad); color: var(--on); }
+  .tool.on.dot { color: var(--ink); }
+  .tool.on.dot::after { content: ""; position: absolute; bottom: 2px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--accent); }
+  .tip-box { white-space: nowrap; background: var(--tooltip); color: var(--tooltip-text); border-radius: var(--r); padding: 5px 9px; font-size: 11px; display: inline-flex; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.4); }
+  .tip-box .k { color: #8a93a3; }
+
+  /* Panels */
+  .panel { display: flex; flex-direction: column; overflow: hidden; z-index: 2; }
+  .ph { height: 40px; display: flex; align-items: center; padding: 0 var(--inset); flex-shrink: 0; }
+  .ph.title { font-weight: 600; font-size: calc(var(--fs) + .5px); }
+  .ph.caps { font-size: 10.5px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+  .ihead { height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); flex-shrink: 0; margin-bottom: 4px; }
+  .ihead .nm { flex: 1; height: 28px; display: flex; align-items: center; padding: 0 8px; border-radius: var(--r); background: var(--field); font-weight: 500; }
+  .ihead .nm.ghost { background: transparent; }
+  .ihead .nm.pill { border-radius: 999px; padding: 0 12px; }
+  .ihead .eye { color: var(--muted); }
+
+  /* Cards */
+  .card { padding-bottom: 6px; }
+  .card.line { border-bottom: 1px solid var(--line); }
+  .card.space { padding-bottom: 12px; }
+  .card.tile { background: var(--raised); border-radius: var(--r2); margin: 0 8px 8px; padding: 2px 0 6px; }
+  .card.tile .f, .card.tile .chead { padding-left: 10px; padding-right: 10px; }
+  .card.chip { padding-bottom: 12px; }
+  .chead { height: 32px; display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); font-weight: 600; }
+  .chead .t { flex: 1; }
+  .chead svg.i { width: 14px; height: 14px; color: var(--faint); }
+  .card.space .chead .t { font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+  .chead .dotc { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Fields */
+  .f { height: var(--rowh); display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); }
+  .f > label { width: 116px; color: var(--muted); flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .f .vals { flex: 1; display: flex; gap: 6px; min-width: 0; align-items: center; }
+  .inp { flex: 1; min-width: 0; height: calc(var(--rowh) - 5px); padding: 0 8px; display: flex; align-items: center; gap: 5px; font-family: var(--font-num); white-space: nowrap; overflow: hidden; border-radius: var(--r); }
+  .inp.filled { background: var(--field); }
+  .inp.ghost { background: transparent; }
+  .inp.ghost.hov { background: var(--field); }
+  .inp.pill { background: var(--field); border-radius: 999px; padding: 0 11px; }
+  .inp.ro { background: transparent; }
+  .inp.focus { background: var(--soft); }
+  .lines .inp.focus { background: var(--field); box-shadow: inset 0 0 0 1px var(--accent); }
+  .inp.err { background: rgba(229, 83, 75, .16); color: #ff9a93; }
+  .lines .inp.err { background: var(--field); box-shadow: inset 0 0 0 1px var(--danger); color: var(--text); }
+  .inp.fillbar { background: linear-gradient(90deg, var(--soft) 0 var(--p), var(--field) var(--p)); }
+  .inp .ax { color: var(--muted); }
+  .inp .unit { color: var(--faint); margin-left: auto; }
+  .inp .chev { margin-left: auto; width: 12px; height: 12px; color: var(--muted); }
+  .inp.short { flex: 0 0 60px; }
+  .msg { padding: 0 var(--inset) 4px calc(var(--inset) + 124px); font-size: 11px; color: #ff9a93; }
+  .slider { flex: 1; height: 3px; background: var(--hover); border-radius: 2px; position: relative; }
+  .lines .slider { background: var(--line); }
+  .slider i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--muted); border-radius: 2px; }
+  .slider b { position: absolute; top: -4px; width: 11px; height: 11px; margin-left: -5.5px; border-radius: 50%; background: var(--text); }
+  .cb { width: 15px; height: 15px; border-radius: 4px; background: var(--field); display: inline-flex; align-items: center; justify-content: center; }
+  .lines .cb { background: none; border: 1px solid var(--muted); border-radius: 3px; width: 14px; height: 14px; }
+  .cb.on, .lines .cb.on { background: var(--accent); border-color: var(--accent); color: var(--on); }
+  .cb.on svg.i { width: 11px; height: 11px; stroke-width: 2.6; }
+  .tg { width: 28px; height: 16px; border-radius: 999px; background: rgba(255, 255, 255, .12); position: relative; flex-shrink: 0; }
+  .tg::after { content: ""; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--muted); }
+  .tg.on { background: var(--accent); }
+  .tg.on::after { left: 14px; background: var(--on); }
+  .swc { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .25); }
+  .inp.pill .swc { border-radius: 50%; }
+
+  /* Entities panel rows */
+  .rows { padding: 2px 0; }
+  .lrow { height: var(--rowh); display: flex; align-items: center; gap: 6px; padding-right: 10px; color: var(--text); }
+  .lrow .kind { color: var(--muted); display: flex; }
+  .lrow .name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lrow .eye { color: var(--faint); display: flex; }
+  .lrow .fold { width: 14px; height: 14px; color: var(--muted); }
+  .rows.pill .lrow, .rows.solid .lrow { margin: 0 6px; border-radius: var(--r); }
+  .lrow.hover { background: var(--hover); }
+  .lrow.hover .eye { color: var(--muted); }
+  .rows.tint .lrow.sel, .rows.pill .lrow.sel { background: var(--soft); }
+  .rows.tint .sel .kind, .rows.pill .sel .kind { color: var(--ink); }
+  .rows.solid .lrow.sel { background: var(--accent); color: var(--on); }
+  .rows.solid .sel .kind, .rows.solid .sel .eye { color: var(--on); }
+  .rows.mark .lrow.sel { color: var(--ink); font-weight: 600; }
+  .rows.mark .sel .kind { color: var(--ink); }
+
+  /* The status bar */
+  .status { display: flex; align-items: center; gap: 20px; padding: 0 12px; color: var(--muted); font-size: 11px; z-index: 3; }
+  .status .hint { flex: 1; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .status .warn { display: flex; align-items: center; gap: 4px; }
+  .status svg.i { width: 13px; height: 13px; }
+
+  /* What floats: the options strip, menus, dialogs, the Play bar */
+  .opts { position: absolute; z-index: 4; display: flex; gap: 2px; padding: 4px; background: var(--menu); border-radius: var(--r2); box-shadow: 0 6px 20px rgba(0,0,0,.3); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+  .lines .opts { border: 1px solid var(--line); border-radius: var(--r); padding: 3px; }
+  .opts .ib { padding: 0 9px; }
+  .menu { position: absolute; z-index: 6; min-width: 214px; background: var(--menu); border-radius: var(--r2); box-shadow: 0 12px 32px rgba(0,0,0,.45); padding: 6px; -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+  .menu.static { position: relative; display: inline-block; vertical-align: top; box-shadow: 0 6px 18px rgba(0,0,0,.3); }
+  .lines .menu { border: 1px solid var(--line); border-radius: var(--r); padding: 4px; }
+  .mi { height: 28px; display: flex; align-items: center; padding: 0 10px; border-radius: var(--r); gap: 12px; }
+  .mi .l { flex: 1; }
+  .mi .k { color: var(--muted); font-family: var(--font-num); font-size: 11px; }
+  .mi.dis, .mi.dis .k { color: var(--faint); }
+  .mi .chev { width: 12px; height: 12px; }
+  .menu.solid .mi.hover { background: var(--accent); color: var(--on); }
+  .menu.solid .mi.hover .k { color: var(--on); opacity: .8; }
+  .menu.soft .mi.hover { background: var(--soft); }
+  .msep { height: 7px; }
+  .lines .msep { height: 1px; background: var(--line); margin: 4px 6px; }
+  .scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, .5); z-index: 7; }
+  .dialog { position: absolute; z-index: 8; left: 50%; top: 290px; width: 400px; margin-left: -200px; background: var(--menu); border-radius: calc(var(--r2) + 4px); box-shadow: 0 20px 60px rgba(0,0,0,.55); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+  .dialog.static { position: relative; left: auto; top: auto; margin: 0 16px; width: auto; box-shadow: 0 6px 18px rgba(0,0,0,.3); }
+  .dialog h3 { margin: 0; padding: 22px 22px 6px; font-size: calc(var(--fs) + 2px); font-weight: 600; }
+  .dialog p { margin: 0; padding: 0 22px 20px; color: var(--muted); line-height: 1.55; }
+  .dialog .row { display: flex; justify-content: flex-end; gap: 8px; padding: 0 16px 16px; }
+  .lines .dialog { border: 1px solid var(--line); border-radius: 4px; }
+  .lines .dialog h3 { padding: 16px 16px 6px; }
+  .lines .dialog p { padding: 0 16px 16px; }
+  .lines .dialog .row { border-top: 1px solid var(--line); padding: 12px 16px; }
+  .btn { height: 30px; padding: 0 16px; border-radius: var(--r); display: inline-flex; align-items: center; background: var(--raised); color: var(--text); }
+  .lines .btn { background: none; border: 1px solid var(--line); height: 28px; padding: 0 14px; }
+  .btn.primary, .lines .btn.primary { background: var(--grad); color: var(--on); font-weight: 600; border: 0; }
+  .btn.dis { color: var(--faint); }
+  .addc { margin: 8px var(--inset) 12px; height: 30px; border-radius: var(--r); display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--raised); color: var(--muted); }
+  .addc.pill { border-radius: 999px; }
+  .lines .addc { background: none; border: 1px solid var(--line); color: var(--text); }
+  .game { position: absolute; inset: 0; background: #000; }
+  .playbar { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 2px; padding: 4px; background: var(--menu); border-radius: var(--r2); box-shadow: 0 6px 24px rgba(0,0,0,.45); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+  .playbar.static { position: static; transform: none; display: inline-flex; box-shadow: 0 6px 18px rgba(0,0,0,.3); margin: 0 16px 8px; }
+  .playbar.frame { border: 1.5px solid var(--pc); border-radius: var(--r); }
+  .playbar.dot, .playbar.tint { border-radius: 999px; padding: 4px 6px; }
+  .playbar.tint { background: color-mix(in srgb, var(--pc) 16%, var(--menu)); }
+  .playbar .state { display: flex; align-items: center; gap: 7px; padding: 0 10px 0 8px; font-weight: 600; color: var(--pc); letter-spacing: .05em; font-size: 11px; }
+  .playbar .state i { width: 8px; height: 8px; border-radius: 50%; background: var(--pc); }
+  .playbar.dot .state i, .playbar.tint .state i { box-shadow: 0 0 10px var(--pc); }
+  .playbar .ib { padding: 0 10px; }
+  .playbar.dot .ib, .playbar.tint .ib { border-radius: 999px; }
+  .playbar .k { color: var(--muted); font-size: 11px; }
+  .note { margin: 4px var(--inset); padding: 8px 10px; border-radius: var(--r); display: flex; gap: 8px; align-items: flex-start; line-height: 1.45; }
+  .note.box { background: var(--field); }
+  .note.tint { background: rgba(229, 185, 49, .1); }
+  .note.tint.tipn { background: rgba(90, 169, 240, .1); }
+  .note.plain { padding: 4px 0; }
+  .note .fix { color: var(--ink); white-space: nowrap; }
+
+  /* The parts sheet */
+  .sheet { padding: 22px; columns: 4 300px; column-gap: 16px; }
+  .kbox { break-inside: avoid; background: var(--panel); border-radius: var(--r2); padding: 14px 0 6px; margin-bottom: 16px; }
+  .lines .kbox { border: 1px solid var(--line); border-radius: 4px; }
+  .kbox h4 { margin: 0 16px 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .kbox .kd { margin: 0 16px 8px; font-size: 11px; color: var(--faint); line-height: 1.45; }
+  .var { padding: 6px 0 10px; }
+  .var .vl { padding: 0 16px 6px; font-size: 11px; color: var(--faint); }
+  .var .vl b { color: var(--text); font-weight: 600; }
+  .var.cur .vl::after { content: "  ← this direction"; color: var(--ink); }
+  .inl { display: flex; gap: 8px; align-items: center; padding: 0 16px; flex-wrap: wrap; }
+  .schem { position: relative; width: 288px; height: 180px; margin: 0 16px; border-radius: 6px; overflow: hidden; background: var(--app); }
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hrow"><span class="lbl">Direction</span><span id="dirs" class="hrow"></span></div>
+  <div class="hrow"><span class="lbl">Show</span><span id="views" class="hrow"></span><span class="lbl" style="width:auto;margin-left:14px">Font</span><span id="fonts" class="hrow"></span></div>
+  <div class="hrow"><span class="lbl">Mix</span><span id="overs" style="flex:1"></span></div>
+  <div class="caption" id="caption"></div>
+  <div class="picks" id="picks" title="Copy this line and send it to Claude"></div>
+</div>
+<div class="stage" id="stage"><div id="sizer"></div><div class="frame" id="frame"></div></div>
+<script>
+// Outline icons, drawn in the style of Lucide, as in the first mockups.
+const ICON = {
+  menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  select: '<path d="M6 3l12 8-5.5 1.5L10 19z"/>',
+  shape: '<rect x="3" y="3" width="10" height="10" rx="1"/><circle cx="15.5" cy="15.5" r="5.5"/>',
+  joint: '<circle cx="7" cy="17" r="3"/><circle cx="17" cy="7" r="3"/><path d="M9.2 14.8l5.6-5.6"/>',
+  eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff: '<path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.7 8.4 2 12 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+  right: '<path d="M9 6l6 6-6 6"/>',
+  down: '<path d="M6 9l6 6 6-6"/>',
+  undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
+  redo: '<path d="M15 14l5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h3"/>',
+  magnet: '<path d="M6 4v7a6 6 0 0 0 12 0V4"/><path d="M6 8h4M14 8h4M10 4v4M14 4v4"/>',
+  play: '<path d="M7 4v16l13-8z"/>',
+  pause: '<path d="M8 5v14M16 5v14"/>',
+  step: '<path d="M5 5l10 7-10 7z"/><path d="M19 5v14"/>',
+  stop: '<rect x="6" y="6" width="12" height="12" rx="1"/>',
+  help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 5 0c0 1.8-2.5 2-2.5 4"/><path d="M12 17h.01"/>',
+  world: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/>',
+  camera: '<rect x="3" y="7" width="13" height="10" rx="1"/><path d="M16 10.5l5-3v9l-5-3"/>',
+  rect: '<rect x="4" y="6" width="16" height="12" rx="1"/>',
+  circle: '<circle cx="12" cy="12" r="8"/>',
+  polygon: '<path d="M12 3l9 7-3.5 10h-11L3 10z"/>',
+  group: '<path d="M3 6.5h6l2 2h10V19H3z"/>',
+  warning: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>',
+  check: '<path d="M5 12l5 5 9-10"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  dots: '<path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/>'
+};
+const ic = (name, extra = '') => `<svg class="i" viewBox="0 0 24 24" ${extra}>${ICON[name]}</svg>`;
+const CHEV = ic('down', 'class="i chev"');
+
+// Each choice that changes the look, with its variants. The number of a variant is its place in the list.
+const KINDS = [
+  ['layout', 'Layout', 'Where the panels sit. The panels\' places and sizes stay as the requirements say.', [['flush', 'Flush'], ['bento', 'Tiles with gaps'], ['float', 'Floating islands']]],
+  ['head', 'Panel titles', '', [['title', 'Title'], ['caps', 'Small caps']]],
+  ['card', 'Inspector cards', 'How one component\'s card is told apart from the next.', [['line', 'Lines (today)'], ['space', 'Space only'], ['tile', 'Tiles'], ['chip', 'Colour dot']]],
+  ['field', 'Fields', 'Normal, focused and refused. Ghost fields show their box only under the mouse.', [['filled', 'Filled'], ['ghost', 'Ghost'], ['pill', 'Pill']]],
+  ['slider', 'Sliders', '', [['thin', 'Thin track'], ['fill', 'Filled field']]],
+  ['check', 'Checkboxes', '', [['box', 'Box'], ['switch', 'Switch']]],
+  ['row', 'Selected row', 'Crate 2 is under the mouse, Rectangle 1 is selected.', [['tint', 'Tint'], ['pill', 'Pill'], ['solid', 'Solid'], ['mark', 'Coloured text']]],
+  ['tool', 'Active tool', 'The Shape tool is active, the mouse is on Joint.', [['fill', 'Filled'], ['soft', 'Soft'], ['glow', 'Glow'], ['grad', 'Gradient'], ['dot', 'Dot']]],
+  ['btn', 'Buttons', '', [['rounded', 'Rounded'], ['pill', 'Pill']]],
+  ['menu', 'Menus', 'No separator lines outside today\'s look: groups are split by a gap.', [['solid', 'Solid hover'], ['soft', 'Soft hover']]],
+  ['note', 'Editor messages', '', [['box', 'Box'], ['tint', 'Tinted'], ['plain', 'Plain']]],
+  ['handle', 'Selection handles', 'In the level view.', [['square', 'Square'], ['round', 'Round'], ['dot', 'Filled dot']]],
+  ['play', 'Play bar', 'Running, then paused.', [['frame', 'Frame (today)'], ['dot', 'Pill with a dot'], ['tint', 'Tinted pill']]]
+];
+
+// The directions. Each is a set of tokens and one variant of each kind.
+const DIRS = [
+  { id: '0', name: 'Today', desc: 'The current design, for comparison: flush panels with 1 px lines, 4 px corners, cool blue-grey and blue.',
+    t: { app: '#16191e', panel: '#21252c', raised: '#262a32', field: '#191c22', hover: '#2b3039', line: '#323843', text: '#d5dbe5', muted: '#8a93a3', faint: '#5d6574',
+      accent: '#3b82f6', soft: 'rgba(59,130,246,.24)', on: '#fff', ink: '#d5dbe5', r: 4, r2: 4, rl: 0, rowh: 28, inset: 12, lines: true },
+    s: { layout: 'flush', head: 'title', card: 'line', field: 'filled', slider: 'thin', check: 'box', row: 'tint', tool: 'fill', btn: 'rounded', menu: 'solid', note: 'box', handle: 'square', play: 'frame' } },
+  { id: '1', name: 'Bento', desc: 'Every part is a rounded tile on a dark frame, with 6 px gaps instead of lines. Graphite with violet. Cards are split by space alone, titles are small caps. The level view becomes a tile too, so it no longer fills the window, which the workspace requirement asks for.',
+    t: { app: '#0e0e11', panel: '#1b1b20', raised: '#232329', field: '#141418', hover: '#25252c', text: '#e6e6ea', muted: '#8e8e9a', faint: '#5a5a66',
+      accent: '#8b7cf6', soft: 'rgba(139,124,246,.2)', on: '#fff', ink: '#b3a9ff', r: 7, r2: 10, rl: 14, rowh: 28, inset: 14 },
+    s: { layout: 'bento', head: 'caps', card: 'space', field: 'filled', slider: 'thin', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'round', play: 'dot' } },
+  { id: '2', name: 'Islands', desc: 'The level fills the whole window and the panels float over it as rounded islands with soft shadows. The top bar splits into three islands, with Play alone in the middle. Slate with a bright blue.',
+    t: { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
+      accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: '0 10px 40px rgba(0,0,0,.35)' },
+    s: { layout: 'float', head: 'caps', card: 'tile', field: 'filled', slider: 'fill', check: 'switch', row: 'pill', tool: 'fill', btn: 'rounded', menu: 'solid', note: 'tint', handle: 'round', play: 'dot' } },
+  { id: '3', name: 'Quiet', desc: 'Near-black, flush with the window and no lines: the bars and the panels differ by tone only. Fields have no box until the mouse is on them. Mint marks only what is active. Taller rows and more air.',
+    t: { app: '#0e0f11', panel: '#141518', bar: '#0e0f11', raised: '#1b1c20', field: '#1d1e22', hover: '#1c1d21', text: '#d9dadf', muted: '#7c7f88', faint: '#4c4f57',
+      accent: '#5eead4', soft: 'rgba(94,234,212,.12)', on: '#062a25', ink: '#5eead4', r: 6, r2: 10, rl: 0, rowh: 32, inset: 16 },
+    s: { layout: 'flush', head: 'caps', card: 'space', field: 'ghost', slider: 'thin', check: 'switch', row: 'tint', tool: 'dot', btn: 'rounded', menu: 'soft', note: 'plain', handle: 'square', play: 'dot' } },
+  { id: '4', name: 'Glass', desc: 'Floating islands of frosted glass: the level shows blurred through the panels. A coral-to-orange gradient for Play and the active tool, pill-shaped fields and buttons.',
+    t: { app: '#101118', panel: 'rgba(26,28,40,.74)', menu: 'rgba(30,32,46,.86)', raised: 'rgba(255,255,255,.05)', field: 'rgba(255,255,255,.08)', hover: 'rgba(255,255,255,.09)', text: '#f1f2f6', muted: '#a3a6b8', faint: '#6b6e80',
+      accent: '#ff6b8b', soft: 'rgba(255,107,139,.2)', on: '#fff', ink: '#ff9cb1', grad: 'linear-gradient(135deg,#ff6b8b,#ff9a5a)', r: 10, r2: 14, rl: 18, rowh: 30, inset: 14, blur: 22, shadow: '0 12px 40px rgba(0,0,0,.3)' },
+    s: { layout: 'float', head: 'caps', card: 'tile', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'grad', btn: 'pill', menu: 'soft', note: 'tint', handle: 'dot', play: 'tint' } },
+  { id: '5', name: 'Candy', desc: 'Tiles in deep plum with lilac and pastel colours. Each component has its own colour dot, rounder corners, switches and pills. The most playful, made for a game. The level view is a tile, as in Bento.',
+    t: { app: '#120d1a', panel: '#1d1628', raised: '#261d33', field: '#16101f', hover: '#2a2137', text: '#efe9f7', muted: '#a194b5', faint: '#66597a',
+      accent: '#c4a1ff', soft: 'rgba(196,161,255,.18)', on: '#1e1033', ink: '#d6bfff', r: 9, r2: 14, rl: 18, rowh: 30, inset: 14 },
+    s: { layout: 'bento', head: 'title', card: 'chip', field: 'pill', slider: 'thin', check: 'switch', row: 'solid', tool: 'fill', btn: 'pill', menu: 'solid', note: 'tint', handle: 'round', play: 'tint' } },
+  { id: '6', name: 'Neon', desc: 'Pure black, flush and tight. One cyan accent that glows on the active tool; the selected row is only cyan text. Terminal-like, best with the mono font.',
+    t: { app: '#000', panel: '#0a0a0b', bar: '#000', raised: '#121214', field: '#131315', hover: '#161618', text: '#e8e8e8', muted: '#7a7a7a', faint: '#444',
+      accent: '#22d3ee', soft: 'rgba(34,211,238,.12)', on: '#001a1f', ink: '#22d3ee', r: 4, r2: 6, rl: 0, rowh: 26, inset: 12 },
+    s: { layout: 'flush', head: 'caps', card: 'space', field: 'filled', slider: 'thin', check: 'box', row: 'mark', tool: 'glow', btn: 'rounded', menu: 'soft', note: 'plain', handle: 'square', play: 'dot' } },
+  { id: '7', name: 'Ember', desc: 'Warm charcoal tiles with orange, the accent Claude suggested in round 8. Cards as tiles, filled fields, boxes for checks. Calm, a little warmer than the others.',
+    t: { app: '#11100e', panel: '#1c1a17', raised: '#24211d', field: '#151310', hover: '#28241f', text: '#ece6df', muted: '#9a9086', faint: '#5f5850',
+      accent: '#f97316', soft: 'rgba(249,115,22,.18)', on: '#fff', ink: '#ffa665', r: 7, r2: 10, rl: 12, rowh: 28, inset: 14 },
+    s: { layout: 'bento', head: 'caps', card: 'tile', field: 'filled', slider: 'thin', check: 'box', row: 'tint', tool: 'fill', btn: 'rounded', menu: 'solid', note: 'box', handle: 'round', play: 'dot' } }
+];
+
+const FONTS = [
+  ['mono', 'JetBrains Mono (today)', '"JetBrains Mono", ui-monospace, monospace', '"JetBrains Mono", ui-monospace, monospace', 12],
+  ['inter', 'Inter', 'Inter, system-ui, sans-serif', 'Inter, system-ui, sans-serif', 12.5],
+  ['geist', 'Geist', 'Geist, system-ui, sans-serif', 'Geist, system-ui, sans-serif', 12.5],
+  ['mix', 'Inter + mono numbers', 'Inter, system-ui, sans-serif', '"JetBrains Mono", ui-monospace, monospace', 12.5]
+];
+const VIEWS = [['shape', 'A selected shape'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
+
+let state = { dir: '2', view: 'shape', font: 'mono', over: {} };
+try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-redesign') || '{}')); } catch (e) {}
+let S, T;
+
+function tokensCss(t) {
+  const v = Object.assign({ bar: t.panel, menu: t.panel, line: 'transparent', grad: t.accent, blur: 0, shadow: '0 8px 30px rgba(0,0,0,.35)' }, t);
+  const f = FONTS.find((x) => x[0] === state.font) || FONTS[0];
+  return `--app:${v.app};--panel:${v.panel};--bar:${v.bar};--menu:${v.menu};--raised:${v.raised};--field:${v.field};--hover:${v.hover};--line:${v.line};` +
+    `--text:${v.text};--muted:${v.muted};--faint:${v.faint};--accent:${v.accent};--soft:${v.soft};--on:${v.on};--ink:${v.ink};--grad:${v.grad};` +
+    `--r:${v.r}px;--r2:${v.r2}px;--rl:${v.rl}px;--rowh:${v.rowh}px;--inset:${v.inset}px;--blur:${v.blur}px;--shadow:${v.shadow};` +
+    `--font-ui:${f[2]};--font-num:${f[3]};--fs:${f[4]}px;`;
+}
+const withS = (over, fn) => { const old = S; S = Object.assign({}, S, over); const out = fn(); S = old; return out; };
+const pos = ([x, y, w, h]) => `left:${x}px;top:${y}px;width:${w}px;${h == null ? '' : `height:${h}px;`}`;
+
+// Where each part sits, in window pixels, for each layout. The sizes are the requirement's.
+const W = 1440, H = 900;
+function geo(layout) {
+  if (layout === 'flush') return { view: [0, 44, W, H - 68], top: [0, 0, W, 44], tools: [0, 44, 44, H - 68], insp: [44, 44, 300, H - 68], ents: [W - 260, 44, 260, H - 68], status: [0, H - 24, W, 24], strip: [52, 52], menu: [8, 40] };
+  if (layout === 'bento') {
+    const g = 6, y = g + 44 + g, sh = 26, h = H - y - g - sh - g, vx = g + 44 + g + 300 + g;
+    return { top: [g, g, W - 2 * g, 44], tools: [g, y, 44, h], insp: [g + 44 + g, y, 300, h], ents: [W - g - 260, y, 260, h], view: [vx, y, W - g - 260 - g - vx, h], status: [g, H - g - sh, W - 2 * g, sh], strip: [62, 62], menu: [12, 52] };
+  }
+  return { view: [0, 0, W, H], top: [10, 10, W - 20, 44], tools: [10, 64, 48, null], insp: [68, 64, 300, H - 74], ents: [W - 270, 64, 260, H - 74], status: [378, H - 38, W - 378 - 280, 28], strip: [68, 64], menu: [10, 60] };
+}
+
+// The sample level, in level pixels. The origin is the middle of the level, y points down.
+const BG = '#cde3f2';
+const LEVEL = [
+  { id: 'ground', t: 'rect', x: -1100, y: 380, w: 2200, h: 260, fill: '#6ba368', line: '#2f5130' },
+  { id: 'ramp', t: 'poly', p: [[-1000, 380], [-560, 380], [-1000, 170]], fill: '#7db37a', line: '#2f5130' },
+  { id: 'platform', t: 'rect', x: 250, y: 60, w: 420, h: 40, fill: '#8a6b4e', line: '#4a3626' },
+  { id: 'crate1', t: 'rect', x: 290, y: -40, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
+  { id: 'crate2', t: 'rect', x: 410, y: -40, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
+  { id: 'crate3', t: 'rect', x: 350, y: -140, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
+  { id: 'ball', t: 'circle', cx: 140, cy: 180, r: 40, fill: '#f0c419', line: '#8a6d00' },
+  { id: 'carbody', t: 'rect', x: -440, y: 250, w: 320, h: 60, fill: '#d9534f', line: '#7a2522' },
+  { id: 'cabin', t: 'poly', p: [[-380, 250], [-340, 190], [-230, 190], [-190, 250]], fill: '#e8807c', line: '#7a2522' },
+  { id: 'wheel1', t: 'circle', cx: -370, cy: 338, r: 42, fill: '#3a3a3a', line: '#111111' },
+  { id: 'wheel2', t: 'circle', cx: -190, cy: 338, r: 42, fill: '#3a3a3a', line: '#111111' },
+  { id: 'rect1', t: 'rect', x: -60, y: 300, w: 160, h: 80, fill: '#4a90d9', line: '#1f3552' }
+];
+const HINGES = [[-370, 338], [-190, 338]];
+const PLAYED = { crate3: { dx: 320, dy: 60, rot: 28 }, ball: { dy: 100 }, carbody: { dx: 50 }, cabin: { dx: 50 }, wheel1: { dx: 50 }, wheel2: { dx: 50 } };
+
+function drawShape(s, X, Y, z, opts) {
+  const style = `fill="${s.fill}" stroke="${s.line}" stroke-width="${Math.max(0.6, 2 * z)}" stroke-linejoin="round"`;
+  const m = (opts.play && PLAYED[s.id]) || {};
+  const dx = m.dx || 0, dy = m.dy || 0;
+  if (s.t === 'rect') {
+    const x = X(s.x + dx), y = Y(s.y + dy);
+    return `<rect x="${x}" y="${y}" width="${s.w * z}" height="${s.h * z}" ${style} transform="rotate(${m.rot || 0} ${x + s.w * z / 2} ${y + s.h * z / 2})"/>`;
+  }
+  if (s.t === 'circle') return `<circle cx="${X(s.cx + dx)}" cy="${Y(s.cy + dy)}" r="${s.r * z}" ${style}/>`;
+  return `<polygon points="${s.p.map(([a, b]) => X(a + dx) + ',' + Y(b + dy)).join(' ')}" ${style}/>`;
+}
+function handle(x, y) {
+  if (S.handle === 'square') return `<rect x="${x - 4}" y="${y - 4}" width="8" height="8" rx="${T.lines ? 0 : 1.5}" style="fill:#fff;stroke:var(--accent)" stroke-width="1.5"/>`;
+  if (S.handle === 'round') return `<circle cx="${x}" cy="${y}" r="4.5" style="fill:#fff;stroke:var(--accent)" stroke-width="1.5"/>`;
+  return `<circle cx="${x}" cy="${y}" r="4.5" style="fill:var(--accent);stroke:#fff" stroke-width="1.5"/>`;
+}
+const handles = (x, y, w, h) => [[0, 0], [.5, 0], [1, 0], [0, .5], [1, .5], [0, 1], [.5, 1], [1, 1]].map(([a, b]) => handle(x + a * w, y + b * h)).join('');
+
+// One SVG of the level view. Overlays are drawn in screen pixels.
+function scene(w, h, z, cx, cy, opts) {
+  const X = (x) => +(cx + x * z).toFixed(2), Y = (y) => +(cy + y * z).toFixed(2);
+  let s = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="${BG}"/>`;
+  if (opts.grid) {
+    const step = 50 * z, ox = ((cx % step) + step) % step, oy = ((cy % step) + step) % step;
+    s += `<defs><pattern id="g" width="${step}" height="${step}" patternUnits="userSpaceOnUse" x="${ox}" y="${oy}"><path d="M ${step} 0 L 0 0 0 ${step}" fill="none" stroke="rgba(30,60,95,.11)" stroke-width="1"/></pattern></defs><rect width="${w}" height="${h}" fill="url(#g)"/>`;
+    s += `<path d="M ${cx} 0 V ${h} M 0 ${cy} H ${w}" stroke="rgba(30,60,95,.28)" stroke-width="1"/>`;
+  }
+  for (const shape of LEVEL) s += drawShape(shape, X, Y, z, opts);
+  if (opts.joints) for (const [a, b] of HINGES) s += `<circle cx="${X(a)}" cy="${Y(b)}" r="7" fill="#fff" stroke="#1d2430" stroke-width="1.5"/><circle cx="${X(a)}" cy="${Y(b)}" r="2" fill="#1d2430"/>`;
+  if (opts.cameraFrame) {
+    s += `<rect x="${X(-960)}" y="${Y(-540)}" width="${1920 * z}" height="${1080 * z}" fill="none" stroke="rgba(20,28,40,.6)" stroke-width="1.5"/>`;
+    s += `<text x="${X(-960)}" y="${Y(-540) - 7}" font-size="11" fill="rgba(20,28,40,.75)" style="font-family:var(--font-ui)">Camera 1920 × 1080</text>`;
+  }
+  if (opts.selected) {
+    const r = LEVEL.find((e) => e.id === opts.selected), x = X(r.x), y = Y(r.y), rw = r.w * z, rh = r.h * z;
+    s += `<rect x="${x}" y="${y}" width="${rw}" height="${rh}" fill="none" style="stroke:var(--accent)" stroke-width="1.5"/>` + handles(x, y, rw, rh);
+  }
+  if (opts.drawing) {
+    const pts = [[-760, -250], [-560, -390], [-330, -300], [-380, -90]], mouse = [-640, -40];
+    s += `<polygon points="${pts.concat([mouse]).map(([a, b]) => X(a) + ',' + Y(b)).join(' ')}" fill="#4a90d9" fill-opacity=".35"/>`;
+    s += `<polyline points="${pts.map(([a, b]) => X(a) + ',' + Y(b)).join(' ')}" fill="none" stroke="#1f3552" stroke-width="1.5"/>`;
+    s += `<polyline points="${X(pts[3][0])},${Y(pts[3][1])} ${X(mouse[0])},${Y(mouse[1])} ${X(pts[0][0])},${Y(pts[0][1])}" fill="none" stroke="#1f3552" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+    pts.forEach(([a, b], i) => { s += i === 0 ? `<circle cx="${X(a)}" cy="${Y(b)}" r="6" style="fill:#fff;stroke:var(--accent)" stroke-width="2"/>` : handle(X(a), Y(b)); });
+    const mx = X(mouse[0]), my = Y(mouse[1]);
+    s += `<path d="M ${mx - 9} ${my} H ${mx + 9} M ${mx} ${my - 9} V ${my + 9}" stroke="#0b0d10" stroke-width="1.5"/>`;
+  }
+  return s + '</svg>';
+}
+
+// Entities panel rows: [depth, icon, name, folded state].
+const ROWS = [
+  [0, 'world', 'World', 'open'], [1, 'camera', 'Camera'], [1, 'rect', 'Rectangle 1'], [1, 'circle', 'Ball'],
+  [1, 'rect', 'Crate 3'], [1, 'rect', 'Crate 2'], [1, 'rect', 'Crate 1'], [1, 'rect', 'Platform'],
+  [1, 'group', 'Car', 'open'], [2, 'joint', 'Hinge 2'], [2, 'joint', 'Hinge 1'], [2, 'circle', 'Wheel 2'],
+  [2, 'circle', 'Wheel 1'], [2, 'polygon', 'Cabin'], [2, 'rect', 'Body'], [1, 'polygon', 'Ramp'], [1, 'rect', 'Ground']
+];
+function rowsHtml(rows, selected, hover) {
+  const indent = S.row === 'pill' || S.row === 'solid' ? 2 : 8;
+  return `<div class="rows ${S.row}">` + rows.map(([d, icon, name, fold]) => {
+    const st = name === selected ? ' sel' : name === hover ? ' hover' : '';
+    const arrow = fold ? ic(fold === 'open' ? 'down' : 'right', 'class="i fold"') : '<span style="width:14px"></span>';
+    const eye = name === 'World' ? '' : `<span class="eye">${ic('eye')}</span>`;
+    return `<div class="lrow${st}" style="padding-left:${indent + d * 16}px">${arrow}<span class="kind">${ic(icon)}</span><span class="name">${name}</span>${eye}</div>`;
+  }).join('') + '</div>';
+}
+const entities = (selected, hover) => `<div class="abs blk panel ents" style="${pos(geo(S.layout).ents)}"><div class="ph ${S.head}">Entities</div>${rowsHtml(ROWS, selected, hover)}</div>`;
+
+// Inspector fields
+const fc = () => `inp ${S.field}`;
+const F = {
+  num: (l, v, u = '', o = {}) => {
+    let vals;
+    if (o.slider !== undefined && S.slider === 'fill') vals = `<div class="${fc()} fillbar" style="--p:${o.slider * 100}%">${v}<span class="unit">${u}</span></div>`;
+    else if (o.slider !== undefined) vals = `<div class="${fc()} short">${v}<span class="unit">${u}</span></div><div class="slider"><i style="width:${o.slider * 100}%"></i><b style="left:${o.slider * 100}%"></b></div>`;
+    else vals = `<div class="${o.ro ? 'inp ro' : fc()}${o.focus ? ' focus' : ''}${o.err ? ' err' : ''}${o.hov ? ' hov' : ''}">${v}<span class="unit">${u}</span></div>`;
+    return `<div class="f"><label>${l}</label><div class="vals">${vals}</div></div>`;
+  },
+  vec: (l, a, b, u = '') => `<div class="f"><label>${l}</label><div class="vals"><div class="${fc()}"><span class="ax">X</span>${a}<span class="unit">${u}</span></div><div class="${fc()}"><span class="ax">Y</span>${b}<span class="unit">${u}</span></div></div></div>`,
+  choice: (l, v) => `<div class="f"><label>${l}</label><div class="vals"><div class="${fc()}">${v}${CHEV}</div></div></div>`,
+  colour: (l, hex) => `<div class="f"><label>${l}</label><div class="vals"><div class="${fc()}"><span class="swc" style="background:${hex}"></span>${hex.toUpperCase()}</div></div></div>`,
+  check: (l, on) => `<div class="f"><label>${l}</label><div class="vals">${S.check === 'switch' ? `<span class="tg${on ? ' on' : ''}"></span>` : `<span class="cb${on ? ' on' : ''}">${on ? ic('check') : ''}</span>`}</div></div>`
+};
+const CHIP = { TransformComponent: '#8fb5ff', ShapeComponent: '#7ee2b8', StyleComponent: '#f7a8cf', BodyComponent: '#f6d06b', SurfaceComponent: '#c4b5fd', PhysicsWorldComponent: '#7dd3fc' };
+const card = (title, body) => `<div class="card ${S.card}"><div class="chead">${S.card === 'chip' ? `<span class="dotc" style="background:${CHIP[title]}"></span>` : ic('down')}<span class="t">${title}</span>${ic('dots')}</div>${body}</div>`;
+
+function inspector() {
+  return `<div class="abs blk panel insp" style="${pos(geo(S.layout).insp)}"><div class="ph ${S.head}">Inspector</div>
+    <div class="ihead"><span style="color:var(--muted);display:flex">${ic('rect')}</span><div class="nm ${S.field === 'filled' ? '' : S.field}">Rectangle 1</div><span class="ib eye">${ic('eye')}</span></div>
+    <div style="overflow:hidden">
+    ${card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°') + F.vec('Scale', '1', '1') + F.num('Skew', '0', '°'))}
+    ${card('ShapeComponent', F.choice('Kind', 'Rectangle') + F.num('Width', '160', 'px') + F.num('Height', '80', 'px', { focus: true }))}
+    ${card('StyleComponent', F.colour('Fill', '#4a90d9') + F.colour('Outline colour', '#1f3552') + F.num('Outline width', '2', 'px') + F.num('Opacity', '100', '%', { slider: 1 }))}
+    ${card('BodyComponent', F.choice('Type', 'Dynamic') + F.num('Gravity scale', '1', '', { slider: .55 }) + F.num('Linear damping', '0', '', { slider: 0 }) + F.check('Fixed rotation', false) + F.check('Bullet', false) + F.check('Merge', true) + F.num('Mass', '5.12', 'kg', { ro: true }))}
+    ${card('SurfaceComponent', F.num('Density', '1', '', { slider: .01 }) + F.num('Friction', '0.3', '', { slider: .06 }) + F.num('Restitution', '0', '', { slider: 0 }) + F.check('Sensor', false))}
+    </div></div>`;
+}
+
+function topbar(o = {}) {
+  const sm = 'style="width:13px;height:13px"';
+  const left = `<span class="ib${o.menuOpen ? ' on' : ''}">${ic('menu')}</span><span class="levelname">Car test</span><span class="savestate">${ic('check', sm)}Saved</span>` +
+    `<span class="sep"></span><span class="ib">${ic('undo')}</span><span class="ib dim">${ic('redo')}</span><span class="ib on">${ic('magnet')}</span>`;
+  const play = `<span class="play ${S.btn}">${ic('play')}Play</span>`;
+  const right = `<span class="ib">View${CHEV}</span><span class="ib num">40%${CHEV}</span><span class="ib">${ic('help')}</span>`;
+  const g = geo(S.layout).top;
+  if (S.layout === 'float') return `<div class="abs top" style="${pos(g)}"><div class="isl">${left}</div><div class="isl">${play}</div><div class="isl">${right}</div></div>`;
+  return `<div class="abs top bar" style="${pos(g)}">${left}<span class="grow"></span>${play}<span class="grow"></span>${right}</div>`;
+}
+const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
+const TOOLS = ['select', 'shape', 'joint'];
+const toolstrip = (active) => `<div class="abs blk tools" style="${pos(geo(S.layout).tools)}">${TOOLS.map((t) => toolHtml(t, active)).join('')}</div>`;
+function statusbar(hint, posText, sel) {
+  const cls = S.layout === 'float' ? 'blk' : 'bar';
+  return `<div class="abs status ${cls}" style="${pos(geo(S.layout).status)}"><span class="hint">${hint}</span><span class="num">${posText}</span><span>${sel}</span>
+    <span class="warn">${ic('warning', 'style="color:var(--warning)"')}<span class="num">1</span></span></div>`;
+}
+function view(opts) {
+  const g = geo(S.layout), v = g.view;
+  const cx = (g.insp[0] + g.insp[2] + g.ents[0]) / 2 - v[0];
+  const cy = (S.layout === 'float' ? (64 + H) / 2 : v[1] + v[3] / 2) - v[1];
+  return `<div class="abs viewbox" style="${pos(v)}">${scene(v[2], v[3], 0.38, cx, cy, Object.assign({ grid: true, cameraFrame: true, joints: true }, opts))}</div>`;
+}
+function editor(o) {
+  return view(o.scene || {}) + topbar(o.top) + toolstrip(o.tool || 'select') + entities(o.sel, o.hover) +
+    (o.noInspector ? '' : inspector()) + (o.extra || '') +
+    statusbar(o.hint || 'Select · drag a handle to resize, Shift keeps proportions', o.pos || 'x 20, y 340', o.sel || 'Nothing selected');
+}
+
+function shapeStrip() {
+  const [x, y] = geo(S.layout).strip;
+  const kinds = [['rect', 'Rectangle'], ['circle', 'Circle'], ['polygon', 'Polygon']];
+  return `<div class="opts" style="left:${x}px;top:${y}px">${kinds.map(([icon, name]) => `<span class="ib${icon === 'polygon' ? ' on' : ''}">${ic(icon)}${name}</span>`).join('')}</div>`;
+}
+function menuBody(items) {
+  return items.map((m) => m === '-' ? '<div class="msep"></div>' :
+    `<div class="mi${m[2] ? ' ' + m[2] : ''}"><span class="l">${m[0]}</span>${m[1] === '>' ? ic('right', 'class="i chev"') : `<span class="k">${m[1] || ''}</span>`}</div>`).join('');
+}
+function mainMenu() {
+  const [x, y] = geo(S.layout).menu;
+  const top = [['File', '>'], ['Edit', '>', 'hover'], ['Arrange', '>'], ['View', '>'], ['Help', '>']];
+  const edit = [['Undo Move 1 entity', 'Ctrl+Z'], ['Redo', 'Ctrl+Shift+Z', 'dis'], '-', ['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C'], ['Paste', 'Ctrl+V', 'hover'], ['Duplicate', 'Ctrl+D'], ['Delete', 'Del'], '-', ['Select all', 'Ctrl+A'], ['Rename', 'F2'], ['Hide or show', 'Ctrl+Shift+H']];
+  return `<div class="menu ${S.menu}" style="left:${x}px;top:${y}px">${menuBody(top)}</div><div class="menu ${S.menu}" style="left:${x + 206}px;top:${y + 38}px;min-width:250px">${menuBody(edit)}</div>`;
+}
+const dialogBody = () => `<h3>Replace the open level?</h3><p>Export it first if you want to keep it.</p><div class="row"><span class="btn ${S.btn}">Cancel</span><span class="btn primary ${S.btn}">Replace</span></div>`;
+function playbar(paused, extraCls = '') {
+  const pc = paused ? 'var(--paused)' : 'var(--playing)';
+  return `<div class="playbar ${S.play} ${extraCls}" style="--pc:${pc}"><span class="state"><i></i>${paused ? 'PAUSED' : 'PLAYING'}</span>` +
+    (paused ? `<span class="ib">${ic('play')}Resume</span><span class="ib">${ic('step')}Step <span class="k">F9</span></span>` : `<span class="ib">${ic('pause')}Pause <span class="k">F8</span></span><span class="ib dim">${ic('step')}Step <span class="k">F9</span></span>`) +
+    `<span class="ib">${ic('stop')}Stop <span class="k">Ctrl+Enter</span></span></div>`;
+}
+
+const MOMENTS = {
+  shape: () => editor({ sel: 'Rectangle 1', hover: 'Crate 2', scene: { selected: 'rect1' } }),
+  draw: () => editor({ tool: 'shape', noInspector: true, extra: shapeStrip(), scene: { drawing: true }, hint: 'Shape · click to add a point, click the first point to close, Enter to finish as a line', pos: 'x −640, y −40' }),
+  menu: () => editor({ sel: 'Rectangle 1', scene: { selected: 'rect1' }, top: { menuOpen: true }, extra: mainMenu() }),
+  dialog: () => editor({ extra: `<div class="scrim"></div><div class="dialog">${dialogBody()}</div>`, hint: 'Select · click to select, drag to move', pos: 'x 412, y −96' }),
+  play: () => `<div class="game"><div style="position:absolute;left:0;top:45px">${scene(1440, 810, 0.75, 720, 405, { play: true })}</div></div>${playbar(false)}`,
+  parts: () => partsSheet()
+};
+
+// The parts sheet: each kind with all its variants, drawn in the chosen direction's colours.
+function schematic(layout) {
+  const g = geo(layout), k = 0.2, r = Math.max(2, (layout === 'flush' ? 0 : Math.max(T.rl, 10)) * k);
+  const box = (rect, bg, extra = '') => `<div style="position:absolute;left:${rect[0] * k}px;top:${rect[1] * k}px;width:${rect[2] * k}px;height:${(rect[3] ?? 160) * k}px;background:${bg};border-radius:${layout === 'flush' ? 0 : r}px;${extra}"></div>`;
+  const sh = layout === 'float' ? 'box-shadow:0 2px 6px rgba(0,0,0,.3)' : '';
+  let s = box(g.view, BG);
+  if (layout === 'float') s += box([10, 10, 520, 44], 'var(--panel)', sh) + box([660, 10, 120, 44], 'var(--panel)', sh) + box([1180, 10, 250, 44], 'var(--panel)', sh);
+  else s += box(g.top, 'var(--bar)');
+  for (const p of ['tools', 'insp', 'ents', 'status']) s += box(g[p], p === 'status' && layout !== 'float' ? 'var(--bar)' : 'var(--panel)', sh);
+  return `<div class="schem">${s}</div>`;
+}
+const PARTS = {
+  layout: () => schematic(S.layout),
+  head: () => `<div class="ph ${S.head}">Inspector</div>`,
+  card: () => card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°')) + card('ShapeComponent', F.choice('Kind', 'Rectangle') + F.num('Width', '160', 'px')),
+  field: () => F.num('Width', '160', 'px', { hov: true }) + F.num('Height', '80.25', 'px', { focus: true }) + F.num('Friction', 'abc', '', { err: true }) + `<div class="msg">Can't read this as a number</div>` + F.colour('Fill', '#4a90d9'),
+  slider: () => F.num('Gravity scale', '1', '', { slider: .55 }) + F.num('Opacity', '100', '%', { slider: 1 }),
+  check: () => F.check('Merge', true) + F.check('Bullet', false),
+  row: () => rowsHtml([[1, 'rect', 'Crate 1'], [1, 'rect', 'Crate 2'], [1, 'rect', 'Rectangle 1'], [1, 'circle', 'Ball']], 'Rectangle 1', 'Crate 2'),
+  tool: () => `<div class="inl"><span class="blk tools h">${TOOLS.map((t) => toolHtml(t, 'shape', 'joint')).join('')}</span><span class="tip-box">Joint<span class="k">6</span></span></div>`,
+  btn: () => `<div class="inl"><span class="btn ${S.btn}">Cancel</span><span class="btn primary ${S.btn}">Replace</span><span class="play ${S.btn}">${ic('play')}Play</span></div>`,
+  menu: () => `<div class="inl"><div class="menu static ${S.menu}">${menuBody([['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C', 'hover'], ['Paste', 'Ctrl+V'], '-', ['Redo', 'Ctrl+Shift+Z', 'dis']])}</div></div>`,
+  note: () => `<div class="note ${S.note}">${ic('warning', 'style="color:var(--warning);margin-top:1px"')}<span>Needs a SurfaceComponent to collide. <span class="fix">Add SurfaceComponent</span></span></div>` +
+    `<div class="note ${S.note} tipn">${ic('info', 'style="color:var(--tip);margin-top:1px"')}<span>A tip reads the same, with a blue icon.</span></div>`,
+  handle: () => `<div class="inl"><svg width="200" height="90" viewBox="0 0 200 90" style="border-radius:6px"><rect width="200" height="90" fill="${BG}"/><rect x="60" y="25" width="80" height="40" fill="#4a90d9" stroke="#1f3552"/><rect x="60" y="25" width="80" height="40" fill="none" style="stroke:var(--accent)" stroke-width="1.5"/>${handles(60, 25, 80, 40)}</svg></div>`,
+  play: () => playbar(false, 'static') + playbar(true, 'static')
+};
+function partsSheet() {
+  return `<div class="sheet">` + KINDS.map(([key, title, desc, variants]) =>
+    `<div class="kbox"><h4>${title}</h4>${desc ? `<div class="kd">${desc}</div>` : ''}` +
+    variants.map(([v, label], i) => `<div class="var${S[key] === v ? ' cur' : ''}"><div class="vl"><b>${i + 1}</b> ${label}</div>${withS({ [key]: v }, PARTS[key])}</div>`).join('') +
+    `</div>`).join('') + `</div>`;
+}
+
+// The page around the mockups
+function picksText(d) {
+  const changed = Object.entries(state.over).filter(([k, v]) => v && v !== d.s[k]);
+  const font = FONTS.find((f) => f[0] === state.font);
+  let s = `Direction ${d.id} ${d.name}`;
+  for (const [k, v] of changed) {
+    const kind = KINDS.find((x) => x[0] === k), i = kind[3].findIndex((x) => x[0] === v);
+    s += `, ${kind[1].toLowerCase()} ${i + 1} ${kind[3][i][1]}`;
+  }
+  return s + `, font ${font[1]}`;
+}
+function buttons(id, items, current, onPick) {
+  const el = document.getElementById(id);
+  el.innerHTML = '';
+  for (const [v, label] of items) {
+    const b = document.createElement('button');
+    b.className = 'pick' + (v === current ? ' on' : '');
+    b.textContent = label;
+    b.onclick = () => onPick(v);
+    el.appendChild(b);
+  }
+}
+function render() {
+  const d = DIRS.find((x) => x.id === state.dir) || DIRS[0];
+  T = d.t;
+  S = Object.assign({}, d.s);
+  for (const [k, v] of Object.entries(state.over)) if (v) S[k] = v;
+  buttons('dirs', DIRS.map((x) => [x.id, `${x.id} ${x.name}`]), d.id, (v) => { state.dir = v; state.over = {}; render(); });
+  buttons('views', VIEWS, state.view, (v) => { state.view = v; render(); });
+  buttons('fonts', FONTS.map((f) => [f[0], f[1]]), state.font, (v) => { state.font = v; render(); });
+  const overs = document.getElementById('overs');
+  overs.innerHTML = KINDS.map(([key, title, , variants]) => `<label class="ov">${title}<select data-k="${key}" class="${state.over[key] && state.over[key] !== d.s[key] ? 'changed' : ''}">` +
+    variants.map(([v, label], i) => `<option value="${v}"${S[key] === v ? ' selected' : ''}>${i + 1} ${label}${d.s[key] === v ? ' ·' : ''}</option>`).join('') + `</select></label>`).join('') +
+    `<button class="pick" id="reset">Reset to the direction</button>`;
+  for (const sel of overs.querySelectorAll('select')) sel.onchange = () => { state.over[sel.dataset.k] = sel.value; render(); };
+  document.getElementById('reset').onclick = () => { state.over = {}; render(); };
+  document.getElementById('caption').textContent = `${d.desc} All directions are dark: a light theme is in rejected.md. "·" in a list marks the direction's own pick.`;
+  document.getElementById('picks').textContent = picksText(d);
+  const parts = state.view === 'parts';
+  const cls = ['ed', S.layout, T.lines ? 'lines' : '', parts ? 'tall' : ''].join(' ');
+  document.getElementById('frame').innerHTML = `<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
+  document.getElementById('stage').classList.toggle('scroll', parts);
+  try { localStorage.setItem('engine-v3-redesign', JSON.stringify(state)); } catch (e) {}
+  fit();
+}
+function fit() {
+  const stage = document.getElementById('stage'), frame = document.getElementById('frame');
+  const parts = state.view === 'parts';
+  const k = Math.min((stage.clientWidth - 24) / 1440, parts ? 1 : (stage.clientHeight - 16) / 900, 1);
+  frame.style.transform = `scale(${k})`;
+  document.getElementById('sizer').style.height = parts ? `${frame.offsetHeight * k + 24}px` : '0';
+}
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'SELECT') return;
+  const i = DIRS.findIndex((x) => x.id === state.dir);
+  if (e.key === 'ArrowRight') { state.dir = DIRS[Math.min(i + 1, DIRS.length - 1)].id; state.over = {}; render(); }
+  if (e.key === 'ArrowLeft') { state.dir = DIRS[Math.max(i - 1, 0)].id; state.over = {}; render(); }
+});
+window.addEventListener('resize', fit);
+render();
+</script>
+</body>
+</html>
