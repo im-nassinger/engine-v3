@@ -73,7 +73,7 @@ export function runFrames(frames: ManualFrames) {
 // Waits until the GPU has drawn every frame run so far. A browser shows a frame only once it is drawn, so
 // it never queues more; a test running frames back to back would. Without a GPU the drawing is slow, and
 // the queue it left would hold up the next frame timed, or the renderer's destroy, by many seconds.
-export function waitForDrawing(page: LevelViewPage) {
+export function waitForDrawing(page: Pick<LevelViewPage, 'levelView'>) {
     const canvas = page.levelView.canvas;
     if (!(canvas instanceof HTMLCanvasElement)) throw new Error('The level view draws off screen.');
     const context = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
