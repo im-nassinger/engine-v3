@@ -55,7 +55,7 @@ src/
     physics/           PhysicsWorld contract, PhysicsSceneBuilder (merging), BodyMass, JointEnds
       merging/           mergesInto: which body a shape merges into
       mass/              BodyMass: a body's mass from its surfaces
-    simulation/        run/ (Simulation, PlayRun), phases/ (the tick phases), bodies/ (BodyMatrices), removal/ (RemovalMarks), report/ (TickReport), hash/, start/ (startSimulation), testing/ (a scripted PhysicsWorld, test levels); CameraFollow
+    simulation/        run/ (Simulation, PlayRun), phases/ (the tick phases), bodies/ (BodyMatrices), removal/ (RemovalMarks), report/ (TickReport), hash/, start/ (startPlayCopy, startSimulation), testing/ (a scripted PhysicsWorld, test levels); CameraFollow
   editor/
     session/           EditorSession (the editor's root object), OpenLevel, CurrentGroup
     history/           History, HistoryStep, EditTransaction, changes/
@@ -71,7 +71,7 @@ src/
     clipboard/         ClipboardCodec, PastePlacement, IdRemapping
     shortcuts/         KeyChord, KeyPress, ShortcutMap, ShortcutDispatcher
     saving/            Autosave, SaveState, ProjectFile, ImportLevel, ExportLevel, contracts
-    play/              PlaySession, TickPacer, PlayMirror, Watchdog; runner/ (the GameRunner contract), fixed-size/ (fixedSizeView), testing/ (DirectGameRunner)
+    play/              PlaySession, TickPacer, Watchdog; mirror/ (PlayMirror, NoPhysicsEngine), runner/ (the GameRunner contract), fixed-size/ (fixedSizeView), testing/ (DirectGameRunner)
     status/            StatusText (the status bar's left slot), the status bar's texts (selectionSummary, mousePositionText)
     time/              Clock, Timer, FrameScheduler, TimeOfDay contracts
   adapters/

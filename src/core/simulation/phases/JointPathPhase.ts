@@ -1,9 +1,8 @@
 import { PathComponent } from '../../components/index.ts';
 import type { EntityId } from '../../fields/index.ts';
-import type { Point } from '../../geometry/index.ts';
-import { jointPathPoints } from '../../physics/index.ts';
 
-import type { PlayJoint, PlayJointEnd } from '../joints/PlayJoints.ts';
+import { jointPathOf } from '../joints/jointPathOf.ts';
+import type { PlayJoint } from '../joints/PlayJoints.ts';
 import type { PlayRun } from '../run/PlayRun.ts';
 import type { TickContext, TickPhase } from '../run/TickPhase.ts';
 
@@ -31,22 +30,11 @@ function hasMovedEnd(joint: PlayJoint, moved: ReadonlySet<EntityId>) {
 }
 
 function updatePath(run: PlayRun, joint: PlayJoint) {
-    if (joint.type === 'hinge') return;
-
     const path = joint.entity.getComponent(PathComponent);
     if (path === undefined) return;
 
-    const jointMatrix = run.caches.worldMatrices.matrixOf(joint.entity);
-    const toJoint = jointMatrix.invert();
-    if (toJoint === undefined) return;
-
-    const endALevel = levelPositionOf(run, joint.endA);
-    const endBLevel = levelPositionOf(run, joint.endB);
-    if (endALevel === undefined || endBLevel === undefined) return;
-
-    const endA = toJoint.apply(endALevel);
-    const endB = toJoint.apply(endBLevel);
-    const newPath = jointPathPoints(joint.type, endA, endB);
+    const newPath = jointPathOf(joint, run.caches.worldMatrices, run.bodyMatrices);
+    if (newPath === undefined) return;
 
     const before = path.get('path');
     const stored = path.set('path', newPath);
@@ -54,12 +42,4 @@ function updatePath(run: PlayRun, joint: PlayJoint) {
     if (stored === before) return;
 
     run.report.pathChanged(joint.entity.id, stored);
-}
-
-function levelPositionOf(run: PlayRun, end: PlayJointEnd): Point | undefined {
-    if (end.body === undefined) return end.position;
-
-    const pose = run.bodyMatrices.poseMatrixOf(end.body);
-
-    return pose?.apply(end.position);
 }

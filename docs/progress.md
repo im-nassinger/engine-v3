@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 16, step 5 of 12: `Watchdog` is built, checked once a frame: the notice after 2 s unanswered, `hung` after 5 s, and a frame gap over 1 s starting the wait again. Next is step 6, `PlayMirror`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 16, step 6 of 12: `PlayMirror` is built: read with the play copy's own `startPlayCopy` on a `NoPhysicsEngine`, its matrices equal the play copy's after each report, and `drawAt` draws bodies, the camera and rope paths between ticks. Next is step 7, `PlaySession`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

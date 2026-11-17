@@ -17,7 +17,7 @@ function crash(error: unknown): GameCrash {
 export class DirectGameRunner implements GameRunner {
     private readonly engine: PhysicsEngine;
     private queue: Promise<unknown> = Promise.resolve();
-    private simulation: Simulation | undefined;
+    private currentSimulation: Simulation | undefined;
     // Raised by terminate, so nothing asked before it is answered.
     private generation = 0;
     private prepareCount = 0;
@@ -36,6 +36,11 @@ export class DirectGameRunner implements GameRunner {
         return this.terminateCount;
     }
 
+    // The run going now, so a test can compare the page's mirror with the play copy.
+    get simulation() {
+        return this.currentSimulation;
+    }
+
     prepare() {
         this.prepareCount += 1;
         void this.enqueue(() => this.engine.load());
@@ -48,7 +53,7 @@ export class DirectGameRunner implements GameRunner {
             const started = startSimulation(levelData, this.engine, start);
             if (!started.ok) return { kind: 'failed', reason: started.refusal };
 
-            this.simulation = started.value;
+            this.currentSimulation = started.value;
 
             return { kind: 'started' };
         });
@@ -56,7 +61,7 @@ export class DirectGameRunner implements GameRunner {
 
     runTicks(inputsPerTick: readonly TickInputs[]): Promise<TicksOutcome> {
         return this.enqueue(() => {
-            const simulation = this.simulation;
+            const simulation = this.currentSimulation;
             if (simulation === undefined) throw new Error('A batch was sent with no run.');
 
             for (const inputs of inputsPerTick) {
@@ -102,8 +107,8 @@ export class DirectGameRunner implements GameRunner {
     }
 
     private dropRun() {
-        const simulation = this.simulation;
-        this.simulation = undefined;
+        const simulation = this.currentSimulation;
+        this.currentSimulation = undefined;
         simulation?.destroy();
     }
 }

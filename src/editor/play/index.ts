@@ -1,5 +1,6 @@
 export { fixedSizeView } from './fixed-size/fixedSizeView.ts';
 export type { FixedSizeView, ScreenRect } from './fixed-size/fixedSizeView.ts';
+export { PlayMirror } from './mirror/PlayMirror.ts';
 export type { GameCrash, GameRunner, StartOutcome, TicksOutcome } from './runner/GameRunner.ts';
 export { TickPacer } from './pacing/TickPacer.ts';
 export { Watchdog } from './watchdog/Watchdog.ts';

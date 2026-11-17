@@ -1,4 +1,5 @@
 export { BodyMatrices } from './bodies/BodyMatrices.ts';
+export { jointPathOf } from './joints/jointPathOf.ts';
 export { PlayJoints } from './joints/PlayJoints.ts';
 export type { PlayJoint, PlayJointEnd } from './joints/PlayJoints.ts';
 export type { CameraBox } from './camera/CameraBox.ts';
@@ -28,6 +29,8 @@ export type { JointPath, TickReport } from './report/TickReport.ts';
 export type { PlayRun } from './run/PlayRun.ts';
 export type { RunStart } from './run/RunStart.ts';
 export { Simulation } from './run/Simulation.ts';
+export { startPlayCopy } from './start/startPlayCopy.ts';
+export type { PlayCopy } from './start/startPlayCopy.ts';
 export { startSimulation } from './start/startSimulation.ts';
 export type { TickContext, TickPhase } from './run/TickPhase.ts';
 export type { TickInputs } from './run/TickInputs.ts';
