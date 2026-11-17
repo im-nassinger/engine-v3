@@ -149,4 +149,4 @@ To update when planned: `architecture/ui.md` (the stacking order), the layout ch
 
 The owner's words: just call it "Let connected objects collide". The name is enough, and the description under it ("Lets the two bodies bump into each other.") goes. *Why: in a ragdoll the description led the owner to expect limbs joined through other limbs to stop colliding too, and they don't: the setting covers the joint's two bodies only. Ragdolls are for the collision grid in v3 (`requirements/physics/world.md`).*
 
-To update when planned: the joint settings table in `requirements/physics/joints.md`, `jointSchema.ts` and its tests.
+To update when planned: "Settings of each joint" in `requirements/physics/joints.md`, `jointSchema.ts` and its tests.
