@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Changes the owner asked for that must be built **after v1's 18 stages and before v2 starts**. They are planned as stage 18 of [plan.md](plan.md), in [steps/stage-18.md](steps/stage-18.md) (2026-11-17); each step writes its change into the requirements and the architecture as it builds it. This is the one place these changes are listed.
+Changes the owner asked for that must be built **after v1's 18 stages and before v2 starts**. They are planned as stage 18 of [plan.md](plan.md), in [steps/stage-18.md](steps/stage-18.md) (2026-11-17); each step writes its change into the requirements and the architecture as it builds it. **All ten are built** (2026-11-17), so stage 18 is done and nothing of v2 has started. This is the one place these changes are listed.
 
 ## The list
 
@@ -35,6 +35,8 @@ Outlines: with resizing changing the scale, an uneven resize stretches the outli
 - **Shift no longer multiplies the outline's width.** A proportional resize is an even scale, so the outline follows the checkbox like any other resize.
 
 To update once that's settled: `requirements/drawing.md` ("Width and height, not scale", now "Resizing changes the scale"), `requirements/editor/selection.md`, `architecture/core-model/components-and-fields.md`, `architecture/editor/selection-and-tools.md` (`EntityResize`, the readout), `architecture/core-model/geometry.md` (outline bounds), `glossary.md`, `scope.md`, `decisions.md`, and a stage before v2 in `plan.md`. The World keeps resizing its rectangle, because its TransformComponent is fixed.
+
+**Built** (2026-11-17, steps 7 and 8): a polygon or line shows only its Points in the Inspector, and the StyleComponent has the Scale outline checkbox, off by default, with a level saved before it reading it off. With it off the drawing is traced through the entity's own scale and skew and the outline drawn at its own width; bounds and hit areas leave the same stretch out. The handles write only the TransformComponent's scale and position, never width, height, radius, points or the outline's width; a circle's scale stays even by taking the larger stretch, and the readout and the 1 px rule measure the size the shape is drawn at. The World still resizes its rectangle from its centre. Tests cover each kind keeping its values, the checkbox on and off on a shape scaled 3 by 1, and an old level read.
 
 ## 2. Rotating with Z and X
 
