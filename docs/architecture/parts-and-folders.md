@@ -71,7 +71,7 @@ src/
     clipboard/         ClipboardCodec, PastePlacement, IdRemapping
     shortcuts/         KeyChord, KeyPress, ShortcutMap, ShortcutDispatcher
     saving/            Autosave, SaveState, ProjectFile, ImportLevel, ExportLevel, contracts
-    play/              session/ (PlaySession), pacing/ (TickPacer), watchdog/ (Watchdog), mirror/ (PlayMirror, NoPhysicsEngine), runner/ (the GameRunner contract), fixed-size/ (fixedSizeView), testing/ (DirectGameRunner)
+    play/              session/ (PlaySession), pacing/ (TickPacer), watchdog/ (Watchdog), mirror/ (PlayMirror, NoPhysicsEngine), runner/ (the GameRunner contract), inputs/ (HeldKeys, the PageLifecycle contract), fixed-size/ (fixedSizeView), testing/ (DirectGameRunner, FakePageLifecycle)
     status/            StatusText (the status bar's left slot), the status bar's texts (selectionSummary, mousePositionText)
     time/              Clock, Timer, FrameScheduler, TimeOfDay contracts
   adapters/
@@ -81,8 +81,8 @@ src/
     browser/           keyboard/ (KeyboardInput), pointer/ (PointerInput, ClickCounter, wheelPixels),
                        time/ (SystemClock, LocalTimeOfDay, BrowserTimer, AnimationFrames),
                        screen/ (DevicePixelRatio), clipboard/ (ClipboardBridge),
-                       files/ (FileDownload, BrowserFilePicker, FileDropTarget), and later
-                       PageVisibility, LeavePrompt in their own areas
+                       files/ (FileDownload, BrowserFilePicker, FileDropTarget),
+                       page/ (PageSavingEvents, TabTitle, PageVisibility)
     worker/            import/ (ImportWorkerClient, ImportWorkerHost, importProtocol), and later
                        WorkerGameRunner, GameWorkerHost and their protocol
     zip/               FflateZipCodec, FflateZipReader

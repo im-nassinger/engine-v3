@@ -10,8 +10,10 @@ import { placeBody, transform } from '../../../core/simulation/testing/scriptedL
 import { EditorSession } from '../../session/index.ts';
 import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 
+import { HeldKeys } from '../inputs/HeldKeys.ts';
 import type { GameRunner, StartOutcome, TicksOutcome } from '../runner/GameRunner.ts';
 import { DirectGameRunner } from '../testing/DirectGameRunner.ts';
+import { FakePageLifecycle } from '../testing/FakePageLifecycle.ts';
 import { Watchdog } from '../watchdog/Watchdog.ts';
 
 import {
@@ -87,7 +89,8 @@ function setUp(level = levelWithACrate(), setUpOptions: SetUpOptions = {}) {
     const runner = new ControlledRunner(engine);
     const session = new EditorSession({ level, clock, timer, frames: new ManualFrames() });
     const calls: string[] = [];
-    const heldKeys: string[] = [];
+    const heldKeys = new HeldKeys();
+    const page = new FakePageLifecycle();
     const play = new PlaySession({
         session,
         runner,
@@ -100,8 +103,9 @@ function setUp(level = levelWithACrate(), setUpOptions: SetUpOptions = {}) {
             return NEVER_ANSWERED;
         },
         isDialogOpen: () => setUpOptions.dialogOpen ?? false,
-        heldKeys: () => heldKeys,
+        heldKeys,
     });
+    play.connectPage(page);
 
     // One frame later, with every answer due by then taken in.
     async function nextFrame(ms = FRAME_MS) {
@@ -118,7 +122,7 @@ function setUp(level = levelWithACrate(), setUpOptions: SetUpOptions = {}) {
         }
     }
 
-    return { timer, clock, frames, engine, runner, session, play, calls, heldKeys, nextFrame, framesFor };
+    return { timer, clock, frames, engine, runner, session, play, calls, heldKeys, page, nextFrame, framesFor };
 }
 
 // Lets every promise already answered run its callbacks.
@@ -228,7 +232,7 @@ describe('PlaySession', () => {
         play.play();
         await settle();
 
-        heldKeys.push('ArrowRight');
+        heldKeys.press('ArrowRight');
         for (let i = 0; i < 60; i++) {
             await nextFrame();
         }
@@ -471,5 +475,88 @@ describe('PlaySession', () => {
         await nextFrame(FRAME_MS / 2);
 
         expect(drawnCount).toBe(2);
+    });
+
+    test('a hidden tab pauses the run, and its ticks stay at what they were', async () => {
+        const { play, page, nextFrame } = setUp();
+        play.play();
+        await settle();
+        await nextFrame();
+        expect(play.mirror?.tick).toBe(1);
+
+        page.change('hidden');
+        await nextFrame(60_000);
+        await nextFrame();
+
+        expect(play.state).toBe('paused');
+        expect(play.mirror?.tick).toBe(1);
+    });
+
+    test('a key held while the tab hides is released, and the next batch sends none', async () => {
+        const { play, page, runner, heldKeys, nextFrame } = setUp();
+        play.play();
+        await settle();
+        heldKeys.press('ArrowRight');
+
+        page.change('hidden');
+        expect(heldKeys.codes()).toEqual([]);
+
+        play.resume();
+        await nextFrame();
+        expect(runner.batches.at(-1)).toEqual([{ heldKeys: [] }]);
+    });
+
+    test('a tab hidden while the game loads starts the run paused', async () => {
+        const { play, page, nextFrame } = setUp();
+        play.play();
+        page.change('hidden');
+        await settle();
+        await nextFrame(60_000);
+
+        expect(play.state).toBe('paused');
+        expect(play.mirror?.tick).toBe(0);
+    });
+
+    test('a hidden tab during a run that ended or was stopped changes nothing', async () => {
+        const { play, page } = setUp();
+        page.change('hidden');
+        expect(play.state).toBe('idle');
+
+        play.play();
+        play.stop();
+        page.change('hidden');
+        play.play();
+        await settle();
+
+        expect(play.state).toBe('playing');
+    });
+
+    test('a lost window focus or a click on the Play bar releases the keys and keeps the run going', async () => {
+        const { play, page, heldKeys, nextFrame } = setUp();
+        play.play();
+        await settle();
+
+        heldKeys.press('KeyW');
+        page.change('focusLost');
+        expect(heldKeys.codes()).toEqual([]);
+
+        heldKeys.press('KeyW');
+        play.releaseKeys();
+        expect(heldKeys.codes()).toEqual([]);
+
+        await nextFrame();
+        expect(play.state).toBe('playing');
+        expect(play.mirror?.tick).toBe(1);
+    });
+
+    test('connectPage gives back a way to stop listening', () => {
+        const { play } = setUp();
+        const page = new FakePageLifecycle();
+
+        const disconnect = play.connectPage(page);
+        expect(page.listenerCount).toBe(1);
+        disconnect();
+
+        expect(page.listenerCount).toBe(0);
     });
 });

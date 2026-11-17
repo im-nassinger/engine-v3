@@ -13,4 +13,5 @@ export { SystemClock } from './time/SystemClock.ts';
 export { LocalTimeOfDay } from './time/LocalTimeOfDay.ts';
 export { PageSavingEvents } from './page/PageSavingEvents.ts';
 export type { PageSavingParts } from './page/PageSavingEvents.ts';
+export { PageVisibility } from './page/PageVisibility.ts';
 export { TabTitle, tabTitleText } from './page/TabTitle.ts';

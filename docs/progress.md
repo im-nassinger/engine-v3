@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 16, step 7 of 12: `PlaySession` is built: Play commits, saves, writes and starts, ignored mid-drag or with a dialog open; Stop cancels a start and leaves the editor untouched; Pause, Resume and Step; a failed, crashed or hung run ends with its message; the hard limit's warning names the body. Next is step 8, inputs and focus. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 16, step 8 of 12: inputs and focus are built: `HeldKeys` shared by the keyboard and `PlaySession`, sent with every batch; `PageVisibility` behind `PageLifecycle`, so a hidden tab pauses the run and releases every key, and a lost window focus releases them and keeps it going. Next is step 9, the commands and keys. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

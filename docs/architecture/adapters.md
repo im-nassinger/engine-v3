@@ -19,7 +19,7 @@ Every detail is reached through **one small contract declared where it is needed
 | `LevelFileImporter` | editor/saving | `ImportWorkerClient` | `DirectImporter` (same code, no worker) |
 | `GameRunner` | editor/play | `WorkerGameRunner` | `DirectGameRunner` (the simulation in the same thread) |
 | `Clock`, `Timer`, `FrameScheduler` | editor/time | `SystemClock`, `BrowserTimer`, `AnimationFrames` | `ManualClock`, `ManualTimer`, `ManualFrames` |
-| `PageLifecycle` | editor/play | `PageVisibility`, `LeavePrompt` | `FakePageLifecycle` |
+| `PageLifecycle` | editor/play | `PageVisibility` (the leave prompt is `PageSavingEvents`', stage 12) | `FakePageLifecycle` |
 | Keyboard and pointer input | none: the adapters call `ShortcutDispatcher` and `ToolController` | `KeyboardInput`, `PointerInput` | tests call the editor classes directly |
 | Clipboard | none: the adapter calls the copy, cut and paste commands | `ClipboardBridge` | tests call the codec and commands |
 | `ScriptEngine` (v2) | core/simulation | `WasmoonScriptEngine` | |

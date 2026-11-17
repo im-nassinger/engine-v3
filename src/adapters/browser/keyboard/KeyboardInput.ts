@@ -1,4 +1,5 @@
 import type { Unsubscribe } from '../../../core/events/index.ts';
+import { HeldKeys } from '../../../editor/play/index.ts';
 import type { KeyboardInputData, ShortcutDispatcher } from '../../../editor/shortcuts/index.ts';
 
 import { focusPlaceOf } from './focusPlaceOf.ts';
@@ -13,18 +14,20 @@ const LEVEL_VIEW_SELECTOR = '[data-focus-place="level"]';
 export class KeyboardInput {
     private readonly handler: KeyHandler;
     private readonly page: Window;
-    private readonly held = new Set<string>();
+    private readonly held: HeldKeys;
     private pointerOverLevelView = false;
 
-    constructor(handler: KeyHandler, page: Window) {
+    // held is shared with test play, which sends the keys held with every batch.
+    constructor(handler: KeyHandler, page: Window, held = new HeldKeys()) {
         this.handler = handler;
         this.page = page;
+        this.held = held;
     }
 
     // The physical keys held down now. Emptied when the window loses focus, because the key up
     // never arrives then, and a key would stick.
     isHeld(code: string) {
-        return this.held.has(code);
+        return this.held.isHeld(code);
     }
 
     connect(): Unsubscribe {
@@ -51,7 +54,7 @@ export class KeyboardInput {
     }
 
     private handleKeyDown(event: KeyboardEvent) {
-        this.held.add(event.code);
+        this.held.press(event.code);
 
         if (isAltAlone(event)) {
             event.preventDefault();
@@ -69,7 +72,7 @@ export class KeyboardInput {
 
     // Firefox and Windows open the browser's menu bar when Alt goes up after being pressed alone.
     private handleKeyUp(event: KeyboardEvent) {
-        this.held.delete(event.code);
+        this.held.release(event.code);
         this.handler.handleKeyUp(readKeyboardInput(event));
 
         if (isAltAlone(event)) {
@@ -82,7 +85,7 @@ export class KeyboardInput {
     private handleBlur(event: FocusEvent) {
         const windowLostFocus = event.target === this.page;
         if (windowLostFocus) {
-            this.held.clear();
+            this.held.releaseAll();
         }
     }
 

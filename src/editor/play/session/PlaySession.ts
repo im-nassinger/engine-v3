@@ -1,4 +1,5 @@
 import { VersionCounter } from '../../../core/events/index.ts';
+import type { Unsubscribe } from '../../../core/events/index.ts';
 import type { EntityId } from '../../../core/fields/index.ts';
 import { LevelWriter } from '../../../core/level-data/index.ts';
 import type { LevelData } from '../../../core/level-data/index.ts';
@@ -8,6 +9,8 @@ import type { EditorSession } from '../../session/index.ts';
 import { StatusText } from '../../status/index.ts';
 import type { Cancel, Clock, FrameScheduler, Timer } from '../../time/index.ts';
 
+import { HeldKeys } from '../inputs/HeldKeys.ts';
+import type { PageChange, PageLifecycle } from '../inputs/PageLifecycle.ts';
 import { PlayMirror } from '../mirror/PlayMirror.ts';
 import { TickPacer } from '../pacing/TickPacer.ts';
 import type { GameRunner, StartOutcome, TicksOutcome } from '../runner/GameRunner.ts';
@@ -34,8 +37,8 @@ export type PlaySessionOptions = {
     // Saves the level now. Play doesn't wait for it.
     saveNow(): Promise<void>;
     isDialogOpen(): boolean;
-    // The keys held now, by KeyboardEvent.code. Nothing held when left out.
-    heldKeys?(): readonly string[];
+    // The keys held now, shared with the keyboard adapter. Nothing held when left out.
+    readonly heldKeys?: HeldKeys;
     readonly writer?: LevelWriter;
 };
 
@@ -53,6 +56,9 @@ export class PlaySession {
     private readonly writer: LevelWriter;
     private readonly pacer: TickPacer;
     private readonly watchdog: Watchdog;
+    private readonly heldKeys: HeldKeys;
+    // The tab was hidden while the game was loading, so the run starts paused.
+    private pauseWhenStarted = false;
     private currentState: PlayState = 'idle';
     private currentMirror: PlayMirror | undefined;
     private currentNotice: string | undefined;
@@ -69,6 +75,12 @@ export class PlaySession {
         this.pacer = new TickPacer(options.clock);
         this.watchdog = new Watchdog(options.clock);
         this.hint = new StatusText(options.timer);
+        this.heldKeys = options.heldKeys ?? new HeldKeys();
+    }
+
+    // A hidden tab pauses the run and releases every key; a lost window focus only releases them.
+    connectPage(page: PageLifecycle): Unsubscribe {
+        return page.subscribe((change) => this.pageChanged(change));
     }
 
     get state() {
@@ -176,6 +188,11 @@ export class PlaySession {
         this.pacer.stepOnce();
     }
 
+    // The game lost the keyboard, as when the Play bar is clicked: the run goes on with nothing held.
+    releaseKeys() {
+        this.heldKeys.releaseAll();
+    }
+
     // An edit tried during play: nothing changes, and the Play bar says why.
     refuseEdit() {
         this.hint.show(STOP_TO_EDIT_TEXT);
@@ -203,7 +220,13 @@ export class PlaySession {
         this.currentMirror = mirrored.value;
         this.pacer.start();
         this.watchdog.reset();
-        this.setState('playing');
+        if (this.pauseWhenStarted) {
+            this.pauseWhenStarted = false;
+            this.pacer.pause();
+            this.setState('paused');
+        } else {
+            this.setState('playing');
+        }
         this.askForFrame();
     }
 
@@ -237,7 +260,7 @@ export class PlaySession {
         const count = this.pacer.ticksDue();
         if (count === 0) return;
 
-        const heldKeys = this.options.heldKeys?.() ?? [];
+        const heldKeys = this.heldKeys.codes();
         const inputs: TickInputs = { heldKeys };
         const inputsPerTick = Array.from({ length: count }, () => inputs);
         const run = this.run;
@@ -290,8 +313,20 @@ export class PlaySession {
         this.setState('ended');
     }
 
+    private pageChanged(change: PageChange) {
+        this.releaseKeys();
+        if (change !== 'hidden') return;
+
+        if (this.currentState === 'starting') {
+            this.pauseWhenStarted = true;
+            return;
+        }
+        this.pause();
+    }
+
     private dropRun() {
         this.run += 1;
+        this.pauseWhenStarted = false;
         this.cancelFrame?.();
         this.cancelFrame = undefined;
         this.watchdog.reset();
