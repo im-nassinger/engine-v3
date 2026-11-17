@@ -12,7 +12,7 @@ Changes the owner asked for that must be built **after v1's 18 stages and before
 | 2 | **Z and X rotate the selection and the Shape tool's preview**, Shift+Z and Shift+X by 10° | owner, 2026-11-16 and 2026-11-17 | Settled, with Claude's picks for the owner to change; steps 10 and 11 |
 | 3 | **Ctrl+Shift while resizing resizes from the centre** | owner, 2026-11-16 | Settled, with Claude's picks for the owner to change; step 9 |
 | 4 | **The Joint tool says why an entity can't take a joint** | owner, 2026-11-16 | Settled; step 5 |
-| 5 | **Unstyled joints are invisible in play**, joint icons included | owner, 2026-11-17 | Settled; step 4 |
+| 5 | **Unstyled joints are invisible in play**, joint icons included | owner, 2026-11-17 | **Built** on 2026-11-17, step 4 |
 | 6 | **+ zooms in without Shift**, as - zooms out | owner, 2026-11-17 | Settled; step 3 |
 | 7 | **Shift+T plays and stops** | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change; step 6 |
 | 8 | **W, A, S and D resize the selection and the Shape tool's preview**, changing the shape's values | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change; steps 12 and 13 |
@@ -89,7 +89,9 @@ To build:
 - After Stop, the joint icons come back as the Joint icons switch says.
 - A Playwright test plays a level with an unstyled Hinge and a styled Rope, and checks only the Rope is drawn.
 
-To update when planned: `JointIconOverlay.ts` and `PixiLevelView.ts` with their tests, and `architecture/adapters.md` if it says what the overlays draw in play.
+To update when planned: `JointIconOverlay.ts` and `PixiLevelView.ts` with their tests, `architecture/adapters.md` if it says what the overlays draw in play, and the editor-only drawing line of "Play and Stop" in `requirements/play-and-save/test-play.md`.
+
+**Built** (2026-11-17, step 4): the cause was as guessed. `PixiLevelView` clears `JointIconOverlay` while it shows the level through the camera, whatever the Joint icons switch says, and draws the icons again after Stop. A selected joint's ring was already hidden in play, with the rest of the selection. A browser test and a Playwright test in three browsers check it; the Playwright test also showed a Rope's own icon covered the middle of its styled path.
 
 ## 6. + zooms in without Shift
 

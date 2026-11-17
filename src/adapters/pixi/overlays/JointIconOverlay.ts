@@ -52,7 +52,8 @@ function isOffScreen(position: Point, scene: OverlayScene) {
 }
 
 // One icon per joint at its position, the same size at any zoom: Hinge has a dot in the middle, Rope a short
-// upright line, Spring a small zigzag. Editor only; hidden by its View menu switch and with the joint's eye.
+// upright line, Spring a small zigzag. Editor only, never drawn in play; hidden by its View menu switch and
+// with the joint's eye.
 export class JointIconOverlay {
     readonly graphics = new Graphics();
     private shown: readonly ShownJointIcon[] = [];
@@ -63,8 +64,7 @@ export class JointIconOverlay {
     }
 
     update(scene: OverlayScene) {
-        this.graphics.clear();
-        this.shown = [];
+        this.clear();
 
         const level = scene.level;
         const caches = scene.caches;
@@ -88,6 +88,12 @@ export class JointIconOverlay {
         }
 
         this.shown = shown;
+    }
+
+    // Draws no icon, whatever the switch says: play shows none.
+    clear() {
+        this.graphics.clear();
+        this.shown = [];
     }
 
     destroy() {

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { StyleComponent } from '../../core/components/index.ts';
+import { JointComponent, StyleComponent, TransformComponent } from '../../core/components/index.ts';
 import { BoundsCache, PiecesCache, WorldMatrixCache } from '../../core/derived/index.ts';
 import { Level } from '../../core/level/index.ts';
 import { Signal } from '../../core/events/index.ts';
@@ -80,7 +80,7 @@ async function showRedLevel(width: number, height: number) {
     levelView.show(level, caches);
     frames.runFrame();
 
-    return { levelView, view, settings, frames, host };
+    return { levelView, view, settings, frames, host, level };
 }
 
 function pixelAt(pixels: Uint8ClampedArray, width: number, x: number, y: number) {
@@ -194,6 +194,26 @@ describe('PixiLevelView through the camera', () => {
         settings.toggle('grid');
         frames.runFrame();
         expect(levelView.overlays.grid.plan).toBeDefined();
+    });
+
+    test('no joint icon is drawn in play, whatever its switch, and they come back after Stop', async () => {
+        const { levelView, settings, frames, level } = await showRedLevel(320, 180);
+        const hinge = level.createEntity(level.world, 0);
+        hinge.addComponent(new TransformComponent());
+        const joint = new JointComponent();
+        joint.set('type', 'hinge');
+        hinge.addComponent(joint);
+        frames.runFrame();
+        expect(levelView.overlays.jointIcons.shownIcons).toHaveLength(1);
+
+        levelView.showThroughCamera({ x: 0, y: 0 }, CAMERA_BOX);
+        frames.runFrame();
+        expect(levelView.overlays.jointIcons.shownIcons).toEqual([]);
+        expect(settings.isOn('jointIcons')).toBe(true);
+
+        levelView.stopShowingThroughCamera();
+        frames.runFrame();
+        expect(levelView.overlays.jointIcons.shownIcons).toHaveLength(1);
     });
 
     test('the editor view is left as it was, and stopping goes back to it without bars', async () => {

@@ -73,7 +73,7 @@ export type PhysicsWorld = {
 - **Drawing order:** the level (back to front), then the grid, then the editor overlays. Overlays live in a container with no zoom, so handles, icons and outlines keep their size on screen.
 - **Each entity draws one thing**, text before path before shape, as the requirement says. A shape with no StyleComponent is drawn as a thin outline in the editor and not at all in play.
 - **The physics view** draws the collision pieces from `PiecesCache` at each entity's level matrix, in the editor and in play alike (owner, 2026-11-13).
-- **During play** the view follows the camera from the tick reports: Fixed size scales the camera's box to fit the window, centred, with black bars. Editor-only drawing (handles, the camera frame, joint icons) is hidden unless a View menu switch shows it.
+- **During play** the view follows the camera from the tick reports: Fixed size scales the camera's box to fit the window, centred, with black bars. Editor-only drawing (handles, the camera frame) is hidden unless a View menu switch shows it. **Joint icons are never drawn in play**, whatever their switch, so an unstyled joint is invisible like any entity, and they come back after Stop (owner, 2026-11-17).
 - **Sharp at any browser zoom:** the renderer's resolution follows `devicePixelRatio` and a `ResizeObserver` on the host, as the tech notes say. Antialiasing is on.
 - Culling and batching are described in [performance.md](performance.md).
 
