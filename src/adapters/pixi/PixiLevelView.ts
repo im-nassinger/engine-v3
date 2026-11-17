@@ -1,8 +1,12 @@
-import { autoDetectRenderer, Container, Matrix } from 'pixi.js';
+import { autoDetectRenderer, Container, Matrix, Rectangle } from 'pixi.js';
 import type { Renderer } from 'pixi.js';
+import type { Point } from '../../core/geometry/index.ts';
 import type { Level } from '../../core/level/index.ts';
+import type { CameraBox } from '../../core/simulation/index.ts';
 import type { Unsubscribe } from '../../core/events/index.ts';
-import type { ViewSettings, ViewState } from '../../editor/view/index.ts';
+import { fixedSizeView } from '../../editor/play/index.ts';
+import { ViewState } from '../../editor/view/index.ts';
+import type { ViewSettings } from '../../editor/view/index.ts';
 import type { Cancel, FrameScheduler } from '../../editor/time/index.ts';
 import type { EntityDrawingOptions } from './EntityDrawing.ts';
 import { LevelDisplay } from './LevelDisplay.ts';
@@ -14,6 +18,7 @@ import {
     GridOverlay,
     JointIconOverlay,
     JointPreviewOverlay,
+    LetterboxOverlay,
     PhysicsViewOverlay,
     SelectionOverlay,
 } from './overlays/index.ts';
@@ -43,6 +48,12 @@ export type OpenLevelSource = {
     readonly openLevelChanged: { subscribe(listener: () => void): Unsubscribe };
 };
 
+// What the camera shows during play: its position, the middle of its box, and the box's size.
+type CameraShot = {
+    readonly position: Point;
+    readonly box: CameraBox;
+};
+
 // Owns the canvas and decides when to draw. There is no PixiJS Application and so no ticker: a
 // change marks the view dirty, which asks for one render on the next animation frame, and an idle
 // view asks for nothing.
@@ -67,6 +78,12 @@ export class PixiLevelView {
     private readonly selectionOverlay = new SelectionOverlay();
     // In front of the selection, since a new shape is drawn over what is selected; the readout stays on top.
     private readonly drawingPreviewOverlay = new DrawingPreviewOverlay();
+    // Over everything, so nothing of the level shows on Fixed size's black bars.
+    private readonly letterboxOverlay = new LetterboxOverlay();
+    // The view through the camera during play. The editor's ViewState is left as it was, so leaving play
+    // finds the editor's view where it was.
+    private readonly cameraView = new ViewState();
+    private camera: CameraShot | undefined;
     private selection: SelectionSource | undefined;
     private stopFollowingSelection: Unsubscribe | undefined;
     private drawing: DrawingSource | undefined;
@@ -97,6 +114,7 @@ export class PixiLevelView {
             this.jointIconOverlay.graphics,
             this.drawingPreviewOverlay.graphics,
             this.selectionOverlay.container,
+            this.letterboxOverlay.graphics,
         );
         this.applyViewMatrix();
 
@@ -144,7 +162,13 @@ export class PixiLevelView {
             jointPreview: this.jointPreviewOverlay,
             selection: this.selectionOverlay,
             drawingPreview: this.drawingPreviewOverlay,
+            letterbox: this.letterboxOverlay,
         };
+    }
+
+    // The view drawn now: the camera's during play, the editor's otherwise.
+    get shownView() {
+        return this.camera === undefined ? this.parts.view : this.cameraView;
     }
 
     // How many times the view has drawn, for tests and the performance numbers.
@@ -234,6 +258,33 @@ export class PixiLevelView {
         this.markDirty();
     }
 
+    // Shows the level through the camera from now on, as Fixed size does: the camera's box fills the
+    // window one way, centred, with black bars the other way. Selection, handles, previews and the dimmed
+    // outside aren't drawn; the grid, camera frame, joint icons and physics view follow their switches.
+    showThroughCamera(position: Point, box: CameraBox) {
+        this.camera = { position, box };
+        this.fitCamera();
+    }
+
+    // Back to the editor's view, as it was before play.
+    stopShowingThroughCamera() {
+        if (this.camera === undefined) return;
+
+        this.camera = undefined;
+        this.letterboxOverlay.update([]);
+        this.applyViewMatrix();
+        this.markDirty();
+    }
+
+    // The canvas's pixels as last drawn, top row first, four bytes a pixel, at one pixel per CSS pixel.
+    // For tests.
+    readPixels() {
+        const { width, height } = this.renderer.screen;
+        const frame = new Rectangle(0, 0, width, height);
+
+        return this.renderer.extract.pixels({ target: this.stage, frame, resolution: 1 });
+    }
+
     // Asks for one render on the next frame. Several changes before it still draw once.
     markDirty() {
         if (this.cancelFrame !== undefined) return;
@@ -282,6 +333,7 @@ export class PixiLevelView {
         this.renderer.resize(safeWidth, safeHeight, this.renderer.resolution);
         // ViewState moves its version on a real change, which marks the view dirty.
         this.parts.view.setSize(width, height);
+        this.fitCamera();
         this.markDirty();
     }
 
@@ -293,12 +345,33 @@ export class PixiLevelView {
     }
 
     private handleViewChange() {
+        // The editor's view can still change during play, behind the camera's: it only shows after play.
+        if (this.camera !== undefined) return;
+
+        this.applyViewMatrix();
+        this.markDirty();
+    }
+
+    private fitCamera() {
+        const camera = this.camera;
+        if (camera === undefined) return;
+
+        const size = this.parts.view.size;
+        this.cameraView.setSize(size.width, size.height);
+
+        const fixed = fixedSizeView(camera.box, size);
+        // A window with no size yet has nothing to fit; the first resize fits it.
+        if (Number.isFinite(fixed.zoom) && fixed.zoom > 0) {
+            this.cameraView.place(camera.position, fixed.zoom);
+            this.letterboxOverlay.update(fixed.bars);
+        }
+
         this.applyViewMatrix();
         this.markDirty();
     }
 
     private applyViewMatrix() {
-        const matrix = this.parts.view.matrix();
+        const matrix = this.shownView.matrix();
         const pixiMatrix = new Matrix(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 
         this.levelLayer.setFromMatrix(pixiMatrix);
@@ -310,7 +383,7 @@ export class PixiLevelView {
 
         display.prepare();
 
-        const view = this.parts.view;
+        const view = this.shownView;
         const marginInLevel = CULLING_MARGIN_SCREEN_PX / view.zoom;
         const visibleBounds = view.visibleBounds();
         const cullingArea = visibleBounds.expandedBy(marginInLevel);
@@ -318,19 +391,30 @@ export class PixiLevelView {
     }
 
     private updateOverlays() {
+        const throughCamera = this.camera !== undefined;
         const scene: OverlayScene = {
-            view: this.parts.view,
+            view: this.shownView,
             settings: this.parts.settings,
             level: this.shownLevel,
             caches: this.caches,
         };
 
         this.gridOverlay.update(scene);
-        this.boundsOverlay.update(scene);
         this.cameraFrameOverlay.update(scene);
         this.physicsViewOverlay.update(scene);
-        this.jointPreviewOverlay.update(scene, this.jointPreview);
         this.jointIconOverlay.update(scene);
+
+        if (throughCamera) {
+            // Editor-only drawing: play shows none of it, whatever the editor holds behind the view.
+            this.boundsOverlay.clear();
+            this.jointPreviewOverlay.update(scene, undefined);
+            this.drawingPreviewOverlay.update(scene, undefined);
+            this.selectionOverlay.update(scene, undefined);
+            return;
+        }
+
+        this.boundsOverlay.update(scene);
+        this.jointPreviewOverlay.update(scene, this.jointPreview);
         this.drawingPreviewOverlay.update(scene, this.drawing);
         this.selectionOverlay.update(scene, this.selection);
     }

@@ -22,8 +22,7 @@ export class BoundsOverlay {
     }
 
     update(scene: OverlayScene) {
-        this.graphics.clear();
-        this.dimmed = [];
+        this.clear();
 
         const level = scene.level;
         if (level === undefined) return;
@@ -44,6 +43,12 @@ export class BoundsOverlay {
         const right = onPixel(inView.right);
         const bottom = onPixel(inView.bottom);
         this.graphics.rect(left, top, right - left, bottom - top).stroke(EDGE);
+    }
+
+    // Draws nothing, as during play.
+    clear() {
+        this.graphics.clear();
+        this.dimmed = [];
     }
 
     destroy() {

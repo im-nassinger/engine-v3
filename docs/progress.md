@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 15, step 5 of 7: `fixedSizeView` in `editor/play/fixed-size/` works out Fixed size's zoom, middle and black bars, with unit tests at 16:9, 4:3 and 21:9. Next is step 6, `PixiLevelView.showThroughCamera` with `LetterboxOverlay`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 15, step 6 of 7: `PixiLevelView.showThroughCamera` draws the level through the camera with `LetterboxOverlay`'s black bars, tested at 16:9, 4:3 and 21:9 in three browsers. Next is step 7, the docs. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

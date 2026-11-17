@@ -197,6 +197,19 @@ export class ViewState {
         this.change(middleX, middleY, newZoom);
     }
 
+    // Puts the middle and the zoom exactly here, past the zoom range and the pan limit. Only the view
+    // through the camera uses it: Fixed size's zoom comes from the window, and a 160 px camera in a wide
+    // window needs more than MAX_ZOOM.
+    place(middle: Point, zoom: number) {
+        const unchanged = middle.x === this.middleX && middle.y === this.middleY && zoom === this.currentZoom;
+        if (unchanged) return;
+
+        this.middleX = middle.x;
+        this.middleY = middle.y;
+        this.currentZoom = zoom;
+        this.version.increment();
+    }
+
     private moveMiddleTo(middleX: number, middleY: number) {
         this.change(middleX, middleY, this.currentZoom);
     }

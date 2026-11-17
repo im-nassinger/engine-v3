@@ -269,4 +269,18 @@ describe('ViewState', () => {
 
         expect(view.size).toEqual({ width: 0, height: 0 });
     });
+
+    test('place puts the middle and the zoom exactly, past the zoom range and the pan limit', () => {
+        const view = viewOfSize(800, 600);
+        view.setPanLimit(new Bounds(-100, -100, 100, 100));
+        let notified = 0;
+        view.version.subscribe(() => (notified += 1));
+
+        view.place({ x: 5000, y: -5000 }, MAX_ZOOM * 3);
+        view.place({ x: 5000, y: -5000 }, MAX_ZOOM * 3);
+
+        expect(view.middle).toEqual({ x: 5000, y: -5000 });
+        expect(view.zoom).toBe(MAX_ZOOM * 3);
+        expect(notified).toBe(1);
+    });
 });

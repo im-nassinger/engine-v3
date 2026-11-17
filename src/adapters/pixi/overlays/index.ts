@@ -19,6 +19,7 @@ export type { DrawnDrawing } from './drawing/DrawingPreviewOverlay.ts';
 export { planDrawing } from './drawing/drawingPlan.ts';
 export type { DrawingPlan } from './drawing/drawingPlan.ts';
 export type { DrawingSource, ShownPolygonPreview, ShownShapePreview } from './drawing/DrawingSource.ts';
+export { LetterboxOverlay } from './letterbox/LetterboxOverlay.ts';
 export { JointPreviewOverlay } from './joint-preview/JointPreviewOverlay.ts';
 export type { DrawnJointPreview } from './joint-preview/JointPreviewOverlay.ts';
 export { planJointPreview } from './joint-preview/planJointPreview.ts';
