@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 15, step 3 of 7: `CameraPhase` moves `CameraState` in `PlayRun` each tick, the run starts on the target, and the report and `stateHash` read it. Next is step 4, the `camera-follow` determinism level. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 15, step 4 of 7: the `camera-follow` determinism level is recorded, all eleven levels match in Node and three browsers, and the ball stays in the camera's box inside the bounds on every tick. Next is step 5, `fixedSizeView`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

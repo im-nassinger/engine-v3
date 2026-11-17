@@ -1,3 +1,4 @@
+import { CameraComponent } from '../../../../src/core/components/index.ts';
 import type { Point } from '../../../../src/core/geometry/index.ts';
 import { Level } from '../../../../src/core/level/index.ts';
 
@@ -252,11 +253,35 @@ function hingedCar() {
     return level;
 }
 
+// Only a little wider and taller than the default 1920 by 1080 camera, so the camera stops at the bounds
+// both ways.
+export const CAMERA_FOLLOW_BOUNDS = { width: 2400, height: 1400 };
+
+// A ball rolling down two slopes towards the right Wall, followed by the camera with the default 0.3 s of
+// smoothing.
+function cameraFollow() {
+    const level = Level.createNew();
+    setBounds(level, CAMERA_FOLLOW_BOUNDS.width, CAMERA_FOLLOW_BOUNDS.height, true);
+    addSurface(
+        addEntity(level, level.world, 'Upper slope', { position: { x: -500, y: -250 }, rotation: 10 }),
+        rectangle(1300, 20),
+    );
+    addSurface(
+        addEntity(level, level.world, 'Lower slope', { position: { x: 500, y: 250 }, rotation: 8 }),
+        rectangle(1300, 20),
+    );
+    const ball = addEntity(level, level.world, 'Ball', at(-1000, -450));
+    addBody(addSurface(ball, circle(30), { friction: 0.6 }));
+    level.camera.requireComponent(CameraComponent).set('follow', ball.id);
+
+    return level;
+}
+
 function point(x: number, y: number): Point {
     return { x, y };
 }
 
-// The determinism test's levels: stage 13's seven and stage 14's three with joints. Stage 15 adds the camera.
+// The determinism test's levels: stage 13's seven, stage 14's three with joints and stage 15's camera.
 export const DETERMINISM_LEVELS: readonly DeterminismLevel[] = [
     { name: 'crate-pyramid', build: cratePyramid },
     { name: 'merged-car', build: mergedCar },
@@ -268,4 +293,5 @@ export const DETERMINISM_LEVELS: readonly DeterminismLevel[] = [
     { name: 'rope-bridge', build: ropeBridge },
     { name: 'springs', build: springs },
     { name: 'hinged-car', build: hingedCar },
+    { name: 'camera-follow', build: cameraFollow },
 ];

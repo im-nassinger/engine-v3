@@ -1,0 +1,205 @@
+{
+    "format": "engine-v3-level",
+    "formatVersion": 1,
+    "physicsVersion": 1,
+    "name": "camera-follow",
+    "editor": {
+        "gridSize": 50,
+        "foldedRows": []
+    },
+    "world": {
+        "id": 1,
+        "hidden": false,
+        "locked": false,
+        "components": {
+            "NameComponent": {
+                "name": "World"
+            },
+            "TransformComponent": {
+                "position": {
+                    "x": 0,
+                    "y": 0
+                },
+                "rotation": 0,
+                "scale": {
+                    "x": 1,
+                    "y": 1
+                },
+                "skew": 0
+            },
+            "ShapeComponent": {
+                "geometry": {
+                    "kind": "rectangle",
+                    "width": 2400,
+                    "height": 1400
+                }
+            },
+            "StyleComponent": {
+                "fill": {
+                    "kind": "solid",
+                    "colour": "#BFE3F5FF"
+                },
+                "outline_colour": "#1F3552FF",
+                "outline_width": 0,
+                "opacity": 1
+            },
+            "PhysicsWorldComponent": {
+                "gravity": {
+                    "x": 0,
+                    "y": 9.8
+                },
+                "walls": true
+            }
+        },
+        "children": [
+            {
+                "id": 2,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Camera"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "CameraComponent": {
+                        "width": 1920,
+                        "height": 1080,
+                        "follow": {
+                            "entity": 5
+                        },
+                        "smoothing": 0.3,
+                        "mode": "fixedSize"
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 3,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Upper slope"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -500,
+                            "y": -250
+                        },
+                        "rotation": 10,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 1300,
+                            "height": 20
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 4,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Lower slope"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 500,
+                            "y": 250
+                        },
+                        "rotation": 8,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 1300,
+                            "height": 20
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 5,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Ball"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -1000,
+                            "y": -450
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "circle",
+                            "radius": 30
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.6,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            }
+        ]
+    }
+}
