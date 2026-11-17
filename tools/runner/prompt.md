@@ -9,6 +9,8 @@ Your job: do the next step, commit it, and stop.
 4. Run `npm run check` and fix things until it passes. Then commit, with the **Runner:** line in `docs/progress.md` updated in the same commit. Don't stop before the step is committed.
 5. The **Runner:** line always starts `**Runner:** stage N, step S of T`, where S is the step you just finished; the runner works out v1's % from it. After a stage's last step, that is `stage N, step T of T`, never `stage N is done`.
 
+When you have just committed stage 18's last step, so every change in `docs/before-v2.md` is built, stop the runner so nothing of v2 starts: run `echo "Stage 18, Before v2, is done. The owner decides v2." > ~/.local/state/engine-v3-runner/paused` and `systemctl --user disable engine-v3-runner`, then report `finished`. Never run `systemctl stop` or `kill` on the runner: that ends your own session.
+
 Never use `sudo`. If something needs root, skip that part, write it in `docs/progress.md` under "Waiting for the owner", and put the command in NEEDS.
 
 End with exactly these lines:
