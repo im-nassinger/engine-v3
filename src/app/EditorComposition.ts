@@ -15,7 +15,7 @@ import {
     TabTitle,
 } from '../adapters/browser/index.ts';
 import { PixiLevelView } from '../adapters/pixi/index.ts';
-import { ImportWorkerClient } from '../adapters/worker/index.ts';
+import { ImportWorkerClient, WorkerGameRunner } from '../adapters/worker/index.ts';
 import {
     BrowserPersistence,
     IndexedDbLevelStore,
@@ -28,6 +28,7 @@ import { createV1Registry } from '../core/components/index.ts';
 import { FormatUpgrader, LevelReader, LevelWriter, V1_LEVEL_LIMITS } from '../core/level-data/index.ts';
 import { EditorClipboard } from '../editor/clipboard/index.ts';
 import { READ_ONLY_REASON } from '../editor/history/index.ts';
+import type { GameRunner } from '../editor/play/index.ts';
 import {
     ClipboardEvents,
     CommandRunner,
@@ -52,6 +53,7 @@ import type { KeyboardPlatform } from '../editor/shortcuts/index.ts';
 import { EscapeChain, MousePosition, OpenWindowCount } from '../editor/tools/index.ts';
 import type { ToolController } from '../editor/tools/index.ts';
 
+import { createGameWorker } from './createGameWorker.ts';
 import { createImportWorker } from './createImportWorker.ts';
 import { createTools } from './createTools.ts';
 import { EditorDrawingSource } from './EditorDrawingSource.ts';
@@ -79,6 +81,7 @@ type EditorParts = {
     readonly pageSaving: PageSavingEvents;
     readonly tabTitle: TabTitle;
     readonly exporter: FileExporter;
+    readonly gameRunner: GameRunner;
 };
 
 // The composition root: the only code that knows both the editor's rules and the browser's details.
@@ -100,6 +103,7 @@ export class EditorComposition {
     private readonly pageSaving: PageSavingEvents;
     private readonly tabTitle: TabTitle;
     private readonly exporter: FileExporter;
+    private readonly gameRunner: GameRunner;
     private readonly keyboard: KeyboardInput;
     private readonly pointer: PointerInput;
     private readonly clipboardBridge: ClipboardBridge;
@@ -124,6 +128,7 @@ export class EditorComposition {
         this.pageSaving = parts.pageSaving;
         this.tabTitle = parts.tabTitle;
         this.exporter = parts.exporter;
+        this.gameRunner = parts.gameRunner;
     }
 
     static async create() {
@@ -208,6 +213,7 @@ export class EditorComposition {
         const sessionOpen = opening.readOnly ? undefined : settings.sessionOpen;
         const pageSaving = new PageSavingEvents({ indicator: saveIndicator, saving, settings, sessionOpen }, window);
         const tabTitle = new TabTitle(session, saveIndicator, document);
+        const gameRunner = new WorkerGameRunner(createGameWorker);
 
         const composition = new EditorComposition({
             session,
@@ -228,6 +234,7 @@ export class EditorComposition {
             pageSaving,
             tabTitle,
             exporter,
+            gameRunner,
         });
         composition.start();
 
@@ -256,6 +263,8 @@ export class EditorComposition {
             this.fitCameraFrameOnceSized();
         }
         this.showOpeningNotes();
+        // Loading Box2D now, while the editor is used, makes the first Play fast.
+        this.gameRunner.prepare();
     }
 
     // The crash note, the storage notices or the read-only reason as status text, and the damaged level's notice.
