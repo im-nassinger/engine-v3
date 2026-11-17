@@ -217,7 +217,8 @@ describe('Inspector: the colour field', () => {
         styleOf(crates[0] as Entity).set('outlineColour', '#000000FF');
 
         await expect.poll(() => codeBox('outlineColour').placeholder).toBe('Mixed');
-        expect(codeBox('outlineColour').value).toBe('');
+        // On a loaded machine the placeholder can show a render before the old value is cleared.
+        await expect.poll(() => codeBox('outlineColour').value).toBe('');
     });
 });
 

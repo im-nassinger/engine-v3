@@ -13,8 +13,6 @@ type Inspect = (what: string, part: Locator) => Promise<boolean>;
 type CoverCase = {
     name: string;
     run: (page: Page, inspect: Inspect) => Promise<void>;
-    // Found covered in step 14 and marked fixme until step 15's stacking order fixes it.
-    isCoveredUntilStep15?: boolean;
 };
 
 // The same five as layout.spec.ts.
@@ -189,7 +187,6 @@ async function inspectMenuButton(page: Page, inspect: Inspect, within: Locator, 
 const CASES: CoverCase[] = [
     {
         name: "the top bar's menus and the save state's explanation",
-        isCoveredUntilStep15: true,
         run: async (page, inspect) => {
             const topBar = region(page, 'Top bar');
             for (const name of ['Main menu', 'Help', 'View menu', 'Zoom']) {
@@ -202,7 +199,6 @@ const CASES: CoverCase[] = [
     },
     {
         name: "the main menu's submenus",
-        isCoveredUntilStep15: true,
         run: async (page, inspect) => {
             const topBar = region(page, 'Top bar');
             await topBar.getByRole('button', { name: 'Main menu' }).click();
@@ -226,15 +222,12 @@ const CASES: CoverCase[] = [
     },
     {
         name: "the tool buttons' tooltips",
-        isCoveredUntilStep15: true,
         run: async (page, inspect) => {
             await inspectTooltips(page, inspect, region(page, 'Tools').locator('.tooltip'), 'a tool button');
         },
     },
     ...['Shape', 'Joint'].map((tool) => ({
         name: `the ${tool} tool's options strip, its tooltips and its hint`,
-        // At 1280×720 at 200% the Entities panel covers the Joint tool's strip.
-        isCoveredUntilStep15: tool === 'Joint',
         run: async (page: Page, inspect: Inspect) => {
             const strip = page.getByRole('toolbar', { name: 'Tool options' });
             await pickTool(page, tool);
@@ -245,7 +238,6 @@ const CASES: CoverCase[] = [
     })),
     {
         name: "the Inspector's menus and dropdowns",
-        isCoveredUntilStep15: true,
         run: async (page, inspect) => {
             await drawCrate(page);
             await addComponent(page, 'BodyComponent');
@@ -264,7 +256,6 @@ const CASES: CoverCase[] = [
     },
     {
         name: "the Inspector's tooltips",
-        isCoveredUntilStep15: true,
         run: async (page, inspect) => {
             await drawCrate(page);
             await addComponent(page, 'BodyComponent');
@@ -305,7 +296,6 @@ const CASES: CoverCase[] = [
     },
     {
         name: "the Camera's Follow dropdown and its pick button's tooltip",
-        isCoveredUntilStep15: true,
         run: async (page, inspect) => {
             await selectRow(page, 'Camera');
             const camera = card(page, 'CameraComponent');
@@ -355,7 +345,6 @@ test.use({ actionTimeout: ACTION_TIMEOUT_MS });
 
 for (const coverCase of CASES) {
     test(`nothing covers ${coverCase.name}`, async ({ browser }, testInfo) => {
-        test.fixme(coverCase.isCoveredUntilStep15 === true, 'Covered until step 15: docs/steps/stage-18.md, step 14');
         test.setTimeout(CASE_TIMEOUT_MS);
         const problems: string[] = [];
 

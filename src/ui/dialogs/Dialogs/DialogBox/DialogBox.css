@@ -1,7 +1,7 @@
 .dialog-box {
     position: fixed;
     inset: 0;
-    z-index: 40;
+    z-index: var(--stack-dialog);
     display: grid;
     place-items: center;
     background: var(--scrim);

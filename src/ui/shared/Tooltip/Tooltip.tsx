@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
+import type { ReactNode, RefObject } from 'react';
+import { rectOf, usePopupPlacement } from '../popup-placement/index.ts';
 import './Tooltip.css';
 
 // A tooltip that appeared at once would flash over every button the mouse crosses on its way somewhere.
 const SHOW_DELAY_MS = 500;
+const BUBBLE_GAP_PX = 4;
 
 export type TooltipProps = {
     label: string;
@@ -15,6 +17,7 @@ export type TooltipProps = {
 
 export function Tooltip({ label, shortcut, isLong = false, children }: TooltipProps) {
     const [isShown, setIsShown] = useState(false);
+    const rootRef = useRef<HTMLSpanElement>(null);
     const showTimer = useRef<number | undefined>(undefined);
 
     const cancelShowing = () => {
@@ -37,6 +40,7 @@ export function Tooltip({ label, shortcut, isLong = false, children }: TooltipPr
     return (
         <span
             className="tooltip"
+            ref={rootRef}
             data-long={isLong}
             onPointerEnter={showSoon}
             onPointerLeave={hide}
@@ -44,7 +48,7 @@ export function Tooltip({ label, shortcut, isLong = false, children }: TooltipPr
             onBlur={hide}
         >
             {children}
-            {isShown && <TooltipBubble label={label} shortcut={shortcut} />}
+            {isShown && <TooltipBubble label={label} shortcut={shortcut} isLong={isLong} owner={rootRef} />}
         </span>
     );
 }
@@ -52,11 +56,19 @@ export function Tooltip({ label, shortcut, isLong = false, children }: TooltipPr
 type TooltipBubbleProps = {
     label: string;
     shortcut: string | undefined;
+    isLong: boolean;
+    owner: RefObject<HTMLSpanElement | null>;
 };
 
-function TooltipBubble({ label, shortcut }: TooltipBubbleProps) {
+// Under its owner, or over it when only that side has room, and slid along to stay inside the window.
+function TooltipBubble({ label, shortcut, isLong, owner }: TooltipBubbleProps) {
+    const bubbleRef = useRef<HTMLSpanElement>(null);
+    const readOwner = () => rectOf(owner);
+    const align = isLong ? 'start' : 'centre';
+    usePopupPlacement(bubbleRef, readOwner, { side: 'below', align, gapPx: BUBBLE_GAP_PX });
+
     return (
-        <span className="bubble" role="tooltip">
+        <span className="bubble" ref={bubbleRef} role="tooltip">
             {label}
             {shortcut && <span className="shortcut">{shortcut}</span>}
         </span>

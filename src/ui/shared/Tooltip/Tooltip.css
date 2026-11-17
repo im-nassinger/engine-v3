@@ -2,11 +2,10 @@
     position: relative;
     display: inline-flex;
 
+    /* Placed by usePopupPlacement, outside every panel's edges. */
     > .bubble {
-        position: absolute;
-        top: calc(100% + var(--space-4));
-        left: 50%;
-        z-index: 30;
+        position: fixed;
+        z-index: var(--stack-tooltip);
         display: flex;
         gap: var(--space-8);
         padding: var(--space-4) var(--space-8);
@@ -17,7 +16,6 @@
         font-size: var(--text-small);
         white-space: nowrap;
         pointer-events: none;
-        transform: translateX(-50%);
 
         > .shortcut {
             color: var(--muted);
@@ -25,9 +23,7 @@
     }
 
     &[data-long='true'] > .bubble {
-        left: 0;
         width: 240px;
         white-space: normal;
-        transform: none;
     }
 }

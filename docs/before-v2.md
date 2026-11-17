@@ -16,7 +16,7 @@ Changes the owner asked for that must be built **after v1's 18 stages and before
 | 6 | **+ zooms in without Shift**, as - zooms out | owner, 2026-11-17 | **Built** on 2026-11-17, step 3 |
 | 7 | **Shift+T plays and stops** | owner, 2026-11-17 | **Built** on 2026-11-17, step 6 |
 | 8 | **W, A, S and D resize the selection and the Shape tool's preview**, changing the shape's values | owner, 2026-11-17 | **Built** on 2026-11-17, steps 12 and 13, with Claude's picks for the owner to change |
-| 9 | **No part of the editor is covered by another**: find every case and fix it | owner, 2026-11-17 | Settled; steps 14 and 15 |
+| 9 | **No part of the editor is covered by another**: find every case and fix it | owner, 2026-11-17 | **Built** on 2026-11-17, steps 14 and 15 |
 | 10 | **"Let connected objects collide" has no description** | owner, 2026-11-17 | **Built** on 2026-11-17, step 2 |
 
 ## 1. Resizing changes the scale
@@ -164,6 +164,8 @@ To build:
 - **One stacking order for the whole editor** (*proposal*, Claude's pick, for the owner to change): the layers, from the level view up to tooltips, are named once in the shared CSS, and every component uses those names instead of its own numbers. *Why: a number picked in one component is how one part ends up under another.*
 
 To update when planned: `architecture/ui.md` (the stacking order), the layout checks in `architecture/tooling.md` or wherever they are described, and each component's CSS that sets its own stacking.
+
+**Built** (2026-11-17, steps 14 and 15): the cover check, `tests/e2e/layout/covered.spec.ts`, found 8 cases and now passes in three browsers at the five sizes, with no `fixme` left. One stacking order of four tokens, `--stack-floating`, `--stack-popup`, `--stack-tooltip` and `--stack-dialog`, is named in `theme.css`, and the panels set none, so the Tools panel no longer covers the main menu. Menus, submenus, tooltips and the save state's explanation are placed in the window rather than in their panel: each opens on its own side when it has room, on the other when only that has, and slides to stay inside the window. The options strip floats over the panels, so at 200% it reaches over the Entities panel instead of going under it. Written in [ui.md](architecture/ui.md#styles), [tokens.md](design/tokens.md#spacing-corners-shadows) and [performance.md](architecture/performance.md).
 
 ## 10. "Let connected objects collide" has no description
 

@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 18, step 14 of 16: a Playwright check finds 8 places where a part of the editor is covered, listed in [step 14's cases](steps/stage-18.md#step-14s-cases) and marked `fixme`. Next is step 15, one stacking order that fixes them all. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 18, step 15 of 16: one stacking order of four `--stack-*` tokens, and menus, submenus and tooltips placed in the window, fix every covered part; the cover check passes in three browsers with no `fixme`. Next is step 16, the stage's docs. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -38,7 +38,7 @@
 | Stage 15, the camera | Done on 2026-11-16. See below |
 | Stage 16, test play | Done on 2026-11-17. See below |
 | Stage 17, the speed pass and the browser checks | Done on 2026-11-17. See below |
-| Stage 18, Before v2 | Planned on 2026-11-17 in [16 steps](steps/stage-18.md); steps 1 to 14 done |
+| Stage 18, Before v2 | Planned on 2026-11-17 in [16 steps](steps/stage-18.md); steps 1 to 15 done |
 | Code | Stages 0 to 17 done. Stage 18, Before v2, is being built |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.

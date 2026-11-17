@@ -37,10 +37,10 @@ export function EditorShell() {
                     <PlayBar />
                 </PanelErrorBoundary>
             )}
-            <PanelPlace area="top-bar" label="Top bar" letsMenusOut>
+            <PanelPlace area="top-bar" label="Top bar">
                 <TopBar />
             </PanelPlace>
-            <PanelPlace area="toolbar" label="Tools" letsMenusOut>
+            <PanelPlace area="toolbar" label="Tools">
                 <Toolbar />
             </PanelPlace>
             {!isInspectorHidden && (
@@ -52,7 +52,7 @@ export function EditorShell() {
             <PanelPlace area="entities" label="Entities">
                 <EntitiesPanel />
             </PanelPlace>
-            <PanelPlace area="status-bar" label="Status bar" letsMenusOut>
+            <PanelPlace area="status-bar" label="Status bar">
                 <StatusBar />
             </PanelPlace>
             <PanelErrorBoundary>

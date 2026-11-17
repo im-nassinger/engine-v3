@@ -7,14 +7,14 @@ import './MenuSubmenuRow.css';
 export type MenuSubmenuRowProps = {
     submenu: MenuSubmenu;
     isOpen: boolean;
-    onShow: ((submenu: MenuSubmenu, topPx: number) => void) | undefined;
+    onShow: ((submenu: MenuSubmenu, row: HTMLElement) => void) | undefined;
 };
 
-// The submenu opens to the right of its entry, level with it (docs/design/controls.md).
+// The submenu opens to the right of its entry, level with it (docs/design/controls.md), or to its left
+// or higher up when the window has no room there.
 export function MenuSubmenuRow({ submenu, isOpen, onShow }: MenuSubmenuRowProps) {
     const show = (event: PointerEvent<HTMLButtonElement>) => {
-        const rowTopPx = event.currentTarget.offsetTop;
-        onShow?.(submenu, rowTopPx);
+        onShow?.(submenu, event.currentTarget);
     };
 
     return (

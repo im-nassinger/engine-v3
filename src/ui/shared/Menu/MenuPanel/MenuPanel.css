@@ -2,6 +2,8 @@
     display: flex;
     flex-direction: column;
     min-width: 200px;
+    max-height: var(--popup-room, none);
+    overflow-y: auto;
     padding: var(--space-4);
     border: 1px solid var(--line);
     border-radius: var(--radius);

@@ -9,7 +9,7 @@ export type MenuPanelProps = {
     onChoose: () => void;
     header?: ReactNode;
     openSubmenuId?: string;
-    onShowSubmenu?: (submenu: MenuSubmenu, topPx: number) => void;
+    onShowSubmenu?: (submenu: MenuSubmenu, row: HTMLElement) => void;
     onHideSubmenu?: () => void;
 };
 
@@ -37,7 +37,7 @@ type MenuPanelEntryProps = {
     entry: MenuEntry;
     onChoose: () => void;
     isSubmenuOpen: boolean;
-    onShowSubmenu: ((submenu: MenuSubmenu, topPx: number) => void) | undefined;
+    onShowSubmenu: ((submenu: MenuSubmenu, row: HTMLElement) => void) | undefined;
     onHideSubmenu: (() => void) | undefined;
 };
 

@@ -191,6 +191,7 @@ Words for how the editor looks, used while the design is settled (owner, 2026-11
 | Mockup | A static page that shows how a screen of the editor will look, with made-up content and nothing working behind it. |
 | Design system | The written rules of the editor's look: its design tokens, how each control looks in each state, its icons, and the colours the level view draws with. |
 | Design token | One named value of the design system, such as the panel background colour or the space between two rows. In the code it is a CSS custom property in `theme.css`. |
+| Stacking order | Which part of the editor shows over which: the level view, then the panels, then the floating parts, popups, tooltips and dialogs, each named once as a design token (stage 18, standing yes, 2026-11-17). |
 | Accent colour | The one colour that marks what is active or selected: the active tool, a selected row, the selection outline in the level view, the focused field. |
 
 ## Components

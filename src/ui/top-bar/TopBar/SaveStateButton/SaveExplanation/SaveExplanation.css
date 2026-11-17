@@ -1,8 +1,7 @@
+/* Placed by usePopupPlacement, outside every panel's edges. */
 .save-explanation {
-    position: absolute;
-    top: calc(100% + var(--space-4));
-    left: 0;
-    z-index: 20;
+    position: fixed;
+    z-index: var(--stack-popup);
     width: 280px;
     padding: var(--space-8);
     border: 1px solid var(--line);

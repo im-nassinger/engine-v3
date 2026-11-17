@@ -1,7 +1,10 @@
 .back-to-level {
     position: absolute;
-    left: 50%;
+    right: 0;
     bottom: var(--space-16);
-    transform: translateX(-50%);
+    left: 0;
+    z-index: var(--stack-floating);
+    width: fit-content;
+    margin-inline: auto;
     pointer-events: auto;
 }
