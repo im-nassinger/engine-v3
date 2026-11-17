@@ -54,7 +54,7 @@ for (const testLevel of determinismLevels) {
 | The same level twice in one process, and after a Stop and Play | No state leaks between runs |
 
 - **When it fails**, the test names the first tick that differs and the first body whose numbers differ, which usually points at the cause.
-- The tech notes' phone check (x86 against ARM in a phone browser) is a page in `tests/determinism/page/` that runs the same levels and shows the hashes; it is run by hand before a release.
+- The tech notes' phone check (x86 against ARM in a phone browser) is a page in `tests/determinism/page/` that runs the same levels and shows the hashes. **A Playwright test runs it** at phone sizes and in Chromium on CI's ARM runner, since no check is done by hand (owner, 2026-11-14; standing yes, 2026-11-17, see [performance.md](performance.md#stage-17s-choices)).
 
 ## Browser tests
 

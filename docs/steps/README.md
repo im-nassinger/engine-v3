@@ -21,3 +21,4 @@ Each stage of the [plan](../plan.md) is written as small steps when the stage st
 | [stage-14.md](stage-14.md) | 14, joints |
 | [stage-15.md](stage-15.md) | 15, the camera |
 | [stage-16.md](stage-16.md) | 16, test play |
+| [stage-17.md](stage-17.md) | 17, the speed pass and the browser checks |

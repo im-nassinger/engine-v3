@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 16, step 12 of 12: stage 16, test play, is written up in the docs, with its test counts and what it leaves for later. Next is stage 17, whose steps are to be written. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 17, step 1 of 9: stage 17's steps are written, with their choices in [performance.md](architecture/performance.md#stage-17s-choices). Next is step 2, the Entities panel's speed tests. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -37,7 +37,7 @@
 | Stage 14, joints | Done on 2026-11-16. See below |
 | Stage 15, the camera | Done on 2026-11-16. See below |
 | Stage 16, test play | Done on 2026-11-17. See below |
-| Code | Stages 0 to 16 done. Stage 17 is next; its steps are not written yet |
+| Code | Stages 0 to 16 done. Stage 17 is going: its [steps](steps/stage-17.md) are written |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
