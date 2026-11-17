@@ -63,14 +63,12 @@
   /* The toolbar strip */
   .tools { display: flex; flex-direction: column; align-items: center; padding: 8px 0; gap: 4px; z-index: 2; }
   .tools.h { flex-direction: row; padding: 6px; display: inline-flex; position: static; border-radius: var(--r2); }
+  .tools.row { flex-direction: row; justify-content: center; padding: 0 7px; }
+  .isl .tool { width: 30px; height: 30px; }
   .tool { width: 32px; height: 32px; border-radius: var(--r); display: flex; align-items: center; justify-content: center; position: relative; color: var(--muted); }
   .tool.hover { background: var(--hover); color: var(--text); }
   .tool.on.fill { background: var(--accent); color: var(--on); }
   .tool.on.soft { background: var(--soft); color: var(--ink); }
-  .tool.on.glow { background: var(--soft); color: var(--ink); box-shadow: 0 0 18px -3px var(--accent); }
-  .tool.on.grad { background: var(--grad); color: var(--on); }
-  .tool.on.dot { color: var(--ink); }
-  .tool.on.dot::after { content: ""; position: absolute; bottom: 2px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--accent); }
   .tip-box { white-space: nowrap; background: var(--tooltip); color: var(--tooltip-text); border-radius: var(--r); padding: 5px 9px; font-size: 11px; display: inline-flex; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.4); }
   .tip-box .k { color: #8a93a3; }
 
@@ -91,7 +89,8 @@
   .card.space { padding-bottom: 12px; }
   .card.tile { background: var(--raised); border-radius: var(--r2); margin: 0 8px 8px; padding: 2px 0 6px; }
   .card.tile .f, .card.tile .chead { padding-left: 10px; padding-right: 10px; }
-  .card.chip { padding-bottom: 12px; }
+  .card.inset { background: rgba(0, 0, 0, .2); border-radius: var(--r2); margin: 0 8px 8px; padding: 2px 0 6px; }
+  .card.inset .f, .card.inset .chead { padding-left: 10px; padding-right: 10px; }
   .card.island { background: var(--panel); border-radius: var(--rl); box-shadow: var(--shadow); margin-top: 8px; padding: 4px 0 8px; -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
   .kbox .card.island { margin: 8px 12px 0; box-shadow: 0 4px 16px rgba(0,0,0,.35); background: var(--app); }
   .insp.bare { overflow: visible; }
@@ -100,7 +99,6 @@
   .chead .t { flex: 1; }
   .chead svg.i { width: 14px; height: 14px; color: var(--faint); }
   .card.space .chead .t { font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
-  .chead .dotc { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
   /* Fields */
   .f { height: var(--rowh); display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); }
@@ -140,15 +138,14 @@
   .lrow .name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .lrow .eye { color: var(--faint); display: flex; }
   .lrow .fold { width: 14px; height: 14px; color: var(--muted); }
-  .rows.pill .lrow, .rows.solid .lrow { margin: 0 6px; border-radius: var(--r); }
+  .rows.pill .lrow, .rows.solid .lrow, .rows.grey .lrow { margin: 0 6px; border-radius: var(--r); }
   .lrow.hover { background: var(--hover); }
   .lrow.hover .eye { color: var(--muted); }
-  .rows.tint .lrow.sel, .rows.pill .lrow.sel { background: var(--soft); }
-  .rows.tint .sel .kind, .rows.pill .sel .kind { color: var(--ink); }
+  .rows.pill .lrow.sel { background: var(--soft); }
+  .rows.pill .sel .kind { color: var(--ink); }
+  .rows.grey .lrow.sel { background: rgba(255, 255, 255, .1); }
   .rows.solid .lrow.sel { background: var(--accent); color: var(--on); }
   .rows.solid .sel .kind, .rows.solid .sel .eye { color: var(--on); }
-  .rows.mark .lrow.sel { color: var(--ink); font-weight: 600; }
-  .rows.mark .sel .kind { color: var(--ink); }
 
   /* The status bar */
   .status { display: flex; align-items: center; gap: 20px; padding: 0 12px; color: var(--muted); font-size: 11px; z-index: 3; }
@@ -184,7 +181,6 @@
   .game { position: absolute; inset: 0; background: #000; }
   .playbar { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 2px; padding: 4px; background: var(--menu); border-radius: var(--r2); box-shadow: 0 6px 24px rgba(0,0,0,.45); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
   .playbar.static { position: static; transform: none; display: inline-flex; box-shadow: 0 6px 18px rgba(0,0,0,.3); margin: 0 16px 8px; }
-  .playbar.frame { border: 1.5px solid var(--pc); border-radius: var(--r); }
   .playbar.dot, .playbar.tint { border-radius: 999px; padding: 4px 6px; }
   .playbar.tint { background: color-mix(in srgb, var(--pc) 16%, var(--menu)); }
   .playbar .state { display: flex; align-items: center; gap: 7px; padding: 0 10px 0 8px; font-weight: 600; color: var(--pc); letter-spacing: .05em; font-size: 11px; }
@@ -197,7 +193,6 @@
   .note.box { background: var(--field); }
   .note.tint { background: rgba(229, 185, 49, .1); }
   .note.tint.tipn { background: rgba(90, 169, 240, .1); }
-  .note.plain { padding: 4px 0; }
   .note .fix { color: var(--ink); white-space: nowrap; }
 
   /* The parts sheet */
@@ -258,49 +253,35 @@ const CHEV = ic('down', 'class="i chev"');
 
 // Each choice that changes the look, with its variants. The number of a variant is its place in the list.
 const KINDS = [
-  ['layout', 'Layout', 'Where the panels sit. The panels\' places and sizes stay as the requirements say.', [['float', 'Full-height panels'], ['hug', 'Entities panel fits its rows']]],
-  ['head', 'Panel titles', '', [['title', 'Title'], ['caps', 'Small caps']]],
-  ['card', 'Inspector cards', 'How one component\'s card is told apart from the next.', [['space', 'Space only'], ['tile', 'Tiles'], ['chip', 'Colour dot'], ['island', 'Each card an island']]],
-  ['field', 'Fields', 'Normal, focused and refused. Ghost fields show their box only under the mouse.', [['filled', 'Filled'], ['ghost', 'Ghost'], ['pill', 'Pill']]],
-  ['slider', 'Sliders', '', [['thin', 'Thin track'], ['fill', 'Filled field']]],
-  ['check', 'Checkboxes', '', [['box', 'Box'], ['switch', 'Switch']]],
-  ['row', 'Selected row', 'Crate 2 is under the mouse, Rectangle 1 is selected.', [['tint', 'Tint'], ['pill', 'Pill'], ['solid', 'Solid'], ['mark', 'Coloured text']]],
-  ['tool', 'Active tool', 'The Shape tool is active, the mouse is on Joint.', [['fill', 'Filled'], ['soft', 'Soft'], ['glow', 'Glow'], ['grad', 'Gradient'], ['dot', 'Dot']]],
+  ['layout', 'Panel height', 'The panels\' places and widths stay as the requirements say.', [['float', 'Full height'], ['hug', 'Entities panel fits its rows']]],
+  ['toolsAt', 'Tools', 'Where the three tools sit.', [['left', 'Strip on the left'], ['top', 'In the top bar'], ['bottom', 'Island at the bottom']]],
+  ['head', 'Panel titles', '', [['caps', 'Small caps'], ['title', 'Title']]],
+  ['card', 'Inspector cards', 'How one component\'s card is told apart from the next.', [['tile', 'Tiles'], ['inset', 'Sunken tiles'], ['space', 'Space only'], ['island', 'Each card an island']]],
+  ['field', 'Fields', 'Under the mouse, focused, refused.', [['filled', 'Filled'], ['ghost', 'Box only under the mouse'], ['pill', 'Pill']]],
+  ['slider', 'Sliders', '', [['fill', 'Filled field'], ['thin', 'Thin track']]],
+  ['check', 'Checkboxes', '', [['switch', 'Switch'], ['box', 'Box']]],
+  ['row', 'Selected row', 'Crate 2 is under the mouse, Rectangle 1 is selected.', [['pill', 'Blue pill'], ['grey', 'Grey pill'], ['solid', 'Solid blue']]],
+  ['tool', 'Active tool', 'The Shape tool is active, the mouse is on Joint.', [['fill', 'Filled'], ['soft', 'Soft']]],
   ['btn', 'Buttons', '', [['rounded', 'Rounded'], ['pill', 'Pill']]],
   ['menu', 'Menus', 'Groups are split by a gap, not a line.', [['solid', 'Solid hover'], ['soft', 'Soft hover']]],
-  ['note', 'Editor messages', '', [['box', 'Box'], ['tint', 'Tinted'], ['plain', 'Plain']]],
-  ['handle', 'Selection handles', 'In the level view.', [['square', 'Square'], ['round', 'Round'], ['dot', 'Filled dot']]],
+  ['note', 'Editor messages', '', [['tint', 'Tinted'], ['box', 'Box']]],
+  ['handle', 'Selection handles', 'In the level view.', [['round', 'Round'], ['square', 'Square']]],
   ['play', 'Play bar', 'Running, then paused.', [['dot', 'Pill with a dot'], ['tint', 'Tinted pill']]]
 ];
 
 // The directions. Each is a set of tokens and one variant of each kind.
-const BASE = { layout: 'float', head: 'caps', card: 'tile', field: 'filled', slider: 'fill', check: 'switch', row: 'pill', tool: 'fill', btn: 'rounded', menu: 'solid', note: 'tint', handle: 'round', play: 'dot' };
+const BASE = { layout: 'float', toolsAt: 'left', head: 'caps', card: 'tile', field: 'filled', slider: 'fill', check: 'switch', row: 'pill', tool: 'fill', btn: 'rounded', menu: 'solid', note: 'tint', handle: 'round', play: 'dot' };
 const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
-  accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: '0 10px 40px rgba(0,0,0,.35)' };
+  accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, m: 10, gap: 10, blur: 0, shadow: '0 10px 40px rgba(0,0,0,.35)' };
 const dir = (id, name, desc, t, s) => ({ id, name, desc, t: Object.assign({}, SLATE, t), s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'Islands', 'The one you picked, with Play moved to the start of the right island. The level fills the window and the panels float over it with soft shadows. Slate with a bright blue, cards as tiles.', {}, {}),
-  dir('2', 'Midnight', 'Islands in deep navy with an indigo accent. Cards split by space alone, the active tool soft instead of filled.',
-    { panel: 'rgba(17,21,36,.96)', app: '#0a0c16', text: '#e6e9f5', muted: '#8a91ad', faint: '#525a78', accent: '#7c8cff', soft: 'rgba(124,140,255,.2)', ink: '#aab4ff' },
-    { card: 'space', tool: 'soft', menu: 'soft' }),
-  dir('3', 'Graphite', 'Neutral grey islands with no blue tint, and a system blue. Panel titles as plain titles, a little like macOS.',
-    { panel: 'rgba(30,30,32,.96)', app: '#111112', text: '#ececee', muted: '#8e8e93', faint: '#5a5a5f', accent: '#0a84ff', soft: 'rgba(10,132,255,.22)', ink: '#64b0ff' },
-    { head: 'title' }),
-  dir('4', 'Mint', 'Slate islands with a teal accent and a colour dot on each card.',
-    { panel: 'rgba(20,24,27,.96)', accent: '#2dd4bf', soft: 'rgba(45,212,191,.16)', on: '#04201c', ink: '#5eead4' },
-    { card: 'chip', tool: 'soft' }),
-  dir('5', 'Soft', 'Rounder and roomier: 22 px islands, taller rows, pill fields and buttons, cards split by space.',
-    { panel: 'rgba(30,32,38,.96)', accent: '#6c8cff', soft: 'rgba(108,140,255,.2)', ink: '#a5b8ff', r: 10, r2: 14, rl: 22, rowh: 32, inset: 18 },
-    { card: 'space', field: 'pill', btn: 'pill', play: 'tint' }),
-  dir('6', 'Compact', 'Tighter: smaller corners and rows, fields with no box until the mouse is on them, a dot under the active tool.',
-    { r: 6, r2: 8, rl: 12, rowh: 26, inset: 12 },
-    { card: 'space', field: 'ghost', slider: 'thin', check: 'box', tool: 'dot', menu: 'soft' }),
-  dir('7', 'Frosted', 'The same islands in frosted glass: the level shows blurred through the panels.',
-    { panel: 'rgba(22,25,32,.72)', menu: 'rgba(26,29,37,.88)', blur: 20, shadow: '0 12px 40px rgba(0,0,0,.28)' }, {}),
-  dir('8', 'Floating cards', 'Each Inspector card is its own island, so the level shows between them. Entities panel fits its rows.',
-    {}, { card: 'island', layout: 'hug' }),
-  dir('9', 'Warm', 'Warm charcoal islands with orange.',
-    { panel: 'rgba(30,27,24,.96)', app: '#12100e', text: '#efe9e2', muted: '#a0958a', faint: '#625a52', accent: '#ff8a3d', soft: 'rgba(255,138,61,.18)', ink: '#ffb07a' }, {})
+  dir('1', 'Islands', 'The one you picked, with Play at the start of the right island. Every other variation keeps its colours and changes one idea.', {}, {}),
+  dir('2', 'Tools in the top bar', 'The three tools join the left island of the top bar, so the left strip is gone and the Inspector moves to the window\'s edge. Two fewer things floating on the left.', {}, { toolsAt: 'top' }),
+  dir('3', 'Tools at the bottom', 'The three tools sit in their own island at the bottom middle of the level view, above the status bar, as in many drawing apps. The Inspector moves to the window\'s edge.', {}, { toolsAt: 'bottom' }),
+  dir('4', 'Roomy', 'More air around and inside the islands: 16 px from the window, 12 px between islands, 20 px corners, more padding.', { m: 16, gap: 12, rl: 20, r2: 14, inset: 16 }, {}),
+  dir('5', 'Sunken cards', 'The islands are a step lighter and the Inspector\'s cards sit in them as darker, sunken tiles.', { panel: 'rgba(33,37,45,.97)', field: 'rgba(255,255,255,.06)', hover: 'rgba(255,255,255,.07)' }, { card: 'inset' }),
+  dir('6', 'Short panels', 'The Entities panel is only as tall as its rows, so more of the level shows on the right.', {}, { layout: 'hug' }),
+  dir('7', 'Calmer blue', 'Blue only for Play, the selection in the level view and focus. The selected row and the active tool are a light grey instead.', {}, { row: 'grey', tool: 'soft', menu: 'soft' })
 ];
 
 const FONTS = [
@@ -312,7 +293,7 @@ const FONTS = [
 const VIEWS = [['shape', 'A selected shape'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
 
 let state = { dir: '1', view: 'shape', font: 'mono', over: {} };
-try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands') || '{}')); } catch (e) {}
+try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-2') || '{}')); } catch (e) {}
 let S, T;
 
 function tokensCss(t) {
@@ -329,8 +310,14 @@ const pos = ([x, y, w, h]) => `left:${x}px;top:${y}px;width:${w}px;${h == null ?
 // Where each part sits, in window pixels, for each layout. The sizes are the requirement's.
 const W = 1440, H = 900;
 function geo(layout) {
-  const entsH = layout === 'hug' ? 17 * T.rowh + 56 : H - 74;
-  return { view: [0, 0, W, H], top: [10, 10, W - 20, 44], tools: [10, 64, 48, null], insp: [68, 64, 300, H - 74], ents: [W - 270, 64, 260, entsH], status: [378, H - 38, W - 378 - 280, 28], strip: [68, 64], menu: [10, 60] };
+  const m = T.m, gp = T.gap, y = m + 44 + gp, statusH = 28, left = S.toolsAt === 'left';
+  const ix = left ? m + 48 + gp : m;
+  const insp = [ix, y, 300, H - m - y];
+  const ents = [W - m - 260, y, 260, layout === 'hug' ? 17 * T.rowh + 56 : H - m - y];
+  const sx = ix + 300 + gp, sw = W - m - 260 - gp - sx;
+  const status = [sx, H - m - statusH, sw, statusH];
+  const tools = left ? [m, y, 48, null] : S.toolsAt === 'bottom' ? [sx + sw / 2 - 64, status[1] - gp - 46, 128, 46] : null;
+  return { view: [0, 0, W, H], top: [m, m, W - 2 * m, 44], tools, insp, ents, status, strip: [ix, y], menu: [m, m + 50] };
 }
 
 // The sample level, in level pixels. The origin is the middle of the level, y points down.
@@ -409,7 +396,7 @@ const ROWS = [
   [2, 'circle', 'Wheel 1'], [2, 'polygon', 'Cabin'], [2, 'rect', 'Body'], [1, 'polygon', 'Ramp'], [1, 'rect', 'Ground']
 ];
 function rowsHtml(rows, selected, hover) {
-  const indent = S.row === 'pill' || S.row === 'solid' ? 2 : 8;
+  const indent = 2;
   return `<div class="rows ${S.row}">` + rows.map(([d, icon, name, fold]) => {
     const st = name === selected ? ' sel' : name === hover ? ' hover' : '';
     const arrow = fold ? ic(fold === 'open' ? 'down' : 'right', 'class="i fold"') : '<span style="width:14px"></span>';
@@ -434,8 +421,7 @@ const F = {
   colour: (l, hex) => `<div class="f"><label>${l}</label><div class="vals"><div class="${fc()}"><span class="swc" style="background:${hex}"></span>${hex.toUpperCase()}</div></div></div>`,
   check: (l, on) => `<div class="f"><label>${l}</label><div class="vals">${S.check === 'switch' ? `<span class="tg${on ? ' on' : ''}"></span>` : `<span class="cb${on ? ' on' : ''}">${on ? ic('check') : ''}</span>`}</div></div>`
 };
-const CHIP = { TransformComponent: '#8fb5ff', ShapeComponent: '#7ee2b8', StyleComponent: '#f7a8cf', BodyComponent: '#f6d06b', SurfaceComponent: '#c4b5fd', PhysicsWorldComponent: '#7dd3fc' };
-const card = (title, body) => `<div class="card ${S.card}"><div class="chead">${S.card === 'chip' ? `<span class="dotc" style="background:${CHIP[title]}"></span>` : ic('down')}<span class="t">${title}</span>${ic('dots')}</div>${body}</div>`;
+const card = (title, body) => `<div class="card ${S.card}"><div class="chead">${ic('down')}<span class="t">${title}</span>${ic('dots')}</div>${body}</div>`;
 
 function inspector() {
   const bare = S.card === 'island';
@@ -453,7 +439,7 @@ function inspector() {
 function topbar(o = {}) {
   const sm = 'style="width:13px;height:13px"';
   const left = `<span class="ib${o.menuOpen ? ' on' : ''}">${ic('menu')}</span><span class="levelname">Car test</span><span class="savestate">${ic('check', sm)}Saved</span>` +
-    `<span class="sep"></span><span class="ib">${ic('undo')}</span><span class="ib dim">${ic('redo')}</span><span class="ib on">${ic('magnet')}</span>`;
+    `<span class="sep"></span><span class="ib">${ic('undo')}</span><span class="ib dim">${ic('redo')}</span><span class="ib on">${ic('magnet')}</span>` + (S.toolsAt === 'top' ? `<span class="sep"></span>${TOOLS.map((t) => toolHtml(t, o.tool)).join('')}` : '');
   const play = `<span class="play ${S.btn}">${ic('play')}Play</span>`;
   const right = `<span class="ib">View${CHEV}</span><span class="ib num">40%${CHEV}</span><span class="ib">${ic('help')}</span>`;
   const g = geo(S.layout).top;
@@ -461,7 +447,7 @@ function topbar(o = {}) {
 }
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
-const toolstrip = (active) => `<div class="abs blk tools" style="${pos(geo(S.layout).tools)}">${TOOLS.map((t) => toolHtml(t, active)).join('')}</div>`;
+const toolstrip = (active) => { const g = geo(S.layout).tools; return g ? `<div class="abs blk tools${S.toolsAt === 'bottom' ? ' row' : ''}" style="${pos(g)}">${TOOLS.map((t) => toolHtml(t, active)).join('')}</div>` : ''; };
 function statusbar(hint, posText, sel) {
   const cls = 'blk';
   return `<div class="abs status ${cls}" style="${pos(geo(S.layout).status)}"><span class="hint">${hint}</span><span class="num">${posText}</span><span>${sel}</span>
@@ -470,11 +456,11 @@ function statusbar(hint, posText, sel) {
 function view(opts) {
   const g = geo(S.layout), v = g.view;
   const cx = (g.insp[0] + g.insp[2] + g.ents[0]) / 2 - v[0];
-  const cy = (v[1] === 0 ? (64 + H) / 2 : v[1] + v[3] / 2) - v[1];
+  const cy = (54 + H) / 2;
   return `<div class="abs viewbox" style="${pos(v)}">${scene(v[2], v[3], 0.38, cx, cy, Object.assign({ grid: true, cameraFrame: true, joints: true }, opts))}</div>`;
 }
 function editor(o) {
-  return view(o.scene || {}) + topbar(o.top) + toolstrip(o.tool || 'select') + entities(o.sel, o.hover) +
+  return view(o.scene || {}) + topbar(Object.assign({ tool: o.tool || 'select' }, o.top)) + toolstrip(o.tool || 'select') + entities(o.sel, o.hover) +
     (o.noInspector ? '' : inspector()) + (o.extra || '') +
     statusbar(o.hint || 'Select · drag a handle to resize, Shift keeps proportions', o.pos || 'x 20, y 340', o.sel || 'Nothing selected');
 }
@@ -516,12 +502,13 @@ function schematic(layout) {
   const g = geo(layout), k = 0.2, r = Math.max(2, T.rl * k);
   const box = (rect, bg, extra = '') => `<div style="position:absolute;left:${rect[0] * k}px;top:${rect[1] * k}px;width:${rect[2] * k}px;height:${(rect[3] ?? 160) * k}px;background:${bg};border-radius:${r}px;${extra}"></div>`;
   const sh = 'box-shadow:0 2px 6px rgba(0,0,0,.3)';
-  let s = box(g.view, BG) + box([10, 10, 520, 44], 'var(--panel)', sh) + box([1010, 10, 420, 44], 'var(--panel)', sh);
-  for (const p of ['tools', 'insp', 'ents', 'status']) s += box(g[p], 'var(--panel)', sh);
+  let s = box(g.view, BG) + box([T.m, T.m, S.toolsAt === 'top' ? 620 : 520, 44], 'var(--panel)', sh) + box([W - T.m - 420, T.m, 420, 44], 'var(--panel)', sh);
+  for (const p of ['tools', 'insp', 'ents', 'status']) if (g[p]) s += box(g[p], 'var(--panel)', sh);
   return `<div class="schem">${s}</div>`;
 }
 const PARTS = {
   layout: () => schematic(S.layout),
+  toolsAt: () => schematic(S.layout),
   head: () => `<div class="ph ${S.head}">Inspector</div>`,
   card: () => card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°')) + card('ShapeComponent', F.choice('Kind', 'Rectangle') + F.num('Width', '160', 'px')),
   field: () => F.num('Width', '160', 'px', { hov: true }) + F.num('Height', '80.25', 'px', { focus: true }) + F.num('Friction', 'abc', '', { err: true }) + `<div class="msg">Can't read this as a number</div>` + F.colour('Fill', '#4a90d9'),
@@ -585,7 +572,7 @@ function render() {
   const cls = ['ed', 'float', parts ? 'tall' : ''].join(' ');
   document.getElementById('frame').innerHTML = `<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
   document.getElementById('stage').classList.toggle('scroll', parts);
-  try { localStorage.setItem('engine-v3-islands', JSON.stringify(state)); } catch (e) {}
+  try { localStorage.setItem('engine-v3-islands-2', JSON.stringify(state)); } catch (e) {}
   fit();
 }
 function fit() {
