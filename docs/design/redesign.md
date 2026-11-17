@@ -13,7 +13,7 @@ The owner wants a new look for the editor before v2 starts (2026-11-17): **clean
 5. **Too many islands** was a complaint: two similar top islands (left and right) and a status bar island were too much. The bottom status bar island looked ugly.
 6. **A level card** at the top left, above the Inspector, as wide as it (300 px) and only as tall as its content, holds the main menu, the level's name, the save state and the zoom. The Inspector starts under it. The Entities panel starts at the top right.
 7. **No View button.** The View menu is the main menu's View submenu, written into [workspace.md](../requirements/editor/workspace.md), the glossary and [rejected.md](../rejected.md). The built editor still has the button until the redesign is built.
-8. **A minimap** at the bottom right, its own island 260 px wide, under the Entities panel: the level's bounds (the World's rectangle) with the part on screen outlined in blue. It is a new feature, not yet in the requirements, so [workspace.md](../requirements/editor/workspace.md) needs it with its version before it is built.
+8. **A minimap** at the bottom right, its own island 260 px wide with no padding or border, under the Entities panel: the whole level, with a blue rectangle showing what the level view shows. The mockup's level was widened past the window so the rectangle sits inside it. It is a new feature, not yet in the requirements, so [workspace.md](../requirements/editor/workspace.md) needs it with its version before it is built.
 
 ## The tokens of the pick
 

@@ -112,8 +112,8 @@
   .lc-over.top { top: 0; background: linear-gradient(rgba(16,19,24,.92), rgba(16,19,24,0)); padding-bottom: 18px; }
   .lc-over.bot { bottom: 0; background: linear-gradient(rgba(16,19,24,0), rgba(16,19,24,.92)); padding-top: 18px; }
   .lc-over .zoomg { background: rgba(16,19,24,.75); }
-  .minimap { position: absolute; z-index: 2; padding: 6px; }
-  .minimap svg { display: block; border-radius: 10px; }
+  .minimap { position: absolute; z-index: 2; overflow: hidden; }
+  .minimap svg { display: block; }
   .dock { position: absolute; transform: translateX(-50%); height: 46px; z-index: 3; }
   .onebar .hint { color: var(--muted); font-size: 11.5px; white-space: nowrap; }
   .barnums { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 11px; margin-right: 14px; }
@@ -360,21 +360,21 @@ const W = 1440, H = 900, M = 10, GP = 10;
 function geo() {
   const ex = W - M - 260;
   const left = [M, M, 300, H - 2 * M];
-  const mapW = 260, mapH = Math.round((mapW - 12) * MAP_AREA[3] / MAP_AREA[2]) + 12;
+  const mapW = 260, mapH = Math.round(mapW * MAP_AREA[3] / MAP_AREA[2]);
   const map = [W - M - mapW, H - M - mapH, mapW, mapH];
   const ents = [ex, M, 260, S.layout === 'hug' ? null : H - 2 * M - mapH - GP];
   const rx0 = M + 300 + GP, rx1 = ex - GP, cx = (rx0 + rx1) / 2;
   return { left, ents, map, rx0, rx1, cx };
 }
 
-// The level view's zoom and centre, in window pixels, and the part of the level it shows between the panels.
+// The level view's zoom and centre, in window pixels, and the part of the level the window shows.
 const VIEW_Z = 0.38, VIEW_CY = (54 + H) / 2;
 function visibleArea() {
   const g = geo(), cx = (g.rx0 + g.rx1) / 2;
-  return [(g.rx0 - cx) / VIEW_Z, (0 - VIEW_CY) / VIEW_Z, (g.rx1 - g.rx0) / VIEW_Z, H / VIEW_Z];
+  return [-cx / VIEW_Z, -VIEW_CY / VIEW_Z, W / VIEW_Z, H / VIEW_Z];
 }
-// The minimap shows the level's bounds (the World's rectangle) and outlines the part on screen, in level pixels: [x, y, w, h].
-const MAP_AREA = [-1400, -800, 2800, 1600];
+// The minimap shows the whole level and outlines the part the level view shows, in level pixels: [x, y, w, h].
+const MAP_AREA = [-4300, -2300, 8600, 3600];
 
 // The sample level, in level pixels. The origin is the middle of the level, y points down.
 const BG = '#cde3f2';
@@ -390,7 +390,21 @@ const LEVEL = [
   { id: 'cabin', t: 'poly', p: [[-380, 250], [-340, 190], [-230, 190], [-190, 250]], fill: '#e8807c', line: '#7a2522' },
   { id: 'wheel1', t: 'circle', cx: -370, cy: 338, r: 42, fill: '#3a3a3a', line: '#111111' },
   { id: 'wheel2', t: 'circle', cx: -190, cy: 338, r: 42, fill: '#3a3a3a', line: '#111111' },
-  { id: 'rect1', t: 'rect', x: -60, y: 300, w: 160, h: 80, fill: '#4a90d9', line: '#1f3552' }
+  { id: 'rect1', t: 'rect', x: -60, y: 300, w: 160, h: 80, fill: '#4a90d9', line: '#1f3552' },
+  // Off screen: the rest of the level, seen only in the minimap.
+  { id: 'groundL', t: 'rect', x: -4200, y: 380, w: 2150, h: 260, fill: '#6ba368', line: '#2f5130' },
+  { id: 'hillL', t: 'poly', p: [[-4200, 380], [-4200, -200], [-3500, 380]], fill: '#7db37a', line: '#2f5130' },
+  { id: 'ledgeL', t: 'rect', x: -3200, y: -1500, w: 700, h: 50, fill: '#8a6b4e', line: '#4a3626' },
+  { id: 'crateL', t: 'rect', x: -3000, y: -1600, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
+  { id: 'groundR', t: 'rect', x: 1950, y: 380, w: 2250, h: 260, fill: '#6ba368', line: '#2f5130' },
+  { id: 'rampR', t: 'poly', p: [[2600, 380], [3300, 380], [3300, 60]], fill: '#7db37a', line: '#2f5130' },
+  { id: 'towerR', t: 'rect', x: 3300, y: -400, w: 300, h: 780, fill: '#8a6b4e', line: '#4a3626' },
+  { id: 'crateR1', t: 'rect', x: 3350, y: -500, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
+  { id: 'crateR2', t: 'rect', x: 3460, y: -500, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
+  { id: 'ballR', t: 'circle', cx: 2300, cy: 300, r: 80, fill: '#f0c419', line: '#8a6d00' },
+  { id: 'ledgeT', t: 'rect', x: -600, y: -2000, w: 1200, h: 50, fill: '#8a6b4e', line: '#4a3626' },
+  { id: 'ledgeT2', t: 'rect', x: 1600, y: -1700, w: 800, h: 50, fill: '#8a6b4e', line: '#4a3626' },
+  { id: 'goal', t: 'circle', cx: 0, cy: -2100, r: 50, fill: '#4a90d9', line: '#1f3552' }
 ];
 const HINGES = [[-370, 338], [-190, 338]];
 const PLAYED = { crate3: { dx: 320, dy: 60, rot: 28 }, ball: { dy: 100 }, carbody: { dx: 50 }, cabin: { dx: 50 }, wheel1: { dx: 50 }, wheel2: { dx: 50 } };
@@ -536,7 +550,7 @@ function view(opts) {
   return `<div class="abs viewbox" style="${pos([0, 0, W, H])}">${scene(W, H, VIEW_Z, (g.rx0 + g.rx1) / 2, VIEW_CY, Object.assign({ grid: true, cameraFrame: true, joints: true }, opts))}</div>`;
 }
 function minimap() {
-  const g = geo(), [ax, ay, aw] = MAP_AREA, w = g.map[2] - 12, h = g.map[3] - 12, z = w / aw;
+  const g = geo(), [ax, ay, aw] = MAP_AREA, w = g.map[2], h = g.map[3], z = w / aw;
   const [vx, vy, vw, vh] = visibleArea(), X = (x) => (x - ax) * z, Y = (y) => (y - ay) * z;
   const frame = `<rect x="${X(vx)}" y="${Y(vy)}" width="${vw * z}" height="${vh * z}" rx="3" fill="rgba(79,140,255,.1)" style="stroke:var(--accent)" stroke-width="1.5"/>`;
   const map = scene(w, h, z, -ax * z, -ay * z, { grid: false }).replace('</svg>', frame + '</svg>');
