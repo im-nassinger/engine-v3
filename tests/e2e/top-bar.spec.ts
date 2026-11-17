@@ -38,6 +38,11 @@ const MAIN_MENU: Record<string, [string, string][]> = {
         ['Selection', 'F'],
         ['Camera frame', 'Shift+3'],
     ],
+    Play: [
+        ['Play', 'Ctrl+Enter'],
+        ['Pause', 'F8'],
+        ['Step', 'F9'],
+    ],
     Help: [['About', '']],
 };
 

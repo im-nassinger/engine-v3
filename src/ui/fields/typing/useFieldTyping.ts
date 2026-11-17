@@ -64,6 +64,9 @@ export function useFieldTyping({ shownText, fullText, commit, onRestore }: Field
     };
 
     const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+        // The editor already used the key, as Ctrl+Enter, which commits the field itself before Play.
+        if (event.defaultPrevented) return;
+
         const field = event.currentTarget;
 
         if (event.key === 'Enter') {

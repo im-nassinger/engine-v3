@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 16, step 8 of 12: inputs and focus are built: `HeldKeys` shared by the keyboard and `PlaySession`, sent with every batch; `PageVisibility` behind `PageLifecycle`, so a hidden tab pauses the run and releases every key, and a lost window focus releases them and keeps it going. Next is step 9, the commands and keys. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 16, step 9 of 12: the commands and keys are built: Play or Stop (Ctrl+Enter), Pause (F8) and Step (F9) in the Play menu; `CommandRunner` refuses every other command during a run with "Stop to edit", the keyboard belongs to the game, and the tab title starts `▶`. Next is step 10, the page. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -233,7 +233,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 16 of [plan.md](steps/stage-16.md): test play.** Step 1 wrote its twelve steps and the [choices](architecture/simulation.md#stage-16s-choices); step 2, the game worker's protocol and `GameWorkerHost`, is next.
+1. **Stage 16 of [plan.md](steps/stage-16.md): test play.** Step 1 wrote its twelve steps and the [choices](architecture/simulation.md#stage-16s-choices); steps 2 to 9 are built, and step 10, the page with the Play button and the Play bar, is next.
 2. Then each stage in order. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement

@@ -1,25 +1,34 @@
 import type { Unsubscribe } from '../../../core/events/index.ts';
 import { GAME_NAME } from '../../../editor/commands/index.ts';
+import type { PlaySession } from '../../../editor/play/index.ts';
 import type { SaveIndicator } from '../../../editor/saving/index.ts';
 import type { EditorSession } from '../../../editor/session/index.ts';
 
-// "castle - engine-v3", with `*` in front while the level has unsaved changes.
-export function tabTitleText(levelName: string, hasUnsavedChanges: boolean) {
+type RunShown = Pick<PlaySession, 'isRunGoing' | 'version'>;
+
+const RUN_MARK = '▶ ';
+
+// "castle - engine-v3", with `*` in front while the level has unsaved changes, and `▶ ` in front of
+// that while a run is going.
+export function tabTitleText(levelName: string, hasUnsavedChanges: boolean, isRunGoing = false) {
+    const runMark = isRunGoing ? RUN_MARK : '';
     const mark = hasUnsavedChanges ? '*' : '';
 
-    return `${mark}${levelName} - ${GAME_NAME}`;
+    return `${runMark}${mark}${levelName} - ${GAME_NAME}`;
 }
 
-// The browser tab's title follows the open level's name and the save state.
+// The browser tab's title follows the open level's name, the save state and test play.
 export class TabTitle {
     private readonly session: EditorSession;
     private readonly indicator: SaveIndicator;
     private readonly page: Document;
+    private readonly play: RunShown | undefined;
 
-    constructor(session: EditorSession, indicator: SaveIndicator, page: Document) {
+    constructor(session: EditorSession, indicator: SaveIndicator, page: Document, play?: RunShown) {
         this.session = session;
         this.indicator = indicator;
         this.page = page;
+        this.play = play;
     }
 
     connect(): Unsubscribe {
@@ -30,12 +39,14 @@ export class TabTitle {
             this.write();
         });
         const stopState = this.indicator.version.subscribe(() => this.write());
+        const stopPlay = this.play?.version.subscribe(() => this.write());
         this.write();
 
         return () => {
             stopName();
             stopLevel();
             stopState();
+            stopPlay?.();
         };
     }
 
@@ -45,6 +56,10 @@ export class TabTitle {
 
     private write() {
         const name = this.session.openLevel.level.name;
-        this.page.title = tabTitleText(name, this.indicator.hasUnsavedChanges);
+        const isRunGoing = this.play?.isRunGoing === true;
+        const title = tabTitleText(name, this.indicator.hasUnsavedChanges, isRunGoing);
+        if (title === this.page.title) return;
+
+        this.page.title = title;
     }
 }

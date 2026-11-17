@@ -3,6 +3,7 @@ import {
     BrowserFilePicker,
     BrowserTimer,
     ClipboardBridge,
+    commitFocusedField,
     DevicePixelRatio,
     FileDownload,
     FileDropTarget,
@@ -10,6 +11,7 @@ import {
     keyboardPlatform,
     LocalTimeOfDay,
     PageSavingEvents,
+    PageVisibility,
     PointerInput,
     SystemClock,
     TabTitle,
@@ -28,6 +30,7 @@ import { createV1Registry } from '../core/components/index.ts';
 import { FormatUpgrader, LevelReader, LevelWriter, V1_LEVEL_LIMITS } from '../core/level-data/index.ts';
 import { EditorClipboard } from '../editor/clipboard/index.ts';
 import { READ_ONLY_REASON } from '../editor/history/index.ts';
+import { HeldKeys, PlaySession } from '../editor/play/index.ts';
 import type { GameRunner } from '../editor/play/index.ts';
 import {
     ClipboardEvents,
@@ -35,6 +38,7 @@ import {
     createCommandRegistry,
     damagedLevelQuestion,
     FileDropEvents,
+    OpenDialog,
 } from '../editor/commands/index.ts';
 import type { CommandRegistry } from '../editor/commands/index.ts';
 import {
@@ -82,6 +86,8 @@ type EditorParts = {
     readonly tabTitle: TabTitle;
     readonly exporter: FileExporter;
     readonly gameRunner: GameRunner;
+    readonly play: PlaySession;
+    readonly pageVisibility: PageVisibility;
 };
 
 // The composition root: the only code that knows both the editor's rules and the browser's details.
@@ -99,6 +105,8 @@ export class EditorComposition {
     readonly openWindows: OpenWindowCount;
     // What the page shows of saving: the top bar's save state, the tab title's `*` and the leave prompt.
     readonly saveIndicator: SaveIndicator;
+    // Test play: Play, Stop, Pause and Step, and what the Play bar shows.
+    readonly play: PlaySession;
     private readonly opening: Opening;
     private readonly pageSaving: PageSavingEvents;
     private readonly tabTitle: TabTitle;
@@ -108,6 +116,7 @@ export class EditorComposition {
     private readonly pointer: PointerInput;
     private readonly clipboardBridge: ClipboardBridge;
     private readonly fileDrop: FileDropTarget;
+    private readonly pageVisibility: PageVisibility;
 
     private constructor(parts: EditorParts) {
         this.session = parts.session;
@@ -129,6 +138,8 @@ export class EditorComposition {
         this.tabTitle = parts.tabTitle;
         this.exporter = parts.exporter;
         this.gameRunner = parts.gameRunner;
+        this.play = parts.play;
+        this.pageVisibility = parts.pageVisibility;
     }
 
     static async create() {
@@ -190,9 +201,23 @@ export class EditorComposition {
         const importer = new ImportWorkerClient(createImportWorker);
         const levelImport = new LevelImport({ importer, reader: session.reader });
         const picker = new BrowserFilePicker(window);
-        const runner = new CommandRunner(session.status);
+        const gameRunner = new WorkerGameRunner(createGameWorker);
+        const dialog = new OpenDialog();
+        const heldKeys = new HeldKeys();
+        const play = new PlaySession({
+            session,
+            runner: gameRunner,
+            clock,
+            timer,
+            frames,
+            commitTyping: () => commitFocusedField(document),
+            saveNow: () => saving.saveNow(),
+            isDialogOpen: () => dialog.current !== undefined,
+            heldKeys,
+        });
+        const runner = new CommandRunner(session.status, { dialog, play });
         const fileParts = { levelExport, levelImport, picker, saving, outcomes: runner };
-        const commands = createCommandRegistry(session, { clipboard, mouse }, fileParts);
+        const commands = createCommandRegistry(session, { clipboard, mouse }, fileParts, play);
         const platform = keyboardPlatform(navigator.platform);
         const levelView = await PixiLevelView.create({
             view: session.view,
@@ -205,15 +230,15 @@ export class EditorComposition {
         const openWindows = new OpenWindowCount();
         const escape = new EscapeChain(session, tools, openWindows);
         const dispatcher = new ShortcutDispatcher(commands, runner, platform, { tools, escape });
-        const keyboard = new KeyboardInput(dispatcher, window);
+        const keyboard = new KeyboardInput(dispatcher, window, heldKeys);
         const pointerParts = { tools, escape, mouse, view: session.view, platform };
         const pointer = new PointerInput(pointerParts, levelView.canvas, window);
         const clipboardBridge = new ClipboardBridge(new ClipboardEvents(commands, runner), window);
         const fileDrop = new FileDropTarget(new FileDropEvents(commands, runner), window);
         const sessionOpen = opening.readOnly ? undefined : settings.sessionOpen;
         const pageSaving = new PageSavingEvents({ indicator: saveIndicator, saving, settings, sessionOpen }, window);
-        const tabTitle = new TabTitle(session, saveIndicator, document);
-        const gameRunner = new WorkerGameRunner(createGameWorker);
+        const tabTitle = new TabTitle(session, saveIndicator, document, play);
+        const pageVisibility = new PageVisibility(window);
 
         const composition = new EditorComposition({
             session,
@@ -235,6 +260,8 @@ export class EditorComposition {
             tabTitle,
             exporter,
             gameRunner,
+            play,
+            pageVisibility,
         });
         composition.start();
 
@@ -248,14 +275,15 @@ export class EditorComposition {
         this.levelView.showSelection(new EditorSelectionSource(this.session, this.tools));
         this.levelView.showDrawing(new EditorDrawingSource(this.tools));
         this.levelView.showJointPreview(new EditorJointPreviewSource(this.session, this.tools, this.mouse));
-        // The editor lives as long as the page, so the keyboard, the pointer, the clipboard events, file drops
-        // and the page's saving events are never disconnected.
+        // The editor lives as long as the page, so the keyboard, the pointer, the clipboard events, file drops,
+        // the page's saving events and its visibility are never disconnected.
         this.keyboard.connect();
         this.pointer.connect();
         this.clipboardBridge.connect();
         this.fileDrop.connect();
         this.pageSaving.connect();
         this.tabTitle.connect();
+        this.play.connectPage(this.pageVisibility);
         this.limitPanToOpenLevel();
         this.session.openLevelChanged.subscribe(() => this.limitPanToOpenLevel());
         // A new level has no place of its own yet, so a view kept from an earlier level would show nothing.

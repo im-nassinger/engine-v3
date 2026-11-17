@@ -5,7 +5,8 @@ import type { CommandRunner } from '../running/CommandRunner.ts';
 import { ImportCommand } from './ImportCommand.ts';
 
 // What a file dropped on the editor does: Import's question, then the import, shown through the
-// CommandRunner like the menu's Import. Nothing happens while a dialog is open, as with the keys.
+// CommandRunner like the menu's Import. Nothing happens while a dialog is open, as with the keys, and
+// during play the Play bar says "Stop to edit".
 export class FileDropEvents {
     private readonly importCommand: ImportCommand;
     private readonly runner: CommandRunner;
@@ -21,6 +22,7 @@ export class FileDropEvents {
     dropFile(file: PickedFile) {
         const isDialogOpen = this.runner.dialog.current !== undefined;
         if (isDialogOpen) return;
+        if (this.runner.refusedDuringPlay()) return;
 
         const outcome = this.importCommand.importDropped(file);
         this.runner.showOutcome(outcome);

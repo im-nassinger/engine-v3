@@ -55,6 +55,14 @@ export type {
     ShortcutScope,
 } from './EditorCommand.ts';
 export { CommandRunner } from './running/CommandRunner.ts';
+export type { CommandRunnerParts, PlayGate } from './running/CommandRunner.ts';
+export {
+    NOT_PAUSED_REASON,
+    NOT_PLAYING_REASON,
+    PauseOrResumeCommand,
+    PlayOrStopCommand,
+    StepCommand,
+} from './play/index.ts';
 export { OpenDialog } from './running/OpenDialog.ts';
 export type { Dialog } from './running/OpenDialog.ts';
 export { moveEntities } from './move/moveEntities.ts';

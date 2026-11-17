@@ -35,7 +35,7 @@ const UNDO_COMMAND_ID = 'edit.undo';
 const SCOPES_IN_ORDER: readonly ShortcutScope[] = ['levelView', 'editor', 'everywhere'];
 
 // Turns a key press into Esc's answer, a tool picked, a key the tool uses, or a command run through
-// the CommandRunner, in that order.
+// the CommandRunner, in that order. During play only the Play commands' keys do anything.
 export class ShortcutDispatcher {
     private readonly registry: CommandRegistry;
     private readonly runner: CommandRunner;
@@ -62,8 +62,12 @@ export class ShortcutDispatcher {
         const press = KeyPress.fromKeyboard(input, this.platform);
         if (press === undefined) return false;
 
-        const usedByTools = this.handleToolKey(press, focus);
-        if (usedByTools !== undefined) return usedByTools;
+        // During play the keys belong to the game: the tools and Esc never see them.
+        const isRunGoing = this.runner.isRunGoing;
+        if (!isRunGoing) {
+            const usedByTools = this.handleToolKey(press, focus);
+            if (usedByTools !== undefined) return usedByTools;
+        }
 
         const place = { focus, pointerOverLevelView };
         const shortcut = this.shortcutFor(press, place);
@@ -73,6 +77,9 @@ export class ShortcutDispatcher {
         if (command === undefined) return false;
         // The browser goes on to send its cut, copy or paste event, which ClipboardBridge answers.
         if (command.shortcutsAsBrowserEvents === true) return false;
+        // Only the Play commands run. Another command's key is a game key then: it runs nothing and shows
+        // no hint, and the browser's own use of it, such as Ctrl+S saving the page, is stopped.
+        if (isRunGoing && command.runsDuringPlay !== true) return true;
 
         if (press.repeat && !command.repeatsWhileHeld) return true;
         if (command.id === UNDO_COMMAND_ID && this.toolKeys?.tools.undoDrawingStep() === true) return true;

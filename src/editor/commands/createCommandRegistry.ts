@@ -1,4 +1,5 @@
 import { EditorClipboard } from '../clipboard/index.ts';
+import type { PlaySession } from '../play/index.ts';
 import type { EditorSession } from '../session/index.ts';
 
 import { GoIntoGroupCommand } from './arrange/GoIntoGroupCommand.ts';
@@ -28,14 +29,23 @@ import { VIEW_SWITCH_ENTRIES, ViewSwitchCommand } from './view/ViewSwitchCommand
 import { ZoomInCommand } from './view/ZoomInCommand.ts';
 import { ZoomOutCommand } from './view/ZoomOutCommand.ts';
 import { NudgeCommand } from './move/NudgeCommand.ts';
+import { PauseOrResumeCommand } from './play/PauseOrResumeCommand.ts';
+import { PlayOrStopCommand } from './play/PlayOrStopCommand.ts';
+import { StepCommand } from './play/StepCommand.ts';
 import { ReadOnlyGuard } from './ReadOnlyGuard.ts';
 import { RenameCommand } from './rename/RenameCommand.ts';
 import { ZoomToActualSizeCommand } from './view/ZoomToActualSizeCommand.ts';
 
 // Every command built so far, each reading the session's open level when it runs, so replacing the
 // open level needs no new registry. Without clipboard parts, as in most tests, copies stay in memory and
-// the mouse is never over the level view. Without file parts the File menu's commands aren't registered.
-export function createCommandRegistry(session: EditorSession, clipboardParts?: ClipboardParts, fileParts?: FileParts) {
+// the mouse is never over the level view. Without file parts the File menu's commands aren't registered,
+// and without a play session the Play menu's.
+export function createCommandRegistry(
+    session: EditorSession,
+    clipboardParts?: ClipboardParts,
+    fileParts?: FileParts,
+    play?: PlaySession,
+) {
     const registry = new CommandRegistry();
     const clipboard = clipboardParts ?? { clipboard: new EditorClipboard(), mouse: { current: undefined } };
     // In a read-only tab these are disabled with the reason; the rest only look, select or copy.
@@ -77,6 +87,12 @@ export function createCommandRegistry(session: EditorSession, clipboardParts?: C
     registry.register(new FitWholeLevelCommand(session));
     registry.register(new FitSelectionCommand(session));
     registry.register(new FitCameraFrameCommand(session));
+    if (play !== undefined) {
+        registry.register(new PlayOrStopCommand(play));
+        registry.register(new PauseOrResumeCommand(play));
+        registry.register(new StepCommand(play));
+    }
+
     registry.register(new AboutCommand());
 
     return registry;

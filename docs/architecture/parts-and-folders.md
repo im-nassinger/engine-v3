@@ -78,7 +78,7 @@ src/
     pixi/              PixiLevelView, EntityNode, EntityDrawing, overlays/
     box2d/             Box2dPhysicsEngine, Box2dPhysicsWorld, Box2dShapes, Box2dJoints
     storage/           IndexedDbLevelStore, LocalStorageSettings, WebLockTabGuard, BrowserPersistence
-    browser/           keyboard/ (KeyboardInput), pointer/ (PointerInput, ClickCounter, wheelPixels),
+    browser/           keyboard/ (KeyboardInput, commitFocusedField), pointer/ (PointerInput, ClickCounter, wheelPixels),
                        time/ (SystemClock, LocalTimeOfDay, BrowserTimer, AnimationFrames),
                        screen/ (DevicePixelRatio), clipboard/ (ClipboardBridge),
                        files/ (FileDownload, BrowserFilePicker, FileDropTarget),

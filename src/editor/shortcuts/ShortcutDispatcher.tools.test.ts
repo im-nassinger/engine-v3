@@ -12,14 +12,25 @@ const SPACE = recordedKey('Space', ' ');
 const DIGIT_4 = recordedKey('Digit4', '4');
 const ENTER = recordedKey('Enter', 'Enter');
 
+// Test play as the runner sees it, with a run going or not as the test sets.
+class FakePlay {
+    isRunGoing = false;
+    refusals = 0;
+
+    refuseEdit() {
+        this.refusals += 1;
+    }
+}
+
 function buildDispatcher() {
     const parts = buildToolTestSession();
-    const runner = new CommandRunner(parts.session.status);
+    const play = new FakePlay();
+    const runner = new CommandRunner(parts.session.status, { play });
     const windows = { isOpen: () => false };
     const escape = new EscapeChain(parts.session, parts.controller, windows);
     const dispatcher = new ShortcutDispatcher(parts.commands, runner, 'other', { tools: parts.controller, escape });
 
-    return { ...parts, runner, dispatcher };
+    return { ...parts, runner, dispatcher, play };
 }
 
 describe('ShortcutDispatcher with the tools', () => {
@@ -143,5 +154,17 @@ describe('ShortcutDispatcher with the tools', () => {
         dispatcher.handleKeyDown(GERMAN_KEYS.ctrlZ, 'level', true);
 
         expect(session.openLevel.history.undoCount).toBe(0);
+    });
+
+    test('during play the tool keys and Esc do nothing, and are left to the game', () => {
+        const { dispatcher, controller, play } = buildDispatcher();
+        controller.pick('shape');
+        play.isRunGoing = true;
+
+        expect(dispatcher.handleKeyDown(US_KEYS.digit1, 'level', true)).toBe(false);
+        expect(dispatcher.handleKeyDown(ESC, 'level', true)).toBe(false);
+
+        expect(controller.active.id).toBe('shape');
+        expect(play.refusals).toBe(0);
     });
 });

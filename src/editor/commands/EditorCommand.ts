@@ -60,6 +60,8 @@ export type EditorCommand = {
     // which need no permission, so ShortcutDispatcher leaves the keys to the browser and ClipboardBridge
     // answers the events. The menu still shows the shortcuts.
     readonly shortcutsAsBrowserEvents?: boolean;
+    // Only Play or Stop, Pause and Step: CommandRunner refuses every other command while a run is going.
+    readonly runsDuringPlay?: boolean;
     availability(): Availability;
     // Only a switch has it: true shows a tick next to the menu entry.
     checked?(): boolean;

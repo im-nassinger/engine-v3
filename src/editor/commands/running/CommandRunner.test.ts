@@ -199,6 +199,28 @@ describe('CommandRunner', () => {
 
         expect(changes).toBe(3);
     });
+
+    test("while a run is going only a Play command runs, and the rest show the Play bar's refusal", () => {
+        const timer = new ManualTimer();
+        const status = new StatusText(timer);
+        const play = { isRunGoing: true, refusals: 0, refuseEdit: () => (play.refusals += 1) };
+        const runner = new CommandRunner(status, { play });
+        const edit = fakeCommand({ kind: 'done', text: 'Deleted Square' });
+        const playCommand = { ...fakeCommand({ kind: 'done' }), runsDuringPlay: true };
+
+        runner.run(edit);
+        runner.run(playCommand);
+
+        expect(edit.runCount).toBe(0);
+        expect(play.refusals).toBe(1);
+        expect(status.current).toBeUndefined();
+        expect(runner.refusedDuringPlay()).toBe(true);
+
+        play.isRunGoing = false;
+        runner.run(edit);
+        expect(edit.runCount).toBe(1);
+        expect(runner.refusedDuringPlay()).toBe(false);
+    });
 });
 
 function titleOf(runner: CommandRunner) {
