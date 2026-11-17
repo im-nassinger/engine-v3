@@ -67,10 +67,10 @@ export function showPanel(level: Level) {
     return session;
 }
 
-export function createSession(level: Level) {
+export function createSession(level: Level, frames = new ManualFrames()) {
     const timer = new ManualTimer();
 
-    return new EditorSession({ level, clock: new ManualClock(), timer, frames: new ManualFrames() });
+    return new EditorSession({ level, clock: new ManualClock(), timer, frames });
 }
 
 export function mountPanel(session: EditorSession, openWindows = new OpenWindowCount()) {

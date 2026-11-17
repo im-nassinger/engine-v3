@@ -20,7 +20,7 @@
         "check": "npm run typecheck && npm run lint && npm run format:check && npm run deps && npm test && npm run docs:check",
         "test:browser": "vitest run --project browser",
         "test:e2e": "playwright test",
-        "test:performance": "vitest run --project performance",
+        "test:performance": "vitest run --project performance --silent=false",
         "determinism:record": "node tests/determinism/record/recordDeterminism.ts"
     },
     "devDependencies": {

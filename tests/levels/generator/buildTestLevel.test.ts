@@ -1,7 +1,11 @@
 import { describe, expect, test } from 'vitest';
 import { DerivedCaches, levelBoundsOf } from '../../../src/core/derived/index.ts';
+import { V1_LEVEL_LIMITS } from '../../../src/core/level-data/index.ts';
 
 import { buildTestLevel } from './buildTestLevel.ts';
+
+// Building and measuring 100,000 entities takes a few seconds, longer while every test file runs at once.
+const LARGE_LEVEL_TIMEOUT_MS = 60_000;
 
 describe('buildTestLevel', () => {
     test('holds the entities asked for, besides the World and the camera', () => {
@@ -33,7 +37,34 @@ describe('buildTestLevel', () => {
         expect(everything).toEqual(worldRectangle);
     });
 
-    test('refuses a count that is not whole blocks', () => {
-        expect(() => buildTestLevel(15)).toThrow('A test level holds a multiple of 10 entities, not 15.');
+    test('a count that is not whole blocks ends with the first entities of a block', () => {
+        const { level, platforms, looseCrates, carts } = buildTestLevel(18);
+        const [, lastCart] = carts;
+
+        expect(level.entityCount).toBe(20);
+        expect(platforms).toHaveLength(2);
+        expect(looseCrates).toHaveLength(8);
+        // The last block's cart, its box and the box's left crate.
+        expect(lastCart?.children).toHaveLength(1);
+        expect(lastCart?.children[0]?.children).toHaveLength(1);
+    });
+
+    test(
+        'at the limit, counting the World and the camera, it fits the largest World rectangle',
+        () => {
+            const { level } = buildTestLevel(V1_LEVEL_LIMITS.maxEntities - 2);
+            const caches = new DerivedCaches(level);
+            const everything = caches.bounds.subtreeBoundsOf(level.world);
+            caches.dispose();
+
+            expect(level.entityCount).toBe(V1_LEVEL_LIMITS.maxEntities);
+            expect(everything?.width).toBeLessThanOrEqual(V1_LEVEL_LIMITS.maxLevelSize);
+            expect(everything?.height).toBeLessThanOrEqual(V1_LEVEL_LIMITS.maxLevelSize);
+        },
+        LARGE_LEVEL_TIMEOUT_MS,
+    );
+
+    test('refuses a count that is not a whole number', () => {
+        expect(() => buildTestLevel(1.5)).toThrow('A test level holds a whole number of entities, not 1.5.');
     });
 });

@@ -5,17 +5,12 @@ import {
     addNamedEntity,
     buildLevel,
     closePanelPage,
-    createSession,
     findRow,
-    mountPanel,
     openPanelPage,
     rowNamed,
     showPanel,
     shownRows,
 } from './testing/panelPage.ts';
-
-// The target in performance.md: the panel paints its first rows within 0.2 s of mounting.
-const OPEN_TIME_LIMIT_MS = 200;
 
 beforeEach(openPanelPage);
 afterEach(closePanelPage);
@@ -31,22 +26,6 @@ function runGroup(session: EditorSession) {
 
     const runner = new CommandRunner(session.status);
     runner.run(group);
-}
-
-// Resolves in the first animation frame that finds a row, which is the frame that paints it.
-function firstFrameWithRows() {
-    return new Promise<number>((resolve) => {
-        const lookForRows = () => {
-            if (shownRows().length > 0) {
-                resolve(performance.now());
-                return;
-            }
-
-            requestAnimationFrame(lookForRows);
-        };
-
-        requestAnimationFrame(lookForRows);
-    });
 }
 
 describe('revealing rows', () => {
@@ -86,18 +65,5 @@ describe('revealing rows', () => {
         await expect.poll(() => rowNamed('Crate 90').getAttribute('aria-selected')).toBe('true');
         expect(list.scrollTop).toBe(scrollTop);
         expect(session.openLevel.selectionReveal.entityId).toBeUndefined();
-    });
-
-    test('at 10,000 entities the panel paints its first rows within 0.2 s of mounting', async () => {
-        const { level } = buildLevel(10_000);
-        const session = createSession(level);
-
-        const mountedAt = performance.now();
-        mountPanel(session);
-        const paintedAt = await firstFrameWithRows();
-        const openTimeMs = paintedAt - mountedAt;
-
-        console.info(`The Entities panel's open time at 10,000 entities: ${openTimeMs.toFixed(1)} ms`);
-        expect(openTimeMs).toBeLessThan(OPEN_TIME_LIMIT_MS);
     });
 });

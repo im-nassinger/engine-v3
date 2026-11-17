@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 17, step 1 of 9: stage 17's steps are written, with their choices in [performance.md](architecture/performance.md#stage-17s-choices). Next is step 2, the Entities panel's speed tests. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 17, step 2 of 9: the Entities panel's speed tests are built: it opens in 45 to 48 ms at 10,000 entities, and scrolling misses 16.7 ms (18 to 20.5 ms), left to step 8's speed pass, see [performance.md](architecture/performance.md#targets-and-their-tests). Next is step 3, the 100,000-entity level's load, save, export and import. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
