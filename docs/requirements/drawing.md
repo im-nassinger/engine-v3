@@ -8,7 +8,7 @@ How shapes, paths and text are made and how they look. **v1:** the Shape tool (r
 
 ### Shared rules for drawing tools · v1
 
-- **Shift** keeps proportions (square, circle) or straight angles (15° steps). **Alt** draws from the centre. **Enter or Esc** finishes. Ctrl held turns snapping off.
+- **Shift** keeps proportions (square, circle) or straight angles (15° steps). **Alt**, or **Ctrl+Shift**, draws a box from the centre, Ctrl+Shift neither keeping proportions nor turning snapping off (owner: 2026-11-16; standing yes, 2026-11-17). **Enter or Esc** finishes. Ctrl held turns snapping off.
 - No key throws away drawn work: Enter and Esc both finish and keep the drawing. A drawing too short to be valid is dropped (a polygon needs 3 points, a line or path needs 2).
 - While drawing, Ctrl+Z or Backspace removes the last point. The finished drawing is one undo step.
 - Choosing another tool, or pressing Play, finishes and keeps the drawing.

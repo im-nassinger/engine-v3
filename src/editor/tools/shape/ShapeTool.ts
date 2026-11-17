@@ -6,6 +6,7 @@ import type { ShapeDrawing } from '../../commands/index.ts';
 import { READ_ONLY_REASON } from '../../history/index.ts';
 import type { DragReadout } from '../readout/DragReadout.ts';
 import { diameterReadout, sizeReadout } from '../readout/readoutText.ts';
+import { sizingModifiers } from '../sizing/sizingModifiers.ts';
 import type { LevelPointerInput, Modifiers, Tool, ToolContext, ToolKey } from '../Tool.ts';
 
 import { atLeastOnePixel, draggedBox, placedDrawing } from './boxDrawing.ts';
@@ -43,7 +44,7 @@ const TOO_MANY_POINTS = `A polygon holds at most ${MAX_POINTS.toLocaleString('en
 
 const LOCKED = 'This group is locked';
 
-const BOX_HINT = 'Click to place, drag to size. Shift keeps proportions, Alt draws from the centre.';
+const BOX_HINT = 'Click to place, drag to size. Shift keeps proportions, Ctrl+Shift or Alt draws from the centre.';
 const POLYGON_HINT = 'Click to add points. Click the first point to close it, Enter to finish as a line.';
 
 // 100 x 100 px at first, a circle 50 px in radius.
@@ -170,7 +171,7 @@ export class ShapeTool implements Tool {
         const space = this.groupSpace();
         if (space === undefined) return;
 
-        const start = space.toGroup.apply(this.snapped(input.levelPosition, input.modifiers));
+        const start = space.toGroup.apply(this.snapped(input.levelPosition, sizingModifiers(input.modifiers)));
         this.press = { kind, screenPosition: input.screenPosition, start, space, dragging: false };
         this.lastInput = input;
         this.show({ shape: { drawing: placedDrawing(kind, this.sizes[kind], start), toLevel: space.toLevel } });
@@ -386,7 +387,9 @@ export class ShapeTool implements Tool {
         return placedDrawing(press.kind, size, box.centre);
     }
 
-    private boxOf(press: Press, input: LevelPointerInput, modifiers: Modifiers) {
+    // Ctrl+Shift draws from the centre, as Alt does, with snapping on.
+    private boxOf(press: Press, input: LevelPointerInput, held: Modifiers) {
+        const modifiers = sizingModifiers(held);
         const corner = press.space.toGroup.apply(this.snapped(input.levelPosition, modifiers));
 
         return draggedBox({ kind: press.kind, start: press.start, corner, shift: modifiers.shift, alt: modifiers.alt });
@@ -446,7 +449,7 @@ export class ShapeTool implements Tool {
             return;
         }
 
-        const centre = space.toGroup.apply(this.snapped(input.levelPosition, held));
+        const centre = space.toGroup.apply(this.snapped(input.levelPosition, sizingModifiers(held)));
         this.show({ shape: { drawing: placedDrawing(kind, this.sizes[kind], centre), toLevel: space.toLevel } });
     }
 

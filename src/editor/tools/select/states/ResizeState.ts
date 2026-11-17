@@ -4,13 +4,14 @@ import type { FrameHandle } from '../frame/FrameHandle.ts';
 import type { SelectionFrame } from '../frame/SelectionFrame.ts';
 import type { EntityResize } from '../resize/EntityResize.ts';
 import { sizeReadout } from '../../readout/readoutText.ts';
+import { sizingModifiers } from '../../sizing/sizingModifiers.ts';
 import { resizeFactor } from '../resize/resizeFactor.ts';
 
 import type { SelectState, SelectStateHost } from './SelectState.ts';
 
 // A drag on one of the eight handles: the handle follows the mouse on screen along the entity's own sides,
-// and the release makes one step, `Resize <name>`. Shift keeps proportions, Alt resizes from the centre,
-// Ctrl turns snapping off, Esc puts it back.
+// and the release makes one step, `Resize <name>`. Shift keeps proportions, Alt or Ctrl+Shift resizes from
+// the centre, Ctrl turns snapping off, Esc puts it back.
 export class ResizeState implements SelectState {
     private readonly host: SelectStateHost;
     private readonly frame: SelectionFrame;
@@ -50,7 +51,7 @@ export class ResizeState implements SelectState {
 
     private resizeTo(input: LevelPointerInput) {
         const { snapper, view } = this.host.context;
-        const { modifiers } = input;
+        const modifiers = sizingModifiers(input.modifiers);
         const wanted = {
             x: input.levelPosition.x + this.grabOffset.x,
             y: input.levelPosition.y + this.grabOffset.y,

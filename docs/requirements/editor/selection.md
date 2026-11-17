@@ -102,17 +102,19 @@ Source: round 6: LY2; old: SG-39 to SG-42
 - A whole drag is one undo step.
 - A locked entity never moves through handles or arrow keys. A locked child still moves with its unlocked parent.
 
-| While | Shift | Alt | Ctrl | Esc |
-|---|---|---|---|---|
-| Moving | Lock to horizontal or vertical | | Turn snapping off | Cancel |
-| Resizing | Keep proportions | Resize from the centre | Turn snapping off | Cancel |
-| Rotating | Snap to 15° steps | | | Cancel |
+| While | Shift | Alt | Ctrl | Ctrl+Shift | Esc |
+|---|---|---|---|---|---|
+| Moving | Lock to horizontal or vertical | | Turn snapping off | | Cancel |
+| Resizing | Keep proportions | Resize from the centre | Turn snapping off | Resize from the centre, and only that | Cancel |
+| Rotating | Snap to 15° steps | | | | Cancel |
+
+- **Ctrl+Shift resizes from the centre**, as Alt does, and neither keeps proportions nor turns snapping off (owner: 2026-11-16; the rest under the standing yes, 2026-11-17). *Why: on Linux with GNOME, Alt+drag moves the window, so Alt can't reach the page there.* Alt stays a second way, and Alt+Shift resizes from the centre keeping proportions.
 
 Source: scope SE2; round 1: D21; round 4: 02 2.7; round 5: 03 2.4; old: SG-43 to SG-48, SG-52, SG-53, SG-55, SG-56; owner: 2026-11-16
 
 ### Several entities together · v3
 
-- A multi-selection resizes and rotates together. Rotation turns the entities around the centre of the selection box. Resizing keeps the opposite side or corner fixed. Alt resizes from the centre. Shift keeps proportions.
+- A multi-selection resizes and rotates together. Rotation turns the entities around the centre of the selection box. Resizing keeps the opposite side or corner fixed. Alt or Ctrl+Shift resizes from the centre. Shift keeps proportions.
 - *Why: it matches single entities and groups, so nothing changes when you group them, and it uses the same keys as the drawing tools.*
 - Resizing rotated entities unevenly slants them through skew, exactly as it would inside a group.
 - In v1 a multi-selection can only be moved. To turn several entities together, group them first.

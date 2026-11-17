@@ -10,7 +10,7 @@ Changes the owner asked for that must be built **after v1's 18 stages and before
 |---|---|---|---|
 | 1 | **Resizing changes the scale**, not the shape's values. Polygons and lines lose Width and Height | owner, 2026-11-16 | **Built** on 2026-11-17, steps 7 and 8 |
 | 2 | **Z and X rotate the selection and the Shape tool's preview**, Shift+Z and Shift+X by 10° | owner, 2026-11-16 and 2026-11-17 | Settled, with Claude's picks for the owner to change; steps 10 and 11 |
-| 3 | **Ctrl+Shift while resizing resizes from the centre** | owner, 2026-11-16 | Settled, with Claude's picks for the owner to change; step 9 |
+| 3 | **Ctrl+Shift while resizing resizes from the centre** | owner, 2026-11-16 | **Built** on 2026-11-17, step 9 |
 | 4 | **The Joint tool says why an entity can't take a joint** | owner, 2026-11-16 | **Built** on 2026-11-17, step 5 |
 | 5 | **Unstyled joints are invisible in play**, joint icons included | owner, 2026-11-17 | **Built** on 2026-11-17, step 4 |
 | 6 | **+ zooms in without Shift**, as - zooms out | owner, 2026-11-17 | Settled; step 3 |
@@ -64,6 +64,8 @@ The two questions left open are decided under the standing yes (2026-11-17), for
 - **The Shape tool's drawing follows:** Ctrl+Shift draws from the centre, as Alt does.
 
 To update when planned: the resizing row of the keys table in `requirements/editor/selection.md`, the v3 "Several entities together" rule there, `architecture/editor/selection-and-tools.md` (`ResizeState`), and the Shape tool's keys if drawing follows.
+
+**Built** (2026-11-17, step 9): one function, `sizingModifiers`, reads Ctrl+Shift as Alt for the Select tool's handles and the Shape tool's rectangle and circle, so both tools share the rule. Ctrl+Shift+Alt is from the centre only too. A polygon's or line's points still read Ctrl and Shift as before, since placing a point is not resizing. Tests cover Ctrl+Shift, Alt, Alt+Shift and Ctrl alone on a handle and while drawing, and Ctrl+Shift pressed during a drag.
 
 ## 4. The Joint tool says why an entity can't take a joint
 

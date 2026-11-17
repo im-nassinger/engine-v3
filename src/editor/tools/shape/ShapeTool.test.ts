@@ -86,6 +86,42 @@ describe('the Shape tool', () => {
         expect(positionOf(made(both))).toEqual({ x: 0, y: 0 });
     });
 
+    test('Ctrl+Shift draws from the centre only, with no square and snapping on', () => {
+        const plain = buildShapeTest();
+        drag(plain, { x: 0, y: 0 }, { x: 200, y: 50 }, { ctrl: true, shift: true });
+        expect(geometryOf(made(plain))).toEqual({ kind: 'rectangle', width: 400, height: 100 });
+        expect(positionOf(made(plain))).toEqual({ x: 0, y: 0 });
+
+        const snapped = buildShapeTest(TENS_SNAPPER);
+        drag(snapped, { x: 2, y: 3 }, { x: 98, y: 41 }, { ctrl: true, shift: true });
+        expect(geometryOf(made(snapped))).toEqual({ kind: 'rectangle', width: 200, height: 80 });
+        expect(positionOf(made(snapped))).toEqual({ x: 0, y: 0 });
+
+        const circle = buildShapeTest();
+        circle.tool.chooseKind('circle');
+        drag(circle, { x: 0, y: 0 }, { x: 100, y: 40 }, { ctrl: true, shift: true });
+        expect(geometryOf(made(circle))).toEqual({ kind: 'circle', radius: 100 });
+        expect(positionOf(made(circle))).toEqual({ x: 0, y: 0 });
+    });
+
+    test('Shift pressed with Ctrl during a drag turns it to from the centre without a move', () => {
+        const setup = buildShapeTest();
+        setup.controller.pointerDown(pointer({ x: 0, y: 0 }));
+        setup.controller.pointerMove(pointer({ x: 200, y: 100 }, { ctrl: true }));
+        expect(setup.tool.readout?.text).toBe('200 × 100 px');
+
+        setup.controller.keyDown({
+            code: 'ShiftLeft',
+            key: 'Shift',
+            shift: true,
+            alt: false,
+            ctrl: true,
+            repeat: false,
+        });
+
+        expect(setup.tool.readout?.text).toBe('400 × 200 px');
+    });
+
     test('a circle’s drag gives the circle that fits the box, as if Shift were held, and Alt from the centre', () => {
         const setup = buildShapeTest();
         setup.tool.chooseKind('circle');

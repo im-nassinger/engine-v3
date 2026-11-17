@@ -234,7 +234,7 @@ describe('SelectTool resizing', () => {
         expect(square.requireComponent(StyleComponent).get('outlineWidth')).toBe(2);
 
         selection.replace([other.id]);
-        dragHandle(tool, BOTTOM_RIGHT, { x: 100, y: 20 }, { shift: true });
+        dragHandle(tool, BOTTOM_RIGHT, { x: 100, y: 20 }, { shift: true, ctrl: false });
         expect(geometryOf(other)).toEqual(SQUARE);
         expect(transformOf(other, 'scale')).toEqual({ x: 2, y: 2 });
         expect(other.requireComponent(StyleComponent).get('outlineWidth')).toBe(2);
@@ -249,6 +249,32 @@ describe('SelectTool resizing', () => {
 
         expect(transformOf(square, 'scale')).toEqual({ x: 2, y: 1 });
         expect(transformOf(square, 'position')).toEqual({ x: 100, y: 100 });
+    });
+
+    test('Ctrl+Shift resizes from the centre only: proportions free and snapping on', () => {
+        const { square, other, tool, selection } = buildResizeTest();
+        selection.replace([square.id]);
+        dragHandle(tool, RIGHT, { x: 47, y: 0 }, { ctrl: true, shift: true });
+        expect(transformOf(square, 'scale')).toEqual({ x: 2, y: 1 });
+        expect(transformOf(square, 'position')).toEqual({ x: 100, y: 100 });
+
+        selection.replace([other.id]);
+        dragHandle(tool, BOTTOM_RIGHT, { x: 50, y: 0 }, { ctrl: true, shift: true });
+        expect(transformOf(other, 'scale')).toEqual({ x: 2, y: 1 });
+        expect(transformOf(other, 'position')).toEqual({ x: 300, y: 100 });
+    });
+
+    test('Alt+Shift resizes from the centre keeping proportions, and Ctrl alone keeps the opposite side', () => {
+        const { square, other, tool, selection } = buildResizeTest();
+        selection.replace([square.id]);
+        dragHandle(tool, BOTTOM_RIGHT, { x: 50, y: 0 }, { ctrl: false, alt: true, shift: true });
+        expect(transformOf(square, 'scale')).toEqual({ x: 2, y: 2 });
+        expect(transformOf(square, 'position')).toEqual({ x: 100, y: 100 });
+
+        selection.replace([other.id]);
+        dragHandle(tool, RIGHT, { x: 47, y: 0 }, { ctrl: true });
+        expectClose(transformOf(other, 'scale'), { x: 1.47, y: 1 });
+        expectClose(transformOf(other, 'position'), { x: 323.5, y: 100 });
     });
 
     test('dragging past the opposite side mirrors the shape through its scale, its points kept', () => {
