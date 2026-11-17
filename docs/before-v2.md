@@ -15,7 +15,9 @@ Changes the owner asked for that must be built **after v1's 18 stages and before
 | 5 | **Unstyled joints are invisible in play**, joint icons included | owner, 2026-11-17 | Settled, to plan |
 | 6 | **+ zooms in without Shift**, as - zooms out | owner, 2026-11-17 | Settled, to plan |
 | 7 | **Shift+T plays and stops** | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change |
-| 8 | **W, A, S and D resize the selection and the Shape tool's preview**, changing the shape's values | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change, one question open |
+| 8 | **W, A, S and D resize the selection and the Shape tool's preview**, changing the shape's values | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change |
+| 9 | **No part of the editor is covered by another**: find every case and fix it | owner, 2026-11-17 | Settled, to plan |
+| 10 | **"Let connected objects collide" has no description** | owner, 2026-11-17 | Settled, to plan |
 
 ## 1. Resizing changes the scale
 
@@ -127,6 +129,24 @@ To build (*proposal*, Claude's picks, for the owner to change):
 - Entities without a ShapeComponent, locked entities, the World and the camera are skipped with the skip rule's status text.
 - **No grid step.** DR4 says Ctrl+Shift moves one grid step, but the browser keeps Ctrl+Shift+W (close the window), so W couldn't do it. Snapping still applies to the handles.
 
-Open for the owner: Shift+S is already "Snapping to entities on or off" in v3 (`requirements/editor/shortcuts.md`), and this makes it "10 px shorter". Claude's pick: Shift+S stays a resize key, and snapping to entities gets another key when v3 plans it.
+- **Shift+S is 10 px shorter.** It was "Snapping to entities on or off" in v3 (`requirements/editor/shortcuts.md`); that gets another key when v3 plans it (owner, 2026-11-17).
 
 To update when planned: "W, A, S, D set the preview size" in `requirements/drawing.md` (its version and the selection), `requirements/editor/selection.md` (Handles and arrow keys), `requirements/editor/shortcuts.md` (the new rows and Shift+S), `scope.md` (DR4), `architecture/editor/selection-and-tools.md` and `clipboard-and-shortcuts.md`, and the main menu's command list.
+
+## 9. Nothing in the editor is covered
+
+The problem the owner found: many parts of the editor don't show in full, because other parts cover them. There are many, so finding them is part of the work: the owner gave no list.
+
+To build:
+
+- **Find every case.** Open each menu, submenu, tooltip, popup, dropdown, colour picker, options strip, hint and editor message, over each panel and near each edge of the window, at the five window sizes and in the three browsers the layout checks already use. Write each case found in the stage's steps.
+- **A Playwright check proves it**: for each one open, the browser's topmost element at its corners and centre is that element or inside it, and it lies inside the window. It joins the layout checks, so a new case fails CI.
+- **One stacking order for the whole editor** (*proposal*, Claude's pick, for the owner to change): the layers, from the level view up to tooltips, are named once in the shared CSS, and every component uses those names instead of its own numbers. *Why: a number picked in one component is how one part ends up under another.*
+
+To update when planned: `architecture/ui.md` (the stacking order), the layout checks in `architecture/tooling.md` or wherever they are described, and each component's CSS that sets its own stacking.
+
+## 10. "Let connected objects collide" has no description
+
+The owner's words: just call it "Let connected objects collide". The name is enough, and the description under it ("Lets the two bodies bump into each other.") goes. *Why: in a ragdoll the description led the owner to expect limbs joined through other limbs to stop colliding too, and they don't: the setting covers the joint's two bodies only. Ragdolls are for the collision grid in v3 (`requirements/physics/world.md`).*
+
+To update when planned: the joint settings table in `requirements/physics/joints.md`, `jointSchema.ts` and its tests.
