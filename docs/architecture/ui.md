@@ -138,7 +138,7 @@ export function LevelViewHost() {
 
 ## Stage 6's choices
 
-Made under the standing yes (2026-11-15), before building. The [plan](../plan.md#stage-6-in-steps) has the steps.
+Made under the standing yes (2026-11-15), before building. The [plan](../steps/stage-06.md) has the steps.
 
 - **Stage 6 builds the frame, not what fills it.** The top bar leaves the save state (stage 12), Play (stage 16) and the grid snapping switch (stage 9) out; the toolbar shows only Select, active, until the tools come (stages 9, 10 and 14); the status bar shows the status text and the selection, and the mouse position and the editor messages' count come with stages 9 and 8; the Entities panel and the Inspector are empty boxes in their places until stages 7 and 8. *Why: a stage never builds what a later stage owns, and a button that does nothing would be a lie.*
 - **The main menu lists what the registry has**, so it grows as stages register commands. Its submenus come in the order File, Edit, Arrange, View, Play, Tools, Help, and an empty one isn't shown. A switch shows a tick from `checked()`, a disabled entry its reason in a tooltip, and every entry its first shortcut at the right. *Why: the requirement makes the menu "the full list of commands", which only holds if the menu is built from the registry.*

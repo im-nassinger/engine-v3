@@ -140,7 +140,7 @@ The text is JSON with a tag, as the tech notes suggest:
 
 ## Stage 11's choices
 
-Made under the standing yes (2026-11-16), before building. The [plan](../../plan.md#stage-11-in-steps) has the steps.
+Made under the standing yes (2026-11-16), before building. The [plan](../../steps/stage-11.md) has the steps.
 
 - **The commands live in a new `editor/commands/clipboard/`**: `CutCommand`, `CopyCommand`, `PasteCommand` and `DuplicateCommand`, in the Edit menu's second section before Delete (orders 10 to 40), with Ctrl+X, Ctrl+C, Ctrl+V and Ctrl+D. `ClipboardCodec`, `IdRemapping`, `PastePlacement` and `EditorClipboard` are in `editor/clipboard/`, as [parts-and-folders.md](../parts-and-folders.md) places them. *Why: the commands are what the menu and the keys run, the rest is the clipboard's own rules, and each folder keeps one job.*
 - **What is copied:** the selection, without the World and the camera (the skip rule), and without any entity inside another selected one, since its parent brings it. The roots keep panel order. Joints come only when selected, as the requirement says, so a crate copied with its hinge unselected pastes without the hinge.

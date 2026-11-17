@@ -65,7 +65,7 @@ export class TickPacer {
 
 ## The worker boundary
 
-Requests from the page and reports from the worker are plain data, defined once in `adapters/worker/protocol/`:
+Requests from the page and reports from the worker are plain data, defined once in `adapters/worker/game/` ([stage 16's choices](#stage-16s-choices)):
 
 | Request | Answer |
 |---|---|
@@ -152,7 +152,7 @@ The same level, seed, inputs and clock time give the same run on any computer. W
 
 ## Stage 13's choices
 
-Made under the standing yes (2026-11-16), before building. The [plan](../plan.md#stage-13-in-steps) has the steps.
+Made under the standing yes (2026-11-16), before building. The [plan](../steps/stage-13.md) has the steps.
 
 - **Bodies and surfaces only.** Joints, the `JointPathPhase` and `createJoint` come with stage 14, and the `CameraPhase` with stage 15. Until then the report's camera is the camera entity's level position, unchanged, and `stateHash` folds it in already. *Why: the plan gives joints and the camera their own stages, and a stage never builds what a later one owns.*
 - **Where things live:** the contracts `PhysicsEngine` and `PhysicsWorld`, their definitions and `BodyPoses` in `core/physics/contracts/`; `BodyMembership` in `core/physics/membership/` beside `merging/`, which it builds on; `PhysicsSceneBuilder` in `core/physics/scene/`; `Simulation`, `startSimulation` and `runHeadless` in `core/simulation/`, one subfolder per job (`run/`, `phases/`, `report/`, `hash/`, `headless/`); `Box2dPhysicsEngine` and `Box2dPhysicsWorld` in `adapters/box2d/`. *Why: `runHeadless` takes a `PhysicsEngine`, so it stays in core, and the test hands it the Box2D adapter.*
@@ -178,7 +178,7 @@ Made under the standing yes (2026-11-16), before building. The [plan](../plan.md
 
 ## Stage 14's choices
 
-Made under the standing yes (2026-11-16), before building. The [plan](../plan.md#stage-14-in-steps) has the steps; the Joint tool's choices are in [selection-and-tools.md](editor/selection-and-tools.md#stage-14s-choices).
+Made under the standing yes (2026-11-16), before building. The [plan](../steps/stage-14.md) has the steps; the Joint tool's choices are in [selection-and-tools.md](editor/selection-and-tools.md#stage-14s-choices).
 
 - **Field A is Box2D's body B, and field B (or the ground) is Box2D's body A.** *Why: the requirement's motor turns A and its limits stop A turning too far, and Box2D measures the angle of its body B against its body A, as the [tech notes](../tech-notes.md#physics-and-joints) say.*
 - **Box2D 3.2 has no reference angle; it has a local frame on each body.** `Box2dPhysicsWorld` gives both frames the joint's level position, and B's frame the angle between the two bodies at the start, so the placed angle reads 0 and the limits are measured from how the joint was built. Box2D's positive angle is clockwise on screen, like the requirement's. Step 2 found that 3.2 holds a Hinge's limits inside ±180°, so that cap is now in the requirement and the schema, as the spin cap was (see [adapters.md](adapters.md#physics)).
@@ -194,7 +194,7 @@ Made under the standing yes (2026-11-16), before building. The [plan](../plan.md
 
 ## Stage 15's choices
 
-Made under the standing yes (2026-11-16), before building. The [plan](../plan.md#stage-15-in-steps) has the steps. The [camera requirement](../requirements/camera.md) gives the rules; these say how they are built.
+Made under the standing yes (2026-11-16), before building. The [plan](../steps/stage-15.md) has the steps. The [camera requirement](../requirements/camera.md) gives the rules; these say how they are built.
 
 - **Smoothing is an even ease, the same share each tick:** the camera moves `1 − exp(−3 / (60 · Smoothing))` of the way to its goal, so it is 95% of the way there after Smoothing seconds. 0 locks it to the goal. `exp` is `DeterministicMath.exp`. *Why: the requirement calls Smoothing roughly how long the camera takes to catch up; an ease never quite arrives, so "catching up" is read as 95%, and a share per tick needs no speed kept between ticks.*
 - **Each tick, in order:** the goal is the target's level origin, limited to the bounds; the camera smooths towards it; then the safety margin pulls it so the target is at least 10% of the box's width and height from its edge; then it is limited to the bounds again. *Why: limiting the goal first makes the camera slow down gently into an edge instead of hitting it, as the requirement asks; limiting last means the bounds win over the margin, so the camera always ends up inside, and near a wall the target can reach the edge of the view.*
@@ -208,3 +208,22 @@ Made under the standing yes (2026-11-16), before building. The [plan](../plan.md
 - **`fixedSizeView(cameraBox, windowSize)`** in `editor/play/fixed-size/` works out the zoom, the middle and the black bars, in screen pixels. *Why: it is about the window, which never reaches the game, so it stays out of core; `PlaySession` in stage 16 feeds it to the view.*
 - **`PixiLevelView.showThroughCamera(position, box)`** sets its view from `fixedSizeView` and draws `LetterboxOverlay` (`adapters/pixi/overlays/letterbox/`) in black over everything, so nothing of the level shows on a bar. Selection and handles aren't drawn; the grid, camera frame, joint icons and physics view follow their View menu switches, as [adapters.md](adapters.md#rendering) says. Interpolating the camera between ticks, as the tech notes advise, comes with stage 16's mirror.
 - *As built (step 6, standing yes, 2026-11-16):* the view through the camera is a second `ViewState` inside `PixiLevelView`, so the editor's own view is left as it was and `stopShowingThroughCamera()` goes back to it; `shownView` says which one draws. Its middle and zoom are set with a new `ViewState.place`, which skips the editor's 1% to 1000% zoom range and pan limit. *Why: a 160 px camera, the smallest allowed, in a 1920 px window needs 1200%, and the bars must match the zoom drawn.* During play the dimmed outside of the bounds isn't drawn, nor the selection, the Shape tool's preview or the Joint tool's preview and thin lines; `readPixels()` lets the browser tests check every pixel of each bar is black.
+
+## Stage 16's choices
+
+Made under the standing yes (2026-11-16), before building. The [plan](../steps/stage-16.md) has the steps. The [test play requirement](../requirements/play-and-save/test-play.md) gives the rules; these say how they are built.
+
+- **The protocol lives in `adapters/worker/game/`**, beside `import/`, not in a shared `protocol/` folder. *Why: the import worker's protocol already sits with its two ends, and the folder rule wants one area per folder.*
+- **Two answers end a run without waiting:** `failed { reason }` when the level data can't be read (the reader's reason, which should never happen, since the editor wrote it), and `crashed { detail }` when the worker throws during a tick. Both end the run with a message on the Play bar, like a hang, and a crash replaces the worker. *Why: the requirement says a crash ends the run with a message; waiting 5 seconds for the watchdog would hide what happened.*
+- **One worker, prepared when the editor opens and kept between runs.** `stop` drops the run and keeps Box2D loaded. After the watchdog or a crash terminates it, a fresh one is created and prepared at once. The tech notes' spare worker is for Restart, which is v2. *Why: v1 has no Restart, and one loaded worker already makes the first Play fast.*
+- **Play before the worker is ready waits for `ready`**, in the `starting` state; Stop cancels it. *Why: the requirement says Play starts as fast as possible and Stop during loading cancels the start.*
+- **Each batch sends the keys held when it is sent, once for every tick in it.** The inputs list is still per tick in the protocol, so v2 can stamp a key change on its own tick. *Why: nothing reads keys in v1, and a batch is at most 4 ticks; Step sends the keys held at that moment, so "hold right, press Step" works.*
+- **`TickPacer` reads the `Clock` on each frame**, as the [architecture](#pacing-and-time) says, and adds `stepOnce()` for Step. *Why: Step asks for exactly one tick while paused, with no backlog.*
+- **`Watchdog` waits only while a request is unanswered**, and a frame gap over 1 second (a hidden tab or a sleeping computer) starts its wait again. *Why: the tech notes warn that hidden tabs and sleep stretch time; a run that is paused asks for nothing, so it can't look hung.*
+- **The "not responding" notice, the "Stop to edit" hint, the hard limit's warning and an ended run's message show on the Play bar**, since the status bar is hidden during play. A hint goes after 4 seconds like a status text; the ended message stays until Stop. *Why: [errors.md](errors.md) lists the Play bar as the place for a run that ended badly, and the status text has nowhere to show during play.*
+- **`PlayMirror` splits each body into its pose and rest with the code `startSimulation` uses**, moved into a function both call, so the mirror and the worker's play copy compute the same matrices. *Why: the mirror must draw the same shapes as the game moves; one function can't drift from the other.*
+- **The mirror draws between ticks:** each moved body's position goes the straight way and its angle the shorter way round from its last pose to its new one at the pacer's `interpolation`; a snapped body is drawn at its new pose. The camera is drawn between its last two positions the same way. *Why: the requirement asks for smooth drawing at any refresh rate, and teleports with no streak.*
+- **Stop gives back the editor exactly by leaving it untouched:** during play no command that edits runs, Undo and Redo are off, and the tool, selection, current group and view are never changed; Stop only drops the mirror, shows the editor's level, stops drawing through the camera and shows the panels again. *Why: "test play never changes the level or its history" holds by construction, as [Play, Stop, Pause, Step](#play-stop-pause-step) says.*
+- **Play saves now through `Autosave`, and doesn't wait for the save to finish.** A failed save shows its own warning after Stop, as any failed save does. *Why: Play must start as fast as possible, and the level written for the worker is the one being saved.*
+- **The tab title starts `▶ ` while a run is going**, as in `▶ castle - engine-v3`. *Why: the requirement says the tab title shows the game is running; a mark at the front stays visible on a narrow tab.*
+- **The hung-worker test uses a test worker file that never answers**, given to `WorkerGameRunner` the way the app gives it the real one. *Why: v1 can't make the real worker hang (that is v2's endless Lua loop), and the test must use a real worker to prove `terminate()`.*

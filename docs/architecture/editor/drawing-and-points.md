@@ -21,7 +21,7 @@
 
 ## Stage 10's choices
 
-Made under the standing yes (2026-11-16), before building. The [plan](../../plan.md#stage-10-in-steps) has the steps.
+Made under the standing yes (2026-11-16), before building. The [plan](../../steps/stage-10.md) has the steps.
 
 - **`createShape` is an edit, not a registered command**, in a new `editor/commands/draw`, beside `moveEntities`: it has no menu place and no key, and only the Shape tool runs it. It takes the kind, the geometry in the current group's space and the position, and returns the new id for `finished`. The step is `Draw Rectangle 1`. *Why: the [command registry](clipboard-and-shortcuts.md) holds what the menu and the keys run; the plan's `CreateShapeCommand` named the job, not a registered command.* **As built** (standing yes, 2026-11-16): `createShape(openLevel, reader, drawing)` takes the session's `LevelReader` too, since the new entity is added through `AddEntitiesChange` like Group's, and returns `created` with the id or `refused`; the shape gets a NameComponent for its name beside the other three; it is also refused, with Group's `Groups can be at most 256 deep`, when the current group is already that deep. *Why: a tool's context holds the open level but not the session, so stage 10 step 3 adds the reader to `ToolContext`.*
 - **`EntityNamer`'s words** are the kind's name: `Rectangle`, `Circle`, `Polygon`, `Line`. A polygon finished open is named `Line`.

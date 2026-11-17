@@ -211,7 +211,7 @@ export type Snapper = {
 
 ## Stage 9's choices
 
-Made under the standing yes (2026-11-15), before building. The [plan](../../plan.md#stage-9-in-steps) has the steps.
+Made under the standing yes (2026-11-15), before building. The [plan](../../steps/stage-09.md) has the steps.
 
 - **The nested level file comes first** (owner, 2026-11-15), as step 2, before any tool, so every later test writes the new shape. *Why: the tools add nothing to the file, and changing it while nothing else moves keeps the change easy to check.*
 - **Stage 9 builds the Select tool, not what links it to later stages.** `PointEditState` is stage 10's point editing, so until then a double-click on a polygon or line only selects it. Editing text is v2. The Shape and Joint buttons join the toolbar with their stages (10 and 14); the toolbar shows Select alone, which tool lock still applies to. Hover outlines, Alt+click and resizing several entities are v3. *Why: a stage never builds what a later stage owns.*
@@ -253,7 +253,7 @@ Made under the standing yes (2026-11-15), before building. The [plan](../../plan
 
 ## Stage 14's choices
 
-Made under the standing yes (2026-11-16), before building. The [plan](../../plan.md#stage-14-in-steps) has the steps; how joints play is in [simulation.md](../simulation.md#stage-14s-choices).
+Made under the standing yes (2026-11-16), before building. The [plan](../../steps/stage-14.md) has the steps; how joints play is in [simulation.md](../simulation.md#stage-14s-choices).
 
 - **Where things live:** `CreateJointCommand` in `editor/commands/joints/`; `JointTool` and `pickBodyA` in `editor/tools/joint/`; `PointSnapper` in `editor/snapping/point/` beside `grid/`; `JointPreviewOverlay` and `planJointPreview` in `adapters/pixi/overlays/joint-preview/`.
 - **What the tool finds under the mouse:** `HitTester.allAt` with the tool's probe, front to back, so hidden and locked entities are already passed through. Each hit becomes its body through `BodyMembership.bodyOf`, or itself for a surface with no body; hits without either are skipped, and two shapes of one body count once. The two frontmost bodies are used; choosing among three is v3.

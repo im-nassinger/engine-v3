@@ -169,7 +169,7 @@ export class Autosave {
 
 ## Stage 12's choices
 
-Made under the standing yes (2026-11-16), before building. The [plan](../plan.md#stage-12-in-steps) has the steps.
+Made under the standing yes (2026-11-16), before building. The [plan](../steps/stage-12.md) has the steps.
 
 - **Where things live:** `Autosave`, `SaveState`, `EditorSettings`, `LevelOpener`, `ProjectFile`, the import's checks (`ImportCheck`, run by `ImportWorkerHost`) and the contracts `LevelStore`, `SettingsStore`, `TabGuard`, `StoragePersistence`, `ZipCodec`, `ZipReader`, `FileImporter`, `FileExporter` and `FilePicker` are in `editor/saving/`, one subfolder per job (`autosave/`, `settings/`, `opening/`, `project-file/`, `import/`, `contracts/`, `testing/` for the fakes). The New, Import and Export commands are in a new `editor/commands/file/`, in the File menu. The adapters are in `adapters/storage/`, `adapters/zip/`, `adapters/worker/` and a new `adapters/browser/files/` (`FileDownload`, `BrowserFilePicker`, dropping). *Why: the commands are what the menu and keys run, the rest is saving's own rules, as stage 11 split the clipboard.* `EditorSession` gains no `SaveCoordinator`: the composition holds `Autosave` and `LevelOpener`, and the commands get them as `FileParts`, as the clipboard commands get `ClipboardParts`. *Why: `editor/session` importing `editor/saving`, which reads the session's open level, would be a cycle.*
 - **`Autosave` follows the session, not one level**: it reads `session.openLevel.level.version` and starts over on `openLevelChanged`, so New and Import need no new `Autosave`. *Why: the page builds it once, like the rest of the composition.*

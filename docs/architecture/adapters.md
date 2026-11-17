@@ -79,7 +79,7 @@ export type PhysicsWorld = {
 
 ### Stage 4's choices
 
-Made under the standing yes (2026-11-14), before building, and the "as built" entries while building (2026-11-14 and 15). The [plan](../plan.md#stage-4-in-steps) has the steps.
+Made under the standing yes (2026-11-14), before building, and the "as built" entries while building (2026-11-14 and 15). The [plan](../steps/stage-04.md) has the steps.
 
 - **Stage 4 builds what later stages call, not their inputs.** The wheel, Space and middle-drag panning come with `PointerInput` (stage 9); F and the Zoom menu are commands (stages 5 and 6); the `Back to level` button is ui (stage 6, moved to stage 9 with panning: see [ui.md](ui.md#stage-6s-choices)); remembering the view in the browser is `LocalStorageSettings` (stage 12); `SelectionOverlay` is stage 9's and `DrawingPreviewOverlay` stage 10's. *Why: a stage never builds what a later stage owns.*
 - **`PixiLevelView` is given the level, its caches, `ViewState`, `ViewSettings` and a `FrameScheduler`**, not the `EditorSession`, which stage 5 builds. `show(level, caches)` swaps the level, for New, Import and the `PlayMirror`.
@@ -135,7 +135,7 @@ The editor never calls `Date.now`, `setTimeout` or `requestAnimationFrame` itsel
 
 - `WorkerGameRunner` and `GameWorkerHost` are the two ends of the game worker. `app/workers/game.worker.ts` builds the host with the real `Box2dPhysicsEngine`.
 - `ImportWorkerClient` and `ImportWorkerHost` are the two ends of the import worker, which unzips and checks a file away from the page, as the tech notes advise. `app/workers/import.worker.ts` builds it.
-- Both protocols are plain data types in `adapters/worker/protocol/`, shared by the two ends. Large arrays are transferred, not copied.
+- Each protocol is plain data types beside its two ends, in `adapters/worker/import/` and `adapters/worker/game/` (standing yes, 2026-11-16). Large arrays are transferred, not copied.
 
 ## Lua (v2) and audio (v3)
 

@@ -67,7 +67,7 @@ Tools follow the same path when they finish: the Shape tool's release runs a com
 
 ## Stage 5's choices
 
-Made under the standing yes (2026-11-15), before building. The [plan](../../plan.md#stage-5-in-steps) has the steps.
+Made under the standing yes (2026-11-15), before building. The [plan](../../steps/stage-05.md) has the steps.
 
 - **Stage 5 builds the editor's rules, not its page.** `CommandRunner`, the menu, `KeyboardInput` and `ShortcutDispatcher` are stage 6's; F2's renaming in place is the Entities panel's (stage 7); Esc's `EscapeChain` and double-click are stage 9's. `app/startLevelView.ts` and `app/testLevel.ts` stay until stage 6's editor page replaces them. *Why: a stage never builds what a later stage owns.*
 - **`EditorSession` starts with what exists:** `commands`, `view`, `viewSettings`, `status`, `openLevel` and `openLevelChanged`. `shortcuts` joins it in stage 6, `tools` in stage 9, `saving` in stage 12 and `play` in stage 16. **`OpenLevel` starts without `messages` (stage 8) and `hitTester` (stage 9).**

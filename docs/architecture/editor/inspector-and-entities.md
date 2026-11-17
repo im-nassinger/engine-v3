@@ -140,7 +140,7 @@ export type DropTarget = {
 
 ## Stage 7's choices
 
-Made under the standing yes (2026-11-15), before building. The [plan](../../plan.md#stage-7-in-steps) has the steps.
+Made under the standing yes (2026-11-15), before building. The [plan](../../steps/stage-07.md) has the steps.
 
 - **Stage 7 builds the panel, not what links it to later stages.** Hover outlines between a row and the level view are v3 ([selection](../../requirements/editor/selection.md)), so a hovered row only gets the `--hover` background. Selecting in the level view comes with the Select tool in stage 9; until then "a selection made outside the panel" is one made by a command (Select all, Group, Ungroup) or an undo, which reveals its rows the same way. The panel's read-only state during play comes with Play in stage 16, and the lock with v3. *Why: a stage never builds what a later stage owns.*
 - **`EntitiesRows` and `RenameRequest` belong to `OpenLevel`**, next to the selection, because both follow one level and New and Import replace them with it. They live in `editor/entities-panel`, which imports only core, so `editor/session` can hold them without a cycle.
@@ -163,7 +163,7 @@ Made under the standing yes (2026-11-15), before building. The [plan](../../plan
 
 ## Stage 8's choices
 
-Made under the standing yes (2026-11-15), before building. The [plan](../../plan.md#stage-8-in-steps) has the steps.
+Made under the standing yes (2026-11-15), before building. The [plan](../../steps/stage-08.md) has the steps.
 
 - **Stage 8 builds the Inspector, not what links it to later stages.** The entity field's picker that waits for a click in the level view needs stage 9's `ToolController`, so it comes then; stage 8 builds the dropdown and dropping a row. The read-only state during play comes with stage 16, the lock with v3, and the failed save's message with stage 12, which calls `setLevelWide`. *Why: a stage never builds what a later stage owns.*
 - **Card folds are kept in memory until stage 12.** `CardFolds` holds one switch per component type behind a small `FoldStore` contract; stage 12's `LocalStorageSettings` fulfils it, so the folds then survive a reload, as the requirement says. Folding is never a step.

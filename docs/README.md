@@ -17,6 +17,7 @@ Everything known about the project: a 2D physics game with a level editor, for t
 | [architecture/](architecture/README.md) | How the game is built: the stack, the parts of the code, the classes, saving, test play, tests, the tooling and checks |
 | [design/](design/README.md) | How the editor looks: the round 8 answers, the mockups, and later the design system |
 | [plan.md](plan.md) | The v1 plan in 18 stages, each with the docs it implements |
+| [steps/](steps/README.md) | Each stage's steps, one file per stage, written when the stage starts |
 | [review.html](review.html) | The review page where the owner answers questions in the browser. Earlier rounds are in git history |
 | [before-v2.md](before-v2.md) | Changes the owner asked for that are built after v1's stages and before v2 |
 | [proposals/](proposals/README.md) | Proposals waiting for the owner's answer. Empty now |
@@ -30,4 +31,4 @@ Everything known about the project: a 2D physics game with a level editor, for t
 - **To catch up:** progress, overview, then scope.
 - **To work on a feature:** its row in scope, then its topic in requirements. Check the words in the glossary.
 - **To propose something:** principles, then rejected.
-- **To write code:** [plan.md](plan.md) for the current stage, then [architecture/](architecture/README.md) and the requirement files the stage names.
+- **To write code:** [plan.md](plan.md) and the current stage's file in [steps/](steps/README.md), then [architecture/](architecture/README.md) and the requirement files the stage names.
