@@ -37,25 +37,16 @@
   .abs { position: absolute; }
   .blk { background: var(--panel); }
   .bar { background: var(--bar); }
-  .bento .blk, .bento .bar, .bento .viewbox { border-radius: var(--rl); }
   .float .blk, .isl { border-radius: var(--rl); box-shadow: var(--shadow); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
   .isl { background: var(--panel); display: flex; align-items: center; gap: 2px; padding: 0 7px; height: 44px; }
   .viewbox { overflow: hidden; }
   .viewbox svg { display: block; }
 
-  /* Today's lines, only in direction 0 */
-  .lines .top { border-bottom: 1px solid var(--line); }
-  .lines .tools { border-right: 1px solid var(--line); }
-  .lines .insp { border-right: 1px solid var(--line); }
-  .lines .ents { border-left: 1px solid var(--line); }
-  .lines .status { border-top: 1px solid var(--line); }
-  .lines .ph, .lines .ihead { border-bottom: 1px solid var(--line); }
 
   /* The top bar */
   .top { display: flex; align-items: center; gap: 4px; padding: 0 8px; z-index: 3; }
-  .float .top { background: none; padding: 0; display: grid; grid-template-columns: 1fr auto 1fr; }
-  .float .top > .isl:first-child { justify-self: start; }
-  .float .top > .isl:last-child { justify-self: end; }
+  .float-top { background: none; padding: 0; display: flex; justify-content: space-between; }
+  .isl .play { margin-right: 6px; }
   .grow { flex: 1; }
   .ib { height: 28px; min-width: 28px; padding: 0 6px; border-radius: var(--r); display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: var(--text); }
   .ib.hover { background: var(--hover); }
@@ -65,7 +56,6 @@
   .levelname { padding: 0 8px; height: 28px; display: flex; align-items: center; font-weight: 500; }
   .savestate { color: var(--muted); display: flex; align-items: center; gap: 4px; padding-right: 6px; }
   .sep { width: 8px; }
-  .lines .sep { width: 1px; height: 20px; background: var(--line); margin: 0 4px; }
   .play { height: 30px; padding: 0 16px; border-radius: var(--r); background: var(--grad); color: var(--on); display: inline-flex; align-items: center; gap: 7px; font-weight: 600; }
   .play svg.i { fill: currentColor; stroke: none; width: 12px; height: 12px; }
   .play.pill, .btn.pill { border-radius: 999px; }
@@ -74,7 +64,6 @@
   .tools { display: flex; flex-direction: column; align-items: center; padding: 8px 0; gap: 4px; z-index: 2; }
   .tools.h { flex-direction: row; padding: 6px; display: inline-flex; position: static; border-radius: var(--r2); }
   .tool { width: 32px; height: 32px; border-radius: var(--r); display: flex; align-items: center; justify-content: center; position: relative; color: var(--muted); }
-  .lines .tool { color: var(--text); }
   .tool.hover { background: var(--hover); color: var(--text); }
   .tool.on.fill { background: var(--accent); color: var(--on); }
   .tool.on.soft { background: var(--soft); color: var(--ink); }
@@ -103,6 +92,10 @@
   .card.tile { background: var(--raised); border-radius: var(--r2); margin: 0 8px 8px; padding: 2px 0 6px; }
   .card.tile .f, .card.tile .chead { padding-left: 10px; padding-right: 10px; }
   .card.chip { padding-bottom: 12px; }
+  .card.island { background: var(--panel); border-radius: var(--rl); box-shadow: var(--shadow); margin-top: 8px; padding: 4px 0 8px; -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+  .kbox .card.island { margin: 8px 12px 0; box-shadow: 0 4px 16px rgba(0,0,0,.35); background: var(--app); }
+  .insp.bare { overflow: visible; }
+  .insp.bare .ihead { margin-bottom: 0; }
   .chead { height: 32px; display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); font-weight: 600; }
   .chead .t { flex: 1; }
   .chead svg.i { width: 14px; height: 14px; color: var(--faint); }
@@ -120,9 +113,7 @@
   .inp.pill { background: var(--field); border-radius: 999px; padding: 0 11px; }
   .inp.ro { background: transparent; }
   .inp.focus { background: var(--soft); }
-  .lines .inp.focus { background: var(--field); box-shadow: inset 0 0 0 1px var(--accent); }
   .inp.err { background: rgba(229, 83, 75, .16); color: #ff9a93; }
-  .lines .inp.err { background: var(--field); box-shadow: inset 0 0 0 1px var(--danger); color: var(--text); }
   .inp.fillbar { background: linear-gradient(90deg, var(--soft) 0 var(--p), var(--field) var(--p)); }
   .inp .ax { color: var(--muted); }
   .inp .unit { color: var(--faint); margin-left: auto; }
@@ -130,12 +121,10 @@
   .inp.short { flex: 0 0 60px; }
   .msg { padding: 0 var(--inset) 4px calc(var(--inset) + 124px); font-size: 11px; color: #ff9a93; }
   .slider { flex: 1; height: 3px; background: var(--hover); border-radius: 2px; position: relative; }
-  .lines .slider { background: var(--line); }
   .slider i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--muted); border-radius: 2px; }
   .slider b { position: absolute; top: -4px; width: 11px; height: 11px; margin-left: -5.5px; border-radius: 50%; background: var(--text); }
   .cb { width: 15px; height: 15px; border-radius: 4px; background: var(--field); display: inline-flex; align-items: center; justify-content: center; }
-  .lines .cb { background: none; border: 1px solid var(--muted); border-radius: 3px; width: 14px; height: 14px; }
-  .cb.on, .lines .cb.on { background: var(--accent); border-color: var(--accent); color: var(--on); }
+  .cb.on { background: var(--accent); border-color: var(--accent); color: var(--on); }
   .cb.on svg.i { width: 11px; height: 11px; stroke-width: 2.6; }
   .tg { width: 28px; height: 16px; border-radius: 999px; background: rgba(255, 255, 255, .12); position: relative; flex-shrink: 0; }
   .tg::after { content: ""; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--muted); }
@@ -169,11 +158,9 @@
 
   /* What floats: the options strip, menus, dialogs, the Play bar */
   .opts { position: absolute; z-index: 4; display: flex; gap: 2px; padding: 4px; background: var(--menu); border-radius: var(--r2); box-shadow: 0 6px 20px rgba(0,0,0,.3); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
-  .lines .opts { border: 1px solid var(--line); border-radius: var(--r); padding: 3px; }
   .opts .ib { padding: 0 9px; }
   .menu { position: absolute; z-index: 6; min-width: 214px; background: var(--menu); border-radius: var(--r2); box-shadow: 0 12px 32px rgba(0,0,0,.45); padding: 6px; -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
   .menu.static { position: relative; display: inline-block; vertical-align: top; box-shadow: 0 6px 18px rgba(0,0,0,.3); }
-  .lines .menu { border: 1px solid var(--line); border-radius: var(--r); padding: 4px; }
   .mi { height: 28px; display: flex; align-items: center; padding: 0 10px; border-radius: var(--r); gap: 12px; }
   .mi .l { flex: 1; }
   .mi .k { color: var(--muted); font-family: var(--font-num); font-size: 11px; }
@@ -183,24 +170,17 @@
   .menu.solid .mi.hover .k { color: var(--on); opacity: .8; }
   .menu.soft .mi.hover { background: var(--soft); }
   .msep { height: 7px; }
-  .lines .msep { height: 1px; background: var(--line); margin: 4px 6px; }
   .scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, .5); z-index: 7; }
   .dialog { position: absolute; z-index: 8; left: 50%; top: 290px; width: 400px; margin-left: -200px; background: var(--menu); border-radius: calc(var(--r2) + 4px); box-shadow: 0 20px 60px rgba(0,0,0,.55); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
   .dialog.static { position: relative; left: auto; top: auto; margin: 0 16px; width: auto; box-shadow: 0 6px 18px rgba(0,0,0,.3); }
   .dialog h3 { margin: 0; padding: 22px 22px 6px; font-size: calc(var(--fs) + 2px); font-weight: 600; }
   .dialog p { margin: 0; padding: 0 22px 20px; color: var(--muted); line-height: 1.55; }
   .dialog .row { display: flex; justify-content: flex-end; gap: 8px; padding: 0 16px 16px; }
-  .lines .dialog { border: 1px solid var(--line); border-radius: 4px; }
-  .lines .dialog h3 { padding: 16px 16px 6px; }
-  .lines .dialog p { padding: 0 16px 16px; }
-  .lines .dialog .row { border-top: 1px solid var(--line); padding: 12px 16px; }
   .btn { height: 30px; padding: 0 16px; border-radius: var(--r); display: inline-flex; align-items: center; background: var(--raised); color: var(--text); }
-  .lines .btn { background: none; border: 1px solid var(--line); height: 28px; padding: 0 14px; }
-  .btn.primary, .lines .btn.primary { background: var(--grad); color: var(--on); font-weight: 600; border: 0; }
+  .btn.primary { background: var(--grad); color: var(--on); font-weight: 600; border: 0; }
   .btn.dis { color: var(--faint); }
   .addc { margin: 8px var(--inset) 12px; height: 30px; border-radius: var(--r); display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--raised); color: var(--muted); }
   .addc.pill { border-radius: 999px; }
-  .lines .addc { background: none; border: 1px solid var(--line); color: var(--text); }
   .game { position: absolute; inset: 0; background: #000; }
   .playbar { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 2px; padding: 4px; background: var(--menu); border-radius: var(--r2); box-shadow: 0 6px 24px rgba(0,0,0,.45); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
   .playbar.static { position: static; transform: none; display: inline-flex; box-shadow: 0 6px 18px rgba(0,0,0,.3); margin: 0 16px 8px; }
@@ -223,20 +203,19 @@
   /* The parts sheet */
   .sheet { padding: 22px; columns: 4 300px; column-gap: 16px; }
   .kbox { break-inside: avoid; background: var(--panel); border-radius: var(--r2); padding: 14px 0 6px; margin-bottom: 16px; }
-  .lines .kbox { border: 1px solid var(--line); border-radius: 4px; }
   .kbox h4 { margin: 0 16px 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
   .kbox .kd { margin: 0 16px 8px; font-size: 11px; color: var(--faint); line-height: 1.45; }
   .var { padding: 6px 0 10px; }
   .var .vl { padding: 0 16px 6px; font-size: 11px; color: var(--faint); }
   .var .vl b { color: var(--text); font-weight: 600; }
-  .var.cur .vl::after { content: "  ← this direction"; color: var(--ink); }
+  .var.cur .vl::after { content: "  ← this variation"; color: var(--ink); }
   .inl { display: flex; gap: 8px; align-items: center; padding: 0 16px; flex-wrap: wrap; }
   .schem { position: relative; width: 288px; height: 180px; margin: 0 16px; border-radius: 6px; overflow: hidden; background: var(--app); }
 </style>
 </head>
 <body>
 <div class="hdr">
-  <div class="hrow"><span class="lbl">Direction</span><span id="dirs" class="hrow"></span></div>
+  <div class="hrow"><span class="lbl">Variation</span><span id="dirs" class="hrow"></span></div>
   <div class="hrow"><span class="lbl">Show</span><span id="views" class="hrow"></span><span class="lbl" style="width:auto;margin-left:14px">Font</span><span id="fonts" class="hrow"></span></div>
   <div class="hrow"><span class="lbl">Mix</span><span id="overs" style="flex:1"></span></div>
   <div class="caption" id="caption"></div>
@@ -279,55 +258,49 @@ const CHEV = ic('down', 'class="i chev"');
 
 // Each choice that changes the look, with its variants. The number of a variant is its place in the list.
 const KINDS = [
-  ['layout', 'Layout', 'Where the panels sit. The panels\' places and sizes stay as the requirements say.', [['flush', 'Flush'], ['bento', 'Tiles with gaps'], ['float', 'Floating islands']]],
+  ['layout', 'Layout', 'Where the panels sit. The panels\' places and sizes stay as the requirements say.', [['float', 'Full-height panels'], ['hug', 'Entities panel fits its rows']]],
   ['head', 'Panel titles', '', [['title', 'Title'], ['caps', 'Small caps']]],
-  ['card', 'Inspector cards', 'How one component\'s card is told apart from the next.', [['line', 'Lines (today)'], ['space', 'Space only'], ['tile', 'Tiles'], ['chip', 'Colour dot']]],
+  ['card', 'Inspector cards', 'How one component\'s card is told apart from the next.', [['space', 'Space only'], ['tile', 'Tiles'], ['chip', 'Colour dot'], ['island', 'Each card an island']]],
   ['field', 'Fields', 'Normal, focused and refused. Ghost fields show their box only under the mouse.', [['filled', 'Filled'], ['ghost', 'Ghost'], ['pill', 'Pill']]],
   ['slider', 'Sliders', '', [['thin', 'Thin track'], ['fill', 'Filled field']]],
   ['check', 'Checkboxes', '', [['box', 'Box'], ['switch', 'Switch']]],
   ['row', 'Selected row', 'Crate 2 is under the mouse, Rectangle 1 is selected.', [['tint', 'Tint'], ['pill', 'Pill'], ['solid', 'Solid'], ['mark', 'Coloured text']]],
   ['tool', 'Active tool', 'The Shape tool is active, the mouse is on Joint.', [['fill', 'Filled'], ['soft', 'Soft'], ['glow', 'Glow'], ['grad', 'Gradient'], ['dot', 'Dot']]],
   ['btn', 'Buttons', '', [['rounded', 'Rounded'], ['pill', 'Pill']]],
-  ['menu', 'Menus', 'No separator lines outside today\'s look: groups are split by a gap.', [['solid', 'Solid hover'], ['soft', 'Soft hover']]],
+  ['menu', 'Menus', 'Groups are split by a gap, not a line.', [['solid', 'Solid hover'], ['soft', 'Soft hover']]],
   ['note', 'Editor messages', '', [['box', 'Box'], ['tint', 'Tinted'], ['plain', 'Plain']]],
   ['handle', 'Selection handles', 'In the level view.', [['square', 'Square'], ['round', 'Round'], ['dot', 'Filled dot']]],
-  ['play', 'Play bar', 'Running, then paused.', [['frame', 'Frame (today)'], ['dot', 'Pill with a dot'], ['tint', 'Tinted pill']]]
+  ['play', 'Play bar', 'Running, then paused.', [['dot', 'Pill with a dot'], ['tint', 'Tinted pill']]]
 ];
 
 // The directions. Each is a set of tokens and one variant of each kind.
+const BASE = { layout: 'float', head: 'caps', card: 'tile', field: 'filled', slider: 'fill', check: 'switch', row: 'pill', tool: 'fill', btn: 'rounded', menu: 'solid', note: 'tint', handle: 'round', play: 'dot' };
+const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
+  accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: '0 10px 40px rgba(0,0,0,.35)' };
+const dir = (id, name, desc, t, s) => ({ id, name, desc, t: Object.assign({}, SLATE, t), s: Object.assign({}, BASE, s) });
 const DIRS = [
-  { id: '0', name: 'Today', desc: 'The current design, for comparison: flush panels with 1 px lines, 4 px corners, cool blue-grey and blue.',
-    t: { app: '#16191e', panel: '#21252c', raised: '#262a32', field: '#191c22', hover: '#2b3039', line: '#323843', text: '#d5dbe5', muted: '#8a93a3', faint: '#5d6574',
-      accent: '#3b82f6', soft: 'rgba(59,130,246,.24)', on: '#fff', ink: '#d5dbe5', r: 4, r2: 4, rl: 0, rowh: 28, inset: 12, lines: true },
-    s: { layout: 'flush', head: 'title', card: 'line', field: 'filled', slider: 'thin', check: 'box', row: 'tint', tool: 'fill', btn: 'rounded', menu: 'solid', note: 'box', handle: 'square', play: 'frame' } },
-  { id: '1', name: 'Bento', desc: 'Every part is a rounded tile on a dark frame, with 6 px gaps instead of lines. Graphite with violet. Cards are split by space alone, titles are small caps. The level view becomes a tile too, so it no longer fills the window, which the workspace requirement asks for.',
-    t: { app: '#0e0e11', panel: '#1b1b20', raised: '#232329', field: '#141418', hover: '#25252c', text: '#e6e6ea', muted: '#8e8e9a', faint: '#5a5a66',
-      accent: '#8b7cf6', soft: 'rgba(139,124,246,.2)', on: '#fff', ink: '#b3a9ff', r: 7, r2: 10, rl: 14, rowh: 28, inset: 14 },
-    s: { layout: 'bento', head: 'caps', card: 'space', field: 'filled', slider: 'thin', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'round', play: 'dot' } },
-  { id: '2', name: 'Islands', desc: 'The level fills the whole window and the panels float over it as rounded islands with soft shadows. The top bar splits into three islands, with Play alone in the middle. Slate with a bright blue.',
-    t: { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
-      accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: '0 10px 40px rgba(0,0,0,.35)' },
-    s: { layout: 'float', head: 'caps', card: 'tile', field: 'filled', slider: 'fill', check: 'switch', row: 'pill', tool: 'fill', btn: 'rounded', menu: 'solid', note: 'tint', handle: 'round', play: 'dot' } },
-  { id: '3', name: 'Quiet', desc: 'Near-black, flush with the window and no lines: the bars and the panels differ by tone only. Fields have no box until the mouse is on them. Mint marks only what is active. Taller rows and more air.',
-    t: { app: '#0e0f11', panel: '#141518', bar: '#0e0f11', raised: '#1b1c20', field: '#1d1e22', hover: '#1c1d21', text: '#d9dadf', muted: '#7c7f88', faint: '#4c4f57',
-      accent: '#5eead4', soft: 'rgba(94,234,212,.12)', on: '#062a25', ink: '#5eead4', r: 6, r2: 10, rl: 0, rowh: 32, inset: 16 },
-    s: { layout: 'flush', head: 'caps', card: 'space', field: 'ghost', slider: 'thin', check: 'switch', row: 'tint', tool: 'dot', btn: 'rounded', menu: 'soft', note: 'plain', handle: 'square', play: 'dot' } },
-  { id: '4', name: 'Glass', desc: 'Floating islands of frosted glass: the level shows blurred through the panels. A coral-to-orange gradient for Play and the active tool, pill-shaped fields and buttons.',
-    t: { app: '#101118', panel: 'rgba(26,28,40,.74)', menu: 'rgba(30,32,46,.86)', raised: 'rgba(255,255,255,.05)', field: 'rgba(255,255,255,.08)', hover: 'rgba(255,255,255,.09)', text: '#f1f2f6', muted: '#a3a6b8', faint: '#6b6e80',
-      accent: '#ff6b8b', soft: 'rgba(255,107,139,.2)', on: '#fff', ink: '#ff9cb1', grad: 'linear-gradient(135deg,#ff6b8b,#ff9a5a)', r: 10, r2: 14, rl: 18, rowh: 30, inset: 14, blur: 22, shadow: '0 12px 40px rgba(0,0,0,.3)' },
-    s: { layout: 'float', head: 'caps', card: 'tile', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'grad', btn: 'pill', menu: 'soft', note: 'tint', handle: 'dot', play: 'tint' } },
-  { id: '5', name: 'Candy', desc: 'Tiles in deep plum with lilac and pastel colours. Each component has its own colour dot, rounder corners, switches and pills. The most playful, made for a game. The level view is a tile, as in Bento.',
-    t: { app: '#120d1a', panel: '#1d1628', raised: '#261d33', field: '#16101f', hover: '#2a2137', text: '#efe9f7', muted: '#a194b5', faint: '#66597a',
-      accent: '#c4a1ff', soft: 'rgba(196,161,255,.18)', on: '#1e1033', ink: '#d6bfff', r: 9, r2: 14, rl: 18, rowh: 30, inset: 14 },
-    s: { layout: 'bento', head: 'title', card: 'chip', field: 'pill', slider: 'thin', check: 'switch', row: 'solid', tool: 'fill', btn: 'pill', menu: 'solid', note: 'tint', handle: 'round', play: 'tint' } },
-  { id: '6', name: 'Neon', desc: 'Pure black, flush and tight. One cyan accent that glows on the active tool; the selected row is only cyan text. Terminal-like, best with the mono font.',
-    t: { app: '#000', panel: '#0a0a0b', bar: '#000', raised: '#121214', field: '#131315', hover: '#161618', text: '#e8e8e8', muted: '#7a7a7a', faint: '#444',
-      accent: '#22d3ee', soft: 'rgba(34,211,238,.12)', on: '#001a1f', ink: '#22d3ee', r: 4, r2: 6, rl: 0, rowh: 26, inset: 12 },
-    s: { layout: 'flush', head: 'caps', card: 'space', field: 'filled', slider: 'thin', check: 'box', row: 'mark', tool: 'glow', btn: 'rounded', menu: 'soft', note: 'plain', handle: 'square', play: 'dot' } },
-  { id: '7', name: 'Ember', desc: 'Warm charcoal tiles with orange, the accent Claude suggested in round 8. Cards as tiles, filled fields, boxes for checks. Calm, a little warmer than the others.',
-    t: { app: '#11100e', panel: '#1c1a17', raised: '#24211d', field: '#151310', hover: '#28241f', text: '#ece6df', muted: '#9a9086', faint: '#5f5850',
-      accent: '#f97316', soft: 'rgba(249,115,22,.18)', on: '#fff', ink: '#ffa665', r: 7, r2: 10, rl: 12, rowh: 28, inset: 14 },
-    s: { layout: 'bento', head: 'caps', card: 'tile', field: 'filled', slider: 'thin', check: 'box', row: 'tint', tool: 'fill', btn: 'rounded', menu: 'solid', note: 'box', handle: 'round', play: 'dot' } }
+  dir('1', 'Islands', 'The one you picked, with Play moved to the start of the right island. The level fills the window and the panels float over it with soft shadows. Slate with a bright blue, cards as tiles.', {}, {}),
+  dir('2', 'Midnight', 'Islands in deep navy with an indigo accent. Cards split by space alone, the active tool soft instead of filled.',
+    { panel: 'rgba(17,21,36,.96)', app: '#0a0c16', text: '#e6e9f5', muted: '#8a91ad', faint: '#525a78', accent: '#7c8cff', soft: 'rgba(124,140,255,.2)', ink: '#aab4ff' },
+    { card: 'space', tool: 'soft', menu: 'soft' }),
+  dir('3', 'Graphite', 'Neutral grey islands with no blue tint, and a system blue. Panel titles as plain titles, a little like macOS.',
+    { panel: 'rgba(30,30,32,.96)', app: '#111112', text: '#ececee', muted: '#8e8e93', faint: '#5a5a5f', accent: '#0a84ff', soft: 'rgba(10,132,255,.22)', ink: '#64b0ff' },
+    { head: 'title' }),
+  dir('4', 'Mint', 'Slate islands with a teal accent and a colour dot on each card.',
+    { panel: 'rgba(20,24,27,.96)', accent: '#2dd4bf', soft: 'rgba(45,212,191,.16)', on: '#04201c', ink: '#5eead4' },
+    { card: 'chip', tool: 'soft' }),
+  dir('5', 'Soft', 'Rounder and roomier: 22 px islands, taller rows, pill fields and buttons, cards split by space.',
+    { panel: 'rgba(30,32,38,.96)', accent: '#6c8cff', soft: 'rgba(108,140,255,.2)', ink: '#a5b8ff', r: 10, r2: 14, rl: 22, rowh: 32, inset: 18 },
+    { card: 'space', field: 'pill', btn: 'pill', play: 'tint' }),
+  dir('6', 'Compact', 'Tighter: smaller corners and rows, fields with no box until the mouse is on them, a dot under the active tool.',
+    { r: 6, r2: 8, rl: 12, rowh: 26, inset: 12 },
+    { card: 'space', field: 'ghost', slider: 'thin', check: 'box', tool: 'dot', menu: 'soft' }),
+  dir('7', 'Frosted', 'The same islands in frosted glass: the level shows blurred through the panels.',
+    { panel: 'rgba(22,25,32,.72)', menu: 'rgba(26,29,37,.88)', blur: 20, shadow: '0 12px 40px rgba(0,0,0,.28)' }, {}),
+  dir('8', 'Floating cards', 'Each Inspector card is its own island, so the level shows between them. Entities panel fits its rows.',
+    {}, { card: 'island', layout: 'hug' }),
+  dir('9', 'Warm', 'Warm charcoal islands with orange.',
+    { panel: 'rgba(30,27,24,.96)', app: '#12100e', text: '#efe9e2', muted: '#a0958a', faint: '#625a52', accent: '#ff8a3d', soft: 'rgba(255,138,61,.18)', ink: '#ffb07a' }, {})
 ];
 
 const FONTS = [
@@ -338,8 +311,8 @@ const FONTS = [
 ];
 const VIEWS = [['shape', 'A selected shape'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
 
-let state = { dir: '2', view: 'shape', font: 'mono', over: {} };
-try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-redesign') || '{}')); } catch (e) {}
+let state = { dir: '1', view: 'shape', font: 'mono', over: {} };
+try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands') || '{}')); } catch (e) {}
 let S, T;
 
 function tokensCss(t) {
@@ -356,12 +329,8 @@ const pos = ([x, y, w, h]) => `left:${x}px;top:${y}px;width:${w}px;${h == null ?
 // Where each part sits, in window pixels, for each layout. The sizes are the requirement's.
 const W = 1440, H = 900;
 function geo(layout) {
-  if (layout === 'flush') return { view: [0, 44, W, H - 68], top: [0, 0, W, 44], tools: [0, 44, 44, H - 68], insp: [44, 44, 300, H - 68], ents: [W - 260, 44, 260, H - 68], status: [0, H - 24, W, 24], strip: [52, 52], menu: [8, 40] };
-  if (layout === 'bento') {
-    const g = 6, y = g + 44 + g, sh = 26, h = H - y - g - sh - g, vx = g + 44 + g + 300 + g;
-    return { top: [g, g, W - 2 * g, 44], tools: [g, y, 44, h], insp: [g + 44 + g, y, 300, h], ents: [W - g - 260, y, 260, h], view: [vx, y, W - g - 260 - g - vx, h], status: [g, H - g - sh, W - 2 * g, sh], strip: [62, 62], menu: [12, 52] };
-  }
-  return { view: [0, 0, W, H], top: [10, 10, W - 20, 44], tools: [10, 64, 48, null], insp: [68, 64, 300, H - 74], ents: [W - 270, 64, 260, H - 74], status: [378, H - 38, W - 378 - 280, 28], strip: [68, 64], menu: [10, 60] };
+  const entsH = layout === 'hug' ? 17 * T.rowh + 56 : H - 74;
+  return { view: [0, 0, W, H], top: [10, 10, W - 20, 44], tools: [10, 64, 48, null], insp: [68, 64, 300, H - 74], ents: [W - 270, 64, 260, entsH], status: [378, H - 38, W - 378 - 280, 28], strip: [68, 64], menu: [10, 60] };
 }
 
 // The sample level, in level pixels. The origin is the middle of the level, y points down.
@@ -395,7 +364,7 @@ function drawShape(s, X, Y, z, opts) {
   return `<polygon points="${s.p.map(([a, b]) => X(a + dx) + ',' + Y(b + dy)).join(' ')}" ${style}/>`;
 }
 function handle(x, y) {
-  if (S.handle === 'square') return `<rect x="${x - 4}" y="${y - 4}" width="8" height="8" rx="${T.lines ? 0 : 1.5}" style="fill:#fff;stroke:var(--accent)" stroke-width="1.5"/>`;
+  if (S.handle === 'square') return `<rect x="${x - 4}" y="${y - 4}" width="8" height="8" rx="1.5" style="fill:#fff;stroke:var(--accent)" stroke-width="1.5"/>`;
   if (S.handle === 'round') return `<circle cx="${x}" cy="${y}" r="4.5" style="fill:#fff;stroke:var(--accent)" stroke-width="1.5"/>`;
   return `<circle cx="${x}" cy="${y}" r="4.5" style="fill:var(--accent);stroke:#fff" stroke-width="1.5"/>`;
 }
@@ -469,9 +438,10 @@ const CHIP = { TransformComponent: '#8fb5ff', ShapeComponent: '#7ee2b8', StyleCo
 const card = (title, body) => `<div class="card ${S.card}"><div class="chead">${S.card === 'chip' ? `<span class="dotc" style="background:${CHIP[title]}"></span>` : ic('down')}<span class="t">${title}</span>${ic('dots')}</div>${body}</div>`;
 
 function inspector() {
-  return `<div class="abs blk panel insp" style="${pos(geo(S.layout).insp)}"><div class="ph ${S.head}">Inspector</div>
-    <div class="ihead"><span style="color:var(--muted);display:flex">${ic('rect')}</span><div class="nm ${S.field === 'filled' ? '' : S.field}">Rectangle 1</div><span class="ib eye">${ic('eye')}</span></div>
-    <div style="overflow:hidden">
+  const bare = S.card === 'island';
+  return `<div class="abs panel insp${bare ? ' bare' : ' blk'}" style="${pos(geo(S.layout).insp)}">${bare ? '<div class="blk" style="border-radius:var(--rl)">' : ''}<div class="ph ${S.head}">Inspector</div>
+    <div class="ihead"><span style="color:var(--muted);display:flex">${ic('rect')}</span><div class="nm ${S.field === 'filled' ? '' : S.field}">Rectangle 1</div><span class="ib eye">${ic('eye')}</span></div>${bare ? '</div>' : ''}
+    <div style="overflow:${bare ? 'visible' : 'hidden'}">
     ${card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°') + F.vec('Scale', '1', '1') + F.num('Skew', '0', '°'))}
     ${card('ShapeComponent', F.choice('Kind', 'Rectangle') + F.num('Width', '160', 'px') + F.num('Height', '80', 'px', { focus: true }))}
     ${card('StyleComponent', F.colour('Fill', '#4a90d9') + F.colour('Outline colour', '#1f3552') + F.num('Outline width', '2', 'px') + F.num('Opacity', '100', '%', { slider: 1 }))}
@@ -487,21 +457,20 @@ function topbar(o = {}) {
   const play = `<span class="play ${S.btn}">${ic('play')}Play</span>`;
   const right = `<span class="ib">View${CHEV}</span><span class="ib num">40%${CHEV}</span><span class="ib">${ic('help')}</span>`;
   const g = geo(S.layout).top;
-  if (S.layout === 'float') return `<div class="abs top" style="${pos(g)}"><div class="isl">${left}</div><div class="isl">${play}</div><div class="isl">${right}</div></div>`;
-  return `<div class="abs top bar" style="${pos(g)}">${left}<span class="grow"></span>${play}<span class="grow"></span>${right}</div>`;
+  return `<div class="abs top float-top" style="${pos(g)}"><div class="isl">${left}</div><div class="isl">${play}${right}</div></div>`;
 }
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
 const toolstrip = (active) => `<div class="abs blk tools" style="${pos(geo(S.layout).tools)}">${TOOLS.map((t) => toolHtml(t, active)).join('')}</div>`;
 function statusbar(hint, posText, sel) {
-  const cls = S.layout === 'float' ? 'blk' : 'bar';
+  const cls = 'blk';
   return `<div class="abs status ${cls}" style="${pos(geo(S.layout).status)}"><span class="hint">${hint}</span><span class="num">${posText}</span><span>${sel}</span>
     <span class="warn">${ic('warning', 'style="color:var(--warning)"')}<span class="num">1</span></span></div>`;
 }
 function view(opts) {
   const g = geo(S.layout), v = g.view;
   const cx = (g.insp[0] + g.insp[2] + g.ents[0]) / 2 - v[0];
-  const cy = (S.layout === 'float' ? (64 + H) / 2 : v[1] + v[3] / 2) - v[1];
+  const cy = (v[1] === 0 ? (64 + H) / 2 : v[1] + v[3] / 2) - v[1];
   return `<div class="abs viewbox" style="${pos(v)}">${scene(v[2], v[3], 0.38, cx, cy, Object.assign({ grid: true, cameraFrame: true, joints: true }, opts))}</div>`;
 }
 function editor(o) {
@@ -544,13 +513,11 @@ const MOMENTS = {
 
 // The parts sheet: each kind with all its variants, drawn in the chosen direction's colours.
 function schematic(layout) {
-  const g = geo(layout), k = 0.2, r = Math.max(2, (layout === 'flush' ? 0 : Math.max(T.rl, 10)) * k);
-  const box = (rect, bg, extra = '') => `<div style="position:absolute;left:${rect[0] * k}px;top:${rect[1] * k}px;width:${rect[2] * k}px;height:${(rect[3] ?? 160) * k}px;background:${bg};border-radius:${layout === 'flush' ? 0 : r}px;${extra}"></div>`;
-  const sh = layout === 'float' ? 'box-shadow:0 2px 6px rgba(0,0,0,.3)' : '';
-  let s = box(g.view, BG);
-  if (layout === 'float') s += box([10, 10, 520, 44], 'var(--panel)', sh) + box([660, 10, 120, 44], 'var(--panel)', sh) + box([1180, 10, 250, 44], 'var(--panel)', sh);
-  else s += box(g.top, 'var(--bar)');
-  for (const p of ['tools', 'insp', 'ents', 'status']) s += box(g[p], p === 'status' && layout !== 'float' ? 'var(--bar)' : 'var(--panel)', sh);
+  const g = geo(layout), k = 0.2, r = Math.max(2, T.rl * k);
+  const box = (rect, bg, extra = '') => `<div style="position:absolute;left:${rect[0] * k}px;top:${rect[1] * k}px;width:${rect[2] * k}px;height:${(rect[3] ?? 160) * k}px;background:${bg};border-radius:${r}px;${extra}"></div>`;
+  const sh = 'box-shadow:0 2px 6px rgba(0,0,0,.3)';
+  let s = box(g.view, BG) + box([10, 10, 520, 44], 'var(--panel)', sh) + box([1010, 10, 420, 44], 'var(--panel)', sh);
+  for (const p of ['tools', 'insp', 'ents', 'status']) s += box(g[p], 'var(--panel)', sh);
   return `<div class="schem">${s}</div>`;
 }
 const PARTS = {
@@ -580,7 +547,7 @@ function partsSheet() {
 function picksText(d) {
   const changed = Object.entries(state.over).filter(([k, v]) => v && v !== d.s[k]);
   const font = FONTS.find((f) => f[0] === state.font);
-  let s = `Direction ${d.id} ${d.name}`;
+  let s = `Islands variation ${d.id} ${d.name}`;
   for (const [k, v] of changed) {
     const kind = KINDS.find((x) => x[0] === k), i = kind[3].findIndex((x) => x[0] === v);
     s += `, ${kind[1].toLowerCase()} ${i + 1} ${kind[3][i][1]}`;
@@ -609,16 +576,16 @@ function render() {
   const overs = document.getElementById('overs');
   overs.innerHTML = KINDS.map(([key, title, , variants]) => `<label class="ov">${title}<select data-k="${key}" class="${state.over[key] && state.over[key] !== d.s[key] ? 'changed' : ''}">` +
     variants.map(([v, label], i) => `<option value="${v}"${S[key] === v ? ' selected' : ''}>${i + 1} ${label}${d.s[key] === v ? ' ·' : ''}</option>`).join('') + `</select></label>`).join('') +
-    `<button class="pick" id="reset">Reset to the direction</button>`;
+    `<button class="pick" id="reset">Reset to the variation</button>`;
   for (const sel of overs.querySelectorAll('select')) sel.onchange = () => { state.over[sel.dataset.k] = sel.value; render(); };
   document.getElementById('reset').onclick = () => { state.over = {}; render(); };
-  document.getElementById('caption').textContent = `${d.desc} All directions are dark: a light theme is in rejected.md. "·" in a list marks the direction's own pick.`;
+  document.getElementById('caption').textContent = `${d.desc} "·" in a list marks the variation's own pick.`;
   document.getElementById('picks').textContent = picksText(d);
   const parts = state.view === 'parts';
-  const cls = ['ed', S.layout, T.lines ? 'lines' : '', parts ? 'tall' : ''].join(' ');
+  const cls = ['ed', 'float', parts ? 'tall' : ''].join(' ');
   document.getElementById('frame').innerHTML = `<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
   document.getElementById('stage').classList.toggle('scroll', parts);
-  try { localStorage.setItem('engine-v3-redesign', JSON.stringify(state)); } catch (e) {}
+  try { localStorage.setItem('engine-v3-islands', JSON.stringify(state)); } catch (e) {}
   fit();
 }
 function fit() {
