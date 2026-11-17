@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 16, step 1 of 12: the steps and choices for test play are written. Next is step 2, the game worker's protocol and `GameWorkerHost`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 16, step 2 of 12: the game worker's protocol and `GameWorkerHost` are built. Next is step 3, the `GameRunner` contract with `DirectGameRunner` and `WorkerGameRunner`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
