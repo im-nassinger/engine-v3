@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 16, step 6 of 12: `PlayMirror` is built: read with the play copy's own `startPlayCopy` on a `NoPhysicsEngine`, its matrices equal the play copy's after each report, and `drawAt` draws bodies, the camera and rope paths between ticks. Next is step 7, `PlaySession`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 16, step 7 of 12: `PlaySession` is built: Play commits, saves, writes and starts, ignored mid-drag or with a dialog open; Stop cancels a start and leaves the editor untouched; Pause, Resume and Step; a failed, crashed or hung run ends with its message; the hard limit's warning names the body. Next is step 8, inputs and focus. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

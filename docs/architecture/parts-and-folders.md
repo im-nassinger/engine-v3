@@ -71,7 +71,7 @@ src/
     clipboard/         ClipboardCodec, PastePlacement, IdRemapping
     shortcuts/         KeyChord, KeyPress, ShortcutMap, ShortcutDispatcher
     saving/            Autosave, SaveState, ProjectFile, ImportLevel, ExportLevel, contracts
-    play/              PlaySession, TickPacer, Watchdog; mirror/ (PlayMirror, NoPhysicsEngine), runner/ (the GameRunner contract), fixed-size/ (fixedSizeView), testing/ (DirectGameRunner)
+    play/              session/ (PlaySession), pacing/ (TickPacer), watchdog/ (Watchdog), mirror/ (PlayMirror, NoPhysicsEngine), runner/ (the GameRunner contract), fixed-size/ (fixedSizeView), testing/ (DirectGameRunner)
     status/            StatusText (the status bar's left slot), the status bar's texts (selectionSummary, mousePositionText)
     time/              Clock, Timer, FrameScheduler, TimeOfDay contracts
   adapters/

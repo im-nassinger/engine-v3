@@ -5,3 +5,12 @@ export type { GameCrash, GameRunner, StartOutcome, TicksOutcome } from './runner
 export { TickPacer } from './pacing/TickPacer.ts';
 export { Watchdog } from './watchdog/Watchdog.ts';
 export type { WatchdogVerdict } from './watchdog/Watchdog.ts';
+export {
+    CRASHED_TEXT,
+    FAILED_TEXT,
+    HUNG_TEXT,
+    NOT_RESPONDING_TEXT,
+    PlaySession,
+    STOP_TO_EDIT_TEXT,
+} from './session/PlaySession.ts';
+export type { PlaySessionOptions, PlayState } from './session/PlaySession.ts';
