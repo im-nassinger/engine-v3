@@ -171,6 +171,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Full screen.** Esc, tab switching and Alt+Tab all end it, and going back needs a click.
 - **Without a GPU, Chromium draws a 1280×720 level view in about 28 ms.** Found on 2026-11-17: a page that draws every frame then runs at about 36 frames a second, its `page.evaluate` waits about 30 ms, and a one-pixel Playwright screenshot about 240 ms, against 37 ms when nothing is drawn. Firefox and WebKit stay at 60. So the level view draws only when something on it changed, also during play.
 - **A page that never waits for an animation frame gets no worker messages.** Found in stage 17 (2026-11-17): in Chromium drawing without a GPU, as on CI, a loop that waits only on `setTimeout` gets the game worker's answers late and in bursts, and soon not at all, so the watchdog ends the run. Waiting for `requestAnimationFrame` each frame lets them in. The editor's frames come from `requestAnimationFrame`, so only a test that runs frames on its own clock must wait for one too (`tests/performance/testPlay.browser.test.ts`).
+- **Without a GPU, reading one pixel back after a frame of 1,000 moving crates takes about 110 ms** (2026-11-17, this laptop with SwiftShader on 4 cores; on CI the frames came about 0.35 s apart). The session sends at most 4 ticks a frame, so there test play runs at about a sixth of its speed, and a speed test's tick count is held to what its frames allow.
 
 ## Saving and files
 

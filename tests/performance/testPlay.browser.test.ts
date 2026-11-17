@@ -9,7 +9,7 @@ import { Signal } from '../../src/core/events/index.ts';
 import type { LevelData } from '../../src/core/level-data/index.ts';
 import type { Level } from '../../src/core/level/index.ts';
 import type { RunStart, TickInputs } from '../../src/core/simulation/index.ts';
-import { PlaySession } from '../../src/editor/play/index.ts';
+import { PlaySession, TickPacer } from '../../src/editor/play/index.ts';
 import type { GameRunner, StartOutcome, TicksOutcome } from '../../src/editor/play/index.ts';
 import { EditorSession } from '../../src/editor/session/index.ts';
 import { ManualFrames, ManualTimer } from '../../src/editor/time/testing/index.ts';
@@ -233,14 +233,18 @@ describe('test play with 1,000 Dynamic crates', () => {
 
         const smooth = percentile(times, SMOOTH_SHARE);
         const expectedTicks = PLAY_SECONDS * TICKS_PER_SECOND;
+        // The session asks for at most TickPacer.maxBatch ticks a frame, so a slow computer slows the game. The
+        // frames here wait, untimed, for the drawing, about 0.1 to 0.35 s each without a GPU, as on CI, so there
+        // the ticks are held to what the frames allow, and only a game falling behind its frames fails.
+        const ticksTheFramesAllow = Math.min(expectedTicks, times.length * TickPacer.maxBatch);
         console.info(
             `Test play with ${CRATE_COUNT} crates: the first tick drawn ${firstTickMs.toFixed(0)} ms after Play; ` +
                 `in ${playedSeconds.toFixed(1)} s, ${times.length} frames, 95% within ${smooth.toFixed(1)} ms ` +
-                `(target ${FRAME_TIME_LIMIT_MS} ms), ${ticks} ticks (target ${expectedTicks})`,
+                `(target ${FRAME_TIME_LIMIT_MS} ms), ${ticks} ticks (target ${expectedTicks}, ${ticksTheFramesAllow} as the frames allow)`,
         );
         expect(opened.play.state).toBe('playing');
         expect(firstTickMs).toBeLessThan(LARGE_SLOWDOWN * FIRST_TICK_LIMIT_MS);
         expect(smooth).toBeLessThan(LARGE_SLOWDOWN * FRAME_TIME_LIMIT_MS);
-        expect(ticks).toBeGreaterThan(expectedTicks / LARGE_SLOWDOWN);
+        expect(ticks).toBeGreaterThan(ticksTheFramesAllow / LARGE_SLOWDOWN);
     });
 });
