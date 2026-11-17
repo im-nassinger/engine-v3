@@ -259,7 +259,15 @@ function buildPartBlocks(part: Part): Linter.Config[] {
 }
 
 export default defineConfig(
-    globalIgnores(['dist/', 'docs/', 'tools/*.js', 'node_modules/', 'test-results/', 'playwright-report/']),
+    globalIgnores([
+        'dist/',
+        'dist-determinism-page/',
+        'docs/',
+        'tools/*.js',
+        'node_modules/',
+        'test-results/',
+        'playwright-report/',
+    ]),
     js.configs.recommended,
     tseslint.configs.recommendedTypeChecked,
     {
@@ -291,7 +299,7 @@ export default defineConfig(
     PARTS.flatMap(buildPartBlocks),
     {
         name: 'engine-v3/config-files',
-        files: ['*.config.ts'],
+        files: ['*.config.ts', 'tests/determinism/page/vite.config.ts'],
         rules: {
             'no-restricted-syntax': 'off',
         },

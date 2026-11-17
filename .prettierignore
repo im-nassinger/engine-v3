@@ -1,6 +1,7 @@
 docs/
 tools/*.js
 dist/
+dist-determinism-page/
 package-lock.json
 node_modules/
 # Written by npm run determinism:record, never by hand.

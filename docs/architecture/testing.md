@@ -54,7 +54,7 @@ for (const testLevel of determinismLevels) {
 | The same level twice in one process, and after a Stop and Play | No state leaks between runs |
 
 - **When it fails**, the test names the first tick that differs and the first body whose numbers differ, which usually points at the cause.
-- The tech notes' phone check (x86 against ARM in a phone browser) is a page in `tests/determinism/page/` that runs the same levels and shows the hashes. **A Playwright test runs it** at phone sizes and in Chromium on CI's ARM runner, since no check is done by hand (owner, 2026-11-14; standing yes, 2026-11-17, see [performance.md](performance.md#stage-17s-choices)).
+- The tech notes' phone check (x86 against ARM in a phone browser) is a page in `tests/determinism/page/` that runs the same levels and shows the hashes. **A Playwright test runs it** at phone sizes and in Chromium on CI's ARM runner, since no check is done by hand (owner, 2026-11-14; standing yes, 2026-11-17, see [performance.md](performance.md#stage-17s-choices)). *As built (stage 17 step 7, standing yes, 2026-11-17):* the page has its own Vite config, `tests/determinism/page/vite.config.ts`, built into `dist-determinism-page/` so it never empties the game's `dist/` while Playwright builds both at once, and served on port 4174; it and `determinism.browser.test.ts` share the bundled levels and hashes in `tests/determinism/bundled/`. The Playwright projects `phone-chromium` (Pixel 7) and `phone-webkit` (iPhone 15) run only `tests/e2e/phone/`, and the desktop projects skip it; CI's `phone-arm` job runs `phone-chromium` on `ubuntu-24.04-arm` on every push. Each row of the page shows a level's ticks, its last hash and whether it matches.
 
 ## Browser tests
 
@@ -84,4 +84,4 @@ Described in [performance.md](performance.md#targets-and-their-tests). They run 
 
 ## In CI
 
-On every push: `npm run check` on x86 and ARM (type checks with each part's own `tsconfig`, ESLint, Prettier's check, dependency-cruiser, unit and guard tests, `node tools/check-docs.js`), and from stage 13 the determinism test in Node on both; browser tests in three browsers, the determinism test among them from stage 13. The journeys run on master. The jobs are in [tooling.md](tooling.md#ci).
+On every push: `npm run check` on x86 and ARM (type checks with each part's own `tsconfig`, ESLint, Prettier's check, dependency-cruiser, unit and guard tests, `node tools/check-docs.js`), and from stage 13 the determinism test in Node on both; browser tests in three browsers, the determinism test among them from stage 13. The journeys run on master, and the phone checks in Chromium on ARM on every push. The jobs are in [tooling.md](tooling.md#ci).

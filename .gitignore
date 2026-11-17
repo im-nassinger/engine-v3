@@ -1,5 +1,6 @@
 node_modules/
 dist/
+dist-determinism-page/
 .DS_Store
 *.log
 *.tsbuildinfo
