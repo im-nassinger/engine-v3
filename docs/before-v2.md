@@ -11,6 +11,7 @@ Changes the owner asked for that must be built **after v1's 18 stages and before
 | 1 | **Resizing changes the scale**, not the shape's values. Polygons and lines lose Width and Height | owner, 2026-11-16 | Outlines still open |
 | 2 | **Z and X rotate the selection**, Shift+Z and Shift+X by 10° | owner, 2026-11-16 | Settled, with Claude's picks for the owner to change |
 | 3 | **Ctrl+Shift while resizing resizes from the centre** | owner, 2026-11-16 | Two questions open |
+| 4 | **The Joint tool says why an entity can't take a joint** | owner, 2026-11-16 | Settled, to plan |
 
 ## 1. Resizing changes the scale
 
@@ -50,3 +51,15 @@ Open for the owner:
 - Does Alt stay as a second way to resize from the centre, for the Shape tool's drawing too?
 
 To update when planned: the resizing row of the keys table in `requirements/editor/selection.md`, the v3 "Several entities together" rule there, `architecture/editor/selection-and-tools.md` (`ResizeState`), and the Shape tool's keys if drawing follows.
+
+## 4. The Joint tool says why an entity can't take a joint
+
+The problem the owner found: clicking an entity with no physics with the Joint tool seems to do nothing. The click shows "Nothing with physics here" as the status text, but it is small, far from the mouse, and doesn't say which entity or why.
+
+To build:
+
+- **The preview's label gives the reason before the click**, when the mouse is over an entity the tool skips: "Platform has no BodyComponent", "Platform is hidden", "Platform is locked". The click still does nothing, and the status text repeats the same reason.
+- **A Rope or Spring's second click on an entity the tool skips is refused** with the same reason. Today it counts as empty space and pins that end to the background, making a joint the user didn't mean.
+- No fix button in the preview: the preview can't be clicked, and a fix button belongs in an editor message on the card.
+
+To update when planned: "The Joint tool" in `requirements/physics/joints.md` (the skip and hint rules), `architecture/editor/selection-and-tools.md` if it describes the Joint tool's preview, and `JointTool.ts` with its tests.
