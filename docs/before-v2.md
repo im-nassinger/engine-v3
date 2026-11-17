@@ -2,22 +2,22 @@
 
 ## TL;DR
 
-Changes the owner asked for that must be built **after v1's 18 stages and before v2 starts**. Each is written into the requirements, the architecture and a stage of [plan.md](plan.md) when it is planned. Until then, the plan's stages and the requirements stay as they are. This is the one place these changes are listed.
+Changes the owner asked for that must be built **after v1's 18 stages and before v2 starts**. They are planned as stage 18 of [plan.md](plan.md), in [steps/stage-18.md](steps/stage-18.md) (2026-11-17); each step writes its change into the requirements and the architecture as it builds it. This is the one place these changes are listed.
 
 ## The list
 
 | # | Change | Asked | State |
 |---|---|---|---|
-| 1 | **Resizing changes the scale**, not the shape's values. Polygons and lines lose Width and Height | owner, 2026-11-16 | Outlines still open |
-| 2 | **Z and X rotate the selection and the Shape tool's preview**, Shift+Z and Shift+X by 10° | owner, 2026-11-16 and 2026-11-17 | Settled, with Claude's picks for the owner to change |
-| 3 | **Ctrl+Shift while resizing resizes from the centre** | owner, 2026-11-16 | Two questions open |
-| 4 | **The Joint tool says why an entity can't take a joint** | owner, 2026-11-16 | Settled, to plan |
-| 5 | **Unstyled joints are invisible in play**, joint icons included | owner, 2026-11-17 | Settled, to plan |
-| 6 | **+ zooms in without Shift**, as - zooms out | owner, 2026-11-17 | Settled, to plan |
-| 7 | **Shift+T plays and stops** | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change |
-| 8 | **W, A, S and D resize the selection and the Shape tool's preview**, changing the shape's values | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change |
-| 9 | **No part of the editor is covered by another**: find every case and fix it | owner, 2026-11-17 | Settled, to plan |
-| 10 | **"Let connected objects collide" has no description** | owner, 2026-11-17 | Settled, to plan |
+| 1 | **Resizing changes the scale**, not the shape's values. Polygons and lines lose Width and Height | owner, 2026-11-16 | Settled, with Claude's picks for the owner to change; steps 7 and 8 |
+| 2 | **Z and X rotate the selection and the Shape tool's preview**, Shift+Z and Shift+X by 10° | owner, 2026-11-16 and 2026-11-17 | Settled, with Claude's picks for the owner to change; steps 10 and 11 |
+| 3 | **Ctrl+Shift while resizing resizes from the centre** | owner, 2026-11-16 | Settled, with Claude's picks for the owner to change; step 9 |
+| 4 | **The Joint tool says why an entity can't take a joint** | owner, 2026-11-16 | Settled; step 5 |
+| 5 | **Unstyled joints are invisible in play**, joint icons included | owner, 2026-11-17 | Settled; step 4 |
+| 6 | **+ zooms in without Shift**, as - zooms out | owner, 2026-11-17 | Settled; step 3 |
+| 7 | **Shift+T plays and stops** | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change; step 6 |
+| 8 | **W, A, S and D resize the selection and the Shape tool's preview**, changing the shape's values | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change; steps 12 and 13 |
+| 9 | **No part of the editor is covered by another**: find every case and fix it | owner, 2026-11-17 | Settled; steps 14 and 15 |
+| 10 | **"Let connected objects collide" has no description** | owner, 2026-11-17 | Settled; step 2 |
 
 ## 1. Resizing changes the scale
 
@@ -27,7 +27,12 @@ The owner decided:
 - Resizing any shape with the handles changes its TransformComponent (its scale), never its shape values (width, height, radius, points).
 - The code must be changed to match before v2 starts.
 
-Still open: outlines. With resizing changing the scale, an uneven resize stretches the outline unevenly. The owner asked whether this can be a setting on the StyleComponent. Claude's answer: yes, a checkbox such as "Scale outline" that, when off, keeps the outline's width whatever the scale. Its name, its default, and whether it also ignores a parent group's scale still need the owner's answer.
+Outlines: with resizing changing the scale, an uneven resize stretches the outline unevenly. The owner asked whether this can be a setting on the StyleComponent. Claude's answer was yes, a checkbox that, when off, keeps the outline's width whatever the scale. Its name, its default and whether it ignores a parent group's scale were left open, and are decided under the standing yes (2026-11-17), for the owner to change:
+
+- **It is called "Scale outline"**, a checkbox on the StyleComponent under the outline's width.
+- **Off by default.** *Why: the owner's worry was an uneven resize stretching the outline, and W, A, S and D keep the outline's width too ([8](#8-w-a-s-and-d-resize)), so by default the handles and the keys agree.* A level saved before the checkbox reads with it off.
+- **It covers only the entity's own scale.** With it off, the outline is as wide as its width says, measured in the parent's space, however the entity's own TransformComponent scales it. A scaled group still stretches everything inside it, outlines included, as "Width and height, not scale" says ("like a picture"). *Why: that rule is the owner's (round 1: D21), and ignoring a group's scale would override it.*
+- **Shift no longer multiplies the outline's width.** A proportional resize is an even scale, so the outline follows the checkbox like any other resize.
 
 To update once that's settled: `requirements/drawing.md` ("Width and height, not scale"), `requirements/editor/selection.md`, `architecture/core-model/components-and-fields.md`, `architecture/editor/selection-and-tools.md` (`EntityResize`, the readout), `architecture/core-model/geometry.md` (outline bounds), `glossary.md`, `scope.md`, `decisions.md`, and a stage before v2 in `plan.md`. The World keeps resizing its rectangle, because its TransformComponent is fixed.
 
@@ -52,10 +57,11 @@ The owner's words: holding Ctrl and Shift while resizing resizes from the centre
 
 Today Shift keeps proportions, Alt resizes from the centre and Ctrl turns snapping off. *Why it matters: on Linux with GNOME, Alt+drag moves the window, so Alt can't reach the page there.*
 
-Open for the owner:
+The two questions left open are decided under the standing yes (2026-11-17), for the owner to change:
 
-- Does Ctrl+Shift also keep proportions, as Shift alone does, and turn snapping off, as Ctrl alone does?
-- Does Alt stay as a second way to resize from the centre, for the Shape tool's drawing too?
+- **Ctrl+Shift only resizes from the centre.** It neither keeps proportions nor turns snapping off: the pair means one thing, not the sum of Ctrl and Shift. *Why: the owner asked for Ctrl+Shift to mean "from the centre", and a third meaning on the same keys would make it the only way to get the other two.*
+- **Alt stays a second way**, for the handles and the Shape tool's drawing, where the system lets it reach the page. Alt+Shift resizes from the centre keeping proportions, as today. *Why: Alt works on Windows and macOS, and taking it away would change what works there for no gain.*
+- **The Shape tool's drawing follows:** Ctrl+Shift draws from the centre, as Alt does.
 
 To update when planned: the resizing row of the keys table in `requirements/editor/selection.md`, the v3 "Several entities together" rule there, `architecture/editor/selection-and-tools.md` (`ResizeState`), and the Shape tool's keys if drawing follows.
 

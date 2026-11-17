@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 17, step 11 of 11: stage 17, the speed pass and the browser checks, is written up in the docs, with its numbers, test counts and what it leaves for later. Next is stage 18, Before v2, whose steps are to be written. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 18, step 1 of 16: stage 18, Before v2, is planned in [16 steps](steps/stage-18.md), its row is in the plan, and the open questions of changes 1 and 3 in [before-v2.md](before-v2.md) are decided under the standing yes. Next is step 2, "Let connected objects collide" without its description. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -38,7 +38,8 @@
 | Stage 15, the camera | Done on 2026-11-16. See below |
 | Stage 16, test play | Done on 2026-11-17. See below |
 | Stage 17, the speed pass and the browser checks | Done on 2026-11-17. See below |
-| Code | Stages 0 to 17 done. Stage 18, Before v2, is next; its steps are not written yet |
+| Stage 18, Before v2 | Planned on 2026-11-17 in [16 steps](steps/stage-18.md); step 1 done |
+| Code | Stages 0 to 17 done. Stage 18, Before v2, is being built |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists. It is a finished one-time proof; decisions made after the review are cited as `owner: <date>`.
 
@@ -254,7 +255,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-1. **Stage 18 of [plan.md](plan.md): Before v2**, every change in [before-v2.md](before-v2.md). Its first step adds its row to the plan's stages table and writes its steps in [steps/](steps/README.md); nothing of v2 is built after it.
+1. **Stage 18 of [plan.md](plan.md): Before v2**, every change in [before-v2.md](before-v2.md), in the order of its [steps](steps/stage-18.md); nothing of v2 is built after it.
 2. A stage ends with its tests passing, this file updated, and a commit.
 
 ## How to change a requirement
@@ -281,4 +282,4 @@ Left open by 2026-11-16's variables change, all for v2 unless marked. None block
 
 ## Before v2
 
-The owner's changes to build after v1's stages and before v2 starts (resizing changes the scale, Z and X rotate, Ctrl+Shift resizes from the centre) are listed in [before-v2.md](before-v2.md), with their open questions.
+The owner's changes to build after v1's stages and before v2 starts (resizing changes the scale, Z and X rotate, Ctrl+Shift resizes from the centre) are listed in [before-v2.md](before-v2.md) and planned as stage 18 in [steps/stage-18.md](steps/stage-18.md). Their last open questions, the outline setting of change 1 and the keys of change 3, were decided under the standing yes (2026-11-17) and are there for the owner to change.
