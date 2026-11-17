@@ -141,8 +141,15 @@ async function shownBoxTop(page: Page, x: number) {
     return top;
 }
 
+// The canvas is drawn on the next frame, so a change the page shows, such as the top bar coming back
+// after Stop, may come a frame before the box is drawn where that change puts it.
+async function waitForBoxShown(page: Page, x: number) {
+    await expect.poll(async () => (await boxTopAt(page, x)) !== undefined, { intervals: [50] }).toBe(true);
+}
+
 // The box's top, once it has stopped moving on screen: two looks STILL_MS apart agree.
 async function settledBoxTop(page: Page, x: number) {
+    await waitForBoxShown(page, x);
     let before = await shownBoxTop(page, x);
     for (;;) {
         await page.waitForTimeout(STILL_MS);
