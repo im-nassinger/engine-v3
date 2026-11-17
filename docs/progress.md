@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 16, step 3 of 12: the `GameRunner` contract, `DirectGameRunner` and `WorkerGameRunner` are built, and the editor prepares the game worker when it opens. Next is step 4, `TickPacer`. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 16, step 4 of 12: `TickPacer` is built, pacing 60 ticks a second in batches of at most 4 with the backlog capped at 15 ticks, Pause, Step and `interpolation`. Next is step 5, `Watchdog`. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
