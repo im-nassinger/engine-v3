@@ -12,6 +12,9 @@ Changes the owner asked for that must be built **after v1's 18 stages and before
 | 2 | **Z and X rotate the selection**, Shift+Z and Shift+X by 10° | owner, 2026-11-16 | Settled, with Claude's picks for the owner to change |
 | 3 | **Ctrl+Shift while resizing resizes from the centre** | owner, 2026-11-16 | Two questions open |
 | 4 | **The Joint tool says why an entity can't take a joint** | owner, 2026-11-16 | Settled, to plan |
+| 5 | **Unstyled joints are invisible in play**, joint icons included | owner, 2026-11-17 | Settled, to plan |
+| 6 | **+ zooms in without Shift**, as - zooms out | owner, 2026-11-17 | Settled, to plan |
+| 7 | **T plays and stops** | owner, 2026-11-17 | Settled, with Claude's picks for the owner to change, one question open |
 
 ## 1. Resizing changes the scale
 
@@ -63,3 +66,44 @@ To build:
 - No fix button in the preview: the preview can't be clicked, and a fix button belongs in an editor message on the card.
 
 To update when planned: "The Joint tool" in `requirements/physics/joints.md` (the skip and hint rules), `architecture/editor/selection-and-tools.md` if it describes the Joint tool's preview, and `JointTool.ts` with its tests.
+
+## 5. Unstyled joints are invisible in play
+
+The problem the owner found: during test play, joints are drawn even when they have no StyleComponent.
+
+The requirement already says this ("Joints have no special drawing in play. An unstyled joint is invisible, like any entity", `requirements/physics/joints.md`), so this is the build not matching it. The likely cause: `JointIconOverlay` checks only the Joint icons switch, not whether the level is playing.
+
+To build:
+
+- **During play, no joint icon or ring is drawn.** A Rope or Spring with a StyleComponent shows through its path, as JO5 says; every other joint shows nothing.
+- After Stop, the joint icons come back as the Joint icons switch says.
+- A Playwright test plays a level with an unstyled Hinge and a styled Rope, and checks only the Rope is drawn.
+
+To update when planned: `JointIconOverlay.ts` and `PixiLevelView.ts` with their tests, and `architecture/adapters.md` if it says what the overlays draw in play.
+
+## 6. + zooms in without Shift
+
+The problem the owner found: - zooms out, but + zooms in only with Shift held.
+
+Why: `ZoomInCommand` listens for the typed character `+` and for Ctrl+=. On most keyboards, US and ABNT2 included, + is Shift on the = key, so the key alone types `=`, which nothing listens for.
+
+To build:
+
+- **The = key alone zooms in**, as - alone zooms out, so the key that holds + works with or without Shift. The numpad's + and - keep working.
+- Ctrl+= and Ctrl+- stay.
+
+To update when planned: the zoom row of `requirements/editor/shortcuts.md`, `ZoomInCommand.ts` and its tests, and `architecture/editor/clipboard-and-shortcuts.md` if it lists the zoom keys.
+
+## 7. T plays and stops
+
+The owner's words: to play or stop a level, the T key should be used.
+
+To build (*proposal*, Claude's picks, for the owner to change):
+
+- **T plays, and stops while playing**, wherever the editor's single-letter keys work. In a text field or the code editor, T types a T.
+- **Ctrl+Enter stays** as the second way, since it is the one that works from inside a field or the code editor.
+- The Play button's tooltip and the main menu show T.
+
+Open for the owner: from v2 the game reads keys, so a level could use T as one of its inputs. Should T then still stop the run, taking the key from the game, or should only Ctrl+Enter and the Stop button stop it while the game reads keys?
+
+To update when planned: the Play row of `requirements/editor/shortcuts.md`, "Ctrl+Enter starts and stops" in `requirements/play-and-save/test-play.md`, `architecture/editor/clipboard-and-shortcuts.md` (the Play row), the Play command's shortcuts and its tests.
