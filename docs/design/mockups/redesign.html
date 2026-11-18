@@ -157,7 +157,7 @@
   .leftcol > .insp { flex: 1; min-height: 0; }
   .leftcol > .opts { position: static; align-self: flex-start; }
   .minimap { position: absolute; z-index: 2; padding: 3px; }
-  .minimap svg { display: block; border-radius: 13px; }
+  .minimap svg { display: block; border-radius: calc(var(--rl) - 3px); }
   .dock { position: absolute; transform: translateX(-50%); height: 46px; z-index: 3; }
   .onebar .hint { color: var(--muted); font-size: 12px; white-space: nowrap; }
   .barnums { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 12px; margin-right: 14px; }
@@ -366,7 +366,7 @@ const KINDS = [
 // The directions. Each is a set of tokens and one variant of each kind.
 const BASE = { title: 'boundsize', actions: 'apart', burger: 'with', name: 'plain', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
 const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
-  accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
+  accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 10, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s, view) => ({ id, name, desc, view, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
   dir('1', '☰ over the tool column', '', {})
@@ -645,11 +645,11 @@ function inspector(o) {
   return `<div class="panel insp${bare ? ' bare' : ' blk'}">${bare ? '<div class="blk" style="border-radius:var(--rl)">' : ''}${head}<div class="ph ${S.head}">Entity inspector</div>
     <div class="ihead"><span style="color:var(--muted);display:flex">${ic('rect')}</span><div class="nm ${S.field === 'filled' ? '' : S.field}">Rectangle 1</div><span class="ib eye">${ic('eye')}</span></div>${bare ? '</div>' : ''}
     <div style="overflow:${bare ? 'visible' : 'hidden'}">
-    ${card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°') + F.vec('Scale', '1', '1') + F.num('Skew', '0', '°'))}
-    ${card('ShapeComponent', F.choice('Kind', 'Rectangle') + F.num('Width', '160', 'px') + F.num('Height', '80', 'px', { focus: true }))}
-    ${card('StyleComponent', F.colour('Fill', '#4a90d9') + F.colour('Outline colour', '#1f3552') + F.num('Outline width', '2', 'px') + F.num('Opacity', '100', '%', { slider: 1 }))}
-    ${card('BodyComponent', F.choice('Type', 'Dynamic') + F.num('Gravity scale', '1', '', { slider: .55 }) + F.num('Linear damping', '0', '', { slider: 0 }) + F.check('Fixed rotation', false) + F.check('Bullet', false) + F.check('Merge', true) + F.num('Mass', '5.12', 'kg', { ro: true }))}
-    ${card('SurfaceComponent', F.num('Density', '1', '', { slider: .01 }) + F.num('Friction', '0.3', '', { slider: .06 }) + F.num('Restitution', '0', '', { slider: 0 }) + F.check('Sensor', false))}
+    ${card('Transform', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°') + F.vec('Scale', '1', '1') + F.num('Skew', '0', '°'))}
+    ${card('Shape', F.choice('Kind', 'Rectangle') + F.num('Width', '160', 'px') + F.num('Height', '80', 'px', { focus: true }))}
+    ${card('Style', F.colour('Fill', '#4a90d9') + F.colour('Outline colour', '#1f3552') + F.num('Outline width', '2', 'px') + F.num('Opacity', '100', '%', { slider: 1 }))}
+    ${card('Body', F.choice('Type', 'Dynamic') + F.num('Gravity scale', '1', '', { slider: .55 }) + F.num('Linear damping', '0', '', { slider: 0 }) + F.check('Fixed rotation', false) + F.check('Bullet', false) + F.check('Merge', true) + F.num('Mass', '5.12', 'kg', { ro: true }))}
+    ${card('Surface', F.num('Density', '1', '', { slider: .01 }) + F.num('Friction', '0.3', '', { slider: .06 }) + F.num('Restitution', '0', '', { slider: 0 }) + F.check('Sensor', false))}
     </div></div>`;
 }
 
@@ -733,7 +733,7 @@ function schematic() {
 const PARTS = {
   layout: schematic,
   head: () => `<div class="ph ${S.head}">Entity inspector</div>`,
-  card: () => card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°')) + card('ShapeComponent', F.choice('Kind', 'Rectangle') + F.num('Width', '160', 'px')),
+  card: () => card('Transform', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°')) + card('Shape', F.choice('Kind', 'Rectangle') + F.num('Width', '160', 'px')),
   field: () => F.num('Width', '160', 'px', { hov: true }) + F.num('Height', '80.25', 'px', { focus: true }) + F.num('Friction', 'abc', '', { err: true }) + `<div class="msg">Can't read this as a number</div>` + F.colour('Fill', '#4a90d9'),
   slider: () => F.num('Gravity scale', '1', '', { slider: .55 }) + F.num('Opacity', '100', '%', { slider: 1 }),
   check: () => F.check('Merge', true) + F.check('Bullet', false),
@@ -741,7 +741,7 @@ const PARTS = {
   tool: () => `<div class="inl"><span class="blk tools h">${TOOLS.map((t) => toolHtml(t, 'shape', 'joint')).join('')}</span><span class="tip-box">Joint<span class="k">6</span></span></div>`,
   btn: () => `<div class="inl"><span class="btn ${S.btn}">Cancel</span><span class="btn primary ${S.btn}">Replace</span><span class="play ${S.btn}">${ic('play')}Play</span></div>`,
   menu: () => `<div class="inl"><div class="menu static ${S.menu}">${menuBody([['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C', 'hover'], ['Paste', 'Ctrl+V'], '-', ['Redo', 'Ctrl+Shift+Z', 'dis']])}</div></div>`,
-  note: () => `<div class="note ${S.note}">${ic('warning', 'style="color:var(--warning);margin-top:1px"')}<span>Needs a SurfaceComponent to collide. <span class="fix">Add SurfaceComponent</span></span></div>` +
+  note: () => `<div class="note ${S.note}">${ic('warning', 'style="color:var(--warning);margin-top:1px"')}<span>Needs a Surface to collide. <span class="fix">Add Surface</span></span></div>` +
     `<div class="note ${S.note} tipn">${ic('info', 'style="color:var(--tip);margin-top:1px"')}<span>A tip reads the same, with a blue icon.</span></div>`,
   handle: () => `<div class="inl"><svg width="200" height="90" viewBox="0 0 200 90" style="border-radius:6px"><rect width="200" height="90" fill="${WORLD_FILL}"/><rect x="60" y="25" width="80" height="40" fill="#4a90d9" stroke="#1f3552"/><rect x="60" y="25" width="80" height="40" fill="none" style="stroke:var(--accent)" stroke-width="1.5"/>${handles(60, 25, 80, 40)}</svg></div>`,
   play: () => playbar(false, 'static') + playbar(true, 'static')
