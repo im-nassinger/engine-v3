@@ -568,7 +568,7 @@ const TOOLS = ['select', 'shape', 'joint'];
 const DEBUG_H = 28;
 const debugHeight = () => DEBUG_H;
 function bottom(o) {
-  const cells = [['X', o.x], ['Y', o.y], ['GRID', '50'], ['ZOOM', zoomText()]].map(([l, v]) => `<span><b>${l}</b>${v}</span>`).join('');
+  const cells = [['X', o.x], ['Y', o.y], ['GRID', '50'], ['ZOOM', zoomText()]].map(([l, v]) => `<span><b>${l}:</b>${v}</span>`).join('');
   return `<div class="debug" style="right:${M}px;top:${H - M - DEBUG_H}px;height:${DEBUG_H}px">${cells}</div>`;
 }
 function toolColumn(o) {
