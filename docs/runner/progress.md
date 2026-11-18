@@ -13,7 +13,7 @@
 | Restarting itself when its own code changes | Done |
 | Pushing after each step | Works since 2026-11-15. The first push started CI. Since 2026-11-15 the runner pushes, not the session |
 | Acting on CI | Since 2026-11-16: waits for CI after each push; a red CI makes the next session fix it, and three failed fixes pause the runner |
-| Stopping before v2 | Since 2026-11-16: stage 18 is the before-v2 changes, and the runner stops only after it |
+| Stopping before v2 | Since 2026-11-18: stage 19, the redesign, is the last, and the runner stops only after it (before: stage 18, the before-v2 changes) |
 | The short prompt | Since 2026-11-15: context, the step's loop, and `STATUS`, `SUMMARY`, `NEEDS` |
 
 ## Known issues

@@ -163,8 +163,8 @@ function readStageName(stage: number) {
     return match?.[1] ?? '';
 }
 
-// Stage 18, the changes in docs/before-v2.md, is the last; the runner stops before v2.
-const LAST_STAGE = 18;
+// Stage 19, the redesign (docs/steps/stage-19.md), is the last; the runner stops before v2.
+const LAST_STAGE = 19;
 
 function isLastStageDone() {
     const runnerLine = parseRunnerLine(fs.readFileSync(progressFile, 'utf8'));
@@ -389,7 +389,7 @@ async function main() {
         failuresInARow = 0;
         const report = outcome.report;
         if (report.status === 'finished' && !isLastStageDone()) {
-            // Only the end of stage 18, the before-v2 changes, finishes the run.
+            // Only the end of stage 19, the redesign, finishes the run.
             report.status = 'done';
         }
         await reportStep(report, outcome.newCommits);
@@ -406,9 +406,11 @@ async function main() {
             const finalCiFailure = await checkCi();
             if (finalCiFailure !== undefined) continue;
 
-            statusFile.setState('Finished: v1 and the before-v2 changes are done, and the runner has stopped.');
+            statusFile.setState(
+                'Finished: v1, the before-v2 changes and the redesign are done, and the runner has stopped.',
+            );
             await announce(
-                '🎉 **v1 is finished**, with the before-v2 changes. Every stage of the plan is done. The runner stops before v2.',
+                '🎉 **The redesign is built**, after v1 and the before-v2 changes. Every stage of the plan is done. The runner stops before v2.',
             );
             return;
         }

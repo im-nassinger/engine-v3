@@ -1,5 +1,5 @@
-// v1's stages 0 to 17, then stage 18, the changes in docs/before-v2.md.
-const STAGE_COUNT = 19;
+// v1's stages 0 to 17, then stage 18, the changes in docs/before-v2.md, and stage 19, the redesign.
+const STAGE_COUNT = 20;
 
 export type SessionStatus = 'done' | 'blocked' | 'finished';
 
