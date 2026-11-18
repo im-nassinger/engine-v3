@@ -27,14 +27,6 @@
   .stage { flex: 1; position: relative; overflow: hidden; }
   .stage.scroll { overflow-y: auto; }
   .frame { position: absolute; left: 50%; top: 8px; width: 1440px; margin-left: -720px; transform-origin: top center; border-radius: 10px; overflow: hidden; }
-  /* The browser around the editor: its tab carries the level's name, as the requirement's tab title does */
-  .chrome { height: 38px; background: #1f2126; display: flex; align-items: flex-end; padding: 0 10px; gap: 8px; font: 12px/1 system-ui, sans-serif; }
-  .chrome .dots { display: flex; gap: 7px; align-self: center; margin-right: 8px; }
-  .chrome .dots i { width: 11px; height: 11px; border-radius: 50%; background: #3a3d44; }
-  .chrome .btab { height: 30px; width: 230px; padding: 0 12px; border-radius: 9px 9px 0 0; background: #0d0f13; color: #e4e8ef; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-  .chrome .btab .fav { width: 14px; height: 14px; border-radius: 4px; background: #4f8cff; flex-shrink: 0; }
-  .chrome .btab .x { margin-left: auto; color: #6b7280; }
-  .chrome .btab.other { background: transparent; color: #8b93a1; width: 180px; }
 
   /* The editor. Its tokens are set per direction on .ed. */
   .ed { position: relative; width: 1440px; height: 900px; overflow: hidden; background: var(--app); color: var(--text); font-family: var(--font-ui); font-size: var(--fs);
@@ -151,11 +143,12 @@
   .minimap { position: absolute; z-index: 2; padding: 3px; }
   .minimap svg { display: block; border-radius: 13px; }
   .maphead { height: 32px; display: flex; align-items: center; gap: 7px; padding: 0 11px; white-space: nowrap; overflow: hidden; }
-  .maphead .dirty, .actisl .dirty, .mhead .dirty { width: 7px; height: 7px; border-radius: 50%; background: #fff; flex-shrink: 0; }
-  .actisl .dirty { margin: 0 8px 0 -6px; }
-  .mhead { padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 3px; }
-  .mhead .n { display: flex; align-items: center; gap: 8px; font-size: calc(var(--fs) + 2px); font-weight: 500; }
-  .mhead .s { color: var(--muted); font-size: 11px; }
+  .maphead .dirty, .viewlabel .dirty, .stname .dirty { width: 7px; height: 7px; border-radius: 50%; background: #fff; flex-shrink: 0; }
+  .lc-thumb { width: 30px; height: 30px; border-radius: 7px; overflow: hidden; flex-shrink: 0; margin: 0 4px 0 6px; }
+  .lc-thumb svg { display: block; }
+  .lc-val.title { font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+  .viewlabel { position: absolute; z-index: 2; height: 30px; padding: 0 13px; border-radius: 999px; background: rgba(13, 15, 19, .8); color: #e4e8ef; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .stname { display: flex; align-items: center; gap: 7px; font-weight: 500; padding-right: 14px; margin-right: -2px; }
   .mapfoot { display: flex; align-items: center; justify-content: center; height: 34px; }
   .mapfoot .zoomg, .zoomisl .zoomg { background: transparent; }
   .zoomisl { position: absolute; z-index: 3; display: flex; align-items: center; height: 36px; padding: 0 4px; }
@@ -372,7 +365,7 @@ const KINDS = [
   ['note', 'Editor messages', '', [['tint', 'Tinted'], ['box', 'Box']]],
   ['handle', 'Selection handles', 'In the level view.', [['square', 'Square'], ['round', 'Round']]],
   ['play', 'Play bar', 'Running, then paused.', [['tint', 'Tinted pill'], ['dot', 'Pill with a dot']]],
-  ['title', 'Level\'s name', 'Where the level\'s name lives. The browser tab above shows it in every variant, as the requirement says.', [['menu', 'With ☰ (today)'], ['map', 'On the minimap'], ['tab', 'Only in the tab and the main menu']]]
+  ['title', 'Level\'s name', 'Where and how the level\'s name is shown.', [['menu', 'With ☰ (today)'], ['map', 'Minimap caption'], ['thumb', 'Thumbnail and name'], ['title', 'Document title'], ['view', 'Label on the level view'], ['status', 'In the status chip']]]
 ];
 
 // The directions. Each is a set of tokens and one variant of each kind.
@@ -381,7 +374,7 @@ const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,2
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s) => ({ id, name, desc, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'The redesign', 'The top left: the ☰ menu and the level\'s name in one island, the name in regular weight with a white dot while it isn\'t saved, then Save and Play as dark islands with green and blue words. The zoom sits under the minimap. Try the Mix row\'s Level\'s name: on the minimap, or only in the browser tab and the main menu.', {})
+  dir('1', 'The redesign', 'The top left: the ☰ menu and the level\'s name in one island, the name in regular weight with a white dot while it isn\'t saved, then Save and Play as dark islands with green and blue words. The zoom sits under the minimap. Try the Mix row\'s Level\'s name for five other ways to show the name.', {})
 ];
 
 const FONTS = [
@@ -393,7 +386,7 @@ const FONTS = [
 const VIEWS = [['shape', 'A selected shape'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
 
 let state = { dir: '1', view: 'shape', font: 'mono', over: {} };
-try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-12') || '{}')); } catch (e) {}
+try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-13') || '{}')); } catch (e) {}
 let S, T;
 
 function tokensCss(t) {
@@ -572,7 +565,14 @@ function inspector(o) {
 // The top left: the main menu, the level's name and Save and Play, as the Mix row places them.
 const DIRTY = '<span class="dirty" title="Not saved"></span>';
 function nameHtml() {
+  if (S.title === 'thumb') return `<span class="lc-thumb">${levelThumb(30)}</span><span class="lc-val m">Car test</span>${DIRTY}`;
+  if (S.title === 'title') return `<span class="lc-val title">Car test</span>${DIRTY}`;
   return `<span class="lc-val">Car test</span>${DIRTY}`;
+}
+// The whole level, drawn small, as the level's picture.
+function levelThumb(size) {
+  const [ax, ay, aw] = MAP_AREA, z = size / aw;
+  return scene(size, size, z, -ax * z, -ay * z, { grid: false, noLines: true });
 }
 function nameChip(cls = '', style = '') {
   return `<div class="blk namechip ${cls}" style="${style}"><span>Car test</span>${DIRTY}</div>`;
@@ -582,9 +582,8 @@ function levelCard(o) {
   const where = S.burger === 'own' ? 'own' : S.burger === 'actions' || centred ? 'actions' : 'name';
   const buttons = `<span class="act save">${ic('save')}Save</span><span class="act play">${ic('play')}Play</span>`;
   const inPill = S.actions === 'inpill' && !centred;
-  if (S.title !== 'menu') {
-    const dot = S.title === 'tab' ? DIRTY : '';
-    return `<div class="lc-top"><div class="blk lcbtn">${menu}</div><div class="blk actisl"><span class="act save">${ic('save')}Save</span>${dot}</div><div class="blk actisl"><span class="act play">${ic('play')}Play</span></div></div>`;
+  if (['map', 'view', 'status'].includes(S.title)) {
+    return `<div class="lc-top"><div class="blk lcbtn">${menu}</div><div class="blk actisl"><span class="act save">${ic('save')}Save</span></div><div class="blk actisl"><span class="act play">${ic('play')}Play</span></div></div>`;
   }
   let out = where === 'own' ? `<div class="blk lcbtn">${menu}</div>` : '';
   if (!centred) {
@@ -602,7 +601,8 @@ const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? 
 const TOOLS = ['select', 'shape', 'joint'];
 function bottom(o) {
   const g = geo();
-  const chip = `<span>${o.hint}</span><span class="cnums">${nums(o)}</span>`;
+  const lead = S.title === 'status' ? `<span class="stname">Car test${DIRTY}</span>` : '';
+  const chip = `${lead}<span>${o.hint}</span><span class="cnums">${nums(o)}</span>`;
   return `<div class="abs isl dock" style="left:${g.cx}px;top:${H - M - 46}px">${C.tools(o)}<span class="sep"></span>${C.edit()}</div>` +
     `<div class="hintchip" style="left:${g.cx}px;top:${H - M - 46 - GP - 30}px">${chip}</div>`;
 }
@@ -634,7 +634,7 @@ function minimap(r = W - M, b = H - M) {
 }
 function editor(o) {
   o = Object.assign({ tool: 'select', hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Nothing selected' }, o, o.top);
-  return view(o.scene || {}) + `<div class="leftcol" style="${pos(geo().left)}">${levelCard(o)}${o.noInspector ? shapeStrip() : inspector(o)}</div>` + (S.name === 'centre' ? nameChip('', `left:${geo().cx}px;top:${M}px`) : '') + entities(o) + minimap() + bottom(o) + (o.extra || '');
+  return view(o.scene || {}) + `<div class="leftcol" style="${pos(geo().left)}">${levelCard(o)}${o.noInspector ? shapeStrip() : inspector(o)}</div>` + (S.name === 'centre' ? nameChip('', `left:${geo().cx}px;top:${M}px`) : '') + (S.title === 'view' ? `<div class="viewlabel" style="left:${geo().rx0}px;top:${M + 7}px">Car test${DIRTY}</div>` : '') + entities(o) + minimap() + bottom(o) + (o.extra || '');
 }
 
 function shapeStrip() {
@@ -649,8 +649,7 @@ function mainMenu() {
   const x = M, y = M + 50;
   const top = [['File', '>'], ['Edit', '>', 'hover'], ['Arrange', '>'], ['View', '>'], ['Help', '>']];
   const edit = [['Undo Move 1 entity', 'Ctrl+Z'], ['Redo', 'Ctrl+Shift+Z', 'dis'], '-', ['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C'], ['Paste', 'Ctrl+V', 'hover'], ['Duplicate', 'Ctrl+D'], ['Delete', 'Del'], '-', ['Select all', 'Ctrl+A'], ['Rename', 'F2'], ['Hide or show', 'Ctrl+Shift+H']];
-  const head = S.title === 'tab' ? `<div class="mhead"><span class="n">Car test${DIRTY}</span><span class="s">Not saved · click the name to rename</span></div>` : '';
-  const dy = head ? 62 : 0;
+  const head = '', dy = 0;
   return `<div class="menu ${S.menu}" style="left:${x}px;top:${y}px">${head}${menuBody(top)}</div><div class="menu ${S.menu}" style="left:${x + 206}px;top:${y + 38 + dy}px;min-width:250px">${menuBody(edit)}</div>`;
 }
 const dialogBody = () => `<h3>Replace the open level?</h3><p>Export it first if you want to keep it.</p><div class="row"><span class="btn ${S.btn}">Cancel</span><span class="btn primary ${S.btn}">Replace</span></div>`;
@@ -740,16 +739,15 @@ function render() {
   document.getElementById('picks').textContent = picksText(d);
   const parts = state.view === 'parts';
   const cls = ['ed', 'float', parts ? 'tall' : ''].join(' ');
-  const chrome = parts ? '' : `<div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="btab"><span class="fav"></span>*Car test - engine-v3<span class="x">×</span></span><span class="btab other">New tab</span></div>`;
-  document.getElementById('frame').innerHTML = `${chrome}<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
+  document.getElementById('frame').innerHTML = `<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
   document.getElementById('stage').classList.toggle('scroll', parts);
-  try { localStorage.setItem('engine-v3-islands-12', JSON.stringify(state)); } catch (e) {}
+  try { localStorage.setItem('engine-v3-islands-13', JSON.stringify(state)); } catch (e) {}
   fit();
 }
 function fit() {
   const stage = document.getElementById('stage'), frame = document.getElementById('frame');
   const parts = state.view === 'parts';
-  const k = Math.min((stage.clientWidth - 24) / 1440, parts ? 1 : (stage.clientHeight - 16) / 938, 1);
+  const k = Math.min((stage.clientWidth - 24) / 1440, parts ? 1 : (stage.clientHeight - 16) / 900, 1);
   frame.style.transform = `scale(${k})`;
   document.getElementById('sizer').style.height = parts ? `${frame.offsetHeight * k + 24}px` : '0';
 }
