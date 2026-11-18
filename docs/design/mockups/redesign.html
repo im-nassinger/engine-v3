@@ -80,40 +80,32 @@
   .cnums { display: flex; gap: 12px; align-items: center; color: #9aa3b2; font-size: 11px; }
   .titlechip { position: absolute; transform: translateX(-50%); z-index: 3; display: flex; align-items: center; gap: 10px; padding: 7px 14px; border-radius: 999px; background: rgba(13, 15, 19, .8); color: #e4e8ef; font-weight: 500; }
   .titlechip .savestate { padding: 0; }
-  .lcard { display: flex; flex-direction: column; padding: 6px 8px 8px; overflow: hidden; z-index: 2; }
+  .lcard { display: flex; align-items: center; gap: 2px; height: 44px; padding: 0 12px 0 8px; z-index: 2; flex-shrink: 0; }
   .lcard .grow { flex: 1; }
-  .lc-top, .lc-row, .lc-over { display: flex; align-items: center; gap: 2px; }
-  .lc-name { font-size: 20px; font-weight: 600; padding: 4px 6px 0; letter-spacing: -.01em; }
-  .lc-name.sm { font-size: 13px; padding: 0 6px; }
-  .lc-sub { padding: 2px 6px 0; }
-  .lc-sub { display: flex; gap: 12px; align-items: center; }
-  .lc-sub .savestate { padding: 0; }
-  .lc-meta { color: var(--faint); }
-  .lcard > .lc-row:last-child { margin-top: 10px; }
+  .lc-name { font-weight: 600; padding: 0 6px; white-space: nowrap; }
+  .lcard .savestate { padding: 0; }
+  .lcard.pill { align-self: flex-start; border-radius: 999px; padding: 0 16px 0 8px; gap: 4px; }
+  .lcard.pill .savestate { color: var(--faint); }
+  .lc-split { display: flex; gap: 10px; flex-shrink: 0; align-self: flex-start; }
+  .lc-split .lcbtn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
+  .lc-split .lcard { border-radius: 999px; padding: 0 18px; gap: 12px; }
   .leftcol { position: absolute; display: flex; flex-direction: column; gap: 10px; z-index: 2; }
   .leftcol > .insp { flex: 1; min-height: 0; }
   .leftcol > .opts { position: static; align-self: flex-start; }
   .zoomg { display: inline-flex; align-items: center; gap: 2px; background: var(--field); border-radius: 999px; padding: 0 2px; }
   .zoomg .ib { min-width: 26px; height: 26px; border-radius: 999px; }
   .zoomg .num { min-width: 36px; text-align: center; }
-  .lc-grid { display: grid; grid-template-columns: 76px 1fr; gap: 5px 8px; padding: 8px 6px 0; font-size: 11.5px; }
-  .lc-grid > span:nth-child(odd) { color: var(--muted); }
-  .lc-grid .warn { display: flex; align-items: center; gap: 5px; }
-  .lcard.info .lc-row .savestate { padding-left: 6px; }
-  .lcard.toggles .lc-top + .lc-row { margin-top: 10px; }
-  .zslider { flex: 1; height: 4px; border-radius: 2px; background: var(--field); position: relative; margin: 0 6px; }
-  .zslider i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); border-radius: 2px; }
-  .zslider b { position: absolute; top: -5px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--text); }
-  .zval { width: 42px; text-align: right; padding-right: 4px; }
-  .lcard.preview { padding: 0; height: 170px; position: relative; }
-  .lc-map { position: absolute; inset: 0; }
-  .lc-map svg { position: absolute; left: 0; top: 0; }
-  .lc-over { position: absolute; left: 0; right: 0; padding: 6px 8px; }
-  .lc-over.top { top: 0; background: linear-gradient(rgba(16,19,24,.92), rgba(16,19,24,0)); padding-bottom: 18px; }
-  .lc-over.bot { bottom: 0; background: linear-gradient(rgba(16,19,24,0), rgba(16,19,24,.92)); padding-top: 18px; }
-  .lc-over .zoomg { background: rgba(16,19,24,.75); }
   .minimap { position: absolute; z-index: 2; padding: 3px; }
   .minimap svg { display: block; border-radius: 13px; }
+  .mapfoot { display: flex; align-items: center; justify-content: center; height: 34px; }
+  .mapfoot .zoomg, .zoomisl .zoomg { background: transparent; }
+  .zoomisl { position: absolute; z-index: 3; display: flex; align-items: center; height: 36px; padding: 0 4px; }
+  .zoomisl.v { flex-direction: column; width: 36px; height: auto; padding: 4px 0; }
+  .zoomisl.v .zoomg { flex-direction: column; padding: 2px 0; }
+  .zoomisl.v .zoomg .num { min-width: 0; padding: 6px 0; font-size: 11px; }
+  .zoomover { position: absolute; right: 9px; bottom: 9px; background: rgba(13, 15, 19, .8); border-radius: 999px; }
+  .zoomover .zoomg { background: transparent; }
+  .zoomover .zoomg .ib { min-width: 24px; height: 24px; }
   .dock { position: absolute; transform: translateX(-50%); height: 46px; z-index: 3; }
   .onebar .hint { color: var(--muted); font-size: 11.5px; white-space: nowrap; }
   .barnums { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 11px; margin-right: 14px; }
@@ -305,7 +297,8 @@ const CHEV = ic('down', 'class="i chev"');
 
 // Each choice that changes the look, with its variants. The number of a variant is its place in the list.
 const KINDS = [
-  ['lcard', 'Level card', 'A card the width of the Inspector, above it, for the level and the zoom. The dock at the bottom holds the tools, Undo, Redo, snapping and Play.', [['basic', 'Name and zoom'], ['preview', 'Preview of the level'], ['info', 'Name, numbers and zoom']]],
+  ['lcard', 'Level card', 'The top left island, above the Inspector: the main menu, the level\'s name and the save state. Help is in the main menu.', [['row', 'One row'], ['pill', 'Pill'], ['split', 'Menu button and name pill']]],
+  ['zoom', 'Zoom', 'The zoom by the minimap at the bottom right.', [['above', 'Pill above the map'], ['footer', 'Under the map, one island'], ['over', 'On the map'], ['side', 'Upright, left of the map']]],
   ['layout', 'Entities panel height', '', [['hug', 'Fits its rows'], ['float', 'Full height']]],
   ['head', 'Panel titles', '', [['title', 'Title'], ['caps', 'Small caps']]],
   ['card', 'Inspector cards', 'How one component\'s card is told apart from the next.', [['space', 'Space only'], ['tile', 'Tiles'], ['inset', 'Sunken tiles'], ['island', 'Each card an island']]],
@@ -322,14 +315,14 @@ const KINDS = [
 ];
 
 // The directions. Each is a set of tokens and one variant of each kind.
-const BASE = { lcard: 'basic', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
+const BASE = { lcard: 'row', zoom: 'above', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
 const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s) => ({ id, name, desc, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'Level card', 'A card above the Inspector, as wide as it and only as tall as its content: the menu and Help at its top, the level\'s name large, with Saved and the zoom under it. The View menu\'s switches are in the main menu\'s View submenu. The status text is a chip above the dock. Four islands and a chip.', {}),
-  dir('2', 'Preview card', 'The card shows a small preview of the whole level, with the part on screen outlined in blue. The name sits on the preview\'s top, the zoom on its foot. A preview is a new idea, not in the requirements.', { lcard: 'preview' }),
-  dir('3', 'Info card', 'The card gathers what the status bar showed: the mouse position, the selection and the warning count, under the level\'s name, with the zoom at its foot. Only the tool hint stays as a chip above the dock.', { lcard: 'info' })
+  dir('1', 'One row', 'The top left island is one row as wide as the Inspector: the main menu, the level\'s name and Saved. The zoom is a small pill right above the minimap. The status text is a chip above the dock.', {}),
+  dir('2', 'Pill', 'The top left island is a pill only as wide as its content: the main menu, the name, and a check for the save state. The zoom sits under the minimap in the same island.', { lcard: 'pill', zoom: 'footer' }),
+  dir('3', 'Split', 'The main menu is a round button of its own, and the name with Saved is a pill next to it. The zoom floats on the minimap\'s corner.', { lcard: 'split', zoom: 'over' })
 ];
 
 const FONTS = [
@@ -341,7 +334,7 @@ const FONTS = [
 const VIEWS = [['shape', 'A selected shape'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
 
 let state = { dir: '1', view: 'shape', font: 'mono', over: {} };
-try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-5') || '{}')); } catch (e) {}
+try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-6') || '{}')); } catch (e) {}
 let S, T;
 
 function tokensCss(t) {
@@ -360,9 +353,8 @@ const W = 1440, H = 900, M = 10, GP = 10;
 function geo() {
   const ex = W - M - 260;
   const left = [M, M, 300, H - 2 * M];
-  const mapW = 180, mapH = Math.round((mapW - 6) * MAP_AREA[3] / MAP_AREA[2]) + 6;
-  const map = [W - M - mapW, H - M - mapH, mapW, mapH];
-  const ents = [ex, M, 260, S.layout === 'hug' ? null : H - 2 * M - mapH - GP];
+  const map = mapParts(W - M, H - M);
+  const ents = [ex, M, 260, S.layout === 'hug' ? null : H - 2 * M - map.height - GP];
   const rx0 = M + 300 + GP, rx1 = ex - GP, cx = (rx0 + rx1) / 2;
   return { left, ents, map, rx0, rx1, cx };
 }
@@ -519,30 +511,16 @@ function inspector(o) {
 }
 
 function levelCard(o) {
-  const g = geo(), k = S.lcard;
-  const zoom = `<span class="zoomg"><span class="ib">${ic('minus')}</span><span class="num">40%</span><span class="ib">${ic('plus')}</span></span>`;
   const saved = `<span class="savestate">${ic('check', sm)}Saved</span>`;
-  let body;
-  if (k === 'preview') {
-    const mini = scene(300, 170, 0.095, 150, 80, { grid: false });
-    body = `<div class="lc-map">${mini}<svg class="lc-view" width="300" height="170"><rect x="68" y="30" width="164" height="106" rx="3" fill="rgba(79,140,255,.08)" style="stroke:var(--accent)" stroke-width="1.5"/></svg></div>
-      <div class="lc-over top">${C.menu(o)}<span class="lc-name sm">Car test</span><span class="grow"></span>${saved}</div>
-      <div class="lc-over bot"><span class="grow"></span>${zoom}</div>`;
-  } else if (k === 'info') {
-    body = `<div class="lc-top">${C.menu(o)}<span class="lc-name sm">Car test</span><span class="grow"></span><span class="ib">${ic('help')}</span></div>
-      <div class="lc-grid"><span>Mouse</span><span class="num">${o.pos}</span><span>Selected</span><span>${o.sel}</span><span>Messages</span><span class="warn">${ic('warning', 'style="color:var(--warning);width:13px;height:13px"')}1 warning</span></div>
-      <div class="lc-row">${saved}<span class="grow"></span>${zoom}</div>`;
-  } else {
-    body = `<div class="lc-top">${C.menu(o)}<span class="grow"></span><span class="ib">${ic('help')}</span></div>
-      <div class="lc-name">Car test</div><div class="lc-row lc-sub">${saved}<span class="lc-meta">17 entities</span><span class="grow"></span>${zoom}</div>`;
-  }
-  return `<div class="blk lcard ${k}">${body}</div>`;
+  if (S.lcard === 'pill') return `<div class="blk lcard pill">${C.menu(o)}<span class="lc-name">Car test</span><span class="savestate" title="Saved">${ic('check', sm)}</span></div>`;
+  if (S.lcard === 'split') return `<div class="lc-split"><div class="blk lcbtn">${C.menu(o)}</div><div class="blk lcard"><span class="lc-name" style="padding:0">Car test</span>${saved}</div></div>`;
+  return `<div class="blk lcard row">${C.menu(o)}<span class="lc-name">Car test</span><span class="grow"></span>${saved}</div>`;
 }
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
 function bottom(o) {
   const g = geo();
-  const chip = S.lcard === 'info' ? o.hint : `<span>${o.hint}</span><span class="cnums">${nums(o)}</span>`;
+  const chip = `<span>${o.hint}</span><span class="cnums">${nums(o)}</span>`;
   return `<div class="abs isl dock" style="left:${g.cx}px;top:${H - M - 46}px">${C.tools(o)}<span class="sep"></span>${C.edit()}<span class="sep"></span>${C.play()}</div>` +
     `<div class="hintchip" style="left:${g.cx}px;top:${H - M - 46 - GP - 30}px">${chip}</div>`;
 }
@@ -550,12 +528,26 @@ function view(opts) {
   const g = geo();
   return `<div class="abs viewbox" style="${pos([0, 0, W, H])}">${scene(W, H, VIEW_Z, (g.rx0 + g.rx1) / 2, VIEW_CY, Object.assign({ grid: true, cameraFrame: true, joints: true }, opts))}</div>`;
 }
-function minimap() {
-  const g = geo(), [ax, ay, aw] = MAP_AREA, w = g.map[2] - 6, h = g.map[3] - 6, z = w / aw;
+// The minimap and the zoom, with their right and bottom edges at r and b: where each island sits.
+const MAP_W = 180, ZOOM_H = 36;
+function mapParts(r, b) {
+  const inner = MAP_W - 6, mapH = Math.round(inner * MAP_AREA[3] / MAP_AREA[2]) + 6, foot = S.zoom === 'footer' ? 34 : 0;
+  const map = [r - MAP_W, b - mapH - foot, MAP_W, mapH + foot];
+  const zoom = S.zoom === 'above' ? [r - MAP_W / 2, map[1] - GP - ZOOM_H] : S.zoom === 'side' ? [map[0] - GP - 36, b - 104] : null;
+  return { map, zoom, inner, height: b - (S.zoom === 'above' ? zoom[1] : map[1]) };
+}
+function minimap(r = W - M, b = H - M) {
+  const g = mapParts(r, b), [ax, ay, aw] = MAP_AREA, w = g.inner, h = Math.round(w * MAP_AREA[3] / aw), z = w / aw;
   const [vx, vy, vw, vh] = visibleArea(), X = (x) => (x - ax) * z, Y = (y) => (y - ay) * z;
   const frame = `<rect x="${X(vx)}" y="${Y(vy)}" width="${vw * z}" height="${vh * z}" rx="3" fill="rgba(79,140,255,.1)" style="stroke:var(--accent)" stroke-width="1.5"/>`;
   const map = scene(w, h, z, -ax * z, -ay * z, { grid: false, noLines: true }).replace('</svg>', frame + '</svg>');
-  return `<div class="blk minimap" style="${pos(g.map)}">${map}</div>`;
+  const zoom = `<span class="zoomg"><span class="ib">${ic('minus')}</span><span class="num">40%</span><span class="ib">${ic('plus')}</span></span>`;
+  const zoomUp = `<span class="zoomg"><span class="ib">${ic('plus')}</span><span class="num">40%</span><span class="ib">${ic('minus')}</span></span>`;
+  const inside = S.zoom === 'footer' ? `<div class="mapfoot">${zoom}</div>` : S.zoom === 'over' ? `<div class="zoomover">${zoom}</div>` : '';
+  let out = `<div class="blk minimap" style="${pos(g.map)}">${map}${inside}</div>`;
+  if (S.zoom === 'above') out += `<div class="blk zoomisl" style="left:${g.zoom[0]}px;top:${g.zoom[1]}px;transform:translateX(-50%)">${zoom}</div>`;
+  if (S.zoom === 'side') out += `<div class="blk zoomisl v" style="left:${g.zoom[0]}px;top:${g.zoom[1]}px">${zoomUp}</div>`;
+  return out;
 }
 function editor(o) {
   o = Object.assign({ tool: 'select', hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Nothing selected' }, o, o.top);
@@ -598,7 +590,8 @@ function schematic() {
   return `<div class="schem"><div class="ed float" style="${tokensCss(T)}position:absolute;left:0;top:0;transform:scale(.2);transform-origin:0 0">${editor({ sel: 'Rectangle 1', scene: { selected: 'rect1' } })}</div></div>`;
 }
 const PARTS = {
-  lcard: () => `<div class="inl"><div style="width:300px">${levelCard({ tool: 'select', pos: 'x 20, y 340', sel: 'Rectangle 1' })}</div></div>`,
+  lcard: () => `<div class="inl"><div class="leftcol" style="position:static;width:300px">${levelCard({})}</div></div>`,
+  zoom: () => `<div class="inl"><div class="float" style="position:relative;width:300px;height:250px;background:${BG};border-radius:12px">${minimap(290, 240)}</div></div>`,
   layout: schematic,
   head: () => `<div class="ph ${S.head}">Inspector</div>`,
   card: () => card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°')) + card('ShapeComponent', F.choice('Kind', 'Rectangle') + F.num('Width', '160', 'px')),
@@ -663,7 +656,7 @@ function render() {
   const cls = ['ed', 'float', parts ? 'tall' : ''].join(' ');
   document.getElementById('frame').innerHTML = `<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
   document.getElementById('stage').classList.toggle('scroll', parts);
-  try { localStorage.setItem('engine-v3-islands-5', JSON.stringify(state)); } catch (e) {}
+  try { localStorage.setItem('engine-v3-islands-6', JSON.stringify(state)); } catch (e) {}
   fit();
 }
 function fit() {

@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The owner wants a new look for the editor before v2 starts (2026-11-17): **clean, cool and beautiful, with no borders, separator lines or outlines**, even if it looks less "professional" than commercial tools. Only the look changes (colours, spacing, layout, the parts' shapes); what the screen shows stays. **Settled so far:** the Islands look, the owner's set of parts, the dock at the bottom, panels holding only their own content, a level card above the Inspector, no View button, and a minimap at the bottom right. **Open:** which level card, the font, and the status chip. The mockup is [mockups/redesign.html](mockups/redesign.html); the [round 8 design](README.md) stays what is built until this one is written into [tokens.md](tokens.md) and [controls.md](controls.md) and planned as a stage.
+The owner wants a new look for the editor before v2 starts (2026-11-17): **clean, cool and beautiful, with no borders, separator lines or outlines**, even if it looks less "professional" than commercial tools. Only the look changes (colours, spacing, layout, the parts' shapes); what the screen shows stays. **Settled so far:** the Islands look, the owner's set of parts, the dock at the bottom, panels holding only their own content, a level card above the Inspector, no View button, and a minimap at the bottom right with the zoom beside it. **Open:** which level card, where the zoom sits, the font, and the status chip. The mockup is [mockups/redesign.html](mockups/redesign.html); the [round 8 design](README.md) stays what is built until this one is written into [tokens.md](tokens.md) and [controls.md](controls.md) and planned as a stage.
 
 ## Settled, in order (all owner, 2026-11-17)
 
@@ -11,10 +11,10 @@ The owner wants a new look for the editor before v2 starts (2026-11-17): **clean
 3. **The dock** at the bottom middle of the level view holds the three tools, Undo, Redo, grid snapping and Play.
 4. **Panels hold only their own content.** The owner rejected putting the top bar's controls or the status text at the top or foot of the Inspector or the Entities panel.
 5. **Too many islands** was a complaint: two similar top islands (left and right) and a status bar island were too much. The bottom status bar island looked ugly.
-6. **A level card** at the top left, above the Inspector, as wide as it (300 px) and only as tall as its content, holds the main menu, the level's name, the save state and the zoom. The Inspector starts under it. The Entities panel starts at the top right.
+6. **A level card** at the top left, above the Inspector, holds only the main menu, the level's name and the save state. The Inspector starts under it. The Entities panel starts at the top right. The zoom moved to the minimap, and the card has no Help button: Help is already in the main menu.
 7. **No shadows, anywhere.** The owner hates them (2026-11-17): no island, menu, dialog, chip or Play bar casts one, and nothing glows. An island stands apart from the level view by its colour alone.
 8. **No View button.** The View menu is the main menu's View submenu, written into [workspace.md](../requirements/editor/workspace.md), the glossary and [rejected.md](../rejected.md). The built editor still has the button until the redesign is built.
-9. **A minimap** at the bottom right, its own island 180 px wide, with a thin 3 px edge in the panels' colour so it doesn't merge with the level view, under the Entities panel: the whole level, with a blue rectangle showing what the level view shows. The mockup's level is a square 8000 px wide, like a new level's bounds, so the rectangle sits inside it, and the minimap is a square too. Its shapes have no outlines. It is a new feature, not yet in the requirements, so [workspace.md](../requirements/editor/workspace.md) needs it with its version before it is built.
+9. **A minimap** at the bottom right, its own island 180 px wide, with a thin 3 px edge in the panels' colour so it doesn't merge with the level view, under the Entities panel: the whole level, with a blue rectangle showing what the level view shows. The mockup's level is a square 8000 px wide, like a new level's bounds, so the rectangle sits inside it, and the minimap is a square too. Its shapes have no outlines. The zoom (− 40% +) sits by it. It is a new feature, not yet in the requirements, so [workspace.md](../requirements/editor/workspace.md) needs it with its version before it is built.
 
 ## The tokens of the pick
 
@@ -22,10 +22,10 @@ From the mockup's `SLATE` set: app `#0d0f13`, panels `rgba(24,27,33,.96)`, raise
 
 ## Open for the owner
 
-- **Which level card:** 1, name and zoom (Claude's pick), with the menu and Help on top, the name large, then Saved, "17 entities" (Claude's addition) and the zoom on one row; 2, a preview of the whole level with the part on screen outlined (a new feature, not in the requirements); 3, the name with the mouse position, selection and warning count (the owner had objected to unrelated things in one window, so this one is doubtful).
+- **Which level card:** 1, one row as wide as the Inspector, with the menu, the name and Saved; 2, a pill only as wide as its content, with the save state as a check; 3, the menu as a round button of its own and the name with Saved as a pill next to it. The old cards (name and zoom, the level preview, the info card) were dropped once the zoom moved to the minimap.
+- **Where the zoom sits:** 1, a small pill above the minimap; 2, under the map in the same island; 3, floating on the map's bottom right corner; 4, upright, left of the map.
 - **The status text:** today it is one dark chip above the dock with the tool hint, the mouse position, the selection and the warning count. Not yet confirmed.
 - **The font:** JetBrains Mono (round 8's decision) is still the default; the page offers Inter, Geist and Inter with mono numbers.
-- Where Help goes if the card has no room (card 1 has it at the top right).
 
 ## The mockup page
 
@@ -33,7 +33,7 @@ From the mockup's `SLATE` set: app `#0d0f13`, panels `rgba(24,27,33,.96)`, raise
 
 ## Next
 
-1. The owner picks the level card, the status text and the font.
+1. The owner picks the level card, the zoom's place, the status text and the font.
 2. Write the result into [tokens.md](tokens.md), [controls.md](controls.md), [level-view.md](level-view.md) (square handles, the selection colour) and this folder's README, replacing round 8's look; change [workspace.md](../requirements/editor/workspace.md)'s top bar, status bar and toolbar sections to the islands, the dock and the level card (a requirement change, so with the owner's yes).
 3. Plan the build as a stage in [plan.md](../plan.md) with its steps in [steps/](../steps/README.md), before v2.
 
