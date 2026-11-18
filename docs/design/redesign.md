@@ -62,7 +62,7 @@ From the mockup's `SLATE` set: app `#0d0f13`, panels `rgba(24,27,33,.96)`, raise
 
 - **Unresolved:** after the last commit (the name back in the ☰ island) the owner opened the mockup and said the fix wasn't there. The file on disk has it (`BASE` has `burger: 'with'`, the `localStorage` key is `engine-v3-islands-11`), and a Playwright screenshot showed **( ☰ Car test ● ) ( Save ) ( Play )**. The cause wasn't found: ask the owner what they see. Possible causes are a stale tab or cache, or a different copy of the page (`.netlify/` in the project points to an old Netlify site, so a deployed copy would be out of date).
 - **How the owner wants design rounds:** think about why something looks wrong before offering choices. When the owner rejects one part, find the cause (here: the name's island was shaped like the buttons beside it) and propose one fix with its reason. Don't answer with another batch of five cosmetic variations; two such rounds were called "ridiculous".
-- Still waiting on the owner: what Save does, the status chip, the font, the minimap's requirement, dropping the level's name and save state from the top bar, `Level.ts`'s square default (see [progress.md](../progress.md)), and `.netlify/` in the ignore files.
+- Still waiting on the owner: what Save does, the font, the minimap's requirement, dropping the level's name and save state from the top bar, `Level.ts`'s square default (see [progress.md](../progress.md)), and `.netlify/` in the ignore files.
 
 ## Next
 
