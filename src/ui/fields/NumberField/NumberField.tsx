@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MIXED, ValueInput } from '../../../editor/inspector/index.ts';
+import { MIXED, ValueInput } from '../../../editor/entity-inspector/index.ts';
 import { FieldMessage, useFieldMessage } from '../FieldMessage/index.ts';
 import type { FieldProps } from '../FieldProps.ts';
 import { NumberBox } from '../NumberBox/index.ts';

@@ -139,7 +139,7 @@ One file, `eslint.config.ts`, with one block per part. ESLint needs `jiti` to re
 | ui | core, editor | `react`, `react-dom`, `@tanstack/react-virtual`, `lucide-react` (stage 6). The font comes in through `theme.css`, which ESLint doesn't read |
 | app | all | all |
 
-- **Test files** (`*.test.ts`) may also import `vitest` and the `testing/` fakes. A `testing/` helper shared by tests, such as `ui/entities-panel/EntitiesPanel/testing/panelPage.ts`, may import other modules' `testing/` fakes too, but not `vitest`, since ESLint's test rule looks at the file's name *(standing yes, 2026-11-15)*. The direction stays the same for them. *Why: a rule on the import's text can't tell a test from the code, so without this exception core couldn't have tests next to its files.*
+- **Test files** (`*.test.ts`) may also import `vitest` and the `testing/` fakes. A `testing/` helper shared by tests, such as `ui/entities-viewer/EntitiesViewer/testing/panelPage.ts`, may import other modules' `testing/` fakes too, but not `vitest`, since ESLint's test rule looks at the file's name *(standing yes, 2026-11-15)*. The direction stays the same for them. *Why: a rule on the import's text can't tell a test from the code, so without this exception core couldn't have tests next to its files.*
 - **`box2d3-wasm` without `/compat` is refused everywhere**, with the stack's reason in the message: the default import may pick a different build per computer, which breaks determinism.
 - **`node:` imports** are refused in every part. Only `tests/` and the config files run in Node.
 - Each refusal's message says the rule in plain words ("core imports only core"), so the fix is clear without opening the config.

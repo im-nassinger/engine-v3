@@ -54,17 +54,17 @@ async function playColumn(page: Page) {
     return view.x + view.width / 2 + OFF_AXIS_PX;
 }
 
-function inspector(page: Page) {
-    return page.getByRole('region', { name: 'Inspector' });
+function entityInspector(page: Page) {
+    return page.getByRole('region', { name: 'Entity inspector' });
 }
 
 function card(page: Page, typeName: string) {
-    return inspector(page).locator(`.inspector-card[data-type="${typeName}"]`);
+    return entityInspector(page).locator(`.entity-inspector-card[data-type="${typeName}"]`);
 }
 
 async function addComponent(page: Page, typeName: string) {
-    await inspector(page).getByRole('button', { name: 'Add Component' }).click();
-    await inspector(page).getByRole('menuitem', { name: typeName, exact: true }).click();
+    await entityInspector(page).getByRole('button', { name: 'Add Component' }).click();
+    await entityInspector(page).getByRole('menuitem', { name: typeName, exact: true }).click();
     await expect(card(page, typeName)).toHaveCount(1);
 }
 
@@ -171,7 +171,7 @@ async function waitForBoxBelow(page: Page, x: number, y: number) {
 async function editorSnapshot(page: Page) {
     return {
         rows: await page.getByRole('tree', { name: 'Entities' }).ariaSnapshot(),
-        cards: await inspector(page).ariaSnapshot(),
+        cards: await entityInspector(page).ariaSnapshot(),
         undo: await page.getByRole('button', { name: /^Undo/ }).ariaSnapshot(),
     };
 }
@@ -198,7 +198,7 @@ test('a drawn Dynamic box falls during play, and after Stop the level is exactly
 
     await play(page);
     await expect(page.locator('.top-bar')).toBeHidden();
-    await expect(inspector(page)).toBeHidden();
+    await expect(entityInspector(page)).toBeHidden();
     const column = await playColumn(page);
     const firstTop = await shownBoxTop(page, column);
     await waitForBoxBelow(page, column, firstTop + FALL_BEFORE_PAUSE_PX);

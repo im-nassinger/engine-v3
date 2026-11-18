@@ -1,6 +1,6 @@
 import type { FieldType, ParseOutcome, Unit } from '../../fields/index.ts';
 
-// A field the Inspector shows that isn't stored, such as Width and Height, read from the shape's own geometry.
+// A field the Entity inspector shows that isn't stored, such as Width and Height, read from the shape's own geometry.
 export type DerivedFieldDefinition<Values extends object, T> = {
     readonly key: string;
     readonly label: string;

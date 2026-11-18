@@ -24,7 +24,7 @@ export function useVersion(source: Versioned): number {
 ```
 
 ```tsx
-// ui/entities-panel/EntitiesRow/EntitiesRow.tsx
+// ui/entities-viewer/EntitiesRow/EntitiesRow.tsx
 export function EntitiesRow({ entityId }: EntitiesRowProps) {
     const session = useEditorSession();
     const { level } = session.openLevel;
@@ -37,9 +37,9 @@ export function EntitiesRow({ entityId }: EntitiesRowProps) {
 }
 ```
 
-- **A component subscribes to the smallest thing it shows:** an Entities viewer row to its entity's version, the Entity inspector to `InspectorModel.version`, the Edit menu's Undo entry to `History.version`. Dragging one crate wakes its row and its card, not the panel.
+- **A component subscribes to the smallest thing it shows:** an Entities viewer row to its entity's version, the Entity inspector to `EntityInspectorModel.version`, the Edit menu's Undo entry to `History.version`. Dragging one crate wakes its row and its card, not the panel.
 - **The version is the snapshot.** The component then reads current values straight from the class. React never stores a copy that could fall behind.
-- **`useVersion` opts out of the React Compiler and keeps its two functions per source** (stage 17 step 5, standing yes, 2026-11-17). *Why: the compiler kept `() => source.version` for as long as `source.version` was the same number, not the same source. After New then Import, both levels' `InspectorModel`s were at version 0, so React kept reading the New level's model, and the Entity inspector showed the World whatever was selected until the page was reloaded. Journey 2 found it.* The same holds for a `useReading` read written in place: `() => level.name` is kept while the name is the same, so `LevelName` reads through `nameOf(level)`, a call, which the compiler keeps per `level`.
+- **`useVersion` opts out of the React Compiler and keeps its two functions per source** (stage 17 step 5, standing yes, 2026-11-17). *Why: the compiler kept `() => source.version` for as long as `source.version` was the same number, not the same source. After New then Import, both levels' `EntityInspectorModel`s were at version 0, so React kept reading the New level's model, and the Entity inspector showed the World whatever was selected until the page was reloaded. Journey 2 found it.* The same holds for a `useReading` read written in place: `() => level.name` is kept while the name is the same, so `LevelName` reads through `nameOf(level)`, a call, which the compiler keeps per `level`.
 - **Changes go the other way through commands:** a button calls `session.commands.find(id).run()`, a field calls its `FieldModel`'s commit. Components never change a core class directly.
 - Pure display state (a menu being open, a hovered button, a field's uncommitted text) stays in React state, because nothing outside the component needs it.
 
@@ -85,9 +85,9 @@ EditorShell
 ├── LevelViewHost                      the canvas, behind everything
 ├── MainMenuButton (☰)                 ui/main-menu: opens CommandMenu to its right
 ├── ToolColumn                         ui/toolbar: the tools, and KindsMenu beside the Shape or Joint tool
-├── EntityInspector                    ui/inspector, hidden while the Shape tool is active
+├── EntityInspector                    ui/entity-inspector, hidden while the Shape tool is active
 ├── FreeArea                           reports the covered edges for fitting
-├── EntitiesViewer                     ui/entities-panel, grows with its rows up to the minimap
+├── EntitiesViewer                     ui/entities-viewer, grows with its rows up to the minimap
 ├── Minimap                            ui, drawing through a small adapter contract (step 13)
 ├── DebugBox                           ui/status-bar
 ├── MessagePill                        ui/status-bar: StatusText and a failed save
@@ -140,14 +140,14 @@ export function LevelViewHost() {
 | `ToolColumn` | `ToolController` | Three tool buttons in v1 |
 | `KindsMenu` | The active tool | Open beside the Shape tool (Rectangle, Circle, Polygon) or the Joint tool (Hinge, Rope, Spring) while it is active |
 | `EntitiesViewer` | `EntitiesRows` | Virtual list, below |
-| `EntityInspector` | `InspectorModel` | One `Card` per card model, one field component per field type; card titles from one function |
+| `EntityInspector` | `EntityInspectorModel` | One `Card` per card model, one field component per field type; card titles from one function |
 | `Minimap` | The level, `ViewState` | Show-only in v1, redrawn a few times a second at most |
 | `DebugBox` | The mouse position, the grid size, `ViewState`'s zoom | |
 | `MessagePill` | `StatusText`, `SaveState` | Shown only while there is a message |
 | `PlayBar` | `PlaySession` | Pause or Resume, Step, Stop, and one message |
 | `Dialogs` | Questions from commands (`needsConfirmation`), import refusals, Rename level… | One dialog at a time |
 
-Until stage 19's steps 2 and 7 to 11 land, the code still has `TopBar`, `Toolbar`, `ToolOptions`, `EntitiesPanel`, `Inspector` and `StatusBar` in these places.
+Until stage 19's steps 7 to 11 land, the code still has `TopBar`, `Toolbar`, `ToolOptions` and `StatusBar` in these places. Step 2 gave the code the new names: `EntityInspector` in `ui/entity-inspector` and `EntitiesViewer` in `ui/entities-viewer`.
 
 **Fields:** `ui/fields/` has one component per field type (`NumberField`, `TextField`, `CheckboxField`, `ChoiceField`, `ColourField`, `VectorField`, `EntityField`). `FieldControl` picks the component from `FieldModel.definition.type.kind` through a lookup table, so a new field type adds one entry and one component. `NumberField` uses `ValueInput` from the editor for parsing and formatting, and serves angles too (standing yes, 2026-11-15).
 

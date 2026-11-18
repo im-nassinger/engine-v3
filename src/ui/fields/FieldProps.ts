@@ -1,7 +1,7 @@
 import type { ComponentTypeName } from '../../core/components/index.ts';
 import type { EntityId } from '../../core/level/index.ts';
 import type { Axis } from '../../editor/commands/index.ts';
-import type { FieldModel } from '../../editor/inspector/index.ts';
+import type { FieldModel } from '../../editor/entity-inspector/index.ts';
 import type { OpenLevel } from '../../editor/session/index.ts';
 
 // Whose field it is: an entity field lists the level's entities but its own, and a list keeps its fold

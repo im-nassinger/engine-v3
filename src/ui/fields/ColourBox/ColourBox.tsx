@@ -1,4 +1,4 @@
-import { ValueInput } from '../../../editor/inspector/index.ts';
+import { ValueInput } from '../../../editor/entity-inspector/index.ts';
 import { FieldMessage, useFieldMessage } from '../FieldMessage/index.ts';
 import { useFieldTyping } from '../typing/useFieldTyping.ts';
 import { ColourSwatch } from './ColourSwatch/index.ts';

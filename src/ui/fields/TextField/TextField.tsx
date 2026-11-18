@@ -1,4 +1,4 @@
-import { MIXED } from '../../../editor/inspector/index.ts';
+import { MIXED } from '../../../editor/entity-inspector/index.ts';
 import type { FieldProps } from '../FieldProps.ts';
 import { useFieldTyping } from '../typing/useFieldTyping.ts';
 import './TextField.css';

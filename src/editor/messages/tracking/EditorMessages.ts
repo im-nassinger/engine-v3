@@ -15,7 +15,7 @@ const NONE_READ: readonly EntityId[] = [];
 export class EditorMessages {
     // Moves whenever any message comes or goes: the status bar's count.
     readonly version = new VersionCounter();
-    // The entities whose messages changed in one check, for an Inspector showing some of them.
+    // The entities whose messages changed in one check, for an Entity inspector showing some of them.
     readonly changed = new Signal<ReadonlySet<EntityId>>();
     private readonly level: Level;
     private readonly rules: readonly EditorMessageRule[];

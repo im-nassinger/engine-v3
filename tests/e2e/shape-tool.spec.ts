@@ -63,12 +63,12 @@ function entityRow(page: Page, name: string) {
     return page.getByRole('tree', { name: 'Entities' }).getByRole('treeitem').filter({ hasText: name });
 }
 
-function inspector(page: Page) {
-    return page.getByRole('region', { name: 'Inspector' });
+function entityInspector(page: Page) {
+    return page.getByRole('region', { name: 'Entity inspector' });
 }
 
 function shapeCard(page: Page) {
-    return inspector(page).locator('.inspector-card[data-type="ShapeComponent"]');
+    return entityInspector(page).locator('.entity-inspector-card[data-type="ShapeComponent"]');
 }
 
 function shapeField(page: Page, label: string) {
@@ -94,7 +94,7 @@ async function expectFinished(page: Page, name: string) {
     await expect(shapeCard(page)).toHaveCount(1);
 }
 
-test('key 4 picks the Shape tool and hides the Inspector, and a click places a rectangle of the first size', async ({
+test('key 4 picks the Shape tool and hides the Entity inspector, and a click places a rectangle of the first size', async ({
     page,
 }) => {
     await openEditor(page);
@@ -103,7 +103,7 @@ test('key 4 picks the Shape tool and hides the Inspector, and a click places a r
     await page.mouse.move(middle.x, middle.y);
     await page.keyboard.press('4');
     await expect(page.getByRole('toolbar', { name: 'Tool options' })).toBeVisible();
-    await expect(inspector(page)).toHaveCount(0);
+    await expect(entityInspector(page)).toHaveCount(0);
 
     await page.mouse.click(middle.x, middle.y);
 

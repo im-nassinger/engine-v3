@@ -37,22 +37,22 @@ test('a panel that throws shows its notice, and the panel beside it still works'
 
     const brokenPanel = createElement(
         PanelPlace,
-        { area: 'inspector', label: 'Inspector' },
+        { area: 'entity-inspector', label: 'Entity inspector' },
         createElement(ThrowingPanel),
     );
     const workingPanel = createElement(
         PanelPlace,
-        { area: 'entities', label: 'Entities' },
+        { area: 'entities-viewer', label: 'Entities viewer' },
         createElement(CountingPanel),
     );
     const page = createElement('div', null, brokenPanel, workingPanel);
 
     flushSync(() => root.render(page));
 
-    const inspector = container.querySelector('[aria-label="Inspector"]');
-    const entities = container.querySelector('[aria-label="Entities"]');
-    expect(inspector?.textContent).toContain('This panel hit a problem. Your level is safe.');
-    expect(inspector?.querySelector('button')?.textContent).toBe('Reload');
+    const entityInspector = container.querySelector('[aria-label="Entity inspector"]');
+    const entities = container.querySelector('[aria-label="Entities viewer"]');
+    expect(entityInspector?.textContent).toContain('This panel hit a problem. Your level is safe.');
+    expect(entityInspector?.querySelector('button')?.textContent).toBe('Reload');
 
     const countButton = entities?.querySelector('button');
     flushSync(() => countButton?.click());

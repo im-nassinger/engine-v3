@@ -1,6 +1,6 @@
 import type { Axis } from '../../../../editor/commands/index.ts';
-import { ValueInput } from '../../../../editor/inspector/index.ts';
-import type { Mixed, NumberInputDefinition } from '../../../../editor/inspector/index.ts';
+import { ValueInput } from '../../../../editor/entity-inspector/index.ts';
+import type { Mixed, NumberInputDefinition } from '../../../../editor/entity-inspector/index.ts';
 import { FieldMessage, useFieldMessage } from '../../FieldMessage/index.ts';
 import { NumberBox } from '../../NumberBox/index.ts';
 import { useFieldTyping } from '../../typing/useFieldTyping.ts';

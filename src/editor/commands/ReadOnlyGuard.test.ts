@@ -9,7 +9,7 @@ import type { CutCommand } from './clipboard/CutCommand.ts';
 import type { PasteCommand } from './clipboard/PasteCommand.ts';
 import { createShape } from './draw/createShape.ts';
 import { toggleEntityHidden } from './hide/toggleEntityHidden.ts';
-import { setFieldValue } from './inspector/setFieldValue.ts';
+import { setFieldValue } from './entity-inspector/setFieldValue.ts';
 import { renameEntity } from './rename/renameEntity.ts';
 import { renameLevel } from './rename/renameLevel.ts';
 import { buildCommandTestSession, levelSnapshot } from './testing/commandTestSession.ts';
@@ -62,7 +62,7 @@ describe('a read-only tab', () => {
         expect(session.openLevel.history.undoCount).toBe(2);
     });
 
-    test('refuses the edits that are not commands: the Inspector, renaming, the eye, drawing', () => {
+    test('refuses the edits that are not commands: the Entity inspector, renaming, the eye, drawing', () => {
         const { session, level, square } = buildReadOnly();
         const { openLevel } = session;
         const before = levelSnapshot(level);

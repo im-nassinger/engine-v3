@@ -1,5 +1,5 @@
 import type { Axis } from '../../../editor/commands/index.ts';
-import type { MixedVector } from '../../../editor/inspector/index.ts';
+import type { MixedVector } from '../../../editor/entity-inspector/index.ts';
 import type { FieldProps } from '../FieldProps.ts';
 import { numberInputOf } from '../typing/numberInputOf.ts';
 import { VectorAxisBox } from './VectorAxisBox/index.ts';

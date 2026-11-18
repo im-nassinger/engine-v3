@@ -3,18 +3,18 @@
     inset: 0;
     overflow: hidden;
     display: grid;
-    grid-template-columns: var(--toolbar) var(--inspector) 1fr var(--entities);
+    grid-template-columns: var(--toolbar) var(--entity-inspector) 1fr var(--entities-viewer);
     grid-template-rows: var(--top-bar) 1fr var(--status-bar);
     grid-template-areas:
         'top-bar top-bar top-bar top-bar'
-        'toolbar inspector free entities'
+        'toolbar entity-inspector free entities-viewer'
         'status-bar status-bar status-bar status-bar';
 
-    &[data-inspector-hidden='true'] {
-        grid-template-columns: var(--toolbar) 1fr var(--entities);
+    &[data-entity-inspector-hidden='true'] {
+        grid-template-columns: var(--toolbar) 1fr var(--entities-viewer);
         grid-template-areas:
             'top-bar top-bar top-bar'
-            'toolbar free entities'
+            'toolbar free entities-viewer'
             'status-bar status-bar status-bar';
     }
 

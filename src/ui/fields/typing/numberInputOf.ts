@@ -1,5 +1,5 @@
 import { AngleFieldType, NumberFieldType, VectorFieldType } from '../../../core/fields/index.ts';
-import type { FieldModel, NumberInputDefinition } from '../../../editor/inspector/index.ts';
+import type { FieldModel, NumberInputDefinition } from '../../../editor/entity-inspector/index.ts';
 
 // What ValueInput reads from a number, angle or vector field, stored or derived. A vector's boxes share it.
 export function numberInputOf(field: FieldModel): NumberInputDefinition {

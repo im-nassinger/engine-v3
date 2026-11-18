@@ -35,11 +35,11 @@
     --top-bar: 44px;
     --status-bar: 24px;
     --toolbar: 44px;
-    --inspector: 300px;
-    --entities: 260px;
+    --entity-inspector: 300px;
+    --entities-viewer: 260px;
     --row: 28px;
     --panel-head: 36px;
-    --inspector-head: 44px;
+    --entity-inspector-head: 44px;
     --card-head: 32px;
     --control: 28px;
     --input: 22px;

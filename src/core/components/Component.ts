@@ -43,7 +43,7 @@ export abstract class Component<Values extends ComponentValues> implements AnyCo
         return this.values[key];
     }
 
-    // By key, for generic code: the Inspector, undo, the reader. Reaches fields and stored values alike.
+    // By key, for generic code: the Entity inspector, undo, the reader. Reaches fields and stored values alike.
     readValue(key: string): unknown {
         const entry = this.requireEntryByName(key);
 

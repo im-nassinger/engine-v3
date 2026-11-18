@@ -109,12 +109,12 @@ function region(page: Page, name: string) {
     return page.getByRole('region', { name });
 }
 
-function inspector(page: Page) {
-    return region(page, 'Inspector');
+function entityInspector(page: Page) {
+    return region(page, 'Entity inspector');
 }
 
 function card(page: Page, typeName: string) {
-    return inspector(page).locator(`.inspector-card[data-type="${typeName}"]`);
+    return entityInspector(page).locator(`.entity-inspector-card[data-type="${typeName}"]`);
 }
 
 // The open menu's own panel, and its open submenu: the menu's root is only as big as its panel.
@@ -142,8 +142,8 @@ async function drawCrate(page: Page) {
 }
 
 async function addComponent(page: Page, typeName: string) {
-    await inspector(page).getByRole('button', { name: 'Add Component' }).click();
-    await inspector(page).getByRole('menuitem', { name: typeName, exact: true }).click();
+    await entityInspector(page).getByRole('button', { name: 'Add Component' }).click();
+    await entityInspector(page).getByRole('menuitem', { name: typeName, exact: true }).click();
     await expect(card(page, typeName)).toHaveCount(1);
 }
 
@@ -237,11 +237,11 @@ const CASES: CoverCase[] = [
         },
     })),
     {
-        name: "the Inspector's menus and dropdowns",
+        name: "the Entity inspector's menus and dropdowns",
         run: async (page, inspect) => {
             await drawCrate(page);
             await addComponent(page, 'BodyComponent');
-            const panel = inspector(page);
+            const panel = entityInspector(page);
 
             await inspectMenuButton(page, inspect, panel, 'Add Component');
             await inspectMenuButton(page, inspect, card(page, 'ShapeComponent'), 'ShapeComponent menu');
@@ -255,14 +255,19 @@ const CASES: CoverCase[] = [
         },
     },
     {
-        name: "the Inspector's tooltips",
+        name: "the Entity inspector's tooltips",
         run: async (page, inspect) => {
             await drawCrate(page);
             await addComponent(page, 'BodyComponent');
-            const panel = inspector(page);
+            const panel = entityInspector(page);
 
-            await inspectTooltips(page, inspect, panel.locator('.inspector-head .tooltip'), "the Inspector's head");
-            const labels = panel.locator('.inspector-card .tooltip[data-long="true"]');
+            await inspectTooltips(
+                page,
+                inspect,
+                panel.locator('.entity-inspector-head .tooltip'),
+                "the Entity inspector's head",
+            );
+            const labels = panel.locator('.entity-inspector-card .tooltip[data-long="true"]');
             await inspectTooltips(page, inspect, labels.first(), 'the first described field');
             await inspectTooltips(page, inspect, labels.last(), 'the last described field');
 
@@ -274,7 +279,7 @@ const CASES: CoverCase[] = [
         },
     },
     {
-        name: "the Inspector's editor messages",
+        name: "the Entity inspector's editor messages",
         run: async (page, inspect) => {
             await drawCrate(page);
             await addComponent(page, 'BodyComponent');

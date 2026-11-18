@@ -1,5 +1,5 @@
 import { ChoiceFieldType } from '../../../core/fields/index.ts';
-import { MIXED } from '../../../editor/inspector/index.ts';
+import { MIXED } from '../../../editor/entity-inspector/index.ts';
 import { Menu, MenuButton, useOpenMenu } from '../../shared/index.ts';
 import type { MenuEntry } from '../../shared/index.ts';
 import type { FieldProps } from '../FieldProps.ts';

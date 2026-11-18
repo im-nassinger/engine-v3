@@ -11,7 +11,7 @@ import { PointPressState } from './PointPressState.ts';
 import type { SelectState, SelectStateHost } from './SelectState.ts';
 
 // Editing a polygon's or line's points, entered by double-clicking it. The entity stays selected, so
-// the Inspector shows its Points. Ends with Esc, a press on another entity (handed to IdleState, which
+// the Entity inspector shows its Points. Ends with Esc, a press on another entity (handed to IdleState, which
 // selects it), a click on empty space outside the shape's frame, a change of selection from elsewhere,
 // the entity going away, or it being hidden or stopping being a polygon or line. Undo and Redo clear the selected points, since their indexes may not match.
 export class PointEditState implements SelectState {
@@ -168,7 +168,7 @@ export class PointEditState implements SelectState {
         return selectable !== undefined && selectable !== this.points.entity;
     }
 
-    // The Inspector can change the shape's kind, hide it, or delete points from its list.
+    // The Entity inspector can change the shape's kind, hide it, or delete points from its list.
     private followEntity() {
         this.endIfNotEditable();
         this.points.dropMissing();

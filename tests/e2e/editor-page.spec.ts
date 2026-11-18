@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-const PANEL_PLACES = ['Top bar', 'Tools', 'Inspector', 'Entities', 'Status bar'];
+const PANEL_PLACES = ['Top bar', 'Tools', 'Entity inspector', 'Entities viewer', 'Status bar'];
 
 test('the built page opens with every panel in its place and logs no error', async ({ page }) => {
     const errors: string[] = [];

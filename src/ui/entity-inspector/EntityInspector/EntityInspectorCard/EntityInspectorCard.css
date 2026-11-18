@@ -1,0 +1,46 @@
+.entity-inspector-card {
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--line);
+
+    > .head {
+        display: flex;
+        align-items: center;
+        height: var(--card-head);
+        padding: 0 var(--space-4) 0 var(--space-8);
+
+        > .title {
+            display: flex;
+            flex: 1;
+            align-items: center;
+            gap: var(--space-4);
+            min-width: 0;
+            height: 100%;
+            padding: 0;
+            border: none;
+            background: none;
+            color: var(--text);
+            font-weight: var(--weight-heading);
+            text-align: left;
+            cursor: default;
+
+            > .icon {
+                flex-shrink: 0;
+                color: var(--muted);
+            }
+
+            > .name {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            &:focus-visible {
+                outline: 1px solid var(--accent);
+            }
+        }
+    }
+
+    &:has(> .head > .title[aria-expanded='false']) {
+        padding-bottom: 0;
+    }
+}

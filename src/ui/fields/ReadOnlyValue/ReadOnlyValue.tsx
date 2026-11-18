@@ -1,4 +1,4 @@
-import type { FieldModel } from '../../../editor/inspector/index.ts';
+import type { FieldModel } from '../../../editor/entity-inspector/index.ts';
 import { readOnlyText } from './readOnlyText.ts';
 import './ReadOnlyValue.css';
 

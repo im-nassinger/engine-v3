@@ -42,12 +42,12 @@ function offset(point: ScreenPoint, dx: number, dy: number): ScreenPoint {
     return { x: point.x + dx, y: point.y + dy };
 }
 
-function inspector(page: Page) {
-    return page.getByRole('region', { name: 'Inspector' });
+function entityInspector(page: Page) {
+    return page.getByRole('region', { name: 'Entity inspector' });
 }
 
 function card(page: Page, typeName: string) {
-    return inspector(page).locator(`.inspector-card[data-type="${typeName}"]`);
+    return entityInspector(page).locator(`.entity-inspector-card[data-type="${typeName}"]`);
 }
 
 function rows(page: Page, name: string) {
@@ -68,8 +68,8 @@ async function drawBody(page: Page, kind: 'Rectangle' | 'Circle', box: ScreenBox
     await page.mouse.up();
     await expect(rows(page, name)).toHaveAttribute('aria-selected', 'true');
 
-    await inspector(page).getByRole('button', { name: 'Add Component' }).click();
-    await inspector(page).getByRole('menuitem', { name: 'BodyComponent', exact: true }).click();
+    await entityInspector(page).getByRole('button', { name: 'Add Component' }).click();
+    await entityInspector(page).getByRole('menuitem', { name: 'BodyComponent', exact: true }).click();
     await card(page, 'BodyComponent').getByRole('button', { name: 'Add SurfaceComponent' }).click();
     await expect(card(page, 'SurfaceComponent')).toHaveCount(1);
 }
@@ -192,7 +192,7 @@ test('journey 2: a car of a group, a body and two hinged wheels, exported and im
     const reexported = await exportLevel(page);
     expect(levelJsonOf(reexported.bytes)).toEqual(before);
 
-    // The hinges still join their wheels to the chassis, as the Inspector shows them.
+    // The hinges still join their wheels to the chassis, as the Entity inspector shows them.
     // The import may open the group folded.
     const unfold = rows(page, 'Group 1').getByRole('button', { name: 'Unfold' });
     if ((await unfold.count()) > 0) {

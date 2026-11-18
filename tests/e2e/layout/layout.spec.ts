@@ -14,7 +14,7 @@ const SIZES: WindowSize[] = [
     { name: '1280×720 at 200%', width: 1280, height: 720, zoom: 2 },
 ];
 
-const PANEL_PLACES = ['Top bar', 'Tools', 'Inspector', 'Entities', 'Status bar'];
+const PANEL_PLACES = ['Top bar', 'Tools', 'Entity inspector', 'Entities viewer', 'Status bar'];
 // A new level's camera size.
 const CAMERA_WIDTH = 1920;
 const CAMERA_HEIGHT = 1080;
@@ -129,7 +129,7 @@ for (const size of SIZES) {
 
         test("a click at a drawn crate's middle selects it", async ({ page }) => {
             await openEditor(page);
-            // Measured with the Inspector shown, so the point stays free once the Shape tool returns to Select.
+            // Measured with the Entity inspector shown, so the point stays free once the Shape tool returns to Select.
             const free = await freeAreaBox(page);
             const middle = { x: free.x + free.width / 2, y: free.y + free.height / 2 };
 

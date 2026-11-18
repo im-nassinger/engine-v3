@@ -13,7 +13,7 @@ export type BodyMassCaches = {
 
 // The mass of a body: every surface that belongs to it, its own and the ones merged into it, added up in
 // level positions, so scaling the body or any shape in it changes the mass. The same pieces play collides
-// with, so the Inspector's Mass matches play.
+// with, so the Entity inspector's Mass matches play.
 export class BodyMass {
     // undefined when the entity has no BodyComponent or merges into another body, since then it has no
     // mass of its own. A body without surfaces weighs 0 kg here; play gives a weightless Dynamic body 1 kg.

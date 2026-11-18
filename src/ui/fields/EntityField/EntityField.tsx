@@ -1,5 +1,5 @@
 import type { EntityId } from '../../../core/level/index.ts';
-import { EntityChoices } from '../../../editor/inspector/index.ts';
+import { EntityChoices } from '../../../editor/entity-inspector/index.ts';
 import { useEditorSession } from '../../EditorContext.tsx';
 import { useEntityVersion } from '../../hooks/index.ts';
 import { MenuButton, useEntityRowDrop } from '../../shared/index.ts';

@@ -42,8 +42,8 @@ function crateRow(page: Page) {
 
 function positionX(page: Page) {
     const transform = page
-        .getByRole('region', { name: 'Inspector' })
-        .locator('.inspector-card[data-type="TransformComponent"]');
+        .getByRole('region', { name: 'Entity inspector' })
+        .locator('.entity-inspector-card[data-type="TransformComponent"]');
 
     return transform.getByRole('textbox', { name: 'Position X' });
 }

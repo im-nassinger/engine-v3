@@ -16,7 +16,7 @@ export function moveReadout(offset: Point) {
     return `${numberText(offset.x)}, ${numberText(offset.y)} px`;
 }
 
-// The new size, in the pixels the Inspector shows: `200 × 100 px`.
+// The new size, in the pixels the Entity inspector shows: `200 × 100 px`.
 export function sizeReadout(size: Point) {
     return `${numberText(size.x)} × ${numberText(size.y)} px`;
 }

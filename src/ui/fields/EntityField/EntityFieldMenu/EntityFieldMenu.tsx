@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Entity, EntityId, Level } from '../../../../core/level/index.ts';
 import { labelName } from '../../../../core/level/index.ts';
-import { EntityChoices } from '../../../../editor/inspector/index.ts';
+import { EntityChoices } from '../../../../editor/entity-inspector/index.ts';
 import { Menu, MenuSearch, useOpenMenu } from '../../../shared/index.ts';
 import type { MenuEntry } from '../../../shared/index.ts';
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { SolidFill } from '../../../core/fields/index.ts';
-import { MIXED } from '../../../editor/inspector/index.ts';
+import { MIXED } from '../../../editor/entity-inspector/index.ts';
 import { ColourBox } from '../ColourBox/index.ts';
 import type { FieldProps } from '../FieldProps.ts';
 import './FillField.css';

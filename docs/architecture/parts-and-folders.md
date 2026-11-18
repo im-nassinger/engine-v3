@@ -67,8 +67,8 @@ src/
     hit-testing/       HitTester, HitProbe; areas/ (each entity's hit area), spatial-index/ (SpatialIndex, LinearSpatialIndex)
     snapping/          Snapper, GridSnapper
     view/              ViewState (pan and zoom), ViewSettings, the overlay sizes the drawing and hitting share
-    entities-panel/    rows/ (EntitiesRows, the visible rows, and rowKind, a row's icon), clicks/ (RowClicks), drop/ (EntitiesDrop, where a drag lands)
-    inspector/         InspectorModel, CardModel, FieldModel, CardFolds, ValueInput (typed text)
+    entities-viewer/   rows/ (EntitiesRows, the visible rows, and rowKind, a row's icon), clicks/ (RowClicks), drop/ (EntitiesDrop, where a drag lands)
+    entity-inspector/  EntityInspectorModel, CardModel, FieldModel, CardFolds, ValueInput (typed text)
     messages/          EditorMessages, EditorMessageRule, rules/
     clipboard/         ClipboardCodec, PastePlacement, IdRemapping
     shortcuts/         KeyChord, KeyPress, ShortcutMap, ShortcutDispatcher
@@ -103,7 +103,7 @@ src/
     play/              PlayContext: the PlaySession for the shell, the Play button and the Play bar
     play-bar/          PlayBar/ (with PlayBarButton/)
     testing/           editorPage: a component shown with the session, commands and tools, for browser tests
-    top-bar/ main-menu/ tool-options/ level-view-host/ entities-panel/ inspector/
+    top-bar/ main-menu/ tool-options/ level-view-host/ entities-viewer/ entity-inspector/
     fields/            one component per field type: NumberField/, ColourField/, ...
     shared/            Button/, IconButton/, Menu/, MenuButton/, Tooltip/, Icon/
 tests/

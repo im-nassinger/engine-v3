@@ -38,8 +38,8 @@ function find(selector: string) {
     return editorPageContainer().querySelector<HTMLElement>(selector);
 }
 
-function inspector() {
-    return find('section[aria-label="Inspector"]');
+function entityInspector() {
+    return find('section[aria-label="Entity inspector"]');
 }
 
 function optionButton(label: string) {
@@ -51,7 +51,7 @@ function optionButton(label: string) {
 }
 
 function nameBoxValue() {
-    return inspector()?.querySelector('input')?.value ?? '';
+    return entityInspector()?.querySelector('input')?.value ?? '';
 }
 
 function statusText() {
@@ -69,14 +69,14 @@ function leftClickAt(x: number, y: number): LevelPointerInput {
 }
 
 describe('EditorShell', () => {
-    test('the Shape tool hides the Inspector, and the free area reaches the toolbar', async () => {
+    test('the Shape tool hides the Entity inspector, and the free area reaches the toolbar', async () => {
         const { tools } = showShell();
-        await expect.poll(() => inspector()).not.toBeNull();
+        await expect.poll(() => entityInspector()).not.toBeNull();
         expect(find('.tool-options')).toBeNull();
 
         tools.controller.pick('shape');
 
-        await expect.poll(() => inspector()).toBeNull();
+        await expect.poll(() => entityInspector()).toBeNull();
         const toolbarBox = find('section[aria-label="Tools"]')?.getBoundingClientRect();
         const freeBox = find('.free-area')?.getBoundingClientRect();
         expect(freeBox?.left).toBe(toolbarBox?.right);
@@ -117,8 +117,8 @@ describe('EditorShell', () => {
         expect(optionButton('Hinge').getAttribute('aria-pressed')).toBe('true');
         expect(optionButton('Rope').getAttribute('aria-pressed')).toBe('false');
         expect(optionButton('Spring').getAttribute('aria-pressed')).toBe('false');
-        // The Inspector stays, unlike with the Shape tool.
-        expect(inspector()).not.toBeNull();
+        // The Entity inspector stays, unlike with the Shape tool.
+        expect(entityInspector()).not.toBeNull();
 
         await userEvent.click(optionButton('Spring'));
 
@@ -147,10 +147,10 @@ describe('EditorShell', () => {
         await expect.poll(statusText).toContain('Click the first entity, then the second.');
     });
 
-    test('the Inspector shows again, with the new shape, once a shape is finished', async () => {
+    test('the Entity inspector shows again, with the new shape, once a shape is finished', async () => {
         const { session, tools } = showShell();
         tools.controller.pick('shape');
-        await expect.poll(() => inspector()).toBeNull();
+        await expect.poll(() => entityInspector()).toBeNull();
 
         tools.controller.pointerDown(leftClickAt(0, 0));
         tools.controller.pointerUp(leftClickAt(0, 0));

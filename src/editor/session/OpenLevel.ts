@@ -1,12 +1,12 @@
 import type { ComponentRegistry } from '../../core/components/index.ts';
 import { DerivedCaches } from '../../core/derived/index.ts';
 import type { Level } from '../../core/level/index.ts';
-import { EntitiesRows, RenameRequest, RowClicks, SelectionReveal } from '../entities-panel/index.ts';
+import { EntitiesRows, RenameRequest, RowClicks, SelectionReveal } from '../entities-viewer/index.ts';
 import { History, LevelEditor, LiveEdit } from '../history/index.ts';
 import type { ReadOnlyMode } from '../history/index.ts';
 import { HitTester, LinearSpatialIndex } from '../hit-testing/index.ts';
-import { InspectorModel } from '../inspector/index.ts';
-import type { CardFolds } from '../inspector/index.ts';
+import { EntityInspectorModel } from '../entity-inspector/index.ts';
+import type { CardFolds } from '../entity-inspector/index.ts';
 import { createV1Rules, EditorMessages } from '../messages/index.ts';
 import { Selection } from '../selection/index.ts';
 import type { Clock, FrameScheduler } from '../time/index.ts';
@@ -48,7 +48,7 @@ export class OpenLevel {
     // A drag's values, changed live and recorded as one step on release.
     readonly liveEdit: LiveEdit;
     readonly messages: EditorMessages;
-    readonly inspector: InspectorModel;
+    readonly entityInspector: EntityInspectorModel;
     // What is under the mouse, for the tools.
     readonly hitTester: HitTester;
     // Names this opening of the level in what it copies, so a paste can tell whether its links to entities
@@ -74,7 +74,7 @@ export class OpenLevel {
         });
         this.liveEdit = new LiveEdit(level, this.editor);
         this.messages = new EditorMessages(level, createV1Rules(), services.frames);
-        this.inspector = new InspectorModel({
+        this.entityInspector = new EntityInspectorModel({
             level,
             selection: this.selection,
             caches: this.caches,
@@ -89,7 +89,7 @@ export class OpenLevel {
 
     // Stops everything here following the level.
     dispose() {
-        this.inspector.dispose();
+        this.entityInspector.dispose();
         this.messages.dispose();
         this.selectionReveal.dispose();
         this.entitiesRows.dispose();

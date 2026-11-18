@@ -72,12 +72,12 @@ function offset(point: ScreenPoint, dx: number, dy: number): ScreenPoint {
     return { x: point.x + dx, y: point.y + dy };
 }
 
-function inspector(page: Page) {
-    return page.getByRole('region', { name: 'Inspector' });
+function entityInspector(page: Page) {
+    return page.getByRole('region', { name: 'Entity inspector' });
 }
 
 function card(page: Page, typeName: string) {
-    return inspector(page).locator(`.inspector-card[data-type="${typeName}"]`);
+    return entityInspector(page).locator(`.entity-inspector-card[data-type="${typeName}"]`);
 }
 
 function rows(page: Page, name: string) {
@@ -88,8 +88,8 @@ function rows(page: Page, name: string) {
 }
 
 async function addComponent(page: Page, typeName: string) {
-    await inspector(page).getByRole('button', { name: 'Add Component' }).click();
-    await inspector(page).getByRole('menuitem', { name: typeName, exact: true }).click();
+    await entityInspector(page).getByRole('button', { name: 'Add Component' }).click();
+    await entityInspector(page).getByRole('menuitem', { name: typeName, exact: true }).click();
     await expect(card(page, typeName)).toHaveCount(1);
 }
 
@@ -111,7 +111,7 @@ async function drawBody(page: Page, centre: ScreenPoint, name: string, type: 'Dy
     if (type === 'Static') {
         const typeButton = card(page, 'BodyComponent').getByRole('button', { name: 'Type' });
         await typeButton.click();
-        await inspector(page).getByRole('menuitem', { name: 'Static', exact: true }).click();
+        await entityInspector(page).getByRole('menuitem', { name: 'Static', exact: true }).click();
         await expect(typeButton).toHaveText('Static');
     }
 }

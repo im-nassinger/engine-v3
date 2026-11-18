@@ -1,6 +1,6 @@
 import { ChoiceFieldType } from '../../../core/fields/index.ts';
-import { MIXED, ValueInput } from '../../../editor/inspector/index.ts';
-import type { FieldModel } from '../../../editor/inspector/index.ts';
+import { MIXED, ValueInput } from '../../../editor/entity-inspector/index.ts';
+import type { FieldModel } from '../../../editor/entity-inspector/index.ts';
 
 const MIXED_TEXT = 'Mixed';
 

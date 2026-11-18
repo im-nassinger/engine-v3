@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { MIXED } from '../../../editor/inspector/index.ts';
+import { MIXED } from '../../../editor/entity-inspector/index.ts';
 import type { FieldProps } from '../FieldProps.ts';
 import './CheckboxField.css';
 

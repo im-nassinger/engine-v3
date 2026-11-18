@@ -7,7 +7,7 @@ import type { NameValues } from './NameValues.ts';
 export const nameSchema = new ComponentSchema<NameValues>({
     typeName: 'NameComponent',
     cardOrder: 0,
-    // The Inspector's header edits the name.
+    // The Entity inspector's header edits the name.
     hasCard: false,
     addableByHand: false,
     fields: [

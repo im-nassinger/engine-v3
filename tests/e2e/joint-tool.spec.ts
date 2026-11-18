@@ -33,12 +33,12 @@ function offset(point: ScreenPoint, dx: number, dy: number): ScreenPoint {
     return { x: point.x + dx, y: point.y + dy };
 }
 
-function inspector(page: Page) {
-    return page.getByRole('region', { name: 'Inspector' });
+function entityInspector(page: Page) {
+    return page.getByRole('region', { name: 'Entity inspector' });
 }
 
 function card(page: Page, typeName: string) {
-    return inspector(page).locator(`.inspector-card[data-type="${typeName}"]`);
+    return entityInspector(page).locator(`.entity-inspector-card[data-type="${typeName}"]`);
 }
 
 function rows(page: Page, name: string) {
@@ -61,8 +61,8 @@ async function drawBody(page: Page, box: ScreenBox, name: string) {
     await page.mouse.up();
     await expect(rows(page, name)).toHaveAttribute('aria-selected', 'true');
 
-    await inspector(page).getByRole('button', { name: 'Add Component' }).click();
-    await inspector(page).getByRole('menuitem', { name: 'BodyComponent', exact: true }).click();
+    await entityInspector(page).getByRole('button', { name: 'Add Component' }).click();
+    await entityInspector(page).getByRole('menuitem', { name: 'BodyComponent', exact: true }).click();
     await card(page, 'BodyComponent').getByRole('button', { name: 'Add SurfaceComponent' }).click();
     await expect(card(page, 'SurfaceComponent')).toHaveCount(1);
 }
@@ -76,12 +76,12 @@ async function click(page: Page, at: ScreenPoint) {
     await page.mouse.click(at.x, at.y);
 }
 
-// The selected joint's A or B, as the Inspector's JointComponent card names it.
+// The selected joint's A or B, as the Entity inspector's JointComponent card names it.
 function jointEnd(page: Page, label: 'A' | 'B') {
     return card(page, 'JointComponent').getByRole('button', { name: label, exact: true });
 }
 
-// After placing, the joint is selected and the tool is back to Select, so the Inspector shows it.
+// After placing, the joint is selected and the tool is back to Select, so the Entity inspector shows it.
 async function expectPlaced(page: Page, name: string) {
     await expect(rows(page, name)).toHaveAttribute('aria-selected', 'true');
     await expect(page.getByRole('toolbar', { name: 'Tool options' })).toHaveCount(0);

@@ -1,6 +1,6 @@
 import type { ComponentTypeName } from '../../../core/components/index.ts';
 import type { Unsubscribe } from '../../../core/events/index.ts';
-import type { FoldStore } from '../../inspector/index.ts';
+import type { FoldStore } from '../../entity-inspector/index.ts';
 import type { EditorSession } from '../../session/index.ts';
 import type { Cancel, FrameScheduler } from '../../time/index.ts';
 import { DEFAULT_VIEW_SWITCHES, ViewSettings } from '../../view/index.ts';

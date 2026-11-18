@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { ChangeEvent, CSSProperties } from 'react';
-import type { NumberInputDefinition } from '../../../../editor/inspector/index.ts';
+import type { NumberInputDefinition } from '../../../../editor/entity-inspector/index.ts';
 import './FieldSlider.css';
 
 export type SliderRange = {

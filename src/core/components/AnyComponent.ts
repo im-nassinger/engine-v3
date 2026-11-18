@@ -39,7 +39,7 @@ export type ComponentChange = {
     readonly key: string;
 };
 
-// Any component, whatever its values, for code that works by key: the entity, the Inspector, undo, the reader.
+// Any component, whatever its values, for code that works by key: the entity, the Entity inspector, undo, the reader.
 // Component<Values> can't play this part itself, because a schema typed by its keys never widens to all keys.
 export type AnyComponent = {
     readonly schema: AnyComponentSchema;

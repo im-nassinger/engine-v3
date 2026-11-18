@@ -57,8 +57,8 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--island-gap` | 10 px: from the window's edge and between islands | requirement |
 | `--island-bar` | 48 px: ☰ and the tool column's width | requirement |
 | `--tool` | 34 px: a tool button, ☰'s button | requirement |
-| `--inspector` | 300 px wide | requirement |
-| `--entities` | 260 px wide | requirement |
+| `--entity-inspector` | 300 px wide | requirement |
+| `--entities-viewer` | 260 px wide | requirement |
 | `--minimap` | 180 px wide | requirement |
 | `--debug-box` | 28 px tall | redesign 24 |
 | `--row` | 30 px: an Entities viewer row, an Entity inspector field | redesign |

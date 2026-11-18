@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
 import { ListFieldType } from '../../../core/fields/index.ts';
-import { ListItems, MIXED } from '../../../editor/inspector/index.ts';
+import { ListItems, MIXED } from '../../../editor/entity-inspector/index.ts';
 import { useEditorSession } from '../../EditorContext.tsx';
 import { useReading } from '../../hooks/index.ts';
 import { Icon, IconButton } from '../../shared/index.ts';

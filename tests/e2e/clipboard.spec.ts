@@ -41,11 +41,11 @@ function statusText(page: Page) {
     return page.locator('.status-bar .status-text');
 }
 
-// The selected entity's position, read from the Inspector's TransformComponent card.
+// The selected entity's position, read from the Entity inspector's TransformComponent card.
 async function selectedPosition(page: Page) {
     const transform = page
-        .getByRole('region', { name: 'Inspector' })
-        .locator('.inspector-card[data-type="TransformComponent"]');
+        .getByRole('region', { name: 'Entity inspector' })
+        .locator('.entity-inspector-card[data-type="TransformComponent"]');
     const read = async (label: string) => {
         const text = await transform.getByRole('textbox', { name: label, exact: true }).inputValue();
         return Number(text.replace('−', '-'));
