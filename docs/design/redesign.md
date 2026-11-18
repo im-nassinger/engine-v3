@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The owner wants a new look for the editor before v2 starts (2026-11-17): **clean, cool and beautiful, with no borders, separator lines or outlines**, even if it looks less "professional" than commercial tools. Only the look changes (colours, spacing, layout, the parts' shapes); what the screen shows stays. **Settled so far:** the Islands look, the owner's set of parts, panels holding only their own content, no level name, no View button, no shadows, the panels titled **Entity inspector** and **Entities viewer**, and the layout of 17 to 20: ☰ alone at the top left, holding every command (Undo, Redo, Save and Play included) in its submenus, the tools in a column under it, the Entity inspector beside them from the top, a minimap at the bottom right with the zoom under it, and Grid snapping in the View menu (18). **Open:** what Save does, the font, and the status chip. The mockup is [mockups/redesign.html](mockups/redesign.html); the [round 8 design](README.md) stays what is built until this one is written into [tokens.md](tokens.md) and [controls.md](controls.md) and planned as a stage.
+The owner wants a new look for the editor before v2 starts (2026-11-17): **clean, cool and beautiful, with no borders, separator lines or outlines**, even if it looks less "professional" than commercial tools. Only the look changes (colours, spacing, layout, the parts' shapes); what the screen shows stays. **Settled so far:** the Islands look, the owner's set of parts, panels holding only their own content, no level name, no View button, no shadows, the panels titled **Entity inspector** and **Entities viewer**, and the layout of 17 to 20: ☰ alone at the top left, holding every command (Undo, Redo, Save and Play included) in its submenus, the tools in a column under it, the Entity inspector beside them from the top, a minimap at the bottom right with the zoom under it, and Grid snapping in the View menu (18). **Open:** what Save does and the font. The mockup is [mockups/redesign.html](mockups/redesign.html); the [round 8 design](README.md) stays what is built until this one is written into [tokens.md](tokens.md) and [controls.md](controls.md) and planned as a stage.
 
 ## Settled, in order (all owner, 2026-11-17)
 
@@ -43,6 +43,7 @@ The owner wants a new look for the editor before v2 starts (2026-11-17): **clean
     - **☰ and the tools are the same size**: 34 px buttons in 48 px islands, the ☰ icon muted like an unchosen tool's.
     - **Nothing else sits at the top**: the Entity inspector and the Entities viewer start 10 px from the window's top.
     - *For [workspace.md](../requirements/editor/workspace.md), with the owner's yes: the top bar is gone, its Undo, Redo, Snapping and Play rows with it, and the main menu starts with Play.*
+21. **The hint chip shows only a message and the mouse position** (owner, 2026-11-17), so it reads cleaner: the tool's hint, or a status message while one is shown, then the position, muted, in tabular figures, as `x 20  y 340`. Gone from it: the selection's name, since the Entities viewer and the Entity inspector already show what is selected, the warning count, and the tool's name before the hint, since the tool column shows which tool is on. *For [workspace.md](../requirements/editor/workspace.md), with the owner's yes: the status bar's selection and warning count go. Whether the warning count needs another place is open.*
 
 ## The tokens of the pick
 
@@ -51,7 +52,6 @@ From the mockup's `SLATE` set: app `#0d0f13`, panels `rgba(24,27,33,.96)`, raise
 ## Open for the owner
 
 - **What Save does.** A level autosaves, and Ctrl+S exports the `.editable` file today ([saving.md](../requirements/play-and-save/saving.md)). Claude's suggestion: Save saves now, without waiting for autosave; exporting stays in the File menu. This is a requirement change, so it waits for the owner.
-- **The status text:** today it is one dark chip above the dock with the tool hint, the mouse position, the selection and the warning count. Not yet confirmed.
 - **The font:** JetBrains Mono (round 8's decision) is still the default; the page offers Inter, Geist and Inter with mono numbers.
 
 ## The mockup page
