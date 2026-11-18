@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { JointComponent } from '../../../core/components/index.ts';
+import { JointComponent, SurfaceComponent } from '../../../core/components/index.ts';
 import { labelName, Level } from '../../../core/level/index.ts';
 import {
     addBareEntity,
@@ -74,6 +74,17 @@ function notesOf(typeName: string) {
     return [...notes].map((note) => note.textContent);
 }
 
+// A token as the browser writes the colour, to compare with a computed style.
+function themeColour(token: string) {
+    const probe = document.createElement('div');
+    probe.style.color = `var(${token})`;
+    entityInspectorContainer().append(probe);
+    const colour = getComputedStyle(probe).color;
+    probe.remove();
+
+    return colour;
+}
+
 function press(element: Element, key: string) {
     element.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
 }
@@ -97,6 +108,88 @@ describe('Entity inspector', () => {
         expect(types).not.toContain('TransformComponent');
         expect(entityInspectorContainer().querySelector('.entity-inspector-head input')).toBeNull();
         expect(entityInspectorContainer().querySelector('.entity-inspector-head button')).toBeNull();
+    });
+
+    test('the panel is titled Entity inspector, in the plain title size', async () => {
+        showEntityInspector(Level.createNew());
+        await expect.poll(() => headTitle()).toBe('World');
+
+        const title = requireElement(entityInspectorContainer(), '.panel-title');
+
+        expect(title.textContent).toBe('Entity inspector');
+        expect(getComputedStyle(title).fontSize).toBe('14px');
+        expect(getComputedStyle(title).textTransform).toBe('none');
+    });
+
+    test('the name is a pill field of medium weight', async () => {
+        const level = Level.createNew();
+        const crate = addCrate(level, 'Crate');
+        const { session } = showEntityInspector(level);
+        select(session, [crate]);
+        await expect.poll(() => headTitle()).toBe('Crate');
+
+        const box = requireElement(entityInspectorContainer(), '.entity-inspector-head input');
+        const style = getComputedStyle(box);
+
+        expect(style.borderTopLeftRadius).toBe('14px');
+        expect(style.fontWeight).toBe('500');
+    });
+
+    test('a card reads its title without Component, in small capitals, and its menu is named the same', async () => {
+        const level = Level.createNew();
+        const crate = addCrate(level, 'Crate');
+        const { session } = showEntityInspector(level);
+        select(session, [crate]);
+        await expect.poll(() => headTitle()).toBe('Crate');
+
+        const card = requireCard('BodyComponent');
+        const name = requireElement(card, '.title .name');
+        const style = getComputedStyle(name);
+
+        expect(name.textContent).toBe('Body');
+        expect(style.textTransform).toBe('uppercase');
+        expect(style.fontSize).toBe('10px');
+        expect(card.querySelector('button[aria-label="Body menu"]')).not.toBeNull();
+    });
+
+    test('cards are split by space only', async () => {
+        const level = Level.createNew();
+        const crate = addCrate(level, 'Crate');
+        const { session } = showEntityInspector(level);
+        select(session, [crate]);
+        await expect.poll(() => headTitle()).toBe('Crate');
+
+        const style = getComputedStyle(requireCard('BodyComponent'));
+
+        expect(style.borderBottomStyle).toBe('none');
+        expect(style.paddingBottom).toBe('10px');
+    });
+
+    test('a warning note is tinted at 10% and its fix is in the accent text colour', async () => {
+        const level = Level.createNew();
+        const crate = addCrate(level, 'Crate');
+        crate.removeComponent(SurfaceComponent);
+        const { session, frames } = showEntityInspector(level);
+        select(session, [crate]);
+        await expect.poll(() => headTitle()).toBe('Crate');
+        frames.runFrame();
+        await expect.poll(() => notesOf('BodyComponent')).toEqual(['Needs a Surface to collide. Add Surface']);
+
+        const note = requireElement(requireCard('BodyComponent'), '[role="note"]');
+        const accentText = themeColour('--accent-text');
+
+        expect(getComputedStyle(note).backgroundColor).toMatch(/[/,] 0\.1\)$/);
+        expect(getComputedStyle(requireElement(note, '.fix')).color).toBe(accentText);
+    });
+
+    test('Add Component is a raised button across the panel', async () => {
+        showEntityInspector(Level.createNew());
+        await expect.poll(() => headTitle()).toBe('World');
+
+        const button = requireElement(entityInspectorContainer(), '.add-component .open');
+        const raised = themeColour('--raised');
+
+        expect(getComputedStyle(button).backgroundColor).toBe(raised);
     });
 
     test('a fold is kept per component type, on every entity', async () => {
@@ -159,15 +252,15 @@ describe('Entity inspector', () => {
         select(session, [crate]);
         await expect.poll(() => headTitle()).toBe('Crate');
 
-        const shapeMenu = requireElement(requireCard('ShapeComponent'), 'button[aria-label="ShapeComponent menu"]');
+        const shapeMenu = requireElement(requireCard('ShapeComponent'), 'button[aria-label="Shape menu"]');
         click(shapeMenu);
         click(await shownMenuRow('Remove'));
         frames.runFrame();
 
         await expect.poll(() => shownCardTypes()).not.toContain('ShapeComponent');
-        await expect.poll(() => notesOf('SurfaceComponent').join(' ')).toContain('Needs a ShapeComponent');
+        await expect.poll(() => notesOf('SurfaceComponent').join(' ')).toContain('Needs a Shape');
 
-        click(buttonNamed(requireCard('SurfaceComponent'), 'Add ShapeComponent'));
+        click(buttonNamed(requireCard('SurfaceComponent'), 'Add Shape'));
         frames.runFrame();
 
         await expect.poll(() => shownCardTypes()).toContain('ShapeComponent');
@@ -182,7 +275,7 @@ describe('Entity inspector', () => {
 
         const worldMenu = requireElement(
             requireCard('PhysicsWorldComponent'),
-            'button[aria-label="PhysicsWorldComponent menu"]',
+            'button[aria-label="PhysicsWorld menu"]',
         );
         click(worldMenu);
 

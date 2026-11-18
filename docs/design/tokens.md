@@ -51,6 +51,7 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--weight-text` | 400 | Text |
 | `--weight-name` | 500 | The entity's name field |
 | `--weight-heading` | 600 | Panel titles, card heads, the Play bar's label and primary buttons |
+| `--caps-spacing` | 0.09em | The letter spacing of small caps, as in the mockup |
 
 ## Sizes
 

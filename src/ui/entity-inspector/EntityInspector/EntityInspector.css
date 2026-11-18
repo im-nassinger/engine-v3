@@ -3,6 +3,17 @@
     flex-direction: column;
     height: 100%;
 
+    > .panel-title {
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        height: var(--panel-head);
+        margin: 0;
+        padding: 0 var(--inset);
+        font-size: var(--text-title);
+        font-weight: var(--weight-heading);
+    }
+
     > .cards {
         flex: 1;
         min-height: 0;

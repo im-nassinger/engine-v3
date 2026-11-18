@@ -1,4 +1,4 @@
-import { TransformComponent } from '../../../core/components/index.ts';
+import { cardTitle, TransformComponent } from '../../../core/components/index.ts';
 import type { AnyComponent, ComponentTypeName } from '../../../core/components/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import type { BodyMassCaches } from '../../../core/physics/index.ts';
@@ -68,8 +68,10 @@ function cardModel(held: HeldComponents, sources: CardSources): CardModel {
     const removals = held.entities.map((entity) => removeAvailability(entity, held.schema));
     const canRemove = firstRefusal(removals);
     const canReset = resetAvailability(held.schema);
-    const isFolded = sources.folds.isFolded(held.schema.typeName);
-    const notes = cardNotes(held.entities, held.schema.typeName, sources.messages);
+    const { typeName } = held.schema;
+    const title = cardTitle(typeName);
+    const isFolded = sources.folds.isFolded(typeName);
+    const notes = cardNotes(held.entities, typeName, sources.messages);
 
-    return { typeName: held.schema.typeName, isFolded, fields, canRemove, canReset, notes };
+    return { typeName, title, isFolded, fields, canRemove, canReset, notes };
 }

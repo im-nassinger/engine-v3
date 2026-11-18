@@ -1,6 +1,6 @@
 .add-component {
     position: relative;
-    padding: var(--space-10);
+    padding: var(--space-4) var(--inset) var(--inset);
 
     > .open {
         display: flex;
@@ -10,7 +10,7 @@
         width: 100%;
         height: var(--control);
         border-radius: var(--radius);
-        background: none;
+        background: var(--raised);
         color: var(--text);
         cursor: default;
 
@@ -20,6 +20,7 @@
 
         &[aria-expanded='true'] {
             background: var(--accent-soft);
+            color: var(--accent-text);
         }
 
         &:focus-visible {

@@ -66,7 +66,7 @@ export const styleSchema = new ComponentSchema<StyleValues>({
         {
             partner: 'ShapeComponent',
             alsoSatisfiedBy: ['PathComponent'],
-            noteText: 'Needs a ShapeComponent to draw anything.',
+            noteText: 'Needs a Shape to draw anything.',
         },
     ],
 });

@@ -22,6 +22,7 @@ export function EntityInspector() {
 
     return (
         <div className="entity-inspector">
+            <h2 className="panel-title">Entity inspector</h2>
             <EntityInspectorHead openLevel={openLevel} header={entityInspector.header} />
             <div className="cards">
                 {entityInspector.cards.map((card) => (

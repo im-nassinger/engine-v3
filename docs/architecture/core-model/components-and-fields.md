@@ -88,7 +88,7 @@ export type PartnerRule = {
     readonly partner: ComponentTypeName;              // 'SurfaceComponent': the one the note's button adds
     readonly alsoSatisfiedBy?: readonly ComponentTypeName[];  // others that end the note too
     readonly onlyWith?: ComponentTypeName;            // 'ShapeComponent': the note shows only when the entity has it
-    readonly noteText: string;                        // "Needs a SurfaceComponent to collide."
+    readonly noteText: string;                        // "Needs a Surface to collide."
 };
 
 export type DerivedFieldDefinition<Values extends object, T> = {

@@ -15,7 +15,7 @@ The rules every requirement follows, and the rules for proposing a change. They 
 | **One component of each type per entity** | A component that needs several of something holds a list | One TriggerComponent with a list of triggers, one ScriptComponent with a list of `.lua` files |
 | **No special cases** | A rule or list for one kind of entity should be a general one | A joint is an ordinary entity, and breaking is being destroyed. The Used by list, not a "list of its joints" |
 | **Only what is selected moves or copies** | Nothing is dragged or copied along because it is connected | Moving a wheel doesn't move its hinge |
-| **Nothing happens behind the user's back** | No hidden packing, no partner components added on their own. Show a note with a button instead | "Needs a ShapeComponent to draw anything. [Add ShapeComponent]" |
+| **Nothing happens behind the user's back** | No hidden packing, no partner components added on their own. Show a note with a button instead | "Needs a Shape to draw anything. [Add Shape]" |
 | **One row = one entity** | The Entities viewer shows the tree and nothing else | Joints aren't shown inside another entity's row |
 | **The order you see is the order things run** | Triggers and scripts run in Entities viewer order | Drag a row to change when it runs |
 | **Assets are raw files** | Settings never live on the asset. They live where it is used | Volume is on the "Play sound" action, tiling on the image fill |

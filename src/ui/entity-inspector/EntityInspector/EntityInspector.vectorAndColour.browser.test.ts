@@ -222,6 +222,19 @@ describe('Entity inspector: the colour field', () => {
         expect(undoCount(session)).toBe(1);
     });
 
+    test("a colour's pill sits in the middle of its row, in line with its label", async () => {
+        await showCrates(1);
+        await expect.poll(() => codeBox('outlineColour').value).not.toBe('');
+
+        const row = fieldRow('StyleComponent', 'outlineColour').getBoundingClientRect();
+        const pill = requireElement(fieldRow('StyleComponent', 'outlineColour'), '.colour-box .row');
+        const pillBounds = pill.getBoundingClientRect();
+        const rowMiddle = row.top + row.height / 2;
+        const pillMiddle = pillBounds.top + pillBounds.height / 2;
+
+        expect(pillMiddle).toBeCloseTo(rowMiddle, 0);
+    });
+
     test('different colours show Mixed', async () => {
         const { crates } = await showCrates(2);
         styleOf(crates[0] as Entity).set('outlineColour', '#000000FF');

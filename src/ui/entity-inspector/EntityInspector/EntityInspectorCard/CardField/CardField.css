@@ -3,7 +3,7 @@
     align-items: flex-start;
     gap: var(--space-8);
     min-height: var(--row);
-    padding: 0 var(--space-10);
+    padding: 0 var(--inset);
 
     .label {
         display: block;

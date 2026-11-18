@@ -17,7 +17,7 @@ export type EntityInspectorHeadProps = {
     header: EntityInspectorHeader;
 };
 
-// The kind icon, the name in its box, and the eye. The World's name is plain text and it has no eye; with
+// The kind icon, the name in its pill field, and the eye. The World's name is plain text and it has no eye; with
 // several entities the title reads `3 entities` and the eye hides or shows them all, like Hide or show.
 export function EntityInspectorHead({ openLevel, header }: EntityInspectorHeadProps) {
     const session = useEditorSession();
@@ -67,7 +67,9 @@ export function EntityInspectorHead({ openLevel, header }: EntityInspectorHeadPr
         <div className="entity-inspector-head">
             {kindIcon}
             {title}
-            {!isWorld && <IconButton icon={eyeIcon} label={eyeLabel} isOn={isHidden} onClick={toggleHidden} />}
+            {!isWorld && (
+                <IconButton icon={eyeIcon} label={eyeLabel} isOn={isHidden} look="quiet" onClick={toggleHidden} />
+            )}
         </div>
     );
 }

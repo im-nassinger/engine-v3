@@ -5,6 +5,7 @@ export type {
     AnyValueEntry,
     ComponentChange,
 } from './AnyComponent.ts';
+export { cardTitle } from './schema/cardTitle.ts';
 export { camelCaseOfLabel, snakeCaseOfKey, snakeCaseOfLabel } from './schema/attributeNames.ts';
 export { Component } from './Component.ts';
 export type { ComponentClass } from './registry/ComponentClass.ts';

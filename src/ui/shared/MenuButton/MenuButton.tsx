@@ -14,8 +14,8 @@ export type MenuButtonProps = {
     hasArrow?: boolean;
     // 'field' fills its row like a field's box: a choice field's value. 'status' fits the status bar.
     // 'island' fills its island with a tool-sized button in the middle, so a menu beside it lines up with
-    // the island: ☰.
-    look?: 'bar' | 'field' | 'status' | 'island';
+    // the island: ☰. 'quiet' draws its icon faint: a card's `…`.
+    look?: 'bar' | 'field' | 'status' | 'island' | 'quiet';
     isDisabled?: boolean;
 };
 

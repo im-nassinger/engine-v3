@@ -44,5 +44,5 @@ export const surfaceSchema = new ComponentSchema<SurfaceValues>({
             changeableInPlay: true,
         },
     ],
-    partners: [{ partner: 'ShapeComponent', noteText: 'Needs a ShapeComponent to collide.' }],
+    partners: [{ partner: 'ShapeComponent', noteText: 'Needs a Shape to collide.' }],
 });

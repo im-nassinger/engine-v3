@@ -7,6 +7,6 @@ export type PartnerRule = {
     readonly alsoSatisfiedBy?: readonly ComponentTypeName[];
     // The note shows only when the entity has this component.
     readonly onlyWith?: ComponentTypeName;
-    // "Needs a SurfaceComponent to collide."
+    // "Needs a Surface to collide.", naming the partner by its card's title.
     readonly noteText: string;
 };

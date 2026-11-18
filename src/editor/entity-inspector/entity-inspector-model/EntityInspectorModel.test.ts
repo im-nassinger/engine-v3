@@ -366,9 +366,9 @@ describe('EntityInspectorModel: notes', () => {
         expect(requireCard(model, 'SurfaceComponent').notes).toEqual([
             {
                 kind: 'warning',
-                text: 'Needs a ShapeComponent to collide.',
+                text: 'Needs a Shape to collide.',
                 fieldKey: undefined,
-                fix: { kind: 'addComponent', label: 'Add ShapeComponent', componentType: 'ShapeComponent' },
+                fix: { kind: 'addComponent', label: 'Add Shape', componentType: 'ShapeComponent' },
                 entityIds: [crate.id],
             },
         ]);

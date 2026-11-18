@@ -37,8 +37,8 @@ describe('applyMessageFix', () => {
         frames.runFrame();
 
         const [note] = surfaceNotes(session);
-        expect(note?.text).toBe('Needs a ShapeComponent to collide.');
-        expect(note?.fix?.label).toBe('Add ShapeComponent');
+        expect(note?.text).toBe('Needs a Shape to collide.');
+        expect(note?.fix?.label).toBe('Add Shape');
         if (note?.fix === undefined) throw new Error('The note has no fix.');
 
         const stepsBefore = openLevel.history.undoCount;

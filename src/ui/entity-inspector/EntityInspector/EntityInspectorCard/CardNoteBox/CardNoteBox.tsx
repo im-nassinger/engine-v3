@@ -13,7 +13,7 @@ export type CardNoteBoxProps = {
 };
 
 // An editor message on its card: the icon, the sentence and its fix as a link, such as "Needs a
-// SurfaceComponent to collide. Add SurfaceComponent". The fix runs on every entity the note is about.
+// Surface to collide. Add Surface". The fix runs on every entity the note is about.
 export function CardNoteBox({ openLevel, note }: CardNoteBoxProps) {
     const icon = note.kind === 'warning' ? TriangleAlert : Lightbulb;
 

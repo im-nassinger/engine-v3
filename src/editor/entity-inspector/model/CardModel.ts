@@ -45,6 +45,8 @@ export type FieldModel =
 
 export type CardModel = {
     readonly typeName: ComponentTypeName;
+    // What the card is called on screen: `Body` for the BodyComponent.
+    readonly title: string;
     readonly isFolded: boolean;
     readonly fields: readonly FieldModel[];
     readonly canRemove: Availability;

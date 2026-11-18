@@ -236,12 +236,12 @@ const CASES: CoverCase[] = [
             const panel = entityInspector(page);
 
             await inspectMenuButton(page, inspect, panel, 'Add Component');
-            await inspectMenuButton(page, inspect, card(page, 'ShapeComponent'), 'ShapeComponent menu');
-            await inspectMenuButton(page, inspect, card(page, 'BodyComponent'), 'BodyComponent menu');
+            await inspectMenuButton(page, inspect, card(page, 'ShapeComponent'), 'Shape menu');
+            await inspectMenuButton(page, inspect, card(page, 'BodyComponent'), 'Body menu');
             await inspectMenuButton(page, inspect, card(page, 'ShapeComponent'), 'Kind');
             await inspectMenuButton(page, inspect, card(page, 'BodyComponent'), 'Type');
 
-            await card(page, 'ShapeComponent').getByRole('button', { name: 'ShapeComponent menu' }).click();
+            await card(page, 'ShapeComponent').getByRole('button', { name: 'Shape menu' }).click();
             const disabled = menuPanel(card(page, 'ShapeComponent')).locator('.tooltip');
             await inspectTooltips(page, inspect, disabled, "a card menu's disabled entry");
         },

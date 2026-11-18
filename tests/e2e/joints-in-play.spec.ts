@@ -110,7 +110,7 @@ async function drawBody(page: Page, centre: ScreenPoint, name: string, type: 'Dy
     await expect(rows(page, name)).toHaveAttribute('aria-selected', 'true');
 
     await addComponent(page, 'BodyComponent');
-    await card(page, 'BodyComponent').getByRole('button', { name: 'Add SurfaceComponent' }).click();
+    await card(page, 'BodyComponent').getByRole('button', { name: 'Add Surface' }).click();
     await expect(card(page, 'SurfaceComponent')).toHaveCount(1);
     if (type === 'Static') {
         const typeButton = card(page, 'BodyComponent').getByRole('button', { name: 'Type' });

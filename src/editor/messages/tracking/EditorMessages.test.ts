@@ -74,8 +74,8 @@ describe('EditorMessages', () => {
         const messages = new EditorMessages(level, createV1Rules(), new ManualFrames());
 
         expect(texts(messages.forEntity(crate.id))).toEqual([
-            'StyleComponent: Needs a ShapeComponent to draw anything.',
-            'SurfaceComponent: Needs a ShapeComponent to collide.',
+            'StyleComponent: Needs a Shape to draw anything.',
+            'SurfaceComponent: Needs a Shape to collide.',
         ]);
     });
 
@@ -94,8 +94,8 @@ describe('EditorMessages', () => {
                 entityId: crate.id,
                 componentType: 'SurfaceComponent',
                 fieldKey: undefined,
-                text: 'Needs a ShapeComponent to collide.',
-                fix: { kind: 'addComponent', label: 'Add ShapeComponent', componentType: 'ShapeComponent' },
+                text: 'Needs a Shape to collide.',
+                fix: { kind: 'addComponent', label: 'Add Shape', componentType: 'ShapeComponent' },
             },
         ]);
         expect(messages.all()).toHaveLength(1);
@@ -129,7 +129,7 @@ describe('EditorMessages', () => {
         crate.removeComponent(SurfaceComponent);
         frames.runFrame();
 
-        expect(texts(messages.forEntity(crate.id))).toEqual(['BodyComponent: Needs a SurfaceComponent to collide.']);
+        expect(texts(messages.forEntity(crate.id))).toEqual(['BodyComponent: Needs a Surface to collide.']);
     });
 
     test("deleting the camera's Follow target gives `missing entity` on Follow, and undoing it clears it", () => {

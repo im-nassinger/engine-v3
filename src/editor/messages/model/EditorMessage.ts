@@ -5,7 +5,7 @@ import type { EntityId } from '../../../core/level/index.ts';
 // adds the missing partner.
 export type MessageFix = {
     readonly kind: 'addComponent';
-    // "Add ShapeComponent"
+    // "Add Shape"
     readonly label: string;
     readonly componentType: ComponentTypeName;
 };

@@ -17,11 +17,11 @@ export type CardMenuProps = {
 // The `…` button at the right of a card's title, with Remove and Reset to defaults. A disabled entry
 // says why in its tooltip.
 export function CardMenu({ openLevel, card, entityIds }: CardMenuProps) {
-    const label = `${card.typeName} menu`;
+    const label = `${card.title} menu`;
     const menu = <CardMenuEntries openLevel={openLevel} card={card} entityIds={entityIds} />;
 
     return (
-        <MenuButton label={label} menu={menu}>
+        <MenuButton label={label} menu={menu} look="quiet">
             <Icon icon={Ellipsis} />
         </MenuButton>
     );

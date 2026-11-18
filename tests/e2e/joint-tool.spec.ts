@@ -67,7 +67,7 @@ async function drawBody(page: Page, box: ScreenBox, name: string) {
 
     await entityInspector(page).getByRole('button', { name: 'Add Component' }).click();
     await entityInspector(page).getByRole('menuitem', { name: 'BodyComponent', exact: true }).click();
-    await card(page, 'BodyComponent').getByRole('button', { name: 'Add SurfaceComponent' }).click();
+    await card(page, 'BodyComponent').getByRole('button', { name: 'Add Surface' }).click();
     await expect(card(page, 'SurfaceComponent')).toHaveCount(1);
 }
 

@@ -11,8 +11,8 @@ export type IconButtonProps = {
     isOn?: boolean;
     // A disabled button still says why, in its tooltip.
     disabledReason?: string;
-    // The island look: the larger, muted button of ☰ and the tool column.
-    look?: 'island';
+    // 'island': the larger, muted button of ☰ and the tool column. 'quiet': muted, at the usual size.
+    look?: 'island' | 'quiet';
 };
 
 export function IconButton({ icon, label, onClick, shortcut, isOn, disabledReason, look }: IconButtonProps) {

@@ -1,10 +1,11 @@
+import { cardTitle } from '../../../core/components/index.ts';
 import type { AnyComponent, ComponentTypeName, PartnerRule } from '../../../core/components/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 
 import type { EditorMessage } from '../model/EditorMessage.ts';
 import type { EditorMessageRule } from '../model/EditorMessageRule.ts';
 
-// "Needs a ShapeComponent to collide. [Add ShapeComponent]", from each component's partners in its schema.
+// "Needs a Shape to collide. [Add Shape]", from each component's partners in its schema.
 export class MissingPartnerRule implements EditorMessageRule {
     check(entity: Entity): readonly EditorMessage[] {
         const held = new Set<ComponentTypeName>(entity.components.map((component) => component.schema.typeName));
@@ -32,12 +33,14 @@ function isMissing(partner: PartnerRule, held: ReadonlySet<ComponentTypeName>) {
 }
 
 function partnerNote(entity: Entity, component: AnyComponent, partner: PartnerRule): EditorMessage {
+    const partnerTitle = cardTitle(partner.partner);
+
     return {
         kind: 'warning',
         entityId: entity.id,
         componentType: component.schema.typeName,
         fieldKey: undefined,
         text: partner.noteText,
-        fix: { kind: 'addComponent', label: `Add ${partner.partner}`, componentType: partner.partner },
+        fix: { kind: 'addComponent', label: `Add ${partnerTitle}`, componentType: partner.partner },
     };
 }

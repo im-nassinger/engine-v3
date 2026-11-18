@@ -37,7 +37,7 @@ export function EntityInspectorCard({ openLevel, card, entityIds }: EntityInspec
             <div className="head">
                 <button type="button" className="title" aria-expanded={!card.isFolded} onClick={toggleFold}>
                     <Icon icon={foldIcon} size="small" />
-                    <span className="name">{card.typeName}</span>
+                    <span className="name">{card.title}</span>
                 </button>
                 <CardMenu openLevel={openLevel} card={card} entityIds={entityIds} />
             </div>

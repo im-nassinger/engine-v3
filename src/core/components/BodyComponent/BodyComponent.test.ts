@@ -45,7 +45,7 @@ describe('BodyComponent', () => {
             {
                 partner: 'SurfaceComponent',
                 onlyWith: 'ShapeComponent',
-                noteText: 'Needs a SurfaceComponent to collide.',
+                noteText: 'Needs a Surface to collide.',
             },
         ]);
     });

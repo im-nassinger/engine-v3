@@ -12,7 +12,7 @@ Field names are Box2D's, so the Entity inspector, the Lua API and tutorials matc
 
 - The editor says **Body** for how something moves and **Surface** for how it collides. A Surface is what Box2D calls a shape, and older Box2D a "fixture". *Why not "shape": it would clash with ShapeComponent.*
 - One click adds a BodyComponent as **Static**, **Dynamic** or **Kinematic**.
-- **The click adds only the BodyComponent.** If the entity has a ShapeComponent but no SurfaceComponent, the BodyComponent's card shows a note with an [Add SurfaceComponent] button. Adding a body to a group adds nothing to the shapes inside it. *Why: nothing happens behind the user's back. A body on a group whose shapes already have surfaces needs nothing more, so adding surfaces automatically would often be wrong.*
+- **The click adds only the BodyComponent.** If the entity has a ShapeComponent but no SurfaceComponent, the BodyComponent's card shows a note with an [Add Surface] button. Adding a body to a group adds nothing to the shapes inside it. *Why: nothing happens behind the user's back. A body on a group whose shapes already have surfaces needs nothing more, so adding surfaces automatically would often be wrong.*
 - Adding a body to an entity with children makes them one solid thing: the shapes inside merge into that body.
 - New shapes have no physics until you add it.
 - The type is a three-way switch with a plain line under it, and a hint saying what collides with what.
@@ -72,7 +72,7 @@ Source: scope PH3; round 1: C7; round 6: 05 2.5; round 7: SF1, SN1; round 8: CT1
 ### Sensors and touching · v2
 
 - A sensor notices things entering it but doesn't push them. Triggers and scripts decide what happens.
-- **Triggers that react to touching need a SurfaceComponent.** Without one, the trigger card shows "Needs a SurfaceComponent to notice touching. [Add SurfaceComponent as sensor]".
+- **Triggers that react to touching need a SurfaceComponent.** Without one, the trigger card shows "Needs a Surface to notice touching. [Add Surface as sensor]".
 - A coin is a ShapeComponent, a SurfaceComponent set to sensor, and a TriggerComponent.
 - *Why: Box2D detects touching, so we don't write a second collision system that would disagree at the edges and threaten determinism.*
 - A sensor is drawn like any other shape, so its StyleComponent decides whether players see it. With no StyleComponent it is invisible, and only the physics view shows it.

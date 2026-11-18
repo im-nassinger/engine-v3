@@ -4,7 +4,8 @@
     align-items: center;
     gap: var(--space-8);
     height: var(--panel-head);
-    padding: 0 var(--space-8) 0 var(--space-10);
+    margin-bottom: var(--space-4);
+    padding: 0 var(--space-8) 0 var(--inset);
 
     > .title {
         flex: 1;

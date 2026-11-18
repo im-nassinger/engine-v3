@@ -46,7 +46,7 @@ describe('StyleComponent', () => {
             {
                 partner: 'ShapeComponent',
                 alsoSatisfiedBy: ['PathComponent'],
-                noteText: 'Needs a ShapeComponent to draw anything.',
+                noteText: 'Needs a Shape to draw anything.',
             },
         ]);
     });

@@ -18,6 +18,10 @@
         color: var(--muted);
     }
 
+    &[data-look='quiet'] {
+        color: var(--muted);
+    }
+
     &:hover {
         background: var(--hover);
     }
