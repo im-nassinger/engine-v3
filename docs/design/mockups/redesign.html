@@ -147,9 +147,10 @@
   .burger .menu.sub { top: 69px; left: calc(100% + 4px); min-width: 250px; }
   .ed .menu { background: rgb(24, 27, 33); }
   .toolcol { z-index: 3; flex-direction: column; height: auto; padding: 7px 0; gap: 4px; }
-  /* The Shape tool's kinds menu: its first item level with the Shape tool (the second button), the arrow on its middle. */
-  .toolcol .menu.kinds { top: 39px; left: calc(100% + 12px); min-width: 170px; }
-  .toolcol .menu.kinds::before { content: ""; position: absolute; left: -7px; top: 17px; border: 7px solid transparent; border-left: 0; border-right-color: rgb(24, 27, 33); }
+  /* The Shape tool's kinds menu: centred on the Shape tool (the second button, whose middle is 7 + 34 + 4 + 17 = 62 px
+     down the island), the arrow on the menu's middle, reaching 1 px into the menu so no seam shows at any scale. */
+  .toolcol .menu.kinds { top: 62px; transform: translateY(-50%); left: calc(100% + 12px); min-width: 170px; }
+  .toolcol .menu.kinds::before { content: ""; position: absolute; left: -6px; top: calc(50% - 7px); border: 7px solid transparent; border-left: 0; border-right-color: rgb(24, 27, 33); }
   .menu .mi svg.i { color: var(--muted); }
   .menu .mi.on { background: var(--soft); color: var(--ink); }
   .menu .mi.on svg.i { color: var(--ink); }
