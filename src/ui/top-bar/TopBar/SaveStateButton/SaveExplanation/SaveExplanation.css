@@ -4,10 +4,9 @@
     z-index: var(--stack-popup);
     width: 280px;
     padding: var(--space-8);
-    border: 1px solid var(--line);
     border-radius: var(--radius);
     background: var(--panel);
-    box-shadow: var(--shadow-menu);
+    box-shadow: var(--shade);
     color: var(--text);
     white-space: normal;
 }

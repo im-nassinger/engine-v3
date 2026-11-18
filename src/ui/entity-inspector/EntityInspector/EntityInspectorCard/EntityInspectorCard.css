@@ -1,6 +1,5 @@
 .entity-inspector-card {
     padding-bottom: var(--space-4);
-    border-bottom: 1px solid var(--line);
 
     > .head {
         display: flex;

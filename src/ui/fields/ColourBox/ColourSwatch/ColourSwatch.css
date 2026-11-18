@@ -4,8 +4,7 @@
     width: 14px;
     height: 14px;
     overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-small);
+    border-radius: var(--radius);
     background: var(--swatch);
 
     > input {

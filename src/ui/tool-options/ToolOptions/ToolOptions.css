@@ -5,9 +5,8 @@
     z-index: var(--stack-floating);
     display: flex;
     padding: 3px;
-    border: 1px solid var(--line);
     border-radius: var(--radius);
     background: var(--panel);
-    box-shadow: var(--shadow-options);
+    box-shadow: var(--shade);
     pointer-events: auto;
 }

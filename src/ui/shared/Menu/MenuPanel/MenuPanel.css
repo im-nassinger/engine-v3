@@ -5,14 +5,12 @@
     max-height: var(--popup-room, none);
     overflow-y: auto;
     padding: var(--space-4);
-    border: 1px solid var(--line);
     border-radius: var(--radius);
     background: var(--panel);
-    box-shadow: var(--shadow-menu);
+    box-shadow: var(--shade);
 
     > .separator {
         height: 1px;
         margin: var(--space-4) 0;
-        background: var(--line);
     }
 }

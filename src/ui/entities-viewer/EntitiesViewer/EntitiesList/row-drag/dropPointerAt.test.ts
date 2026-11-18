@@ -3,7 +3,7 @@ import { dropPointerAt } from './dropPointerAt.ts';
 
 describe('dropPointerAt', () => {
     test('finds the row and the place in it', () => {
-        const pointer = dropPointerAt({ x: 30, y: 28 * 2 + 7 }, 5);
+        const pointer = dropPointerAt({ x: 30, y: 30 * 2 + 7.5 }, 5);
 
         expect(pointer).toEqual({ rowIndex: 2, heightFraction: 0.25, pointerDepth: 1 });
     });

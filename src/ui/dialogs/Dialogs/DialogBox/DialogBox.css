@@ -8,21 +8,20 @@
 
     > .box {
         width: 400px;
-        border: 1px solid var(--line);
         border-radius: var(--radius);
         background: var(--panel);
-        box-shadow: var(--shadow-dialog);
+        box-shadow: var(--shade);
 
         > h2 {
             margin: 0;
-            padding: var(--space-16) var(--space-16) var(--space-8);
+            padding: var(--space-14) var(--space-14) var(--space-8);
             font-size: var(--text-title);
             font-weight: var(--weight-heading);
         }
 
         > p {
             margin: 0;
-            padding: 0 var(--space-16) var(--space-16);
+            padding: 0 var(--space-14) var(--space-14);
             color: var(--muted);
             white-space: pre-line;
         }
@@ -31,8 +30,7 @@
             display: flex;
             justify-content: flex-end;
             gap: var(--space-8);
-            padding: var(--space-12) var(--space-16);
-            border-top: 1px solid var(--line);
+            padding: var(--space-10) var(--space-14);
         }
     }
 }

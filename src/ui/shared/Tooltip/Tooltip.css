@@ -11,9 +11,9 @@
         padding: var(--space-4) var(--space-8);
         border-radius: var(--radius);
         background: var(--tooltip);
-        box-shadow: var(--shadow-tooltip);
+        box-shadow: var(--shade);
         color: var(--tooltip-text);
-        font-size: var(--text-small);
+        font-size: var(--text-size);
         white-space: nowrap;
         pointer-events: none;
 

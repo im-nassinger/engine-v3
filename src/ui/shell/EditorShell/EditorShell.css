@@ -3,15 +3,15 @@
     inset: 0;
     overflow: hidden;
     display: grid;
-    grid-template-columns: var(--toolbar) var(--entity-inspector) 1fr var(--entities-viewer);
-    grid-template-rows: var(--top-bar) 1fr var(--status-bar);
+    grid-template-columns: var(--island-bar) var(--entity-inspector) 1fr var(--entities-viewer);
+    grid-template-rows: var(--island-bar) 1fr var(--debug-box);
     grid-template-areas:
         'top-bar top-bar top-bar top-bar'
         'toolbar entity-inspector free entities-viewer'
         'status-bar status-bar status-bar status-bar';
 
     &[data-entity-inspector-hidden='true'] {
-        grid-template-columns: var(--toolbar) 1fr var(--entities-viewer);
+        grid-template-columns: var(--island-bar) 1fr var(--entities-viewer);
         grid-template-areas:
             'top-bar top-bar top-bar'
             'toolbar free entities-viewer'

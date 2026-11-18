@@ -2,7 +2,7 @@
     display: block;
     padding: var(--space-4) 0 0;
     color: var(--muted);
-    font-size: var(--text-small);
+    font-size: var(--text-size);
 
     &[data-tone='refused'] {
         color: var(--danger);

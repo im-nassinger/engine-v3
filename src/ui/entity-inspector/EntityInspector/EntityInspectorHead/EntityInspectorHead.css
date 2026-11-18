@@ -3,9 +3,8 @@
     flex-shrink: 0;
     align-items: center;
     gap: var(--space-8);
-    height: var(--entity-inspector-head);
-    padding: 0 var(--space-8) 0 var(--space-12);
-    border-bottom: 1px solid var(--line);
+    height: var(--panel-head);
+    padding: 0 var(--space-8) 0 var(--space-10);
 
     > .title {
         flex: 1;

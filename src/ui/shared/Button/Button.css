@@ -1,7 +1,6 @@
 .button {
     height: var(--control);
-    padding: 0 var(--space-12);
-    border: 1px solid var(--line);
+    padding: 0 var(--space-10);
     border-radius: var(--radius);
     background: none;
     color: var(--text);

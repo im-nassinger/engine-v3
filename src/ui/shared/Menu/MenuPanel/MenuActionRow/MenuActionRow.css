@@ -3,10 +3,10 @@
     align-items: center;
     gap: var(--space-8);
     width: 100%;
-    height: var(--menu-item);
+    height: var(--control);
     padding: 0 var(--space-8);
     border: none;
-    border-radius: var(--radius-small);
+    border-radius: var(--radius);
     background: none;
     color: var(--text);
     text-align: left;
@@ -23,7 +23,7 @@
 
     > .shortcut {
         color: var(--muted);
-        font-size: var(--text-small);
+        font-size: var(--text-size);
     }
 
     &:hover,

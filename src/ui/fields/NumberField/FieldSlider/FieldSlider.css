@@ -9,13 +9,13 @@
     &::-webkit-slider-runnable-track {
         height: 3px;
         border-radius: 2px;
-        background: linear-gradient(to right, var(--muted) var(--filled), var(--line) var(--filled));
+        background: linear-gradient(to right, var(--muted) var(--filled), var(--field) var(--filled));
     }
 
     &::-moz-range-track {
         height: 3px;
         border-radius: 2px;
-        background: linear-gradient(to right, var(--muted) var(--filled), var(--line) var(--filled));
+        background: linear-gradient(to right, var(--muted) var(--filled), var(--field) var(--filled));
     }
 
     &::-webkit-slider-thumb {

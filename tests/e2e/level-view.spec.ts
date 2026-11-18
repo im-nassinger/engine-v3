@@ -3,9 +3,9 @@ import type { Page } from '@playwright/test';
 
 type Rgb = { r: number; g: number; b: number };
 
-// A new level's World fill, its camera's size, and the panels' colour from theme.css.
+// A new level's World fill, its camera's size, and the panels' colour from theme.css, --panel at 96% over --app.
 const BACKGROUND: Rgb = { r: 0xbf, g: 0xe3, b: 0xf5 };
-const PANEL: Rgb = { r: 0x21, g: 0x25, b: 0x2c };
+const PANEL: Rgb = { r: 0x18, g: 0x1b, b: 0x21 };
 const CAMERA_WIDTH = 1920;
 const CAMERA_HEIGHT = 1080;
 // ViewState's FIT_MARGIN_PX.

@@ -1,5 +1,5 @@
 // The --row token. The virtual list needs it as a number to place rows without measuring them.
-export const ROW_HEIGHT = 28;
+export const ROW_HEIGHT = 30;
 
 // The left padding before the World's fold arrow, and the --indent token per level below it.
 const START_PADDING = 8;

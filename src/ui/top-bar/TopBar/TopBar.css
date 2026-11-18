@@ -9,7 +9,6 @@
         width: 1px;
         height: 20px;
         margin: 0 var(--space-4);
-        background: var(--line);
     }
 
     > .grow {

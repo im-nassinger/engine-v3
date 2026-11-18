@@ -5,7 +5,7 @@
     height: 14px;
     margin: 0;
     border: 1px solid var(--muted);
-    border-radius: var(--radius-small);
+    border-radius: var(--radius);
     background: none;
     appearance: none;
 

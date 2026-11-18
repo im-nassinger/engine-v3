@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Every named value of the editor's look: colours, the font, sizes, spacing, corners and the shadow. **Each token is a CSS custom property in `ui/theme.css`**, with the name given here, and no component writes a colour or a size of its own. **These are the redesign's values** (owner, 2026-11-17, see [redesign.md](redesign.md)): the Slate colours of its [mockup](mockups/redesign.html), islands with 14 px corners, no borders or lines anywhere, and one soft shadow under every grey container. They replace round 8's flush panels, which stage 19 rebuilds. Sizes marked *requirement* come from [workspace.md](../requirements/editor/workspace.md) and change only with it.
+Every named value of the editor's look: colours, the font, sizes, spacing, corners and the shadow. **Each token is a CSS custom property in `ui/theme.css`**, with the name given here and no other (a guard test compares the two), and no component writes a colour or a size of its own. **These are the redesign's values** (owner, 2026-11-17, see [redesign.md](redesign.md)): the Slate colours of its [mockup](mockups/redesign.html), islands with 14 px corners, no borders or lines anywhere, and one soft shadow under every grey container. They replace round 8's flush panels, which stage 19 rebuilds. Sizes marked *requirement* come from [workspace.md](../requirements/editor/workspace.md) and change only with it.
 
 ## Colours
 
@@ -48,7 +48,9 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--text-size` | 12 px | The default: rows, fields, menus, numbers, tooltips, the message pill |
 | `--text-title` | 14 px | A panel's title, a dialog's title |
 | `--text-large` | 16 px | Kept for the rare large text; v1 uses none |
-| Weights | 400 text, 500 the entity's name field, 600 panel titles, card heads, the Play bar's label and primary buttons | |
+| `--weight-text` | 400 | Text |
+| `--weight-name` | 500 | The entity's name field |
+| `--weight-heading` | 600 | Panel titles, card heads, the Play bar's label and primary buttons |
 
 ## Sizes
 
@@ -67,13 +69,14 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--control` | 28 px: buttons, icon buttons, a menu entry | |
 | `--input` | 24 px: a pill field | |
 | `--label` | 120 px: a field's label column | |
-| `--icon` | 16 px, 13 px in fields and the debug box | |
+| `--icon` | 16 px | |
+| `--icon-small` | 13 px: in fields, menu entries and the debug box | |
 | `--indent` | 16 px per level of the Entities viewer tree | |
 | `--dialog` | 400 px wide | |
 
 ## Spacing, corners, the shadow
 
-- **Spacing** steps: 4, 6, 8, 10, 14 px. A panel's content is inset 14 px (`--inset`). Cards and sections are split by space only.
+- **Spacing** steps: `--space-4`, `--space-6`, `--space-8`, `--space-10` and `--space-14`, of 4, 6, 8, 10 and 14 px. A panel's content is inset 14 px (`--inset`). Cards and sections are split by space only.
 - **Corners:** `--radius` 8 px for controls (buttons, rows, menu entries, notes), `--radius-menu` 12 px for menus and tiles, `--radius-island` 14 px for islands and dialogs (owner, 2026-11-17), and `--radius-tool` 7 px for a button inside an island, the island's corner minus the 7 px around it, so their curves run parallel. Pill fields, the message pill and the Play bar are fully round.
 - **No borders, outlines or separator lines** (owner, 2026-11-17), except the focus ring a keyboard user needs and the minimap's 3 px edge in `--panel`.
 - **One shadow, `--shade`: `0 2px 5px rgba(0,0,0,.3)`**, under every grey container: ☰, the tool column, the Entity inspector, the Entities viewer, the minimap, the debug box, every menu (the kinds menus included), dialogs and the Play bar (owner, 2026-11-17). Nothing glows.

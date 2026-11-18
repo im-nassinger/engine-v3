@@ -4,6 +4,4 @@
     min-height: 0;
     overflow: hidden;
     background: var(--panel);
-    outline: 1px solid var(--line);
-    outline-offset: -1px;
 }
