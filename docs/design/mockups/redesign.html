@@ -127,6 +127,8 @@
   .tint .act.play { background: var(--soft); color: var(--ink); }
   .actisl { height: 44px; padding: 0 8px; border-radius: 999px; display: flex; align-items: center; flex-shrink: 0; }
   .actisl .act { background: transparent; }
+  .actisl.edit { padding: 0 8px; gap: 2px; }
+  .actisl.edit .ib { border-radius: 999px; width: 30px; height: 30px; }
   .actisl .act.save { color: var(--save-ink); }
   .actisl .act.play { color: var(--ink); }
   .namechip { position: absolute; transform: translateX(-50%); z-index: 3; height: 44px; padding: 0 20px; border-radius: 999px; display: flex; align-items: center; gap: 8px; font-weight: 600; white-space: nowrap; }
@@ -341,9 +343,9 @@ const CHEV = ic('down', 'class="i chev"');
 
 // Each choice that changes the look, with its variants. The number of a variant is its place in the list.
 const KINDS = [
-  ['layout', 'Entities panel height', '', [['hug', 'Fits its rows'], ['float', 'Full height']]],
+  ['layout', 'Entities viewer height', '', [['hug', 'Fits its rows'], ['float', 'Full height']]],
   ['head', 'Panel titles', '', [['title', 'Title'], ['caps', 'Small caps']]],
-  ['card', 'Inspector cards', 'How one component\'s card is told apart from the next.', [['space', 'Space only'], ['tile', 'Tiles'], ['inset', 'Sunken tiles'], ['island', 'Each card an island']]],
+  ['card', 'Entity inspector cards', 'How one component\'s card is told apart from the next.', [['space', 'Space only'], ['tile', 'Tiles'], ['inset', 'Sunken tiles'], ['island', 'Each card an island']]],
   ['field', 'Fields', 'Under the mouse, focused, refused.', [['pill', 'Pill'], ['filled', 'Filled'], ['ghost', 'Box only under the mouse']]],
   ['slider', 'Sliders', '', [['fill', 'Filled field'], ['thin', 'Thin track']]],
   ['check', 'Checkboxes', '', [['switch', 'Switch'], ['box', 'Box']]],
@@ -362,7 +364,11 @@ const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,2
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s, view) => ({ id, name, desc, view, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'The redesign', 'The top left: the ☰ menu, then Save and Play as dark islands with green and blue words. The level\'s name isn\'t shown anywhere; the level\'s bounds are labelled World with their size, as the camera frame is labelled (see The whole level). The zoom sits under the minimap.', {})
+  dir('1', 'Edit island first', 'Undo, Redo and grid snapping left the dock for an island of their own between ☰ and Save: ( ☰ ) ( ↶ ↷ magnet ) ( Save ) ( Play ). The dock holds only the three tools. Panels are now titled Entity inspector and Entities viewer.', { edit: 'before' }),
+  dir('2', 'Edit island last', 'The same islands, with Undo, Redo and grid snapping after Play: ( ☰ ) ( Save ) ( Play ) ( ↶ ↷ magnet ).', { edit: 'after' }),
+  dir('3', 'Five in one island', 'Undo, Redo, grid snapping, Save and Play share one island, a gap between the icons and the words: ( ☰ ) ( ↶ ↷ magnet   Save Play ).', { edit: 'one' }),
+  dir('4', 'Edit island, then Save and Play together', 'Two islands after ☰: ( ☰ ) ( ↶ ↷ magnet ) ( Save Play ).', { edit: 'pair' }),
+  dir('5', 'Everything in one island', '☰ joins too, so the top left is one island: ( ☰   ↶ ↷ magnet   Save Play ).', { edit: 'all' })
 ];
 
 const FONTS = [
@@ -374,7 +380,7 @@ const FONTS = [
 const VIEWS = [['shape', 'A selected shape'], ['whole', 'The whole level'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
 
 let state = { dir: '1', view: 'shape', font: 'mono' };
-try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-13') || '{}')); } catch (e) {}
+try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-14') || '{}')); } catch (e) {}
 let S, T;
 
 function tokensCss(t) {
@@ -523,13 +529,13 @@ const sm = 'style="width:13px;height:13px"';
 const C = {
   menu: (o) => `<span class="ib${o.menuOpen ? ' on' : ''}">${ic('menu')}</span>`,
   name: () => `<span class="levelname">Car test</span><span class="savestate">${ic('check', sm)}Saved</span>`,
-  edit: () => `<span class="ib">${ic('undo')}</span><span class="ib dim">${ic('redo')}</span><span class="ib on">${ic('magnet')}</span>`,
+  edit: () => `<span class="ib" title="Undo">${ic('undo')}</span><span class="ib dim" title="Redo">${ic('redo')}</span><span class="ib on" title="Grid snapping">${ic('magnet')}</span>`,
   tools: (o) => TOOLS.map((t) => toolHtml(t, o.tool)).join(''),
   play: () => `<span class="play ${S.btn}">${ic('play')}Play</span>`,
   view: () => `<span class="ib">View${CHEV}</span><span class="ib num">40%${CHEV}</span><span class="ib">${ic('help')}</span>`
 };
 const nums = (o) => `<span class="num">${o.pos}</span><span>${o.sel}</span><span class="warn">${ic('warning', 'style="color:var(--warning)"')}<span class="num">1</span></span>`;
-const entities = (o) => `<div class="abs blk panel ents" style="${pos(geo().ents)}"><div class="ph ${S.head}">Entities</div>${rowsHtml(ROWS, o.sel, o.hover)}</div>`;
+const entities = (o) => `<div class="abs blk panel ents" style="${pos(geo().ents)}"><div class="ph ${S.head}">Entities viewer</div>${rowsHtml(ROWS, o.sel, o.hover)}</div>`;
 
 // Inspector fields
 const fc = () => `inp ${S.field}`;
@@ -551,7 +557,7 @@ const card = (title, body) => `<div class="card ${S.card}"><div class="chead">${
 function inspector(o) {
   const g = geo(), bare = S.card === 'island', head = '';
   if (o.noInspector) return '';
-  return `<div class="panel insp${bare ? ' bare' : ' blk'}">${bare ? '<div class="blk" style="border-radius:var(--rl)">' : ''}${head}<div class="ph ${S.head}">Inspector</div>
+  return `<div class="panel insp${bare ? ' bare' : ' blk'}">${bare ? '<div class="blk" style="border-radius:var(--rl)">' : ''}${head}<div class="ph ${S.head}">Entity inspector</div>
     <div class="ihead"><span style="color:var(--muted);display:flex">${ic('rect')}</span><div class="nm ${S.field === 'filled' ? '' : S.field}">Rectangle 1</div><span class="ib eye">${ic('eye')}</span></div>${bare ? '</div>' : ''}
     <div style="overflow:${bare ? 'visible' : 'hidden'}">
     ${card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°') + F.vec('Scale', '1', '1') + F.num('Skew', '0', '°'))}
@@ -575,10 +581,7 @@ function levelCard(o) {
   const where = S.burger === 'own' ? 'own' : S.burger === 'actions' || centred ? 'actions' : 'name';
   const buttons = `<span class="act save">${ic('save')}Save</span><span class="act play">${ic('play')}Play</span>`;
   const inPill = S.actions === 'inpill' && !centred;
-  if (S.title !== 'menu') {
-    const lead = `<div class="blk lcbtn">${menu}</div>`;
-    return `<div class="lc-top">${lead}<div class="blk actisl"><span class="act save">${ic('save')}Save</span></div><div class="blk actisl"><span class="act play">${ic('play')}Play</span></div></div>`;
-  }
+  if (S.title !== 'menu') return `<div class="lc-top">${topLeft(menu)}</div>`;
   let out = where === 'own' ? `<div class="blk lcbtn">${menu}</div>` : '';
   if (!centred) {
     const cls = ['blk', 'lcard', 'pill', 'namebox', where === 'name' ? 'withmenu' : 'plain'].join(' ');
@@ -591,12 +594,23 @@ function levelCard(o) {
   }
   return `<div class="lc-top">${out}</div>`;
 }
+// The top left as the variation places Undo, Redo and grid snapping by Save and Play.
+function topLeft(menu) {
+  const isl = (inner, cls = '') => `<div class="blk actisl ${cls}">${inner}</div>`;
+  const save = `<span class="act save">${ic('save')}Save</span>`, play = `<span class="act play">${ic('play')}Play</span>`;
+  const edit = isl(C.edit(), 'edit'), lead = `<div class="blk lcbtn">${menu}</div>`;
+  if (S.edit === 'after') return lead + isl(save) + isl(play) + edit;
+  if (S.edit === 'one') return lead + isl(C.edit() + '<span class="lc-gap"></span>' + save + play, 'edit');
+  if (S.edit === 'pair') return lead + edit + isl(save + play);
+  if (S.edit === 'all') return isl(menu + '<span class="lc-gap"></span>' + C.edit() + '<span class="lc-gap"></span>' + save + play, 'edit');
+  return lead + edit + isl(save) + isl(play);
+}
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
 function bottom(o) {
   const g = geo();
   const chip = `<span>${o.hint}</span><span class="cnums">${nums(o)}</span>`;
-  return `<div class="abs isl dock" style="left:${g.cx}px;top:${H - M - 46}px">${C.tools(o)}<span class="sep"></span>${C.edit()}</div>` +
+  return `<div class="abs isl dock" style="left:${g.cx}px;top:${H - M - 46}px">${C.tools(o)}</div>` +
     `<div class="hintchip" style="left:${g.cx}px;top:${H - M - 46 - GP - 30}px">${chip}</div>`;
 }
 function view(opts) {
@@ -670,7 +684,7 @@ function schematic() {
 }
 const PARTS = {
   layout: schematic,
-  head: () => `<div class="ph ${S.head}">Inspector</div>`,
+  head: () => `<div class="ph ${S.head}">Entity inspector</div>`,
   card: () => card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°')) + card('ShapeComponent', F.choice('Kind', 'Rectangle') + F.num('Width', '160', 'px')),
   field: () => F.num('Width', '160', 'px', { hov: true }) + F.num('Height', '80.25', 'px', { focus: true }) + F.num('Friction', 'abc', '', { err: true }) + `<div class="msg">Can't read this as a number</div>` + F.colour('Fill', '#4a90d9'),
   slider: () => F.num('Gravity scale', '1', '', { slider: .55 }) + F.num('Opacity', '100', '%', { slider: 1 }),
@@ -723,7 +737,7 @@ function render() {
   const cls = ['ed', 'float', parts ? 'tall' : ''].join(' ');
   document.getElementById('frame').innerHTML = `<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
   document.getElementById('stage').classList.toggle('scroll', parts);
-  try { localStorage.setItem('engine-v3-islands-13', JSON.stringify(state)); } catch (e) {}
+  try { localStorage.setItem('engine-v3-islands-14', JSON.stringify(state)); } catch (e) {}
   fit();
 }
 function fit() {
