@@ -32,3 +32,4 @@ Rules for the session:
 | [how-it-works.md](how-it-works.md) | The loop, the Discord messages, how it detects the limit, its files and the commands to start, stop and resume it |
 | [decisions.md](decisions.md) | The owner's decisions about the runner, and why |
 | [public-ci.md](public-ci.md) | CI runs in a public copy of the code, `im-nassinger/engine-v3-ci`, because the private repo's free minutes ran out, and how to read a slow run |
+| [ci-speed.md](ci-speed.md) | The plan to make CI faster and show its wait on Discord. Not built yet |
