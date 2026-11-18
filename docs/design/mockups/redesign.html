@@ -362,7 +362,7 @@ const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,2
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s, view) => ({ id, name, desc, view, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'The redesign', 'The top left: the ☰ menu, then Save and Play as dark islands with green and blue words. The level\'s name, a dot while it isn\'t saved and its size label the level\'s bounds, as the camera frame is labelled (see The whole level). The zoom sits under the minimap.', {})
+  dir('1', 'The redesign', 'The top left: the ☰ menu, then Save and Play as dark islands with green and blue words. The level\'s name isn\'t shown anywhere; the level\'s bounds are labelled World with their size, as the camera frame is labelled (see The whole level). The zoom sits under the minimap.', {})
 ];
 
 const FONTS = [
@@ -463,10 +463,9 @@ function handle(x, y) {
 }
 const handles = (x, y, w, h) => [[0, 0], [.5, 0], [1, 0], [0, .5], [1, .5], [0, 1], [.5, 1], [1, 1]].map(([a, b]) => handle(x + a * w, y + b * h)).join('');
 
-// A frame's label over its top left corner: the name in bold, the unsaved dot right after it, then a gap and the size.
-function frameLabel(x, y, name, size, dirty) {
-  const dot = dirty ? `<tspan dx="4" font-size="11" dy="-0.5">●</tspan><tspan dy="0.5"></tspan>` : '';
-  return `<text x="${x}" y="${y - 7}" font-size="11" fill="rgba(20,28,40,.75)" style="font-family:var(--font-ui)"><tspan font-weight="600" fill="rgba(20,28,40,.9)">${name}</tspan>${dot}<tspan dx="10">${size}</tspan></text>`;
+// A frame's label over its top left corner: the name in bold, then a gap and the size.
+function frameLabel(x, y, name, size) {
+  return `<text x="${x}" y="${y - 7}" font-size="11" fill="rgba(20,28,40,.75)" style="font-family:var(--font-ui)"><tspan font-weight="600" fill="rgba(20,28,40,.9)">${name}</tspan><tspan dx="10">${size}</tspan></text>`;
 }
 // One SVG of the level view. Overlays are drawn in screen pixels.
 function scene(w, h, z, cx, cy, opts) {
@@ -482,11 +481,11 @@ function scene(w, h, z, cx, cy, opts) {
   if (opts.bounds) {
     const [bx, by, bw, bh] = MAP_AREA, x = X(bx), y = Y(by);
     s += `<rect x="${x}" y="${y}" width="${bw * z}" height="${bh * z}" fill="none" stroke="rgba(20,28,40,.6)" stroke-width="1.5"/>`;
-    s += frameLabel(x, y, 'Car test', `${bw} × ${bh}`, true);
+    s += frameLabel(x, y, 'World', `${bw} × ${bh}`);
   }
   if (opts.cameraFrame) {
     s += `<rect x="${X(-960)}" y="${Y(-540)}" width="${1920 * z}" height="${1080 * z}" fill="none" stroke="rgba(20,28,40,.6)" stroke-width="1.5"/>`;
-    s += frameLabel(X(-960), Y(-540), 'Camera', '1920 × 1080', false);
+    s += frameLabel(X(-960), Y(-540), 'Camera', '1920 × 1080');
   }
   if (opts.selected) {
     const r = LEVEL.find((e) => e.id === opts.selected), x = X(r.x), y = Y(r.y), rw = r.w * z, rh = r.h * z;
