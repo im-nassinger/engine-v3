@@ -73,7 +73,7 @@ async function drawBody(page: Page, box: ScreenBox, name: string) {
 
 async function pickJointTool(page: Page, type: 'Hinge' | 'Rope' | 'Spring') {
     await page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name: 'Joint' }).click();
-    await page.getByRole('toolbar', { name: 'Tool options' }).getByRole('button', { name: type }).click();
+    await page.getByRole('group', { name: 'Kinds menu' }).getByRole('button', { name: type }).click();
 }
 
 async function click(page: Page, at: ScreenPoint) {
@@ -88,7 +88,7 @@ function jointEnd(page: Page, label: 'A' | 'B') {
 // After placing, the joint is selected and the tool is back to Select, so the Entity inspector shows it.
 async function expectPlaced(page: Page, name: string) {
     await expect(rows(page, name)).toHaveAttribute('aria-selected', 'true');
-    await expect(page.getByRole('toolbar', { name: 'Tool options' })).toHaveCount(0);
+    await expect(page.getByRole('group', { name: 'Kinds menu' })).toHaveCount(0);
     await expect(card(page, 'JointComponent')).toHaveCount(1);
 }
 
@@ -110,7 +110,7 @@ test('key 6 picks the Joint tool, and a click on one box pins it with a Hinge', 
 
     await page.mouse.move(middle.x, middle.y);
     await page.keyboard.press('6');
-    await expect(page.getByRole('toolbar', { name: 'Tool options' })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Kinds menu' })).toBeVisible();
     await click(page, offset(middle, BOX_HALF_PX / 2, 0));
 
     await expectPlaced(page, 'Hinge 1');
@@ -142,7 +142,7 @@ test('a click on nothing makes no joint and shows why', async ({ page }) => {
 
     await expect(page.locator('.status-bar .status-text')).toHaveText('Nothing with physics here');
     await expect(rows(page, 'Hinge 1')).toHaveCount(0);
-    await expect(page.getByRole('toolbar', { name: 'Tool options' })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Kinds menu' })).toBeVisible();
 });
 
 test('a Rope and a Spring take two clicks each, and Ctrl+Z removes the Spring alone', async ({ page }) => {

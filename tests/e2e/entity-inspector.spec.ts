@@ -9,7 +9,7 @@ async function openEditorWithCrateSelected(page: Page) {
     if (!free) throw new Error('The free area has no size.');
 
     await page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name: 'Shape' }).click();
-    await page.getByRole('toolbar', { name: 'Tool options' }).getByRole('button', { name: 'Rectangle' }).click();
+    await page.getByRole('group', { name: 'Kinds menu' }).getByRole('button', { name: 'Rectangle' }).click();
     await page.mouse.click(free.x + free.width / 2, free.y + free.height / 2);
     await expect(card(page, 'ShapeComponent')).toHaveCount(1);
 }

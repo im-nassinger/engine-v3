@@ -11,9 +11,11 @@ export type IconButtonProps = {
     isOn?: boolean;
     // A disabled button still says why, in its tooltip.
     disabledReason?: string;
+    // The island look: the larger, muted button of ☰ and the tool column.
+    look?: 'island';
 };
 
-export function IconButton({ icon, label, onClick, shortcut, isOn, disabledReason }: IconButtonProps) {
+export function IconButton({ icon, label, onClick, shortcut, isOn, disabledReason, look }: IconButtonProps) {
     const isDisabled = disabledReason !== undefined;
 
     let tooltipLabel = label;
@@ -34,6 +36,7 @@ export function IconButton({ icon, label, onClick, shortcut, isOn, disabledReaso
             <button
                 type="button"
                 className="icon-button"
+                data-look={look}
                 aria-label={label}
                 aria-pressed={isOn}
                 aria-disabled={isDisabled}

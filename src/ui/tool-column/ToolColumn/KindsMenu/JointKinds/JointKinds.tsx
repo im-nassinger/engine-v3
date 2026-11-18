@@ -1,12 +1,11 @@
 import { Cable, CircleDot, Waves } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import type { JointType } from '../../../../core/components/index.ts';
-import type { JointTool } from '../../../../editor/tools/index.ts';
-import { useVersion } from '../../../hooks/index.ts';
-import { OptionButton } from '../OptionButton/index.ts';
-import './JointOptions.css';
+import type { JointType } from '../../../../../core/components/index.ts';
+import type { JointTool } from '../../../../../editor/tools/index.ts';
+import { useVersion } from '../../../../hooks/index.ts';
+import { KindButton } from '../KindButton/index.ts';
 
-export type JointOptionsProps = {
+export type JointKindsProps = {
     tool: JointTool;
 };
 
@@ -17,7 +16,7 @@ type TypeChoice = {
     readonly icon: LucideIcon;
 };
 
-// The Entities panel's icons for the same types. Each tooltip adds the physics name, so people can find
+// The Entities viewer's icons for the same types. Each tooltip adds the physics name, so people can find
 // help elsewhere.
 const TYPE_CHOICES: readonly TypeChoice[] = [
     { type: 'hinge', label: 'Hinge', tooltip: 'Hinge (revolute joint)', icon: CircleDot },
@@ -26,7 +25,7 @@ const TYPE_CHOICES: readonly TypeChoice[] = [
 ];
 
 // Hinge, Rope and Spring, the chosen one on.
-export function JointOptions({ tool }: JointOptionsProps) {
+export function JointKinds({ tool }: JointKindsProps) {
     // The type is read from the same tool object each time it moves, so the React Compiler must not keep
     // an old answer.
     'use no memo';
@@ -35,9 +34,9 @@ export function JointOptions({ tool }: JointOptionsProps) {
     const chosen = tool.type;
 
     return (
-        <div className="joint-options">
+        <>
             {TYPE_CHOICES.map((choice) => (
-                <OptionButton
+                <KindButton
                     key={choice.type}
                     icon={choice.icon}
                     label={choice.label}
@@ -46,6 +45,6 @@ export function JointOptions({ tool }: JointOptionsProps) {
                     onClick={() => tool.chooseType(choice.type)}
                 />
             ))}
-        </div>
+        </>
     );
 }

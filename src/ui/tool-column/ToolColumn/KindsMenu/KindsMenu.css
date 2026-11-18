@@ -1,0 +1,23 @@
+/* Placed by usePopupPlacement, outside the tool column's edges. */
+.kinds-menu {
+    position: fixed;
+    z-index: var(--stack-floating);
+    display: grid;
+    min-width: 170px;
+    padding: var(--space-6);
+    border-radius: var(--radius-menu);
+    background: var(--panel);
+    box-shadow: var(--shade);
+
+    /* The arrow reaches 1 px into the menu, so no seam shows at any zoom. */
+    &::before {
+        content: '';
+        position: absolute;
+        top: calc(50% - 7px);
+        left: -6px;
+        width: 7px;
+        height: 14px;
+        background: var(--panel);
+        clip-path: polygon(100% 0, 0 50%, 100% 100%);
+    }
+}

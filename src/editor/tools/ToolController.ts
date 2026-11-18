@@ -69,7 +69,7 @@ export class ToolController {
         return this.current.hint;
     }
 
-    // In the order given, for the toolbar.
+    // In the order given, for the tool column.
     get tools() {
         return [...this.toolsById.values()];
     }

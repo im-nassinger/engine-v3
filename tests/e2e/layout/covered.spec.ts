@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import type { Browser, Locator, Page } from '@playwright/test';
 
 // Change 9 of before-v2.md: nothing in the editor is covered. Each case opens a part that shows over the
-// others (a menu, submenu, tooltip, popup, dropdown, options strip, hint or editor message) and checks it at
+// others (a menu, submenu, tooltip, popup, dropdown, kinds menu, hint or editor message) and checks it at
 // the layout checks' five window sizes: the topmost element at its four corners and its centre must be
 // that part or inside it, and the part must lie inside the window. The cases found are listed in
 // docs/steps/stage-18.md, step 14.
@@ -136,7 +136,7 @@ async function drawCrate(page: Page) {
     if (!free) throw new Error('The free area has no size.');
 
     await pickTool(page, 'Shape');
-    await page.getByRole('toolbar', { name: 'Tool options' }).getByRole('button', { name: 'Rectangle' }).click();
+    await page.getByRole('group', { name: 'Kinds menu' }).getByRole('button', { name: 'Rectangle' }).click();
     await page.mouse.click(free.x + free.width / 2, free.y + free.height / 2);
     await expect(card(page, 'ShapeComponent')).toHaveCount(1);
 }
@@ -219,12 +219,12 @@ const CASES: CoverCase[] = [
         },
     },
     ...['Shape', 'Joint'].map((tool) => ({
-        name: `the ${tool} tool's options strip, its tooltips and its hint`,
+        name: `the ${tool} tool's kinds menu, its tooltips and its hint`,
         run: async (page: Page, inspect: Inspect) => {
-            const strip = page.getByRole('toolbar', { name: 'Tool options' });
+            const kindsMenu = page.getByRole('group', { name: 'Kinds menu' });
             await pickTool(page, tool);
-            await inspect(`the ${tool} tool's options strip`, strip);
-            await inspectTooltips(page, inspect, strip.locator('.tooltip'), `the ${tool} tool's options`);
+            await inspect(`the ${tool} tool's kinds menu`, kindsMenu);
+            await inspectTooltips(page, inspect, kindsMenu.locator('.tooltip'), `the ${tool} tool's kinds`);
             await inspect(`the ${tool} tool's hint`, region(page, 'Status bar').locator('.status-text'));
         },
     })),

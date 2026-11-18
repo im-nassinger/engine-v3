@@ -23,7 +23,7 @@
         height: var(--island-bar);
     }
 
-    > [data-area='toolbar'] {
+    > [data-area='tool-column'] {
         top: var(--under-main-menu);
         left: var(--island-gap);
         width: var(--island-bar);

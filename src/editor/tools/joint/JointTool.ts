@@ -66,7 +66,7 @@ type PlacePlan = Extract<ClickPlan, { readonly kind: 'place' }>;
 export class JointTool implements Tool {
     readonly id = 'joint';
     readonly preview = new VersionCounter();
-    // Moves when the type changes, for the options strip and the hint.
+    // Moves when the type changes, for the kinds menu and the hint.
     readonly options = new VersionCounter();
     private chosenType: JointType = 'hinge';
     private context: ToolContext | undefined;
@@ -92,7 +92,7 @@ export class JointTool implements Tool {
         return this.shown;
     }
 
-    // The options strip. A first click is dropped, since its joint is no longer the one chosen.
+    // The kinds menu. A first click is dropped, since its joint is no longer the one chosen.
     chooseType(type: JointType) {
         if (type === this.chosenType) return;
 

@@ -6,7 +6,7 @@ import { MainMenu } from '../../main-menu/index.ts';
 import { usePlaySession } from '../../play/index.ts';
 import { PlayBar } from '../../play-bar/index.ts';
 import { StatusBar } from '../../status-bar/index.ts';
-import { Toolbar } from '../../toolbar/index.ts';
+import { ToolColumn } from '../../tool-column/index.ts';
 import { useReading } from '../../hooks/index.ts';
 import { useEditorTools } from '../../tools/index.ts';
 import { PanelErrorBoundary } from '../PanelErrorBoundary/index.ts';
@@ -42,8 +42,8 @@ export function EditorShell() {
             <PanelPlace area="main-menu" label="Main menu">
                 <MainMenu />
             </PanelPlace>
-            <PanelPlace area="toolbar" label="Tools">
-                <Toolbar />
+            <PanelPlace area="tool-column" label="Tools">
+                <ToolColumn />
             </PanelPlace>
             {!isEntityInspectorHidden && (
                 <PanelPlace area="entity-inspector" label="Entity inspector">

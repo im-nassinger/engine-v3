@@ -80,4 +80,23 @@ describe('placePopup beside', () => {
 
         expect(placed.top).toBe(360 - WINDOW_MARGIN_PX - 100);
     });
+
+    test('centred, its middle is level with the middle of its anchor', () => {
+        const tool = { left: 10, right: 58, top: 100, bottom: 134 };
+        const centred: PopupPlacement = { side: 'beside', align: 'centre', gapPx: 12 };
+
+        const placed = placePopup(tool, { width: 170, height: 96 }, WINDOW, centred);
+
+        expect(placed.left).toBe(58 + 12);
+        expect(placed.top).toBe(117 - 48);
+    });
+
+    test("centred near the window's top, it slides down to stay inside", () => {
+        const tool = { left: 10, right: 58, top: 10, bottom: 44 };
+        const centred: PopupPlacement = { side: 'beside', align: 'centre', gapPx: 12 };
+
+        const placed = placePopup(tool, { width: 170, height: 96 }, WINDOW, centred);
+
+        expect(placed.top).toBe(WINDOW_MARGIN_PX);
+    });
 });

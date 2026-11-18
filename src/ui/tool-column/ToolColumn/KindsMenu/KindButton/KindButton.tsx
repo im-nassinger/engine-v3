@@ -1,8 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
-import { Icon, Tooltip } from '../../../shared/index.ts';
-import './OptionButton.css';
+import { Icon, Tooltip } from '../../../../shared/index.ts';
+import './KindButton.css';
 
-export type OptionButtonProps = {
+export type KindButtonProps = {
     icon: LucideIcon;
     label: string;
     // Shown on hover when the label alone doesn't say enough, such as a joint's physics name.
@@ -11,10 +11,10 @@ export type OptionButtonProps = {
     onClick: () => void;
 };
 
-// One choice of the options strip: an icon with its name. The chosen one is on.
-export function OptionButton({ icon, label, tooltip, isOn, onClick }: OptionButtonProps) {
+// One entry of a kinds menu: an icon with its name. The chosen one is drawn like the active tool.
+export function KindButton({ icon, label, tooltip, isOn, onClick }: KindButtonProps) {
     const button = (
-        <button type="button" className="option-button" aria-pressed={isOn} onClick={onClick}>
+        <button type="button" className="kind-button" aria-pressed={isOn} onClick={onClick}>
             <Icon icon={icon} />
             {label}
         </button>

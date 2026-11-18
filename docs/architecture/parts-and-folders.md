@@ -96,14 +96,14 @@ src/
     theme.css          colour and size tokens of the one dark theme
     shell/             EditorShell/ (with FreeArea/, PanelPlace/), PanelErrorBoundary/
     status-bar/        StatusBar/
-    toolbar/           Toolbar/
+    tool-column/       ToolColumn/ (with ToolButton/, KindsMenu/)
     dialogs/           Dialogs/ (with DialogBox/)
     open-windows/      OpenWindowsContext: where menus and the row drag report themselves open
-    tools/             ToolsContext: ToolController and MousePosition for the toolbar, status bar and picker; testing/
+    tools/             ToolsContext: ToolController and MousePosition for the tool column, status bar and picker; testing/
     play/              PlayContext: the PlaySession for the shell, the Play button and the Play bar
     play-bar/          PlayBar/ (with PlayBarButton/)
     testing/           editorPage: a component shown with the session, commands and tools, for browser tests
-    main-menu/ tool-options/ level-view-host/ entities-viewer/ entity-inspector/
+    main-menu/ level-view-host/ entities-viewer/ entity-inspector/
     level-file/        LevelName/, SaveStateButton/: on the status bar until stage 19 step 12 removes them
     save-state/        SaveIndicatorContext
     fields/            one component per field type: NumberField/, ColourField/, ...

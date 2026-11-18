@@ -16,7 +16,7 @@ import { previewStepOf, steppedBoxSize, steppedPoints } from './previewSize.ts';
 import type { PreviewStep } from './previewSize.ts';
 import { previewTurnOf } from './previewTurn.ts';
 
-// The options strip's three kinds. A line is a polygon finished open.
+// The kinds menu's three kinds. A line is a polygon finished open.
 export type ShapeToolKind = BoxKind | 'polygon';
 
 // What the tool draws over the level: the shape a click or the drag in progress would make, in the current
@@ -90,7 +90,7 @@ type FinishWay = 'return' | 'keep';
 export class ShapeTool implements Tool {
     readonly id = 'shape';
     readonly preview = new VersionCounter();
-    // Moves when the kind changes, for the options strip and the hint.
+    // Moves when the kind changes, for the kinds menu and the hint.
     readonly options = new VersionCounter();
     private chosenKind: ShapeToolKind = 'rectangle';
     // Remembered for the session, each kind its own.
@@ -134,7 +134,7 @@ export class ShapeTool implements Tool {
         return this.shownPolygon;
     }
 
-    // The options strip. A drag or a polygon in progress keeps its kind.
+    // The kinds menu. A drag or a polygon in progress keeps its kind.
     chooseKind(kind: ShapeToolKind) {
         if (kind === this.chosenKind) return;
 

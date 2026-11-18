@@ -81,7 +81,7 @@ function playBarButton(page: Page, name: string) {
 async function drawFallingBox(page: Page) {
     const start = await boxStart(page);
     await page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name: 'Shape' }).click();
-    await page.getByRole('toolbar', { name: 'Tool options' }).getByRole('button', { name: 'Rectangle' }).click();
+    await page.getByRole('group', { name: 'Kinds menu' }).getByRole('button', { name: 'Rectangle' }).click();
     await page.mouse.click(start.x, start.y);
     await expect(card(page, 'ShapeComponent')).toHaveCount(1);
 

@@ -19,7 +19,7 @@ export type PopupSize = {
 export type PopupSide = 'below' | 'above' | 'beside';
 
 // Which of the anchor's edges the popup lines up with: start is the left (or the top, beside), end the
-// right, and centre the middle.
+// right, and centre the middle (beside, the anchor's vertical middle).
 export type PopupAlign = 'start' | 'end' | 'centre';
 
 export type PopupPlacement = {
@@ -76,7 +76,11 @@ function placeBeside(anchor: PopupRect, popup: PopupSize, window: PopupSize, pla
 
     const room = window.height - 2 * WINDOW_MARGIN_PX;
     const shownHeight = Math.min(popup.height, room);
-    const top = keepInside(anchor.top, shownHeight, window.height);
+    let wantedTop = anchor.top;
+    if (placement.align === 'centre') {
+        wantedTop = alignedStart(anchor.top, anchor.bottom, shownHeight, 'centre');
+    }
+    const top = keepInside(wantedTop, shownHeight, window.height);
 
     const keptLeft = keepInside(left, popup.width, window.width);
 

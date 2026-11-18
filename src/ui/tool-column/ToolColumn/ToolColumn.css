@@ -1,0 +1,8 @@
+/* The tool buttons sit as far from the island's top and bottom as from its sides. */
+.tool-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    padding: calc((var(--island-bar) - var(--tool)) / 2) 0;
+}

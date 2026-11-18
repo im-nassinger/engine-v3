@@ -11,6 +11,13 @@
     color: var(--text);
     cursor: default;
 
+    &[data-look='island'] {
+        width: var(--tool);
+        height: var(--tool);
+        border-radius: var(--radius-tool);
+        color: var(--muted);
+    }
+
     &:hover {
         background: var(--hover);
     }

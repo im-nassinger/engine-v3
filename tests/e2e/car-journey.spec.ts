@@ -64,7 +64,7 @@ function rows(page: Page, name: string) {
 // A shape dragged with the Shape tool, given a BodyComponent and, through the note's fix, a SurfaceComponent.
 async function drawBody(page: Page, kind: 'Rectangle' | 'Circle', box: ScreenBox, name: string) {
     await page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name: 'Shape' }).click();
-    await page.getByRole('toolbar', { name: 'Tool options' }).getByRole('button', { name: kind }).click();
+    await page.getByRole('group', { name: 'Kinds menu' }).getByRole('button', { name: kind }).click();
     await page.mouse.move(box.from.x, box.from.y);
     await page.mouse.down();
     await page.mouse.move((box.from.x + box.to.x) / 2, (box.from.y + box.to.y) / 2, { steps: 4 });
@@ -81,7 +81,7 @@ async function drawBody(page: Page, kind: 'Rectangle' | 'Circle', box: ScreenBox
 // A Hinge where a wheel overlaps the chassis joins them, the smaller, the wheel, as A.
 async function hingeWheel(page: Page, wheelMiddle: ScreenPoint, hinge: string, wheel: string) {
     await page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name: 'Joint' }).click();
-    await page.getByRole('toolbar', { name: 'Tool options' }).getByRole('button', { name: 'Hinge' }).click();
+    await page.getByRole('group', { name: 'Kinds menu' }).getByRole('button', { name: 'Hinge' }).click();
     const at = offset(wheelMiddle, 0, -ABOVE_WHEEL_MIDDLE_PX);
     await page.mouse.click(at.x, at.y);
 

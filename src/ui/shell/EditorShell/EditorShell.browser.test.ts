@@ -59,10 +59,10 @@ function entityInspector() {
     return find('section[aria-label="Entity inspector"]');
 }
 
-function optionButton(label: string) {
-    const options = find('.tool-options');
+function kindButton(label: string) {
+    const options = find('.kinds-menu');
     const button = [...(options?.querySelectorAll('button') ?? [])].find((each) => each.textContent === label);
-    if (button === undefined) throw new Error(`The options strip has no ${label}.`);
+    if (button === undefined) throw new Error(`The kinds menu has no ${label}.`);
 
     return button;
 }
@@ -153,34 +153,34 @@ describe('EditorShell', () => {
         await expect.poll(() => session.view.coveredEdges.left, { timeout: 5_000 }).toBe(GAP + TOOL_COLUMN);
     });
 
-    test('the Shape tool hides the Entity inspector, and the free area reaches the toolbar', async () => {
+    test('the Shape tool hides the Entity inspector, and the free area reaches the tool column', async () => {
         const { tools } = showShell();
         await expect.poll(() => entityInspector()).not.toBeNull();
-        expect(find('.tool-options')).toBeNull();
+        expect(find('.kinds-menu')).toBeNull();
 
         tools.controller.pick('shape');
 
         await expect.poll(() => entityInspector()).toBeNull();
-        const toolbarBox = find('section[aria-label="Tools"]')?.getBoundingClientRect();
+        const toolColumnBox = find('section[aria-label="Tools"]')?.getBoundingClientRect();
         const freeBox = find('.free-area')?.getBoundingClientRect();
-        expect(freeBox?.left).toBe(toolbarBox?.right);
-        expect(find('.tool-options')).not.toBeNull();
+        expect(freeBox?.left).toBe(toolColumnBox?.right);
+        expect(find('.kinds-menu')).not.toBeNull();
     });
 
-    test('the options strip shows the three kinds, the chosen one on, and changes the kind', async () => {
+    test('the kinds menu shows the three kinds, the chosen one on, and changes the kind', async () => {
         const { tools } = showShell();
         tools.controller.pick('shape');
-        await expect.poll(() => find('.tool-options')).not.toBeNull();
-        expect(optionButton('Rectangle').getAttribute('aria-pressed')).toBe('true');
-        expect(optionButton('Circle').getAttribute('aria-pressed')).toBe('false');
-        expect(optionButton('Polygon').getAttribute('aria-pressed')).toBe('false');
+        await expect.poll(() => find('.kinds-menu')).not.toBeNull();
+        expect(kindButton('Rectangle').getAttribute('aria-pressed')).toBe('true');
+        expect(kindButton('Circle').getAttribute('aria-pressed')).toBe('false');
+        expect(kindButton('Polygon').getAttribute('aria-pressed')).toBe('false');
 
-        await userEvent.click(optionButton('Polygon'));
+        await userEvent.click(kindButton('Polygon'));
 
         const shapeTool = tools.controller.active;
         expect(shapeTool instanceof ShapeTool && shapeTool.kind).toBe('polygon');
-        await expect.poll(() => optionButton('Polygon').getAttribute('aria-pressed')).toBe('true');
-        expect(optionButton('Rectangle').getAttribute('aria-pressed')).toBe('false');
+        await expect.poll(() => kindButton('Polygon').getAttribute('aria-pressed')).toBe('true');
+        expect(kindButton('Rectangle').getAttribute('aria-pressed')).toBe('false');
     });
 
     test('the status bar shows each tool hint, following the kind', async () => {
@@ -190,36 +190,36 @@ describe('EditorShell', () => {
         tools.controller.pick('shape');
         await expect.poll(statusText).toContain('Click to place, drag to size.');
 
-        await userEvent.click(optionButton('Polygon'));
+        await userEvent.click(kindButton('Polygon'));
         await expect.poll(statusText).toContain('Click to add points.');
     });
 
-    test('the Joint tool’s strip shows the three types, Hinge on, and changes the type', async () => {
+    test('the Joint tool’s kinds menu shows the three types, Hinge on, and changes the type', async () => {
         const { tools } = showShell();
         tools.controller.pick('joint');
-        await expect.poll(() => find('.tool-options')).not.toBeNull();
-        expect(optionButton('Hinge').getAttribute('aria-pressed')).toBe('true');
-        expect(optionButton('Rope').getAttribute('aria-pressed')).toBe('false');
-        expect(optionButton('Spring').getAttribute('aria-pressed')).toBe('false');
+        await expect.poll(() => find('.kinds-menu')).not.toBeNull();
+        expect(kindButton('Hinge').getAttribute('aria-pressed')).toBe('true');
+        expect(kindButton('Rope').getAttribute('aria-pressed')).toBe('false');
+        expect(kindButton('Spring').getAttribute('aria-pressed')).toBe('false');
         // The Entity inspector stays, unlike with the Shape tool.
         expect(entityInspector()).not.toBeNull();
 
-        await userEvent.click(optionButton('Spring'));
+        await userEvent.click(kindButton('Spring'));
 
         const jointTool = tools.controller.active;
         expect(jointTool instanceof JointTool && jointTool.type).toBe('spring');
-        await expect.poll(() => optionButton('Spring').getAttribute('aria-pressed')).toBe('true');
-        expect(optionButton('Hinge').getAttribute('aria-pressed')).toBe('false');
+        await expect.poll(() => kindButton('Spring').getAttribute('aria-pressed')).toBe('true');
+        expect(kindButton('Hinge').getAttribute('aria-pressed')).toBe('false');
     });
 
     test('a joint type’s tooltip adds its physics name', async () => {
         const { tools } = showShell();
         tools.controller.pick('joint');
-        await expect.poll(() => find('.tool-options')).not.toBeNull();
+        await expect.poll(() => find('.kinds-menu')).not.toBeNull();
 
-        await userEvent.hover(optionButton('Hinge'));
+        await userEvent.hover(kindButton('Hinge'));
 
-        await expect.poll(() => find('.tool-options [role="tooltip"]')?.textContent).toBe('Hinge (revolute joint)');
+        await expect.poll(() => find('.kinds-menu [role="tooltip"]')?.textContent).toBe('Hinge (revolute joint)');
     });
 
     test('the status bar shows the Joint tool’s hints, following the type', async () => {
@@ -227,7 +227,7 @@ describe('EditorShell', () => {
         tools.controller.pick('joint');
         await expect.poll(statusText).toContain('Click where two bodies overlap to join them, or on one to pin it.');
 
-        await userEvent.click(optionButton('Rope'));
+        await userEvent.click(kindButton('Rope'));
         await expect.poll(statusText).toContain('Click the first entity, then the second.');
     });
 
@@ -242,13 +242,13 @@ describe('EditorShell', () => {
         expect(tools.controller.active.id).toBe('select');
         expect(session.openLevel.selection.entities.length).toBe(1);
         await expect.poll(nameBoxValue).toBe('Rectangle 1');
-        expect(find('.tool-options')).toBeNull();
+        expect(find('.kinds-menu')).toBeNull();
     });
 
     test('Play hides every panel and bar, the Play bar shows, and Stop brings them back as they were', async () => {
         const { play, tools } = showShell();
         tools.controller.pick('joint');
-        await expect.poll(() => find('.tool-options')).not.toBeNull();
+        await expect.poll(() => find('.kinds-menu')).not.toBeNull();
         const places = [...editorPageContainer().querySelectorAll<HTMLElement>('.panel-place, .free-area')];
         expect(places.length).toBeGreaterThan(4);
 
@@ -258,6 +258,7 @@ describe('EditorShell', () => {
         for (const place of places) {
             expect(getComputedStyle(place).visibility).toBe('hidden');
         }
+        expect(getComputedStyle(find('.kinds-menu') ?? document.body).visibility).toBe('hidden');
         expect(getComputedStyle(find('.level-view-host') ?? document.body).visibility).toBe('visible');
 
         play.stop();

@@ -40,7 +40,7 @@ function offset(point: ScreenPoint, dx: number, dy: number): ScreenPoint {
 
 async function pickShapeTool(page: Page, kind: 'Rectangle' | 'Circle' | 'Polygon') {
     await page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name: 'Shape' }).click();
-    await page.getByRole('toolbar', { name: 'Tool options' }).getByRole('button', { name: kind }).click();
+    await page.getByRole('group', { name: 'Kinds menu' }).getByRole('button', { name: kind }).click();
 }
 
 async function drag(page: Page, from: ScreenPoint, to: ScreenPoint) {
@@ -94,7 +94,7 @@ function pointsCount(page: Page) {
 
 async function expectFinished(page: Page, name: string) {
     await expect(entityRow(page, name)).toHaveAttribute('aria-selected', 'true');
-    await expect(page.getByRole('toolbar', { name: 'Tool options' })).toHaveCount(0);
+    await expect(page.getByRole('group', { name: 'Kinds menu' })).toHaveCount(0);
     await expect(shapeCard(page)).toHaveCount(1);
 }
 
@@ -106,7 +106,7 @@ test('key 4 picks the Shape tool and hides the Entity inspector, and a click pla
 
     await page.mouse.move(middle.x, middle.y);
     await page.keyboard.press('4');
-    await expect(page.getByRole('toolbar', { name: 'Tool options' })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Kinds menu' })).toBeVisible();
     await expect(entityInspector(page)).toHaveCount(0);
 
     await page.mouse.click(middle.x, middle.y);
@@ -221,7 +221,7 @@ test('Ctrl+Z while drawing removes the last point and makes no step', async ({ p
     await page.mouse.click(middle.x + APART_PX, middle.y);
     await page.mouse.click(middle.x, middle.y - APART_PX);
     await page.keyboard.press('Control+z');
-    await expect(page.getByRole('toolbar', { name: 'Tool options' })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Kinds menu' })).toBeVisible();
     await page.keyboard.press('Enter');
 
     await expectFinished(page, 'Line 1');

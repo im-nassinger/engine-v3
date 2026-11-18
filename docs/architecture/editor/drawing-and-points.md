@@ -2,11 +2,11 @@
 
 ## TL;DR
 
-**The Shape tool** draws the four kinds a ShapeComponent holds. Its options strip offers Rectangle, Circle and Polygon; a line is a polygon drawing finished open. While it is active the Entity inspector is hidden. Finishing runs **`createShape`**, one step, and the tool returns to Select with the new shape selected. **Point editing** is a state of the Select tool, entered by double-clicking a polygon or line: its points are selected, dragged, nudged, added on an edge and deleted, each one step. Stage 10 builds both; its choices are at the end. The tool contract, `ToolController` and snapping are in [selection-and-tools.md](selection-and-tools.md).
+**The Shape tool** draws the four kinds a ShapeComponent holds. Its kinds menu offers Rectangle, Circle and Polygon; a line is a polygon drawing finished open. While it is active the Entity inspector is hidden. Finishing runs **`createShape`**, one step, and the tool returns to Select with the new shape selected. **Point editing** is a state of the Select tool, entered by double-clicking a polygon or line: its points are selected, dragged, nudged, added on an edge and deleted, each one step. Stage 10 builds both; its choices are at the end. The tool contract, `ToolController` and snapping are in [selection-and-tools.md](selection-and-tools.md).
 
 ## The Shape tool
 
-- One tool, four kinds: rectangle, circle, polygon and line. **Its options strip offers Rectangle, Circle and Polygon** (owner, 2026-11-15); a line is a polygon drawing finished open. The tool remembers the kind used last, a rectangle at first.
+- One tool, four kinds: rectangle, circle, polygon and line. **Its kinds menu offers Rectangle, Circle and Polygon** (owner, 2026-11-15, the menu since 2026-11-17); a line is a polygon drawing finished open. The tool remembers the kind used last, a rectangle at first.
 - **Choosing it clears the selection and hides the Entity inspector** (owner, 2026-11-15). `EntityInspectorModel` only ever describes entities in the level, never a shape being drawn, so it needs no case for something that isn't an entity. The Entity inspector shows again when the tool is left: after a shape is finished the tool returns to Select with the shape selected.
 - A faded preview follows the mouse; a click places it at the remembered size, a drag sets a new size. A circle's drag gives the circle that fits the box, as if Shift were held. Resizing a circle with the Select tool's handles keeps it round: the radius follows the larger stretch.
 - Polygon: each click adds a point; clicking the first point closes it into a polygon; Enter, Esc, double-click, choosing another tool or Play finish it open, as a line (fewer than 2 points is dropped); Ctrl+Z or Backspace removes the last point.

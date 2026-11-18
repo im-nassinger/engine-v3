@@ -190,7 +190,7 @@ The Shape tool and point editing are in [drawing-and-points.md](drawing-and-poin
 
 ## The Joint tool
 
-- The joint type comes from its options strip, Hinge by default.
+- The joint type comes from its kinds menu, Hinge by default.
 - Under the mouse it looks for entities with physics, skipping hidden and locked ones and those without physics. Shapes merged into one body count as one, through `BodyMembership` from [the physics module](../simulation.md#bodies-and-their-entities).
 - **It says why it skips an entity** (owner, 2026-11-16): with no body to use under the mouse, the preview's label names the frontmost skipped entity and the reason, `Platform has no BodyComponent`, `Platform is hidden` or `Platform is locked`; a click shows the same text as the status text, and a Rope's or Spring's second click there is refused instead of pinning that end to the background.
 - **One-point joints** (Hinge) take one click: two bodies under the mouse are A and B; one body pins it to the background (B empty). **Two-ended joints** (Rope, Spring) take two clicks, one per entity, each end exactly where clicked.

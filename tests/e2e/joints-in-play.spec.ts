@@ -122,7 +122,7 @@ async function drawBody(page: Page, centre: ScreenPoint, name: string, type: 'Dy
 
 async function pickJointTool(page: Page, type: 'Hinge' | 'Rope') {
     await page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name: 'Joint' }).click();
-    await page.getByRole('toolbar', { name: 'Tool options' }).getByRole('button', { name: type }).click();
+    await page.getByRole('group', { name: 'Kinds menu' }).getByRole('button', { name: type }).click();
 }
 
 async function click(page: Page, at: ScreenPoint) {

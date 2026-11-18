@@ -23,7 +23,7 @@ async function openEditorWithCrate(page: Page): Promise<ScreenPoint> {
     const middle = { x: free.x + free.width / 2, y: free.y + free.height / 2 };
 
     await page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name: 'Shape' }).click();
-    await page.getByRole('toolbar', { name: 'Tool options' }).getByRole('button', { name: 'Rectangle' }).click();
+    await page.getByRole('group', { name: 'Kinds menu' }).getByRole('button', { name: 'Rectangle' }).click();
     await page.mouse.click(middle.x, middle.y);
     await expect(crateRow(page)).toHaveAttribute('aria-selected', 'true');
 

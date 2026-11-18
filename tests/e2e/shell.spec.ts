@@ -53,7 +53,7 @@ test('the status bar shows the mouse position over the level view, and nothing o
     await expect(mousePosition).toHaveText('');
 });
 
-test('the toolbar shows Select as the active tool', async ({ page }) => {
+test('the tool column shows Select as the active tool', async ({ page }) => {
     await openEditor(page);
 
     const select = page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name: 'Select' });
