@@ -141,13 +141,13 @@
   .grp .ib { border-radius: 999px; width: 28px; height: 28px; }
   .actisl.tint .act + .act { margin-left: 6px; }
   .burger { z-index: 5; justify-content: center; padding: 0; }
-  .burger > .ib { width: 34px; height: 34px; border-radius: var(--r); color: var(--muted); }
+  .burger > .ib { width: 34px; height: 34px; border-radius: calc(var(--rl) - 7px); color: var(--muted); }
   .burger > .ib.on { background: var(--soft); color: var(--ink); }
   .burger .menu.main { top: 0; left: calc(100% + 6px); min-width: 170px; color: var(--text); }
   .burger .menu.sub { top: 69px; left: calc(100% + 4px); min-width: 250px; }
   .ed .menu { background: rgb(24, 27, 33); }
   .toolcol { z-index: 3; flex-direction: column; height: auto; padding: 7px 0; gap: 4px; }
-  .isl.toolcol .tool { width: 34px; height: 34px; }
+  .isl.toolcol .tool { width: 34px; height: 34px; border-radius: calc(var(--rl) - 7px); }
   .actisl.edit .ib { border-radius: 999px; width: 30px; height: 30px; }
   .actisl .act.save { color: var(--save-ink); }
   .actisl .act.play { color: var(--ink); }
@@ -366,7 +366,7 @@ const KINDS = [
 // The directions. Each is a set of tokens and one variant of each kind.
 const BASE = { title: 'boundsize', actions: 'apart', burger: 'with', name: 'plain', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
 const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
-  accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 10, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
+  accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 14, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s, view) => ({ id, name, desc, view, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
   dir('1', '☰ over the tool column', '', {})
