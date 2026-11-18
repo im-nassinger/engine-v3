@@ -29,6 +29,7 @@ A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: s
 - **A change to the runner's own code:** it restarts itself between sessions, so the change applies without stopping a step.
 - **Waiting:** every wait counts by the wall clock, a minute at a time, so a night with the computer asleep doesn't make it wait hours too long. While it runs, it blocks the computer from going to sleep on its own (`systemd-inhibit`). Closing the lid still puts it to sleep.
 - **A hung session:** no output for 30 minutes ends it, and it counts as a failure.
+- **A session that won't exit:** the CLI waits for every background shell its session started, so a leftover loop keeps it open forever. A minute after the session's result line, the runner ends it and everything under it (`tools/runner/ProcessTree.ts`), and the session counts by its report as usual. The prompt also tells sessions to stop their background commands. *Why: on 2026-11-18 step 5 reported its result at 13:49 and then hung, because two `until ! pgrep -f "playwright test"` loops found their own command lines and never ended.*
 - **Never two at once:** a runner writes its process ID to `~/.local/state/engine-v3-runner/runner.pid` and refuses to start while another live runner holds it (under systemd it tries again a minute later). Each session's process ID goes in `session.pid` next to it, and the runner waits for a session still alive from an earlier runner to end before starting a new one.
 
 ## Files
@@ -38,6 +39,7 @@ A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: s
 | `tools/runner/run.ts` | The loop |
 | `tools/runner/prompt.md` | What each session is told |
 | `tools/runner/ci-fix-prompt.md` | Put before `prompt.md` when CI failed on the last push |
+| `tools/runner/ProcessTree.ts` | Ends a process and every process under it, for a session that won't exit |
 | `tools/runner/CiChecker.ts` | Waits for CI on a commit and reads its failed steps and log through `gh` |
 | `tools/runner/engine-v3-runner.service` | The systemd unit. It names the Node version from nvm, so update it after a Node upgrade |
 | `.claude/settings.json` | Allows `git push`, refuses `sudo`, `pkexec` and force pushes. Sessions run with `--permission-mode auto` |

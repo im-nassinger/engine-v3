@@ -11,6 +11,8 @@ Your job: do the next step, commit it, and stop.
 
 When you have just committed stage 19's last step, so the redesign is built, stop the runner so nothing of v2 starts: run `echo "Stage 19, the redesign, is done. The owner decides v2." > ~/.local/state/engine-v3-runner/paused` and `systemctl --user disable engine-v3-runner`, then report `finished`. Never run `systemctl stop` or `kill` on the runner: that ends your own session.
 
+Before you end, stop every background command you started, and never wait in a loop on `pgrep -f`: its pattern is in the loop's own command line, so it finds itself and waits forever. Run long tests in the foreground instead. The runner ends anything left running a minute after your last line.
+
 Never use `sudo`. If something needs root, skip that part, write it in `docs/progress.md` under "Waiting for the owner", and put the command in NEEDS.
 
 End with exactly these lines:

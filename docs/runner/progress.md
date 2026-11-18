@@ -14,6 +14,7 @@
 | Pushing after each step | Works since 2026-11-15. The first push started CI. Since 2026-11-15 the runner pushes, not the session |
 | Acting on CI | Since 2026-11-16: waits for CI after each push; a red CI makes the next session fix it, and three failed fixes pause the runner |
 | Stopping before v2 | Since 2026-11-18: stage 19, the redesign, is the last, and the runner stops only after it (before: stage 18, the before-v2 changes) |
+| Ending a session that won't exit | Since 2026-11-18: a minute after its result line, the runner ends the session and everything it left running |
 | The short prompt | Since 2026-11-15: context, the step's loop, and `STATUS`, `SUMMARY`, `NEEDS` |
 
 ## Known issues

@@ -3,8 +3,12 @@ import fs from 'node:fs';
 import readline from 'node:readline';
 import { isRecord } from './RateLimitTracker.ts';
 import type { RateLimitTracker } from './RateLimitTracker.ts';
+import { killProcessTree } from './ProcessTree.ts';
 
 const SILENCE_LIMIT_MS = 30 * 60 * 1000;
+// The CLI doesn't exit while a background shell it started is still running. On 2026-11-18 a
+// session reported its result and then hung for good on a wait loop that never ended.
+const EXIT_AFTER_RESULT_LIMIT_MS = 60 * 1000;
 
 export type SessionResult = {
     exitCode: number | null;
@@ -36,12 +40,18 @@ export function runClaudeSession(options: SessionOptions) {
     const result: SessionResult = { exitCode: null, finalText: '', isError: false, apiError: '', wentSilent: false };
     let lastAssistantText = '';
     let silenceTimer: NodeJS.Timeout | undefined;
+    let exitTimer: NodeJS.Timeout | undefined;
+
+    const endSession = () => {
+        if (child.pid === undefined) return;
+        killProcessTree(child.pid);
+    };
 
     const restartSilenceTimer = () => {
         clearTimeout(silenceTimer);
         silenceTimer = setTimeout(() => {
             result.wentSilent = true;
-            child.kill('SIGTERM');
+            endSession();
         }, SILENCE_LIMIT_MS);
     };
 
@@ -73,6 +83,9 @@ export function runClaudeSession(options: SessionOptions) {
             if (typeof resultText === 'string') {
                 result.finalText = resultText;
             }
+
+            clearTimeout(exitTimer);
+            exitTimer = setTimeout(endSession, EXIT_AFTER_RESULT_LIMIT_MS);
         }
     };
 
@@ -87,6 +100,7 @@ export function runClaudeSession(options: SessionOptions) {
     return new Promise<SessionResult>((resolve) => {
         child.on('close', (exitCode) => {
             clearTimeout(silenceTimer);
+            clearTimeout(exitTimer);
             log.end();
 
             result.exitCode = exitCode;
