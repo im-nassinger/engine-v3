@@ -72,7 +72,13 @@
   .cnums svg.i, .barnums svg.i { width: 13px; height: 13px; }
   .hintchip { position: absolute; transform: translateX(-50%); z-index: 3; white-space: nowrap; background: rgba(13, 15, 19, .8); color: #e4e8ef; border-radius: 999px; padding: 7px 15px; font-size: 12px; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
   .hintchip { display: flex; gap: 18px; align-items: center; }
-  .hintchip .cnums { min-width: 92px; justify-content: flex-end; font-variant-numeric: tabular-nums; white-space: pre; }
+  .note-top { position: absolute; transform: translateX(-50%); z-index: 3; display: flex; align-items: center; gap: 12px; padding: 8px 18px 8px 8px; border-radius: 14px; background: var(--panel); max-width: 480px; }
+  .note-top .ti { width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--k); background: color-mix(in srgb, var(--k) 18%, transparent); }
+  .note-top .ti svg.i { width: 17px; height: 17px; }
+  .note-top .tt { font-weight: 600; color: var(--text); }
+  .note-top .td { color: var(--muted); }
+  .debug { position: absolute; transform: translateX(-50%); z-index: 3; display: flex; gap: 18px; padding: 5px 14px; border-radius: 999px; background: rgba(13, 15, 19, .72); color: #e4e8ef; font-size: 10px; white-space: pre; font-variant-numeric: tabular-nums; }
+  .debug b { font-weight: 400; color: #8b93a1; margin-right: 6px; }
   .cnums { display: flex; gap: 12px; align-items: center; color: #9aa3b2; font-size: 12px; }
   .titlechip { position: absolute; transform: translateX(-50%); z-index: 3; display: flex; align-items: center; gap: 10px; padding: 7px 14px; border-radius: 999px; background: rgba(13, 15, 19, .8); color: #e4e8ef; font-weight: 500; }
   .titlechip .savestate { padding: 0; }
@@ -540,8 +546,12 @@ const C = {
   play: () => `<span class="play ${S.btn}">${ic('play')}Play</span>`,
   view: () => `<span class="ib">View${CHEV}</span><span class="ib num">40%${CHEV}</span><span class="ib">${ic('help')}</span>`
 };
-// The hint chip shows only the message (the tool's hint, or a status message) and the mouse position.
-const nums = (o) => `<span class="num">${o.pos}</span>`;
+// The message at the top middle: an icon tinted by its kind, a title and a line. The tool's hint is a message too.
+const KIND = { tool: 'var(--accent)', done: 'var(--playing)', warn: 'var(--warning)' };
+function message(o) {
+  const m = o.msg, k = KIND[m.kind];
+  return `<div class="note-top" style="left:${geo().cx}px;top:${M}px;--k:${k}"><span class="ti">${ic(m.icon)}</span><span><div class="tt">${m.title}</div><div class="td">${m.text}</div></span></div>`;
+}
 const entities = (o) => `<div class="abs blk panel ents" style="${pos(geo().ents)}"><div class="ph ${S.head}">Entities viewer</div>${rowsHtml(ROWS, o.sel, o.hover)}</div>`;
 
 // Inspector fields
@@ -577,9 +587,10 @@ function inspector(o) {
 
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
+// The debug line at the bottom middle: the mouse position, the selection's size when there is one, and the grid size.
 function bottom(o) {
-  const g = geo();
-  return `<div class="hintchip" style="left:${g.cx}px;top:${H - M - 34}px"><span>${o.hint}</span><span class="cnums">${nums(o)}</span></div>`;
+  const parts = [['x', o.x], ['y', o.y]].concat(o.size ? [['size', o.size]] : [], [['grid', '50']]);
+  return `<div class="debug" style="left:${geo().cx}px;top:${H - M - 24}px">${parts.map(([l, v]) => `<span><b>${l}</b>${v}</span>`).join('')}</div>` + message(o);
 }
 function toolColumn(o) {
   const [x, y, w] = geo().tools;
@@ -613,7 +624,7 @@ function minimap(r = W - M, b = H - M) {
 }
 function editor(o) {
   setZoom(!!o.whole);
-  o = Object.assign({ tool: 'select', hint: 'Drag a handle to resize, Shift keeps proportions', pos: 'x 20  y 340' }, o, o.top);
+  o = Object.assign({ tool: 'select', msg: TIP.select, x: '20', y: '340' }, o, o.top);
   const g = geo();
   return view(o.scene || {}) + `<div class="leftcol" style="${pos(g.left)}">${o.noInspector ? shapeStrip() : inspector(o)}</div>` + burger(o) + toolColumn(o) + entities(o) + minimap() + bottom(o) + (o.extra || '');
 }
@@ -643,12 +654,19 @@ function playbar(paused, extraCls = '') {
     `<span class="ib">${ic('stop')}Stop <span class="k">Ctrl+Enter</span></span></div>`;
 }
 
+// The messages the moments show: the tool's hint, an action done, and a warning.
+const TIP = {
+  select: { kind: 'tool', icon: 'select', title: 'Resize', text: 'Drag a handle. Shift keeps the proportions.' },
+  shape: { kind: 'tool', icon: 'polygon', title: 'Polygon', text: 'Click to add a point. Click the first point to close it.' }
+};
+const DONE = { kind: 'done', icon: 'check', title: 'Copied 2 entities', text: 'Crate 1 and Crate 2. Ctrl+V pastes them.' };
+const WARN = { kind: 'warn', icon: 'warning', title: 'Rectangle 1 can\'t collide', text: 'It needs a SurfaceComponent.' };
 const MOMENTS = {
-  shape: () => editor({ sel: 'Rectangle 1', hover: 'Crate 2', scene: { selected: 'rect1' } }),
-  whole: () => editor({ whole: true, hint: 'Click to select, drag to move', pos: 'x −3120  y −2410', scene: { bounds: true } }),
-  draw: () => editor({ tool: 'shape', noInspector: true, scene: { drawing: true }, hint: 'Click to add a point, click the first point to close, Enter to finish as a line', pos: 'x −640  y −40' }),
-  menu: () => editor({ sel: 'Rectangle 1', scene: { selected: 'rect1' }, top: { menuOpen: true } }),
-  dialog: () => editor({ extra: `<div class="scrim"></div><div class="dialog">${dialogBody()}</div>`, hint: 'Click to select, drag to move', pos: 'x 412  y −96' }),
+  shape: () => editor({ sel: 'Rectangle 1', hover: 'Crate 2', size: '160 × 80', scene: { selected: 'rect1' } }),
+  whole: () => editor({ whole: true, msg: DONE, x: '−3120', y: '−2410', scene: { bounds: true } }),
+  draw: () => editor({ tool: 'shape', noInspector: true, scene: { drawing: true }, msg: TIP.shape, x: '−640', y: '−40' }),
+  menu: () => editor({ sel: 'Rectangle 1', size: '160 × 80', msg: WARN, scene: { selected: 'rect1' }, top: { menuOpen: true } }),
+  dialog: () => editor({ extra: `<div class="scrim"></div><div class="dialog">${dialogBody()}</div>`, x: '412', y: '−96' }),
   play: () => `<div class="game"><div style="position:absolute;left:0;top:45px">${scene(1440, 810, 0.75, 720, 405, { play: true })}</div></div>${playbar(false)}`,
   parts: () => partsSheet()
 };
