@@ -30,7 +30,7 @@
 
   /* The editor. Its tokens are set per direction on .ed. */
   .ed { position: relative; width: 1440px; height: 900px; overflow: hidden; background: var(--app); color: var(--text); font-family: var(--font-ui); font-size: var(--fs);
-    --warning: #e5b931; --tip: #5aa9f0; --danger: #e5534b; --playing: #3fb27f; --paused: #e5b931; --tooltip: #0b0d10; --tooltip-text: #e8ebf0; }
+    --warning: #e5b931; --tip: #5aa9f0; --danger: #e5534b; --playing: #3fb27f; --save: #2fa866; --save-ink: #6fd89d; --paused: #e5b931; --tooltip: #0b0d10; --tooltip-text: #e8ebf0; }
   .ed.tall { height: auto; }
   .ed svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
   .num { font-family: var(--font-num); }
@@ -84,17 +84,34 @@
   .lcard .grow { flex: 1; }
   .lc-name { font-weight: 600; padding: 0 6px; white-space: nowrap; }
   .lcard .savestate { padding: 0; }
-  .lcard.pill { align-self: flex-start; border-radius: 999px; padding: 0 7px 0 8px; gap: 4px; }
-  .lcard.wide { align-self: stretch; }
-  .lcard .dirty { width: 7px; height: 7px; border-radius: 50%; background: #fff; flex-shrink: 0; margin-right: 18px; }
-  .lcard .play { border-radius: 999px; }
-  .lcard .play.round { width: 30px; padding: 0; justify-content: center; }
-  .lcard .play.round svg.i { margin-left: 2px; }
-  .lcard .play.soft { background: var(--soft); color: var(--ink); }
-  .lc-apart { display: flex; gap: 10px; flex-shrink: 0; align-self: flex-start; }
-  .lc-apart .lcard.pill { padding-right: 16px; }
-  .lc-apart .lcard .dirty { margin-right: 0; }
-  .lc-apart .playisl { height: 44px; padding: 0 20px; border-radius: 999px; }
+  .lcard.pill { border-radius: 999px; padding: 0 16px 0 8px; gap: 4px; }
+  .lcard.pill.nomenu { padding-left: 18px; }
+  .lc-name.lg { font-size: 16px; letter-spacing: -.01em; }
+  .lcard .dirty, .namechip .dirty { width: 7px; height: 7px; border-radius: 50%; background: #fff; flex-shrink: 0; margin-left: 2px; }
+  .lc-two { display: flex; flex-direction: column; padding: 0 6px; gap: 1px; }
+  .lc-two .lc-name { padding: 0; line-height: 1.2; }
+  .lc-state { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11px; }
+  .lc-state .dirty { margin-left: 0; width: 6px; height: 6px; }
+  .lcard.twoline { height: 50px; }
+  .lc-top { display: flex; gap: 10px; align-items: center; align-self: flex-start; flex-shrink: 0; }
+  .lcbtn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 999px; flex-shrink: 0; }
+  .lcact { display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 7px; border-radius: 999px; flex-shrink: 0; }
+  .lcact .ib { border-radius: 999px; }
+  .lc-gap { width: 14px; flex-shrink: 0; }
+  .float .blk.lcbtn, .float .blk.lcact, .float .blk.actisl, .float .blk.namechip { border-radius: 999px; }
+  .act { height: 30px; padding: 0 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 7px; font-weight: 600; white-space: nowrap; }
+  .act svg.i { width: 13px; height: 13px; }
+  .act.play svg.i { fill: currentColor; stroke: none; width: 12px; height: 12px; }
+  .act.save { background: var(--save); color: #fff; }
+  .act.play { background: var(--accent); color: #fff; }
+  .tint .act.save { background: rgba(47, 168, 102, .2); color: var(--save-ink); }
+  .tint .act.play { background: var(--soft); color: var(--ink); }
+  .actisl { height: 44px; padding: 0 8px; border-radius: 999px; display: flex; align-items: center; flex-shrink: 0; }
+  .actisl .act { background: transparent; }
+  .actisl .act.save { color: var(--save-ink); }
+  .actisl .act.play { color: var(--ink); }
+  .namechip { position: absolute; transform: translateX(-50%); z-index: 3; height: 44px; padding: 0 20px; border-radius: 999px; display: flex; align-items: center; gap: 8px; font-weight: 600; white-space: nowrap; }
+  .namechip.static { position: static; transform: none; display: inline-flex; }
   .leftcol { position: absolute; display: flex; flex-direction: column; gap: 10px; z-index: 2; }
   .leftcol > .insp { flex: 1; min-height: 0; }
   .leftcol > .opts { position: static; align-self: flex-start; }
@@ -277,6 +294,7 @@ const ICON = {
   redo: '<path d="M15 14l5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h3"/>',
   magnet: '<path d="M6 4v7a6 6 0 0 0 12 0V4"/><path d="M6 8h4M14 8h4M10 4v4M14 4v4"/>',
   play: '<path d="M7 4v16l13-8z"/>',
+  save: '<path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4"/><path d="M8 20v-6h8v6"/>',
   pause: '<path d="M8 5v14M16 5v14"/>',
   step: '<path d="M5 5l10 7-10 7z"/><path d="M19 5v14"/>',
   stop: '<rect x="6" y="6" width="12" height="12" rx="1"/>',
@@ -303,8 +321,9 @@ const CHEV = ic('down', 'class="i chev"');
 
 // Each choice that changes the look, with its variants. The number of a variant is its place in the list.
 const KINDS = [
-  ['lcard', 'Level card', 'The top left pill: the main menu, the level\'s name, a white dot while it isn\'t saved, and Play. Help is in the main menu; the dock has no Play.', [['pill', 'Play in the pill'], ['round', 'Round Play button'], ['soft', 'Soft Play button'], ['wide', 'As wide as the Inspector'], ['apart', 'Play as its own island']]],
-  ['zoom', 'Zoom', 'The zoom by the minimap at the bottom right.', [['above', 'Pill above the map'], ['footer', 'Under the map, one island'], ['over', 'On the map'], ['side', 'Upright, left of the map']]],
+  ['actions', 'Save and Play', 'A green Save and a blue Play at the top left. The dock has no Play.', [['group', 'Solid, in one island'], ['tint', 'Tinted, in one island'], ['inpill', 'In the name\'s pill'], ['apart', 'Each its own island, coloured text']]],
+  ['burger', 'Main menu button', 'Where the ☰ button sits. With the name in the middle, it joins Save and Play.', [['with', 'With the name'], ['own', 'Its own round island'], ['actions', 'With Save and Play']]],
+  ['name', 'Level name', 'Where and how the name shows, with the white dot while the level isn\'t saved.', [['pill', 'Top left, in a pill'], ['large', 'Top left, larger'], ['twoline', 'Top left, "Not saved" under it'], ['centre', 'Top middle of the level view']]],
   ['layout', 'Entities panel height', '', [['hug', 'Fits its rows'], ['float', 'Full height']]],
   ['head', 'Panel titles', '', [['title', 'Title'], ['caps', 'Small caps']]],
   ['card', 'Inspector cards', 'How one component\'s card is told apart from the next.', [['space', 'Space only'], ['tile', 'Tiles'], ['inset', 'Sunken tiles'], ['island', 'Each card an island']]],
@@ -321,16 +340,17 @@ const KINDS = [
 ];
 
 // The directions. Each is a set of tokens and one variant of each kind.
-const BASE = { lcard: 'pill', zoom: 'footer', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
+const BASE = { actions: 'group', burger: 'with', name: 'pill', zoom: 'footer', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
 const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s) => ({ id, name, desc, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'Play in the pill', 'The top left pill holds the main menu, the level\'s name, a white dot while it isn\'t saved, and then Play, a blue pill button. The dock keeps the tools, Undo, Redo and snapping. The zoom sits under the minimap in the same island.', {}),
-  dir('2', 'Round Play', 'The same pill, with Play as a round blue button holding only its icon.', { lcard: 'round' }),
-  dir('3', 'Soft Play', 'The same pill, with Play as a soft blue button, quieter than a solid one.', { lcard: 'soft' }),
-  dir('4', 'Wide', 'The pill is as wide as the Inspector under it, with Play at its right end.', { lcard: 'wide' }),
-  dir('5', 'Play apart', 'The pill holds the menu, the name and the dot; Play is a blue island of its own next to it.', { lcard: 'apart' })
+  dir('1', 'Together', 'The ☰ menu, the level\'s name and its white dot in one pill; a green Save and a blue Play side by side in a dark island next to it, so neither colour sits on the level.', {}),
+  dir('2', 'Menu apart', 'The ☰ menu is a round island of its own, then the name\'s pill, then Save and Play in their island.', { burger: 'own' }),
+  dir('3', 'Name in the middle', 'The name and its dot sit at the top middle of the level view. The top left island holds ☰, Save and Play.', { name: 'centre', burger: 'actions' }),
+  dir('4', 'All in one', 'One pill: ☰, the name, the dot, then Save and Play after a gap.', { actions: 'inpill' }),
+  dir('5', 'Quiet buttons', 'Save and Play are dark islands with green and blue words, no coloured fill; the ☰ menu is its own island.', { actions: 'apart', burger: 'own' }),
+  dir('6', 'Large name', 'The name larger, in its pill with ☰; Save and Play tinted in their island.', { name: 'large', actions: 'tint' })
 ];
 
 const FONTS = [
@@ -342,7 +362,7 @@ const FONTS = [
 const VIEWS = [['shape', 'A selected shape'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
 
 let state = { dir: '1', view: 'shape', font: 'mono', over: {} };
-try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-7') || '{}')); } catch (e) {}
+try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-8') || '{}')); } catch (e) {}
 let S, T;
 
 function tokensCss(t) {
@@ -518,13 +538,31 @@ function inspector(o) {
     </div></div>`;
 }
 
+// The top left: the main menu, the level's name and Save and Play, as the Mix row places them.
+const DIRTY = '<span class="dirty" title="Not saved"></span>';
+function nameHtml() {
+  if (S.name === 'twoline') return `<span class="lc-two"><span class="lc-name">Car test</span><span class="lc-state"><span class="dirty"></span>Not saved</span></span>`;
+  return `<span class="lc-name${S.name === 'large' ? ' lg' : ''}">Car test</span>${DIRTY}`;
+}
+function nameChip(cls = '', style = '') {
+  return `<div class="blk namechip ${cls}" style="${style}"><span>Car test</span>${DIRTY}</div>`;
+}
 function levelCard(o) {
-  const k = S.lcard, dirty = `<span class="dirty" title="Not saved"></span>`;
-  const head = `${C.menu(o)}<span class="lc-name">Car test</span>`;
-  if (k === 'apart') return `<div class="lc-apart"><div class="blk lcard pill">${head}${dirty}</div><span class="play playisl">${ic('play')}Play</span></div>`;
-  const play = k === 'round' ? `<span class="play round" title="Play">${ic('play')}</span>` : `<span class="play${k === 'soft' ? ' soft' : ''}">${ic('play')}Play</span>`;
-  const grow = k === 'wide' ? '<span class="grow"></span>' : '';
-  return `<div class="blk lcard pill${k === 'wide' ? ' wide' : ''}">${head}${dirty}${grow}${play}</div>`;
+  const centred = S.name === 'centre', menu = C.menu(o);
+  const where = S.burger === 'own' ? 'own' : S.burger === 'actions' || centred ? 'actions' : 'name';
+  const buttons = `<span class="act save">${ic('save')}Save</span><span class="act play">${ic('play')}Play</span>`;
+  const inPill = S.actions === 'inpill' && !centred;
+  let out = where === 'own' ? `<div class="blk lcbtn">${menu}</div>` : '';
+  if (!centred) {
+    const cls = ['blk', 'lcard', 'pill', S.name === 'twoline' ? 'twoline' : '', where === 'name' ? '' : 'nomenu'].join(' ');
+    out += `<div class="${cls}">${where === 'name' ? menu : ''}${nameHtml()}${inPill ? `<span class="lc-gap"></span>${buttons}` : ''}</div>`;
+  }
+  if (!inPill) {
+    const lead = where === 'actions' ? menu : '';
+    if (S.actions === 'apart') out += (lead ? `<div class="blk lcbtn">${lead}</div>` : '') + `<div class="blk actisl"><span class="act save">${ic('save')}Save</span></div><div class="blk actisl"><span class="act play">${ic('play')}Play</span></div>`;
+    else out += `<div class="blk lcact ${S.actions === 'tint' ? 'tint' : ''}">${lead}${buttons}</div>`;
+  }
+  return `<div class="lc-top">${out}</div>`;
 }
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
@@ -561,7 +599,7 @@ function minimap(r = W - M, b = H - M) {
 }
 function editor(o) {
   o = Object.assign({ tool: 'select', hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Nothing selected' }, o, o.top);
-  return view(o.scene || {}) + `<div class="leftcol" style="${pos(geo().left)}">${levelCard(o)}${o.noInspector ? shapeStrip() : inspector(o)}</div>` + entities(o) + minimap() + bottom(o) + (o.extra || '');
+  return view(o.scene || {}) + `<div class="leftcol" style="${pos(geo().left)}">${levelCard(o)}${o.noInspector ? shapeStrip() : inspector(o)}</div>` + (S.name === 'centre' ? nameChip('', `left:${geo().cx}px;top:${M}px`) : '') + entities(o) + minimap() + bottom(o) + (o.extra || '');
 }
 
 function shapeStrip() {
@@ -600,8 +638,9 @@ function schematic() {
   return `<div class="schem"><div class="ed float" style="${tokensCss(T)}position:absolute;left:0;top:0;transform:scale(.2);transform-origin:0 0">${editor({ sel: 'Rectangle 1', scene: { selected: 'rect1' } })}</div></div>`;
 }
 const PARTS = {
-  lcard: () => `<div class="inl"><div class="leftcol" style="position:static;width:300px">${levelCard({})}</div></div>`,
-  zoom: () => `<div class="inl"><div class="float" style="position:relative;width:300px;height:250px;background:${BG};border-radius:12px">${minimap(290, 240)}</div></div>`,
+  actions: () => topLeftPart(),
+  burger: () => topLeftPart(),
+  name: () => topLeftPart(),
   layout: schematic,
   head: () => `<div class="ph ${S.head}">Inspector</div>`,
   card: () => card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°')) + card('ShapeComponent', F.choice('Kind', 'Rectangle') + F.num('Width', '160', 'px')),
@@ -617,6 +656,9 @@ const PARTS = {
   handle: () => `<div class="inl"><svg width="200" height="90" viewBox="0 0 200 90" style="border-radius:6px"><rect width="200" height="90" fill="${BG}"/><rect x="60" y="25" width="80" height="40" fill="#4a90d9" stroke="#1f3552"/><rect x="60" y="25" width="80" height="40" fill="none" style="stroke:var(--accent)" stroke-width="1.5"/>${handles(60, 25, 80, 40)}</svg></div>`,
   play: () => playbar(false, 'static') + playbar(true, 'static')
 };
+function topLeftPart() {
+  return `<div class="inl"><div style="background:${BG};border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:10px;width:100%">${levelCard({})}${S.name === 'centre' ? nameChip('static') : ''}</div></div>`;
+}
 function partsSheet() {
   return `<div class="sheet">` + KINDS.map(([key, title, desc, variants]) =>
     `<div class="kbox"><h4>${title}</h4>${desc ? `<div class="kd">${desc}</div>` : ''}` +
@@ -666,7 +708,7 @@ function render() {
   const cls = ['ed', 'float', parts ? 'tall' : ''].join(' ');
   document.getElementById('frame').innerHTML = `<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
   document.getElementById('stage').classList.toggle('scroll', parts);
-  try { localStorage.setItem('engine-v3-islands-7', JSON.stringify(state)); } catch (e) {}
+  try { localStorage.setItem('engine-v3-islands-8', JSON.stringify(state)); } catch (e) {}
   fit();
 }
 function fit() {
