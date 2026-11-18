@@ -139,13 +139,12 @@
   .zoomg .num { min-width: 36px; text-align: center; }
   .minimap { position: absolute; z-index: 2; padding: 3px; }
   .minimap svg { display: block; border-radius: 13px; }
-  .maphead { height: 32px; display: flex; align-items: center; gap: 7px; padding: 0 11px; white-space: nowrap; overflow: hidden; }
-  .maphead .dirty, .viewlabel .dirty, .stname .dirty { width: 7px; height: 7px; border-radius: 50%; background: #fff; flex-shrink: 0; }
-  .lc-thumb { width: 30px; height: 30px; border-radius: 7px; overflow: hidden; flex-shrink: 0; margin: 0 4px 0 6px; }
-  .lc-thumb svg { display: block; }
-  .lc-val.title { font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
-  .viewlabel { position: absolute; z-index: 2; height: 30px; padding: 0 13px; border-radius: 999px; background: rgba(13, 15, 19, .8); color: #e4e8ef; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-  .stname { display: flex; align-items: center; gap: 7px; font-weight: 500; padding-right: 14px; margin-right: -2px; }
+  /* The level's name as a panel's heading */
+  .ph.doc { height: 50px; gap: 8px; font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+  .ph.doc .ib { margin-left: -6px; }
+  .ph.sub { height: 24px; font-size: 11.5px; font-weight: 500; color: var(--muted); }
+  .ph .dirty, .titlebar .dirty { width: 7px; height: 7px; border-radius: 50%; background: #fff; flex-shrink: 0; }
+  .titlebar { position: absolute; left: 0; top: 0; width: 100%; height: 34px; z-index: 3; background: #16191e; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 500; }
   .mapfoot { display: flex; align-items: center; justify-content: center; height: 34px; }
   .mapfoot .zoomg, .zoomisl .zoomg { background: transparent; }
   .zoomisl { position: absolute; z-index: 3; display: flex; align-items: center; height: 36px; padding: 0 4px; }
@@ -370,11 +369,11 @@ const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,2
 const dir = (id, name, desc, s) => ({ id, name, desc, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
   dir('1', 'The redesign', 'The top left: the ☰ menu and the level\'s name in one island, the name in regular weight with a white dot while it isn\'t saved, then Save and Play as dark islands with green and blue words. The zoom sits under the minimap.', {}),
-  dir('2', 'Minimap caption', 'The level\'s name heads the minimap, over the picture of the level it names. The top left is ☰, Save and Play.', { title: 'map' }),
-  dir('3', 'Thumbnail and name', 'A small picture of the whole level before its name, as file browsers show a file.', { title: 'thumb' }),
-  dir('4', 'Document title', 'The name larger and bold beside ☰, as a document\'s title.', { title: 'title' }),
-  dir('5', 'Label on the level view', 'The name in a dark chip at the top left of the level view, as 3D editors label their viewport. The top left is ☰, Save and Play.', { title: 'view' }),
-  dir('6', 'In the status chip', 'The name first in the status text above the dock, as code editors show the open file in their status bar. The top left is ☰, Save and Play.', { title: 'status' })
+  dir('2', 'Entities heading', 'The level\'s name is the Entities panel\'s heading, a title over the tree of what the level holds. The top left is ☰, Save and Play.', { title: 'ents' }),
+  dir('3', 'Entities heading, labelled', 'The name heads the Entities panel, with a small Entities label under it, as Figma heads its layers with the file\'s name.', { title: 'entslabel' }),
+  dir('4', 'Entities heading with ☰', 'The ☰ menu and the name head the Entities panel together, as in Figma\'s left panel. The top left is only Save and Play.', { title: 'entsmenu' }),
+  dir('5', 'Inspector heading', 'The name heads the left column\'s panel, with a small Inspector label under it. The top left is ☰, Save and Play.', { title: 'insp' }),
+  dir('6', 'Title bar', 'A thin bar along the window\'s top shows the name in the middle, as a desktop app\'s title bar does. The islands sit under it.', { title: 'bar' })
 ];
 
 const FONTS = [
@@ -403,10 +402,10 @@ const pos = ([x, y, w, h]) => `left:${x}px;top:${y}px;width:${w}px;${h == null ?
 // Where each part sits, in window pixels. The panels' widths are the requirement's.
 const W = 1440, H = 900, M = 10, GP = 10;
 function geo() {
-  const ex = W - M - 260;
-  const left = [M, M, 300, H - 2 * M];
+  const ex = W - M - 260, top = S.title === 'bar' ? 34 : 0;
+  const left = [M, M + top, 300, H - 2 * M - top];
   const map = mapParts(W - M, H - M);
-  const ents = [ex, M, 260, S.layout === 'hug' ? null : H - 2 * M - map.height - GP];
+  const ents = [ex, M + top, 260, S.layout === 'hug' ? null : H - 2 * M - map.height - GP];
   const rx0 = M + 300 + GP, rx1 = ex - GP, cx = (rx0 + rx1) / 2;
   return { left, ents, map, rx0, rx1, cx };
 }
@@ -529,7 +528,13 @@ const C = {
   view: () => `<span class="ib">View${CHEV}</span><span class="ib num">40%${CHEV}</span><span class="ib">${ic('help')}</span>`
 };
 const nums = (o) => `<span class="num">${o.pos}</span><span>${o.sel}</span><span class="warn">${ic('warning', 'style="color:var(--warning)"')}<span class="num">1</span></span>`;
-const entities = (o) => `<div class="abs blk panel ents" style="${pos(geo().ents)}"><div class="ph ${S.head}">Entities</div>${rowsHtml(ROWS, o.sel, o.hover)}</div>`;
+function entitiesHead(o) {
+  if (S.title === 'ents') return `<div class="ph doc">Car test${DIRTY}</div>`;
+  if (S.title === 'entslabel') return `<div class="ph doc">Car test${DIRTY}</div><div class="ph sub">Entities</div>`;
+  if (S.title === 'entsmenu') return `<div class="ph doc">${C.menu(o)}Car test${DIRTY}</div><div class="ph sub">Entities</div>`;
+  return `<div class="ph ${S.head}">Entities</div>`;
+}
+const entities = (o) => `<div class="abs blk panel ents" style="${pos(geo().ents)}">${entitiesHead(o)}${rowsHtml(ROWS, o.sel, o.hover)}</div>`;
 
 // Inspector fields
 const fc = () => `inp ${S.field}`;
@@ -551,7 +556,7 @@ const card = (title, body) => `<div class="card ${S.card}"><div class="chead">${
 function inspector(o) {
   const g = geo(), bare = S.card === 'island', head = '';
   if (o.noInspector) return '';
-  return `<div class="panel insp${bare ? ' bare' : ' blk'}">${bare ? '<div class="blk" style="border-radius:var(--rl)">' : ''}${head}<div class="ph ${S.head}">Inspector</div>
+  return `<div class="panel insp${bare ? ' bare' : ' blk'}">${bare ? '<div class="blk" style="border-radius:var(--rl)">' : ''}${head}${S.title === 'insp' ? `<div class="ph doc">Car test${DIRTY}</div><div class="ph sub">Inspector</div>` : `<div class="ph ${S.head}">Inspector</div>`}
     <div class="ihead"><span style="color:var(--muted);display:flex">${ic('rect')}</span><div class="nm ${S.field === 'filled' ? '' : S.field}">Rectangle 1</div><span class="ib eye">${ic('eye')}</span></div>${bare ? '</div>' : ''}
     <div style="overflow:${bare ? 'visible' : 'hidden'}">
     ${card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°') + F.vec('Scale', '1', '1') + F.num('Skew', '0', '°'))}
@@ -565,14 +570,7 @@ function inspector(o) {
 // The top left: the main menu, the level's name and Save and Play, as the variation places them.
 const DIRTY = '<span class="dirty" title="Not saved"></span>';
 function nameHtml() {
-  if (S.title === 'thumb') return `<span class="lc-thumb">${levelThumb(30)}</span><span class="lc-val m">Car test</span>${DIRTY}`;
-  if (S.title === 'title') return `<span class="lc-val title">Car test</span>${DIRTY}`;
   return `<span class="lc-val">Car test</span>${DIRTY}`;
-}
-// The whole level, drawn small, as the level's picture.
-function levelThumb(size) {
-  const [ax, ay, aw] = MAP_AREA, z = size / aw;
-  return scene(size, size, z, -ax * z, -ay * z, { grid: false, noLines: true });
 }
 function nameChip(cls = '', style = '') {
   return `<div class="blk namechip ${cls}" style="${style}"><span>Car test</span>${DIRTY}</div>`;
@@ -582,8 +580,9 @@ function levelCard(o) {
   const where = S.burger === 'own' ? 'own' : S.burger === 'actions' || centred ? 'actions' : 'name';
   const buttons = `<span class="act save">${ic('save')}Save</span><span class="act play">${ic('play')}Play</span>`;
   const inPill = S.actions === 'inpill' && !centred;
-  if (['map', 'view', 'status'].includes(S.title)) {
-    return `<div class="lc-top"><div class="blk lcbtn">${menu}</div><div class="blk actisl"><span class="act save">${ic('save')}Save</span></div><div class="blk actisl"><span class="act play">${ic('play')}Play</span></div></div>`;
+  if (S.title !== 'menu') {
+    const lead = S.title === 'entsmenu' ? '' : `<div class="blk lcbtn">${menu}</div>`;
+    return `<div class="lc-top">${lead}<div class="blk actisl"><span class="act save">${ic('save')}Save</span></div><div class="blk actisl"><span class="act play">${ic('play')}Play</span></div></div>`;
   }
   let out = where === 'own' ? `<div class="blk lcbtn">${menu}</div>` : '';
   if (!centred) {
@@ -601,8 +600,7 @@ const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? 
 const TOOLS = ['select', 'shape', 'joint'];
 function bottom(o) {
   const g = geo();
-  const lead = S.title === 'status' ? `<span class="stname">Car test${DIRTY}</span>` : '';
-  const chip = `${lead}<span>${o.hint}</span><span class="cnums">${nums(o)}</span>`;
+  const chip = `<span>${o.hint}</span><span class="cnums">${nums(o)}</span>`;
   return `<div class="abs isl dock" style="left:${g.cx}px;top:${H - M - 46}px">${C.tools(o)}<span class="sep"></span>${C.edit()}</div>` +
     `<div class="hintchip" style="left:${g.cx}px;top:${H - M - 46 - GP - 30}px">${chip}</div>`;
 }
@@ -613,7 +611,7 @@ function view(opts) {
 // The minimap and the zoom, with their right and bottom edges at r and b: where each island sits.
 const MAP_W = 180, ZOOM_H = 36;
 function mapParts(r, b) {
-  const inner = MAP_W - 6, mapH = Math.round(inner * MAP_AREA[3] / MAP_AREA[2]) + 6, foot = S.zoom === 'footer' ? 34 : 0, head = S.title === 'map' ? 32 : 0;
+  const inner = MAP_W - 6, mapH = Math.round(inner * MAP_AREA[3] / MAP_AREA[2]) + 6, foot = S.zoom === 'footer' ? 34 : 0, head = 0;
   const map = [r - MAP_W, b - mapH - foot - head, MAP_W, mapH + foot + head];
   const zoom = S.zoom === 'above' ? [r - MAP_W / 2, map[1] - GP - ZOOM_H] : S.zoom === 'side' ? [map[0] - GP - 36, b - 104] : null;
   return { map, zoom, inner, height: b - (S.zoom === 'above' ? zoom[1] : map[1]) };
@@ -626,7 +624,7 @@ function minimap(r = W - M, b = H - M) {
   const zoom = `<span class="zoomg"><span class="ib">${ic('minus')}</span><span class="num">40%</span><span class="ib">${ic('plus')}</span></span>`;
   const zoomUp = `<span class="zoomg"><span class="ib">${ic('plus')}</span><span class="num">40%</span><span class="ib">${ic('minus')}</span></span>`;
   const inside = S.zoom === 'footer' ? `<div class="mapfoot">${zoom}</div>` : S.zoom === 'over' ? `<div class="zoomover">${zoom}</div>` : '';
-  const head = S.title === 'map' ? `<div class="maphead"><span>Car test</span>${DIRTY}</div>` : '';
+  const head = '';
   let out = `<div class="blk minimap" style="${pos(g.map)}">${head}${map}${inside}</div>`;
   if (S.zoom === 'above') out += `<div class="blk zoomisl" style="left:${g.zoom[0]}px;top:${g.zoom[1]}px;transform:translateX(-50%)">${zoom}</div>`;
   if (S.zoom === 'side') out += `<div class="blk zoomisl v" style="left:${g.zoom[0]}px;top:${g.zoom[1]}px">${zoomUp}</div>`;
@@ -634,7 +632,7 @@ function minimap(r = W - M, b = H - M) {
 }
 function editor(o) {
   o = Object.assign({ tool: 'select', hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Nothing selected' }, o, o.top);
-  return view(o.scene || {}) + `<div class="leftcol" style="${pos(geo().left)}">${levelCard(o)}${o.noInspector ? shapeStrip() : inspector(o)}</div>` + (S.name === 'centre' ? nameChip('', `left:${geo().cx}px;top:${M}px`) : '') + (S.title === 'view' ? `<div class="viewlabel" style="left:${geo().rx0}px;top:${M + 7}px">Car test${DIRTY}</div>` : '') + entities(o) + minimap() + bottom(o) + (o.extra || '');
+  return view(o.scene || {}) + `<div class="leftcol" style="${pos(geo().left)}">${levelCard(o)}${o.noInspector ? shapeStrip() : inspector(o)}</div>` + (S.name === 'centre' ? nameChip('', `left:${geo().cx}px;top:${M}px`) : '') + (S.title === 'bar' ? `<div class="titlebar">Car test${DIRTY}</div>` : '') + entities(o) + minimap() + bottom(o) + (o.extra || '');
 }
 
 function shapeStrip() {
@@ -646,11 +644,11 @@ function menuBody(items) {
     `<div class="mi${m[2] ? ' ' + m[2] : ''}"><span class="l">${m[0]}</span>${m[1] === '>' ? ic('right', 'class="i chev"') : `<span class="k">${m[1] || ''}</span>`}</div>`).join('');
 }
 function mainMenu() {
-  const x = M, y = M + 50;
+  const fromRight = S.title === 'entsmenu', x = fromRight ? geo().ents[0] + 6 : M, y = M + 50 + (S.title === 'bar' ? 34 : 0);
   const top = [['File', '>'], ['Edit', '>', 'hover'], ['Arrange', '>'], ['View', '>'], ['Help', '>']];
   const edit = [['Undo Move 1 entity', 'Ctrl+Z'], ['Redo', 'Ctrl+Shift+Z', 'dis'], '-', ['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C'], ['Paste', 'Ctrl+V', 'hover'], ['Duplicate', 'Ctrl+D'], ['Delete', 'Del'], '-', ['Select all', 'Ctrl+A'], ['Rename', 'F2'], ['Hide or show', 'Ctrl+Shift+H']];
   const head = '', dy = 0;
-  return `<div class="menu ${S.menu}" style="left:${x}px;top:${y}px">${head}${menuBody(top)}</div><div class="menu ${S.menu}" style="left:${x + 206}px;top:${y + 38 + dy}px;min-width:250px">${menuBody(edit)}</div>`;
+  return `<div class="menu ${S.menu}" style="left:${x}px;top:${y}px">${head}${menuBody(top)}</div><div class="menu ${S.menu}" style="left:${fromRight ? x - 256 : x + 206}px;top:${y + 38 + dy}px;min-width:250px">${menuBody(edit)}</div>`;
 }
 const dialogBody = () => `<h3>Replace the open level?</h3><p>Export it first if you want to keep it.</p><div class="row"><span class="btn ${S.btn}">Cancel</span><span class="btn primary ${S.btn}">Replace</span></div>`;
 function playbar(paused, extraCls = '') {
