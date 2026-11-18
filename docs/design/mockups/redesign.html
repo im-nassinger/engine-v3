@@ -77,6 +77,7 @@
   .note-top .ti svg.i { width: 17px; height: 17px; }
   .note-top .tt { font-weight: 600; color: var(--text); }
   .note-top .td { color: var(--muted); }
+  .note-top .tk { margin-left: 8px; padding: 0 5px; border-radius: 4px; background: var(--field); color: var(--muted); font-weight: 400; font-size: 10px; }
   .debug { position: absolute; transform: translateX(-50%); z-index: 3; display: flex; gap: 18px; padding: 5px 14px; border-radius: 999px; background: rgba(13, 15, 19, .72); color: #e4e8ef; font-size: 10px; white-space: pre; font-variant-numeric: tabular-nums; }
   .debug b { font-weight: 400; color: #8b93a1; margin-right: 6px; }
   .cnums { display: flex; gap: 12px; align-items: center; color: #9aa3b2; font-size: 12px; }
@@ -546,11 +547,10 @@ const C = {
   play: () => `<span class="play ${S.btn}">${ic('play')}Play</span>`,
   view: () => `<span class="ib">View${CHEV}</span><span class="ib num">40%${CHEV}</span><span class="ib">${ic('help')}</span>`
 };
-// The message at the top middle: an icon tinted by its kind, a title and a line. The tool's hint is a message too.
-const KIND = { tool: 'var(--accent)', done: 'var(--playing)', warn: 'var(--warning)' };
+// The tool card at the top middle: the chosen tool's icon, its name and key, and what it does right now.
 function message(o) {
-  const m = o.msg, k = KIND[m.kind];
-  return `<div class="note-top" style="left:${geo().cx}px;top:${M}px;--k:${k}"><span class="ti">${ic(m.icon)}</span><span><div class="tt">${m.title}</div><div class="td">${m.text}</div></span></div>`;
+  const m = o.msg;
+  return `<div class="note-top" style="left:${geo().cx}px;top:${M}px;--k:var(--accent)"><span class="ti">${ic(m.icon)}</span><span><div class="tt">${m.title}<span class="tk">${m.key}</span></div><div class="td">${m.text}</div></span></div>`;
 }
 const entities = (o) => `<div class="abs blk panel ents" style="${pos(geo().ents)}"><div class="ph ${S.head}">Entities viewer</div>${rowsHtml(ROWS, o.sel, o.hover)}</div>`;
 
@@ -654,19 +654,18 @@ function playbar(paused, extraCls = '') {
     `<span class="ib">${ic('stop')}Stop <span class="k">Ctrl+Enter</span></span></div>`;
 }
 
-// The messages the moments show: the tool's hint, an action done, and a warning.
+// What the tool card says in each moment: the chosen tool, and what it does where the mouse is.
 const TIP = {
-  select: { kind: 'tool', icon: 'select', title: 'Resize', text: 'Drag a handle. Shift keeps the proportions.' },
-  shape: { kind: 'tool', icon: 'polygon', title: 'Polygon', text: 'Click to add a point. Click the first point to close it.' }
+  select: { icon: 'select', title: 'Select', key: '1', text: 'Drag a handle to resize. Shift keeps the proportions.' },
+  pick: { icon: 'select', title: 'Select', key: '1', text: 'Click to select, drag to move.' },
+  shape: { icon: 'shape', title: 'Shape', key: '4', text: 'Click to add a point. Click the first point to close it.' }
 };
-const DONE = { kind: 'done', icon: 'check', title: 'Copied 2 entities', text: 'Crate 1 and Crate 2. Ctrl+V pastes them.' };
-const WARN = { kind: 'warn', icon: 'warning', title: 'Rectangle 1 can\'t collide', text: 'It needs a SurfaceComponent.' };
 const MOMENTS = {
   shape: () => editor({ sel: 'Rectangle 1', hover: 'Crate 2', size: '160 × 80', scene: { selected: 'rect1' } }),
-  whole: () => editor({ whole: true, msg: DONE, x: '−3120', y: '−2410', scene: { bounds: true } }),
+  whole: () => editor({ whole: true, msg: TIP.pick, x: '−3120', y: '−2410', scene: { bounds: true } }),
   draw: () => editor({ tool: 'shape', noInspector: true, scene: { drawing: true }, msg: TIP.shape, x: '−640', y: '−40' }),
-  menu: () => editor({ sel: 'Rectangle 1', size: '160 × 80', msg: WARN, scene: { selected: 'rect1' }, top: { menuOpen: true } }),
-  dialog: () => editor({ extra: `<div class="scrim"></div><div class="dialog">${dialogBody()}</div>`, x: '412', y: '−96' }),
+  menu: () => editor({ sel: 'Rectangle 1', size: '160 × 80', scene: { selected: 'rect1' }, top: { menuOpen: true } }),
+  dialog: () => editor({ extra: `<div class="scrim"></div><div class="dialog">${dialogBody()}</div>`, msg: TIP.pick, x: '412', y: '−96' }),
   play: () => `<div class="game"><div style="position:absolute;left:0;top:45px">${scene(1440, 810, 0.75, 720, 405, { play: true })}</div></div>${playbar(false)}`,
   parts: () => partsSheet()
 };
