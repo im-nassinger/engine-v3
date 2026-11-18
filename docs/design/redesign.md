@@ -33,7 +33,7 @@ From the mockup's `SLATE` set: app `#0d0f13`, panels `rgba(24,27,33,.96)`, raise
 
 ## The mockup page
 
-[mockups/redesign.html](mockups/redesign.html): pick a variation, then a moment (a selected shape, drawing, the main menu, a dialog, test play, or all the parts side by side), and a font. The Mix row changes one part at a time; the line under the caption sums up the choices so the owner can paste it back. Its choices are kept in `localStorage`. To check it renders, take screenshots with Playwright (already a dev dependency) from a script in the project folder, since Node resolves `playwright` from there.
+[mockups/redesign.html](mockups/redesign.html): pick a variation, then a moment (a selected shape, drawing, the main menu, a dialog, test play, or all the parts side by side), and a font. The line under the caption names the variation and font so the owner can paste it back. Its choices are kept in `localStorage`. To check it renders, take screenshots with Playwright (already a dev dependency) from a script in the project folder, since Node resolves `playwright` from there.
 
 ## Handoff (end of the 2026-11-17 session)
 

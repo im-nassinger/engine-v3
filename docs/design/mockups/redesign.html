@@ -19,9 +19,6 @@
   .pick { font: inherit; color: var(--page-text); background: var(--page-2); border: 0; border-radius: 999px; padding: 5px 12px; cursor: pointer; }
   .pick:hover { background: var(--page-3); }
   .pick.on { background: var(--page-on); color: #111; }
-  .ov { display: inline-flex; align-items: center; gap: 4px; color: var(--page-muted); font-size: 12px; margin-right: 6px; }
-  .ov select { font: inherit; color: var(--page-text); background: var(--page-2); border: 0; border-radius: 6px; padding: 3px 4px; }
-  .ov select.changed { background: #3b331d; color: #ffd98a; }
   .caption { color: var(--page-muted); max-width: 1180px; }
   .picks { font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: #a9aeb8; user-select: all; }
   .stage { flex: 1; position: relative; overflow: hidden; }
@@ -303,7 +300,6 @@
 <div class="hdr">
   <div class="hrow"><span class="lbl">Variation</span><span id="dirs" class="hrow"></span></div>
   <div class="hrow"><span class="lbl">Show</span><span id="views" class="hrow"></span><span class="lbl" style="width:auto;margin-left:14px">Font</span><span id="fonts" class="hrow"></span></div>
-  <div class="hrow"><span class="lbl">Mix</span><span id="overs" style="flex:1"></span></div>
   <div class="caption" id="caption"></div>
   <div class="picks" id="picks" title="Copy this line and send it to Claude"></div>
 </div>
@@ -390,7 +386,7 @@ const FONTS = [
 ];
 const VIEWS = [['shape', 'A selected shape'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
 
-let state = { dir: '1', view: 'shape', font: 'mono', over: {} };
+let state = { dir: '1', view: 'shape', font: 'mono' };
 try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-13') || '{}')); } catch (e) {}
 let S, T;
 
@@ -567,7 +563,7 @@ function inspector(o) {
     </div></div>`;
 }
 
-// The top left: the main menu, the level's name and Save and Play, as the Mix row places them.
+// The top left: the main menu, the level's name and Save and Play, as the variation places them.
 const DIRTY = '<span class="dirty" title="Not saved"></span>';
 function nameHtml() {
   if (S.title === 'thumb') return `<span class="lc-thumb">${levelThumb(30)}</span><span class="lc-val m">Car test</span>${DIRTY}`;
@@ -706,14 +702,8 @@ function partsSheet() {
 
 // The page around the mockups
 function picksText(d) {
-  const changed = Object.entries(state.over).filter(([k, v]) => v && v !== d.s[k]);
   const font = FONTS.find((f) => f[0] === state.font);
-  let s = `Variation ${d.id} ${d.name}`;
-  for (const [k, v] of changed) {
-    const kind = KINDS.find((x) => x[0] === k), i = kind[3].findIndex((x) => x[0] === v);
-    s += `, ${kind[1].toLowerCase()} ${i + 1} ${kind[3][i][1]}`;
-  }
-  return s + `, font ${font[1]}`;
+  return `Variation ${d.id} ${d.name}, font ${font[1]}`;
 }
 function buttons(id, items, current, onPick) {
   const el = document.getElementById(id);
@@ -730,17 +720,10 @@ function render() {
   const d = DIRS.find((x) => x.id === state.dir) || DIRS[0];
   T = d.t;
   S = Object.assign({}, d.s);
-  for (const [k, v] of Object.entries(state.over)) if (v) S[k] = v;
-  buttons('dirs', DIRS.map((x) => [x.id, `${x.id} ${x.name}`]), d.id, (v) => { state.dir = v; state.over = {}; render(); });
+  buttons('dirs', DIRS.map((x) => [x.id, `${x.id} ${x.name}`]), d.id, (v) => { state.dir = v; render(); });
   buttons('views', VIEWS, state.view, (v) => { state.view = v; render(); });
   buttons('fonts', FONTS.map((f) => [f[0], f[1]]), state.font, (v) => { state.font = v; render(); });
-  const overs = document.getElementById('overs');
-  overs.innerHTML = KINDS.map(([key, title, , variants]) => `<label class="ov">${title}<select data-k="${key}" class="${state.over[key] && state.over[key] !== d.s[key] ? 'changed' : ''}">` +
-    variants.map(([v, label], i) => `<option value="${v}"${S[key] === v ? ' selected' : ''}>${i + 1} ${label}${d.s[key] === v ? ' ·' : ''}</option>`).join('') + `</select></label>`).join('') +
-    `<button class="pick" id="reset">Reset to the variation</button>`;
-  for (const sel of overs.querySelectorAll('select')) sel.onchange = () => { state.over[sel.dataset.k] = sel.value; render(); };
-  document.getElementById('reset').onclick = () => { state.over = {}; render(); };
-  document.getElementById('caption').textContent = `${d.desc} "·" in a list marks the variation's own pick.`;
+  document.getElementById('caption').textContent = d.desc;
   document.getElementById('picks').textContent = picksText(d);
   const parts = state.view === 'parts';
   const cls = ['ed', 'float', parts ? 'tall' : ''].join(' ');
@@ -759,8 +742,8 @@ function fit() {
 document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'SELECT') return;
   const i = DIRS.findIndex((x) => x.id === state.dir);
-  if (e.key === 'ArrowRight') { state.dir = DIRS[Math.min(i + 1, DIRS.length - 1)].id; state.over = {}; render(); }
-  if (e.key === 'ArrowLeft') { state.dir = DIRS[Math.max(i - 1, 0)].id; state.over = {}; render(); }
+  if (e.key === 'ArrowRight') { state.dir = DIRS[Math.min(i + 1, DIRS.length - 1)].id; render(); }
+  if (e.key === 'ArrowLeft') { state.dir = DIRS[Math.max(i - 1, 0)].id; render(); }
 });
 window.addEventListener('resize', fit);
 render();
