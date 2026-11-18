@@ -48,11 +48,16 @@ Confirmed in `setup-node@v7`'s bundled code: it reads this variable, and its def
   run: |
       for limit in 180 180 1800; do
           timeout -k 15 "$limit" npx playwright install --with-deps chromium firefox webkit && exit 0
-          echo "Browser install did not finish within $limit s"
+          echo "Browser install failed or passed its limit of $limit s"
+          # timeout can't reach apt-get under sudo, and it would keep the dpkg lock.
+          sudo pkill -x apt-get || true
+          timeout 120 bash -c 'while pgrep -x "apt-get|dpkg" > /dev/null; do sleep 1; done' || sudo pkill -KILL -x apt-get || true
           sudo dpkg --configure -a || true
       done
       exit 1
 ```
+
+**Why the retry stops `apt-get` first.** Run 44417924360 (`6edc534`, 2026-11-18) went red in 3 of its 4 install jobs: the first try passed its 180 s, `timeout` ended `npx`, but `apt-get`, started under `sudo`, kept running and held the dpkg lock. Both later tries, the 1,800 s one too, failed within seconds on that lock, so the whole step gave up after about 3 minutes.
 
 Two risks to watch:
 

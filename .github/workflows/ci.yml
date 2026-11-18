@@ -40,7 +40,10 @@ jobs:
               run: |
                   for limit in 180 180 1800; do
                       timeout -k 15 "$limit" npx playwright install --with-deps chromium firefox webkit && exit 0
-                      echo "Browser install did not finish within $limit s"
+                      echo "Browser install failed or passed its limit of $limit s"
+                      # timeout can't reach apt-get under sudo, and it would keep the dpkg lock.
+                      sudo pkill -x apt-get || true
+                      timeout 120 bash -c 'while pgrep -x "apt-get|dpkg" > /dev/null; do sleep 1; done' || sudo pkill -KILL -x apt-get || true
                       sudo dpkg --configure -a || true
                   done
                   exit 1
@@ -68,7 +71,10 @@ jobs:
               run: |
                   for limit in 180 180 1800; do
                       timeout -k 15 "$limit" npx playwright install --with-deps chromium firefox webkit && exit 0
-                      echo "Browser install did not finish within $limit s"
+                      echo "Browser install failed or passed its limit of $limit s"
+                      # timeout can't reach apt-get under sudo, and it would keep the dpkg lock.
+                      sudo pkill -x apt-get || true
+                      timeout 120 bash -c 'while pgrep -x "apt-get|dpkg" > /dev/null; do sleep 1; done' || sudo pkill -KILL -x apt-get || true
                       sudo dpkg --configure -a || true
                   done
                   exit 1
@@ -124,7 +130,10 @@ jobs:
               run: |
                   for limit in 180 180 1800; do
                       timeout -k 15 "$limit" npx playwright install --with-deps chromium && exit 0
-                      echo "Browser install did not finish within $limit s"
+                      echo "Browser install failed or passed its limit of $limit s"
+                      # timeout can't reach apt-get under sudo, and it would keep the dpkg lock.
+                      sudo pkill -x apt-get || true
+                      timeout 120 bash -c 'while pgrep -x "apt-get|dpkg" > /dev/null; do sleep 1; done' || sudo pkill -KILL -x apt-get || true
                       sudo dpkg --configure -a || true
                   done
                   exit 1
