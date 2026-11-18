@@ -26,7 +26,7 @@ From the mockup's `SLATE` set: app `#0d0f13`, panels `rgba(24,27,33,.96)`, raise
 
 ## Open for the owner
 
-- **How the name shows as a value:** 1, in a field like the Inspector's name field, in regular weight (Claude's pick: the same component as an entity's name); 2, the field with a level icon in front; 3, the field with a faint pencil at its end; 4, a small "Level" caption above it; 5, a level icon and the name with no field, like a file's tab.
+- **How the name shows**, now as patterns people know from other apps, since the owner rejected the field looks (a field like the Inspector's, with an icon, with a pencil, under a "Level" caption) as unlike anything seen before; the tab was "the least ridiculous". 1, a tab like a code editor's: file icon, name, white dot; 2, the name with a menu arrow, like a design tool's file name; 3, "Car test — Edited" like a Mac document, with no dot; 4, the name over a grey "Edited" line, like a design tool's file panel; 5, a larger plain title like an online text editor's, which becomes a field when clicked.
 - **What Save does.** A level autosaves, and Ctrl+S exports the `.editable` file today ([saving.md](../requirements/play-and-save/saving.md)). Claude's suggestion: Save saves now, without waiting for autosave, and the white dot goes away; exporting stays in the File menu. This is a requirement change, so it waits for the owner.
 - **The status text:** today it is one dark chip above the dock with the tool hint, the mouse position, the selection and the warning count. Not yet confirmed.
 - **The font:** JetBrains Mono (round 8's decision) is still the default; the page offers Inter, Geist and Inter with mono numbers.
