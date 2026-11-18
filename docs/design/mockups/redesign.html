@@ -153,7 +153,6 @@
   .toprow .menubar .menu { top: 35px; }
   .toprow .actisl.edit .ib { width: 28px; height: 28px; }
   .toprow .act { height: 28px; padding: 0 12px; }
-  .mapfoot .snap { margin-left: 6px; border-radius: 999px; width: 28px; height: 28px; }
   .actisl.edit .ib { border-radius: 999px; width: 30px; height: 30px; }
   .actisl .act.save { color: var(--save-ink); }
   .actisl .act.play { color: var(--ink); }
@@ -390,7 +389,7 @@ const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,2
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s, view) => ({ id, name, desc, view, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'Menu bar and tool column', '☰ is gone: a menu bar as wide as its words ( File Edit Arrange View Help ) sits at the top left, followed in the same row by ( ↶ ↷ ) ( Save Play ). Under it the tools run down a column with the Entity inspector beside it. Grid snapping is by the zoom; the hint chip sits alone at the bottom.', {})
+  dir('1', 'Menu bar and tool column', '☰ is gone: a menu bar as wide as its words ( File Edit Arrange View Help ) sits at the top left, followed in the same row by ( ↶ ↷ ) ( Save Play ). Under it the tools run down a column with the Entity inspector beside it. The zoom sits under the minimap, and Grid snapping is in the View menu; the hint chip sits alone at the bottom.', {})
 ];
 
 const FONTS = [
@@ -592,7 +591,7 @@ function inspector(o) {
 }
 
 // The controls above the panels, grouped by what they act on: ☰ the app and the file, Undo and Redo the history,
-// Save and Play the level. Grid snapping changes how the level view places things, so it sits with the zoom.
+// Save and Play the level. Grid snapping is in the View menu, beside Grid.
 const isl = (inner, cls = '') => `<div class="blk actisl edit ${cls}">${inner}</div>`;
 const actBtn = (k, w, iconOnly) => `<span class="act ${k}${iconOnly ? ' icon' : ''}" title="${w}">${ic(k)}${iconOnly ? '' : w}</span>`;
 const HIST = () => `<span class="ib" title="Undo">${ic('undo')}</span><span class="ib dim" title="Redo">${ic('redo')}</span>`;
@@ -634,8 +633,7 @@ function minimap(r = W - M, b = H - M) {
   const map = scene(w, h, z, -ax * z, -ay * z, { grid: false, noLines: true }).replace('</svg>', frame + '</svg>');
   const zoom = `<span class="zoomg"><span class="ib">${ic('minus')}</span><span class="num">${zoomText()}</span><span class="ib">${ic('plus')}</span></span>`;
   const zoomUp = `<span class="zoomg"><span class="ib">${ic('plus')}</span><span class="num">${zoomText()}</span><span class="ib">${ic('minus')}</span></span>`;
-  const snap = `<span class="ib on snap" title="Grid snapping">${ic('magnet')}</span>`;
-  const inside = S.zoom === 'footer' ? `<div class="mapfoot">${zoom}${snap}</div>` : S.zoom === 'over' ? `<div class="zoomover">${zoom}</div>` : '';
+  const inside = S.zoom === 'footer' ? `<div class="mapfoot">${zoom}</div>` : S.zoom === 'over' ? `<div class="zoomover">${zoom}</div>` : '';
   const head = '';
   let out = `<div class="blk minimap" style="${pos(g.map)}">${head}${map}${inside}</div>`;
   if (S.zoom === 'above') out += `<div class="blk zoomisl" style="left:${g.zoom[0]}px;top:${g.zoom[1]}px;transform:translateX(-50%)">${zoom}</div>`;
