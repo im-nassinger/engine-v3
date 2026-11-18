@@ -1,5 +1,8 @@
-// v1's stages 0 to 17, then stage 18, the changes in docs/before-v2.md, and stage 19, the redesign.
-const STAGE_COUNT = 20;
+// The task the runner is building now, and the stages of the plan it covers. Its % runs from 0 to 100 over these
+// stages alone: v1 (stages 0 to 17) and the before-v2 changes (stage 18) are done, and the redesign is a new task
+// (owner, 2026-11-18). The runner stops after the last stage, before v2.
+export const TASK = { name: 'Redesign', firstStage: 19, lastStage: 19 } as const;
+const STAGE_COUNT = TASK.lastStage - TASK.firstStage + 1;
 
 export type SessionStatus = 'done' | 'blocked' | 'finished';
 
@@ -77,7 +80,7 @@ export function parseRunnerLine(progressText: string) {
     return runnerLine;
 }
 
-// Every stage counts the same, and the current stage counts by its finished steps.
+// Every stage of the task counts the same, and the current stage counts by its finished steps.
 export function percentComplete(runnerLine: RunnerLine, status: SessionStatus) {
     if (status === 'finished') return 100;
 
@@ -86,7 +89,7 @@ export function percentComplete(runnerLine: RunnerLine, status: SessionStatus) {
         stageFraction = runnerLine.step / runnerLine.stepCount;
     }
 
-    const stagesDone = runnerLine.stage + stageFraction;
+    const stagesDone = Math.max(0, runnerLine.stage - TASK.firstStage + stageFraction);
     const percent = (stagesDone / STAGE_COUNT) * 100;
 
     return Math.min(99, Math.floor(percent));

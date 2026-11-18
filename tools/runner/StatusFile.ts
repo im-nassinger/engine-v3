@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { TASK } from './StatusReport.ts';
 
 const EVENTS_KEPT = 30;
 
@@ -72,13 +73,13 @@ export class StatusFile {
             '',
             '## TL;DR',
             '',
-            `Written by the runner itself every time something changes, and not in git. **Now:** ${this.state} **v1:** ${this.saved.progress}`,
+            `Written by the runner itself every time something changes, and not in git. **Now:** ${this.state} **${TASK.name}:** ${this.saved.progress}`,
             '',
             '## Now',
             '',
             this.state,
             '',
-            '## v1',
+            `## ${TASK.name}`,
             '',
             this.saved.progress,
             '',

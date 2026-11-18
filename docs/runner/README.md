@@ -2,13 +2,13 @@
 
 ## TL;DR
 
-**The runner builds v1 without the owner**: one fresh Claude session per step of [plan.md](../plan.md), each with one prompt, then a Discord message with what the step did and v1's %. It waits out the usage limit, sends what needs `sudo` to Discord, and stops when v1, the [before-v2](../before-v2.md) changes (stage 18) and the [redesign](../steps/stage-19.md) (stage 19) are done, before v2. **This folder is the handoff for a session that looks after the runner**, not the game: it holds everything such a session needs, so it reads nothing else to catch up.
+**The runner builds v1 without the owner**: one fresh Claude session per step of [plan.md](../plan.md), each with one prompt, then a Discord message with what the step did and the current task's % (now the redesign, from 0 to 100). It waits out the usage limit, sends what needs `sudo` to Discord, and stops when v1, the [before-v2](../before-v2.md) changes (stage 18) and the [redesign](../steps/stage-19.md) (stage 19) are done, before v2. **This folder is the handoff for a session that looks after the runner**, not the game: it holds everything such a session needs, so it reads nothing else to catch up.
 
 ## What the runner is responsible for
 
 - Keep v1 being built, step after step, with no one typing "continue".
 - Give each step a new session with one prompt, never reusing a session.
-- Tell the owner on Discord, briefly: what each step did and v1's %, the usage limit at 90% and when it's reached, anything that needs `sudo`, and when it's paused or done.
+- Tell the owner on Discord, briefly: what each step did and the current task's %, the usage limit at 90% and when it's reached, anything that needs `sudo`, and when it's paused or done.
 - Never decide what the game does. The sessions it starts follow the project's CLAUDE.md and `docs/` like any session.
 
 ## Starting a session that looks after the runner

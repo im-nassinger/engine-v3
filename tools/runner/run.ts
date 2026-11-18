@@ -12,7 +12,7 @@ import { DiscordNotifier } from './DiscordNotifier.ts';
 import { PidFile } from './PidFile.ts';
 import { RateLimitTracker } from './RateLimitTracker.ts';
 import { StatusFile } from './StatusFile.ts';
-import { hasNeeds, parseRunnerLine, parseStatusReport, percentComplete } from './StatusReport.ts';
+import { hasNeeds, parseRunnerLine, parseStatusReport, percentComplete, TASK } from './StatusReport.ts';
 import type { RunnerLine, StatusReport } from './StatusReport.ts';
 
 const MINUTE_MS = 60 * 1000;
@@ -163,8 +163,8 @@ function readStageName(stage: number) {
     return match?.[1] ?? '';
 }
 
-// Stage 19, the redesign (docs/steps/stage-19.md), is the last; the runner stops before v2.
-const LAST_STAGE = 19;
+// The task's last stage; the runner stops after it, before v2.
+const LAST_STAGE = TASK.lastStage;
 
 function isLastStageDone() {
     const runnerLine = parseRunnerLine(fs.readFileSync(progressFile, 'utf8'));
@@ -192,14 +192,16 @@ async function reportStep(report: StatusReport, newCommits: string) {
 
     const runnerLine = parseRunnerLine(fs.readFileSync(progressFile, 'utf8'));
     if (runnerLine === undefined) {
-        await announce(`✅ **v1:** ${statusFile.readProgress()} (no **Runner:** line in docs/progress.md)\n${summary}`);
+        await announce(
+            `✅ **${TASK.name}:** ${statusFile.readProgress()} (no **Runner:** line in docs/progress.md)\n${summary}`,
+        );
         return;
     }
 
     const percent = percentComplete(runnerLine, report.status);
     const stageText = readStageText(runnerLine);
     statusFile.setProgress(`**${percent}%** · ${stageText}.`);
-    await announce(`✅ **v1: ${percent}%** · ${stageText}\n${summary}`);
+    await announce(`✅ **${TASK.name}: ${percent}%** · ${stageText}\n${summary}`);
 }
 
 // The runner pushes, not the session, so a session only has to commit.
@@ -325,6 +327,17 @@ async function runOneStep(ciFailure: CiFailure | undefined) {
     return { kind: 'reported', report, newCommits } as const;
 }
 
+// The task's progress from the **Runner:** line, so a new task starts at its own 0% rather than the last task's 100%.
+function readStartingProgress() {
+    const runnerLine = parseRunnerLine(fs.readFileSync(progressFile, 'utf8'));
+    if (runnerLine === undefined) return statusFile.readProgress();
+
+    const progress = `**${percentComplete(runnerLine, 'done')}%** · ${readStageText(runnerLine)}.`;
+    statusFile.setProgress(progress);
+
+    return progress;
+}
+
 async function main() {
     fs.mkdirSync(logFolder, { recursive: true });
 
@@ -332,8 +345,8 @@ async function main() {
     let failuresInARow = 0;
     let ciFixAttempts = 0;
 
-    const progress = statusFile.readProgress();
-    await announce(`🟢 **Runner started.** v1: ${progress}`);
+    const progress = readStartingProgress();
+    await announce(`🟢 **Runner started.** ${TASK.name}: ${progress}`);
 
     while (true) {
         if (readRunnerCode() !== startingCode) {

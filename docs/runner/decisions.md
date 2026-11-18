@@ -23,4 +23,5 @@ What the owner decided about the runner, newest last. The changes the runner mad
 | 2026-11-15 | Only one runner, and one of its sessions, may run at a time | The owner's rule: two sessions must never work on the same thing at once |
 | 2026-11-16 | After stage 17 the runner builds the changes in `before-v2.md` as stage 18, then stops; nothing of v2 is built | The owner still has things to decide before v2 starts |
 | 2026-11-18 | After stage 18 the runner builds stage 19, the redesign, then stops; nothing of v2 is built | The owner's request: the redesign is built before v2, and v2 waits for the owner |
+| 2026-11-18 | The runner's % counts only the task it is building now, the redesign, from 0 to 100, and its messages name it | v1 is complete, and the owner sees the redesign as a new task |
 | 2026-11-16 | Keep CI, and the runner acts on it: it waits for CI after each push, the next session fixes a failure before a new step, and three failed fixes pause it | CI had failed on every push since stage 9's speed tests, and no session knew; removing CI would hide breakage that `npm run check` doesn't catch |
