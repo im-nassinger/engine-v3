@@ -17,6 +17,7 @@
 
     &[aria-pressed='true'] {
         background: var(--accent-soft);
+        color: var(--accent-text);
     }
 
     &[aria-disabled='true'] {

@@ -43,6 +43,8 @@
             justify-content: space-between;
             min-width: 0;
             height: var(--input);
+            padding: 0 var(--space-10);
+            border-radius: calc(var(--input) / 2);
             background: var(--field);
 
             &:disabled {

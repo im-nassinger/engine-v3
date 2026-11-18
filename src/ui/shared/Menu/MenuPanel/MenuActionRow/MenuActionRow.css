@@ -29,12 +29,7 @@
     &:hover,
     &:focus-visible {
         outline: none;
-        background: var(--accent);
-        color: var(--on-accent);
-
-        > .shortcut {
-            color: var(--on-accent);
-        }
+        background: var(--accent-soft);
     }
 
     &[aria-disabled='true'] {

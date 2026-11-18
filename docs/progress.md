@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 19, step 3 of 17: the theme. `ui/theme.css` holds the redesign's Slate tokens, corners 8, 12, 14 and 7 px, the one `--shade`, JetBrains Mono at 10, 12, 14 and 16 px and no line or border token; every use of a removed token is mapped to the nearest new one until its part's own step (see [decisions.md](decisions.md)); a browser test reads every token and a guard test keeps `theme.css`, tokens.md and the code's `var()`s in step, with 2,009 tests in Node, 1,002 browser tests and 274 Playwright tests passing. Next: step 4, the shared controls. See [steps/stage-19.md](steps/stage-19.md). The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 19, step 4 of 17: the shared controls. `Button` is raised with rounded corners and no edge, `IconButton` on is the soft accent with its icon in the accent text, `Menu` is solid `--panel` with 12 px corners, 6 px inside and the shade, its hovered entry the soft accent, its submenu opening to the right with its first entry level with the row; `MenuButton` and `MenuSearch` are pills, the tooltip and the dialog box (a 14 px-cornered island over the scrim) follow [controls.md](design/controls.md); each state has a browser test that shows the control and compares its computed look with the tokens (`ui/shared/testing/controlLooks.ts`), with 2,009 tests in Node, 1,068 browser tests and 274 Playwright tests passing (one browser test failed once in a full run and passed in three reruns; it was not identified). Next: step 5, the fields. See [steps/stage-19.md](steps/stage-19.md). The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|

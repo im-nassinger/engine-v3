@@ -80,13 +80,15 @@ function Submenu({ open, menuAlign, onChoose }: SubmenuProps) {
     );
 }
 
-// The menu panel's left and right edges, and the row's top.
+// The menu panel's left and right edges, and the row's top less the panel's inside space, so the
+// submenu's first entry is level with the row.
 function besideRow(row: HTMLElement): PopupRect | undefined {
     const panel = row.closest('.menu-panel');
     if (!panel) return undefined;
 
     const panelBox = panel.getBoundingClientRect();
     const rowBox = row.getBoundingClientRect();
+    const insideSpace = parseFloat(getComputedStyle(panel).paddingTop);
 
-    return { left: panelBox.left, right: panelBox.right, top: rowBox.top, bottom: rowBox.bottom };
+    return { left: panelBox.left, right: panelBox.right, top: rowBox.top - insideSpace, bottom: rowBox.bottom };
 }

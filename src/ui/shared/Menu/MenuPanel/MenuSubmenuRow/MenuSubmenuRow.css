@@ -22,7 +22,6 @@
 
     &:hover,
     &[aria-expanded='true'] {
-        background: var(--accent);
-        color: var(--on-accent);
+        background: var(--accent-soft);
     }
 }
