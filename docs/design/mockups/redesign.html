@@ -136,6 +136,11 @@
   .act.play.icon svg.i { width: 14px; height: 14px; }
   .lc-top .menu.down { top: 54px; }
   .lc-top .menu.up { bottom: 54px; }
+  .actisl .lc-gap { width: 10px; }
+  .grp { display: inline-flex; align-items: center; gap: 2px; height: 32px; padding: 0 2px; border-radius: 999px; background: var(--field); }
+  .grp .ib { border-radius: 999px; width: 28px; height: 28px; }
+  .actisl.tint .act + .act { margin-left: 6px; }
+  .mapfoot .snap { margin-left: 6px; border-radius: 999px; width: 28px; height: 28px; }
   .actisl.edit .ib { border-radius: 999px; width: 30px; height: 30px; }
   .actisl .act.save { color: var(--save-ink); }
   .actisl .act.play { color: var(--ink); }
@@ -303,7 +308,6 @@
 <div class="hdr">
   <div class="hrow"><span class="lbl">Variation</span><span id="dirs" class="hrow"></span></div>
   <div class="hrow"><span class="lbl">Show</span><span id="views" class="hrow"></span><span class="lbl" style="width:auto;margin-left:14px">Font</span><span id="fonts" class="hrow"></span></div>
-  <div class="hrow"><span class="lbl">Save, Play</span><span id="btns" class="hrow"></span></div>
   <div class="caption" id="caption"></div>
   <div class="picks" id="picks" title="Copy this line and send it to Claude"></div>
 </div>
@@ -373,11 +377,11 @@ const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,2
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s, view) => ({ id, name, desc, view, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'Top left', 'The owner\'s pick: ( ☰ ) ( Undo Redo snapping ) ( Save ) ( Play ) at the top left, the Entity inspector under it. The dock holds only the three tools.', { place: 'left' }),
-  dir('2', 'On the level view, left', 'The same row at the top left of the level view, beside the Entity inspector, which starts at the top like the Entities viewer.', { place: 'view' }),
-  dir('3', 'Top middle', 'The row centred at the top of the level view; both panels start at the top.', { place: 'middle' }),
-  dir('4', 'On the level view, right', 'The row at the top right of the level view, beside the Entities viewer; both panels start at the top.', { place: 'right' }),
-  dir('5', 'With the dock', 'The row joins the dock at the bottom middle: ( ☰ ) ( Undo Redo snapping ) ( Save ) ( Play ) ( tools ). The main menu opens upward; both panels start at the top.', { place: 'dock' })
+  dir('1', 'Two ends', 'Two islands, one per job, at the level view\'s top corners: ( ☰  ↶ ↷ ) on the left for working on the level, ( Save  Play ) on the right for what you do with it, as Figma puts Share and Play at the right. Grid snapping joins the zoom under the minimap, since both change the level view, not the level. Both panels start at the top.', { top: 'ends' }),
+  dir('2', 'Two islands, together', 'The same two islands side by side at the top middle: ( ☰  ↶ ↷ ) ( Save  Play ). Snapping is by the zoom.', { top: 'pair' }),
+  dir('3', 'Changes, then Play', 'Save is about the level\'s changes, like Undo and Redo, so it joins them as an icon: ( ☰  ↶ ↷ 💾 ) on the left. Play, the one thing that leaves editing, stands alone with its word at the right. Snapping is by the zoom.', { top: 'changes' }),
+  dir('4', 'One island, grouped inside', 'One island at the top middle, its jobs told apart without lines: ☰, then Undo and Redo on a tinted pill, then Save and Play as tinted green and blue buttons. Snapping is by the zoom.', { top: 'one' }),
+  dir('5', 'Play by the tools', 'Play is a mode, like the tools, so it sits beside the dock at the bottom: ( tools ) ( Play ). The top left of the level view keeps ( ☰  ↶ ↷ 💾 ). Snapping is by the zoom.', { top: 'dockplay' })
 ];
 
 const FONTS = [
@@ -388,8 +392,8 @@ const FONTS = [
 ];
 const VIEWS = [['shape', 'A selected shape'], ['whole', 'The whole level'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
 
-let state = { dir: '1', view: 'shape', font: 'mono', btns: 'words' };
-try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-15') || '{}')); } catch (e) {}
+let state = { dir: '1', view: 'shape', font: 'mono' };
+try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-16') || '{}')); } catch (e) {}
 let S, T;
 
 function tokensCss(t) {
@@ -577,50 +581,35 @@ function inspector(o) {
     </div></div>`;
 }
 
-// The top left: the main menu, the level's name and Save and Play, as the variation places them.
-const DIRTY = '<span class="dirty" title="Not saved"></span>';
-function nameHtml() {
-  return `<span class="lc-val">Car test</span>${DIRTY}`;
+// The controls above the panels, grouped by what they act on: ☰ the app and the file, Undo and Redo the history,
+// Save and Play the level. Grid snapping changes how the level view places things, so it sits with the zoom.
+const isl = (inner, cls = '') => `<div class="blk actisl edit ${cls}">${inner}</div>`;
+const actBtn = (k, w, iconOnly) => `<span class="act ${k}${iconOnly ? ' icon' : ''}" title="${w}">${ic(k)}${iconOnly ? '' : w}</span>`;
+const HIST = () => `<span class="ib" title="Undo">${ic('undo')}</span><span class="ib dim" title="Redo">${ic('redo')}</span>`;
+const GAP = '<span class="lc-gap"></span>';
+// One group of islands, placed at [x, y]; anchor is 'left', 'centre' or 'right'. The main menu opens from the group holding ☰.
+function group(o, x, y, anchor, inner, hasMenu, up) {
+  const where = anchor === 'right' ? `right:${W - x}px;` : `left:${x}px;` + (anchor === 'centre' ? 'transform:translateX(-50%);' : '');
+  return `<div class="lc-top abs" style="${where}top:${y}px">${inner}${hasMenu && o.menuOpen ? mainMenu(up) : ''}</div>`;
 }
-function nameChip(cls = '', style = '') {
-  return `<div class="blk namechip ${cls}" style="${style}"><span>Car test</span>${DIRTY}</div>`;
-}
-function levelCard(o) {
-  const centred = S.name === 'centre', menu = C.menu(o);
-  const where = S.burger === 'own' ? 'own' : S.burger === 'actions' || centred ? 'actions' : 'name';
-  const buttons = `<span class="act save">${ic('save')}Save</span><span class="act play">${ic('play')}Play</span>`;
-  const inPill = S.actions === 'inpill' && !centred;
-  if (S.title !== 'menu') return topLeft(menu);
-  let out = where === 'own' ? `<div class="blk lcbtn">${menu}</div>` : '';
-  if (!centred) {
-    const cls = ['blk', 'lcard', 'pill', 'namebox', where === 'name' ? 'withmenu' : 'plain'].join(' ');
-    out += `<div class="${cls}">${where === 'name' ? menu : ''}${nameHtml()}${inPill ? `<span class="lc-gap"></span>${buttons}` : ''}</div>`;
-  }
-  if (!inPill) {
-    const lead = where === 'actions' ? menu : '';
-    if (S.actions === 'apart') out += (lead ? `<div class="blk lcbtn">${lead}</div>` : '') + `<div class="blk actisl"><span class="act save">${ic('save')}Save</span></div><div class="blk actisl"><span class="act play">${ic('play')}Play</span></div>`;
-    else out += `<div class="blk lcact ${S.actions === 'tint' ? 'tint' : ''}">${lead}${buttons}</div>`;
-  }
-  return `<div class="lc-top">${out}</div>`;
-}
-// The top row: ( ☰ ) ( Undo Redo snapping ) ( Save ) ( Play ), where the variation places it.
-function topLeft(menu) {
-  const isl = (inner, cls = '') => `<div class="blk actisl ${cls}">${inner}</div>`;
-  const icons = state.btns === 'icons';
-  const act = (k, w) => `<span class="act ${k}${icons ? ' icon' : ''}" title="${w}">${ic(k)}${icons ? '' : w}</span>`;
-  const one = (k, w) => isl(act(k, w), icons ? 'icon' : '');
-  return `<div class="blk lcbtn">${menu}</div>` + isl(C.edit(), 'edit') + one('save', 'Save') + one('play', 'Play');
+function topIslands(o) {
+  const g = geo(), menu = C.menu(o), top = M;
+  const editing = isl(menu + GAP + HIST());
+  const level = isl(actBtn('save', 'Save') + actBtn('play', 'Play'));
+  if (S.top === 'ends') return group(o, g.rx0, top, 'left', editing, true) + group(o, g.rx1, top, 'right', level);
+  if (S.top === 'pair') return group(o, g.cx, top, 'centre', editing + level, true);
+  if (S.top === 'changes') return group(o, g.rx0, top, 'left', isl(menu + GAP + HIST() + actBtn('save', 'Save', true)), true) + group(o, g.rx1, top, 'right', isl(actBtn('play', 'Play')));
+  if (S.top === 'one') return group(o, g.cx, top, 'centre', isl(menu + GAP + `<span class="grp">${HIST()}</span>` + GAP + actBtn('save', 'Save') + actBtn('play', 'Play'), 'tint'), true);
+  return group(o, g.rx0, top, 'left', isl(menu + GAP + HIST() + actBtn('save', 'Save', true)), true);
 }
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
-function bottom(o, row) {
-  const g = geo();
-  const chip = `<span>${o.hint}</span><span class="cnums">${nums(o)}</span>`;
-  const dock = `<div class="${row ? 'blk' : 'abs'} isl dock" style="${row ? 'position:static;transform:none' : `left:${g.cx}px;top:${H - M - 46}px`}">${C.tools(o)}</div>`;
-  if (row) return `<div class="abs" style="left:${g.cx}px;top:${H - M - 46}px;transform:translateX(-50%);display:flex;gap:10px;align-items:center;z-index:3">${row}${dock}</div>` +
-    `<div class="hintchip" style="left:${g.cx}px;top:${H - M - 46 - GP - 30}px">${chip}</div>`;
-  return dock +
-    `<div class="hintchip" style="left:${g.cx}px;top:${H - M - 46 - GP - 30}px">${chip}</div>`;
+function bottom(o) {
+  const g = geo(), y = H - M - 46;
+  const chip = `<div class="hintchip" style="left:${g.cx}px;top:${y - GP - 30}px"><span>${o.hint}</span><span class="cnums">${nums(o)}</span></div>`;
+  const tools = `<div class="blk isl dock" style="position:static;transform:none">${C.tools(o)}</div>`;
+  const play = S.top === 'dockplay' ? isl(actBtn('play', 'Play')) : '';
+  return `<div class="abs" style="left:${g.cx}px;top:${y}px;transform:translateX(-50%);display:flex;gap:10px;align-items:center;z-index:3">${tools}${play}</div>` + chip;
 }
 function view(opts) {
   const g = geo();
@@ -641,7 +630,8 @@ function minimap(r = W - M, b = H - M) {
   const map = scene(w, h, z, -ax * z, -ay * z, { grid: false, noLines: true }).replace('</svg>', frame + '</svg>');
   const zoom = `<span class="zoomg"><span class="ib">${ic('minus')}</span><span class="num">${zoomText()}</span><span class="ib">${ic('plus')}</span></span>`;
   const zoomUp = `<span class="zoomg"><span class="ib">${ic('plus')}</span><span class="num">${zoomText()}</span><span class="ib">${ic('minus')}</span></span>`;
-  const inside = S.zoom === 'footer' ? `<div class="mapfoot">${zoom}</div>` : S.zoom === 'over' ? `<div class="zoomover">${zoom}</div>` : '';
+  const snap = `<span class="ib on snap" title="Grid snapping">${ic('magnet')}</span>`;
+  const inside = S.zoom === 'footer' ? `<div class="mapfoot">${zoom}${snap}</div>` : S.zoom === 'over' ? `<div class="zoomover">${zoom}</div>` : '';
   const head = '';
   let out = `<div class="blk minimap" style="${pos(g.map)}">${head}${map}${inside}</div>`;
   if (S.zoom === 'above') out += `<div class="blk zoomisl" style="left:${g.zoom[0]}px;top:${g.zoom[1]}px;transform:translateX(-50%)">${zoom}</div>`;
@@ -651,15 +641,8 @@ function minimap(r = W - M, b = H - M) {
 function editor(o) {
   setZoom(!!o.whole);
   o = Object.assign({ tool: 'select', hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Nothing selected' }, o, o.top);
-  const g = geo(), up = S.place === 'dock';
-  const row = (cls, style) => `<div class="lc-top ${cls}" style="${style}">${levelCard(o)}${o.menuOpen ? mainMenu(up) : ''}</div>`;
-  const placed = {
-    view: () => row('abs', `left:${g.rx0}px;top:${M}px`),
-    middle: () => row('abs', `left:${g.cx}px;top:${M}px;transform:translateX(-50%)`),
-    right: () => row('abs', `right:${W - g.rx1}px;top:${M}px`)
-  };
-  const top = S.place === 'left' ? row('', '') : S.place === 'dock' ? '' : placed[S.place]();
-  return view(o.scene || {}) + `<div class="leftcol" style="${pos(g.left)}">${S.place === 'left' ? top : ''}${o.noInspector ? shapeStrip() : inspector(o)}</div>` + (S.place === 'left' ? '' : top) + entities(o) + minimap() + bottom(o, up ? row('', '') : '') + (o.extra || '');
+  const g = geo();
+  return view(o.scene || {}) + `<div class="leftcol" style="${pos(g.left)}">${o.noInspector ? shapeStrip() : inspector(o)}</div>` + topIslands(o) + entities(o) + minimap() + bottom(o) + (o.extra || '');
 }
 
 function shapeStrip() {
@@ -716,9 +699,6 @@ const PARTS = {
   handle: () => `<div class="inl"><svg width="200" height="90" viewBox="0 0 200 90" style="border-radius:6px"><rect width="200" height="90" fill="${BG}"/><rect x="60" y="25" width="80" height="40" fill="#4a90d9" stroke="#1f3552"/><rect x="60" y="25" width="80" height="40" fill="none" style="stroke:var(--accent)" stroke-width="1.5"/>${handles(60, 25, 80, 40)}</svg></div>`,
   play: () => playbar(false, 'static') + playbar(true, 'static')
 };
-function topLeftPart() {
-  return `<div class="inl"><div style="background:${BG};border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:10px;width:100%">${levelCard({})}${S.name === 'centre' ? nameChip('static') : ''}</div></div>`;
-}
 function partsSheet() {
   return `<div class="sheet">` + KINDS.map(([key, title, desc, variants]) =>
     `<div class="kbox"><h4>${title}</h4>${desc ? `<div class="kd">${desc}</div>` : ''}` +
@@ -729,7 +709,7 @@ function partsSheet() {
 // The page around the mockups
 function picksText(d) {
   const font = FONTS.find((f) => f[0] === state.font);
-  return `Variation ${d.id} ${d.name}, Save and Play ${state.btns === 'icons' ? 'as icons only' : 'with words'}, font ${font[1]}`;
+  return `Variation ${d.id} ${d.name}, font ${font[1]}`;
 }
 function buttons(id, items, current, onPick) {
   const el = document.getElementById(id);
@@ -749,14 +729,13 @@ function render() {
   buttons('dirs', DIRS.map((x) => [x.id, `${x.id} ${x.name}`]), d.id, (v) => { state.dir = v; const nd = DIRS.find((x) => x.id === v); if (nd.view) state.view = nd.view; render(); });
   buttons('views', VIEWS, state.view, (v) => { state.view = v; render(); });
   buttons('fonts', FONTS.map((f) => [f[0], f[1]]), state.font, (v) => { state.font = v; render(); });
-  buttons('btns', [['words', 'Icon and word'], ['icons', 'Icon only']], state.btns, (v) => { state.btns = v; render(); });
   document.getElementById('caption').textContent = d.desc;
   document.getElementById('picks').textContent = picksText(d);
   const parts = state.view === 'parts';
   const cls = ['ed', 'float', parts ? 'tall' : ''].join(' ');
   document.getElementById('frame').innerHTML = `<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
   document.getElementById('stage').classList.toggle('scroll', parts);
-  try { localStorage.setItem('engine-v3-islands-15', JSON.stringify(state)); } catch (e) {}
+  try { localStorage.setItem('engine-v3-islands-16', JSON.stringify(state)); } catch (e) {}
   fit();
 }
 function fit() {
