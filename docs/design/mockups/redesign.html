@@ -374,7 +374,12 @@ const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,2
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s) => ({ id, name, desc, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'The redesign', 'The top left: the ☰ menu and the level\'s name in one island, the name in regular weight with a white dot while it isn\'t saved, then Save and Play as dark islands with green and blue words. The zoom sits under the minimap. Try the Mix row\'s Level\'s name for five other ways to show the name.', {})
+  dir('1', 'The redesign', 'The top left: the ☰ menu and the level\'s name in one island, the name in regular weight with a white dot while it isn\'t saved, then Save and Play as dark islands with green and blue words. The zoom sits under the minimap.', {}),
+  dir('2', 'Minimap caption', 'The level\'s name heads the minimap, over the picture of the level it names. The top left is ☰, Save and Play.', { title: 'map' }),
+  dir('3', 'Thumbnail and name', 'A small picture of the whole level before its name, as file browsers show a file.', { title: 'thumb' }),
+  dir('4', 'Document title', 'The name larger and bold beside ☰, as a document\'s title.', { title: 'title' }),
+  dir('5', 'Label on the level view', 'The name in a dark chip at the top left of the level view, as 3D editors label their viewport. The top left is ☰, Save and Play.', { title: 'view' }),
+  dir('6', 'In the status chip', 'The name first in the status text above the dock, as code editors show the open file in their status bar. The top left is ☰, Save and Play.', { title: 'status' })
 ];
 
 const FONTS = [
