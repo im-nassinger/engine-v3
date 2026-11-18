@@ -35,8 +35,8 @@ Never: `docs/`, `CLAUDE.md`, `.claude/`, `tools/runner/`, `tools/check-docs.js`,
 | 2. `check:code` in `package.json`; the jobs skip in a private repo | Done. The one test that reads `docs/` (`tests/guards/theme-tokens.test.ts`) skips the docs comparison when `docs/` is missing |
 | 3. `tools/runner/PublicCopy.ts`: build, guard, push | Done. A copy of 1,232 files passes the guard and `check:code` |
 | 4. `CiChecker` reads the public repo; `run.ts` publishes after pushing | Done |
-| 5. Create `im-nassinger/engine-v3-ci` (public) with `gh repo create` | To do |
-| 6. One publish by hand; the owner looks at the public repo before the runner resumes | To do |
-| 7. Update [how-it-works.md](how-it-works.md) and [progress.md](progress.md), mark this file built | To do |
+| 5. Create `im-nassinger/engine-v3-ci` (public) with `gh repo create` | Done |
+| 6. One publish by hand; the owner looks at the public repo before the runner resumes | Published `26360a3` as run 44374954683; waiting for the result and the owner's look |
+| 7. Update [how-it-works.md](how-it-works.md) and [progress.md](progress.md), mark this file built | how-it-works.md done |
 
 The runner is paused while this is built (`~/.local/state/engine-v3-runner/paused`). The owner resumes it after step 6.

@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: start a fresh `claude -p` session with the prompt in `tools/runner/prompt.md`, read its stream, push its commits, post one Discord message through the webhook, wait for CI on the push, start the next. When CI fails, the next session fixes it before doing a new step. Each session gets one prompt and is never used again. It reads the usage limit from the CLI's own output, waits out the reset, and stops when stage 19, the redesign ([steps](../steps/stage-19.md)), is done, before any of v2.
+A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: start a fresh `claude -p` session with the prompt in `tools/runner/prompt.md`, read its stream, push its commits, post one Discord message through the webhook, publish the code's public copy and wait for CI on it, start the next. When CI fails, the next session fixes it before doing a new step. Each session gets one prompt and is never used again. It reads the usage limit from the CLI's own output, waits out the reset, and stops when stage 19, the redesign ([steps](../steps/stage-19.md)), is done, before any of v2.
 
 ## What it sends to Discord
 
@@ -14,6 +14,7 @@ A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: s
 | 🛑 Usage limit reached, resuming at a time | When the limit is hit. A ▶️ follows when it resumes |
 | 🔑 Needs you | When a finished step reports something in `NEEDS`, such as a command that needs `sudo`. The work goes on without it |
 | ⚠️ Push failed | When `git push` fails after a step. The commits stay local and the next step tries again |
+| ⚠️ Public copy not pushed | When the public copy holds a private path or name, or pushing it fails. CI doesn't run for that commit, and the work goes on |
 | 🔴 CI failed | When CI fails on a push, with the failed steps and the run's link. The next session fixes it first |
 | 🟢 CI passes again | When CI turns green after a failure |
 | ⏸️ Paused | When Claude is blocked, three sessions in a row fail, or CI still fails after three sessions tried to fix it. Nothing runs until you resume |
@@ -23,7 +24,7 @@ A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: s
 
 - **Progress:** every session ends with `STATUS` (`done`, `blocked` or `finished`), `SUMMARY` and `NEEDS` lines. The stage and step come from the `**Runner:** stage N, step S of T` line at the top of `docs/progress.md`, which each session updates in its commit. The % is the current task's, from 0 to 100: `TASK` in `tools/runner/StatusReport.ts` names the task and its stages, now **Redesign**, stage 19 alone, so the % is finished steps ÷ steps in the stage. *Why: v1 and the before-v2 changes are done, and the owner wanted the redesign counted as a new task from 0% (2026-11-18).* Discord's messages and `status.md` name the task: ✅ **Redesign: N%**. A session's `finished` counts only when the **Runner:** line reads stage 19 with its last step done; before that the runner treats it as `done`. As a second safeguard, the prompt tells the session that finishes stage 19 to write the `paused` file and disable the service, so no session starts even if that check fails. The prompt tells sessions to keep that form, ending a stage with `step T of T`. A line reading `stage N is done` counts as stage N + 1 with no steps done: on 2026-11-15 a session wrote that, and the runner read it as stage 8 with no steps done, so it reported 44% instead of 50%.
 - **Pushing:** after every session, the runner pushes `master` if it has commits that aren't on `origin`. Sessions only commit.
-- **CI:** after pushing, the runner waits for the `CI` workflow's run on the pushed commit (about 5 minutes), reading it with `gh`. If it failed, the next session's prompt starts with `tools/runner/ci-fix-prompt.md`: the commit, the run's link, the failed steps and the last 60 lines of each failed step's log, and the session fixes CI instead of doing the next step, leaving the **Runner:** line as it is. Three such sessions in a row with CI still red pause the runner; a session cut off by the usage limit doesn't count. If `gh` fails, no run starts within 5 minutes, or a run takes over 45 minutes, the runner goes on without the result. *Why: sessions run only `npm run check`, so the browser, speed and Playwright tests ran only in CI, and nothing read its result: it failed on 21 pushes in a row on 2026-11-16 unnoticed.*
+- **CI:** CI runs in a public copy of the code, `im-nassinger/engine-v3-ci`, because the private repo's free minutes ran out (2026-11-18): after pushing, the runner publishes the pushed commit's code there, with no docs and no history, refusing if a file names a private path. See [public-ci.md](public-ci.md). It then waits for the `CI` workflow's run on the public commit (about 5 minutes), reading it with `gh`. If it failed, the next session's prompt starts with `tools/runner/ci-fix-prompt.md`: the commit, the run's link, the failed steps and the last 60 lines of each failed step's log, and the session fixes CI instead of doing the next step, leaving the **Runner:** line as it is. Three such sessions in a row with CI still red pause the runner; a session cut off by the usage limit doesn't count. If `gh` fails, no run starts within 5 minutes, or a run takes over 45 minutes, the runner goes on without the result. *Why: sessions run only `npm run check`, so the browser, speed and Playwright tests ran only in CI, and nothing read its result: it failed on 21 pushes in a row on 2026-11-16 unnoticed.*
 - **The prompt:** kept short on purpose, so a session spends its effort on the step. It gives the context and the step's loop, and leaves the project's rules to CLAUDE.md. It is re-read before every session.
 - **The usage limit:** `claude -p --output-format stream-json` prints a `rate_limit_event` line with how much of the 5-hour and 7-day windows is used and when each resets. The CLI prints it, not the model, so the runner sees the limit even when the model is cut off mid-step. The next session finishes the cut-off step first.
 - **A change to the runner's own code:** it restarts itself between sessions, so the change applies without stopping a step.
@@ -40,11 +41,13 @@ A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: s
 | `tools/runner/prompt.md` | What each session is told |
 | `tools/runner/ci-fix-prompt.md` | Put before `prompt.md` when CI failed on the last push |
 | `tools/runner/ProcessTree.ts` | Ends a process and every process under it, for a session that won't exit |
-| `tools/runner/CiChecker.ts` | Waits for CI on a commit and reads its failed steps and log through `gh` |
+| `tools/runner/PublicCopy.ts` | Builds the public copy of a commit, refuses one that names a private path, and force-pushes it to `im-nassinger/engine-v3-ci` |
+| `tools/runner/CiChecker.ts` | Waits for CI on a public commit and reads its failed steps and log through `gh` |
 | `tools/runner/engine-v3-runner.service` | The systemd unit. It names the Node version from nvm, so update it after a Node upgrade |
 | `.claude/settings.json` | Allows `git push`, refuses `sudo`, `pkexec` and force pushes. Sessions run with `--permission-mode auto` |
 | `~/.config/engine-v3-runner/env` | `DISCORD_WEBHOOK_URL`. Secret, outside the repo |
 | `~/.local/state/engine-v3-runner/sessions/` | Every session's full output, one `.jsonl` file each |
+| `~/.local/state/engine-v3-runner/public-copy/`, `public-copy.json` | The last public copy, and which private commit it was published from, so the same commit isn't pushed twice |
 | `~/.local/state/engine-v3-runner/runner.pid`, `session.pid` | The running runner's and session's process IDs, so a second one never starts |
 | `tools/runner/PidFile.ts` | Reads and writes those two files |
 
