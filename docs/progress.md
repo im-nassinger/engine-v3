@@ -6,7 +6,7 @@
 
 ## Where things stand
 
-**Runner:** stage 18, step 16 of 16: the stage's docs, with every change in [before-v2.md](before-v2.md) marked built. Stage 18, Before v2, is done, and the runner stops: the owner decides v2. The [runner](runner/README.md) keeps this line up to date.
+**Runner:** stage 19, step 0 of 17: the owner approved stage 19, the redesign, on 2026-11-18; its steps are in [steps/stage-19.md](steps/stage-19.md). The runner builds it and stops before v2. The [runner](runner/README.md) keeps this line up to date.
 
 | Part | State |
 |---|---|
@@ -265,7 +265,7 @@ Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
 
 ## Next
 
-0. **The redesign, before v2** (owner, 2026-11-17): the owner is choosing a new look. **Start a new session at [design/redesign.md](design/redesign.md)**: what is settled, what is open (the level card, the status text, the font) and the next steps. The top bar's View button is dropped from the requirements, but the built editor still has it until the redesign is built.
+0. **The redesign is stage 19** (owner, 2026-11-18): planned in [steps/stage-19.md](steps/stage-19.md) with every question answered, and built by the runner, which stops after it. The design is in [design/redesign.md](design/redesign.md).
 1. **The owner decides v2.** Stages 0 to 18 are built; the runner is stopped and nothing of v2 is planned or built.
 2. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
 

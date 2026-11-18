@@ -87,6 +87,6 @@ From the mockup's `SLATE` set: app `#0d0f13`, panels `rgba(24,27,33,.96)`, raise
 
 1. The owner decides what Save does.
 2. Write the result into [tokens.md](tokens.md), [controls.md](controls.md), [level-view.md](level-view.md) (square handles, the selection colour) and this folder's README, replacing round 8's look; change [workspace.md](../requirements/editor/workspace.md)'s top bar, status bar and toolbar sections to the islands, the dock, the top left with ☰, Save and Play and no level name, the bounds labelled World, and the minimap with the zoom (a requirement change, so with the owner's yes).
-3. Plan the build as a stage in [plan.md](../plan.md) with its steps in [steps/](../steps/README.md), before v2.
+3. Plan the build as a stage in [plan.md](../plan.md) with its steps in [steps/](../steps/README.md), before v2. **Done (2026-11-18): stage 19, [steps/stage-19.md](../steps/stage-19.md)**, whose answers also settle what Save does.
 
 Note: `npm run check` currently fails on Prettier for the untracked `.netlify/state.json`, which is not the project's. Adding `.netlify/` to `.gitignore` and `.prettierignore` fixes it; the owner hasn't answered yet.
