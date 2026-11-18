@@ -84,11 +84,17 @@
   .lcard .grow { flex: 1; }
   .lc-name { font-weight: 600; padding: 0 6px; white-space: nowrap; }
   .lcard .savestate { padding: 0; }
-  .lcard.pill { align-self: flex-start; border-radius: 999px; padding: 0 16px 0 8px; gap: 4px; }
-  .lcard.pill .savestate { color: var(--faint); }
-  .lc-split { display: flex; gap: 10px; flex-shrink: 0; align-self: flex-start; }
-  .lc-split .lcbtn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
-  .lc-split .lcard { border-radius: 999px; padding: 0 18px; gap: 12px; }
+  .lcard.pill { align-self: flex-start; border-radius: 999px; padding: 0 7px 0 8px; gap: 4px; }
+  .lcard.wide { align-self: stretch; }
+  .lcard .dirty { width: 7px; height: 7px; border-radius: 50%; background: #fff; flex-shrink: 0; margin-right: 18px; }
+  .lcard .play { border-radius: 999px; }
+  .lcard .play.round { width: 30px; padding: 0; justify-content: center; }
+  .lcard .play.round svg.i { margin-left: 2px; }
+  .lcard .play.soft { background: var(--soft); color: var(--ink); }
+  .lc-apart { display: flex; gap: 10px; flex-shrink: 0; align-self: flex-start; }
+  .lc-apart .lcard.pill { padding-right: 16px; }
+  .lc-apart .lcard .dirty { margin-right: 0; }
+  .lc-apart .playisl { height: 44px; padding: 0 20px; border-radius: 999px; }
   .leftcol { position: absolute; display: flex; flex-direction: column; gap: 10px; z-index: 2; }
   .leftcol > .insp { flex: 1; min-height: 0; }
   .leftcol > .opts { position: static; align-self: flex-start; }
@@ -297,7 +303,7 @@ const CHEV = ic('down', 'class="i chev"');
 
 // Each choice that changes the look, with its variants. The number of a variant is its place in the list.
 const KINDS = [
-  ['lcard', 'Level card', 'The top left island, above the Inspector: the main menu, the level\'s name and the save state. Help is in the main menu.', [['row', 'One row'], ['pill', 'Pill'], ['split', 'Menu button and name pill']]],
+  ['lcard', 'Level card', 'The top left pill: the main menu, the level\'s name, a white dot while it isn\'t saved, and Play. Help is in the main menu; the dock has no Play.', [['pill', 'Play in the pill'], ['round', 'Round Play button'], ['soft', 'Soft Play button'], ['wide', 'As wide as the Inspector'], ['apart', 'Play as its own island']]],
   ['zoom', 'Zoom', 'The zoom by the minimap at the bottom right.', [['above', 'Pill above the map'], ['footer', 'Under the map, one island'], ['over', 'On the map'], ['side', 'Upright, left of the map']]],
   ['layout', 'Entities panel height', '', [['hug', 'Fits its rows'], ['float', 'Full height']]],
   ['head', 'Panel titles', '', [['title', 'Title'], ['caps', 'Small caps']]],
@@ -315,14 +321,16 @@ const KINDS = [
 ];
 
 // The directions. Each is a set of tokens and one variant of each kind.
-const BASE = { lcard: 'row', zoom: 'above', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
+const BASE = { lcard: 'pill', zoom: 'footer', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
 const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s) => ({ id, name, desc, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'One row', 'The top left island is one row as wide as the Inspector: the main menu, the level\'s name and Saved. The zoom is a small pill right above the minimap. The status text is a chip above the dock.', {}),
-  dir('2', 'Pill', 'The top left island is a pill only as wide as its content: the main menu, the name, and a check for the save state. The zoom sits under the minimap in the same island.', { lcard: 'pill', zoom: 'footer' }),
-  dir('3', 'Split', 'The main menu is a round button of its own, and the name with Saved is a pill next to it. The zoom floats on the minimap\'s corner.', { lcard: 'split', zoom: 'over' })
+  dir('1', 'Play in the pill', 'The top left pill holds the main menu, the level\'s name, a white dot while it isn\'t saved, and then Play, a blue pill button. The dock keeps the tools, Undo, Redo and snapping. The zoom sits under the minimap in the same island.', {}),
+  dir('2', 'Round Play', 'The same pill, with Play as a round blue button holding only its icon.', { lcard: 'round' }),
+  dir('3', 'Soft Play', 'The same pill, with Play as a soft blue button, quieter than a solid one.', { lcard: 'soft' }),
+  dir('4', 'Wide', 'The pill is as wide as the Inspector under it, with Play at its right end.', { lcard: 'wide' }),
+  dir('5', 'Play apart', 'The pill holds the menu, the name and the dot; Play is a blue island of its own next to it.', { lcard: 'apart' })
 ];
 
 const FONTS = [
@@ -334,7 +342,7 @@ const FONTS = [
 const VIEWS = [['shape', 'A selected shape'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
 
 let state = { dir: '1', view: 'shape', font: 'mono', over: {} };
-try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-6') || '{}')); } catch (e) {}
+try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-7') || '{}')); } catch (e) {}
 let S, T;
 
 function tokensCss(t) {
@@ -511,17 +519,19 @@ function inspector(o) {
 }
 
 function levelCard(o) {
-  const saved = `<span class="savestate">${ic('check', sm)}Saved</span>`;
-  if (S.lcard === 'pill') return `<div class="blk lcard pill">${C.menu(o)}<span class="lc-name">Car test</span><span class="savestate" title="Saved">${ic('check', sm)}</span></div>`;
-  if (S.lcard === 'split') return `<div class="lc-split"><div class="blk lcbtn">${C.menu(o)}</div><div class="blk lcard"><span class="lc-name" style="padding:0">Car test</span>${saved}</div></div>`;
-  return `<div class="blk lcard row">${C.menu(o)}<span class="lc-name">Car test</span><span class="grow"></span>${saved}</div>`;
+  const k = S.lcard, dirty = `<span class="dirty" title="Not saved"></span>`;
+  const head = `${C.menu(o)}<span class="lc-name">Car test</span>`;
+  if (k === 'apart') return `<div class="lc-apart"><div class="blk lcard pill">${head}${dirty}</div><span class="play playisl">${ic('play')}Play</span></div>`;
+  const play = k === 'round' ? `<span class="play round" title="Play">${ic('play')}</span>` : `<span class="play${k === 'soft' ? ' soft' : ''}">${ic('play')}Play</span>`;
+  const grow = k === 'wide' ? '<span class="grow"></span>' : '';
+  return `<div class="blk lcard pill${k === 'wide' ? ' wide' : ''}">${head}${dirty}${grow}${play}</div>`;
 }
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
 function bottom(o) {
   const g = geo();
   const chip = `<span>${o.hint}</span><span class="cnums">${nums(o)}</span>`;
-  return `<div class="abs isl dock" style="left:${g.cx}px;top:${H - M - 46}px">${C.tools(o)}<span class="sep"></span>${C.edit()}<span class="sep"></span>${C.play()}</div>` +
+  return `<div class="abs isl dock" style="left:${g.cx}px;top:${H - M - 46}px">${C.tools(o)}<span class="sep"></span>${C.edit()}</div>` +
     `<div class="hintchip" style="left:${g.cx}px;top:${H - M - 46 - GP - 30}px">${chip}</div>`;
 }
 function view(opts) {
@@ -656,7 +666,7 @@ function render() {
   const cls = ['ed', 'float', parts ? 'tall' : ''].join(' ');
   document.getElementById('frame').innerHTML = `<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
   document.getElementById('stage').classList.toggle('scroll', parts);
-  try { localStorage.setItem('engine-v3-islands-6', JSON.stringify(state)); } catch (e) {}
+  try { localStorage.setItem('engine-v3-islands-7', JSON.stringify(state)); } catch (e) {}
   fit();
 }
 function fit() {
