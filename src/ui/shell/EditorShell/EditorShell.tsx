@@ -17,8 +17,9 @@ import './EditorShell.css';
 // The tool that draws something not yet an entity, which the Entity inspector can't show (owner, 2026-11-15).
 const HIDES_ENTITY_INSPECTOR = 'shape';
 
-// The level view fills the window, and the panels sit over it in fixed places. While the Shape tool is
-// active the Entity inspector's place is gone and the free area reaches the toolbar. During test play every panel
+// The level view fills the window, and the islands float over it in fixed places. While the Shape tool is
+// active the Entity inspector's island is gone and the free area reaches the tool column. The minimap's
+// island is empty until step 13 of stage 19 draws it. During test play every panel
 // and bar is hidden but kept, so Stop shows them as they were, scrolled and folded, and the Play bar floats
 // over the game.
 export function EditorShell() {
@@ -52,6 +53,7 @@ export function EditorShell() {
             <PanelPlace area="entities-viewer" label="Entities viewer">
                 <EntitiesViewer />
             </PanelPlace>
+            <PanelPlace area="minimap" label="Minimap" />
             <PanelPlace area="status-bar" label="Status bar">
                 <StatusBar />
             </PanelPlace>

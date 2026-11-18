@@ -14,7 +14,15 @@ const SIZES: WindowSize[] = [
     { name: '1280×720 at 200%', width: 1280, height: 720, zoom: 2 },
 ];
 
-const PANEL_PLACES = ['Top bar', 'Tools', 'Entity inspector', 'Entities viewer', 'Status bar'];
+const ISLANDS = ['Top bar', 'Tools', 'Entity inspector', 'Entities viewer', 'Minimap', 'Status bar'];
+// From the window's edge and between islands.
+const ISLAND_GAP = 10;
+// The tool column, the Entity inspector and the Entities viewer side by side with their gaps. A narrower
+// window (1280×720 at 200% is 640 px) can't keep them 10 px apart; fitting small windows is v3, so there
+// they only must not overlap.
+const ISLANDS_ROW_WIDTH = 10 + 48 + 10 + 300 + 10 + 260 + 10;
+// The level view's smallest zoom, 1%.
+const MIN_ZOOM = 0.01;
 // A new level's camera size.
 const CAMERA_WIDTH = 1920;
 const CAMERA_HEIGHT = 1080;
@@ -37,12 +45,12 @@ async function freeAreaBox(page: Page): Promise<Box> {
     return box;
 }
 
-function overlapArea(a: Box, b: Box) {
-    const width = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
-    const height = Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y);
-    if (width <= EDGE_TOLERANCE_PX || height <= EDGE_TOLERANCE_PX) return 0;
+// How far apart two boxes are: negative if they overlap.
+function distanceBetween(a: Box, b: Box) {
+    const across = Math.max(b.x - (a.x + a.width), a.x - (b.x + b.width));
+    const down = Math.max(b.y - (a.y + a.height), a.y - (b.y + b.height));
 
-    return width * height;
+    return Math.max(across, down);
 }
 
 async function openEditor(page: Page) {
@@ -69,27 +77,32 @@ for (const size of SIZES) {
         const cssHeight = Math.round(size.height / size.zoom);
         test.use({ viewport: { width: cssWidth, height: cssHeight }, deviceScaleFactor: size.zoom });
 
-        test('no panel or bar overlaps another, and the free area is what they leave', async ({ page }, testInfo) => {
+        test('every island is 10 px from the window and from the others, and the free area lies between them', async ({
+            page,
+        }, testInfo) => {
             await openEditor(page);
             await attachScreenshot(page, testInfo, size);
 
-            const boxes = await Promise.all(PANEL_PLACES.map((name) => boxOf(page, name)));
-            const free = await freeAreaBox(page);
-            const all = [...boxes, free];
-
-            for (const [index, box] of all.entries()) {
-                expect(box.x).toBeGreaterThanOrEqual(-EDGE_TOLERANCE_PX);
-                expect(box.y).toBeGreaterThanOrEqual(-EDGE_TOLERANCE_PX);
-                expect(box.x + box.width).toBeLessThanOrEqual(cssWidth + EDGE_TOLERANCE_PX);
-                expect(box.y + box.height).toBeLessThanOrEqual(cssHeight + EDGE_TOLERANCE_PX);
-                for (const other of all.slice(index + 1)) {
-                    expect(overlapArea(box, other)).toBe(0);
+            const islands = await Promise.all(ISLANDS.map((name) => boxOf(page, name)));
+            const gapBetween = cssWidth >= ISLANDS_ROW_WIDTH ? ISLAND_GAP : 0;
+            for (const [index, box] of islands.entries()) {
+                expect(box.x).toBeGreaterThanOrEqual(ISLAND_GAP - EDGE_TOLERANCE_PX);
+                expect(box.y).toBeGreaterThanOrEqual(ISLAND_GAP - EDGE_TOLERANCE_PX);
+                expect(box.x + box.width).toBeLessThanOrEqual(cssWidth - ISLAND_GAP + EDGE_TOLERANCE_PX);
+                expect(box.y + box.height).toBeLessThanOrEqual(cssHeight - ISLAND_GAP + EDGE_TOLERANCE_PX);
+                for (const other of islands.slice(index + 1)) {
+                    expect(distanceBetween(box, other)).toBeGreaterThanOrEqual(gapBetween - EDGE_TOLERANCE_PX);
                 }
             }
 
-            // Nothing overlaps and everything is inside the window, so equal areas mean no gap is left.
-            const covered = all.reduce((sum, box) => sum + box.width * box.height, 0);
-            expect(covered).toBeCloseTo(cssWidth * cssHeight, -2);
+            const free = await freeAreaBox(page);
+            for (const island of islands) {
+                expect(distanceBetween(free, island)).toBeGreaterThanOrEqual(-EDGE_TOLERANCE_PX);
+            }
+            const entityInspector = await boxOf(page, 'Entity inspector');
+            const entitiesViewer = await boxOf(page, 'Entities viewer');
+            expect(free.x).toBeCloseTo(entityInspector.x + entityInspector.width, 0);
+            expect(free.x + free.width).toBeCloseTo(entitiesViewer.x, 0);
             expect(free.width).toBeGreaterThan(0);
             expect(free.height).toBeGreaterThan(0);
         });
@@ -102,6 +115,12 @@ for (const size of SIZES) {
             const percent = Number((percentText ?? '').replace('%', ''));
             expect(percent).toBeGreaterThan(0);
             const largestZoom = percent / 100 + ZOOM_ROUNDING;
+            // At 1280×720 at 200% the islands leave the free area narrower than the camera frame at the
+            // smallest zoom; fitting small windows is v3, so the view only goes as small as it can.
+            if (CAMERA_WIDTH * MIN_ZOOM > free.width) {
+                expect(percent).toBe(MIN_ZOOM * 100);
+                return;
+            }
 
             expect(CAMERA_WIDTH * largestZoom).toBeLessThanOrEqual(free.width);
             expect(CAMERA_HEIGHT * largestZoom).toBeLessThanOrEqual(free.height);

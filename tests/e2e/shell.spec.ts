@@ -49,7 +49,9 @@ test('the status bar shows the mouse position over the level view, and nothing o
     await page.mouse.move(box.x + box.width / 2 + 40, box.y + box.height / 2);
     await expect(mousePosition).not.toHaveText(first ?? '');
 
-    await page.mouse.move(box.x + box.width / 2, 1);
+    const topBar = await page.getByRole('region', { name: 'Top bar' }).boundingBox();
+    if (topBar === null) throw new Error('The top bar has no box.');
+    await page.mouse.move(topBar.x + topBar.width / 2, topBar.y + topBar.height / 2);
     await expect(mousePosition).toHaveText('');
 });
 

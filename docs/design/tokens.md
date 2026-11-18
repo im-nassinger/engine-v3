@@ -62,6 +62,7 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--entity-inspector` | 300 px wide | requirement |
 | `--entities-viewer` | 260 px wide | requirement |
 | `--minimap` | 180 px wide | requirement |
+| `--minimap-height` | 90 px tall: half its width, as a new level's 20000 × 10000 bounds | stage 19, step 6 (standing yes, 2026-11-18) |
 | `--debug-box` | 28 px tall | redesign 24 |
 | `--row` | 30 px: an Entities viewer row, an Entity inspector field | redesign |
 | `--panel-head` | 40 px: a panel's title | |

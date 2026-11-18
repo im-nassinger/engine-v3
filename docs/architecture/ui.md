@@ -99,6 +99,7 @@ EditorShell
 - **`LevelViewHost` fills the whole window under the islands**, as the requirement says. The islands sit above it; the browser's own stacking keeps clicks on an island away from the canvas.
 - **The free area** is the level view between the Entity inspector (or the tool column while the Shape tool hides it) and the Entities viewer, so fitting frames the level where it is seen.
 - During play, `EditorShell` hides every island and shows `PlayBar`, reading `PlaySession.version` from `PlayContext`. The islands are hidden with `visibility: hidden`, not removed, so they come back at Stop as they were (stage 16).
+- **The layout as built (stage 19 step 6, standing yes, 2026-11-18):** `EditorShell.css` places each `PanelPlace` absolutely by its `data-area`, with the theme's size tokens; `FreeArea` is placed the same way and still reports the covered edges through its `ResizeObserver`. The minimap's place is an empty `PanelPlace` until step 13. Until step 7 the top bar is an island across the top holding ☰, and until step 11 the status bar is one across the bottom; the islands between start under and end above them, through the shell's `--islands-top` and `--islands-bottom`.
 
 ## The level view and React
 

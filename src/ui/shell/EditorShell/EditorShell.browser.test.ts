@@ -16,9 +16,19 @@ const NO_LEVEL_VIEW: LevelViewMount = {
     unmount: () => {},
 };
 
-// Wide enough that the free area isn't covered by the Entities panel, as on a real screen.
+const WINDOW = { width: 1280, height: 800 };
+// From the window's edge and between islands.
+const GAP = 10;
+const TOOL_COLUMN = 48;
+const ENTITY_INSPECTOR = 300;
+const ENTITIES_VIEWER = 260;
+const MINIMAP = { width: 180, height: 90 };
+const TOP_BAR = 48;
+const STATUS_BAR = 28;
+
+// Wide enough that the free area isn't covered by the Entities viewer, as on a real screen.
 beforeEach(async () => {
-    await page.viewport(1280, 800);
+    await page.viewport(WINDOW.width, WINDOW.height);
     openEditorPage();
 });
 
@@ -36,6 +46,13 @@ function showShell() {
 
 function find(selector: string) {
     return editorPageContainer().querySelector<HTMLElement>(selector);
+}
+
+function boxOf(label: string) {
+    const box = find(`section[aria-label="${label}"]`)?.getBoundingClientRect();
+    if (box === undefined) throw new Error(`The shell has no ${label}.`);
+
+    return box;
 }
 
 function entityInspector() {
@@ -69,6 +86,77 @@ function leftClickAt(x: number, y: number): LevelPointerInput {
 }
 
 describe('EditorShell', () => {
+    test('each island sits 10 px from the window and from its neighbours, in its place', async () => {
+        showShell();
+        await expect.poll(() => entityInspector()).not.toBeNull();
+
+        const topBar = boxOf('Top bar');
+        expect([topBar.left, topBar.top, topBar.width, topBar.height]).toEqual([
+            GAP,
+            GAP,
+            WINDOW.width - 2 * GAP,
+            TOP_BAR,
+        ]);
+        const tools = boxOf('Tools');
+        expect([tools.left, tools.top, tools.width]).toEqual([GAP, topBar.bottom + GAP, TOOL_COLUMN]);
+        const inspector = boxOf('Entity inspector');
+        expect([inspector.left, inspector.top, inspector.width]).toEqual([
+            tools.right + GAP,
+            topBar.bottom + GAP,
+            ENTITY_INSPECTOR,
+        ]);
+        const statusBar = boxOf('Status bar');
+        expect([statusBar.left, statusBar.bottom, statusBar.width, statusBar.height]).toEqual([
+            GAP,
+            WINDOW.height - GAP,
+            WINDOW.width - 2 * GAP,
+            STATUS_BAR,
+        ]);
+        expect(inspector.bottom).toBe(statusBar.top - GAP);
+        const minimap = boxOf('Minimap');
+        expect([minimap.right, minimap.bottom, minimap.width, minimap.height]).toEqual([
+            WINDOW.width - GAP,
+            statusBar.top - GAP,
+            MINIMAP.width,
+            MINIMAP.height,
+        ]);
+        const viewer = boxOf('Entities viewer');
+        expect([viewer.right, viewer.top, viewer.bottom, viewer.width]).toEqual([
+            WINDOW.width - GAP,
+            topBar.bottom + GAP,
+            minimap.top - GAP,
+            ENTITIES_VIEWER,
+        ]);
+    });
+
+    test('the free area is the level view between the Entity inspector and the Entities viewer', async () => {
+        const { session } = showShell();
+        await expect.poll(() => entityInspector()).not.toBeNull();
+
+        const free = find('.free-area')?.getBoundingClientRect();
+        expect(free?.left).toBe(boxOf('Entity inspector').right);
+        expect(free?.right).toBe(boxOf('Entities viewer').left);
+        expect(free?.top).toBe(boxOf('Top bar').bottom);
+        expect(free?.bottom).toBe(boxOf('Status bar').top);
+        // Fitting frames the level in what the islands leave free.
+        expect(session.view.coveredEdges).toEqual({
+            left: 2 * GAP + TOOL_COLUMN + ENTITY_INSPECTOR,
+            top: GAP + TOP_BAR,
+            right: GAP + ENTITIES_VIEWER,
+            bottom: GAP + STATUS_BAR,
+        });
+    });
+
+    test('while the Shape tool hides the Entity inspector, fitting uses the free area up to the tool column', async () => {
+        const { session, tools } = showShell();
+        await expect.poll(() => entityInspector()).not.toBeNull();
+
+        tools.controller.pick('shape');
+
+        // The free area reports its edges when its size changes, which a busy browser may deliver late.
+        await expect.poll(() => session.view.coveredEdges.left, { timeout: 5_000 }).toBe(GAP + TOOL_COLUMN);
+    });
+
     test('the Shape tool hides the Entity inspector, and the free area reaches the toolbar', async () => {
         const { tools } = showShell();
         await expect.poll(() => entityInspector()).not.toBeNull();
