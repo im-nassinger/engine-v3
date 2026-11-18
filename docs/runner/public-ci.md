@@ -42,4 +42,4 @@ Never: `docs/`, `CLAUDE.md`, `.claude/`, `tools/runner/`, `tools/check-docs.js`,
 ## Reading a slow run
 
 - **Look at the step's start time, not the job's.** GitHub gives a job's log only after the job ends, but `gh api repos/im-nassinger/engine-v3-ci/actions/runs/<run>/jobs` shows each step's times while it runs. Cancel a run only when one step is clearly stuck. *Why: on 2026-11-18 run 44374954683 was cancelled for its 30 minutes, with 266 of 268 Playwright tests passed and none failed.*
-- **`playwright install --with-deps` can take about 25 minutes**, when Ubuntu's package mirror is slow (94 kB/s on 2026-11-18), against under a minute normally. It hit one job in each of the first two runs. A run past the runner's 45 minutes counts as unknown and the work goes on. If it keeps happening, cache those packages.
+- **`playwright install --with-deps` can take about 25 minutes**, when Ubuntu's package mirror is slow (94 kB/s on 2026-11-18), against under a minute normally. It hit one job in each of the first two runs. A run past the runner's 45 minutes counts as unknown and the work goes on. Since 2026-11-18 the install has limits, see [ci-speed.md](ci-speed.md).

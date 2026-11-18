@@ -23,9 +23,9 @@
 - **The laptop must stay awake.** On 2026-11-15 it went to sleep on battery at 00:23 and woke at 10:19, so nothing ran overnight. The runner now blocks sleep when the computer is idle, but closing the lid still sleeps it, and on battery it can run flat. Keep it plugged in with the lid open.
 - **The systemd unit names Node 26.13.0 from nvm.** After a Node upgrade, update `tools/runner/engine-v3-runner.service` and run `systemctl --user daemon-reload`.
 
-## Planned: faster CI
+## Faster CI: built, not measured
 
-CI took 18 to 32 minutes per run on 2026-11-18 because of stalled downloads, and the runner waits for it after every step. The plan is in [ci-speed.md](ci-speed.md), not built yet.
+CI took 18 to 42 minutes per run on 2026-11-18 because of stalled downloads, and the runner waits for it after every step. Parts 1 to 3 of [ci-speed.md](ci-speed.md) are built. **Next:** read the first three runs' times and whether the `playwright-report` artifact holds all the tests, then record them there and in [public-ci.md](public-ci.md).
 
 ## Next: the Discord bot
 

@@ -191,6 +191,10 @@ async function reportStep(report: StatusReport, newCommits: string) {
     if (newCommits === '') {
         summary += ' (nothing committed)';
     }
+    // A blocked step pauses the runner instead of going on to CI.
+    if (report.status !== 'blocked') {
+        summary += ' Waiting for CI.';
+    }
 
     const runnerLine = parseRunnerLine(fs.readFileSync(progressFile, 'utf8'));
     if (runnerLine === undefined) {
@@ -262,6 +266,16 @@ async function publishPublicCopy(pushedCommit: string) {
     return undefined;
 }
 
+// What comes after CI, for the messages that report its result.
+function describeNextStep() {
+    const runnerLine = parseRunnerLine(fs.readFileSync(progressFile, 'utf8'));
+    const hasNumberedNextStep =
+        runnerLine !== undefined && runnerLine.stepCount > 0 && runnerLine.step < runnerLine.stepCount;
+    if (!hasNumberedNextStep) return 'starting the next step';
+
+    return `starting step ${runnerLine.step + 1} of ${runnerLine.stepCount}`;
+}
+
 // Waits for CI on what the runner last pushed. Only a failure is returned: when CI can't
 // be read, the work goes on rather than stalling on GitHub.
 async function checkCi() {
@@ -275,13 +289,13 @@ async function checkCi() {
     const result = await ciChecker.waitForResult(publicCommit, pushedCommit);
 
     if (result.kind === 'unknown') {
-        console.log(`CI result for ${shortCommit} unknown: ${result.reason}`);
+        const nextText = isLastStageDone() ? 'going on anyway' : 'starting the next step anyway';
+        await announce(`⚠️ **CI result unknown** on \`${shortCommit}\` (${result.reason}), ${nextText}.`);
         return undefined;
     }
     if (result.kind === 'passed') {
-        if (ciWasFailing) {
-            await announce(`🟢 **CI passes again** on \`${shortCommit}\`.`);
-        }
+        const nextText = isLastStageDone() ? '' : `, ${describeNextStep()}`;
+        await announce(`🟢 **CI passed** on \`${shortCommit}\`${nextText}.`);
         ciWasFailing = false;
         return undefined;
     }
