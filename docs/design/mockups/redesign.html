@@ -27,6 +27,14 @@
   .stage { flex: 1; position: relative; overflow: hidden; }
   .stage.scroll { overflow-y: auto; }
   .frame { position: absolute; left: 50%; top: 8px; width: 1440px; margin-left: -720px; transform-origin: top center; border-radius: 10px; overflow: hidden; }
+  /* The browser around the editor: its tab carries the level's name, as the requirement's tab title does */
+  .chrome { height: 38px; background: #1f2126; display: flex; align-items: flex-end; padding: 0 10px; gap: 8px; font: 12px/1 system-ui, sans-serif; }
+  .chrome .dots { display: flex; gap: 7px; align-self: center; margin-right: 8px; }
+  .chrome .dots i { width: 11px; height: 11px; border-radius: 50%; background: #3a3d44; }
+  .chrome .btab { height: 30px; width: 230px; padding: 0 12px; border-radius: 9px 9px 0 0; background: #0d0f13; color: #e4e8ef; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chrome .btab .fav { width: 14px; height: 14px; border-radius: 4px; background: #4f8cff; flex-shrink: 0; }
+  .chrome .btab .x { margin-left: auto; color: #6b7280; }
+  .chrome .btab.other { background: transparent; color: #8b93a1; width: 180px; }
 
   /* The editor. Its tokens are set per direction on .ed. */
   .ed { position: relative; width: 1440px; height: 900px; overflow: hidden; background: var(--app); color: var(--text); font-family: var(--font-ui); font-size: var(--fs);
@@ -142,6 +150,12 @@
   .zoomg .num { min-width: 36px; text-align: center; }
   .minimap { position: absolute; z-index: 2; padding: 3px; }
   .minimap svg { display: block; border-radius: 13px; }
+  .maphead { height: 32px; display: flex; align-items: center; gap: 7px; padding: 0 11px; white-space: nowrap; overflow: hidden; }
+  .maphead .dirty, .actisl .dirty, .mhead .dirty { width: 7px; height: 7px; border-radius: 50%; background: #fff; flex-shrink: 0; }
+  .actisl .dirty { margin: 0 8px 0 -6px; }
+  .mhead { padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 3px; }
+  .mhead .n { display: flex; align-items: center; gap: 8px; font-size: calc(var(--fs) + 2px); font-weight: 500; }
+  .mhead .s { color: var(--muted); font-size: 11px; }
   .mapfoot { display: flex; align-items: center; justify-content: center; height: 34px; }
   .mapfoot .zoomg, .zoomisl .zoomg { background: transparent; }
   .zoomisl { position: absolute; z-index: 3; display: flex; align-items: center; height: 36px; padding: 0 4px; }
@@ -357,16 +371,17 @@ const KINDS = [
   ['menu', 'Menus', 'Groups are split by a gap, not a line.', [['soft', 'Soft hover'], ['solid', 'Solid hover']]],
   ['note', 'Editor messages', '', [['tint', 'Tinted'], ['box', 'Box']]],
   ['handle', 'Selection handles', 'In the level view.', [['square', 'Square'], ['round', 'Round']]],
-  ['play', 'Play bar', 'Running, then paused.', [['tint', 'Tinted pill'], ['dot', 'Pill with a dot']]]
+  ['play', 'Play bar', 'Running, then paused.', [['tint', 'Tinted pill'], ['dot', 'Pill with a dot']]],
+  ['title', 'Level\'s name', 'Where the level\'s name lives. The browser tab above shows it in every variant, as the requirement says.', [['menu', 'With ☰ (today)'], ['map', 'On the minimap'], ['tab', 'Only in the tab and the main menu']]]
 ];
 
 // The directions. Each is a set of tokens and one variant of each kind.
-const BASE = { actions: 'apart', burger: 'with', name: 'plain', zoom: 'footer', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
+const BASE = { title: 'menu', actions: 'apart', burger: 'with', name: 'plain', zoom: 'footer', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
 const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s) => ({ id, name, desc, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'The redesign', 'The top left: the ☰ menu and the level\'s name in one island, the name in regular weight with a white dot while it isn\'t saved, then Save and Play as dark islands with green and blue words. The zoom sits under the minimap.', {})
+  dir('1', 'The redesign', 'The top left: the ☰ menu and the level\'s name in one island, the name in regular weight with a white dot while it isn\'t saved, then Save and Play as dark islands with green and blue words. The zoom sits under the minimap. Try the Mix row\'s Level\'s name: on the minimap, or only in the browser tab and the main menu.', {})
 ];
 
 const FONTS = [
@@ -378,7 +393,7 @@ const FONTS = [
 const VIEWS = [['shape', 'A selected shape'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
 
 let state = { dir: '1', view: 'shape', font: 'mono', over: {} };
-try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-11') || '{}')); } catch (e) {}
+try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-12') || '{}')); } catch (e) {}
 let S, T;
 
 function tokensCss(t) {
@@ -567,6 +582,10 @@ function levelCard(o) {
   const where = S.burger === 'own' ? 'own' : S.burger === 'actions' || centred ? 'actions' : 'name';
   const buttons = `<span class="act save">${ic('save')}Save</span><span class="act play">${ic('play')}Play</span>`;
   const inPill = S.actions === 'inpill' && !centred;
+  if (S.title !== 'menu') {
+    const dot = S.title === 'tab' ? DIRTY : '';
+    return `<div class="lc-top"><div class="blk lcbtn">${menu}</div><div class="blk actisl"><span class="act save">${ic('save')}Save</span>${dot}</div><div class="blk actisl"><span class="act play">${ic('play')}Play</span></div></div>`;
+  }
   let out = where === 'own' ? `<div class="blk lcbtn">${menu}</div>` : '';
   if (!centred) {
     const cls = ['blk', 'lcard', 'pill', 'namebox', where === 'name' ? 'withmenu' : 'plain'].join(' ');
@@ -594,8 +613,8 @@ function view(opts) {
 // The minimap and the zoom, with their right and bottom edges at r and b: where each island sits.
 const MAP_W = 180, ZOOM_H = 36;
 function mapParts(r, b) {
-  const inner = MAP_W - 6, mapH = Math.round(inner * MAP_AREA[3] / MAP_AREA[2]) + 6, foot = S.zoom === 'footer' ? 34 : 0;
-  const map = [r - MAP_W, b - mapH - foot, MAP_W, mapH + foot];
+  const inner = MAP_W - 6, mapH = Math.round(inner * MAP_AREA[3] / MAP_AREA[2]) + 6, foot = S.zoom === 'footer' ? 34 : 0, head = S.title === 'map' ? 32 : 0;
+  const map = [r - MAP_W, b - mapH - foot - head, MAP_W, mapH + foot + head];
   const zoom = S.zoom === 'above' ? [r - MAP_W / 2, map[1] - GP - ZOOM_H] : S.zoom === 'side' ? [map[0] - GP - 36, b - 104] : null;
   return { map, zoom, inner, height: b - (S.zoom === 'above' ? zoom[1] : map[1]) };
 }
@@ -607,7 +626,8 @@ function minimap(r = W - M, b = H - M) {
   const zoom = `<span class="zoomg"><span class="ib">${ic('minus')}</span><span class="num">40%</span><span class="ib">${ic('plus')}</span></span>`;
   const zoomUp = `<span class="zoomg"><span class="ib">${ic('plus')}</span><span class="num">40%</span><span class="ib">${ic('minus')}</span></span>`;
   const inside = S.zoom === 'footer' ? `<div class="mapfoot">${zoom}</div>` : S.zoom === 'over' ? `<div class="zoomover">${zoom}</div>` : '';
-  let out = `<div class="blk minimap" style="${pos(g.map)}">${map}${inside}</div>`;
+  const head = S.title === 'map' ? `<div class="maphead"><span>Car test</span>${DIRTY}</div>` : '';
+  let out = `<div class="blk minimap" style="${pos(g.map)}">${head}${map}${inside}</div>`;
   if (S.zoom === 'above') out += `<div class="blk zoomisl" style="left:${g.zoom[0]}px;top:${g.zoom[1]}px;transform:translateX(-50%)">${zoom}</div>`;
   if (S.zoom === 'side') out += `<div class="blk zoomisl v" style="left:${g.zoom[0]}px;top:${g.zoom[1]}px">${zoomUp}</div>`;
   return out;
@@ -629,7 +649,9 @@ function mainMenu() {
   const x = M, y = M + 50;
   const top = [['File', '>'], ['Edit', '>', 'hover'], ['Arrange', '>'], ['View', '>'], ['Help', '>']];
   const edit = [['Undo Move 1 entity', 'Ctrl+Z'], ['Redo', 'Ctrl+Shift+Z', 'dis'], '-', ['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C'], ['Paste', 'Ctrl+V', 'hover'], ['Duplicate', 'Ctrl+D'], ['Delete', 'Del'], '-', ['Select all', 'Ctrl+A'], ['Rename', 'F2'], ['Hide or show', 'Ctrl+Shift+H']];
-  return `<div class="menu ${S.menu}" style="left:${x}px;top:${y}px">${menuBody(top)}</div><div class="menu ${S.menu}" style="left:${x + 206}px;top:${y + 38}px;min-width:250px">${menuBody(edit)}</div>`;
+  const head = S.title === 'tab' ? `<div class="mhead"><span class="n">Car test${DIRTY}</span><span class="s">Not saved · click the name to rename</span></div>` : '';
+  const dy = head ? 62 : 0;
+  return `<div class="menu ${S.menu}" style="left:${x}px;top:${y}px">${head}${menuBody(top)}</div><div class="menu ${S.menu}" style="left:${x + 206}px;top:${y + 38 + dy}px;min-width:250px">${menuBody(edit)}</div>`;
 }
 const dialogBody = () => `<h3>Replace the open level?</h3><p>Export it first if you want to keep it.</p><div class="row"><span class="btn ${S.btn}">Cancel</span><span class="btn primary ${S.btn}">Replace</span></div>`;
 function playbar(paused, extraCls = '') {
@@ -718,15 +740,16 @@ function render() {
   document.getElementById('picks').textContent = picksText(d);
   const parts = state.view === 'parts';
   const cls = ['ed', 'float', parts ? 'tall' : ''].join(' ');
-  document.getElementById('frame').innerHTML = `<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
+  const chrome = parts ? '' : `<div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="btab"><span class="fav"></span>*Car test - engine-v3<span class="x">×</span></span><span class="btab other">New tab</span></div>`;
+  document.getElementById('frame').innerHTML = `${chrome}<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
   document.getElementById('stage').classList.toggle('scroll', parts);
-  try { localStorage.setItem('engine-v3-islands-11', JSON.stringify(state)); } catch (e) {}
+  try { localStorage.setItem('engine-v3-islands-12', JSON.stringify(state)); } catch (e) {}
   fit();
 }
 function fit() {
   const stage = document.getElementById('stage'), frame = document.getElementById('frame');
   const parts = state.view === 'parts';
-  const k = Math.min((stage.clientWidth - 24) / 1440, parts ? 1 : (stage.clientHeight - 16) / 900, 1);
+  const k = Math.min((stage.clientWidth - 24) / 1440, parts ? 1 : (stage.clientHeight - 16) / 938, 1);
   frame.style.transform = `scale(${k})`;
   document.getElementById('sizer').style.height = parts ? `${frame.offsetHeight * k + 24}px` : '0';
 }

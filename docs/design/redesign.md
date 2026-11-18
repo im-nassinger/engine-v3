@@ -26,6 +26,7 @@ From the mockup's `SLATE` set: app `#0d0f13`, panels `rgba(24,27,33,.96)`, raise
 
 ## Open for the owner
 
+- **Where the level's name lives** (owner, 2026-11-17: next to ☰ it "looks like part of the UI, not a proper name of the file"). *Why it reads as UI: it sits in a row of controls, at their height and in their island, so the eye groups it with them. A name reads as a name when it labels the thing it names.* The Mix row's **Level's name** shows two fixes, both leaving the top left as **( ☰ ) ( Save ) ( Play )**: **on the minimap**, as the caption over the level's own picture, like a file's name under its thumbnail; or **only in the browser tab and the main menu**, the tab being a web app's title bar (the tab title already shows the name), with the main menu opening on the name and the white dot moving to Save. The mockup now draws the browser's tab above the editor. Claude's pick: the minimap.
 - **What Save does.** A level autosaves, and Ctrl+S exports the `.editable` file today ([saving.md](../requirements/play-and-save/saving.md)). Claude's suggestion: Save saves now, without waiting for autosave, and the white dot goes away; exporting stays in the File menu. This is a requirement change, so it waits for the owner.
 - **The status text:** today it is one dark chip above the dock with the tool hint, the mouse position, the selection and the warning count. Not yet confirmed.
 - **The font:** JetBrains Mono (round 8's decision) is still the default; the page offers Inter, Geist and Inter with mono numbers.
