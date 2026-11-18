@@ -147,6 +147,12 @@
   .burger .menu.sub { top: 69px; left: calc(100% + 4px); min-width: 250px; }
   .ed .menu { background: rgb(24, 27, 33); }
   .toolcol { z-index: 3; flex-direction: column; height: auto; padding: 7px 0; gap: 4px; }
+  /* The Shape tool's kinds menu: its first item level with the Shape tool (the second button), the arrow on its middle. */
+  .toolcol .menu.kinds { top: 39px; left: calc(100% + 12px); min-width: 170px; }
+  .toolcol .menu.kinds::before { content: ""; position: absolute; left: -7px; top: 17px; border: 7px solid transparent; border-left: 0; border-right-color: rgb(24, 27, 33); }
+  .menu .mi svg.i { color: var(--muted); }
+  .menu .mi.on { background: var(--soft); color: var(--ink); }
+  .menu .mi.on svg.i { color: var(--ink); }
   .isl.toolcol .tool { width: 34px; height: 34px; border-radius: calc(var(--rl) - 7px); }
   .actisl.edit .ib { border-radius: 999px; width: 30px; height: 30px; }
   .actisl .act.save { color: var(--save-ink); }
@@ -665,7 +671,13 @@ function bottom(o) {
 }
 function toolColumn(o) {
   const [x, y, w] = geo().tools;
-  return `<div class="abs isl blk toolcol" style="left:${x}px;top:${y}px;width:${w}px">${C.tools(o)}</div>`;
+  return `<div class="abs isl blk toolcol" style="left:${x}px;top:${y}px;width:${w}px">${C.tools(o)}${o.tool === 'shape' ? shapeMenu() : ''}</div>`;
+}
+// The Shape tool's kinds: a menu open to the right of the tool, with an arrow pointing at it, for as long as the tool is
+// active. The chosen kind is shown like the active tool.
+function shapeMenu() {
+  const kinds = [['rect', 'Rectangle'], ['circle', 'Circle'], ['polygon', 'Polygon']];
+  return `<div class="menu ${S.menu} kinds">${kinds.map(([icon, name]) => `<div class="mi${icon === 'polygon' ? ' on' : ''}">${ic(icon)}<span class="l">${name}</span></div>`).join('')}</div>`;
 }
 function view(opts) {
   const g = geo();
@@ -688,13 +700,9 @@ function editor(o) {
   setZoom(!!o.whole);
   o = Object.assign({ tool: 'select', x: '20', y: '340' }, o, o.top);
   const g = geo();
-  return view(o.scene || {}) + `<div class="leftcol" style="${pos(g.left)}">${o.noInspector ? shapeStrip() : inspector(o)}</div>` + burger(o) + toolColumn(o) + entities(o) + minimap(o) + bottom(o) + (o.extra || '');
+  return view(o.scene || {}) + `<div class="leftcol" style="${pos(g.left)}">${o.noInspector ? '' : inspector(o)}</div>` + burger(o) + toolColumn(o) + entities(o) + minimap(o) + bottom(o) + (o.extra || '');
 }
 
-function shapeStrip() {
-  const kinds = [['rect', 'Rectangle'], ['circle', 'Circle'], ['polygon', 'Polygon']];
-  return `<div class="opts">${kinds.map(([icon, name]) => `<span class="ib${icon === 'polygon' ? ' on' : ''}">${ic(icon)}${name}</span>`).join('')}</div>`;
-}
 function menuBody(items) {
   return items.map((m) => m === '-' ? '<div class="msep"></div>' :
     `<div class="mi${m[2] ? ' ' + m[2] : ''}"><span class="l">${m[0]}</span>${m[1] === '>' ? ic('right', 'class="i chev"') : `<span class="k">${m[1] || ''}</span>`}</div>`).join('');
