@@ -264,3 +264,4 @@ This replaces round 10's SC1 ("script settings"), widens the owner's three varia
 ## Still to decide
 
 Under the standing yes, new questions are decided and listed above instead of asked. The open points of 2026-11-16's variables change wait for the owner: see [progress.md](progress.md#open-questions-for-the-owner).
+| 2026-11-17 | The redesign: **the mockup's grid is drawn inside the level bounds only, in white at 5% with the origin's lines at 14%**, after the owner made the level view dark outside the bounds and asked for a night example level. *Why: outside the bounds there is no level to place things in, and at level-view.md's 13% and 32% the grid would cut through the level's art.* | [redesign.md](design/redesign.md#settled-in-order-all-owner-2026-11-17) (standing yes, 2026-11-17) |

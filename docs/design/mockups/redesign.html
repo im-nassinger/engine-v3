@@ -411,42 +411,131 @@ function visibleArea() {
 // The minimap shows the whole level and outlines the part the level view shows, in level pixels: [x, y, w, h].
 const MAP_AREA = [-4000, -4000, 8000, 8000];
 
-// The sample level, in level pixels. The origin is the middle of the level, y points down.
-const BG = '#cde3f2';
+// The level view outside the level bounds: the editor's own dark colour, not the level's.
+const OUTSIDE = '#0d0f13';
+// This level's World fill, which paints only the inside of the level bounds: a night blue.
+const WORLD_FILL = '#1a2140';
+
+// The sample level, in level pixels. The origin is the middle of the level, y points down. It is drawn with what v1
+// has: rectangles, circles and polygons with a fill, an outline (`line`, `lw` in level px) and an opacity (`op`).
+// Most shapes have no outline: the low-poly look comes from a darker and a lighter facet of each shape instead.
+const R = (id, x, y, w, h, fill, more = {}) => Object.assign({ id, t: 'rect', x, y, w, h, fill }, more);
+const O = (id, cx, cy, r, fill, more = {}) => Object.assign({ id, t: 'circle', cx, cy, r, fill }, more);
+const P = (id, p, fill, more = {}) => Object.assign({ id, t: 'poly', p, fill }, more);
+
+// A mountain range: valley, peak, valley, peak … valley. The moon is to the right, so each peak's right slope is lit.
+function range(id, base, pts, dark, lit) {
+  const out = [P(id, [[pts[0][0], base], ...pts, [pts[pts.length - 1][0], base]], dark)];
+  for (let i = 1; i < pts.length - 1; i += 2) {
+    const [px, py] = pts[i], [nx, ny] = pts[i + 1], fx = px - (px - pts[i - 1][0]) * 0.25;
+    out.push(P(`${id}-lit${i}`, [[px, py], [nx, ny], [nx, base], [fx, base]], lit));
+  }
+  return out;
+}
+// A pine: a trunk and three tiers, each with a lit right half.
+function pine(id, x, h) {
+  const out = [R(`${id}-trunk`, x - h * 0.03, 380 - h * 0.18, h * 0.06, h * 0.18, '#2b2030')];
+  [[0.12, 0.42, 0.28], [0.36, 0.36, 0.23], [0.58, 0.42, 0.17]].forEach(([at, th, hw], i) => {
+    const y = 380 - h * at, top = y - h * th, w = h * hw;
+    out.push(P(`${id}-t${i}`, [[x - w, y], [x, top], [x + w, y]], '#183a3d'), P(`${id}-l${i}`, [[x, y], [x, top], [x + w, y]], '#225049'));
+  });
+  return out;
+}
+// A rock with a lit top facet.
+const rock = (id, p, lit) => [P(id, p, '#3e3a55'), P(`${id}-lit`, lit, '#575273')];
+// A floating island: grass on top of a rock that narrows to a point.
+const isle = (id, x, y, w) => [
+  P(`${id}-rock`, [[x, y + 40], [x + w, y + 40], [x + w * 0.78, y + 40 + w * 0.22], [x + w * 0.45, y + 40 + w * 0.42], [x + w * 0.2, y + 40 + w * 0.2]], '#2e2440'),
+  P(`${id}-rocklit`, [[x + w * 0.45, y + 40], [x + w, y + 40], [x + w * 0.78, y + 40 + w * 0.22], [x + w * 0.45, y + 40 + w * 0.42]], '#3e3157'),
+  R(id, x, y, w, 50, '#3f8a5a'), R(`${id}-top`, x, y, w, 14, '#56a96b')
+];
+// Stars, from a fixed seed so the page always draws the same sky.
+let seed = 7;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const STARS = Array.from({ length: 110 }, (_, i) => O(`star${i}`, -3950 + rnd() * 7900, -3950 + rnd() * 3200, 4 + rnd() * 7, '#ffffff', { op: 0.3 + rnd() * 0.6 }));
+// Small stones in the earth, from the same seed.
+const PEBBLES = Array.from({ length: 70 }, (_, i) => {
+  const x = -3950 + rnd() * 7900, y = 470 + rnd() * 3450, r = 10 + rnd() * 26;
+  return P(`pebble${i}`, [[x - r, y + r * 0.4], [x - r * 0.4, y - r * 0.6], [x + r * 0.7, y - r * 0.3], [x + r, y + r * 0.5]], i % 3 ? '#3a2e47' : '#45385a');
+});
+// The grass's top edge, a little jagged.
+const grassEdge = (y0, y1, step) => Array.from({ length: 8000 / step + 1 }, (_, i) => [-4000 + i * step, i % 2 ? y0 : y1]);
+
 const LEVEL = [
-  { id: 'ground', t: 'rect', x: -4000, y: 380, w: 8000, h: 3620, fill: '#6ba368', line: '#2f5130' },
-  { id: 'ramp', t: 'poly', p: [[-1000, 380], [-560, 380], [-1000, 170]], fill: '#7db37a', line: '#2f5130' },
-  { id: 'platform', t: 'rect', x: 250, y: 60, w: 420, h: 40, fill: '#8a6b4e', line: '#4a3626' },
-  { id: 'crate1', t: 'rect', x: 290, y: -40, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
-  { id: 'crate2', t: 'rect', x: 410, y: -40, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
-  { id: 'crate3', t: 'rect', x: 350, y: -140, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
-  { id: 'ball', t: 'circle', cx: 140, cy: 180, r: 40, fill: '#f0c419', line: '#8a6d00' },
-  { id: 'carbody', t: 'rect', x: -440, y: 250, w: 320, h: 60, fill: '#d9534f', line: '#7a2522' },
-  { id: 'cabin', t: 'poly', p: [[-380, 250], [-340, 190], [-230, 190], [-190, 250]], fill: '#e8807c', line: '#7a2522' },
-  { id: 'wheel1', t: 'circle', cx: -370, cy: 338, r: 42, fill: '#3a3a3a', line: '#111111' },
-  { id: 'wheel2', t: 'circle', cx: -190, cy: 338, r: 42, fill: '#3a3a3a', line: '#111111' },
-  { id: 'rect1', t: 'rect', x: -60, y: 300, w: 160, h: 80, fill: '#4a90d9', line: '#1f3552' },
-  // Off screen: the rest of the level, seen only in the minimap. The level is a square, like a new level's bounds.
-  { id: 'hillL', t: 'poly', p: [[-4000, 380], [-4000, -300], [-3300, 380]], fill: '#7db37a', line: '#2f5130' },
-  { id: 'rampR', t: 'poly', p: [[2500, 380], [3200, 380], [3200, 60]], fill: '#7db37a', line: '#2f5130' },
-  { id: 'towerR', t: 'rect', x: 3200, y: -400, w: 300, h: 780, fill: '#8a6b4e', line: '#4a3626' },
-  { id: 'crateR1', t: 'rect', x: 3250, y: -500, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
-  { id: 'crateR2', t: 'rect', x: 3360, y: -500, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
-  { id: 'ballR', t: 'circle', cx: 2300, cy: 300, r: 80, fill: '#f0c419', line: '#8a6d00' },
-  { id: 'ledge1', t: 'rect', x: -3200, y: -1500, w: 700, h: 50, fill: '#8a6b4e', line: '#4a3626' },
-  { id: 'crateL', t: 'rect', x: -3000, y: -1600, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
-  { id: 'ledge2', t: 'rect', x: 1600, y: -1700, w: 800, h: 50, fill: '#8a6b4e', line: '#4a3626' },
-  { id: 'ledge3', t: 'rect', x: -600, y: -2200, w: 1200, h: 50, fill: '#8a6b4e', line: '#4a3626' },
-  { id: 'ledge4', t: 'rect', x: -2800, y: -2800, w: 900, h: 50, fill: '#8a6b4e', line: '#4a3626' },
-  { id: 'ledge5', t: 'rect', x: 1200, y: -3300, w: 900, h: 50, fill: '#8a6b4e', line: '#4a3626' },
-  { id: 'goal', t: 'circle', cx: 1650, cy: -3420, r: 60, fill: '#4a90d9', line: '#1f3552' },
-  { id: 'cave', t: 'rect', x: -1600, y: 1600, w: 3200, h: 700, fill: '#4f7d4c', line: '#2f5130' }
+  // The sky: bands that warm towards the horizon, stars, the moon and a cloud.
+  ...[[-2400, '#1e2650'], [-1900, '#242b5b'], [-1450, '#2b3066'], [-1050, '#353571'], [-700, '#433a79'], [-420, '#55407d'], [-180, '#6d467e'], [60, '#8a4e7c']]
+    .map(([y, fill], i) => R(`dusk${i + 1}`, -4000, y, 8000, 380 - y, fill)),
+  ...STARS,
+  O('moonhalo2', 650, -800, 330, '#f6e6c3', { op: 0.04 }),
+  O('moonhalo1', 650, -800, 220, '#f6e6c3', { op: 0.07 }),
+  O('moon', 650, -800, 130, '#f4e3bd'),
+  O('crater1', 610, -840, 24, '#e2cd9f'), O('crater2', 690, -760, 16, '#e2cd9f'), O('crater3', 700, -850, 10, '#e2cd9f'),
+  P('cloud1', [[380, -650], [450, -705], [540, -690], [610, -750], [720, -735], [790, -690], [880, -665], [840, -630], [420, -630]], '#3a3c78', { op: 0.85 }),
+  P('cloud2', [[-1300, -1050], [-1200, -1110], [-1080, -1095], [-990, -1150], [-860, -1120], [-780, -1060], [-1260, -1030]], '#33366c', { op: 0.75 }),
+  P('cloud3', [[-3200, -2200], [-3050, -2290], [-2880, -2260], [-2750, -2330], [-2550, -2280], [-2450, -2190], [-3150, -2170]], '#2c3164', { op: 0.75 }),
+  P('cloud4', [[1800, -2700], [1950, -2790], [2120, -2760], [2260, -2830], [2450, -2780], [2550, -2690], [1860, -2670]], '#2c3164', { op: 0.75 }),
+  // Far mountains, then nearer hills.
+  ...range('far', 380, [[-4000, -100], [-3500, -650], [-3000, -150], [-2500, -500], [-2050, -80], [-1500, -720], [-950, -120], [-500, -430], [-150, -60], [350, -560], [900, -100], [1400, -520], [1900, -60], [2500, -760], [3100, -140], [3550, -480], [4000, -100]], '#232750', '#2e3366'),
+  ...range('hills', 380, [[-4000, 180], [-3400, -120], [-2800, 220], [-2200, -40], [-1600, 240], [-1100, -170], [-600, 200], [-150, -40], [300, 230], [800, -140], [1300, 200], [1900, -100], [2500, 240], [3100, -60], [3600, 200], [3850, 40], [4000, 180]], '#1f3550', '#284766'),
+  // Trees.
+  ...pine('pine1', -1720, 420), ...pine('pine2', -1560, 340), ...pine('pine3', -1420, 460), ...pine('pine4', 780, 380), ...pine('pine5', 930, 470),
+  ...pine('pine6', 1500, 400), ...pine('pine7', 2050, 450), ...pine('pine8', -2600, 430), ...pine('pine9', -3100, 380), ...pine('pine10', 2900, 420),
+  // The ground: earth in layers, grass on top, rocks.
+  R('ground', -4000, 380, 8000, 3620, '#2a2033'),
+  P('strata1', [...grassEdge(880, 940, 400), [4000, 1600], [-4000, 1600]], '#241b2d'),
+  P('strata2', [...grassEdge(2450, 2550, 500), [4000, 4000], [-4000, 4000]], '#1d1626'),
+  P('topsoil', [...grassEdge(560, 600, 250), [4000, 430], [-4000, 430]], '#33263d'),
+  ...PEBBLES,
+  P('grass2', [...grassEdge(400, 412, 160), [4000, 446], [-4000, 446]], '#2b5a47'),
+  P('grass', [...grassEdge(374, 382, 120), [4000, 412], [-4000, 412]], '#46985f'),
+  ...rock('rock1', [[1010, 382], [1040, 335], [1100, 318], [1150, 350], [1165, 382]], [[1040, 335], [1100, 318], [1150, 350], [1090, 356]]),
+  ...rock('rock2', [[-1300, 382], [-1270, 345], [-1220, 336], [-1190, 382]], [[-1270, 345], [-1220, 336], [-1240, 360]]),
+  ...rock('rock3', [[-700, 1100], [-620, 1040], [-520, 1060], [-480, 1130], [-640, 1150]], [[-620, 1040], [-520, 1060], [-560, 1090]]),
+  ...rock('rock4', [[2100, 3000], [2200, 2920], [2340, 2950], [2380, 3040], [2180, 3060]], [[2200, 2920], [2340, 2950], [2280, 2990]]),
+  O('bush1', -1160, 384, 34, '#2a5a48'), O('bush2', -1120, 372, 42, '#33694f'), O('bush3', -1075, 386, 30, '#2a5a48'),
+  O('bush4', 1240, 384, 30, '#2a5a48'), O('bush5', 1275, 372, 38, '#33694f'),
+  // A wooden platform on two posts, with three crates.
+  R('post1', 285, 100, 18, 280, '#3b2730'), R('post2', 617, 100, 18, 280, '#3b2730'),
+  R('platform', 250, 60, 420, 40, '#7a4b36'), R('platform-top', 250, 60, 420, 12, '#a36d4b'),
+  R('crate1', 290, -40, 100, 100, '#c98a4b', { line: '#7a4e26', lw: 6 }),
+  R('crate2', 410, -40, 100, 100, '#c98a4b', { line: '#7a4e26', lw: 6 }),
+  R('crate3', 350, -140, 100, 100, '#d79a58', { line: '#7a4e26', lw: 6 }),
+  // The ramp.
+  P('ramp', [[-1000, 382], [-560, 382], [-1000, 170]], '#2f6e4c'),
+  P('ramp-lit', [[-1000, 170], [-560, 382], [-860, 382]], '#46985f'),
+  // The ball.
+  O('ball', 140, 180, 40, '#f2c14e'), O('ball-hi', 126, 166, 13, '#ffffff', { op: 0.4 }),
+  // The car, its headlight's beam first so it sits behind the shapes it falls on.
+  P('beam', [[-118, 270], [40, 238], [40, 314]], '#ffe39a', { op: 0.1 }),
+  P('carbody', [[-452, 314], [-446, 272], [-400, 258], [-338, 252], [-310, 200], [-222, 198], [-182, 250], [-130, 262], [-112, 290], [-118, 314]], '#e0524a'),
+  P('carshade', [[-452, 314], [-450, 294], [-114, 294], [-118, 314]], '#a8383a'),
+  P('cabin', [[-322, 248], [-300, 210], [-236, 210], [-198, 248]], '#9fd0ee', { op: 0.9 }),
+  O('lamp', -124, 272, 9, '#ffe39a'),
+  O('wheel1', -370, 338, 42, '#1d1a24', { line: '#4a4458', lw: 10 }), O('hub1', -370, 338, 13, '#8b93a1'),
+  O('wheel2', -190, 338, 42, '#1d1a24', { line: '#4a4458', lw: 10 }), O('hub2', -190, 338, 13, '#8b93a1'),
+  // The shape the moments select: a new shape's default colours.
+  R('rect1', -60, 300, 160, 80, '#4a90d9', { line: '#1f3552', lw: 5 }),
+  // Off screen: the rest of the level, seen only in the minimap and the whole level moment.
+  P('hillL', [[-4000, 382], [-4000, -300], [-3300, 382]], '#2f6e4c'), P('hillL-lit', [[-4000, -300], [-3300, 382], [-3700, 382]], '#46985f'),
+  P('rampR', [[2500, 382], [3200, 382], [3200, 60]], '#2f6e4c'), P('rampR-lit', [[2500, 382], [3200, 60], [3200, 382]], '#46985f', { op: 0.5 }),
+  R('towerR', 3200, -400, 300, 782, '#3e3a55'), R('towerR-lit', 3350, -400, 150, 782, '#575273'),
+  R('crateR1', 3250, -500, 100, 100, '#c98a4b', { line: '#7a4e26', lw: 6 }),
+  R('crateR2', 3360, -500, 100, 100, '#c98a4b', { line: '#7a4e26', lw: 6 }),
+  O('ballR', 2300, 300, 80, '#f2c14e'), O('ballR-hi', 2272, 272, 26, '#ffffff', { op: 0.4 }),
+  ...isle('ledge1', -3200, -1500, 700), R('crateL', -3000, -1600, 100, 100, '#c98a4b', { line: '#7a4e26', lw: 6 }),
+  ...isle('ledge2', 1600, -1700, 800), ...isle('ledge3', -600, -2200, 1200), ...isle('ledge4', -2800, -2800, 900), ...isle('ledge5', 1200, -3300, 900),
+  O('goal-halo', 1650, -3420, 150, '#7fe0c0', { op: 0.12 }), O('goal', 1650, -3420, 60, '#7fe0c0'),
+  P('cave', [[-1600, 1950], [-1350, 1680], [-900, 1620], [-300, 1700], [300, 1640], [900, 1700], [1400, 1660], [1600, 1950], [1350, 2250], [600, 2300], [-200, 2240], [-1000, 2290], [-1450, 2200]], '#120d19'),
+  P('crystal1', [[-900, 2280], [-860, 2140], [-820, 2280]], '#7fd1d9', { op: 0.85 }), P('crystal2', [[-830, 2280], [-790, 2190], [-760, 2280]], '#5fb4c4', { op: 0.85 }),
+  P('crystal3', [[700, 2290], [750, 2120], [790, 2290]], '#7fd1d9', { op: 0.85 }), P('crystal4', [[300, 1650], [340, 1780], [380, 1650]], '#5fb4c4', { op: 0.85 })
 ];
 const HINGES = [[-370, 338], [-190, 338]];
-const PLAYED = { crate3: { dx: 320, dy: 60, rot: 28 }, ball: { dy: 100 }, carbody: { dx: 50 }, cabin: { dx: 50 }, wheel1: { dx: 50 }, wheel2: { dx: 50 } };
+const CAR = ['beam', 'carbody', 'carshade', 'cabin', 'lamp', 'wheel1', 'hub1', 'wheel2', 'hub2'];
+const PLAYED = Object.assign({ crate3: { dx: 320, dy: 60, rot: 28 }, ball: { dy: 100 }, 'ball-hi': { dy: 100 } }, Object.fromEntries(CAR.map((id) => [id, { dx: 50 }])));
 
 function drawShape(s, X, Y, z, opts) {
-  const style = opts.noLines ? `fill="${s.fill}"` : `fill="${s.fill}" stroke="${s.line}" stroke-width="${Math.max(0.6, 2 * z)}" stroke-linejoin="round"`;
+  let style = `fill="${s.fill}"${s.op == null ? '' : ` fill-opacity="${s.op}"`}`;
+  if (s.line && !opts.noLines) style += ` stroke="${s.line}" stroke-width="${Math.max(0.6, s.lw * z)}" stroke-linejoin="round"`;
   const m = (opts.play && PLAYED[s.id]) || {};
   const dx = m.dx || 0, dy = m.dy || 0;
   if (s.t === 'rect') {
@@ -465,26 +554,29 @@ const handles = (x, y, w, h) => [[0, 0], [.5, 0], [1, 0], [0, .5], [1, .5], [0, 
 
 // A frame's label over its top left corner: the name in bold, then a gap and the size.
 function frameLabel(x, y, name, size) {
-  return `<text x="${x}" y="${y - 7}" font-size="12" fill="rgba(20,28,40,.75)" style="font-family:var(--font-ui)"><tspan font-weight="600" fill="rgba(20,28,40,.9)">${name}</tspan><tspan dx="10">${size}</tspan></text>`;
+  return `<text x="${x}" y="${y - 7}" font-size="12" fill="rgba(236,240,246,.6)" style="font-family:var(--font-ui)"><tspan font-weight="600" fill="rgba(236,240,246,.92)">${name}</tspan><tspan dx="10">${size}</tspan></text>`;
 }
 // One SVG of the level view. Overlays are drawn in screen pixels.
 function scene(w, h, z, cx, cy, opts) {
   const X = (x) => +(cx + x * z).toFixed(2), Y = (y) => +(cy + y * z).toFixed(2);
-  let s = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="${BG}"/>`;
+  const [bx, by, bw, bh] = MAP_AREA, inside = `x="${X(bx)}" y="${Y(by)}" width="${bw * z}" height="${bh * z}"`;
+  // The editor's colour everywhere, then the World's fill inside the level bounds only.
+  let s = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="${OUTSIDE}"/><rect ${inside} fill="${WORLD_FILL}"/>`;
+  for (const shape of LEVEL) s += drawShape(shape, X, Y, z, opts);
+  // The grid, over the entities and inside the bounds only, in white since the World's fill is dark.
   if (opts.grid) {
     const step = 50 * z, ox = ((cx % step) + step) % step, oy = ((cy % step) + step) % step;
-    s += `<defs><pattern id="g" width="${step}" height="${step}" patternUnits="userSpaceOnUse" x="${ox}" y="${oy}"><path d="M ${step} 0 L 0 0 0 ${step}" fill="none" stroke="rgba(30,60,95,.11)" stroke-width="1"/></pattern></defs><rect width="${w}" height="${h}" fill="url(#g)"/>`;
-    s += `<path d="M ${cx} 0 V ${h} M 0 ${cy} H ${w}" stroke="rgba(30,60,95,.28)" stroke-width="1"/>`;
+    s += `<defs><pattern id="g" width="${step}" height="${step}" patternUnits="userSpaceOnUse" x="${ox}" y="${oy}"><path d="M ${step} 0 L 0 0 0 ${step}" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="1"/></pattern></defs><rect ${inside} fill="url(#g)"/>`;
+    s += `<path d="M ${cx} ${Math.max(0, Y(by))} V ${Math.min(h, Y(by + bh))} M ${Math.max(0, X(bx))} ${cy} H ${Math.min(w, X(bx + bw))}" stroke="rgba(255,255,255,.14)" stroke-width="1"/>`;
   }
-  for (const shape of LEVEL) s += drawShape(shape, X, Y, z, opts);
   if (opts.joints) for (const [a, b] of HINGES) s += `<circle cx="${X(a)}" cy="${Y(b)}" r="7" fill="#fff" stroke="#1d2430" stroke-width="1.5"/><circle cx="${X(a)}" cy="${Y(b)}" r="2" fill="#1d2430"/>`;
   if (opts.bounds) {
-    const [bx, by, bw, bh] = MAP_AREA, x = X(bx), y = Y(by);
-    s += `<rect x="${x}" y="${y}" width="${bw * z}" height="${bh * z}" fill="none" stroke="rgba(20,28,40,.6)" stroke-width="1.5"/>`;
+    const x = X(bx), y = Y(by);
+    s += `<rect ${inside} fill="none" stroke="rgba(236,240,246,.35)" stroke-width="1"/>`;
     s += frameLabel(x, y, 'World', `${bw} × ${bh}`);
   }
   if (opts.cameraFrame) {
-    s += `<rect x="${X(-960)}" y="${Y(-540)}" width="${1920 * z}" height="${1080 * z}" fill="none" stroke="rgba(20,28,40,.6)" stroke-width="1.5"/>`;
+    s += `<rect x="${X(-960)}" y="${Y(-540)}" width="${1920 * z}" height="${1080 * z}" fill="none" stroke="rgba(236,240,246,.55)" stroke-width="1.5"/>`;
     s += frameLabel(X(-960), Y(-540), 'Camera', '1920 × 1080');
   }
   if (opts.selected) {
@@ -494,11 +586,11 @@ function scene(w, h, z, cx, cy, opts) {
   if (opts.drawing) {
     const pts = [[-760, -250], [-560, -390], [-330, -300], [-380, -90]], mouse = [-640, -40];
     s += `<polygon points="${pts.concat([mouse]).map(([a, b]) => X(a) + ',' + Y(b)).join(' ')}" fill="#4a90d9" fill-opacity=".35"/>`;
-    s += `<polyline points="${pts.map(([a, b]) => X(a) + ',' + Y(b)).join(' ')}" fill="none" stroke="#1f3552" stroke-width="1.5"/>`;
-    s += `<polyline points="${X(pts[3][0])},${Y(pts[3][1])} ${X(mouse[0])},${Y(mouse[1])} ${X(pts[0][0])},${Y(pts[0][1])}" fill="none" stroke="#1f3552" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+    s += `<polyline points="${pts.map(([a, b]) => X(a) + ',' + Y(b)).join(' ')}" fill="none" stroke="rgba(236,240,246,.85)" stroke-width="1.5"/>`;
+    s += `<polyline points="${X(pts[3][0])},${Y(pts[3][1])} ${X(mouse[0])},${Y(mouse[1])} ${X(pts[0][0])},${Y(pts[0][1])}" fill="none" stroke="rgba(236,240,246,.85)" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="5 4"/>`;
     pts.forEach(([a, b], i) => { s += i === 0 ? `<circle cx="${X(a)}" cy="${Y(b)}" r="6" style="fill:#fff;stroke:var(--accent)" stroke-width="2"/>` : handle(X(a), Y(b)); });
     const mx = X(mouse[0]), my = Y(mouse[1]);
-    s += `<path d="M ${mx - 9} ${my} H ${mx + 9} M ${mx} ${my - 9} V ${my + 9}" stroke="#0b0d10" stroke-width="1.5"/>`;
+    s += `<path d="M ${mx - 9} ${my} H ${mx + 9} M ${mx} ${my - 9} V ${my + 9}" stroke="#ffffff" stroke-width="1.5"/>`;
   }
   return s + '</svg>';
 }
@@ -508,7 +600,7 @@ const ROWS = [
   [0, 'world', 'World', 'open'], [1, 'camera', 'Camera'], [1, 'rect', 'Rectangle 1'], [1, 'circle', 'Ball'],
   [1, 'rect', 'Crate 3'], [1, 'rect', 'Crate 2'], [1, 'rect', 'Crate 1'], [1, 'rect', 'Platform'],
   [1, 'group', 'Car', 'open'], [2, 'joint', 'Hinge 2'], [2, 'joint', 'Hinge 1'], [2, 'circle', 'Wheel 2'],
-  [2, 'circle', 'Wheel 1'], [2, 'polygon', 'Cabin'], [2, 'rect', 'Body'], [1, 'polygon', 'Ramp'], [1, 'rect', 'Ground']
+  [2, 'circle', 'Wheel 1'], [2, 'polygon', 'Cabin'], [2, 'rect', 'Body'], [1, 'polygon', 'Ramp'], [1, 'rect', 'Ground'], [1, 'group', 'Scenery', 'closed']
 ];
 function rowsHtml(rows, selected, hover) {
   const indent = 2;
@@ -651,7 +743,7 @@ const PARTS = {
   menu: () => `<div class="inl"><div class="menu static ${S.menu}">${menuBody([['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C', 'hover'], ['Paste', 'Ctrl+V'], '-', ['Redo', 'Ctrl+Shift+Z', 'dis']])}</div></div>`,
   note: () => `<div class="note ${S.note}">${ic('warning', 'style="color:var(--warning);margin-top:1px"')}<span>Needs a SurfaceComponent to collide. <span class="fix">Add SurfaceComponent</span></span></div>` +
     `<div class="note ${S.note} tipn">${ic('info', 'style="color:var(--tip);margin-top:1px"')}<span>A tip reads the same, with a blue icon.</span></div>`,
-  handle: () => `<div class="inl"><svg width="200" height="90" viewBox="0 0 200 90" style="border-radius:6px"><rect width="200" height="90" fill="${BG}"/><rect x="60" y="25" width="80" height="40" fill="#4a90d9" stroke="#1f3552"/><rect x="60" y="25" width="80" height="40" fill="none" style="stroke:var(--accent)" stroke-width="1.5"/>${handles(60, 25, 80, 40)}</svg></div>`,
+  handle: () => `<div class="inl"><svg width="200" height="90" viewBox="0 0 200 90" style="border-radius:6px"><rect width="200" height="90" fill="${WORLD_FILL}"/><rect x="60" y="25" width="80" height="40" fill="#4a90d9" stroke="#1f3552"/><rect x="60" y="25" width="80" height="40" fill="none" style="stroke:var(--accent)" stroke-width="1.5"/>${handles(60, 25, 80, 40)}</svg></div>`,
   play: () => playbar(false, 'static') + playbar(true, 'static')
 };
 function partsSheet() {
