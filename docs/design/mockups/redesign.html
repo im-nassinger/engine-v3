@@ -72,12 +72,6 @@
   .cnums svg.i, .barnums svg.i { width: 13px; height: 13px; }
   .hintchip { position: absolute; transform: translateX(-50%); z-index: 3; white-space: nowrap; background: rgba(13, 15, 19, .8); color: #e4e8ef; border-radius: 999px; padding: 7px 15px; font-size: 12px; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
   .hintchip { display: flex; gap: 18px; align-items: center; }
-  .note-top { position: absolute; transform: translateX(-50%); z-index: 3; display: flex; align-items: center; gap: 12px; padding: 8px 18px 8px 8px; border-radius: 14px; background: var(--panel); max-width: 480px; }
-  .note-top .ti { width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--k); background: color-mix(in srgb, var(--k) 18%, transparent); }
-  .note-top .ti svg.i { width: 17px; height: 17px; }
-  .note-top .tt { font-weight: 600; color: var(--text); }
-  .note-top .td { color: var(--muted); }
-  .note-top .tk { margin-left: 8px; padding: 0 5px; border-radius: 4px; background: var(--field); color: var(--muted); font-weight: 400; font-size: 10px; }
   .debug { position: absolute; transform: translateX(-50%); z-index: 3; display: flex; gap: 18px; padding: 5px 14px; border-radius: 999px; background: rgba(13, 15, 19, .72); color: #e4e8ef; font-size: 10px; white-space: pre; font-variant-numeric: tabular-nums; }
   .debug b { font-weight: 400; color: #8b93a1; margin-right: 6px; }
   .cnums { display: flex; gap: 12px; align-items: center; color: #9aa3b2; font-size: 12px; }
@@ -382,7 +376,7 @@ const KINDS = [
 ];
 
 // The directions. Each is a set of tokens and one variant of each kind.
-const BASE = { title: 'boundsize', actions: 'apart', burger: 'with', name: 'plain', zoom: 'footer', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
+const BASE = { title: 'boundsize', actions: 'apart', burger: 'with', name: 'plain', zoom: 'none', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
 const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s, view) => ({ id, name, desc, view, t: SLATE, s: Object.assign({}, BASE, s) });
@@ -547,11 +541,6 @@ const C = {
   play: () => `<span class="play ${S.btn}">${ic('play')}Play</span>`,
   view: () => `<span class="ib">View${CHEV}</span><span class="ib num">40%${CHEV}</span><span class="ib">${ic('help')}</span>`
 };
-// The tool card at the top middle: the chosen tool's icon, its name and key, and what it does right now.
-function message(o) {
-  const m = o.msg;
-  return `<div class="note-top" style="left:${geo().cx}px;top:${M}px;--k:var(--accent)"><span class="ti">${ic(m.icon)}</span><span><div class="tt">${m.title}<span class="tk">${m.key}</span></div><div class="td">${m.text}</div></span></div>`;
-}
 const entities = (o) => `<div class="abs blk panel ents" style="${pos(geo().ents)}"><div class="ph ${S.head}">Entities viewer</div>${rowsHtml(ROWS, o.sel, o.hover)}</div>`;
 
 // Inspector fields
@@ -587,10 +576,10 @@ function inspector(o) {
 
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
-// The debug line at the bottom middle: the mouse position, the selection's size when there is one, and the grid size.
+// The debug line at the bottom middle: the mouse position, the selection's size when there is one, the grid size and the zoom.
 function bottom(o) {
-  const parts = [['x', o.x], ['y', o.y]].concat(o.size ? [['size', o.size]] : [], [['grid', '50']]);
-  return `<div class="debug" style="left:${geo().cx}px;top:${H - M - 24}px">${parts.map(([l, v]) => `<span><b>${l}</b>${v}</span>`).join('')}</div>` + message(o);
+  const parts = [['x', o.x], ['y', o.y]].concat(o.size ? [['size', o.size]] : [], [['grid', '50'], ['zoom', zoomText()]]);
+  return `<div class="debug" style="left:${geo().cx}px;top:${H - M - 24}px">${parts.map(([l, v]) => `<span><b>${l}</b>${v}</span>`).join('')}</div>`;
 }
 function toolColumn(o) {
   const [x, y, w] = geo().tools;
@@ -624,7 +613,7 @@ function minimap(r = W - M, b = H - M) {
 }
 function editor(o) {
   setZoom(!!o.whole);
-  o = Object.assign({ tool: 'select', msg: TIP.select, x: '20', y: '340' }, o, o.top);
+  o = Object.assign({ tool: 'select', x: '20', y: '340' }, o, o.top);
   const g = geo();
   return view(o.scene || {}) + `<div class="leftcol" style="${pos(g.left)}">${o.noInspector ? shapeStrip() : inspector(o)}</div>` + burger(o) + toolColumn(o) + entities(o) + minimap() + bottom(o) + (o.extra || '');
 }
@@ -654,18 +643,12 @@ function playbar(paused, extraCls = '') {
     `<span class="ib">${ic('stop')}Stop <span class="k">Ctrl+Enter</span></span></div>`;
 }
 
-// What the tool card says in each moment: the chosen tool, and what it does where the mouse is.
-const TIP = {
-  select: { icon: 'select', title: 'Select', key: '1', text: 'Drag a handle to resize. Shift keeps the proportions.' },
-  pick: { icon: 'select', title: 'Select', key: '1', text: 'Click to select, drag to move.' },
-  shape: { icon: 'shape', title: 'Shape', key: '4', text: 'Click to add a point. Click the first point to close it.' }
-};
 const MOMENTS = {
   shape: () => editor({ sel: 'Rectangle 1', hover: 'Crate 2', size: '160 × 80', scene: { selected: 'rect1' } }),
-  whole: () => editor({ whole: true, msg: TIP.pick, x: '−3120', y: '−2410', scene: { bounds: true } }),
-  draw: () => editor({ tool: 'shape', noInspector: true, scene: { drawing: true }, msg: TIP.shape, x: '−640', y: '−40' }),
+  whole: () => editor({ whole: true, x: '−3120', y: '−2410', scene: { bounds: true } }),
+  draw: () => editor({ tool: 'shape', noInspector: true, scene: { drawing: true }, x: '−640', y: '−40' }),
   menu: () => editor({ sel: 'Rectangle 1', size: '160 × 80', scene: { selected: 'rect1' }, top: { menuOpen: true } }),
-  dialog: () => editor({ extra: `<div class="scrim"></div><div class="dialog">${dialogBody()}</div>`, msg: TIP.pick, x: '412', y: '−96' }),
+  dialog: () => editor({ extra: `<div class="scrim"></div><div class="dialog">${dialogBody()}</div>`, x: '412', y: '−96' }),
   play: () => `<div class="game"><div style="position:absolute;left:0;top:45px">${scene(1440, 810, 0.75, 720, 405, { play: true })}</div></div>${playbar(false)}`,
   parts: () => partsSheet()
 };
