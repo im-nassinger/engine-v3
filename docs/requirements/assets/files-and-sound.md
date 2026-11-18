@@ -13,7 +13,7 @@ The Assets panel is a small file system: folders of raw files, each with a path,
 - **An asset is only the raw file. Settings never live on the asset.** They live where it is used: on an image fill, on a "Play sound" action. *Why: you never wonder where a setting is, and two places can use one file with different settings without copying it.*
 - A read-only **`builtin` folder** holds the files that come with the game. See [builtin-content.md](builtin-content.md).
 - **Builtin files can't be changed.** To change one, duplicate it into one of your own folders and edit the copy. *Why: builtin files never change once released, so a game update never changes how a level plays (owner: 2026-11-13).*
-- Selecting a file shows its details at the bottom of the panel, not in the Inspector, so the selection in the level is kept.
+- Selecting a file shows its details at the bottom of the panel, not in the Entity inspector, so the selection in the level is kept.
 - F2 or a double-click renames a file. Del deletes it.
 - The panel is read-only during play.
 - *Why v2: it holds .lua and .entity files, which both come in v2.*

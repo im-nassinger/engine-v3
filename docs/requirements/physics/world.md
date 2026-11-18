@@ -15,7 +15,7 @@ The level-wide physics settings, all on the World entity. **v1:** gravity as one
 - The 9.8 default feels floaty for a platformer. The fix is the player's Gravity scale, not the world's gravity: the builtin platformer script sets it from its jump variables.
 - **The background colour is the fill of the World's StyleComponent**, which paints the World's rectangle, the level bounds. A soft light blue by default, **`#BFE3F5`**, with no outline, because the editor already draws the bounds as a thin frame. *Why: a StyleComponent already holds a fill, so the background needs no setting of its own, and in v3 an image fill becomes the background image (owner: 2026-11-13). Why this blue: every default shape colour stands out on it (standing yes, 2026-11-14).*
 - Triggers and scripts can change gravity and the World's whole StyleComponent during play, the background colour included. **Walls can't change during play**, because the bounds don't (standing yes, 2026-11-14). Changing gravity wakes every sleeping body, so nothing hangs in mid-air.
-- The World's settings are edited in the Inspector, like any entity's.
+- The World's settings are edited in the Entity inspector, like any entity's.
 
 Source: scope PH9; round 1: C3, D6, D38; round 3: D75, R15; round 6: 05 2.14; round 7: CF1; old: PH-82 to PH-84, PH-88, PH-89; owner: 2026-11-13, 2026-11-14, 2026-11-15
 
@@ -81,7 +81,7 @@ Source: scope PH7; round 6: 05 2.13; round 8: CF4; old: PH-80, PH-81
 
 - **A level has a fixed size.** Every level has a bounds rectangle, always. *Why: a physics world needs an edge, otherwise lost entities cost time forever and the camera has nothing to stop at.*
 - **The level bounds are the World's rectangle:** the World has a ShapeComponent holding a rectangle, and its width and height are the bounds' size. It is always a rectangle and can't be removed. *Why: the owner's change. A rectangle already has a size, a card and handles, so the bounds need no settings of their own (owner: 2026-11-13).*
-- Default size: **20000×20000 px**, a square. The default camera is 1920×1080. *Why: a new level is square (owner: 2026-11-17). 20000 keeps the width the level had before, so only the height changes (standing yes, 2026-11-17).*
+- Default size: **20000×10000 px**. The default camera is 1920×1080. *Why: the owner first made a new level square (2026-11-17), then kept 20000×10000 (owner: 2026-11-18): the redesign's 8000×8000 square was its example level only.*
 - **The World's rectangle is centred on the level's origin**, and stays there. *Why: the World never moves, so its rectangle can't be moved either, and a centred rectangle needs no offset setting (owner: 2026-11-13).*
 - The bounds show as a thin frame in the editor. Resize them by dragging their handles with the World selected, or by typing the rectangle's width and height. **Dragging one edge moves the opposite edge by the same amount**, so the centre never moves. Example: bounds 20000 wide run from −10000 to 10000; dragging the right edge out by 1000 makes them 22000 wide, from −11000 to 11000.
 - The camera stops at the bounds.
@@ -91,7 +91,7 @@ Source: scope PH7; round 6: 05 2.13; round 8: CF4; old: PH-80, PH-81
 - An entity that starts or spawns outside is left alone until it has been inside once.
 - The bounds don't change during play.
 
-Source: scope PH12; round 1: D5, D40; round 6: 05 2.15; round 7: BND2; round 10: 11 2.16; old: PH-91 to PH-99; owner: 2026-11-13, 2026-11-17
+Source: scope PH12; round 1: D5, D40; round 6: 05 2.15; round 7: BND2; round 10: 11 2.16; old: PH-91 to PH-99; owner: 2026-11-13, 2026-11-17, 2026-11-18
 
 ## Small features
 

@@ -26,7 +26,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Swipe back.** `overscroll-behavior` stops scroll chaining, but its effect on swipe navigation at the page root isn't documented. Test on a Mac.
 - **Hit testing and hover** need a spatial index over level bounds to meet the speed targets. Bounds are derived, so a move must invalidate a subtree cheaply.
 - **Hide and lock from parents** are derived by walking up the tree. Cache per subtree. The play copy must carry the hidden state so play draws the same thing.
-- **Entities panel.** A fixed row height allows a virtualised list. Virtualisation plus drag and drop is where hand-made trees tend to break, so prototype both together at 10,000 rows. Browser find can't see off-screen rows, which is one reason for the panel's own search.
+- **Entities viewer.** A fixed row height allows a virtualised list. Virtualisation plus drag and drop is where hand-made trees tend to break, so prototype both together at 10,000 rows. Browser find can't see off-screen rows, which is one reason for the panel's own search.
 - **Order keys.** If draw order uses fractional keys, repeated inserts between the same neighbours run out of precision. Rebalance quietly, outside undo.
 - **Negative scale** must be allowed (mirroring, Flip). Polygon winding and joint limits need a rule under mirroring.
 
@@ -156,7 +156,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 
 ## Test play
 
-- **Messages between the editor and the game.** Beyond pause, step and stop, the editor needs to send: speed, restart, which View menu switches are on, which entity the Inspector watches, and a click to resolve into an entity. The game sends back: numbers for the performance view, shapes for the debug views, the watched entity's values, variable values and "the run ended".
+- **Messages between the editor and the game.** Beyond pause, step and stop, the editor needs to send: speed, restart, which View menu switches are on, which entity the Entity inspector watches, and a click to resolve into an entity. The game sends back: numbers for the performance view, shapes for the debug views, the watched entity's values, variable values and "the run ended".
 - **Clock.** The speed menu and a player slowing the game scale how often ticks run, never the tick itself. Stamp each input with the tick it applied to: that log is the record of a run. How timers behave in a hidden tab's worker is undocumented, so pause when hidden and don't depend on it.
 - **Restart.** Rebuild from the prepared copy with a fresh Lua state, physics world, id counter and random stream. Resetting in place risks leaking state into a run. Keeping the prepared level and a spare worker ready makes Restart fast.
 - **First Play.** Loading the Lua and Box2D wasm files on the first Play is slow. Preload them when the editor opens.

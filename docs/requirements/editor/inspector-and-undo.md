@@ -1,21 +1,22 @@
-# Editor: Inspector, editor messages, clipboard and undo
+# Editor: Entity inspector, editor messages, clipboard and undo
 
 ## TL;DR
 
-How values are edited and how mistakes are reversed. **v1:** the Inspector shows each component as a card, built from one fixed list of field types; a component that needs a partner shows a note with a button instead of adding it; warnings sit on the card they are about; copy, paste, duplicate and delete; undo with 512 steps. **v3:** copying values and whole components between entities, tips, the physics and joint warnings, and the Used by list.
+How values are edited and how mistakes are reversed. **v1:** the Entity inspector shows each component as a card, built from one fixed list of field types; a component that needs a partner shows a note with a button instead of adding it; warnings sit on the card they are about; copy, paste, duplicate and delete; undo with 512 steps. **v3:** copying values and whole components between entities, tips, the physics and joint warnings, and the Used by list.
 
-## The Inspector
+## The Entity inspector
 
 ### Cards for the selection · v1
 
-- The Inspector shows every component of the selected entity as a card: a title, its fields, and a menu with Remove and Reset to defaults.
+- The Entity inspector shows every component of the selected entity as a card: a title, its fields, and a menu with Remove and Reset to defaults.
+- **A card's title is the component's name without `Component`**: `Transform`, `Shape`, `Style`, `Body`, `Surface`, `Joint`, `Camera`, `PhysicsWorld` (owner: 2026-11-17). Only the title shown changes: the components keep their full names in the file, the glossary and Lua. Cards are split by space only, with no lines between them.
 - **Clicking empty space shows the World's components.** There is no settings window. *Why: the World is an entity like any other, so its settings are its components.*
 - The World's TransformComponent is fixed at zero and its card isn't shown, because the World never moves (owner: 2026-11-13).
 - The header shows the entity's name (editable), and its hide switch, and from v3 its lock switch. With several selected it reads `3 entities`.
-- The Inspector doesn't show the parent. The Entities panel tree does.
+- The Entity inspector doesn't show the parent. The Entities viewer tree does.
 - Cards appear in one fixed order, the same on every entity: TransformComponent, shape, path, text, style, body, surface, joint, camera, tags, scripts, triggers. Users can't reorder them.
 - Clicking a card's title folds it. The folded state is remembered per component type, in the browser.
-- TransformComponent fields are measured from the parent, and the tooltip says so. The level position of the selection is in the status bar.
+- TransformComponent fields are measured from the parent, and the tooltip says so. The level position of the selection isn't shown; the debug box shows the mouse's (owner: 2026-11-17).
 - Hovering a field's label shows its description, when it has one; a label that says enough, such as "Let connected objects collide", has none (owner: 2026-11-17). The TransformComponent's and the name's (owner: 2026-11-14):
 
 | Field | Description |
@@ -27,13 +28,13 @@ How values are edited and how mistakes are reversed. **v1:** the Inspector shows
 | Name | The entity's name. It doesn't have to be unique. |
 
 - **Position and rotation can change during play. Scale and skew can't.** *Why: the physics rules already keep scale, and skew changes the shape the same way (owner: 2026-11-14).*
-- During play the Inspector is read-only, and shows live values when brought back with Panels.
+- During play the Entity inspector is read-only, and shows live values when brought back with Panels.
 
-Source: round 1: C1, C10; round 3: R15; round 4: H2, SEL1; decisions: D14, D15; old: WS-84 to WS-89, WS-124; owner: 2026-11-13, 2026-11-14
+Source: round 1: C1, C10; round 3: R15; round 4: H2, SEL1; decisions: D14, D15; old: WS-84 to WS-89, WS-124; owner: 2026-11-13, 2026-11-14, 2026-11-17
 
 ### One fixed list of field types · v1
 
-- Every Inspector field is one of: **number, text, checkbox, choice, colour, vector, angle, entity, asset, variable, tags, path point**, or a **list** of any of these.
+- Every Entity inspector field is one of: **number, text, checkbox, choice, colour, vector, angle, entity, asset, variable, tags, path point**, or a **list** of any of these.
 - **A list is one field**, such as "Points", folded by default with its item count beside its name. Unfolded, it shows one row per item, each the field of its type. A + at the end adds an item and each row can be removed, unless that breaks the list's minimum or maximum, which is refused with a status text. Each change is one undo step.
 - A **path point** is one point of a path: its position, its two curve handles and its corner (sharp, smooth, or smooth with handles that move separately).
 - *Why the points are one list field: a shape's points are one value, so they read as one entry, not as a row per point (owner, 2026-11-15).*
@@ -50,7 +51,7 @@ Source: round 3: S2; round 4: FT1; owner: 2026-11-15; owner: 2026-11-16
 - Units show as a faded suffix and may be typed: `px`, `°`, `%`, `px/s`, `s`. Rotation is in degrees, lengths and speeds in pixels.
 - Both `1.5` and `1,5` are decimals. *Why: the owner's locale and many others use a comma.*
 - A number with both a minimum and a maximum also shows a slider.
-- An **entity** field is filled by dragging a row from the Entities panel, from a dropdown, or with a picker that lets you click an entity in the level view. A deleted target shows a `missing entity` warning.
+- An **entity** field is filled by dragging a row from the Entities viewer, from a dropdown, or with a picker that lets you click an entity in the level view. A deleted target shows a `missing entity` warning.
 
 | Typed | Result |
 |---|---|
@@ -68,13 +69,13 @@ Source: round 3: 01 2.5; old: WS-114, WS-115, WS-119 to WS-122, WS-125, WS-126; 
 ### Adding and removing components · v1
 
 - `Add Component` sits at the bottom of the cards and opens a searchable menu. Components the entity already has are not listed, because an entity has one of each type.
-- **Adding a component that needs a partner doesn't add the partner.** The card shows a note with a button, such as "Needs a ShapeComponent to draw anything. [Add ShapeComponent]". *Why: adding the partner automatically surprises you, and refusing is annoying when you were about to add it next. A note with a one-click fix is clear and never in the way.*
-- **Every partner note reads "Needs a X to Y. [Add X]"**, such as "Needs a SurfaceComponent to collide. [Add SurfaceComponent]". *Why: one pattern, so every note reads the same (owner: 2026-11-13).*
+- **Adding a component that needs a partner doesn't add the partner.** The card shows a note with a button, such as "Needs a Shape to draw anything. [Add Shape]". *Why: adding the partner automatically surprises you, and refusing is annoying when you were about to add it next. A note with a one-click fix is clear and never in the way.*
+- **Every partner note reads "Needs a X to Y. [Add X]"**, X being the card's title, such as "Needs a Surface to collide. [Add Surface]". *Why: one pattern, so every note reads the same (owner: 2026-11-13), and it names the card the user sees (owner: 2026-11-17).*
 - The TransformComponent, the camera's CameraComponent and the World's own components can't be added or removed by hand, and neither can a JointComponent, which only the [Joint tool](../physics/joints.md#the-joint-tool--v1) adds. The menu entry is disabled and says why.
 - With several entities selected, Add Component adds to every entity that lacks it, and Remove removes from all.
-- **Removing a component that others need removes only that one.** The cards left without their partner show their note. Example: removing a crate's ShapeComponent leaves its SurfaceComponent, whose card then shows its note with an [Add ShapeComponent] button. *Why: nothing happens behind the user's back, and undo brings the component back.*
+- **Removing a component that others need removes only that one.** The cards left without their partner show their note. Example: removing a crate's ShapeComponent leaves its SurfaceComponent, whose card then shows its note with an [Add Shape] button. *Why: nothing happens behind the user's back, and undo brings the component back.*
 
-Source: round 5: AD2; old: WS-101, WS-102, WS-106, WS-112; owner: 2026-11-13, 2026-11-14
+Source: round 5: AD2; old: WS-101, WS-102, WS-106, WS-112; owner: 2026-11-13, 2026-11-14, 2026-11-17
 
 ### Copy values and components · v3
 
@@ -87,7 +88,7 @@ Source: scope ED7; round 6: CP1
 
 ### The Used by list · v3
 
-- At the bottom of the Inspector, a list shows every entity that points to the selected one, and from where, such as "Hinge 1 (JointComponent, A)". Click a line to select that entity.
+- At the bottom of the Entity inspector, a list shows every entity that points to the selected one, and from where, such as "Hinge 1 (JointComponent, A)". Click a line to select that entity.
 - *Why: a joints-only list would be a special case. "What points to this?" is the general question, the same idea as assets showing where they're used.*
 
 Source: scope SE13; round 8: LK1
@@ -97,12 +98,12 @@ Source: scope SE13; round 8: LK1
 ### Warnings · v1
 
 - An **editor message** is the one name for every note the editor shows about a setup: a short sentence on the card it is about, maybe with a fix button, never blocking anything. Two kinds: a **warning** (yellow icon, this may not work) and a **tip** (blue icon, this works but there's an easier way).
-- All editor messages are listed from the count in the status bar. They never block saving or Play.
+- Each editor message shows only on its card; there is no count and no list of them (owner: 2026-11-18). They never block saving or Play.
 - Script errors are not editor messages. They stay in the Console.
 - **v1 has only two warnings:** a component missing its partner (see above), and a failed save (see [saving](../play-and-save/saving.md)).
 - *Why one name and look: every part of the editor reports problems the same way, and the kind says how worried to be.*
 
-Source: scope ED8; round 7: 06 2.13; round 8: WN1; round 10: EM1; old: WS-141 to WS-143
+Source: scope ED8; round 7: 06 2.13; round 8: WN1; round 10: EM1; old: WS-141 to WS-143; owner: 2026-11-18
 
 ### Tips · v3
 
@@ -126,10 +127,10 @@ Source: scope ED10; round 6: 05 2.9; round 7: 06 2.13
 - Paste puts the copy centred on the mouse when it is over the level view, otherwise at the centre of the view. Pasted entities go into the group you are inside, on top, and become the selection.
 - **Only what is selected is copied.** Nothing comes along because it is connected. A joint is copied only when the joint itself is selected.
 - Links between the copies are kept: a copied joint connects the copies of its entities if they were copied too. A link to something outside the copied set stays pointed at the original in the same level, and becomes `missing` in another level. **"The same level" means the same opening of it:** after a reload, New or Import, such links become `missing`. *Why: v1 has no level id, so the editor can only recognise the level it has open (owner: 2026-11-13).*
-- The World and the camera are skipped by copy, cut, duplicate and delete. If anything else was selected the command goes ahead, otherwise the status bar says why.
+- The World and the camera are skipped by copy, cut, duplicate and delete. If anything else was selected the command goes ahead, otherwise the message pill says why.
 - Pasted data is checked like an imported file. Bad data is refused, with a status message, and nothing changes.
 - A paste that would pass a limit is refused whole, naming the limit.
-- With nothing to paste: `Nothing to paste` in the status bar.
+- With nothing to paste: `Nothing to paste` in the message pill.
 
 Source: scope ED3; round 3: 01 2.9; round 7: 06 2.10; round 8: JC1; round 9: 09 2.18; old: WS-71 to WS-83; owner: 2026-11-13
 
@@ -151,16 +152,16 @@ Source: round 7: 06 2.11; old: WS-80, WS-81
 - History is one line: a new change clears redo. Changing the selection or the view doesn't.
 - **The history is lost on reload.** It is saved in no file. *Why: every past change would have to load forever, making files big and fragile across versions.*
 - Test play never changes the level or its history. Undo and Redo are off during play.
-- Undo never moves the view. If the change is out of sight, the status bar still reports it.
+- Undo never moves the view. If the change is out of sight, the message pill still reports it.
 - A command that fails or changes nothing makes no step. Opening or importing a level makes no step.
 
 | One step | Not a step |
 |---|---|
 | Create, delete, paste, duplicate | Changing the selection |
 | A move, resize or rotate drag | Going into or out of a group |
-| A committed Inspector value | The view, zoom, grid display |
+| A committed Entity inspector value | The view, zoom, grid display |
 | Adding or removing a component | The active tool, tool lock |
-| Group, ungroup, reorder, move between groups, rename, hide, lock | Panel sizes, folded cards, tabs, folded Entities panel rows |
+| Group, ungroup, reorder, move between groups, rename, hide, lock | Panel sizes, folded cards, tabs, folded Entities viewer rows |
 | World settings, level rename, the grid size | Snapping switches |
 | Importing, renaming or deleting a file. Several files at once is one step | Test play, Console contents |
 | A committed script edit | Keystrokes in the code editor before commit |
@@ -186,8 +187,8 @@ Small features from the old draft and review that the scope review never asked a
 | Arithmetic in fields | Number fields accept `100/2+8` | v3 |
 | Scrubbing | Dragging a number field's label changes it live: 1 per pixel, Shift 10, Alt 0.1. One undo step. Up and Down in a focused field do the same | v3 |
 | Reset to default | Right-click a field: Reset to default | v3 |
-| Align and distribute | Buttons at the top of the Inspector and in the Arrange menu: align left, centre, right, top, middle, bottom, and spread evenly. A group counts as one entity. One-off moves, unlike Flex | v3 |
-| Draw order commands | Bring forward, send backward, to front, to back, within the same group. Dragging rows in the Entities panel already does this | v3 |
+| Align and distribute | Buttons at the top of the Entity inspector and in the Arrange menu: align left, centre, right, top, middle, bottom, and spread evenly. A group counts as one entity. One-off moves, unlike Flex | v3 |
+| Draw order commands | Bring forward, send backward, to front, to back, within the same group. Dragging rows in the Entities viewer already does this | v3 |
 | Paste in place | Ctrl+Shift+V pastes at the original level position. `Paste here` in the context menu uses the right-click position | v3 |
 | Repeat duplicate | Move a duplicate, press Ctrl+D again, and the next copy repeats the same move | v3 |
 | Alt+drag copy | Alt+drag an entity drags out a copy, as one undo step | v3 |

@@ -9,7 +9,7 @@
 | Code | Test | Runs in |
 |---|---|---|
 | core: model, field types, schemas, geometry, deterministic maths, level data, simulation phases | Unit tests, `*.test.ts` beside the file | Node |
-| editor: history, selection, tools, commands, Inspector and Entities panel models, clipboard codec, shortcuts, autosave, pacer, watchdog | Unit tests with fakes (`FakeClock`, `FakeTimer`, `InMemoryLevelStore`, `DirectGameRunner`) | Node |
+| editor: history, selection, tools, commands, Entity inspector and Entities viewer models, clipboard codec, shortcuts, autosave, pacer, watchdog | Unit tests with fakes (`FakeClock`, `FakeTimer`, `InMemoryLevelStore`, `DirectGameRunner`) | Node |
 | adapters/box2d | Unit tests with the real `box2d3-wasm/compat` | Node |
 | adapters/pixi, storage, browser, worker | `*.browser.test.ts` beside the file | Vitest browser mode: Chromium, Firefox, WebKit |
 | ui components | Covered by the models' unit tests and the journeys below. A component holds no rules worth testing alone | |

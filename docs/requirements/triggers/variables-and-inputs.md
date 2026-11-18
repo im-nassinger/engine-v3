@@ -10,7 +10,7 @@ Two kinds of lists that triggers and scripts share. **Variables** are named valu
 
 - **Any entity can have a VariablesComponent**, listing each variable: a name, a type and a starting value. **The World's variables are the level's**, such as `coins = 0`. Any other entity's are its own, such as an enemy's `health = 3`. *Why: one concept for every named value. A script's values are variables on its entity, so triggers can read and change them too (owner: 2026-11-16).*
 - **Each variable has one type, picked when you create it: number, string, boolean, entity, asset, colour, vector, angle or tags.** Examples: `coins = 0`, `player_name = "Ada"`, `door_open = false`, `door` set to the entity "Door 2". *Why: the owner wants text in v2 (owner: 2026-11-13) and named the first three types (owner: 2026-11-14). The others are the types scripts need, such as the door a button opens (owner: 2026-11-16).*
-- **A number variable can have limits:** a minimum, a maximum and a unit, such as `speed` from 0 to 1,500 px/s. Its value stays inside them, in the Inspector and during play: a value past a limit is held at it (standing yes, 2026-11-16).
+- **A number variable can have limits:** a minimum, a maximum and a unit, such as `speed` from 0 to 1,500 px/s. Its value stays inside them, in the Entity inspector and during play: a value past a limit is held at it (standing yes, 2026-11-16).
 - Scripts add the variables they need from a warning on the ScriptComponent's card, see [scripts](../scripts/scripts.md#the-scriptcomponent--v2).
 - **What a trigger can do with each type:**
   - **number:** Change value sets, adds or subtracts. An If compares it, such as "If coins is 10 or more".

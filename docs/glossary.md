@@ -10,7 +10,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 |---|---|
 | Level | What a creator builds and a player plays: one tree of entities under the World. |
 | Entity | Any single thing in a level: a rectangle, a piece of text, a joint, the camera. On its own an entity is just an id. What it is comes from its components. Say "entity", never "item" or "object". |
-| Component | A piece of data attached to an entity, such as TransformComponent or BodyComponent. The Inspector shows each one as a card. An entity has at most one component of each type. |
+| Component | A piece of data attached to an entity, such as TransformComponent or BodyComponent. The Entity inspector shows each one as a card. An entity has at most one component of each type. |
 | Group | An entity whose job is to hold other entities as its children, so they move together. Every entity can hold children. |
 | World | The top entity of every level. Everything else sits inside it. It holds the level-wide settings: gravity, background colour, level bounds, variables, inputs. |
 | Camera | The one entity that decides which part of the level the player sees during play. In the editor it shows as a frame. |
@@ -26,32 +26,36 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 
 | Word | Meaning |
 |---|---|
-| Level view | Where you see and edit the level. It fills the whole window, with the panels on top. Older docs say "viewport". |
-| Free area | The part of the level view no panel or bar covers. Fitting the view (Whole level, Selection, Camera frame, and a new level opening) fills it. |
-| Panel | A fixed area on top of the level view: Entities, Inspector, Assets, Console. |
-| Entities panel | The panel listing every entity as a tree: groups with their children inside. One row is one entity. The top row is drawn in front. |
-| Inspector | The panel on the left showing the components of what is selected, so you can edit their values. |
-| Card | One component as the Inspector shows it: a title and its fields. |
+| Level view | Where you see and edit the level. It fills the whole window, with the islands on top. Older docs say "viewport". |
+| Free area | The part of the level view between the Entity inspector and the Entities viewer. Fitting the view (Whole level, Selection, Camera frame, and a new level opening) fills it. |
+| Island | A rounded part of the editor floating over the level view, 10 px from the window's edge and from the next island, with a soft shadow: ☰, the tool column, the Entity inspector, the Entities viewer, the minimap and the debug box (stage 19). |
+| Panel | An island that holds a list or cards: the Entities viewer, the Entity inspector, the Assets panel, the Console. |
+| Entities viewer | The panel at the top right listing every entity as a tree: groups with their children inside. One row is one entity. The top row is drawn in front. Only as tall as its rows. |
+| Entity inspector | The panel on the left, beside the tool column, showing the components of what is selected, so you can edit their values. |
+| Card | One component as the Entity inspector shows it: a title and its fields. The title drops "Component": the TransformComponent's card reads `Transform` (owner: 2026-11-17). |
+| ☰ | The square island at the top left that opens the main menu: Play, then File, Edit, Arrange, View and Help. Every command is reached through it. |
+| Tool column | The island under ☰ holding the tools, one button each. |
+| Kinds menu | The menu that stands open beside the Shape tool while it is active, to pick Rectangle, Circle or Polygon; the Joint tool's types (Hinge, Rope, Spring) have the same menu. |
+| Minimap | The island at the bottom right showing the whole level bounds small, with a rectangle for what the level view shows. Show-only in v1. |
+| Debug box | The island under the minimap showing the mouse position, the grid size and the zoom: `X: … Y: … GRID: … ZOOM: …`. |
+| Message pill | The pill at the bottom middle of the level view showing a status text while there is one, and a failed save until it is fixed. |
 | Field | One editable value on a card. Fields come from one fixed list of field types. A list field holds several values of one type as one field, such as a shape's Points. |
-| Attribute | One value of a component, as the Lua API names it: the Inspector field "Linear damping" is the attribute `linear_damping`. Scripts read it with `get_attribute` and change it with `set_attribute`. |
+| Attribute | One value of a component, as the Lua API names it: the Entity inspector field "Linear damping" is the attribute `linear_damping`. Scripts read it with `get_attribute` and change it with `set_attribute`. |
 | Assets panel | The panel listing the level's files in folders, like a small file system. |
 | Console | The panel at the bottom showing errors, `print()` messages and trigger lines from test play. |
-| Top bar | The bar along the top with the main menu, the level's name, the save state, Undo and Redo, Play and the zoom. |
-| Status bar | The bar along the bottom with the tool's hint, the mouse position, the selection and the count of editor messages. |
-| View menu | The main menu's View submenu, which switches what the editor draws over the level: Grid, Joint icons, Camera frame, Physics view. The top bar has no View button of its own. |
+| View menu | The main menu's View submenu, holding the editor's view settings: Grid, Grid snapping, Joint icons, Camera frame, Physics view, and the zooms. There is no View button of its own. |
 | Tool | What the mouse does in the level view: Select, Pencil, Bézier pen, Shape, Text, Joint, Trigger. |
-| Selection | The entities currently selected. There is one selection, shown in the level view, the Entities panel and the Inspector. |
-| Draw order | Which entity is painted on top when entities overlap. It is the Entities panel order. |
+| Selection | The entities currently selected. There is one selection, shown in the level view, the Entities viewer and the Entity inspector. |
+| Draw order | Which entity is painted on top when entities overlap. It is the Entities viewer order. |
 | Hidden | An entity whose eye icon is off. It is not drawn, in the editor or in play. It still collides and runs its triggers and scripts. |
 | Locked | An entity whose lock icon is on. You can't click or drag it in the level view. Editor-only. |
 | Snapping | When an entity you move jumps into line with the grid or with other entities. |
 | Grid | The editor's grid of lines in the level view. Never the collision grid. |
-| Options strip | The small bar of choices a tool shows over the top left of the level view: the Joint tool's types, the Shape tool's kinds. |
 | Pivot | The point an entity rotates and scales around. |
-| Editor message | A short note on the card it is about, never blocking, maybe with a fix button. All of them are listed from the status bar. Two kinds: warning and tip. |
+| Editor message | A short note on the card it is about, never blocking, maybe with a fix button. Each shows only on its card. Two kinds: warning and tip. |
 | Warning | An editor message with a yellow icon: this setup may not work as expected. |
 | Tip | An editor message with a blue icon: this works, but there is an easier way. |
-| Used by | The list at the bottom of the Inspector of every entity that points to the selected one. |
+| Used by | The list at the bottom of the Entity inspector of every entity that points to the selected one. |
 | Component preset | A saved set of values for one component, picked from a menu on its card. Not in v1. |
 | Read-only tab | A tab opened while another tab has the level open. You can look, select, pan, zoom and copy, but every edit is refused with "The level is open in another tab", and nothing is saved. |
 
@@ -142,7 +146,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Tick | One step of the game. The game runs 60 ticks per second. |
 | Seed | The number all random values in a run come from. The same seed gives the same random values. |
 | Play bar | The small bar shown during test play, with Stop, Pause, Step and Panels. |
-| Panels button | The Play bar button that brings the Inspector, Entities panel and Console back during play, read-only. |
+| Panels button | The Play bar button that brings the Entity inspector, the Entities viewer and the Console back during play, read-only. |
 | Pause menu | The menu Tab opens during play: Resume, Restart (R), and later Controls, Settings and Quit. |
 | End window | The window shown when a run is won or lost: a title, the time, Restart and Leave. |
 | Fixed size | A camera mode: players see exactly the camera's box, with black bars if their window is a different shape. |
@@ -173,10 +177,10 @@ Words for how the game is built, used in [architecture/](architecture/README.md)
 | Play mirror | The editor page's own copy of the running level, updated from tick reports and drawn by the level view. |
 | Tick report | What the game worker sends back after running ticks: the bodies that moved, entities removed, the camera's position. |
 | Collision piece | One convex part of a shape, at most 8 points, as handed to the physics engine and drawn by the physics view. |
-| Value type | A class that knows how to check, store, copy and compare one kind of value. Every field type is a value type the Inspector can show. |
+| Value type | A class that knows how to check, store, copy and compare one kind of value. Every field type is a value type the Entity inspector can show. |
 | Change signal | The notice a class sends when its state changed, so caches, the level view and panels can update. Not a game event. |
 | Derived cache | A value worked out from the level and kept until something it depends on changes, such as an entity's bounds. |
-| Status text | The short result the status bar's left slot shows for 4 seconds, such as "Undid: Move 3 entities". |
+| Status text | The short result the message pill shows for 4 seconds, such as "Undid: Move 3 entities". |
 | Browser event | Something the browser reports to the page, such as a key press or a paste. Never a game event. |
 | Body pose | A body's position and angle during play, as the physics engine reports it. |
 | Render chunk | A run of the World's children, next to each other in the draw order, that PixiJS draws as its own render group. Moving an entity uploads again only the shapes of its render chunk, not the whole level's. |
@@ -191,12 +195,12 @@ Words for how the editor looks, used while the design is settled (owner, 2026-11
 | Mockup | A static page that shows how a screen of the editor will look, with made-up content and nothing working behind it. |
 | Design system | The written rules of the editor's look: its design tokens, how each control looks in each state, its icons, and the colours the level view draws with. |
 | Design token | One named value of the design system, such as the panel background colour or the space between two rows. In the code it is a CSS custom property in `theme.css`. |
-| Stacking order | Which part of the editor shows over which: the level view, then the panels, then the floating parts, popups, tooltips and dialogs, each named once as a design token (stage 18, standing yes, 2026-11-17). |
+| Stacking order | Which part of the editor shows over which: the level view, then the islands, then the floating parts, popups, tooltips and dialogs, each named once as a design token (stage 18, standing yes, 2026-11-17). |
 | Accent colour | The one colour that marks what is active or selected: the active tool, a selected row, the selection outline in the level view, the focused field. |
 
 ## Components
 
-Component names end in `Component`, the TransformComponent included (owner: 2026-11-13).
+Component names end in `Component`, the TransformComponent included (owner: 2026-11-13). The rule covers the names, not the card titles, which drop it (owner: 2026-11-17).
 
 | Component | What it holds | On |
 |---|---|---|
@@ -219,6 +223,17 @@ Component names end in `Component`, the TransformComponent included (owner: 2026
 | PhysicsWorldComponent | Gravity, game speed, the collision grid | The World |
 | VariablesComponent | Variables (v2): the level's on the World, an entity's own on any other entity | Any entity, the World included |
 | InputComponent | The level's inputs (v2) | The World |
+
+## Parts gone from the editor
+
+Stage 19, the redesign, removes these parts. Docs written before it still name them, as what was built then; never use them for the editor after it (standing yes, 2026-11-18).
+
+| Part | What replaces it |
+|---|---|
+| Top bar | ☰ for every command, the tab title for unsaved changes, the debug box for the zoom. The level's name and the save state are no longer shown |
+| Status bar | The debug box for the mouse position, the message pill for status texts. The tool's hint, the selection and the message count are no longer shown |
+| Toolbar | The tool column |
+| Options strip | The kinds menu |
 
 ## Dropped words
 
@@ -249,5 +264,6 @@ Don't use these. Each was replaced in the requirements review.
 | `onStart`, `onUpdate`, `onEvent` | `on(name, function)` | One way to listen |
 | Hitbox | Surface on a shape | Physics is added like on any shape |
 | Trigger zone (the tool) | Trigger tool | Shorter (owner: 2026-11-13) |
-| Transform | TransformComponent | Component names end in `Component`, with no exception (owner: 2026-11-13) |
-| Layers panel | Entities panel | Renamed (owner: 2026-11-14) |
+| Transform | TransformComponent | Component names end in `Component` (owner: 2026-11-13). Only a card's title drops it (owner: 2026-11-17) |
+| Layers panel, Entities panel | Entities viewer | Renamed (owner: 2026-11-14, then 2026-11-17) |
+| Inspector | Entity inspector | Renamed (owner: 2026-11-17) |

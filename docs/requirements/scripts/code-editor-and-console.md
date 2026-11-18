@@ -74,7 +74,7 @@ Source: scope LU8; round 9: 09 2.17; round 10: TL1, TL2; round 11: PN1; old: TR-
 
 ### Live values, `print()`, Pause and Step · v2
 
-- **Debugging is exactly three things:** live values in the Inspector and the Entities panel (behind the Panels button), `print()` in the Console, and Pause and Step on the Play bar.
+- **Debugging is exactly three things:** live values in the Entity inspector and the Entities viewer (behind the Panels button), `print()` in the Console, and Pause and Step on the Play bar.
 - **Pause and Step are in v1. Live values and `print()` come in v2**, with scripts. *Why: the owner's smaller v1 has no scripts, and Pause and Step are enough to watch physics.*
 - **Not included:** watched values, a Variables tab, breakpoints, and shapes drawn from scripts. *Why: the owner's rule that no feature appears inside a question without being discussed. "Shapes a script draws" had been slipped into a debugging question.*
 - Pause, Step and Panels are described in [test play](../play-and-save/test-play.md).

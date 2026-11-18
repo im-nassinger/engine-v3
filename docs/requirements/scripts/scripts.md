@@ -8,7 +8,7 @@ A script is a `.lua` file from the Assets panel, attached to an entity through i
 
 ### The ScriptComponent · v2
 
-- **An entity has one ScriptComponent, holding a list of `.lua` files** from the Assets panel. *Why one: an entity has at most one component of each type, so "its ScriptComponent" always means one thing, in the Inspector and in Lua.*
+- **An entity has one ScriptComponent, holding a list of `.lua` files** from the Assets panel. *Why one: an entity has at most one component of each type, so "its ScriptComponent" always means one thing, in the Entity inspector and in Lua.*
 - The `.lua` files are plain assets the component points to. Fixing a file fixes every entity that uses it.
 - **A script's values are the entity's variables.** The ScriptComponent holds only the list of files; the values, such as a speed or a door, live on the entity's VariablesComponent. *Why: one concept for named values, so nothing is stored in two places, and triggers can read and change a script's values too (owner: 2026-11-16).*
 - **A script lists the variables it needs in a `variables` table at its top, built with one `<type>_variable` function per type**, such as `speed = number_variable(400, { min = 0, max = 1500, unit = "px/s" })`. The table only describes them. The rules for reading and writing them are in [lua-api.md](lua-api.md#variables--v2).
@@ -18,7 +18,7 @@ A script is a `.lua` file from the Assets panel, attached to an entity through i
 - A variable the script no longer needs stays on the entity until the creator removes it. *Why: the creator added it, so only the creator removes it (standing yes, 2026-11-16).*
 - Each entity runs its own copy of a script, so twenty enemies never share state by accident.
 - Any entity can have scripts, joints and the camera included.
-- Scripts in the list run top to bottom. Across entities they run in Entities panel order, see [triggers](../triggers/triggers.md).
+- Scripts in the list run top to bottom. Across entities they run in Entities viewer order, see [triggers](../triggers/triggers.md).
 - A script on a hidden entity still runs.
 - A new `.lua` file is made in the Assets panel. The builtin `.lua` files can be read as examples.
 
@@ -45,7 +45,7 @@ Source: scope LU1; round 9: 10 2.3; round 10: EV1; round 1: D4; old: LU-22, LU-2
 
 - **Scripts work with entity and component ids, through functions.** `get_entity_by_name("car")` returns an id. `get_component(id, "NameComponent")` and `get_attribute(...)` read from it.
 - **A destroyed id simply no longer exists.** There are no object references to keep alive. *Why: the owner rejected an object-style API.*
-- Scripts find entities three ways: by name, by tag, or through an entity variable the script needs, picked in the Inspector.
+- Scripts find entities three ways: by name, by tag, or through an entity variable the script needs, picked in the Entity inspector.
 - An id is never reused during a run, so a stored id can never point at a newer entity.
 - **A script's own entity is `this`**, the id of the entity the script is on, such as `destroy(this)`. A handler receives `other`. *Why: the same words as triggers, and each entity runs its own copy, so `this` is always right.*
 
@@ -53,9 +53,9 @@ Source: round 3: D66; round 9: 10 2.2; old: LU-13, LU-18; owner: 2026-11-13
 
 ### Component values · v2
 
-- Scripts read and change the component values that are allowed to change during play, **with the same names as the Inspector**.
+- Scripts read and change the component values that are allowed to change during play, **with the same names as the Entity inspector**.
 - They are the same values a trigger's Change value offers.
-- Angles are in degrees and lengths in pixels, matching the Inspector. *Why degrees: this can't be changed once levels exist, so it was decided before any code.*
+- Angles are in degrees and lengths in pixels, matching the Entity inspector. *Why degrees: this can't be changed once levels exist, so it was decided before any code.*
 
 Source: round 1: D3; round 9: 10 2.7, 10 2.8; old: LU-57 to LU-62; owner: 2026-11-13
 

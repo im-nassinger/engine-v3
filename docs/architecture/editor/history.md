@@ -20,7 +20,7 @@ Changes point at entities by id, never by object, because undo of a delete creat
 | `AddEntitiesChange` | `EntityData` of each subtree, the parent id and index | Create, paste, duplicate, group (the new group) |
 | `RemoveEntitiesChange` | The same, read before removing | Delete, cut, ungroup (the group) |
 | `MoveEntityChange` | Old and new parent and index, old and new TransformComponent values | Reorder, move into a group, group, ungroup |
-| `SetValueChange` | Entity id, component type, key, old value, new value (both cloned) | Inspector edits, drags, nudges, resizing |
+| `SetValueChange` | Entity id, component type, key, old value, new value (both cloned) | Entity inspector edits, drags, nudges, resizing |
 | `AddComponentChange`, `RemoveComponentChange` | The component's values | Add Component, Remove |
 | `SetSwitchChange` | Entity id, `hidden` or `locked`, old and new | The eye and the lock |
 | `RenameLevelChange` | Old and new name | The top bar |
@@ -128,9 +128,9 @@ The requirement's table is kept exactly. In code terms:
 | Is a step: goes through `LevelEditor` | Isn't a step: changes its owner directly |
 |---|---|
 | Create, delete, paste, duplicate, group, ungroup, reorder, move between groups | `Selection`, `CurrentGroup` |
-| A committed Inspector value, a whole drag, a nudge run | `ViewState`, `ViewSettings` (grid shown, View menu switches, folded cards) |
+| A committed Entity inspector value, a whole drag, a nudge run | `ViewState`, `ViewSettings` (grid shown, View menu switches, folded cards) |
 | Add or remove a component, hide, lock, rename an entity, rename the level | `ToolController` (tool, tool lock), panel sizes |
-| World settings, the grid size | Folded Entities panel rows: saved in the file through `LevelEditorData`, but never a step |
+| World settings, the grid size | Folded Entities viewer rows: saved in the file through `LevelEditorData`, but never a step |
 
 - **The grid size** is saved in the project file, and changing it is a step (owner, 2026-11-13). Showing or hiding the grid is a view setting, so it isn't.
 - **Text being typed** in a field isn't a step until it is committed. While a field has uncommitted text, Ctrl+Z belongs to the field (the browser's own text undo), see [inspector-and-entities.md](inspector-and-entities.md).

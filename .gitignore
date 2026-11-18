@@ -16,3 +16,4 @@ __screenshots__/
 
 # Written by the runner while it runs. See docs/runner/README.md.
 docs/runner/status.md
+.netlify/

@@ -2,65 +2,81 @@
 
 ## TL;DR
 
-The frame around everything: where the panels sit, the top bar and status bar, the seven tools, moving around the level view, the grid and snapping, and how the editor behaves inside a browser. **v1:** fixed panels on top of a full-window level view, three of the seven tools on their number keys, pan and zoom from 1% to 1000%, and a grid you can snap to. **v2:** the other four tools and the searchable shortcut list. **v3:** resizing and collapsing panels, and snapping to other entities with pink guides. The shortcut table itself is in [shortcuts.md](shortcuts.md).
+The frame around everything: where the islands sit, ☰ and the main menu, the debug box and the minimap, the seven tools, moving around the level view, the grid and snapping, and how the editor behaves inside a browser. **v1:** islands on top of a full-window level view (the redesign, owner: 2026-11-17), a show-only minimap, three of the seven tools on their number keys, pan and zoom from 1% to 1000%, and a grid you can snap to. **v2:** the other four tools and the searchable shortcut list. **v3:** resizing and collapsing panels, moving the view with the minimap, and snapping to other entities with pink guides. The shortcut table itself is in [shortcuts.md](shortcuts.md).
 
 Sizes in pixels are starting values until tested.
 
 ## Layout
 
-### Fixed panels over the level view · v1
+### Islands over the level view · v1
 
-- The level view fills the whole window. The panels sit on top of it, in fixed places. *Why: the owner's change, so the level is always as big as it can be.*
-- **Left: the toolbar strip, then the Inspector, full height. Right: the Entities panel above the Assets panel** (owner: 2026-11-14). Bottom: the Console, collapsed to a strip by default. Top: the top bar. Bottom edge: the status bar.
-- **In v1 there is no Assets panel and no Console**: the Entities panel takes the whole right side. Both come in v2 with scripts. *Why: the owner's smaller v1 has no files and no scripts.*
-- Panels can't be dragged to other places or floated. *Why: fixed panels are enough for the first version, and docking is a large feature.*
-- Starting sizes: toolbar 44 px wide, Inspector 300 px, Entities and Assets panels 260 px, top bar 44 px, status bar 24 px, Console 220 px when open.
-- The centre has a permanent `Level` tab. A `.lua` file opens as an extra closable tab beside it, one per file. The tab strip shows only while an extra tab is open.
-- A tool with options, such as the Joint tool's joint type, shows a small options strip over the top left of the level view. It never shifts the layout. The Shape tool's strip offers its kinds and takes the Inspector's place, since the Inspector is hidden while that tool is active (owner: 2026-11-15), see [drawing](../drawing.md#the-shape-tool--v1).
+- The level view fills the whole window. Every part of the editor floats on top of it as an **island**: a rounded part with a soft shadow, **10 px from the window's edge and from the next island**, in fixed places. *Why: the owner's change, so the level is always as big as it can be, and the owner's redesign (2026-11-17), so the editor looks clean, with no borders or lines.*
+- **Top left: ☰**, a 48 px square. **Under it: the tool column**, 48 px wide. **Beside them, from the top: the Entity inspector.** **Top right: the Entities viewer**, only as tall as its rows. **Bottom right: the minimap**, with the debug box under it. Nothing else sits at the top: there is no bar across the window (owner: 2026-11-17).
+- **The Entities viewer grows with its rows** until it reaches 10 px above the minimap; then a scrollbar appears. The minimap always shows (owner: 2026-11-18).
+- In v2 the Assets panel and the Console come with scripts; where they go is decided then. *Why: the owner's smaller v1 has no files and no scripts.*
+- Islands can't be dragged to other places or floated. *Why: fixed places are enough for the first version, and docking is a large feature.*
+- Starting sizes: ☰ and the tool column 48 px wide with 34 px buttons, Entity inspector 300 px, Entities viewer 260 px, minimap 180 px.
+- **The free area** is the level view between the Entity inspector and the Entities viewer, so fitting the view frames the level where it is seen.
+- The centre has a permanent `Level` tab. A `.lua` file opens as an extra closable tab beside it, one per file (v2). The tab strip shows only while an extra tab is open.
+- **While the Shape tool is active the Entity inspector is hidden** (owner: 2026-11-15), and the tool's kinds menu stands open beside it, see [drawing](../drawing.md#the-shape-tool--v1). The Joint tool's types have the same menu (owner: 2026-11-18).
 - One dark theme. *Why: art and levels read well on it.*
-- Panel sizes, folded cards and open tabs are editor settings saved in the browser. They are never in the level and never in undo.
+- Folded cards and open tabs are editor settings saved in the browser. They are never in the level and never in undo.
 
-Source: round 1: D12; round 3: 01 2.1; old: WS-01 to WS-15; owner: 2026-11-13, 2026-11-14, 2026-11-15
+Source: round 1: D12; round 3: 01 2.1; old: WS-01 to WS-15; owner: 2026-11-13, 2026-11-14, 2026-11-15, 2026-11-17, 2026-11-18
 
 ### Resize and collapse the panels · v3
 
-- Drag a panel's edge to make it wider or narrower: Entities and Assets panels 200 to 480 px, Inspector 260 to 520 px, Console 120 px to 60% of the window.
-- Click a panel's title to fold it away. A folded side panel becomes a 28 px strip. Double-clicking an edge restores the default size.
+- Drag a panel's edge to make it wider or narrower: the Entities viewer and the Assets panel 200 to 480 px, the Entity inspector 260 to 520 px, the Console 120 px to 60% of the window.
+- Click a panel's title to fold it away. A folded panel becomes a 28 px strip. Double-clicking an edge restores the default size.
 - Sizes and folded states are remembered in the browser. `Reset layout` in the main menu restores the defaults.
 - In v1 the panels have one size each.
 
 Source: scope ED6; round 1: D12; old: WS-02, WS-10, WS-12, WS-13
 
-## Top bar and status bar
+## ☰, the debug box and the minimap
 
-### Top bar · v1
+### ☰ and the main menu · v1
 
-Left to right:
+- **☰ opens the main menu to its right; each submenu opens beside it.** Every command is reached through it, so it is the full list of commands, each with its shortcut (owner: 2026-11-17).
+- The main menu, top to bottom:
 
-| Part | What it does |
+| Item | What it holds |
 |---|---|
-| Main menu | One button with submenus File, Edit, Arrange, View, Help. Every command is here with its shortcut, so it is the full list of commands. **Its View submenu is the View menu:** the switches for what the editor draws over the level (Grid, Joint icons, Camera frame, Physics view), each with a shortcut, saved in the browser and never in the level. *Why: there will be several such switches, and one menu is where most editors put them. The top bar has no View button of its own (owner: 2026-11-17): the main menu already lists every command, so a second button only repeated it* |
-| Level name | Click to rename in place. Enter commits, Esc cancels, an empty name reverts. Renaming is an undo step |
-| Save state | `Saved`, `Saving`, `Unsaved changes` or `Save failed`. Clicking it explains the state. See [saving](../play-and-save/saving.md) |
-| Undo and Redo | Greyed when empty. The tooltip names the step, such as `Undo: Move 3 entities` |
-| Snapping | Switches for the grid, and in v3 for snapping to entities |
-| Play | Starts test play. During play the editor's bars and panels are hidden and the Play bar takes over, see [test play](../play-and-save/test-play.md) |
-| Zoom | Shows the percentage. Click to type a value or pick: Zoom in, Zoom out, 100%, Whole level, Selection, Camera frame |
+| Play | Starts test play (Ctrl+Enter), a plain item. During play the islands are hidden and the Play bar takes over; Pause and Step are on the Play bar, see [test play](../play-and-save/test-play.md) |
+| File | New, Import…, Save, Export…, Rename level…. See [saving](../play-and-save/saving.md) |
+| Edit | Undo, naming its step (such as `Undo: Move 3 entities`), Redo, Cut, Copy, Paste, Duplicate, Delete. Undo and Redo are greyed when empty |
+| Arrange | Group, Ungroup, Go into group |
+| View | **The View menu:** the editor's view settings, each a switch with a shortcut, saved in the browser and never in the level: Grid, Grid snapping right under it, Joint icons, Camera frame, Physics view; then the zooms: Zoom in, Zoom out, 100%, Whole level, Selection, Camera frame |
 | Help | Keyboard shortcuts, About |
 
-- The browser tab title shows the level name, with `*` in front while there are unsaved changes.
-- Space at the right end is left free for publishing and account controls later.
-- **The save state and the zoom are in the top bar**, not the status bar (owner: 2026-11-14).
+- **Select all, Rename and Hide or show are in no menu for now**; their keys still work (owner: 2026-11-18).
+- *Why no buttons for Undo, Redo, Save or Play: each extra island at the top made the editor busier, and the owner tried them in many places before choosing one button for everything (owner: 2026-11-17). The keys stay.*
+- **The level's name isn't shown in the editor** (owner: 2026-11-17). The level keeps its name in the file; File → Rename level… changes it in a small dialog (owner: 2026-11-18). Renaming is an undo step.
+- **The browser tab title shows the level's name, with `*` in front while there are unsaved changes** (owner: 2026-11-18). There is no save state on screen; a failed save shows in the message pill until it is fixed.
+- Space for publishing and account controls is decided in v4.
 
-Source: round 3: 01 2.2, 2.3; round 8: VW1; old: WS-16 to WS-27; owner: 2026-11-14; owner: 2026-11-17
+Source: round 3: 01 2.2, 2.3; round 8: VW1; old: WS-16 to WS-27; owner: 2026-11-14, 2026-11-17, 2026-11-18
 
-### Status bar · v1
+### The debug box and the message pill · v1
 
-- Shows, left to right: the active tool's hint, the mouse position in level pixels, a summary of the selection, and the count of editor messages.
-- The left slot briefly shows results such as `Undid: Move 3 entities` or `The camera can't be deleted` for 4 seconds, then returns to the tool hint.
-- Clicking the count lists every editor message. Clicking one selects its entity.
+- **The debug box** is an island under the minimap, its right edge on the minimap's, as wide as its entries: `X: -3120  Y: -2410  GRID: 50  ZOOM: 9%`. The mouse position in level pixels, the grid size and the zoom; labels muted in capitals, values in tabular figures. It only shows them: the zoom changes with the mouse wheel, the keys and the View menu (owner: 2026-11-17).
+- **The message pill** sits at the bottom middle of the level view, shown only while there is a message: a status text such as `Undid: Move 3 entities` or `The camera can't be deleted` for 4 seconds, or a failed save until it is fixed (owner: 2026-11-18).
+- No lasting tool hint, no selection summary and no message count. *Why: the tool column shows the tool, the Entities viewer and the Entity inspector show the selection, and each editor message already shows on its card (owner: 2026-11-17, 2026-11-18).*
 
-Source: round 3: 01 2.2, 2.3; round 8: WN1; round 10: EM1; old: WS-29 to WS-31
+Source: round 3: 01 2.2, 2.3; round 8: WN1; round 10: EM1; old: WS-29 to WS-31; owner: 2026-11-17, 2026-11-18
+
+### The minimap · v1
+
+- An island at the bottom right, 180 px wide, above the debug box: the whole level bounds drawn small, its shapes without outlines, and an accent rectangle showing what the level view shows (owner: 2026-11-17).
+- **In v1 it only shows** (owner: 2026-11-18). It follows the level and the view a few times a second at most, so it never slows editing.
+
+Source: owner: 2026-11-17, 2026-11-18
+
+### Moving the view with the minimap · v3
+
+- Clicking on the minimap centres the level view there; dragging moves it.
+
+Source: owner: 2026-11-18
 
 ## Tools
 
@@ -78,7 +94,7 @@ Source: round 3: 01 2.2, 2.3; round 8: WN1; round 10: EM1; old: WS-29 to WS-31
 
 - *Why seven: the owner wanted fewer tools. Point editing moved into Select (double-click) as in Inkscape and Figma, and panning is Space, so neither needs a tool.*
 - **v1 has three of them: Select (1), Shape (4) and Joint (6).** The Pencil, the Bézier pen, Text and Trigger come in v2, on the keys above, so nothing is relearned. *Why: in the smaller v1 a path is decoration only, text was for a score, and there are no triggers.*
-- Exactly one tool is active, and its button is highlighted.
+- The tools are 34 px buttons in the tool column. Exactly one tool is active, drawn in the soft accent.
 - **After making something, every tool returns to Select** with the new entity selected, the Joint tool included. To make many in a row, use tool lock. *Why: one rule for every tool, and tool lock already covers placing many joints (owner: 2026-11-13).*
 - **Tool lock:** double-clicking a tool button, or pressing its number key twice, keeps the tool active until another tool is picked or Esc is pressed.
 - Hold Space to pan with any tool. Releasing returns to that tool. It works between clicks of an unfinished path, and is ignored while typing.
@@ -124,11 +140,11 @@ Source: round 3: 01 2.5; old: WS-42 to WS-44, WS-140; owner: 2026-11-13
 - Zoom goes from **1% to 1000%**. 100% means one level pixel per screen pixel. *Why: the owner's range.*
 - **F** zooms to the selection, or to the whole level with nothing selected. Selecting never moves the view by itself.
 - Moving or zooming the view is never an undo step.
-- The area outside the level bounds is dimmed.
+- Outside the level bounds the level view shows the editor's own dark colour; the World's fill and the grid are drawn only inside (owner: 2026-11-17).
 - Panning stops well outside the level. If the view holds nothing, a `Back to level` button appears.
 - The view position and zoom are remembered in the browser. They are not in the level file.
 
-Source: scope ED1; round 3: 01 2.6; round 5: 02 2.5; old: WS-46 to WS-52, WS-56, WS-57, SG-36
+Source: scope ED1; round 3: 01 2.6; round 5: 02 2.5; old: WS-46 to WS-52, WS-56, WS-57, SG-36; owner: 2026-11-17
 
 ### The grid · v1
 
@@ -173,10 +189,10 @@ Small features from the old draft and review that the scope review never asked a
 | No page gestures | Page scrolling, overscroll bounce and swipe-back are off on the editor page, because they would wreck a drag. The middle mouse button never starts the browser's autoscroll, and Alt alone never opens the browser menu | v1 |
 | Losing focus mid-drag | If the window loses focus during a drag, the drag cancels and held keys count as released | v1 |
 | Browser zoom | Browser zoom scales the interface. The level view stays sharp and the mouse stays accurate at any browser zoom | v1 |
-| Small windows | Under 1280 px wide the panels get narrower. Under 1024 px the Console, then the Entities and Assets panels, then the Inspector fold away by themselves and come back when there is room. Under 640×480 a notice asks for a bigger window. The level is never lost | v3 |
+| Small windows | Under 1280 px wide the panels get narrower. Under 1024 px the Console, then the Entities viewer and the Assets panel, then the Entity inspector fold away by themselves and come back when there is room. Under 640×480 a notice asks for a bigger window. The level is never lost | v3 |
 | Touch devices | On a touch-only device a notice says the editor needs a mouse and keyboard | v3 |
 | First-run hints | A hint card in an empty level ("Press 4 and drag to draw a shape"), then one hint pointing to Play. Hints end after the first Play | v3 |
-| Hide all panels | `Ctrl+\` hides every panel and bar, leaving the level view and a small restore button | v3 |
+| Hide all panels | `Ctrl+\` hides every island, leaving the level view and a small restore button | v3 |
 | Temporary zoom tool | Hold Z: drag draws a zoom box, click zooms in, Alt+click zooms out | v3 |
 | Scroll wheel pans | A setting for trackpads: two-finger scroll pans, pinch still zooms | v3 |
 | Rulers | Rulers along the top and left in level pixels, off by default | v3 |

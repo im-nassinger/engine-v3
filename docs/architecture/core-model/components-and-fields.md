@@ -2,11 +2,11 @@
 
 ## TL;DR
 
-**Each component type declares its fields once, in a `ComponentSchema`** (owner, 2026-11-13). A field names its **field type** (one class per type in the fixed list: number, text, checkbox, choice, colour, vector, angle, entity, and from v2 asset, variable, tags, list), its label, default, unit, range, description, and whether it can change during play. From that one list the Inspector draws the card, the file stores and checks the values, undo records them, copy clones them, and in v2 Lua's `get_attribute` and `set_attribute` and the trigger's Change value find them. A component class holds a typed values record and adds no logic of its own beyond what its values need. Component class names end in `Component`. **Imports go one way, entities → components → fields → events:** a component never imports `Entity`, and a schema never reads one.
+**Each component type declares its fields once, in a `ComponentSchema`** (owner, 2026-11-13). A field names its **field type** (one class per type in the fixed list: number, text, checkbox, choice, colour, vector, angle, entity, and from v2 asset, variable, tags, list), its label, default, unit, range, description, and whether it can change during play. From that one list the Entity inspector draws the card, the file stores and checks the values, undo records them, copy clones them, and in v2 Lua's `get_attribute` and `set_attribute` and the trigger's Change value find them. A component class holds a typed values record and adds no logic of its own beyond what its values need. Component class names end in `Component`. **Imports go one way, entities → components → fields → events:** a component never imports `Entity`, and a schema never reads one.
 
 ## Value types and field types
 
-A **value type** knows how to check, store and compare one kind of value. A **field type** is a value type the Inspector can show. Both are classes, one per kind.
+A **value type** knows how to check, store and compare one kind of value. A **field type** is a value type the Entity inspector can show. Both are classes, one per kind.
 
 ```typescript
 export type ParseProblem =                  // reasons, never sentences: the editor writes those
@@ -50,8 +50,8 @@ export type FieldType<T> = ValueType<T> & {
 - **A colour** is read in either case and stored uppercase, so two equal colours compare equal. **A text's length** counts characters (code points), so a character outside the basic plane is never cut in half. **A vector** is geometry's `Point`; `refuseZero` refuses 0 in x or in y, since either makes a matrix that can't be inverted. `JsonValue` is declared in `core/fields` with `EntityId`.
 - **`ColourFieldType` has no `canBeEmpty`** (as built, 2026-11-14): the only colour that could be emptied was the fill, which uses `SolidFillFieldType`, so nothing in v1 needs it.
 - **The fixed list is v1, but each field type is built when the first component needs it.** v1 builds the ten above. Asset, variable, tags and path point come with the v2 components that use them (path point with the Bézier pen: `{ x, y, handle_in, handle_out, corner }`, the stored shape below), and list moved to v1 for Points (owner, 2026-11-15), and the fill field type comes with gradients (owner, 2026-11-13).
-- **The fill in v1** (owner, 2026-11-13): the StyleComponent's fill uses `SolidFillFieldType`, which the Inspector shows as a colour field that can be emptied, but whose value is already the tagged value `{ kind: 'none' } | { kind: 'solid', colour }`. In v2 it is replaced by `FillFieldType` with the same stored shape plus gradients, and in v3 images. Saved levels never change.
-- **`SolidFillFieldType`'s kind is already `'fill'`** (stage 2, standing yes, 2026-11-14), not `'colour'`. *Why: the Inspector picks a field's control by its kind, and the colour control reads `#RRGGBBAA` text, not the tagged value. With `'fill'` now, v2's `FillFieldType` takes the kind over and no kind changes.* The user still sees a colour field that can be emptied.
+- **The fill in v1** (owner, 2026-11-13): the StyleComponent's fill uses `SolidFillFieldType`, which the Entity inspector shows as a colour field that can be emptied, but whose value is already the tagged value `{ kind: 'none' } | { kind: 'solid', colour }`. In v2 it is replaced by `FillFieldType` with the same stored shape plus gradients, and in v3 images. Saved levels never change.
+- **`SolidFillFieldType`'s kind is already `'fill'`** (stage 2, standing yes, 2026-11-14), not `'colour'`. *Why: the Entity inspector picks a field's control by its kind, and the colour control reads `#RRGGBBAA` text, not the tagged value. With `'fill'` now, v2's `FillFieldType` takes the kind over and no kind changes.* The user still sees a colour field that can be emptied.
 - **An entity field is stored as `{ "entity": 12 }`**, not a bare number, so a later "follow by tag" (open question 15) can store `{ "tag": "player" }` beside it without changing saved levels.
 - Internal value types, never shown as fields, use the same `ValueType` contract: `ShapeGeometryValue`, `PathGeometryValue`, `JointEndsValue`. They hold the stored values below.
 
@@ -76,7 +76,7 @@ export type FieldDefinition<Values, Key extends keyof Values> = {
 ```
 
 - **The tech notes' field metadata** (unit, display scale, precision, slider range, description, menu section) is all here. The slider shows when the field type has both a `min` and a `max`, as the requirement says. The menu section belongs to the component, below.
-- **The attribute name is the label in snake_case**, as the Lua API rules say: "Linear damping" is `linear_damping`. It is also the key in `level.json`, so the file, Lua and the Inspector use one name.
+- **The attribute name is the label in snake_case**, as the Lua API rules say: "Linear damping" is `linear_damping`. It is also the key in `level.json`, so the file, Lua and the Entity inspector use one name.
 - **A test checks every schema**: each key is the camelCase of its label, no two attributes in a component clash, and each default sits in its range. Because the file key comes from the label, renaming a label makes this test fail, which forces a conscious choice: Lua's API never changes once shipped.
 
 ## ComponentSchema and Component
@@ -134,7 +134,7 @@ export abstract class Component<Values extends object = object> {
     get<Key extends keyof Values>(key: Key): Values[Key];
     set<Key extends keyof Values>(key: Key, value: Values[Key]): Values[Key];  // normalizes, signals if changed
 
-    readValue(key: string): unknown;                  // by key, for generic code: the Inspector, undo
+    readValue(key: string): unknown;                  // by key, for generic code: the Entity inspector, undo
     writeValue(key: string, raw: unknown): ParseOutcome<unknown>;  // parsed through the field type
 
     copy(): Component<Values>;
@@ -153,8 +153,8 @@ export type ComponentClass<T extends Component> = {
   - **`addMenuSection` is optional:** the TransformComponent and the NameComponent are on every entity, so the Add Component menu never lists them.
   - **`ComponentClass<T extends AnyComponent>`** has `schema: AnyComponentSchema` and `new (...args: never[]): T`. Test components for code that holds components are in `core/components/testing/`.
   - **`derivedField(...)`** checks a derived field against its own type, then widens it for the schema's list.
-- Code that knows the component uses the typed `get` and `set` (`body.get('gravityScale')`). Generic code (the Inspector, undo, the reader, Lua) uses `readValue` and `writeValue` by key, which go through the same field type.
-- `set` returns the value actually stored, after clamping, so the Inspector can show "Max is 1500" when it differs from what was typed.
+- Code that knows the component uses the typed `get` and `set` (`body.get('gravityScale')`). Generic code (the Entity inspector, undo, the reader, Lua) uses `readValue` and `writeValue` by key, which go through the same field type.
+- `set` returns the value actually stored, after clamping, so the Entity inspector can show "Max is 1500" when it differs from what was typed.
 - **A component never knows which entity holds it.** `set` and `writeValue` raise the component's own `changed` signal. `Entity.addComponent` subscribes to it and turns it into the level's `valueChanged` update, and `removeComponent` unsubscribes.
 - **Partner notes come from the schema** (Q5 and Q6, owner 2026-11-13): a component lists, as plain data, the partners it needs and when they are needed. The editor's `MissingPartnerRule` turns them into editor messages with an [Add ...] button. Removing a component removes only that one, so the cards left behind show their notes.
 - **Every note reads "Needs a X to Y. [Add X]"** (owner, 2026-11-13), with Y written per partner in the schema: "to draw anything" for a StyleComponent, "to collide" for a SurfaceComponent and a BodyComponent.
@@ -162,7 +162,7 @@ export type ComponentClass<T extends Component> = {
 
 ## Stored values
 
-**A stored value is a value the Inspector never shows** (stage 2, standing yes, 2026-11-14): a `key`, a `ValueType` and a default, listed in the schema's `storedValues`. It is saved under its key's snake_case like a field, and `readValue` and `writeValue` reach it the same way, so undo, copy and the reader need nothing new. *Why: the docs named `StoredValueDefinition` but never described it, and a field's way of saving and checking already does everything a hidden value needs.*
+**A stored value is a value the Entity inspector never shows** (stage 2, standing yes, 2026-11-14): a `key`, a `ValueType` and a default, listed in the schema's `storedValues`. It is saved under its key's snake_case like a field, and `readValue` and `writeValue` reach it the same way, so undo, copy and the reader need nothing new. *Why: the docs named `StoredValueDefinition` but never described it, and a field's way of saving and checking already does everything a hidden value needs.*
 
 | Component | Stored value | Value type | Holds |
 |---|---|---|---|
@@ -223,7 +223,7 @@ export function createV1Registry(): ComponentRegistry;
 ```
 
 - **As built (2026-11-14):** the registry holds `ComponentClass<AnyComponent>`, refuses a type registered twice, and has `all()`, the classes in the order they were registered, which the schema tests run over. **`indexOf` is that order**, and an unknown name throws. `createV1Registry` registers the ten v1 components in a fixed order, and new types only ever go at the end, so a component id in Lua never changes. *Why: the index must be the same in every run and every version, and the order of registration is the one order nothing else moves (standing yes, 2026-11-14).*
-- The reader finds a component by its type name in the file, the Inspector's Add Component menu lists what the entity lacks (see [the Inspector](../editor/inspector-and-entities.md)), and v2 registers its components into the same registry. Nothing else changes when a component type is added.
+- The reader finds a component by its type name in the file, the Entity inspector's Add Component menu lists what the entity lacks (see [the Entity inspector](../editor/inspector-and-entities.md)), and v2 registers its components into the same registry. Nothing else changes when a component type is added.
 
 ## The v1 components
 
@@ -240,15 +240,15 @@ export function createV1Registry(): ComponentRegistry;
 | CameraComponent | 9 | Width, Height: number px, 160 to 7,680, 1920 × 1080. Follow: entity, empty. Smoothing: number s, 0 to 5, 0.3. Not in the Add Component menu | `mode`: `fixedSize` until v3 | |
 | PhysicsWorldComponent | 10, World only | Gravity: vector m/s², each axis −100 to 100, 0, 9.8 (owner, 2026-11-15). Walls: checkbox, off (all four edges of the level bounds walls, or all open) | | |
 
-- **Mass isn't a field of the BodyComponent**, because it adds up the shapes of other entities merged into the body. `BodyMass.of(entity, caches)` in `core/physics`, which knows which shapes merge, works it out from [geometry](geometry.md#mass), and the Inspector shows it as a read-only row at the end of the BodyComponent's card. It looks exactly as the requirement says.
+- **Mass isn't a field of the BodyComponent**, because it adds up the shapes of other entities merged into the body. `BodyMass.of(entity, caches)` in `core/physics`, which knows which shapes merge, works it out from [geometry](geometry.md#mass), and the Entity inspector shows it as a read-only row at the end of the BodyComponent's card. It looks exactly as the requirement says.
 - Every setting of every joint type is stored, whatever the current type, so switching type in v3 keeps them, as the joints rules ask.
 - **Which camera and world values change during play** (standing yes, 2026-11-14): Follow and Smoothing do, because v3's Change value sets them, and so does Gravity, as the World's rules say. The camera's width and height and Walls don't.
 - **The PhysicsWorldComponent's card comes last, at 10** (standing yes, 2026-11-14), after the World's ShapeComponent and StyleComponent, so the bounds and the background read first.
 - **Merge** is a checkbox on the BodyComponent, on by default (owner, 2026-11-13).
-- **Which values change during play** (owner, 2026-11-14): the TransformComponent's position and rotation; not its scale or skew, and not the name. **The hover descriptions** of these five fields are in the [Inspector's requirements](../../requirements/editor/inspector-and-undo.md#cards-for-the-selection--v1).
+- **Which values change during play** (owner, 2026-11-14): the TransformComponent's position and rotation; not its scale or skew, and not the name. **The hover descriptions** of these five fields are in the [Entity inspector's requirements](../../requirements/editor/inspector-and-undo.md#cards-for-the-selection--v1).
 - **A new level names its World `World` and its camera `Camera`**, the names the round 9 cards used.
 - **The TagsComponent is v2** (owner, 2026-11-13): nothing in v1 reads tags.
-- **The World has a ShapeComponent and a StyleComponent** (owner, 2026-11-13). The rectangle's width and height are the level bounds, 20000 × 20000 by default, a square (owner, 2026-11-17; the size is a standing yes, 2026-11-17, see [world.md](../../requirements/physics/world.md)); the fill is the background colour. Both are World components: they can't be removed, and the shape's kind is always rectangle. The World can't take a BodyComponent or a SurfaceComponent: the Add Component menu shows them disabled, with the reason. The rectangle is centred on the level's origin, and a resize changes both opposite edges by the same amount, so the centre never moves (owner, 2026-11-13).
+- **The World has a ShapeComponent and a StyleComponent** (owner, 2026-11-13). The rectangle's width and height are the level bounds, 20000 × 10000 by default (owner, 2026-11-18, see [world.md](../../requirements/physics/world.md)); the fill is the background colour. Both are World components: they can't be removed, and the shape's kind is always rectangle. The World can't take a BodyComponent or a SurfaceComponent: the Add Component menu shows them disabled, with the reason. The rectangle is centred on the level's origin, and a resize changes both opposite edges by the same amount, so the centre never moves (owner, 2026-11-13).
 
 ## v2 and v3 seams
 
@@ -258,5 +258,5 @@ export function createV1Registry(): ComponentRegistry;
 | Variables of nine types on any entity (v2) | Each variable on a VariablesComponent is drawn with its type's field type, limits included. A script's `variables` table is only read to offer [Add variables] | None |
 | `get_attribute`, `set_attribute`, Change value (v2) | `schema.findFieldByAttribute`, `writeValue`, guarded by `changeableInPlay` | None |
 | Gradients, images as fills (v2, v3) | `FillFieldType` replaces `SolidFillFieldType` on StyleComponent | One line in the StyleComponent schema |
-| Linked copies (v3) | AssetComponent, and the Inspector's read-only mode, which play already uses | None in the model |
+| Linked copies (v3) | AssetComponent, and the Entity inspector's read-only mode, which play already uses | None in the model |
 | Component presets (Later) | A preset is a saved values record, applied with `writeValue` | None |

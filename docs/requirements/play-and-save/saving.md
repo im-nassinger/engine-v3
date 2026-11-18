@@ -27,18 +27,19 @@ Source: round 11: 12 A1, 12 A11; round 12: LV1; old: SV-16, SV-32
 - Saving never needs the internet.
 - **Undo history is not saved.** Reopening the level starts a fresh history. *Why: every past change would have to load forever, making files big and fragile across versions.*
 - Test play never saves its own state and never changes the saved level.
-- The top bar shows the save state, see [the workspace](../editor/workspace.md) (owner: 2026-11-14).
+- **File → Save (Ctrl+S) saves in the browser now**, without waiting for the delay (owner: 2026-11-18). *Why: people press Ctrl+S out of habit, and now it does what they expect; exporting stays its own item.*
+- **No save state is shown** (owner: 2026-11-17). The browser tab title shows the level's name with `*` in front while there are unsaved changes, see [the workspace](../editor/workspace.md#-and-the-main-menu--v1) (owner: 2026-11-18).
 
-Source: round 5: FMT1; round 11: 12 A3; old: SV-17 to SV-19, SV-22, SV-23, SV-31; owner: 2026-11-14
+Source: round 5: FMT1; round 11: 12 A3; old: SV-17 to SV-19, SV-22, SV-23, SV-31; owner: 2026-11-14, 2026-11-17, 2026-11-18
 
 ### A warning when saving fails · v1
 
-- If saving in the browser fails, such as when storage is full or a private window blocks it, **a warning in the status bar says so.**
+- If saving in the browser fails, such as when storage is full or a private window blocks it, **the message pill says so, and stays until a save works again** (owner: 2026-11-18).
 - You keep working, the game keeps trying, and **Export still works**, because it doesn't need the browser's storage. Nothing is deleted.
 - If the browser's storage can't be opened at all, the editor still runs on a new level and says that nothing will be saved.
 - *Why v1: otherwise you'd find out you lost work only after a reload.*
 
-Source: scope SA3; round 12: SV2; old: SV-28, SV-29, SV-46
+Source: scope SA3; round 12: SV2; old: SV-28, SV-29, SV-46; owner: 2026-11-18
 
 ### Ask the browser to keep the saved level · v1
 
@@ -59,10 +60,10 @@ Source: scope SA1; round 11: 12 A7; round 12: TB1; old: SV-47
 
 - A level has a name of 1 to 60 characters, `Untitled level` at first.
 - **A longer name is refused, not cut:** the old name stays and the status text says why. *Why: losing the end of a name quietly is worse than being told (owner: 2026-11-14).*
-- It is shown and edited in the top bar, see [the workspace](../editor/workspace.md), and saved in the project file. Renaming is an undo step.
+- **It isn't shown in the editor** (owner: 2026-11-17), only in the browser tab title. File → Rename level… changes it in a small dialog (owner: 2026-11-18), see [the workspace](../editor/workspace.md#-and-the-main-menu--v1). It is saved in the project file. Renaming is an undo step.
 - It is the default file name on export, with characters no file system allows replaced.
 
-Source: owner: 2026-11-13, 2026-11-14
+Source: owner: 2026-11-13, 2026-11-14, 2026-11-17, 2026-11-18
 
 ## Level files
 
@@ -70,8 +71,8 @@ Source: owner: 2026-11-13, 2026-11-14
 
 - **The project file, `.editable`, is the level as you edit it.** Example: `castle.editable`.
 - It is a package: a `.zip` inside, under its own extension, holding the level and every file it uses. *Why its own extension: it says what the file is for, and it stops someone importing a random `.zip`.*
-- **Ctrl+S exports the project file**, the same as the Export button. *Why: version history was dropped. If Ctrl+S did nothing, people pressing it out of habit would think they had saved.*
-- In the file: the level, its files (also unused ones), and editor-only data such as the grid size, locks and folded Entities panel rows.
+- **File → Export… exports the project file.** Ctrl+S saves in the browser instead (owner: 2026-11-18), see [above](#the-level-saves-itself--v1); Export has no shortcut.
+- In the file: the level, its files (also unused ones), and editor-only data such as the grid size, locks and folded Entities viewer rows.
 - Not in the file: undo history, and what stays in the browser: the view position, the zoom, the pinned seed and the values of kept variables.
 - **Import checks a file before loading it**, and is all or nothing: a file with a problem changes nothing and gets a plain message. The cases: not a level file, too big, damaged, made by a newer version of the game, missing a file it lists, over a limit.
 - **A value missing from a file reads as its default, and so does a whole TransformComponent or NameComponent**, which every entity has. A file without exactly one World and one camera is damaged: their components and children are the level, so they can't be made up (standing yes, 2026-11-14).
@@ -79,7 +80,7 @@ Source: owner: 2026-11-13, 2026-11-14
 - **A level from someone else is untrusted.** Its scripts get the same safe set of functions as any script, see [scripts](../scripts/scripts.md). Importing never starts play.
 - *Why v1: with one level in the browser, the project file is how you keep and move levels.*
 
-Source: round 1: D30; round 3: D79; round 5: FMT1; round 11: 12 A10; round 12: SV1, EXT1; old: SV-61, SV-64, SV-65, SV-68, SV-72, SV-82, SV-83; owner: 2026-11-14
+Source: round 1: D30; round 3: D79; round 5: FMT1; round 11: 12 A10; round 12: SV1, EXT1; old: SV-61, SV-64, SV-65, SV-68, SV-72, SV-82, SV-83; owner: 2026-11-14, 2026-11-18
 
 ### The file format version · v1
 
@@ -122,7 +123,7 @@ Source: scope SA6; round 11: 12 A8
 ### The play file · v3
 
 - **The play file, `.playable`, is made from the project file and holds only what is needed to play.** Example: `castle.playable`.
-- It drops editor-only data: the grid size, locks, folded Entities panel rows. Hidden is not editor-only, so it stays. *Why: the grid serves no purpose to a player.*
+- It drops editor-only data: the grid size, locks, folded Entities viewer rows. Hidden is not editor-only, so it stays. *Why: the grid serves no purpose to a player.*
 - It is a package too: a `.zip` inside with the level and every file it uses. *Why: one packing idea for everything, instead of a second rule.*
 - v3 also adds a way to open a play file and run the level without the editor, see [test play](test-play.md).
 - *Why v3: before publishing, nobody else plays your levels. The project file already keeps and moves them.*

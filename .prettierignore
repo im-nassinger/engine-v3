@@ -7,3 +7,4 @@ node_modules/
 # Written by npm run determinism:record, never by hand.
 tests/levels/determinism/files/
 tests/determinism/recorded/
+.netlify/

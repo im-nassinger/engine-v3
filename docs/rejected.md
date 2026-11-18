@@ -108,11 +108,24 @@ What we decided against, and why. **Check here before proposing something**: an 
 | A Wall or Open choice for each edge of the level bounds | One Walls checkbox: all four edges walls, or all open | One toggle is enough | owner: 2026-11-13 |
 | The Joint tool stays active after each joint | It returns to Select like every tool. Tool lock keeps it | One rule for every tool | owner: 2026-11-13 |
 | "Play as player": a test run with no debug tools | Play | Play already hides the panels, and v3 runs the play file | owner: 2026-11-13 |
-| "Transform" as the component's name | TransformComponent | Component names end in `Component`, with no exception | owner: 2026-11-13 |
+| "Transform" as the component's name | TransformComponent; only its card's title reads `Transform` | Component names end in `Component`; card titles drop it (owner: 2026-11-17) | owner: 2026-11-13, 2026-11-17 |
 | An import that compares level ids and asks Keep both or Replace | Import replaces the open level after asking | v1 keeps no list of levels, so there is nothing to compare against | round 11: 12 A11; round 12: LV1 |
 | CodeMirror | Monaco | The owner's choice | round 9: 10 2.13 |
 | A 12-font list | Inter, then Lora, JetBrains Mono and Roboto Mono | The owner's list | decisions: D26; round 3: F1 |
 | A View button in the top bar | The View menu is the main menu's View submenu | The main menu already lists every command, so a second button only repeated it | owner: 2026-11-17 |
+| The redesign's other directions: Bento tiles, Quiet, Glass, Candy, Neon, Ember, and Islands' Midnight, Graphite, Mint, Soft, Compact, Frosted and Warm | Islands, Slate with a bright blue | The owner's pick; don't bring them back | owner: 2026-11-17 |
+| Round 8's flush panels with lines between parts and 4 px corners | Islands with 14 px corners and no borders or lines | The owner wanted a clean, cool look | owner: 2026-11-17 |
+| A top bar; a menu bar island; a thin menu bar across the window | ☰ alone at the top left, holding every command | Every top row made the editor busier | owner: 2026-11-17 |
+| Buttons for Undo, Redo, Save or Play, in a dock, a row, or islands of their own | Edit, File and Play in the main menu, and their keys | Four controls doing four jobs read badly in any one place | owner: 2026-11-17 |
+| The level's name on screen (beside ☰, in a pill, a card, a chip, a title bar, the panels' heads, over the bounds) and the save state's words or a white dot | No name on screen; the tab title keeps `* Name`; File → Rename level… | None looked like the file's name rather than part of the UI | owner: 2026-11-17, 2026-11-18 |
+| A status bar, a hint chip, a tool card, or a debug line in the middle | The debug box under the minimap, and the message pill | The owner wanted only the numbers checked while placing things | owner: 2026-11-17 |
+| A lasting tool hint and a warning count | No hint; each warning on its card | The tool column shows the tool and each card its warnings | owner: 2026-11-18 |
+| No shadows at all; hard opaque shadows | One soft 2 px shadow under every grey container | No shadow let parts merge; a hard one looked heavy | owner: 2026-11-17 |
+| The Shape tool's options strip | The kinds menu beside the tool, the Joint tool's too | It belongs to the tool it changes | owner: 2026-11-17, 2026-11-18 |
+| Ctrl+S exporting the project file | Ctrl+S saves in the browser now; Export… is its own item | Pressing Ctrl+S out of habit now does what people expect | owner: 2026-11-18 |
+| Inter or Geist for the editor, and sizes between 10 and 16 px | JetBrains Mono at 10, 12, 14 or 16 px | One font, four sizes | owner: 2026-11-17 |
+| A 240 px minimap, and a zoom or snapping button by it | 180 px, the map only | The owner reverted the widening | owner: 2026-11-17 |
+| A square new level, 20000×20000 | 20000×10000 | The redesign's square was its example level only | owner: 2026-11-18 |
 
 ## Left out on purpose
 

@@ -36,13 +36,13 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 | Shift+D, Shift+A, Shift+W, Shift+S | Resize the selection's shapes, or the Shape tool's preview, 10 px. Shift+S was v3's Snapping to entities, which gets another key (owner, 2026-11-17) | Editor | Handles, v1; the Shape tool, v1 |
 | Ctrl+G, Ctrl+Shift+G | Group, ungroup | Editor | Groups, v1 |
 | Enter | Go into the selected group | Editor | Groups, v1 |
-| F2 | Rename the selected entity | Editor | Entities panel, v1 |
+| F2 | Rename the selected entity | Editor | Entities viewer, v1 |
 | G | Show or hide the grid | Editor | Grid, v1 |
 | Shift+G | Grid snapping on or off | Editor | Grid, v1 |
 | Shift+P | Physics view on or off | Editor | Physics view, v1 |
 | Shift+J | Joint icons on or off (standing yes, 2026-11-15) | Editor | A joint is an ordinary entity, v1 |
 | Shift+C | Camera frame on or off (standing yes, 2026-11-15) | Editor | One camera, v1 |
-| Ctrl+S | Export the project file | Everywhere | Saving, v1 |
+| Ctrl+S | Save in the browser now (owner: 2026-11-18) | Everywhere | Saving, v1 |
 | Ctrl+O | Import a project file | Editor | Saving, v1 |
 | Shift+T | Play, or Stop while playing. During play the editor takes it before the game, so a level can't use it (owner, 2026-11-17) | Editor | Test play, v1 |
 | Ctrl+Enter | Play, or Stop while playing, the second way. In a field it commits the field first | Everywhere | Test play, v1 |
@@ -90,4 +90,4 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 
 Alignment has buttons and menu entries but no shortcuts, because Alt+letter collides with browser menus.
 
-Source: round 1: D13; round 3: 01 2.5; round 4: 02 2.7; round 5: TK2, 02 2.5; round 6: CP1; round 12: SV1; old: WS-41, WS-45, section 2.5 of 01
+Source: round 1: D13; round 3: 01 2.5; round 4: 02 2.7; round 5: TK2, 02 2.5; round 6: CP1; round 12: SV1; old: WS-41, WS-45, section 2.5 of 01; owner: 2026-11-18

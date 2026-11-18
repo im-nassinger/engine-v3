@@ -4,7 +4,7 @@
 
 How entities move and collide. A **BodyComponent** says how something moves, a **SurfaceComponent** says how its shape collides. **v1:** add a body in one click, the Box2D body settings, the surface settings (density, friction, restitution, sensor), merging shapes in a group into one body, and the physics view. **v2:** sensors and touching, for triggers and scripts. **v3:** one-way platforms and the warnings for setups that behave badly. Core rules: new shapes have no physics until you add it, collision always matches what you see, and touching is detected by the physics engine alone.
 
-Field names are Box2D's, so the Inspector, the Lua API and tutorials match. The scale is 50 px per metre and is not a setting.
+Field names are Box2D's, so the Entity inspector, the Lua API and tutorials match. The scale is 50 px per metre and is not a setting.
 
 ## Bodies
 
@@ -41,7 +41,7 @@ Source: scope PH1; round 1: C6, D36, D39; round 2: O8; round 6: 05 2.1, 05 2.2, 
 | Bullet | Extra checks so a very fast entity doesn't pass through other moving things | On or off | Off | Dynamic |
 | Mass | Read-only, in kg. Updates as shapes and density change. You set density, never mass | | | Dynamic |
 
-- *Why these names: the owner wanted common terms. These are Box2D's (Unity and Godot are nearly the same), so the Inspector, the Lua API and tutorials match.*
+- *Why these names: the owner wanted common terms. These are Box2D's (Unity and Godot are nearly the same), so the Entity inspector, the Lua API and tutorials match.*
 - Only the fields that matter for the chosen type are enabled. The others are greyed, with their values kept.
 - All of these can change during play.
 - Speed is capped at 6,000 px/s and spin at 7.5 turns per second (2,700 °/s). Higher values are quietly limited.

@@ -23,24 +23,24 @@ Source: round 1: D39; round 5: 03 2.1; old: DR-01 to DR-09
 ### The Shape tool · v1
 
 - One tool draws the four kinds a ShapeComponent can hold: **rectangle, circle, polygon, line**.
-- **Choosing the Shape tool clears the selection and hides the Inspector.** In its place, an options strip at the top left of the level view offers **Rectangle, Circle and Polygon**. A line is drawn as a polygon finished open, see below. *Why: the Inspector only shows entities that exist. A shape still being drawn isn't one, and showing it there would mean the Inspector had to handle things that aren't entities (owner: 2026-11-15).*
-- The strip starts on the kind used last, a rectangle at first.
-- When the shape is finished, the tool returns to Select (see [the toolbar](editor/workspace.md)), the new shape is selected, and the Inspector shows it. With tool lock on, the Shape tool stays active and the Inspector stays hidden until you leave it (standing yes, 2026-11-15).
+- **Choosing the Shape tool clears the selection and hides the Entity inspector.** In its place, **the kinds menu stands open beside the Shape tool**, centred on it with a small arrow joined to the tool, offering **Rectangle, Circle and Polygon** one under another, each with its icon. The chosen kind is drawn like the active tool. The menu never closes while the tool is active, and goes when another tool is chosen (owner: 2026-11-17). A line is drawn as a polygon finished open, see below. *Why: the Entity inspector only shows entities that exist. A shape still being drawn isn't one, and showing it there would mean the Entity inspector had to handle things that aren't entities (owner: 2026-11-15).*
+- The kinds menu starts on the kind used last, a rectangle at first.
+- When the shape is finished, the tool returns to Select (see [the tools](editor/workspace.md#seven-tools-on-number-keys--v1)), the new shape is selected, and the Entity inspector shows it. With tool lock on, the Shape tool stays active and the Entity inspector stays hidden until you leave it (standing yes, 2026-11-15).
 - A faded preview follows the mouse and shows exactly what a click will place. A click places it. Dragging sets the size instead, and the size is remembered for the next shape.
 - **Circle:** a circle has only a radius. A drag draws the circle that fits the dragged box, as if Shift were held. To make an ellipse, scale the circle unevenly in its TransformComponent: the shape stays a circle.
 - **Polygon:** each click adds a point. **Clicking the first point closes it into a polygon.** A polygon is always closed and can be any outline.
-- **Line:** **Enter finishes the polygon being drawn open, as a line**: an open chain of straight segments, 2 points or more. A single segment is a line with 2 points. Curved lines are paths. Esc, double-click, choosing another tool and Play finish it open too, so only clicking the first point closes it (standing yes, 2026-11-15: the owner named Enter; one rule for every other way of finishing). *Why a line is its own kind: Box2D calls it a chain and it is the usual way to make platformer ground. Why it isn't in the strip: an open polygon is a line, so one choice draws both (owner: 2026-11-15).*
+- **Line:** **Enter finishes the polygon being drawn open, as a line**: an open chain of straight segments, 2 points or more. A single segment is a line with 2 points. Curved lines are paths. Esc, double-click, choosing another tool and Play finish it open too, so only clicking the first point closes it (standing yes, 2026-11-15: the owner named Enter; one rule for every other way of finishing). *Why a line is its own kind: Box2D calls it a chain and it is the usual way to make platformer ground. Why it isn't in the kinds menu: an open polygon is a line, so one choice draws both (owner: 2026-11-15).*
 - The size in px shows beside the mouse during a drag.
 - **Z and X turn the preview** around its centre (owner: 2026-11-17): Z counter-clockwise and X clockwise on screen, 1° a press, Shift+Z and Shift+X 10°, as they turn a selection. The shape is made at that rotation, its TransformComponent's Rotation, and a drag measures the box along the turned sides. A polygon or line being drawn turns its placed points with it, and its points stay where they were placed. Turning makes no undo step. Choosing the Shape tool starts the preview straight; with tool lock on, the next shape keeps the turn.
 - A rectangle is at least 1 px on each side, and a circle at least 1 px across.
 - **A line drawn perfectly flat has a height of 0**, and typing a height for it is refused with a status text, because points all on one row can't be spread. To slope it, move a point. The same goes for its width when drawn perfectly upright (standing yes, 2026-11-14).
 - Limits: 1,000 points in a polygon or line. Above 200 a note says "High detail may slow physics".
 
-Source: scope DR1; round 5: TK2; round 7: SH1; old: DR-10 to DR-16; owner: 2026-11-14, 2026-11-15, 2026-11-17
+Source: scope DR1; round 5: TK2; round 7: SH1; old: DR-10 to DR-16; owner: 2026-11-14, 2026-11-15, 2026-11-17, 2026-11-18
 
 ### Changing a shape's kind · v1
 
-- The ShapeComponent's Kind is a choice in the Inspector. Changing it changes the shape, keeps its place and size, and is one undo step.
+- The ShapeComponent's Kind is a choice in the Entity inspector. Changing it changes the shape, keeps its place and size, and is one undo step.
 - Each kind holds its own values: a rectangle a width and height, a circle a radius, a polygon or line its points.
 - What the new kind starts from (standing yes, 2026-11-15: the owner asked for the Kind choice, not for these rules):
 
@@ -71,8 +71,8 @@ Source: scope DR4; round 8: SH3; owner: 2026-11-17
 - **Resizing with the handles changes the TransformComponent's scale, never the shape's values** (owner: 2026-11-16): a rectangle keeps its width and height, a circle its radius, a polygon or line its points. A group's resize changes the group's scale too. Typing Width, Height, Radius or Points changes what the shape measures.
 - A resize never changes the outline's width. Whether the new scale stretches the outline is the StyleComponent's **Scale outline** checkbox, below, with or without Shift.
 - Inside a scaled group everything stretches, outlines and text included. An uneven group scale gives uneven outlines. That is what "like a picture" means.
-- The Inspector shows Width and Height for a rectangle and Radius for a circle. **A polygon or line has no Width or Height, only its points** (owner: 2026-11-16).
-- **Points is one list field** in the Inspector: a polygon's or line's points are a list of vectors, a path's a list of path points. Typing a point moves it. A polygon keeps 3 to 1,000 points, a line 2 to 1,000 (owner: 2026-11-15).
+- The Entity inspector shows Width and Height for a rectangle and Radius for a circle. **A polygon or line has no Width or Height, only its points** (owner: 2026-11-16).
+- **Points is one list field** in the Entity inspector: a polygon's or line's points are a list of vectors, a path's a list of path points. Typing a point moves it. A polygon keeps 3 to 1,000 points, a line 2 to 1,000 (owner: 2026-11-15).
 - **A circle stays round when resized with the handles:** its scale takes the larger stretch on both axes, as if Shift were held. Typing an uneven scale in its TransformComponent makes an ellipse (owner: 2026-11-15; with resizing changing the scale, standing yes, 2026-11-17).
 
 Source: round 1: D21; round 5: 03 2.4; old: DR-21 to DR-30; owner: 2026-11-15, 2026-11-16
@@ -175,7 +175,7 @@ Source: scope DR6; round 6: ST2; old: DR-95, DR-96
 
 ### Toolbar swatches · v3
 
-- Two swatches on the toolbar show the last fill and outline you picked. New shapes use them.
+- Two swatches in the tool column show the last fill and outline you picked. New shapes use them.
 
 Source: scope DR7; round 5: 03 2.3; old: DR-18 to DR-20
 
@@ -261,7 +261,7 @@ Small features from the old draft and review that the scope review never asked a
 | Apply scale | On a single shape with a scale other than 1, a button folds the scale into its size and resets scale to 1. On a circle, only an even scale (standing yes, 2026-11-15: a radius can't hold an uneven one) | v3 |
 | Break and join path points | Break opens a closed path at a point, or splits an open path in two. Join closes an open path | v3 |
 | Create path from shape | Adds a path that exactly matches a shape, so the art can be curved without touching what collides | v3 |
-| Convert a circle to a regular polygon | Replaces it with a polygon whose point count you choose: a triangle, a hexagon or any regular polygon. (A plain change of kind is v1, in the Inspector) | v3 |
+| Convert a circle to a regular polygon | Replaces it with a polygon whose point count you choose: a triangle, a hexagon or any regular polygon. (A plain change of kind is v1, in the Entity inspector) | v3 |
 | "Out of date" after converting | When a path changes after Convert to polygon, the shape shows an "Out of date" note with a Regenerate button | v3 |
 | Polygon too thin to collide | A polygon with almost no area gets a warning and has no collision | v3 |
 | Text tool remembers | The Text tool remembers the last font, size and colour. New text is dark, or light on a dark background | v3 |

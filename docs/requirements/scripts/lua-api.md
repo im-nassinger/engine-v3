@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Every function the game gives scripts. Example scripts are in [lua-examples.md](lua-examples.md). **Functions are top level, take entity ids, and use pixels, degrees and the Inspector's names.** Anything that is a component value is read with `get_attribute` and changed with `set_attribute`, the same list of values a trigger's Change value offers, so there are no separate setters for text, colours, joint motors or gravity. The rules behind the API are in [scripts.md](scripts.md).
+Every function the game gives scripts. Example scripts are in [lua-examples.md](lua-examples.md). **Functions are top level, take entity ids, and use pixels, degrees and the Entity inspector's names.** Anything that is a component value is read with `get_attribute` and changed with `set_attribute`, the same list of values a trigger's Change value offers, so there are no separate setters for text, colours, joint motors or gravity. The rules behind the API are in [scripts.md](scripts.md).
 
 The Status column says which functions the review named and which the owner decided after it. The owner approved the whole list on 2026-11-13.
 
@@ -10,13 +10,13 @@ The Status column says which functions the review named and which the owner deci
 
 - **Every function is top level**, such as `spawn(path)`, never `world.spawn(path)`. Lua's own libraries (`string`, `table`, `math`) stay as Lua has them.
 - **Functions take ids, never objects.** An id is a number. A destroyed entity's id no longer exists: functions given one do nothing, and `exists(id)` returns false.
-- Positions are **level positions in pixels**, y pointing down. Angles are **degrees, clockwise on screen**. Speeds are px/s and °/s. Time is the level's time in seconds. Gravity alone is m/s², as in the Inspector.
+- Positions are **level positions in pixels**, y pointing down. Angles are **degrees, clockwise on screen**. Speeds are px/s and °/s. Time is the level's time in seconds. Gravity alone is m/s², as in the Entity inspector.
 - **A script's own entity is `this`**, and a handler receives `other`, the words triggers use.
 - **A point is two numbers:** `local x, y = get_position(this)`. There is no vector type. Only a vector variable reads as a table, see [variables](#variables--v2).
-- **Attributes use the Inspector's field names in snake_case:** the field "Linear damping" is the attribute `"linear_damping"`.
+- **Attributes use the Entity inspector's field names in snake_case:** the field "Linear damping" is the attribute `"linear_damping"`.
 - Colours are text, such as `"#4A90D9"`.
 - A function of its own exists only when it does more than change one value: velocity, level position, tags, spawning.
-- *Why: handles, not references; same names as the Inspector; pixels and degrees; the owner's rule that functions are top level. A vector type is a concept of its own, and can still be added later without changing these functions.*
+- *Why: handles, not references; same names as the Entity inspector; pixels and degrees; the owner's rule that functions are top level. A vector type is a concept of its own, and can still be added later without changing these functions.*
 
 Source: round 3: D66; round 9: 10 2.7, 10 2.8; round 10: API1; owner: 2026-11-13
 
@@ -53,8 +53,8 @@ Source: round 9: 10 2.3; round 10: EV1; owner: 2026-11-13
 | Function | Does | Status |
 |---|---|---|
 | `this` | Not a function: the id of the entity this script is on | Owner |
-| `get_entity_by_name(name)` | The first entity with this name in Entities panel order, or `nil` | Review |
-| `get_entities_by_tag(tag)` | A list of ids, in Entities panel order | Owner |
+| `get_entity_by_name(name)` | The first entity with this name in Entities viewer order, or `nil` | Review |
+| `get_entities_by_tag(tag)` | A list of ids, in Entities viewer order | Owner |
 | `get_world()`, `get_camera()` | The World's id, the camera's id | Owner |
 | `get_parent(id)`, `get_children(id)` | The parent's id, a list of the children's ids | Owner |
 | `exists(id)` | False once the entity is destroyed | Owner |
@@ -113,7 +113,7 @@ Source: round 9: 10 2.5, 10 2.7; round 11: CL1; owner: 2026-11-13
 | `string_variable`, `boolean_variable`, `angle_variable`, `colour_variable` | String, boolean, angle, colour | Owner |
 | `entity_variable`, `asset_variable`, `vector_variable`, `tags_variable` | Entity, asset, vector, tags | Owner |
 
-- **A script lists the variables it needs in a `variables` table at its top**, such as `speed = number_variable(400, { min = 0, unit = "px/s" })`. The list only describes them: the values are the entity's own, on its VariablesComponent, where the Inspector shows them.
+- **A script lists the variables it needs in a `variables` table at its top**, such as `speed = number_variable(400, { min = 0, unit = "px/s" })`. The list only describes them: the values are the entity's own, on its VariablesComponent, where the Entity inspector shows them.
 - **During play the same table reads and writes them:** `variables.speed` reads, `variables.speed = 500` writes, and triggers see the change. There are no functions inside it. *Why: functions are top level, and plain reads and writes match the rest of Lua (owner: 2026-11-16).*
 - The level's variables, on the World, keep `get_variable(name)` and `set_variable(name, value)`.
 - **What each type reads as:** a number or an angle (in degrees) is a number; a string or a colour is text; a boolean is `true` or `false`; an entity is its id, or `nil` when none is picked; an asset is its file path; tags are a list of text; a vector is a table such as `{ x = 10, y = 20 }`.

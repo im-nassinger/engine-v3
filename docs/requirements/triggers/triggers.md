@@ -13,7 +13,7 @@ A trigger is no-code logic on an entity, in three parts: **When** (one event), *
 - *Why three parts: an earlier one-sentence form hid the "who" inside the When, which only works for touching. When, If, Do gives every trigger the same shape: an event happens, checks decide, actions run.*
 - Every event gives the trigger two entities: **`this`**, the entity holding the trigger, and **`other`**, the entity that caused the event, when there is one. For touching, `other` is the entity that touched. For a custom event, it is the sender. A key, a timer or level start has no `other`, and checks and actions that use it are greyed out.
 - **Each check and action picks its target from: `this`, `other`, an entity by name, or every entity with a tag.**
-- In the Inspector a trigger reads as a **sentence with clickable parts**, such as "When something starts touching this, if it is tagged player: add 1 to coins, destroy this."
+- In the Entity inspector a trigger reads as a **sentence with clickable parts**, such as "When something starts touching this, if it is tagged player: add 1 to coins, destroy this."
 - A part that isn't set yet is highlighted and says what it needs. A trigger with unset parts doesn't run.
 - Each trigger can be switched on or off. It is a value like any other, so one trigger switches another on or off with Change value.
 - Triggers can be dragged to reorder, duplicated and deleted. Every edit is one undo step.
@@ -147,7 +147,7 @@ Source: scope TR2, TR7; round 3: M1; round 9: MSG2; round 10: EV1; owner: 2026-1
 
 ### Order and limits · v2
 
-- **Triggers and scripts run in Entities panel order:** the top row first, and top to bottom inside an entity's card. Drag a row or a trigger to change it. Spawned entities run where they sit in the tree.
+- **Triggers and scripts run in Entities viewer order:** the top row first, and top to bottom inside an entity's card. Drag a row or a trigger to change it. Spawned entities run where they sit in the tree.
 - *Why: the order you see is the order things happen, and it needs nothing new. Godot works this way. The trade-off: moving a row for drawing also changes when it runs. A priority number can be added later without breaking levels.*
 - Which triggers fire for an event is decided once, before any of that event's actions run.
 - When several entities touch at once, each is its own firing.

@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**`Level` owns the tree:** which entity sits in which parent, in which order. **`Entity` owns its components and its own hidden and locked switches.** Every change raises a change signal, which the derived caches, the renderer and React listen to. Ids are whole numbers from an `EntityIdAllocator` that only counts up, so an id is never reused in a session or a run. Children are kept in Entities panel order, so a pre-order walk of the tree is both the run order and, read backwards, the draw order. Copies, undo of a delete, saving, the clipboard and the play copy all use one data shape, `EntityData`, from [the level data format](../persistence.md).
+**`Level` owns the tree:** which entity sits in which parent, in which order. **`Entity` owns its components and its own hidden and locked switches.** Every change raises a change signal, which the derived caches, the renderer and React listen to. Ids are whole numbers from an `EntityIdAllocator` that only counts up, so an id is never reused in a session or a run. Children are kept in Entities viewer order, so a pre-order walk of the tree is both the run order and, read backwards, the draw order. Copies, undo of a delete, saving, the clipboard and the play copy all use one data shape, `EntityData`, from [the level data format](../persistence.md).
 
 ## Ids
 
@@ -30,7 +30,7 @@ export class Entity {
     constructor(id: EntityId, tree: LevelTree, signals: LevelSignals);
 
     get parent(): Entity | undefined;
-    get children(): readonly Entity[];          // Entities panel order, index 0 is the top row
+    get children(): readonly Entity[];          // Entities viewer order, index 0 is the top row
     get depth(): number;
     isAncestorOf(entity: Entity): boolean;
 
@@ -108,7 +108,7 @@ export class Level {
 
 - **Children are a plain ordered array per entity**, top row first. Inserting at an index is an array splice. There are no fractional order keys, so nothing ever needs rebalancing.
 - **Run order** (v2: triggers and scripts) is the pre-order walk, top row first. **Draw order** is the World first, because its fill is the background, then the same walk read backwards, so the top row ends up in front.
-- The Entities panel's visible rows and the run order are both cached and rebuilt only when the tree version changes, see [performance.md](../performance.md).
+- The Entities viewer's visible rows and the run order are both cached and rebuilt only when the tree version changes, see [performance.md](../performance.md).
 
 ### The World and the camera
 
@@ -119,7 +119,7 @@ export class Level {
 | Protected by | `Level`: can't be moved, removed or put under a parent | `Level`: always directly inside the World, can't be removed |
 | Commands that skip it | Copy, cut, duplicate, delete, group, hide, rename | Copy, cut, duplicate, delete, group |
 
-The World draws its rectangle with its fill, which is the background. Clicks never hit it: clicking empty space already shows the World in the Inspector.
+The World draws its rectangle with its fill, which is the background. Clicks never hit it: clicking empty space already shows the World in the Entity inspector.
 
 ## Change signals
 
@@ -149,7 +149,7 @@ export type LevelUpdate =
 export class LevelSignals {
     readonly updated: Signal<LevelUpdate>;
     readonly treeVersion: VersionCounter;      // any add, remove or move
-    readonly entityVersions: EntityVersions;   // one counter per entity, for one Entities panel row or card
+    readonly entityVersions: EntityVersions;   // one counter per entity, for one Entities viewer row or card
     readonly nameVersion: VersionCounter;      // the level's own name: the top bar and the tab title
     readonly levelVersion: VersionCounter;     // anything at all: used by autosave
 }
@@ -178,7 +178,7 @@ Values worked out from the tree, kept until something they depend on changes. Th
 
 ## Copying and the one data shape
 
-- **`EntityData`** is one entity as plain data: its id, its hidden and locked switches, each component's values, keyed by attribute name, and its `children` as `EntityData` in Entities panel order. It holds no parent id: its parent is the entity it sits in (owner, 2026-11-15). It is the same shape as one entity in `level.json`.
+- **`EntityData`** is one entity as plain data: its id, its hidden and locked switches, each component's values, keyed by attribute name, and its `children` as `EntityData` in Entities viewer order. It holds no parent id: its parent is the entity it sits in (owner, 2026-11-15). It is the same shape as one entity in `level.json`.
 - `LevelWriter.writeSubtree(entity)` and `LevelReader.readSubtree(level, data, parent, index)` are the only code that turns entities into data and back. They are used by:
 
 | Use | Ids |

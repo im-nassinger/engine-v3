@@ -6,7 +6,8 @@
 //      (· v1, · v2, · v3, · v4 or · Later) and is closed by a "Source:" line
 //   5. dropped words (the glossary's "Dropped words" table) are used nowhere
 //      except glossary.md and rejected.md. Naming one inside "double quotes" or
-//      `backticks` is fine: that is talking about the word, not using it.
+//      `backticks` is fine: that is talking about the word, not using it, and so
+//      is a link's target, a file name or a fenced code block.
 //
 // Run from the project root: node tools/check-docs.js
 const fs = require("fs");
@@ -24,7 +25,7 @@ const ORDINARY_WORDS = new Set([
   "layer (physics)", "action (for keys)", "full screen (camera mode)",
 ]);
 // Where a dropped word is part of an agreed name.
-const ALLOWED_PHRASES = ["sprite sheet"];
+const ALLOWED_PHRASES = ["sprite sheet", "entity inspector"];
 
 function markdownFiles(dir) {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -82,8 +83,10 @@ for (const file of files) {
   }
 
   let openFeature = null;
+  let inCodeBlock = false;
   lines.forEach((line, index) => {
     const where = `${name}:${index + 1}`;
+    if (line.trimStart().startsWith("```")) inCodeBlock = !inCodeBlock;
 
     for (const match of line.matchAll(/\]\(([^)\s]+)\)/g)) {
       const target = match[1].split("#")[0];
@@ -103,8 +106,15 @@ for (const file of files) {
       if (line.startsWith("Source: ")) openFeature = null;
     }
 
-    if (!mayUseDroppedWords) {
-      let text = line.toLowerCase().replace(/"[^"]*"/g, "").replace(/`[^`]*`/g, "");
+    // A fenced code block holds code and paths, so its words aren't checked.
+    if (!mayUseDroppedWords && !inCodeBlock) {
+      // Link targets and file names (inspector-and-undo.md) are paths, not words.
+      let text = line
+        .toLowerCase()
+        .replace(/"[^"]*"/g, "")
+        .replace(/`[^`]*`/g, "")
+        .replace(/\]\([^)]*\)/g, "]")
+        .replace(/[\w./-]+\.(md|ts|tsx|css|js|html)\b/g, "");
       for (const phrase of ALLOWED_PHRASES) text = text.split(phrase).join("");
       for (const { word, pattern } of dropped) {
         if (pattern.test(text)) problems.push(`${where}: dropped word "${word}"`);

@@ -26,11 +26,12 @@ These versions were decided during the requirements review, or by the owner afte
 
 | Feature | Version | Why |
 |---|---|---|
-| One level at a time, saved in the browser. New and Import replace it after asking. Export and Ctrl+S make a `.editable` file | v1 | A list of levels isn't v1. Without the browser copy, closing the tab would lose work |
+| One level at a time, saved in the browser. New and Import replace it after asking. Export makes a `.editable` file; Ctrl+S saves in the browser now (owner: 2026-11-18) | v1 | A list of levels isn't v1. Without the browser copy, closing the tab would lose work |
 | Three joints: Hinge, Rope and Spring, with the Joint tool | v1 | Each does something the others can't |
 | Only three tools in v1: Select, Shape and Joint | v1 | The other tools make paths, text and triggers, which are v2 (owner: 2026-11-13) |
 | Pause and Step | v1 | To watch a collision tick by tick (owner: 2026-11-13) |
-| The level's name, shown and edited in the top bar | v1 | It names the exported file. It was in no scope list (owner: 2026-11-13) |
+| The level's name, in the tab title and renamed from File → Rename level… (owner: 2026-11-18; not shown in the editor since the redesign) | v1 | It names the exported file. It was in no scope list (owner: 2026-11-13) |
+| The minimap, show-only | v1 | Part of the redesign; moving the view by clicking or dragging on it is v3 (owner: 2026-11-18) |
 | The Bézier pen and the Pencil tool | v2 | A path never collides, and Convert to polygon is v3, so in v1 a path is decoration only. Was v1, decided before versions were split (owner: 2026-11-13) |
 | Gradients | v2 | Decoration. Solid colours are enough to test. The owner had changed it from "not in the first version" (owner: 2026-11-13) |
 | The searchable list of shortcuts | v2 | It never went through "smallest thing that can be tested". The main menu lists every command with its shortcut (owner: 2026-11-13) |
@@ -69,11 +70,11 @@ Rules: [requirements/editor](requirements/editor/README.md)
 | ED5 | Snapping to other entities, with pink guides showing what is aligned. Example: you drag a platform, and a pink guide appears when its top edge is level with the next platform's. | v3 | The grid already aligns things. Guides are a comfort, not a need. |
 | ED6 | Resize and collapse the panels. Drag a panel's edge to make it wider, or click its title to fold it away. | v3 | Panels in fixed places at one size are enough to test with. |
 | ED7 | Right-click a field to copy and paste its value, and copy a whole component onto other selected entities. Example: copy a crate's SurfaceComponent and paste it onto ten other crates at once. | v3 | Saves time in big levels, but values can be typed by hand. |
-| ED8 | Warnings: a yellow note on the card it's about, with a fix button when there is one, and a count in the status bar. Example: a trigger that reacts to touching on an entity with no SurfaceComponent shows 'Needs a SurfaceComponent to notice touching. [Add SurfaceComponent as sensor]'. | v1 | Without it, a coin that does nothing gives no clue why. v1 needs only the warnings for missing partner components and failed saves. |
+| ED8 | Warnings: a yellow note on the card it's about, with a fix button when there is one (no count since the redesign, owner: 2026-11-18). Example: a trigger that reacts to touching on an entity with no SurfaceComponent shows 'Needs a SurfaceComponent to notice touching. [Add SurfaceComponent as sensor]'. | v1 | Without it, a coin that does nothing gives no clue why. v1 needs only the warnings for missing partner components and failed saves. |
 | ED9 | Tips: a blue note saying something works but there's an easier way. Example: an entity with more than 12 triggers gets a tip suggesting a script. | v3 | Tips help people learn, but nothing breaks without them. |
 | ED10 | Warnings for setups likely to behave badly in physics and joints. Examples: a joint end that is off its entity, or a small, fast Dynamic body without Bullet that may pass through walls. | v3 | Each warning is its own small rule to find and write. Add them as testing shows which problems people hit. |
 
-## Selecting and the Entities panel
+## Selecting and the Entities viewer
 
 Rules: [requirements/editor](requirements/editor/README.md)
 
@@ -84,14 +85,14 @@ Rules: [requirements/editor](requirements/editor/README.md)
 | SE3 | Resize and rotate several selected entities together, around the centre of the selection box. Example: select five platforms and turn them as one block. | v3 | Moving several at once is enough to build. To turn them together you can group them first, since a group resizes and rotates. |
 | SE4 | Group and ungroup with Ctrl+G and Ctrl+Shift+G. Double-click to go into a group, Esc to go back up. Example: a car is a group of a body and two wheels. | v1 | Groups are how a car or a player becomes one body. |
 | SE5 | A bar above the level view showing which group you're inside, such as World › Car › Wheel. Click a name to jump there. Inkscape has the same bar. | v3 | Esc already goes back up one group at a time. |
-| SE6 | Alt+click the same spot again to select the next entity underneath. Example: reach a small coin covered by a big background shape. | v3 | The Entities panel already reaches any entity. |
-| SE7 | Hover outlines what a click would select. Hovering an Entities panel row highlights its entity in the level view, and the other way round. | v3 | Helps in crowded levels. Small test levels don't need it. |
-| SE8 | The Entities panel: the tree of entities. Drag rows to reorder them or move them into a group, F2 to rename. The top row is drawn in front. | v1 | It's the only way to see and change the tree. |
-| SE9 | Search the Entities panel by name, with filters. | v3 | Small test levels have few rows. |
+| SE6 | Alt+click the same spot again to select the next entity underneath. Example: reach a small coin covered by a big background shape. | v3 | The Entities viewer already reaches any entity. |
+| SE7 | Hover outlines what a click would select. Hovering an Entities viewer row highlights its entity in the level view, and the other way round. | v3 | Helps in crowded levels. Small test levels don't need it. |
+| SE8 | The Entities viewer: the tree of entities. Drag rows to reorder them or move them into a group, F2 to rename. The top row is drawn in front. | v1 | It's the only way to see and change the tree. |
+| SE9 | Search the Entities viewer by name, with filters. | v3 | Small test levels have few rows. |
 | SE10 | Hide an entity with its eye icon. A hidden entity isn't drawn but still collides and runs its scripts. | v1 | You need it to work on things behind other things, and it's saved in the level. |
 | SE11 | Lock an entity with its lock icon, so you can't grab it in the level view. Example: lock a big background so dragging over it draws a selection box instead of moving it. | v3 | Mostly for big backgrounds, which come with images. |
 | SE12 | Invert the selection. | v3 | Rarely needed. |
-| SE13 | The Used by list at the bottom of the Inspector. Example: selecting a wheel lists 'Hinge 1 (JointComponent, A)'. | v3 | Helps in big levels. In a small one you can see the joint. |
+| SE13 | The Used by list at the bottom of the Entity inspector. Example: selecting a wheel lists 'Hinge 1 (JointComponent, A)'. | v3 | Helps in big levels. In a small one you can see the joint. |
 
 ## Drawing and text
 
@@ -99,7 +100,7 @@ Rules: [requirements/drawing](requirements/drawing.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
-| DR1 | The Shape tool: rectangle, circle, polygon and line, the kind picked in the tool's options strip (a line is a polygon finished open with Enter) and changeable afterwards in the Inspector (owner, 2026-11-15). Shift keeps proportions, Alt draws from the centre. | v1 | Shapes are what levels are made of. |
+| DR1 | The Shape tool: rectangle, circle, polygon and line, the kind picked in the tool's options strip (a line is a polygon finished open with Enter) and changeable afterwards in the Entity inspector (owner, 2026-11-15). Shift keeps proportions, Alt draws from the centre. | v1 | Shapes are what levels are made of. |
 | DR2 | Point editing: double-click a polygon, line or path with Select to move its points. Double-click an edge to add a point. | v1 | Without it, one wrong point means drawing the shape again. |
 | DR3 | Polygons may cross themselves. Every enclosed area is filled and collides. Example: a figure-of-eight polygon is filled in both loops. | v1 | People draw them by accident, and a polygon library handles them. Supporting them from the start is less work than deciding what else should happen. |
 | DR4 | W, A, S and D set the size of the Shape tool's preview before you click. D wider, A narrower, W taller, S shorter, 1 px per press, Shift 10 px (owner, 2026-11-17). | v1 | Was v3: dragging already sets the size. Brought forward before v2, with the same keys resizing a selection (owner, 2026-11-17). |

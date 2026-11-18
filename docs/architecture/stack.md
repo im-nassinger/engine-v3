@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed** means the owner chose it; **recommended** means the architecture chose it (all were approved in review card D11). Five things are fixed: TypeScript, Vite, React, PixiJS 8 and Box2D v3. Beside them: Vitest and Playwright for tests, ESLint and Prettier for code quality, `box2d3-wasm` for Box2D, `clipper2-ts` for polygons (tried in stage 3), `fflate` for zips, `idb` for browser storage, TanStack Virtual for the Entities panel, and the React Compiler, with `jiti` and `dependency-cruiser` for the checks in [tooling.md](tooling.md). **Node.js 26** runs the tools. **Each library is installed by the stage that first uses it**, at the version here, checked again on that day. Lua and Monaco come with v2 and aren't installed in v1. **TypeScript is 6.0, not 7**, because the ESLint TypeScript tools don't support 7 yet.
+Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed** means the owner chose it; **recommended** means the architecture chose it (all were approved in review card D11). Five things are fixed: TypeScript, Vite, React, PixiJS 8 and Box2D v3. Beside them: Vitest and Playwright for tests, ESLint and Prettier for code quality, `box2d3-wasm` for Box2D, `clipper2-ts` for polygons (tried in stage 3), `fflate` for zips, `idb` for browser storage, TanStack Virtual for the Entities viewer, and the React Compiler, with `jiti` and `dependency-cruiser` for the checks in [tooling.md](tooling.md). **Node.js 26** runs the tools. **Each library is installed by the stage that first uses it**, at the version here, checked again on that day. Lua and Monaco come with v2 and aren't installed in v1. **TypeScript is 6.0, not 7**, because the ESLint TypeScript tools don't support 7 yet.
 
 ## Fixed
 
@@ -41,7 +41,7 @@ Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed*
 | `clipper2-ts` | 2.0.1-19, installed in stage 3 | Cuts self-crossing polygons and fills what they enclose | Integer arithmetic inside, so its results are the same on every computer. Tried first in stage 3 (owner, 2026-11-14), because `clipper2-js` 1.2.4 has no triangulation and brings Angular 15. **Only its fill is used**: its triangulation drops areas, so the game triangulates with its own `EarClipping` (standing yes, 2026-11-14). See [geometry](core-model/geometry.md) |
 | `fflate` | 0.8.3 | Makes and reads the `.editable` zip | Small, fast, and can stop unpacking at a size limit |
 | `idb` | 8.0.4 | A thin promise layer over IndexedDB | IndexedDB's own API is callback-based. `idb` adds no storage logic of its own |
-| `@tanstack/react-virtual` | 3.14.26, installed in stage 7 | Builds only the visible Entities panel rows | Fixed row height, no styling of its own, so drag and drop stays ours. The panel builds 8 rows past each edge, and the list opts out of the React Compiler, since the virtualizer changes inside one object (standing yes, 2026-11-15). See [inspector-and-entities.md](editor/inspector-and-entities.md#stage-7s-choices) |
+| `@tanstack/react-virtual` | 3.14.26, installed in stage 7 | Builds only the visible Entities viewer rows | Fixed row height, no styling of its own, so drag and drop stays ours. The panel builds 8 rows past each edge, and the list opts out of the React Compiler, since the virtualizer changes inside one object (standing yes, 2026-11-15). See [inspector-and-entities.md](editor/inspector-and-entities.md#stage-7s-choices) |
 | `lucide-react` | 1.73.0, installed in stage 6 | The editor's outline icons | The open outline set the owner named; one React component per icon, so only the icons used are bundled (standing yes, 2026-11-15) |
 | `@fontsource/jetbrains-mono` | 5.3.0, installed in stage 6 | The editor's font, hosted with the game | Vite bundles its files, so the font never comes from another site; only weights 400, 500 and 600 are imported (standing yes, 2026-11-15) |
 | `@types/node` | 26.6.6 | Types for the Node tools and tests | Matches Node 26 |
@@ -68,7 +68,7 @@ Their versions are checked again when v2 starts.
 | A state library (Redux, Zustand, MobX) | The core classes own their state and send change signals. React reads them through `useSyncExternalStore`, see [ui.md](ui.md) |
 | A CSS framework, CSS-in-JS, CSS Modules | Each React component has its own plain `.css` file scoped under its root class, as the owner's component rules say |
 | A UI component library | The editor needs a few plain controls (buttons, menus, number fields), and how each one works is in the requirements |
-| An ECS library | Entities and components are the game's own model with the owner's rules (one of each type, a tree, Entities panel order). A library would bring its own rules |
+| An ECS library | Entities and components are the game's own model with the owner's rules (one of each type, a tree, Entities viewer order). A library would bring its own rules |
 | `poly-decomp`, `earcut` | One polygon library. The game's own `EarClipping` triangulates, because `clipper2-ts`'s triangulation drops areas (standing yes, 2026-11-14) |
 | Box2D's debug draw | The physics view draws the game's own collision pieces (owner, 2026-11-13) |
 | `fake-indexeddb` and other browser imitations | Browser storage is tested in real browsers, see [testing.md](testing.md) |

@@ -1,25 +1,25 @@
-# Editor: selection, groups and the Entities panel
+# Editor: selection, groups and the Entities viewer
 
 ## TL;DR
 
-How entities are picked, moved and arranged in the tree. **v1:** click and drag-box selection, handles to move, resize and rotate one entity, arrow-key moves, grouping with Ctrl+G, going into groups by double-click, the Entities panel as the real tree, and the eye icon. **v3:** resizing and rotating several entities together, the path bar, Alt+click for the entity underneath, hover outlines, Entities panel search, the lock icon, and invert selection. Core rules: one selection everywhere, one row is one entity, and moving an entity between groups never moves it on screen.
+How entities are picked, moved and arranged in the tree. **v1:** click and drag-box selection, handles to move, resize and rotate one entity, arrow-key moves, grouping with Ctrl+G, going into groups by double-click, the Entities viewer as the real tree, and the eye icon. **v3:** resizing and rotating several entities together, the path bar, Alt+click for the entity underneath, hover outlines, Entities viewer search, the lock icon, and invert selection. Core rules: one selection everywhere, one row is one entity, and moving an entity between groups never moves it on screen.
 
 ## Selecting
 
 ### Click, drag-box, Shift+click, Select all · v1
 
-- There is **one selection**, shown in the level view, the Entities panel and the Inspector.
+- There is **one selection**, shown in the level view, the Entities viewer and the Entity inspector.
 - A click selects the entity under the mouse. If it is inside a group, the click selects the whole group, as seen from the group you are inside.
 - Shift+click adds an entity to the selection or removes it.
 - Dragging on empty space draws a selection box. **It selects every entity it touches.** Shift adds to the selection. Ctrl selects entities inside groups instead of their groups. *Why touch: the owner's change from "fully inside".*
 - Ctrl+A selects every entity directly inside the group you are inside. The World and the camera are left out.
-- Clicking empty space clears the selection. The Inspector then shows the World.
+- Clicking empty space clears the selection. The Entity inspector then shows the World.
 - A drag under 3 px is a click.
 - A selection never holds an entity together with one of its parents. Adding the parent drops its selected children.
 - The World can only be selected alone.
 - The selection, and the group you are inside, are editor state. They are never saved in the level.
 - The selection survives switching tools. Only the Select tool shows handles.
-- **Skip rule:** a command skips entities that don't allow it and the status bar says what was skipped, such as "Camera kept". The command is disabled only when nothing would be left.
+- **Skip rule:** a command skips entities that don't allow it and the message pill says what was skipped, such as "Camera kept". The command is disabled only when nothing would be left.
 
 What a press does:
 
@@ -63,7 +63,7 @@ Source: scope SE6; round 4: 02 2.2; round 5: 02 2.2
 ### Hover outlines · v3
 
 - Hovering outlines what a click would select: the whole group, not the child under the mouse.
-- Hovering an Entities panel row outlines that entity in the level view, and hovering in the level view tints its row.
+- Hovering an Entities viewer row outlines that entity in the level view, and hovering in the level view tints its row.
 - Hidden entities show no outline. Hover is off during a drag.
 
 Source: scope SE7; round 4: 02 2.6
@@ -77,8 +77,8 @@ Source: scope SE7; round 4: 02 2.6
 | Several entities | A thin outline each, and one shared box |
 | A joint | A ring around its icon |
 | The camera | A heavier frame |
-| A locked entity, selected from the Entities panel | A plain outline with a padlock, no handles |
-| Only hidden entities, selected from the Entities panel | A dashed box where they are, no handles |
+| A locked entity, selected from the Entities viewer | A plain outline with a padlock, no handles |
+| Only hidden entities, selected from the Entities viewer | A dashed box where they are, no handles |
 
 - Outlines and handles stay the same size on screen at any zoom.
 - Selecting anything with physics outlines its whole body in the level view.
@@ -130,16 +130,16 @@ Source: scope SE3; round 5: 02 2.8; round 6: MS1; old: SG-57 to SG-61
 - **Ctrl+G** groups the selection, **Ctrl+Shift+G** ungroups. Groups nest up to 256 deep. A move that would go deeper is refused with the reason.
 - Every entity can hold children, with no exceptions. A group is simply an entity used for that. *Why: one rule for every entity is easier to learn and build than special cases.*
 - A new group is named "Group N", sits where the frontmost selected entity was, and becomes the selection. Its origin is the centre of its contents. A single entity may be grouped.
-- **Grouping can change the draw order, and the editor says so.** A group is one run in the draw order, so entities that were apart are pulled together and move up. The status bar says "Draw order changed".
+- **Grouping can change the draw order, and the editor says so.** A group is one run in the draw order, so entities that were apart are pulled together and move up. The message pill says "Draw order changed".
 - Entities from different groups can be grouped together. They stay where they are on screen.
-- Ungrouping removes the group entity and puts its children in its place, selected. The group's own triggers, scripts, tags and body go with it. The status bar lists what was removed.
+- Ungrouping removes the group entity and puts its children in its place, selected. The group's own triggers, scripts, tags and body go with it. The message pill lists what was removed.
 - Deleting a group's last child keeps the empty group, because it may hold scripts or a body.
 - **Double-click a group to go into it. Esc goes up one group.** Inside a group, clicks select its direct children. This is how Inkscape does it.
 - After going in, the child under the mouse is selected, so another double-click goes one deeper. Enter on a selected group goes in too.
 - A single click outside the group you are inside clears the selection and stays inside. A double-click outside leaves.
-- Selecting an entity in the Entities panel works at any depth.
+- Selecting an entity in the Entities viewer works at any depth.
 - Going in or out is never an undo step.
-- Dragging in the level view never changes an entity's parent. Parents change only in the Entities panel or by grouping.
+- Dragging in the level view never changes an entity's parent. Parents change only in the Entities viewer or by grouping.
 
 | Double-click on | Result |
 |---|---|
@@ -160,18 +160,18 @@ Source: scope SE5; round 2: O7; old: SG-85
 
 ### Moving between groups keeps the place on screen · v1
 
-- Moving an entity into or out of a group keeps it exactly where it is on screen. The editor works out its new TransformComponent from the group's, including rotation, scale and **skew**. Its Inspector values change, because they are measured from the new parent.
+- Moving an entity into or out of a group keeps it exactly where it is on screen. The editor works out its new TransformComponent from the group's, including rotation, scale and **skew**. Its Entity inspector values change, because they are measured from the new parent.
 - If the move changes which body the entity belongs to, the editor warns first.
 - Undo restores the old numbers.
 - *Why skew: a TransformComponent is measured from the parent. Position, rotation, scale and skew together describe any mix of moves, turns and stretches, so the result is always exact. Without skew, a rotated entity inside a stretched group would have to change shape.*
 
 Source: round 6: RP1; old: SG-135 to SG-137
 
-## The Entities panel
+## The Entities viewer
 
 ### The tree of entities · v1
 
-- The Entities panel shows the real tree of entities. There is no separate layer system.
+- The Entities viewer shows the real tree of entities. There is no separate layer system.
 - **One row is one entity.** A row has an arrow to fold it, an icon for its kind, its name and an eye, and from v3 a lock. Nothing else. *Why the lock waits: Lock is v3 (owner: 2026-11-14).* *Why: joints are their own rows, so showing them inside another row breaks the picture.*
 - **The top row is drawn in front.** The World is the top row, because it is the root. A new entity appears at the top of the group you are inside.
 - The camera is an ordinary row that can be moved up and down. Where it sits changes nothing, because what is inside the camera is always drawn over the level.
@@ -182,7 +182,7 @@ Source: round 6: RP1; old: SG-135 to SG-137
 - Selecting in the level view unfolds the groups above the row and scrolls it into view.
 - Which rows are folded is saved in the project file, not in the play file.
 - Every entity has a name, filled automatically, such as "Rectangle 1". A name is not a tag.
-- **A name is never empty.** A level file with an empty entity name, or one of only spaces, is damaged. A name missing from the file reads as `Entity`, like any missing value reads as its default. *Why: the Entities panel never shows an empty row, and every file stays readable (owner: 2026-11-14).*
+- **A name is never empty.** A level file with an empty entity name, or one of only spaces, is damaged. A name missing from the file reads as `Entity`, like any missing value reads as its default. *Why: the Entities viewer never shows an empty row, and every file stays readable (owner: 2026-11-14).*
 - **A name can't change during play.** *Why: a lookup by name stays the same for the whole run (owner: 2026-11-14).*
 - During play the panel is read-only.
 
@@ -200,14 +200,14 @@ Source: scope SE9; round 4: 02 2.12; old: SG-108 to SG-110
 - The eye icon hides an entity. **Hidden means not drawn, in the editor or in play. A hidden entity still collides and runs its triggers and scripts.** *Why: hide is purely about drawing. There is no "active" switch.*
 - Hiding applies to children. A child keeps its own switch, so showing the parent again restores the earlier arrangement. A child hidden by its parent shows a dimmed eye.
 - Hide can be undone, and is saved in both the project file and the play file.
-- A hidden entity can still be selected from its row and edited in the Inspector.
+- A hidden entity can still be selected from its row and edited in the Entity inspector.
 
 Source: scope SE10; round 1: C5; round 2: R7; round 5: 02 2.13; decisions: D7; old: SG-113, SG-115 to SG-119
 
 ### Lock · v3
 
 - The lock icon stops an entity from being grabbed in the level view. Example: lock a big background so that dragging over it draws a selection box.
-- A locked entity can still be selected from its row in the Entities panel and edited in the Inspector.
+- A locked entity can still be selected from its row in the Entities viewer and edited in the Entity inspector.
 - Locking applies to children, the same way as hiding. A locked entity still moves with its unlocked parent, and can still be snapped to.
 - Lock can be undone. It is saved in the project file only, because it is editor-only.
 
@@ -219,10 +219,10 @@ Source: scope SE11; round 1: C5; round 3: R17; round 5: 02 2.13, FMT1; decisions
 
 | | World | Camera |
 |---|---|---|
-| Select | From its row, alone. Clicking empty space shows it in the Inspector | From its row, or by the edge of its frame |
+| Select | From its row, alone. Clicking empty space shows it in the Entity inspector | From its row, or by the edge of its frame |
 | Move | No | Yes |
 | Rename, hide | No | Yes. Hiding it hides everything inside the camera |
-| Reorder in the Entities panel | No, it is the root | Yes, but always directly inside the World |
+| Reorder in the Entities viewer | No, it is the root | Yes, but always directly inside the World |
 | Delete, duplicate, copy, group | No | No |
 | Hold children | Yes | Yes |
 
@@ -235,7 +235,7 @@ Source: round 1: C3, C4; round 5: 02 2.15; round 7: 07 2.1; round 8: HUD1; old: 
 
 ### Large levels stay responsive · v1
 
-- Selecting shows within 0.05 s. Moving 1,000 selected entities stays smooth. The Entities panel opens in under 0.2 s and scrolls smoothly at any size.
+- Selecting shows within 0.05 s. Moving 1,000 selected entities stays smooth. The Entities viewer opens in under 0.2 s and scrolls smoothly at any size.
 - These are targets for a level of 10,000 entities on a mid-range laptop.
 
 Source: round 5: 02 2.17; old: SG-140 to SG-145
@@ -253,7 +253,7 @@ Small features from the old draft and review that the scope review never asked a
 | Auto-pan | The view pans by itself when a drag nears the edge of the level view | v3 |
 | Solo | Alt+click an eye shows only that entity and its children until repeated. Never saved, never affects play | v3 |
 | Drag across eyes | Dragging across eye or lock icons sets every row touched to the same state | v3 |
-| Keyboard in the Entities panel | Arrows move, Right unfolds, Left folds, typing a letter jumps to a name | v3 |
-| Entities panel footer | Counts of selected, hidden and locked entities | v3 |
+| Keyboard in the Entities viewer | Arrows move, Right unfolds, Left folds, typing a letter jumps to a name | v3 |
+| Entities viewer footer | Counts of selected, hidden and locked entities | v3 |
 
 Source: old: SG-16 to SG-19, SG-32, SG-49 to SG-51, SG-82, SG-97, SG-111, SG-112, SG-118b, SG-120; owner: 2026-11-14

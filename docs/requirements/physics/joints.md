@@ -10,7 +10,7 @@ All lengths are pixels and all angles are degrees. Positive angles and speeds ar
 
 ### A joint is an ordinary entity · v1
 
-- A joint is an entity with a TransformComponent and a JointComponent. It has its own row in the Entities panel, and can be renamed and hidden like any entity.
+- A joint is an entity with a TransformComponent and a JointComponent. It has its own row in the Entities viewer, and can be renamed and hidden like any entity.
 - It can hold children, triggers and scripts, like any entity. *Why: one rule for every entity. Treating joints as special was left over from an earlier design.*
 - The JointComponent names its two entities in fields **A** and **B**. Clicking a field selects that entity. An empty B pins A to the background.
 - Joints connect bodies. A sensor or a line can be an end.
@@ -54,7 +54,7 @@ Source: round 1: D41, D42; round 6: 06 2.1; round 8: JV2; decisions: D46; old: J
 
 ### The Joint tool · v1
 
-- Pick the joint type in the tool's options strip. Hinge is the default.
+- Pick the joint type in the kinds menu beside the Joint tool, the same menu as the Shape tool's: Hinge, Rope, Spring (owner: 2026-11-18). Hinge is the default.
 - **Click where two physics entities overlap to connect them, or on one alone to pin it to the background.**
 - **A one-point joint (Hinge, and later Weld) takes one click. A two-ended joint (Rope, Spring, and later Rod) takes two clicks, one on each entity**, and each end sits exactly where you clicked. *Why two clicks: it is the only way to say where each end of a rope goes.*
 - Ends snap to centres and corners when close. It is the same snapping used everywhere else.
@@ -67,7 +67,7 @@ Source: round 1: D41, D42; round 6: 06 2.1; round 8: JV2; decisions: D46; old: J
 - Making a joint is one undo step. The new joint is selected.
 - **Joints come only from the Joint tool.** The JointComponent is in the Add Component menu, disabled, with "Use the Joint tool to place a joint." *Why: added by hand, a joint would have no ends and no A, and would do nothing until deleted and placed again, since re-attaching an end is v3 (standing yes, 2026-11-14).*
 
-Source: round 6: 06 2.2; round 7: 06 2.3; round 5: TK2; old: JT-04 to JT-25; owner: 2026-11-14; owner: 2026-11-16
+Source: round 6: 06 2.2; round 7: 06 2.3; round 5: TK2; old: JT-04 to JT-25; owner: 2026-11-14; owner: 2026-11-16; owner: 2026-11-18
 
 ### Settings of each joint · v1
 
@@ -175,7 +175,7 @@ Source: scope JO3; round 6: JB1; round 7: 06 2.5; decisions: D47; old: JT-39, JT
 - **Copying copies a joint only when it is selected.** A copied joint connects the copies of its entities if they were copied too. Otherwise it connects the originals in the same level, or shows them as missing in another level. `.entity` files follow the same rule.
 - *Why: the same rule as everything else. It also makes placing an end easy. The old rule, that a joint's position comes from its two bodies, is only true in play.*
 - Deleting an entity deletes the joints attached to it. Deleting a joint deletes only the joint. Removing physics from an end doesn't delete the joint.
-- Where a joint's row sits in the Entities panel only affects the tree, never what it connects.
+- Where a joint's row sits in the Entities viewer only affects the tree, never what it connects.
 
 Source: round 1: D45; round 7: 06 2.9, 06 2.10, 06 2.11; round 8: JM1, JC1; old: JT-55, JT-63 to JT-78
 
@@ -209,6 +209,6 @@ Small features from the old draft and review that the scope review never asked a
 | Choosing among three bodies | With three or more bodies under the mouse, Tab steps through the pairs | v3 |
 | Which body is A | The smaller of the two becomes A, so the wheel or the door is A whatever the draw order | v1 |
 | Scaling a group with joints | Scaling a group scales its joints' distances, and mirroring it mirrors their limits and motor direction | v1 |
-| Force readout | While a Breakable joint is selected in test play, the Inspector shows the current and peak force | v3 |
+| Force readout | While a Breakable joint is selected in test play, the Entity inspector shows the current and peak force | v3 |
 
 Source: old: JT-12 to JT-16, JT-40, JT-68, JT-69; owner: 2026-11-14
