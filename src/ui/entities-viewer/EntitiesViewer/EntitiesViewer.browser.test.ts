@@ -14,6 +14,8 @@ import {
 
 // 600 px shows about 20 rows of 28 px; the overscan adds a few on each side.
 const MOST_ROWS_BUILT = 60;
+// The rows' pills from the island's sides.
+const INSET = 6;
 
 beforeEach(openPanelPage);
 afterEach(closePanelPage);
@@ -22,6 +24,17 @@ async function rowShown(name: string) {
     await expect.poll(() => findRow(name)).toBeDefined();
 
     return rowNamed(name);
+}
+
+// The token as the browser writes a computed colour, to compare with one.
+function tokenColour(token: string) {
+    const probe = document.createElement('div');
+    probe.style.color = `var(${token})`;
+    panelContainer().append(probe);
+    const colour = getComputedStyle(probe).color;
+    probe.remove();
+
+    return colour;
 }
 
 function nameBox() {
@@ -46,6 +59,33 @@ function press(input: HTMLInputElement, key: string) {
 }
 
 describe('EntitiesViewer', () => {
+    test('it is titled Entities viewer', async () => {
+        showPanel(buildLevel(1).level);
+        await rowShown('World');
+
+        expect(panelContainer().querySelector('h2')?.textContent).toBe('Entities viewer');
+    });
+
+    test('the selected row is a blue pill 6 px from the sides, with its kind icon in the accent text colour', async () => {
+        const { level } = buildLevel(2);
+        showPanel(level);
+        click(await rowShown('Crate 1'));
+        await expect.poll(() => rowNamed('Crate 1').getAttribute('aria-selected')).toBe('true');
+
+        const row = rowNamed('Crate 1');
+        const look = getComputedStyle(row);
+        const panelBox = panelContainer().getBoundingClientRect();
+        const rowBox = row.getBoundingClientRect();
+        const icon = row.querySelector('.row-kind-icon');
+        if (icon === null) throw new Error('The row shows its kind icon.');
+
+        expect(look.backgroundColor).toBe(tokenColour('--accent-soft'));
+        expect(look.borderRadius).toBe('8px');
+        expect(rowBox.left - panelBox.left).toBe(INSET);
+        expect(panelBox.right - rowBox.right).toBe(INSET);
+        expect(getComputedStyle(icon).color).toBe(tokenColour('--accent-text'));
+    });
+
     test('at 10,000 rows only the rows on screen exist', async () => {
         const { level } = buildLevel(10_000);
         showPanel(level);

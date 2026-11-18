@@ -3,7 +3,7 @@ import { useVersion } from '../../hooks/index.ts';
 import { EntitiesList } from './EntitiesList/index.ts';
 import './EntitiesViewer.css';
 
-// The level's tree, one row per visible entity. New and Import give it a fresh list.
+// The level's tree, one row per visible entity, only as tall as its rows. New and Import give it a fresh list.
 export function EntitiesViewer() {
     const session = useEditorSession();
     useVersion(session.openLevelChanged);
@@ -11,7 +11,7 @@ export function EntitiesViewer() {
 
     return (
         <div className="entities-viewer">
-            <h2 className="head">Entities</h2>
+            <h2 className="head">Entities viewer</h2>
             <EntitiesList openLevel={openLevel} />
         </div>
     );

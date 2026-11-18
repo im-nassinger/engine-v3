@@ -1,8 +1,9 @@
 .drop-line {
     position: absolute;
     top: -1px;
-    right: var(--space-8);
+    right: 0;
     height: 2px;
+    border-radius: 1px;
     background: var(--accent);
     pointer-events: none;
 

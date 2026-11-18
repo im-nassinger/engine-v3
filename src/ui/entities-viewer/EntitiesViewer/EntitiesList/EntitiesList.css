@@ -1,6 +1,10 @@
+/* Only as tall as its rows, and it shrinks to scroll them when the island can't grow further. The padding keeps the
+   rows' pills 6 px from the island's sides and bottom, and holds the drop line under the last row, so a drag doesn't
+   make a scrollbar appear. */
 .entities-list {
-    flex: 1;
+    flex: 0 1 auto;
     min-height: 0;
+    padding: 0 var(--space-6) var(--space-6);
     overflow-y: auto;
 
     > .content {

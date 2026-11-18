@@ -25,6 +25,10 @@ const ENTITIES_VIEWER = 260;
 const MINIMAP = { width: 180, height: 90 };
 const MAIN_MENU = 48;
 const STATUS_BAR = 28;
+const PANEL_HEAD = 40;
+const ROW = 30;
+// Under the last row of the Entities viewer.
+const ROWS_BOTTOM = 6;
 
 // Wide enough that the free area isn't covered by the Entities viewer, as on a real screen.
 beforeEach(async () => {
@@ -36,12 +40,12 @@ afterEach(() => {
     closeEditorPage();
 });
 
-function showShell() {
+function showShell(level = Level.createNew()) {
     const shell = createElement(EditorShell);
     const withView = createElement(LevelViewMountContext, { value: NO_LEVEL_VIEW }, shell);
     const withWindows = createElement(OpenWindowsContext, { value: new OpenWindowCount() }, withView);
 
-    return showWithEditor(Level.createNew(), withWindows);
+    return showWithEditor(level, withWindows);
 }
 
 function find(selector: string) {
@@ -53,6 +57,26 @@ function boxOf(label: string) {
     if (box === undefined) throw new Error(`The shell has no ${label}.`);
 
     return box;
+}
+
+function viewerHeightFor(rowCount: number) {
+    return PANEL_HEAD + rowCount * ROW + ROWS_BOTTOM;
+}
+
+function levelWithEntities(count: number) {
+    const level = Level.createNew();
+    for (let index = 0; index < count; index += 1) {
+        level.createEntity(level.world, 0);
+    }
+
+    return level;
+}
+
+function entitiesList() {
+    const list = find('.entities-list');
+    if (list === null) throw new Error('The Entities viewer shows its list.');
+
+    return list;
 }
 
 function entityInspector() {
@@ -117,12 +141,37 @@ describe('EditorShell', () => {
             MINIMAP.height,
         ]);
         const viewer = boxOf('Entities viewer');
-        expect([viewer.right, viewer.top, viewer.bottom, viewer.width]).toEqual([
+        // A new level has two rows: the World and the camera.
+        expect([viewer.right, viewer.top, viewer.height, viewer.width]).toEqual([
             WINDOW.width - GAP,
             GAP,
-            minimap.top - GAP,
+            viewerHeightFor(2),
             ENTITIES_VIEWER,
         ]);
+    });
+
+    test('the Entities viewer grows and shrinks with its rows', async () => {
+        const level = levelWithEntities(3);
+        const { session } = showShell(level);
+        // The three entities, the World and the camera.
+        await expect.poll(() => boxOf('Entities viewer').height).toBe(viewerHeightFor(5));
+
+        session.openLevel.entitiesRows.setFolded(level.world.id, true);
+        await expect.poll(() => boxOf('Entities viewer').height).toBe(viewerHeightFor(1));
+
+        session.openLevel.entitiesRows.setFolded(level.world.id, false);
+        await expect.poll(() => boxOf('Entities viewer').height).toBe(viewerHeightFor(5));
+        expect(entitiesList().scrollHeight).toBe(entitiesList().clientHeight);
+    });
+
+    test('with more rows than fit, the Entities viewer stops 10 px above the minimap and scrolls', async () => {
+        showShell(levelWithEntities(100));
+        await expect.poll(() => find('[role="treeitem"]')).not.toBeNull();
+
+        const minimap = boxOf('Minimap');
+        expect(boxOf('Entities viewer').bottom).toBe(minimap.top - GAP);
+        expect(minimap.height).toBe(MINIMAP.height);
+        expect(entitiesList().scrollHeight).toBeGreaterThan(entitiesList().clientHeight);
     });
 
     test('the free area is the level view between the Entity inspector and the Entities viewer', async () => {

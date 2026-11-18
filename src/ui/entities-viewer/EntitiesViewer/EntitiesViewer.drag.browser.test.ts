@@ -32,7 +32,7 @@ type Point = {
 };
 
 // Past the indent of a row directly inside the World, so the pointer points at depth 1.
-const DEPTH_ONE_X = 8 + 16 + 4;
+const DEPTH_ONE_X = 2 + 16 + 4;
 
 function pointer(type: string, target: EventTarget, point: Point) {
     const init = { bubbles: true, cancelable: true, clientX: point.x, clientY: point.y, button: 0, isPrimary: true };
@@ -105,6 +105,19 @@ function rowAtListTop() {
 }
 
 describe('dragging rows', () => {
+    test('the drop line under the last row makes no scrollbar appear', async () => {
+        const { level } = buildLevel(3);
+        showPanel(level);
+        const lastRow = await rowShown('Crate 1');
+
+        startDrag(await rowShown('Crate 3'));
+        moveTo(pointInRow(lastRow, 0.9));
+        await expect.poll(() => dropLine()).not.toBeNull();
+
+        expect(list().scrollHeight).toBe(list().clientHeight);
+        release(pointInRow(lastRow, 0.9));
+    });
+
     test('at 10,000 rows, a drag across rows scrolled into view lands where its line was drawn', async () => {
         const { level, entities } = buildLevel(10_000);
         const session = showPanel(level);

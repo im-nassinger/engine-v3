@@ -1,7 +1,8 @@
 .entities-viewer {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    min-height: 0;
+    max-height: 100%;
 
     > .head {
         display: flex;
@@ -9,8 +10,8 @@
         align-items: center;
         height: var(--panel-head);
         margin: 0;
-        padding: 0 var(--space-10);
-        font-size: var(--text-size);
+        padding: 0 var(--inset);
+        font-size: var(--text-title);
         font-weight: var(--weight-heading);
     }
 }

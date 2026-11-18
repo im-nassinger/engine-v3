@@ -37,11 +37,14 @@
         width: var(--entity-inspector);
     }
 
+    /* As tall as its rows, up to 10 px above the minimap. A flex column, so the list inside can shrink and scroll. */
     > [data-area='entities-viewer'] {
         top: var(--island-gap);
         right: var(--island-gap);
-        bottom: calc(var(--islands-bottom) + var(--minimap-height) + var(--island-gap));
+        display: flex;
+        flex-direction: column;
         width: var(--entities-viewer);
+        max-height: calc(100% - var(--island-gap) * 2 - var(--islands-bottom) - var(--minimap-height));
     }
 
     > [data-area='minimap'] {
