@@ -10,9 +10,8 @@
         align-items: center;
         min-width: 0;
         height: var(--input);
-        padding: 0 var(--space-6);
-        border: 1px solid transparent;
-        border-radius: var(--radius);
+        padding: 0 var(--space-10) 0 var(--space-6);
+        border-radius: calc(var(--input) / 2);
         background: var(--field);
 
         > input {
@@ -35,11 +34,13 @@
         }
 
         &:has(> input:focus) {
-            border-color: var(--accent);
+            outline: 1px solid var(--accent);
+            outline-offset: -1px;
         }
 
         &[data-refused='true'] {
-            border-color: var(--danger);
+            outline: 1px solid var(--danger);
+            outline-offset: -1px;
         }
 
         &[data-disabled='true'] > input {

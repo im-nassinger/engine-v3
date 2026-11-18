@@ -1,12 +1,11 @@
 .number-box {
     display: flex;
-    flex: 1;
+    flex: 1 1 auto;
     align-items: center;
     min-width: 0;
     height: var(--input);
-    padding: 0 var(--space-6);
-    border: 1px solid transparent;
-    border-radius: var(--radius);
+    padding: 0 var(--space-10);
+    border-radius: calc(var(--input) / 2);
     background: var(--field);
 
     > input {
@@ -19,6 +18,7 @@
         background: none;
         color: var(--text);
         font: inherit;
+        font-variant-numeric: tabular-nums;
 
         &::placeholder {
             color: var(--muted);
@@ -36,12 +36,35 @@
         color: var(--faint);
     }
 
+    /* A filled slider: the soft accent from the left up to the value, the number on top. Dragging across
+       it sets the value, so it doesn't take vertical pans of the panel. */
+    &[data-slider='true'] {
+        background:
+            linear-gradient(to right, var(--accent-soft) var(--filled), transparent var(--filled)), var(--field);
+        touch-action: pan-y;
+        cursor: ew-resize;
+
+        &:not(:focus-within) > input {
+            cursor: ew-resize;
+        }
+
+        &[data-disabled='true'] {
+            cursor: default;
+
+            > input {
+                cursor: default;
+            }
+        }
+    }
+
     &:focus-within {
-        border-color: var(--accent);
+        outline: 1px solid var(--accent);
+        outline-offset: -1px;
     }
 
     &[data-refused='true'] {
-        border-color: var(--danger);
+        outline: 1px solid var(--danger);
+        outline-offset: -1px;
     }
 
     &[data-disabled='true'] > input {

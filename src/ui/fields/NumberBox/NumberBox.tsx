@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes } from 'react';
+import type { CSSProperties, HTMLAttributes, InputHTMLAttributes } from 'react';
 import type { Unit } from '../../../core/fields/index.ts';
 import './NumberBox.css';
 
@@ -11,14 +11,42 @@ export type NumberBoxProps = {
     isMixed: boolean;
     isRefused: boolean;
     isDisabled: boolean;
+    // A filled slider's share, from 0 to 1, and its pointer handlers. Left out for a plain box.
+    slider?: NumberBoxSlider;
 };
 
-// The box a number is typed in, with its unit as a faded suffix inside it.
-export function NumberBox({ label, axisLetter, unit, inputProps, isMixed, isRefused, isDisabled }: NumberBoxProps) {
+export type NumberBoxSlider = {
+    readonly filledShare: number;
+    readonly handlers: Pick<HTMLAttributes<HTMLElement>, 'onPointerDown' | 'onMouseDown' | 'onClick'>;
+};
+
+// The pill a number is typed in, with its unit as a faded suffix inside it. A filled slider's pill is
+// filled in the soft accent from the left up to the value.
+export function NumberBox({
+    label,
+    axisLetter,
+    unit,
+    inputProps,
+    isMixed,
+    isRefused,
+    isDisabled,
+    slider,
+}: NumberBoxProps) {
     const placeholder = isMixed ? 'Mixed' : undefined;
+    let fillStyle: CSSProperties | undefined;
+    if (slider !== undefined) {
+        fillStyle = { '--filled': `${slider.filledShare * 100}%` } as CSSProperties;
+    }
 
     return (
-        <label className="number-box" data-refused={isRefused} data-disabled={isDisabled}>
+        <label
+            className="number-box"
+            data-refused={isRefused}
+            data-disabled={isDisabled}
+            data-slider={slider !== undefined}
+            style={fillStyle}
+            {...slider?.handlers}
+        >
             {axisLetter !== undefined && <span className="axis">{axisLetter}</span>}
             <input
                 {...inputProps}

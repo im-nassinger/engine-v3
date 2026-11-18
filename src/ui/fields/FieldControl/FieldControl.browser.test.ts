@@ -1,83 +1,15 @@
-import { createElement } from 'react';
-import { createRoot } from 'react-dom/client';
-import type { Root } from 'react-dom/client';
-import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import type { AnyFieldDefinition } from '../../../core/components/index.ts';
 import { NumberFieldType, TextFieldType } from '../../../core/fields/index.ts';
-import type { FieldType } from '../../../core/fields/index.ts';
-import { Level } from '../../../core/level/index.ts';
-import { CommandRunner, createCommandRegistry } from '../../../editor/commands/index.ts';
 import { MIXED } from '../../../editor/entity-inspector/index.ts';
-import type { FieldModel } from '../../../editor/entity-inspector/index.ts';
-import { EditorSession } from '../../../editor/session/index.ts';
-import { ManualClock, ManualFrames, ManualTimer } from '../../../editor/time/testing/index.ts';
-import { CommandsContext } from '../../commands/index.ts';
-import type { EditorCommands } from '../../commands/index.ts';
-import '../../theme.css';
-import type { FieldSubject } from '../FieldProps.ts';
-import { FieldControl } from './FieldControl.tsx';
-
-let container: HTMLElement;
-let root: Root;
-
-beforeEach(() => {
-    container = document.createElement('div');
-    container.style.width = '240px';
-    document.body.append(container);
-    root = createRoot(container);
-});
+import { closeField, definitionOf, fieldContainer, showField, shownFieldPart } from './testing/showField.ts';
 
 afterEach(() => {
-    root.unmount();
-    container.remove();
+    closeField();
 });
 
-function definitionOf(label: string, type: FieldType<unknown>): AnyFieldDefinition {
-    return {
-        key: 'value',
-        label,
-        type,
-        defaultValue: undefined,
-        description: '',
-        changeableInPlay: false,
-    };
-}
-
-// The field alone, with every committed value kept in order.
-function showField(definition: AnyFieldDefinition, value: unknown) {
-    const session = new EditorSession({
-        level: Level.createNew(),
-        clock: new ManualClock(),
-        timer: new ManualTimer(),
-        frames: new ManualFrames(),
-    });
-    const commands: EditorCommands = {
-        registry: createCommandRegistry(session),
-        runner: new CommandRunner(session.status),
-        platform: 'other',
-    };
-
-    const committed: unknown[] = [];
-    const field: FieldModel = { kind: 'field', definition, value, isEnabled: true, isReadOnly: false };
-    const subject: FieldSubject = { openLevel: session.openLevel, typeName: 'TestComponent', entityIds: [] };
-    const control = createElement(FieldControl, {
-        field,
-        subject,
-        onCommit: (newValue) => committed.push(newValue),
-        onCommitAxis: (axis, newValue) => committed.push({ [axis]: newValue }),
-    });
-    root.render(createElement(CommandsContext, { value: commands }, control));
-
-    return committed;
-}
-
-async function shownInput() {
-    await expect.poll(() => container.querySelector('input')).not.toBeNull();
-    const input = container.querySelector('input');
-    if (input === null) throw new Error('No input is shown.');
-
-    return input;
+function shownInput() {
+    return shownFieldPart<HTMLInputElement>('input');
 }
 
 describe('FieldControl', () => {
@@ -103,7 +35,7 @@ describe('FieldControl', () => {
         await userEvent.keyboard('{Enter}');
 
         expect(committed).toEqual([1]);
-        await expect.poll(() => container.querySelector('.field-message')?.textContent).toBe('Min is 1');
+        await expect.poll(() => fieldContainer().querySelector('.field-message')?.textContent).toBe('Min is 1');
     });
 
     test('a text field commits on Enter, and an unchanged text commits nothing', async () => {

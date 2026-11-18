@@ -7,8 +7,9 @@
     > .none {
         flex: 0 0 auto;
         height: var(--input);
-        padding: 0 var(--space-6);
-        border-radius: var(--radius);
+        padding: 0 var(--space-10);
+        border: none;
+        border-radius: calc(var(--input) / 2);
         background: none;
         color: var(--muted);
         font: inherit;
@@ -19,9 +20,8 @@
         }
 
         &[aria-pressed='true'] {
-            border-color: var(--accent);
             background: var(--accent-soft);
-            color: var(--text);
+            color: var(--accent-text);
         }
 
         &:focus-visible {

@@ -41,6 +41,29 @@ function boxOf(typeName: string, key: string) {
     return requireElement<HTMLInputElement>(fieldRow(typeName, key), 'input:not([type])');
 }
 
+function pillOf(typeName: string, key: string) {
+    return requireElement<HTMLElement>(fieldRow(typeName, key), '.number-box');
+}
+
+// A pointer on the pill, at this share of its width from the left.
+function pointerAt(pill: HTMLElement, share: number) {
+    const { left, top, width, height } = pill.getBoundingClientRect();
+
+    return { clientX: left + share * width, clientY: top + height / 2, bubbles: true, button: 0, isPrimary: true };
+}
+
+function pressAt(pill: HTMLElement, share: number) {
+    pill.dispatchEvent(new PointerEvent('pointerdown', pointerAt(pill, share)));
+}
+
+function moveTo(pill: HTMLElement, share: number) {
+    window.dispatchEvent(new PointerEvent('pointermove', pointerAt(pill, share)));
+}
+
+function letGo() {
+    window.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+}
+
 function messageOf(typeName: string, key: string) {
     return fieldRow(typeName, key).querySelector('.field-message')?.textContent;
 }
@@ -190,8 +213,7 @@ describe('Entity inspector fields', () => {
         await userEvent.tab();
 
         await expect.poll(() => linearDamping(crate)).toBe(4);
-        expect(document.activeElement).not.toBe(boxOf('BodyComponent', 'linearDamping'));
-        expect(fieldRow('BodyComponent', 'linearDamping').contains(document.activeElement)).toBe(true);
+        expect(document.activeElement).toBe(boxOf('BodyComponent', 'angularDamping'));
     });
 
     test('Esc restores the old value and makes no step', async () => {
@@ -229,50 +251,60 @@ describe('Entity inspector fields', () => {
         expect(document.activeElement).toBe(box);
     });
 
-    test('a number with both limits shows a slider; one without, or with refused limits, does not', async () => {
+    test('a number with both limits is a filled slider; one without, or with refused limits, is not', async () => {
         await showCrate();
 
-        expect(fieldRow('BodyComponent', 'linearDamping').querySelector('input[type="range"]')).not.toBeNull();
-        expect(fieldRow('TransformComponent', 'rotation').querySelector('input[type="range"]')).toBeNull();
-        expect(fieldRow('TransformComponent', 'skew').querySelector('input[type="range"]')).toBeNull();
+        expect(pillOf('BodyComponent', 'linearDamping').dataset['slider']).toBe('true');
+        expect(pillOf('TransformComponent', 'rotation').dataset['slider']).toBe('false');
+        expect(pillOf('TransformComponent', 'skew').dataset['slider']).toBe('false');
     });
 
-    test('the slider changes the level while dragged and is one step when let go', async () => {
+    test('dragging across the slider changes the level while dragged and is one step when let go', async () => {
         const { crate, session } = await showCrate();
-        const slider = requireElement<HTMLInputElement>(
-            fieldRow('BodyComponent', 'linearDamping'),
-            'input[type="range"]',
-        );
+        const pill = pillOf('BodyComponent', 'linearDamping');
 
-        for (const value of ['10', '18', '25']) {
-            Reflect.set(HTMLInputElement.prototype, 'value', value, slider);
-            slider.dispatchEvent(new Event('input', { bubbles: true }));
+        pressAt(pill, 0);
+        for (const share of [0.1, 0.18, 0.25]) {
+            moveTo(pill, share);
         }
         await expect.poll(() => boxOf('BodyComponent', 'linearDamping').value).toBe('25');
         expect(linearDamping(crate)).toBe(25);
         expect(session.openLevel.history.undoCount).toBe(0);
+        expect(pill.style.getPropertyValue('--filled')).toBe('25%');
 
-        slider.dispatchEvent(new Event('change', { bubbles: true }));
+        letGo();
         await expect.poll(() => session.openLevel.history.undoCount).toBe(1);
         expect(undoLabel(session)).toBe('Change Linear damping');
+        expect(document.activeElement).not.toBe(boxOf('BodyComponent', 'linearDamping'));
 
         session.openLevel.editor.undo();
         expect(linearDamping(crate)).toBe(0);
     });
 
+    test('a click on the slider without a drag types in it and changes nothing', async () => {
+        const { crate, session } = await showCrate();
+        const box = boxOf('BodyComponent', 'linearDamping');
+
+        await userEvent.click(box);
+
+        await expect.poll(() => document.activeElement).toBe(box);
+        expect(linearDamping(crate)).toBe(0);
+        expect(session.openLevel.history.undoCount).toBe(0);
+        await userEvent.fill(box, '7');
+        await userEvent.keyboard('{Enter}');
+        await expect.poll(() => linearDamping(crate)).toBe(7);
+    });
+
     test('Esc during a slider drag puts the value back and the release makes no step', async () => {
         const { crate, session } = await showCrate();
-        const slider = requireElement<HTMLInputElement>(
-            fieldRow('BodyComponent', 'linearDamping'),
-            'input[type="range"]',
-        );
+        const pill = pillOf('BodyComponent', 'linearDamping');
 
-        Reflect.set(HTMLInputElement.prototype, 'value', '25', slider);
-        slider.dispatchEvent(new Event('input', { bubbles: true }));
+        pressAt(pill, 0);
+        moveTo(pill, 0.25);
         await expect.poll(() => linearDamping(crate)).toBe(25);
 
         session.openLevel.liveEdit.cancel();
-        slider.dispatchEvent(new Event('change', { bubbles: true }));
+        letGo();
 
         expect(linearDamping(crate)).toBe(0);
         expect(session.openLevel.history.undoCount).toBe(0);

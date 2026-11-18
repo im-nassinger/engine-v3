@@ -1,51 +1,49 @@
+/* A switch, still a checkbox for the keyboard and screen readers: off is the field colour with a muted
+   knob on the left, on is the accent with a white knob on the right, Mixed has its knob in the middle. */
 .checkbox-field {
-    display: grid;
-    place-content: center;
-    width: 14px;
-    height: 14px;
+    position: relative;
+    flex: 0 0 auto;
+    width: 28px;
+    height: 16px;
     margin: 0;
-    border: 1px solid var(--muted);
-    border-radius: var(--radius);
-    background: none;
+    border: none;
+    border-radius: 8px;
+    background: var(--field);
     appearance: none;
+    cursor: pointer;
 
     &::before {
-        width: 8px;
-        height: 4px;
-        margin-top: -2px;
-        border-bottom: 2px solid var(--on-accent);
-        border-left: 2px solid var(--on-accent);
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--muted);
         content: '';
-        opacity: 0;
-        rotate: -45deg;
+        transition: translate 0.12s ease;
     }
 
     &:checked {
-        border-color: var(--accent);
         background: var(--accent);
 
         &::before {
-            opacity: 1;
+            background: var(--on-accent);
+            translate: 12px 0;
         }
     }
 
     &:indeterminate::before {
-        width: 8px;
-        height: 0;
-        margin-top: 0;
-        border-left: none;
-        border-bottom-color: var(--muted);
-        opacity: 1;
-        rotate: none;
+        translate: 6px 0;
     }
 
     &:focus-visible {
         outline: 1px solid var(--accent);
-        outline-offset: 1px;
+        outline-offset: 2px;
     }
 
     &:disabled {
-        border-color: var(--faint);
-        opacity: 0.5;
+        opacity: 0.4;
+        cursor: default;
     }
 }

@@ -5,13 +5,13 @@ import type { FieldProps } from '../FieldProps.ts';
 import { NumberBox } from '../NumberBox/index.ts';
 import { numberInputOf, sliderRangeOf } from '../typing/numberInputOf.ts';
 import { useFieldTyping } from '../typing/useFieldTyping.ts';
-import { FieldSlider } from './FieldSlider/index.ts';
+import { filledShareOf, sliderStepOf } from './slider/sliderValue.ts';
+import { useFieldSlider } from './slider/useFieldSlider.ts';
 import './NumberField.css';
 
-// A number or an angle: the box with its faded unit, and a slider when it has both limits, changing the
-// level while dragged when given slide handlers. A value that
-// can't be read gets a red outline and its reason under the box; one past a limit is clamped, with a
-// brief note saying so.
+// A number or an angle: the pill with its faded unit, a filled slider when it has both limits, changing
+// the level while dragged when given slide handlers. A value that can't be read gets a red ring and its
+// reason under the pill; one past a limit is clamped, with a brief note saying so.
 export function NumberField({ field, onCommit, slide }: FieldProps) {
     const definition = numberInputOf(field);
     const { message, refuse, noteClamp, clear } = useFieldMessage();
@@ -75,31 +75,26 @@ export function NumberField({ field, onCommit, slide }: FieldProps) {
 
     const isRefused = message?.tone === 'refused';
     const sliderRange = sliderRangeOf(definition);
-    const slider = sliderRange && (
-        <FieldSlider
-            label={definition.label}
-            range={sliderRange}
-            definition={definition}
-            value={shownValue}
-            isDisabled={!field.isEnabled}
-            onSlide={slideSlider}
-            onRelease={releaseSlider}
-        />
-    );
+    const sliderHandlers = useFieldSlider({
+        range: sliderRange,
+        step: sliderStepOf(definition),
+        isDisabled: !field.isEnabled,
+        onSlide: slideSlider,
+        onRelease: releaseSlider,
+    });
+    const slider = sliderRange && { filledShare: filledShareOf(shownValue, sliderRange), handlers: sliderHandlers };
 
     return (
-        <div className="number-field" data-slider={sliderRange !== undefined}>
-            <div className="row">
-                <NumberBox
-                    label={definition.label}
-                    unit={definition.unit}
-                    inputProps={typing.inputProps}
-                    isMixed={isMixed && !typing.isFocused}
-                    isRefused={isRefused}
-                    isDisabled={!field.isEnabled}
-                />
-                {slider}
-            </div>
+        <div className="number-field">
+            <NumberBox
+                label={definition.label}
+                unit={definition.unit}
+                inputProps={typing.inputProps}
+                isMixed={isMixed && !typing.isFocused}
+                isRefused={isRefused}
+                isDisabled={!field.isEnabled}
+                slider={slider}
+            />
             {message && <FieldMessage text={message.text} tone={message.tone} />}
         </div>
     );
