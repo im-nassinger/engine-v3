@@ -128,6 +128,14 @@
   .actisl { height: 44px; padding: 0 8px; border-radius: 999px; display: flex; align-items: center; flex-shrink: 0; }
   .actisl .act { background: transparent; }
   .actisl.edit { padding: 0 8px; gap: 2px; }
+  .lc-top { position: relative; }
+  .lc-top.abs { position: absolute; z-index: 3; }
+  .actisl.icon { width: 44px; padding: 0; justify-content: center; }
+  .act.icon { width: 30px; padding: 0; justify-content: center; }
+  .act.icon svg.i { width: 16px; height: 16px; }
+  .act.play.icon svg.i { width: 14px; height: 14px; }
+  .lc-top .menu.down { top: 54px; }
+  .lc-top .menu.up { bottom: 54px; }
   .actisl.edit .ib { border-radius: 999px; width: 30px; height: 30px; }
   .actisl .act.save { color: var(--save-ink); }
   .actisl .act.play { color: var(--ink); }
@@ -295,6 +303,7 @@
 <div class="hdr">
   <div class="hrow"><span class="lbl">Variation</span><span id="dirs" class="hrow"></span></div>
   <div class="hrow"><span class="lbl">Show</span><span id="views" class="hrow"></span><span class="lbl" style="width:auto;margin-left:14px">Font</span><span id="fonts" class="hrow"></span></div>
+  <div class="hrow"><span class="lbl">Save, Play</span><span id="btns" class="hrow"></span></div>
   <div class="caption" id="caption"></div>
   <div class="picks" id="picks" title="Copy this line and send it to Claude"></div>
 </div>
@@ -364,11 +373,11 @@ const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,2
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s, view) => ({ id, name, desc, view, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'Edit island first', 'Undo, Redo and grid snapping left the dock for an island of their own between ☰ and Save: ( ☰ ) ( ↶ ↷ magnet ) ( Save ) ( Play ). The dock holds only the three tools. Panels are now titled Entity inspector and Entities viewer.', { edit: 'before' }),
-  dir('2', 'Edit island last', 'The same islands, with Undo, Redo and grid snapping after Play: ( ☰ ) ( Save ) ( Play ) ( ↶ ↷ magnet ).', { edit: 'after' }),
-  dir('3', 'Five in one island', 'Undo, Redo, grid snapping, Save and Play share one island, a gap between the icons and the words: ( ☰ ) ( ↶ ↷ magnet   Save Play ).', { edit: 'one' }),
-  dir('4', 'Edit island, then Save and Play together', 'Two islands after ☰: ( ☰ ) ( ↶ ↷ magnet ) ( Save Play ).', { edit: 'pair' }),
-  dir('5', 'Everything in one island', '☰ joins too, so the top left is one island: ( ☰   ↶ ↷ magnet   Save Play ).', { edit: 'all' })
+  dir('1', 'Top left', 'The owner\'s pick: ( ☰ ) ( Undo Redo snapping ) ( Save ) ( Play ) at the top left, the Entity inspector under it. The dock holds only the three tools.', { place: 'left' }),
+  dir('2', 'On the level view, left', 'The same row at the top left of the level view, beside the Entity inspector, which starts at the top like the Entities viewer.', { place: 'view' }),
+  dir('3', 'Top middle', 'The row centred at the top of the level view; both panels start at the top.', { place: 'middle' }),
+  dir('4', 'On the level view, right', 'The row at the top right of the level view, beside the Entities viewer; both panels start at the top.', { place: 'right' }),
+  dir('5', 'With the dock', 'The row joins the dock at the bottom middle: ( ☰ ) ( Undo Redo snapping ) ( Save ) ( Play ) ( tools ). The main menu opens upward; both panels start at the top.', { place: 'dock' })
 ];
 
 const FONTS = [
@@ -379,8 +388,8 @@ const FONTS = [
 ];
 const VIEWS = [['shape', 'A selected shape'], ['whole', 'The whole level'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
 
-let state = { dir: '1', view: 'shape', font: 'mono' };
-try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-14') || '{}')); } catch (e) {}
+let state = { dir: '1', view: 'shape', font: 'mono', btns: 'words' };
+try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-15') || '{}')); } catch (e) {}
 let S, T;
 
 function tokensCss(t) {
@@ -581,7 +590,7 @@ function levelCard(o) {
   const where = S.burger === 'own' ? 'own' : S.burger === 'actions' || centred ? 'actions' : 'name';
   const buttons = `<span class="act save">${ic('save')}Save</span><span class="act play">${ic('play')}Play</span>`;
   const inPill = S.actions === 'inpill' && !centred;
-  if (S.title !== 'menu') return `<div class="lc-top">${topLeft(menu)}</div>`;
+  if (S.title !== 'menu') return topLeft(menu);
   let out = where === 'own' ? `<div class="blk lcbtn">${menu}</div>` : '';
   if (!centred) {
     const cls = ['blk', 'lcard', 'pill', 'namebox', where === 'name' ? 'withmenu' : 'plain'].join(' ');
@@ -594,23 +603,23 @@ function levelCard(o) {
   }
   return `<div class="lc-top">${out}</div>`;
 }
-// The top left as the variation places Undo, Redo and grid snapping by Save and Play.
+// The top row: ( ☰ ) ( Undo Redo snapping ) ( Save ) ( Play ), where the variation places it.
 function topLeft(menu) {
   const isl = (inner, cls = '') => `<div class="blk actisl ${cls}">${inner}</div>`;
-  const save = `<span class="act save">${ic('save')}Save</span>`, play = `<span class="act play">${ic('play')}Play</span>`;
-  const edit = isl(C.edit(), 'edit'), lead = `<div class="blk lcbtn">${menu}</div>`;
-  if (S.edit === 'after') return lead + isl(save) + isl(play) + edit;
-  if (S.edit === 'one') return lead + isl(C.edit() + '<span class="lc-gap"></span>' + save + play, 'edit');
-  if (S.edit === 'pair') return lead + edit + isl(save + play);
-  if (S.edit === 'all') return isl(menu + '<span class="lc-gap"></span>' + C.edit() + '<span class="lc-gap"></span>' + save + play, 'edit');
-  return lead + edit + isl(save) + isl(play);
+  const icons = state.btns === 'icons';
+  const act = (k, w) => `<span class="act ${k}${icons ? ' icon' : ''}" title="${w}">${ic(k)}${icons ? '' : w}</span>`;
+  const one = (k, w) => isl(act(k, w), icons ? 'icon' : '');
+  return `<div class="blk lcbtn">${menu}</div>` + isl(C.edit(), 'edit') + one('save', 'Save') + one('play', 'Play');
 }
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
-function bottom(o) {
+function bottom(o, row) {
   const g = geo();
   const chip = `<span>${o.hint}</span><span class="cnums">${nums(o)}</span>`;
-  return `<div class="abs isl dock" style="left:${g.cx}px;top:${H - M - 46}px">${C.tools(o)}</div>` +
+  const dock = `<div class="${row ? 'blk' : 'abs'} isl dock" style="${row ? 'position:static;transform:none' : `left:${g.cx}px;top:${H - M - 46}px`}">${C.tools(o)}</div>`;
+  if (row) return `<div class="abs" style="left:${g.cx}px;top:${H - M - 46}px;transform:translateX(-50%);display:flex;gap:10px;align-items:center;z-index:3">${row}${dock}</div>` +
+    `<div class="hintchip" style="left:${g.cx}px;top:${H - M - 46 - GP - 30}px">${chip}</div>`;
+  return dock +
     `<div class="hintchip" style="left:${g.cx}px;top:${H - M - 46 - GP - 30}px">${chip}</div>`;
 }
 function view(opts) {
@@ -642,7 +651,15 @@ function minimap(r = W - M, b = H - M) {
 function editor(o) {
   setZoom(!!o.whole);
   o = Object.assign({ tool: 'select', hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Nothing selected' }, o, o.top);
-  return view(o.scene || {}) + `<div class="leftcol" style="${pos(geo().left)}">${levelCard(o)}${o.noInspector ? shapeStrip() : inspector(o)}</div>` + (S.name === 'centre' ? nameChip('', `left:${geo().cx}px;top:${M}px`) : '') + entities(o) + minimap() + bottom(o) + (o.extra || '');
+  const g = geo(), up = S.place === 'dock';
+  const row = (cls, style) => `<div class="lc-top ${cls}" style="${style}">${levelCard(o)}${o.menuOpen ? mainMenu(up) : ''}</div>`;
+  const placed = {
+    view: () => row('abs', `left:${g.rx0}px;top:${M}px`),
+    middle: () => row('abs', `left:${g.cx}px;top:${M}px;transform:translateX(-50%)`),
+    right: () => row('abs', `right:${W - g.rx1}px;top:${M}px`)
+  };
+  const top = S.place === 'left' ? row('', '') : S.place === 'dock' ? '' : placed[S.place]();
+  return view(o.scene || {}) + `<div class="leftcol" style="${pos(g.left)}">${S.place === 'left' ? top : ''}${o.noInspector ? shapeStrip() : inspector(o)}</div>` + (S.place === 'left' ? '' : top) + entities(o) + minimap() + bottom(o, up ? row('', '') : '') + (o.extra || '');
 }
 
 function shapeStrip() {
@@ -653,12 +670,13 @@ function menuBody(items) {
   return items.map((m) => m === '-' ? '<div class="msep"></div>' :
     `<div class="mi${m[2] ? ' ' + m[2] : ''}"><span class="l">${m[0]}</span>${m[1] === '>' ? ic('right', 'class="i chev"') : `<span class="k">${m[1] || ''}</span>`}</div>`).join('');
 }
-function mainMenu() {
-  const x = M, y = M + 50;
+function mainMenu(up) {
+  const x = 0, y = 0, side = up ? 'up' : 'down';
   const top = [['File', '>'], ['Edit', '>', 'hover'], ['Arrange', '>'], ['View', '>'], ['Help', '>']];
   const edit = [['Undo Move 1 entity', 'Ctrl+Z'], ['Redo', 'Ctrl+Shift+Z', 'dis'], '-', ['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C'], ['Paste', 'Ctrl+V', 'hover'], ['Duplicate', 'Ctrl+D'], ['Delete', 'Del'], '-', ['Select all', 'Ctrl+A'], ['Rename', 'F2'], ['Hide or show', 'Ctrl+Shift+H']];
   const head = '', dy = 0;
-  return `<div class="menu ${S.menu}" style="left:${x}px;top:${y}px">${head}${menuBody(top)}</div><div class="menu ${S.menu}" style="left:${x + 206}px;top:${y + 38 + dy}px;min-width:250px">${menuBody(edit)}</div>`;
+  const sub = up ? 'bottom:54px' : `top:${54 + 38 + dy}px`;
+  return `<div class="menu ${S.menu} ${side}" style="left:${x}px">${head}${menuBody(top)}</div><div class="menu ${S.menu}" style="left:${x + 206}px;${sub};min-width:250px">${menuBody(edit)}</div>`;
 }
 const dialogBody = () => `<h3>Replace the open level?</h3><p>Export it first if you want to keep it.</p><div class="row"><span class="btn ${S.btn}">Cancel</span><span class="btn primary ${S.btn}">Replace</span></div>`;
 function playbar(paused, extraCls = '') {
@@ -672,7 +690,7 @@ const MOMENTS = {
   shape: () => editor({ sel: 'Rectangle 1', hover: 'Crate 2', scene: { selected: 'rect1' } }),
   whole: () => editor({ whole: true, hint: 'Select · click to select, drag to move', pos: 'x −3120, y −2410', scene: { bounds: true } }),
   draw: () => editor({ tool: 'shape', noInspector: true, scene: { drawing: true }, hint: 'Shape · click to add a point, click the first point to close, Enter to finish as a line', pos: 'x −640, y −40' }),
-  menu: () => editor({ sel: 'Rectangle 1', scene: { selected: 'rect1' }, top: { menuOpen: true }, extra: mainMenu() }),
+  menu: () => editor({ sel: 'Rectangle 1', scene: { selected: 'rect1' }, top: { menuOpen: true } }),
   dialog: () => editor({ extra: `<div class="scrim"></div><div class="dialog">${dialogBody()}</div>`, hint: 'Select · click to select, drag to move', pos: 'x 412, y −96' }),
   play: () => `<div class="game"><div style="position:absolute;left:0;top:45px">${scene(1440, 810, 0.75, 720, 405, { play: true })}</div></div>${playbar(false)}`,
   parts: () => partsSheet()
@@ -711,7 +729,7 @@ function partsSheet() {
 // The page around the mockups
 function picksText(d) {
   const font = FONTS.find((f) => f[0] === state.font);
-  return `Variation ${d.id} ${d.name}, font ${font[1]}`;
+  return `Variation ${d.id} ${d.name}, Save and Play ${state.btns === 'icons' ? 'as icons only' : 'with words'}, font ${font[1]}`;
 }
 function buttons(id, items, current, onPick) {
   const el = document.getElementById(id);
@@ -731,13 +749,14 @@ function render() {
   buttons('dirs', DIRS.map((x) => [x.id, `${x.id} ${x.name}`]), d.id, (v) => { state.dir = v; const nd = DIRS.find((x) => x.id === v); if (nd.view) state.view = nd.view; render(); });
   buttons('views', VIEWS, state.view, (v) => { state.view = v; render(); });
   buttons('fonts', FONTS.map((f) => [f[0], f[1]]), state.font, (v) => { state.font = v; render(); });
+  buttons('btns', [['words', 'Icon and word'], ['icons', 'Icon only']], state.btns, (v) => { state.btns = v; render(); });
   document.getElementById('caption').textContent = d.desc;
   document.getElementById('picks').textContent = picksText(d);
   const parts = state.view === 'parts';
   const cls = ['ed', 'float', parts ? 'tall' : ''].join(' ');
   document.getElementById('frame').innerHTML = `<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
   document.getElementById('stage').classList.toggle('scroll', parts);
-  try { localStorage.setItem('engine-v3-islands-14', JSON.stringify(state)); } catch (e) {}
+  try { localStorage.setItem('engine-v3-islands-15', JSON.stringify(state)); } catch (e) {}
   fit();
 }
 function fit() {
