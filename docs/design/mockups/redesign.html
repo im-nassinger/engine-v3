@@ -641,7 +641,7 @@ function menuBody(items) {
 function burger(o) {
   const [x, y, w] = geo().burger;
   const subs = [['Play', 'Ctrl+Enter'], '-', ['File', '>'], ['Edit', '>', 'hover'], ['Arrange', '>'], ['View', '>'], '-', ['Help', '>']];
-  const edit = [['Undo Move 1 entity', 'Ctrl+Z'], ['Redo', 'Ctrl+Shift+Z', 'dis'], '-', ['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C'], ['Paste', 'Ctrl+V'], ['Duplicate', 'Ctrl+D'], ['Delete', 'Del'], '-', ['Select all', 'Ctrl+A'], ['Rename', 'F2'], ['Hide or show', 'Ctrl+Shift+H']];
+  const edit = [['Undo Move 1 entity', 'Ctrl+Z'], ['Redo', 'Ctrl+Shift+Z', 'dis'], '-', ['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C'], ['Paste', 'Ctrl+V'], ['Duplicate', 'Ctrl+D'], ['Delete', 'Del']];
   const menu = o.menuOpen ? `<div class="menu ${S.menu} main">${menuBody(subs)}<div class="menu ${S.menu} sub">${menuBody(edit)}</div></div>` : '';
   return `<div class="abs isl blk burger" style="left:${x}px;top:${y}px;width:${w}px;height:${w}px"><span class="ib${o.menuOpen ? ' on' : ''}" title="Main menu">${ic('menu')}</span>${menu}</div>`;
 }
