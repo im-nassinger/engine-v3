@@ -38,9 +38,10 @@ The owner wants a new look for the editor before v2 starts (2026-11-17): **clean
     - Replaced the same day by 20, except Save in the File menu.
 20. **☰ alone, and no buttons for Undo, Redo or Play** (owner, 2026-11-17), replacing 19's menu bar and 17's top row:
     - **☰ is its own island** at the top left, a 48 px square, as wide as the tool column under it and 10 px above it, not in the tools' island. It opens the main menu to its right, and each submenu opens beside that.
-    - **The main menu's submenus are File, Edit, Arrange, View, Play and Help**, so every command is reached through ☰: Undo and Redo in Edit, Save in File, Play in Play. *Play is a submenu of its own, as the [architecture's menus](../architecture/editor/clipboard-and-shortcuts.md) already have it, rather than an item in another submenu, since Play, Pause and Step go together (standing yes, 2026-11-17).*
+    - **The main menu starts with Play** (Ctrl+Enter), a plain item, then the submenus File, Edit, Arrange, View and Help, so every command is reached through ☰: Undo and Redo in Edit, Save in File (owner, 2026-11-17). Pause and Step stay on the Play bar, where they are used. *A Play submenu was tried first and dropped: in the editor only its first item would work, Pause and Step being greyed until play starts.*
+    - **☰ and the tools are the same size**: 34 px buttons in 48 px islands, the ☰ icon muted like an unchosen tool's.
     - **Nothing else sits at the top**: the Entity inspector and the Entities viewer start 10 px from the window's top.
-    - *For [workspace.md](../requirements/editor/workspace.md), with the owner's yes: the top bar is gone, its Undo, Redo, Snapping and Play rows with it, and the main menu gains Play.*
+    - *For [workspace.md](../requirements/editor/workspace.md), with the owner's yes: the top bar is gone, its Undo, Redo, Snapping and Play rows with it, and the main menu starts with Play.*
 
 ## The tokens of the pick
 

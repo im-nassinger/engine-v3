@@ -141,13 +141,13 @@
   .grp .ib { border-radius: 999px; width: 28px; height: 28px; }
   .actisl.tint .act + .act { margin-left: 6px; }
   .burger { z-index: 5; justify-content: center; padding: 0; }
-  .burger > .ib { width: 34px; height: 34px; border-radius: var(--r); }
+  .burger > .ib { width: 34px; height: 34px; border-radius: var(--r); color: var(--muted); }
   .burger > .ib.on { background: var(--soft); color: var(--ink); }
   .burger .menu.main { top: 0; left: calc(100% + 6px); min-width: 170px; color: var(--text); }
-  .burger .menu.sub { top: 34px; left: calc(100% + 4px); min-width: 250px; }
+  .burger .menu.sub { top: 69px; left: calc(100% + 4px); min-width: 250px; }
   .ed .menu { background: rgb(24, 27, 33); }
   .toolcol { z-index: 3; flex-direction: column; height: auto; padding: 7px 0; gap: 4px; }
-  .toolcol .tool { width: 34px; height: 34px; }
+  .isl.toolcol .tool { width: 34px; height: 34px; }
   .actisl.edit .ib { border-radius: 999px; width: 30px; height: 30px; }
   .actisl .act.save { color: var(--save-ink); }
   .actisl .act.play { color: var(--ink); }
@@ -384,7 +384,7 @@ const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,2
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s, view) => ({ id, name, desc, view, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', '☰ over the tool column', '☰ sits alone in its own island at the top left, over the tool column; its submenus (File, Edit, Arrange, View, Play, Help) hold every command, Undo, Redo, Save and Play included. The Entity inspector starts at the top, beside them. The zoom sits under the minimap, and Grid snapping is in the View menu; the hint chip sits alone at the bottom.', {})
+  dir('1', '☰ over the tool column', '☰ sits alone in its own island at the top left, over the tool column; it opens with Play, then the submenus (File, Edit, Arrange, View, Help) hold every other command, Undo, Redo and Save included. The Entity inspector starts at the top, beside them. The zoom sits under the minimap, and Grid snapping is in the View menu; the hint chip sits alone at the bottom.', {})
 ];
 
 const FONTS = [
@@ -640,7 +640,7 @@ function menuBody(items) {
 // included, in its submenus. The main menu moment shows it open with Edit's submenu.
 function burger(o) {
   const [x, y, w] = geo().burger;
-  const subs = [['File', '>'], ['Edit', '>', 'hover'], ['Arrange', '>'], ['View', '>'], ['Play', '>'], '-', ['Help', '>']];
+  const subs = [['Play', 'Ctrl+Enter'], '-', ['File', '>'], ['Edit', '>', 'hover'], ['Arrange', '>'], ['View', '>'], '-', ['Help', '>']];
   const edit = [['Undo Move 1 entity', 'Ctrl+Z'], ['Redo', 'Ctrl+Shift+Z', 'dis'], '-', ['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C'], ['Paste', 'Ctrl+V'], ['Duplicate', 'Ctrl+D'], ['Delete', 'Del'], '-', ['Select all', 'Ctrl+A'], ['Rename', 'F2'], ['Hide or show', 'Ctrl+Shift+H']];
   const menu = o.menuOpen ? `<div class="menu ${S.menu} main">${menuBody(subs)}<div class="menu ${S.menu} sub">${menuBody(edit)}</div></div>` : '';
   return `<div class="abs isl blk burger" style="left:${x}px;top:${y}px;width:${w}px;height:${w}px"><span class="ib${o.menuOpen ? ' on' : ''}" title="Main menu">${ic('menu')}</span>${menu}</div>`;
