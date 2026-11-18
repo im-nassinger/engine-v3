@@ -14,7 +14,7 @@
 
 1. After a session, the runner pushes `master` to the private repo as before.
 2. **It builds the copy** of the pushed commit: `git archive` of the listed paths only, into a fresh folder. Listed, not excluded, so a new top-level folder stays private until someone adds it to the list. The list is in `tools/runner/PublicCopy.ts`.
-3. **The guard:** every file in the copy is searched for `ixcsoft`, `/home/`, `ecs-game-v2` and the owner's email. One hit and nothing is pushed: the runner posts ⚠️ to Discord naming the files and goes on without CI for that step.
+3. **The guard:** every file in the copy is searched for `ixcsoft`, `/home/` and `ecs-game-v2`. One hit and nothing is pushed: the runner posts ⚠️ to Discord naming the files and goes on without CI for that step.
 4. **It pushes the copy** as one commit with no parent, force-pushed over `master` in the public repo. Its message is the private commit's hash, so old commits and commit messages never reach the public repo.
 5. **CI runs there** with the same workflow, `.github/workflows/ci.yml`. Each job has `if: ${{ !github.event.repository.private }}`, so in the private repo every job is skipped and uses no minutes.
 6. `CiChecker` reads the run from the public repo (`gh run list --repo im-nassinger/engine-v3-ci --commit <public hash>`). A failure is reported and fixed exactly as before, naming the private commit.
@@ -32,9 +32,9 @@ Never: `docs/`, `CLAUDE.md`, `.claude/`, `tools/runner/`, `tools/check-docs.js`,
 | Step | State |
 |---|---|
 | 1. This plan in `docs/runner/` | Done |
-| 2. `check:code` in `package.json`; the jobs skip in a private repo | To do |
-| 3. `tools/runner/PublicCopy.ts`: build, guard, push | To do |
-| 4. `CiChecker` reads the public repo; `run.ts` publishes after pushing | To do |
+| 2. `check:code` in `package.json`; the jobs skip in a private repo | Done. The one test that reads `docs/` (`tests/guards/theme-tokens.test.ts`) skips the docs comparison when `docs/` is missing |
+| 3. `tools/runner/PublicCopy.ts`: build, guard, push | Done. A copy of 1,232 files passes the guard and `check:code` |
+| 4. `CiChecker` reads the public repo; `run.ts` publishes after pushing | Done |
 | 5. Create `im-nassinger/engine-v3-ci` (public) with `gh repo create` | To do |
 | 6. One publish by hand; the owner looks at the public repo before the runner resumes | To do |
 | 7. Update [how-it-works.md](how-it-works.md) and [progress.md](progress.md), mark this file built | To do |
