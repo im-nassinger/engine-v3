@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The owner wants a new look for the editor before v2 starts (2026-11-17): **clean, cool and beautiful, with no borders, separator lines or outlines**, even if it looks less "professional" than commercial tools. Only the look changes (colours, spacing, layout, the parts' shapes); what the screen shows stays. **Settled so far:** the Islands look, the owner's set of parts, panels holding only their own content, no level name, no View button, no shadows, the panels titled **Entity inspector** and **Entities viewer**, and the layout of 17 to 19: a thin menu bar across the window's top, with Save in its File menu, the tools in a column under it beside the Entity inspector, ( ↶ ↷ ) ( Play ) right of the Entity inspector, a minimap at the bottom right with the zoom under it, and Grid snapping in the View menu (18). **Open:** what Save does, the font, and the status chip. The mockup is [mockups/redesign.html](mockups/redesign.html); the [round 8 design](README.md) stays what is built until this one is written into [tokens.md](tokens.md) and [controls.md](controls.md) and planned as a stage.
+The owner wants a new look for the editor before v2 starts (2026-11-17): **clean, cool and beautiful, with no borders, separator lines or outlines**, even if it looks less "professional" than commercial tools. Only the look changes (colours, spacing, layout, the parts' shapes); what the screen shows stays. **Settled so far:** the Islands look, the owner's set of parts, panels holding only their own content, no level name, no View button, no shadows, the panels titled **Entity inspector** and **Entities viewer**, and the layout of 17 to 20: ☰ alone at the top left, holding every command (Undo, Redo, Save and Play included) in its submenus, the tools in a column under it, the Entity inspector beside them from the top, a minimap at the bottom right with the zoom under it, and Grid snapping in the View menu (18). **Open:** what Save does, the font, and the status chip. The mockup is [mockups/redesign.html](mockups/redesign.html); the [round 8 design](README.md) stays what is built until this one is written into [tokens.md](tokens.md) and [controls.md](controls.md) and planned as a stage.
 
 ## Settled, in order (all owner, 2026-11-17)
 
@@ -35,6 +35,12 @@ The owner wants a new look for the editor before v2 starts (2026-11-17): **clean
     - **The menu bar** is a flat strip the window's full width, 30 px tall, in the panels' colour, with no rounded corners; its words are 12 px. Every island starts 10 px under it, the Entities viewer included.
     - **Save is in the File menu**, not a button: File holds New, Import…, Save and Export…. *What Save does is still open (see below), so the mockup gives it no shortcut.*
     - **( ↶ ↷ ) ( Play )** sit right of the Entity inspector, 10 px from it, at the top of the level view, the islands 38 px tall as before.
+    - Replaced the same day by 20, except Save in the File menu.
+20. **☰ alone, and no buttons for Undo, Redo or Play** (owner, 2026-11-17), replacing 19's menu bar and 17's top row:
+    - **☰ is its own island** at the top left, a 48 px square, as wide as the tool column under it and 10 px above it, not in the tools' island. It opens the main menu to its right, and each submenu opens beside that.
+    - **The main menu's submenus are File, Edit, Arrange, View, Play and Help**, so every command is reached through ☰: Undo and Redo in Edit, Save in File, Play in Play. *Play is a submenu of its own, as the [architecture's menus](../architecture/editor/clipboard-and-shortcuts.md) already have it, rather than an item in another submenu, since Play, Pause and Step go together (standing yes, 2026-11-17).*
+    - **Nothing else sits at the top**: the Entity inspector and the Entities viewer start 10 px from the window's top.
+    - *For [workspace.md](../requirements/editor/workspace.md), with the owner's yes: the top bar is gone, its Undo, Redo, Snapping and Play rows with it, and the main menu gains Play.*
 
 ## The tokens of the pick
 

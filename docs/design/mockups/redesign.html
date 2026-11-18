@@ -140,17 +140,14 @@
   .grp { display: inline-flex; align-items: center; gap: 2px; height: 32px; padding: 0 2px; border-radius: 999px; background: var(--field); }
   .grp .ib { border-radius: 999px; width: 28px; height: 28px; }
   .actisl.tint .act + .act { margin-left: 6px; }
-  .menubar { position: absolute; left: 0; top: 0; right: 0; z-index: 5; display: flex; align-items: center; gap: 0; padding: 0 6px; background: var(--panel); }
-  .menubar .mbi { position: relative; height: 22px; padding: 0 10px; border-radius: 6px; display: inline-flex; align-items: center; font-size: 12px; }
-  .menubar .mbi.on { background: var(--soft); color: var(--ink); }
-  .menubar .menu { top: 26px; left: 0; color: var(--text); }
+  .burger { z-index: 5; justify-content: center; padding: 0; }
+  .burger > .ib { width: 34px; height: 34px; border-radius: var(--r); }
+  .burger > .ib.on { background: var(--soft); color: var(--ink); }
+  .burger .menu.main { top: 0; left: calc(100% + 6px); min-width: 170px; color: var(--text); }
+  .burger .menu.sub { top: 34px; left: calc(100% + 4px); min-width: 250px; }
   .ed .menu { background: rgb(24, 27, 33); }
   .toolcol { z-index: 3; flex-direction: column; height: auto; padding: 7px 0; gap: 4px; }
   .toolcol .tool { width: 34px; height: 34px; }
-  .toprow { z-index: 5; }
-  .toprow .isl, .toprow .actisl { height: 38px; padding: 0 5px; }
-  .toprow .actisl.edit .ib { width: 28px; height: 28px; }
-  .toprow .act { height: 28px; padding: 0 12px; }
   .actisl.edit .ib { border-radius: 999px; width: 30px; height: 30px; }
   .actisl .act.save { color: var(--save-ink); }
   .actisl .act.play { color: var(--ink); }
@@ -387,7 +384,7 @@ const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,2
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s, view) => ({ id, name, desc, view, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'Menu bar and tool column', 'A thin menu bar across the window\'s top ( File Edit Arrange View Help ); Save is in the File menu. Under it the tools run down a column with the Entity inspector beside it, and ( ↶ ↷ ) ( Play ) sit right of the Entity inspector. The zoom sits under the minimap, and Grid snapping is in the View menu; the hint chip sits alone at the bottom.', {})
+  dir('1', '☰ over the tool column', '☰ sits alone in its own island at the top left, over the tool column; its submenus (File, Edit, Arrange, View, Play, Help) hold every command, Undo, Redo, Save and Play included. The Entity inspector starts at the top, beside them. The zoom sits under the minimap, and Grid snapping is in the View menu; the hint chip sits alone at the bottom.', {})
 ];
 
 const FONTS = [
@@ -414,21 +411,21 @@ const withS = (over, fn) => { const old = S; S = Object.assign({}, S, over); con
 const pos = ([x, y, w, h]) => `left:${x}px;top:${y}px;width:${w}px;${h == null ? '' : `height:${h}px;`}`;
 
 // Where each part sits, in window pixels. The panels' widths are the requirement's.
-const W = 1440, H = 900, M = 10, GP = 10, BAR_H = 30, TOOL_W = 48;
+const W = 1440, H = 900, M = 10, GP = 10, TOOL_W = 48;
 function geo() {
   const ex = W - M - 260;
-  const below = BAR_H + M, tools = [M, below, TOOL_W];
-  const left = [M + TOOL_W + GP, below, 300, H - below - M];
+  const burger = [M, M, TOOL_W], tools = [M, M + TOOL_W + GP, TOOL_W];
+  const left = [M + TOOL_W + GP, M, 300, H - 2 * M];
   const map = mapParts(W - M, H - M);
-  const ents = [ex, below, 260, S.layout === 'hug' ? null : H - below - M - map.height - GP];
+  const ents = [ex, M, 260, S.layout === 'hug' ? null : H - 2 * M - map.height - GP];
   const rx0 = left[0] + 300 + GP, rx1 = ex - GP, cx = (rx0 + rx1) / 2;
-  return { left, tools, ents, map, rx0, rx1, cx };
+  return { burger, left, tools, ents, map, rx0, rx1, cx };
 }
 
 // The level view's zoom and centre, in window pixels, and the part of the level the window shows.
-let VIEW_Z = 0.38, VIEW_CY = (BAR_H + 48 + H) / 2;
+let VIEW_Z = 0.38, VIEW_CY = H / 2;
 // Zoom to the whole level (F), as the whole level moment shows it.
-function setZoom(whole) { VIEW_Z = whole ? 0.088 : 0.38; VIEW_CY = whole ? H / 2 : (BAR_H + 48 + H) / 2; }
+function setZoom(whole) { VIEW_Z = whole ? 0.088 : 0.38; VIEW_CY = whole ? H / 2 : H / 2; }
 const zoomText = () => `${Math.round(VIEW_Z * 100)}%`;
 function visibleArea() {
   const g = geo(), cx = (g.rx0 + g.rx1) / 2;
@@ -588,21 +585,6 @@ function inspector(o) {
     </div></div>`;
 }
 
-// The controls above the panels, grouped by what they act on: ☰ the app and the file, Undo and Redo the history,
-// Save and Play the level. Grid snapping is in the View menu, beside Grid.
-const isl = (inner, cls = '') => `<div class="blk actisl edit ${cls}">${inner}</div>`;
-const actBtn = (k, w, iconOnly) => `<span class="act ${k}${iconOnly ? ' icon' : ''}" title="${w}">${ic(k)}${iconOnly ? '' : w}</span>`;
-const HIST = () => `<span class="ib" title="Undo">${ic('undo')}</span><span class="ib dim" title="Redo">${ic('redo')}</span>`;
-const GAP = '<span class="lc-gap"></span>';
-// One group of islands, placed at [x, y]; anchor is 'left', 'centre' or 'right'. The main menu opens from the group holding ☰.
-function group(o, x, y, anchor, inner) {
-  const where = anchor === 'right' ? `right:${W - x}px;` : `left:${x}px;` + (anchor === 'centre' ? 'transform:translateX(-50%);' : '');
-  return `<div class="lc-top abs" style="${where}top:${y}px">${inner}</div>`;
-}
-function topIslands(o) {
-  const g = geo();
-  return `<div class="lc-top abs toprow" style="left:${g.rx0}px;top:${g.left[1]}px">${isl(HIST())}${isl(actBtn('play', 'Play'))}</div>`;
-}
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
 function bottom(o) {
@@ -643,7 +625,7 @@ function editor(o) {
   setZoom(!!o.whole);
   o = Object.assign({ tool: 'select', hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Nothing selected' }, o, o.top);
   const g = geo();
-  return view(o.scene || {}) + `<div class="leftcol" style="${pos(g.left)}">${o.noInspector ? shapeStrip() : inspector(o)}</div>` + toolColumn(o) + menuBar(o) + topIslands(o) + entities(o) + minimap() + bottom(o) + (o.extra || '');
+  return view(o.scene || {}) + `<div class="leftcol" style="${pos(g.left)}">${o.noInspector ? shapeStrip() : inspector(o)}</div>` + burger(o) + toolColumn(o) + entities(o) + minimap() + bottom(o) + (o.extra || '');
 }
 
 function shapeStrip() {
@@ -654,14 +636,14 @@ function menuBody(items) {
   return items.map((m) => m === '-' ? '<div class="msep"></div>' :
     `<div class="mi${m[2] ? ' ' + m[2] : ''}"><span class="l">${m[0]}</span>${m[1] === '>' ? ic('right', 'class="i chev"') : `<span class="k">${m[1] || ''}</span>`}</div>`).join('');
 }
-// The menu bar: the main menu's submenus as words, in a thin bar across the window's top. File, which holds Save, is open in the main menu moment.
-function menuBar(o) {
-  const file = [['New'], ['Import…', 'Ctrl+O'], '-', ['Save', '', 'hover'], ['Export…', 'Ctrl+S']];
-  const items = ['File', 'Edit', 'Arrange', 'View', 'Help'].map((name) => {
-    const open = o.menuOpen && name === 'File';
-    return `<span class="mbi${open ? ' on' : ''}">${name}${open ? `<div class="menu ${S.menu}" style="min-width:250px">${menuBody(file)}</div>` : ''}</span>`;
-  }).join('');
-  return `<div class="menubar">${items}</div>`;
+// The main menu: ☰ alone in its own island over the tool column. It holds every command, Undo, Redo, Save and Play
+// included, in its submenus. The main menu moment shows it open with Edit's submenu.
+function burger(o) {
+  const [x, y, w] = geo().burger;
+  const subs = [['File', '>'], ['Edit', '>', 'hover'], ['Arrange', '>'], ['View', '>'], ['Play', '>'], '-', ['Help', '>']];
+  const edit = [['Undo Move 1 entity', 'Ctrl+Z'], ['Redo', 'Ctrl+Shift+Z', 'dis'], '-', ['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C'], ['Paste', 'Ctrl+V'], ['Duplicate', 'Ctrl+D'], ['Delete', 'Del'], '-', ['Select all', 'Ctrl+A'], ['Rename', 'F2'], ['Hide or show', 'Ctrl+Shift+H']];
+  const menu = o.menuOpen ? `<div class="menu ${S.menu} main">${menuBody(subs)}<div class="menu ${S.menu} sub">${menuBody(edit)}</div></div>` : '';
+  return `<div class="abs isl blk burger" style="left:${x}px;top:${y}px;width:${w}px;height:${w}px"><span class="ib${o.menuOpen ? ' on' : ''}" title="Main menu">${ic('menu')}</span>${menu}</div>`;
 }
 const dialogBody = () => `<h3>Replace the open level?</h3><p>Export it first if you want to keep it.</p><div class="row"><span class="btn ${S.btn}">Cancel</span><span class="btn primary ${S.btn}">Replace</span></div>`;
 function playbar(paused, extraCls = '') {
