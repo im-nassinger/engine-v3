@@ -72,8 +72,9 @@
   .cnums svg.i, .barnums svg.i { width: 13px; height: 13px; }
   .hintchip { position: absolute; transform: translateX(-50%); z-index: 3; white-space: nowrap; background: rgba(13, 15, 19, .8); color: #e4e8ef; border-radius: 999px; padding: 7px 15px; font-size: 12px; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
   .hintchip { display: flex; gap: 18px; align-items: center; }
-  .debug { position: absolute; transform: translateX(-50%); z-index: 3; display: flex; gap: 18px; padding: 5px 14px; border-radius: 999px; background: rgba(13, 15, 19, .72); color: #e4e8ef; font-size: 10px; white-space: pre; font-variant-numeric: tabular-nums; }
-  .debug b { font-weight: 400; color: #8b93a1; margin-right: 6px; }
+  .debug { position: absolute; z-index: 3; display: flex; flex-direction: column; gap: 4px; padding: 8px 14px; border-radius: var(--rl); background: var(--panel); color: var(--text); font-size: 10px; line-height: 14px; white-space: pre; font-variant-numeric: tabular-nums; }
+  .debug .drow { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .debug b { font-weight: 400; color: var(--muted); margin-right: 6px; }
   .cnums { display: flex; gap: 12px; align-items: center; color: #9aa3b2; font-size: 12px; }
   .titlechip { position: absolute; transform: translateX(-50%); z-index: 3; display: flex; align-items: center; gap: 10px; padding: 7px 14px; border-radius: 999px; background: rgba(13, 15, 19, .8); color: #e4e8ef; font-weight: 500; }
   .titlechip .savestate { padding: 0; }
@@ -156,20 +157,8 @@
   .leftcol { position: absolute; display: flex; flex-direction: column; gap: 10px; z-index: 2; }
   .leftcol > .insp { flex: 1; min-height: 0; }
   .leftcol > .opts { position: static; align-self: flex-start; }
-  .zoomg { display: inline-flex; align-items: center; gap: 2px; background: var(--field); border-radius: 999px; padding: 0 2px; }
-  .zoomg .ib { min-width: 26px; height: 26px; border-radius: 999px; }
-  .zoomg .num { min-width: 36px; text-align: center; }
   .minimap { position: absolute; z-index: 2; padding: 3px; }
   .minimap svg { display: block; border-radius: 13px; }
-  .mapfoot { display: flex; align-items: center; justify-content: center; height: 34px; }
-  .mapfoot .zoomg, .zoomisl .zoomg { background: transparent; }
-  .zoomisl { position: absolute; z-index: 3; display: flex; align-items: center; height: 36px; padding: 0 4px; }
-  .zoomisl.v { flex-direction: column; width: 36px; height: auto; padding: 4px 0; }
-  .zoomisl.v .zoomg { flex-direction: column; padding: 2px 0; }
-  .zoomisl.v .zoomg .num { min-width: 0; padding: 6px 0; font-size: 12px; }
-  .zoomover { position: absolute; right: 9px; bottom: 9px; background: rgba(13, 15, 19, .8); border-radius: 999px; }
-  .zoomover .zoomg { background: transparent; }
-  .zoomover .zoomg .ib { min-width: 24px; height: 24px; }
   .dock { position: absolute; transform: translateX(-50%); height: 46px; z-index: 3; }
   .onebar .hint { color: var(--muted); font-size: 12px; white-space: nowrap; }
   .barnums { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 12px; margin-right: 14px; }
@@ -376,7 +365,7 @@ const KINDS = [
 ];
 
 // The directions. Each is a set of tokens and one variant of each kind.
-const BASE = { title: 'boundsize', actions: 'apart', burger: 'with', name: 'plain', zoom: 'none', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
+const BASE = { title: 'boundsize', actions: 'apart', burger: 'with', name: 'plain', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
 const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s, view) => ({ id, name, desc, view, t: SLATE, s: Object.assign({}, BASE, s) });
@@ -406,10 +395,9 @@ function geo() {
   const ex = W - M - 260;
   const burger = [M, M, TOOL_W], tools = [M, M + TOOL_W + GP, TOOL_W];
   const left = [M + TOOL_W + GP, M, 300, H - 2 * M];
-  const map = mapParts(W - M, H - M);
-  const ents = [ex, M, 260, S.layout === 'hug' ? null : H - 2 * M - map.height - GP];
+  const ents = [ex, M, 260, null];
   const rx0 = left[0] + 300 + GP, rx1 = ex - GP, cx = (rx0 + rx1) / 2;
-  return { burger, left, tools, ents, map, rx0, rx1, cx };
+  return { burger, left, tools, ents, rx0, rx1, cx };
 }
 
 // The level view's zoom and centre, in window pixels, and the part of the level the window shows.
@@ -577,9 +565,12 @@ function inspector(o) {
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
 // The debug line at the bottom middle: the mouse position, the selection's size when there is one, the grid size and the zoom.
+const debugRows = (o) => [[['x', o.x], ['y', o.y]], [['grid', '50'], ['zoom', zoomText()]]].concat(o.size ? [[['size', o.size]]] : []);
+const debugHeight = (o) => 16 + debugRows(o).length * 18 - 4;
 function bottom(o) {
-  const parts = [['x', o.x], ['y', o.y]].concat(o.size ? [['size', o.size]] : [], [['grid', '50'], ['zoom', zoomText()]]);
-  return `<div class="debug" style="left:${geo().cx}px;top:${H - M - 24}px">${parts.map(([l, v]) => `<span><b>${l}</b>${v}</span>`).join('')}</div>`;
+  const cell = ([l, v]) => `<span><b>${l}</b>${v}</span>`;
+  const rows = debugRows(o).map((r) => `<div class="drow">${r.map(cell).join('')}</div>`).join('');
+  return `<div class="debug" style="left:${W - M - MAP_W}px;top:${H - M - debugHeight(o)}px;width:${MAP_W}px">${rows}</div>`;
 }
 function toolColumn(o) {
   const [x, y, w] = geo().tools;
@@ -589,33 +580,24 @@ function view(opts) {
   const g = geo();
   return `<div class="abs viewbox" style="${pos([0, 0, W, H])}">${scene(W, H, VIEW_Z, (g.rx0 + g.rx1) / 2, VIEW_CY, Object.assign({ grid: true, cameraFrame: true, joints: true }, opts))}</div>`;
 }
-// The minimap and the zoom, with their right and bottom edges at r and b: where each island sits.
-const MAP_W = 180, ZOOM_H = 36;
+// The minimap, with its right and bottom edges at r and b, sits right above the debug box.
+const MAP_W = 180;
 function mapParts(r, b) {
-  const inner = MAP_W - 6, mapH = Math.round(inner * MAP_AREA[3] / MAP_AREA[2]) + 6, foot = S.zoom === 'footer' ? 34 : 0, head = 0;
-  const map = [r - MAP_W, b - mapH - foot - head, MAP_W, mapH + foot + head];
-  const zoom = S.zoom === 'above' ? [r - MAP_W / 2, map[1] - GP - ZOOM_H] : S.zoom === 'side' ? [map[0] - GP - 36, b - 104] : null;
-  return { map, zoom, inner, height: b - (S.zoom === 'above' ? zoom[1] : map[1]) };
+  const inner = MAP_W - 6, mapH = Math.round(inner * MAP_AREA[3] / MAP_AREA[2]) + 6;
+  return { map: [r - MAP_W, b - mapH, MAP_W, mapH], inner, height: mapH };
 }
-function minimap(r = W - M, b = H - M) {
-  const g = mapParts(r, b), [ax, ay, aw] = MAP_AREA, w = g.inner, h = Math.round(w * MAP_AREA[3] / aw), z = w / aw;
+function minimap(o) {
+  const g = mapParts(W - M, H - M - debugHeight(o) - GP), [ax, ay, aw] = MAP_AREA, w = g.inner, h = Math.round(w * MAP_AREA[3] / aw), z = w / aw;
   const [vx, vy, vw, vh] = visibleArea(), X = (x) => (x - ax) * z, Y = (y) => (y - ay) * z;
   const frame = `<rect x="${X(vx)}" y="${Y(vy)}" width="${vw * z}" height="${vh * z}" rx="3" fill="rgba(79,140,255,.1)" style="stroke:var(--accent)" stroke-width="1.5"/>`;
   const map = scene(w, h, z, -ax * z, -ay * z, { grid: false, noLines: true }).replace('</svg>', frame + '</svg>');
-  const zoom = `<span class="zoomg"><span class="ib">${ic('minus')}</span><span class="num">${zoomText()}</span><span class="ib">${ic('plus')}</span></span>`;
-  const zoomUp = `<span class="zoomg"><span class="ib">${ic('plus')}</span><span class="num">${zoomText()}</span><span class="ib">${ic('minus')}</span></span>`;
-  const inside = S.zoom === 'footer' ? `<div class="mapfoot">${zoom}</div>` : S.zoom === 'over' ? `<div class="zoomover">${zoom}</div>` : '';
-  const head = '';
-  let out = `<div class="blk minimap" style="${pos(g.map)}">${head}${map}${inside}</div>`;
-  if (S.zoom === 'above') out += `<div class="blk zoomisl" style="left:${g.zoom[0]}px;top:${g.zoom[1]}px;transform:translateX(-50%)">${zoom}</div>`;
-  if (S.zoom === 'side') out += `<div class="blk zoomisl v" style="left:${g.zoom[0]}px;top:${g.zoom[1]}px">${zoomUp}</div>`;
-  return out;
+  return `<div class="blk minimap" style="${pos(g.map)}">${map}</div>`;
 }
 function editor(o) {
   setZoom(!!o.whole);
   o = Object.assign({ tool: 'select', x: '20', y: '340' }, o, o.top);
   const g = geo();
-  return view(o.scene || {}) + `<div class="leftcol" style="${pos(g.left)}">${o.noInspector ? shapeStrip() : inspector(o)}</div>` + burger(o) + toolColumn(o) + entities(o) + minimap() + bottom(o) + (o.extra || '');
+  return view(o.scene || {}) + `<div class="leftcol" style="${pos(g.left)}">${o.noInspector ? shapeStrip() : inspector(o)}</div>` + burger(o) + toolColumn(o) + entities(o) + minimap(o) + bottom(o) + (o.extra || '');
 }
 
 function shapeStrip() {
