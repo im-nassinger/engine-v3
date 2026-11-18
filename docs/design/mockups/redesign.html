@@ -38,6 +38,10 @@
   .viewbox svg { display: block; }
 
 
+  /* Every grey container of the editor (islands, panels, the minimap, the debug box, menus, dialogs, the Play bar) has
+     the class shade, and this is its only style: a 2 px dark shadow under it. */
+  .ed .shade { box-shadow: 0 2px 2px rgba(0, 0, 0, .5); }
+
   /* The top bar */
   .top { display: flex; align-items: center; gap: 4px; padding: 0 8px; z-index: 3; }
   .float-top { background: none; padding: 0; display: flex; justify-content: space-between; }
@@ -627,7 +631,7 @@ const C = {
   play: () => `<span class="play ${S.btn}">${ic('play')}Play</span>`,
   view: () => `<span class="ib">View${CHEV}</span><span class="ib num">40%${CHEV}</span><span class="ib">${ic('help')}</span>`
 };
-const entities = (o) => `<div class="abs blk panel ents" style="${pos(geo().ents)}"><div class="ph ${S.head}">Entities viewer</div>${rowsHtml(ROWS, o.sel, o.hover)}</div>`;
+const entities = (o) => `<div class="abs blk panel ents shade" style="${pos(geo().ents)}"><div class="ph ${S.head}">Entities viewer</div>${rowsHtml(ROWS, o.sel, o.hover)}</div>`;
 
 // Inspector fields
 const fc = () => `inp ${S.field}`;
@@ -649,7 +653,7 @@ const card = (title, body) => `<div class="card ${S.card}"><div class="chead">${
 function inspector(o) {
   const g = geo(), bare = S.card === 'island', head = '';
   if (o.noInspector) return '';
-  return `<div class="panel insp${bare ? ' bare' : ' blk'}">${bare ? '<div class="blk" style="border-radius:var(--rl)">' : ''}${head}<div class="ph ${S.head}">Entity inspector</div>
+  return `<div class="panel insp${bare ? ' bare' : ' blk'} shade">${bare ? '<div class="blk shade" style="border-radius:var(--rl)">' : ''}${head}<div class="ph ${S.head}">Entity inspector</div>
     <div class="ihead"><span style="color:var(--muted);display:flex">${ic('rect')}</span><div class="nm ${S.field === 'filled' ? '' : S.field}">Rectangle 1</div><span class="ib eye">${ic('eye')}</span></div>${bare ? '</div>' : ''}
     <div style="overflow:${bare ? 'visible' : 'hidden'}">
     ${card('Transform', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°') + F.vec('Scale', '1', '1') + F.num('Skew', '0', '°'))}
@@ -668,17 +672,17 @@ const DEBUG_H = 28;
 const debugHeight = () => DEBUG_H;
 function bottom(o) {
   const cells = [['X', o.x], ['Y', o.y], ['GRID', '50'], ['ZOOM', zoomText()]].map(([l, v]) => `<span><b>${l}:</b>${v}</span>`).join('');
-  return `<div class="debug" style="right:${M}px;top:${H - M - DEBUG_H}px;height:${DEBUG_H}px">${cells}</div>`;
+  return `<div class="debug shade" style="right:${M}px;top:${H - M - DEBUG_H}px;height:${DEBUG_H}px">${cells}</div>`;
 }
 function toolColumn(o) {
   const [x, y, w] = geo().tools;
-  return `<div class="abs isl blk toolcol" style="left:${x}px;top:${y}px;width:${w}px">${C.tools(o)}${o.tool === 'shape' ? shapeMenu() : ''}</div>`;
+  return `<div class="abs isl blk toolcol shade" style="left:${x}px;top:${y}px;width:${w}px">${C.tools(o)}${o.tool === 'shape' ? shapeMenu() : ''}</div>`;
 }
 // The Shape tool's kinds: a menu open to the right of the tool, with an arrow pointing at it, for as long as the tool is
 // active. The chosen kind is shown like the active tool.
 function shapeMenu() {
   const kinds = [['rect', 'Rectangle'], ['circle', 'Circle'], ['polygon', 'Polygon']];
-  return `<div class="menu ${S.menu} kinds">${kinds.map(([icon, name]) => `<div class="mi${icon === 'polygon' ? ' on' : ''}">${ic(icon)}<span class="l">${name}</span></div>`).join('')}</div>`;
+  return `<div class="menu ${S.menu} kinds shade">${kinds.map(([icon, name]) => `<div class="mi${icon === 'polygon' ? ' on' : ''}">${ic(icon)}<span class="l">${name}</span></div>`).join('')}</div>`;
 }
 function view(opts) {
   const g = geo();
@@ -695,7 +699,7 @@ function minimap(o) {
   const [vx, vy, vw, vh] = visibleArea(), X = (x) => (x - ax) * z, Y = (y) => (y - ay) * z;
   const frame = `<rect x="${X(vx)}" y="${Y(vy)}" width="${vw * z}" height="${vh * z}" rx="3" fill="rgba(79,140,255,.1)" style="stroke:var(--accent)" stroke-width="1.5"/>`;
   const map = scene(w, h, z, -ax * z, -ay * z, { grid: false, noLines: true }).replace('</svg>', frame + '</svg>');
-  return `<div class="blk minimap" style="${pos(g.map)}">${map}</div>`;
+  return `<div class="blk minimap shade" style="${pos(g.map)}">${map}</div>`;
 }
 function editor(o) {
   setZoom(!!o.whole);
@@ -714,13 +718,13 @@ function burger(o) {
   const [x, y, w] = geo().burger;
   const subs = [['Play', 'Ctrl+Enter'], '-', ['File', '>'], ['Edit', '>', 'hover'], ['Arrange', '>'], ['View', '>'], '-', ['Help', '>']];
   const edit = [['Undo Move 1 entity', 'Ctrl+Z'], ['Redo', 'Ctrl+Shift+Z', 'dis'], '-', ['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C'], ['Paste', 'Ctrl+V'], ['Duplicate', 'Ctrl+D'], ['Delete', 'Del']];
-  const menu = o.menuOpen ? `<div class="menu ${S.menu} main">${menuBody(subs)}<div class="menu ${S.menu} sub">${menuBody(edit)}</div></div>` : '';
-  return `<div class="abs isl blk burger" style="left:${x}px;top:${y}px;width:${w}px;height:${w}px"><span class="ib${o.menuOpen ? ' on' : ''}" title="Main menu">${ic('menu')}</span>${menu}</div>`;
+  const menu = o.menuOpen ? `<div class="menu ${S.menu} main shade">${menuBody(subs)}<div class="menu ${S.menu} sub shade">${menuBody(edit)}</div></div>` : '';
+  return `<div class="abs isl blk burger shade" style="left:${x}px;top:${y}px;width:${w}px;height:${w}px"><span class="ib${o.menuOpen ? ' on' : ''}" title="Main menu">${ic('menu')}</span>${menu}</div>`;
 }
 const dialogBody = () => `<h3>Replace the open level?</h3><p>Export it first if you want to keep it.</p><div class="row"><span class="btn ${S.btn}">Cancel</span><span class="btn primary ${S.btn}">Replace</span></div>`;
 function playbar(paused, extraCls = '') {
   const pc = paused ? 'var(--paused)' : 'var(--playing)';
-  return `<div class="playbar ${S.play} ${extraCls}" style="--pc:${pc}"><span class="state"><i></i>${paused ? 'PAUSED' : 'PLAYING'}</span>` +
+  return `<div class="playbar ${S.play} ${extraCls} shade" style="--pc:${pc}"><span class="state"><i></i>${paused ? 'PAUSED' : 'PLAYING'}</span>` +
     (paused ? `<span class="ib">${ic('play')}Resume</span><span class="ib">${ic('step')}Step <span class="k">F9</span></span>` : `<span class="ib">${ic('pause')}Pause <span class="k">F8</span></span><span class="ib dim">${ic('step')}Step <span class="k">F9</span></span>`) +
     `<span class="ib">${ic('stop')}Stop <span class="k">Ctrl+Enter</span></span></div>`;
 }
@@ -730,7 +734,7 @@ const MOMENTS = {
   whole: () => editor({ whole: true, x: '−3120', y: '−2410', scene: { bounds: true } }),
   draw: () => editor({ tool: 'shape', noInspector: true, scene: { drawing: true }, x: '−640', y: '−40' }),
   menu: () => editor({ sel: 'Rectangle 1', scene: { selected: 'rect1' }, top: { menuOpen: true } }),
-  dialog: () => editor({ extra: `<div class="scrim"></div><div class="dialog">${dialogBody()}</div>`, x: '412', y: '−96' }),
+  dialog: () => editor({ extra: `<div class="scrim"></div><div class="dialog shade">${dialogBody()}</div>`, x: '412', y: '−96' }),
   play: () => `<div class="game"><div style="position:absolute;left:0;top:45px">${scene(1440, 810, 0.75, 720, 405, { play: true })}</div></div>${playbar(false)}`,
   parts: () => partsSheet()
 };
@@ -747,9 +751,9 @@ const PARTS = {
   slider: () => F.num('Gravity scale', '1', '', { slider: .55 }) + F.num('Opacity', '100', '%', { slider: 1 }),
   check: () => F.check('Merge', true) + F.check('Bullet', false),
   row: () => rowsHtml([[1, 'rect', 'Crate 1'], [1, 'rect', 'Crate 2'], [1, 'rect', 'Rectangle 1'], [1, 'circle', 'Ball']], 'Rectangle 1', 'Crate 2'),
-  tool: () => `<div class="inl"><span class="blk tools h">${TOOLS.map((t) => toolHtml(t, 'shape', 'joint')).join('')}</span><span class="tip-box">Joint<span class="k">6</span></span></div>`,
+  tool: () => `<div class="inl"><span class="blk tools h shade">${TOOLS.map((t) => toolHtml(t, 'shape', 'joint')).join('')}</span><span class="tip-box">Joint<span class="k">6</span></span></div>`,
   btn: () => `<div class="inl"><span class="btn ${S.btn}">Cancel</span><span class="btn primary ${S.btn}">Replace</span><span class="play ${S.btn}">${ic('play')}Play</span></div>`,
-  menu: () => `<div class="inl"><div class="menu static ${S.menu}">${menuBody([['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C', 'hover'], ['Paste', 'Ctrl+V'], '-', ['Redo', 'Ctrl+Shift+Z', 'dis']])}</div></div>`,
+  menu: () => `<div class="inl"><div class="menu static ${S.menu} shade">${menuBody([['Cut', 'Ctrl+X'], ['Copy', 'Ctrl+C', 'hover'], ['Paste', 'Ctrl+V'], '-', ['Redo', 'Ctrl+Shift+Z', 'dis']])}</div></div>`,
   note: () => `<div class="note ${S.note}">${ic('warning', 'style="color:var(--warning);margin-top:1px"')}<span>Needs a Surface to collide. <span class="fix">Add Surface</span></span></div>` +
     `<div class="note ${S.note} tipn">${ic('info', 'style="color:var(--tip);margin-top:1px"')}<span>A tip reads the same, with a blue icon.</span></div>`,
   handle: () => `<div class="inl"><svg width="200" height="90" viewBox="0 0 200 90" style="border-radius:6px"><rect width="200" height="90" fill="${WORLD_FILL}"/><rect x="60" y="25" width="80" height="40" fill="#4a90d9" stroke="#1f3552"/><rect x="60" y="25" width="80" height="40" fill="none" style="stroke:var(--accent)" stroke-width="1.5"/>${handles(60, 25, 80, 40)}</svg></div>`,
