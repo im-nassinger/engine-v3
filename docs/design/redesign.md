@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The owner wants a new look for the editor before v2 starts (2026-11-17): **clean, cool and beautiful, with no borders, separator lines or outlines**, even if it looks less "professional" than commercial tools. Only the look changes (colours, spacing, layout, the parts' shapes); what the screen shows stays. **Settled so far:** the Islands look, the owner's set of parts, panels holding only their own content, no level name, no View button, no shadows, the panels titled **Entity inspector** and **Entities viewer**, and the layout of 17 to 20: ☰ alone at the top left, holding every command (Undo, Redo, Save and Play included) in its submenus, the tools in a column under it, the Entity inspector beside them from the top, a minimap at the bottom right with the zoom under it, and Grid snapping in the View menu (18). **Open:** what Save does and the font. The mockup is [mockups/redesign.html](mockups/redesign.html); the [round 8 design](README.md) stays what is built until this one is written into [tokens.md](tokens.md) and [controls.md](controls.md) and planned as a stage.
+The owner wants a new look for the editor before v2 starts (2026-11-17): **clean, cool and beautiful, with no borders, separator lines or outlines**, even if it looks less "professional" than commercial tools. Only the look changes (colours, spacing, layout, the parts' shapes); what the screen shows stays. **Settled so far:** the Islands look, the owner's set of parts, panels holding only their own content, no level name, no View button, no shadows, the panels titled **Entity inspector** and **Entities viewer**, and the layout of 17 to 20: ☰ alone at the top left, holding every command (Undo, Redo, Save and Play included) in its submenus, the tools in a column under it, the Entity inspector beside them from the top, a minimap at the bottom right with the zoom under it, and Grid snapping in the View menu (18). **Open:** what Save does. The mockup is [mockups/redesign.html](mockups/redesign.html); the [round 8 design](README.md) stays what is built until this one is written into [tokens.md](tokens.md) and [controls.md](controls.md) and planned as a stage.
 
 ## Settled, in order (all owner, 2026-11-17)
 
@@ -44,6 +44,7 @@ The owner wants a new look for the editor before v2 starts (2026-11-17): **clean
     - **Nothing else sits at the top**: the Entity inspector and the Entities viewer start 10 px from the window's top.
     - *For [workspace.md](../requirements/editor/workspace.md), with the owner's yes: the top bar is gone, its Undo, Redo, Snapping and Play rows with it, and the main menu starts with Play.*
 21. **The hint chip shows only a message and the mouse position** (owner, 2026-11-17), so it reads cleaner: the tool's hint, or a status message while one is shown, then the position, muted, in tabular figures, as `x 20  y 340`. Gone from it: the selection's name, since the Entities viewer and the Entity inspector already show what is selected, the warning count, and the tool's name before the hint, since the tool column shows which tool is on. *For [workspace.md](../requirements/editor/workspace.md), with the owner's yes: the status bar's selection and warning count go. Whether the warning count needs another place is open.*
+22. **JetBrains Mono for everything, at 10, 12, 14 or 16 px only** (owner, 2026-11-17), keeping round 8's font and dropping Inter and Geist. The mockup's sizes were rounded to these: body text and numbers 12 px (from 11 to 13), small caps labels 10 px (from 10.5), panel and dialog titles 14 px. The mockup page lost its font choice, its variation row and its caption, so it shows only the moments.
 
 ## The tokens of the pick
 
@@ -52,21 +53,20 @@ From the mockup's `SLATE` set: app `#0d0f13`, panels `rgba(24,27,33,.96)`, raise
 ## Open for the owner
 
 - **What Save does.** A level autosaves, and Ctrl+S exports the `.editable` file today ([saving.md](../requirements/play-and-save/saving.md)). Claude's suggestion: Save saves now, without waiting for autosave; exporting stays in the File menu. This is a requirement change, so it waits for the owner.
-- **The font:** JetBrains Mono (round 8's decision) is still the default; the page offers Inter, Geist and Inter with mono numbers.
 
 ## The mockup page
 
-[mockups/redesign.html](mockups/redesign.html): pick a moment (a selected shape, drawing, the main menu, a dialog, test play, or all the parts side by side), and a font. The line under the caption names the variation and font so the owner can paste it back. Its choices are kept in `localStorage`. To check it renders, take screenshots with Playwright (already a dev dependency) from a script in the project folder, since Node resolves `playwright` from there.
+[mockups/redesign.html](mockups/redesign.html): pick a moment (a selected shape, drawing, the main menu, a dialog, test play, or all the parts side by side). Its choices are kept in `localStorage`. To check it renders, take screenshots with Playwright (already a dev dependency) from a script in the project folder, since Node resolves `playwright` from there.
 
 ## Handoff (end of the 2026-11-17 session)
 
 - **Unresolved:** after the last commit (the name back in the ☰ island) the owner opened the mockup and said the fix wasn't there. The file on disk has it (`BASE` has `burger: 'with'`, the `localStorage` key is `engine-v3-islands-11`), and a Playwright screenshot showed **( ☰ Car test ● ) ( Save ) ( Play )**. The cause wasn't found: ask the owner what they see. Possible causes are a stale tab or cache, or a different copy of the page (`.netlify/` in the project points to an old Netlify site, so a deployed copy would be out of date).
 - **How the owner wants design rounds:** think about why something looks wrong before offering choices. When the owner rejects one part, find the cause (here: the name's island was shaped like the buttons beside it) and propose one fix with its reason. Don't answer with another batch of five cosmetic variations; two such rounds were called "ridiculous".
-- Still waiting on the owner: what Save does, the font, the minimap's requirement, dropping the level's name and save state from the top bar, `Level.ts`'s square default (see [progress.md](../progress.md)), and `.netlify/` in the ignore files.
+- Still waiting on the owner: what Save does, the minimap's requirement, dropping the level's name and save state from the top bar, `Level.ts`'s square default (see [progress.md](../progress.md)), and `.netlify/` in the ignore files.
 
 ## Next
 
-1. The owner decides what Save does, the status text and the font.
+1. The owner decides what Save does.
 2. Write the result into [tokens.md](tokens.md), [controls.md](controls.md), [level-view.md](level-view.md) (square handles, the selection colour) and this folder's README, replacing round 8's look; change [workspace.md](../requirements/editor/workspace.md)'s top bar, status bar and toolbar sections to the islands, the dock, the top left with ☰, Save and Play and no level name, the bounds labelled World, and the minimap with the zoom (a requirement change, so with the owner's yes).
 3. Plan the build as a stage in [plan.md](../plan.md) with its steps in [steps/](../steps/README.md), before v2.
 

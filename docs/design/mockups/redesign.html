@@ -6,12 +6,12 @@
 <title>Editor Redesign</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   /* The page around the mockups */
   :root { --page: #0b0c0e; --page-2: #17181c; --page-3: #222329; --page-text: #d4d7dd; --page-muted: #80858f; --page-on: #eceef2; }
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; background: var(--page); color: var(--page-text); font: 13px/1.4 system-ui, sans-serif; }
+  html, body { margin: 0; height: 100%; background: var(--page); color: var(--page-text); font: 12px/1.4 "JetBrains Mono", ui-monospace, monospace; }
   body { display: flex; flex-direction: column; }
   .hdr { padding: 12px 16px 10px; display: flex; flex-direction: column; gap: 7px; flex-shrink: 0; }
   .hrow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
@@ -19,8 +19,6 @@
   .pick { font: inherit; color: var(--page-text); background: var(--page-2); border: 0; border-radius: 999px; padding: 5px 12px; cursor: pointer; }
   .pick:hover { background: var(--page-3); }
   .pick.on { background: var(--page-on); color: #111; }
-  .caption { color: var(--page-muted); max-width: 1180px; }
-  .picks { font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: #a9aeb8; user-select: all; }
   .stage { flex: 1; position: relative; overflow: hidden; }
   .stage.scroll { overflow-y: auto; }
   .frame { position: absolute; left: 50%; top: 8px; width: 1440px; margin-left: -720px; transform-origin: top center; border-radius: 10px; overflow: hidden; }
@@ -66,16 +64,16 @@
   .tool.hover { background: var(--hover); color: var(--text); }
   .tool.on.fill { background: var(--accent); color: var(--on); }
   .tool.on.soft { background: var(--soft); color: var(--ink); }
-  .tip-box { white-space: nowrap; background: var(--tooltip); color: var(--tooltip-text); border-radius: var(--r); padding: 5px 9px; font-size: 11px; display: inline-flex; gap: 10px; }
+  .tip-box { white-space: nowrap; background: var(--tooltip); color: var(--tooltip-text); border-radius: var(--r); padding: 5px 9px; font-size: 12px; display: inline-flex; gap: 10px; }
   .tip-box .k { color: #8a93a3; }
 
   .onebar .grow { flex: 1; }
   .cnums .warn, .barnums .warn { display: flex; align-items: center; gap: 4px; }
   .cnums svg.i, .barnums svg.i { width: 13px; height: 13px; }
-  .hintchip { position: absolute; transform: translateX(-50%); z-index: 3; white-space: nowrap; background: rgba(13, 15, 19, .8); color: #e4e8ef; border-radius: 999px; padding: 7px 15px; font-size: 11.5px; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  .hintchip { position: absolute; transform: translateX(-50%); z-index: 3; white-space: nowrap; background: rgba(13, 15, 19, .8); color: #e4e8ef; border-radius: 999px; padding: 7px 15px; font-size: 12px; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
   .hintchip { display: flex; gap: 18px; align-items: center; }
   .hintchip .cnums { min-width: 92px; justify-content: flex-end; font-variant-numeric: tabular-nums; white-space: pre; }
-  .cnums { display: flex; gap: 12px; align-items: center; color: #9aa3b2; font-size: 11px; }
+  .cnums { display: flex; gap: 12px; align-items: center; color: #9aa3b2; font-size: 12px; }
   .titlechip { position: absolute; transform: translateX(-50%); z-index: 3; display: flex; align-items: center; gap: 10px; padding: 7px 14px; border-radius: 999px; background: rgba(13, 15, 19, .8); color: #e4e8ef; font-weight: 500; }
   .titlechip .savestate { padding: 0; }
   .lcard { display: flex; align-items: center; gap: 2px; height: 44px; padding: 0 12px 0 8px; z-index: 2; flex-shrink: 0; }
@@ -88,7 +86,7 @@
   .lcard .dirty, .namechip .dirty { width: 7px; height: 7px; border-radius: 50%; background: #fff; flex-shrink: 0; margin-left: 2px; }
   .lc-two { display: flex; flex-direction: column; padding: 0 6px; gap: 1px; }
   .lc-two .lc-name { padding: 0; line-height: 1.2; }
-  .lc-state { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11px; }
+  .lc-state { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; }
   .lc-state .dirty { margin-left: 0; width: 6px; height: 6px; }
   .lcard.twoline { height: 50px; }
   .lc-top { display: flex; gap: 10px; align-items: center; align-self: flex-start; flex-shrink: 0; }
@@ -103,7 +101,7 @@
   .lc-field.edit { min-width: 168px; padding-right: 10px; }
   .lc-field.edit .grow { flex: 1; }
   .lc-field.edit .i:last-child { color: var(--faint); }
-  .lc-cap { font-size: 10.5px; color: var(--muted); line-height: 1.2; }
+  .lc-cap { font-size: 10px; color: var(--muted); line-height: 1.2; }
   .lc-val { font-weight: 400; white-space: nowrap; }
   .lcard.namebox .lc-two { padding: 0 6px 0 11px; gap: 2px; }
   .lcard.namebox.tab { padding-left: 16px; }
@@ -112,12 +110,12 @@
   .lcard.namebox.withmenu { padding: 0 6px 0 8px; }
   .lcard.namebox.withmenu .lc-val { padding-left: 4px; }
   .lc-val.m { font-weight: 500; }
-  .lc-val.doc { font-size: 15px; }
+  .lc-val.doc { font-size: 14px; }
   .lcard.namebox .chev { width: 14px; height: 14px; color: var(--muted); margin-right: 8px; }
   .lcard.namebox.chevron .dirty { margin-right: 6px; }
   .lc-edited { color: var(--muted); margin: 0 12px 0 6px; white-space: nowrap; }
   .lcard.namebox.sub .lc-two { padding-left: 11px; padding-right: 12px; }
-  .lcard.namebox.sub .lc-cap { font-size: 11px; }
+  .lcard.namebox.sub .lc-cap { font-size: 12px; }
   .float .blk.lcbtn, .float .blk.lcact, .float .blk.actisl, .float .blk.namechip { border-radius: 999px; }
   .act { height: 30px; padding: 0 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 7px; font-weight: 600; white-space: nowrap; }
   .act svg.i { width: 13px; height: 13px; }
@@ -167,20 +165,20 @@
   .zoomisl { position: absolute; z-index: 3; display: flex; align-items: center; height: 36px; padding: 0 4px; }
   .zoomisl.v { flex-direction: column; width: 36px; height: auto; padding: 4px 0; }
   .zoomisl.v .zoomg { flex-direction: column; padding: 2px 0; }
-  .zoomisl.v .zoomg .num { min-width: 0; padding: 6px 0; font-size: 11px; }
+  .zoomisl.v .zoomg .num { min-width: 0; padding: 6px 0; font-size: 12px; }
   .zoomover { position: absolute; right: 9px; bottom: 9px; background: rgba(13, 15, 19, .8); border-radius: 999px; }
   .zoomover .zoomg { background: transparent; }
   .zoomover .zoomg .ib { min-width: 24px; height: 24px; }
   .dock { position: absolute; transform: translateX(-50%); height: 46px; z-index: 3; }
-  .onebar .hint { color: var(--muted); font-size: 11.5px; white-space: nowrap; }
-  .barnums { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 11px; margin-right: 14px; }
+  .onebar .hint { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .barnums { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 12px; margin-right: 14px; }
   .isl .tool { width: 30px; height: 30px; }
 
   /* Panels */
   .panel { display: flex; flex-direction: column; overflow: hidden; z-index: 2; }
   .ph { height: 40px; display: flex; align-items: center; padding: 0 var(--inset); flex-shrink: 0; }
-  .ph.title { font-weight: 600; font-size: calc(var(--fs) + .5px); }
-  .ph.caps { font-size: 10.5px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+  .ph.title { font-weight: 600; font-size: 14px; }
+  .ph.caps { font-size: 10px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
   .ihead { height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); flex-shrink: 0; margin-bottom: 4px; }
   .ihead .nm { flex: 1; height: 28px; display: flex; align-items: center; padding: 0 8px; border-radius: var(--r); background: var(--field); font-weight: 500; }
   .ihead .nm.ghost { background: transparent; }
@@ -202,7 +200,7 @@
   .chead { height: 32px; display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); font-weight: 600; }
   .chead .t { flex: 1; }
   .chead svg.i { width: 14px; height: 14px; color: var(--faint); }
-  .card.space .chead .t { font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+  .card.space .chead .t { font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
 
   /* Fields */
   .f { height: var(--rowh); display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); }
@@ -221,7 +219,7 @@
   .inp .unit { color: var(--faint); margin-left: auto; }
   .inp .chev { margin-left: auto; width: 12px; height: 12px; color: var(--muted); }
   .inp.short { flex: 0 0 60px; }
-  .msg { padding: 0 var(--inset) 4px calc(var(--inset) + 124px); font-size: 11px; color: #ff9a93; }
+  .msg { padding: 0 var(--inset) 4px calc(var(--inset) + 124px); font-size: 12px; color: #ff9a93; }
   .slider { flex: 1; height: 3px; background: var(--hover); border-radius: 2px; position: relative; }
   .slider i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--muted); border-radius: 2px; }
   .slider b { position: absolute; top: -4px; width: 11px; height: 11px; margin-left: -5.5px; border-radius: 50%; background: var(--text); }
@@ -252,7 +250,7 @@
   .rows.solid .sel .kind, .rows.solid .sel .eye { color: var(--on); }
 
   /* The status bar */
-  .status { display: flex; align-items: center; gap: 20px; padding: 0 12px; color: var(--muted); font-size: 11px; z-index: 3; }
+  .status { display: flex; align-items: center; gap: 20px; padding: 0 12px; color: var(--muted); font-size: 12px; z-index: 3; }
   .status .hint { flex: 1; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .status .warn { display: flex; align-items: center; gap: 4px; }
   .status svg.i { width: 13px; height: 13px; }
@@ -264,7 +262,7 @@
   .menu.static { position: relative; display: inline-block; vertical-align: top; }
   .mi { height: 28px; display: flex; align-items: center; padding: 0 10px; border-radius: var(--r); gap: 12px; }
   .mi .l { flex: 1; }
-  .mi .k { color: var(--muted); font-family: var(--font-num); font-size: 11px; }
+  .mi .k { color: var(--muted); font-family: var(--font-num); font-size: 12px; }
   .mi.dis, .mi.dis .k { color: var(--faint); }
   .mi .chev { width: 12px; height: 12px; }
   .menu.solid .mi.hover { background: var(--accent); color: var(--on); }
@@ -274,7 +272,7 @@
   .scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, .5); z-index: 7; }
   .dialog { position: absolute; z-index: 8; left: 50%; top: 290px; width: 400px; margin-left: -200px; background: var(--menu); border-radius: calc(var(--r2) + 4px); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
   .dialog.static { position: relative; left: auto; top: auto; margin: 0 16px; width: auto; }
-  .dialog h3 { margin: 0; padding: 22px 22px 6px; font-size: calc(var(--fs) + 2px); font-weight: 600; }
+  .dialog h3 { margin: 0; padding: 22px 22px 6px; font-size: 14px; font-weight: 600; }
   .dialog p { margin: 0; padding: 0 22px 20px; color: var(--muted); line-height: 1.55; }
   .dialog .row { display: flex; justify-content: flex-end; gap: 8px; padding: 0 16px 16px; }
   .btn { height: 30px; padding: 0 16px; border-radius: var(--r); display: inline-flex; align-items: center; background: var(--raised); color: var(--text); }
@@ -287,12 +285,12 @@
   .playbar.static { position: static; transform: none; display: inline-flex; margin: 0 16px 8px; }
   .playbar.dot, .playbar.tint { border-radius: 999px; padding: 4px 6px; }
   .playbar.tint { background: color-mix(in srgb, var(--pc) 16%, var(--menu)); }
-  .playbar .state { display: flex; align-items: center; gap: 7px; padding: 0 10px 0 8px; font-weight: 600; color: var(--pc); letter-spacing: .05em; font-size: 11px; }
+  .playbar .state { display: flex; align-items: center; gap: 7px; padding: 0 10px 0 8px; font-weight: 600; color: var(--pc); letter-spacing: .05em; font-size: 12px; }
   .playbar .state i { width: 8px; height: 8px; border-radius: 50%; background: var(--pc); }
   .playbar.dot .state i, .playbar.tint .state i { }
   .playbar .ib { padding: 0 10px; }
   .playbar.dot .ib, .playbar.tint .ib { border-radius: 999px; }
-  .playbar .k { color: var(--muted); font-size: 11px; }
+  .playbar .k { color: var(--muted); font-size: 12px; }
   .note { margin: 4px var(--inset); padding: 8px 10px; border-radius: var(--r); display: flex; gap: 8px; align-items: flex-start; line-height: 1.45; }
   .note.box { background: var(--field); }
   .note.tint { background: rgba(229, 185, 49, .1); }
@@ -302,10 +300,10 @@
   /* The parts sheet */
   .sheet { padding: 22px; columns: 4 300px; column-gap: 16px; }
   .kbox { break-inside: avoid; background: var(--panel); border-radius: var(--r2); padding: 14px 0 6px; margin-bottom: 16px; }
-  .kbox h4 { margin: 0 16px 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-  .kbox .kd { margin: 0 16px 8px; font-size: 11px; color: var(--faint); line-height: 1.45; }
+  .kbox h4 { margin: 0 16px 6px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .kbox .kd { margin: 0 16px 8px; font-size: 12px; color: var(--faint); line-height: 1.45; }
   .var { padding: 6px 0 10px; }
-  .var .vl { padding: 0 16px 6px; font-size: 11px; color: var(--faint); }
+  .var .vl { padding: 0 16px 6px; font-size: 12px; color: var(--faint); }
   .var .vl b { color: var(--text); font-weight: 600; }
   .var.cur .vl::after { content: "  ← this variation"; color: var(--ink); }
   .inl { display: flex; gap: 8px; align-items: center; padding: 0 16px; flex-wrap: wrap; }
@@ -314,10 +312,7 @@
 </head>
 <body>
 <div class="hdr">
-  <div class="hrow"><span class="lbl">Variation</span><span id="dirs" class="hrow"></span></div>
-  <div class="hrow"><span class="lbl">Show</span><span id="views" class="hrow"></span><span class="lbl" style="width:auto;margin-left:14px">Font</span><span id="fonts" class="hrow"></span></div>
-  <div class="caption" id="caption"></div>
-  <div class="picks" id="picks" title="Copy this line and send it to Claude"></div>
+  <div class="hrow"><span class="lbl">Show</span><span id="views" class="hrow"></span></div>
 </div>
 <div class="stage" id="stage"><div id="sizer"></div><div class="frame" id="frame"></div></div>
 <script>
@@ -385,28 +380,21 @@ const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,2
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s, view) => ({ id, name, desc, view, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', '☰ over the tool column', '☰ sits alone in its own island at the top left, over the tool column; it opens with Play, then the submenus (File, Edit, Arrange, View, Help) hold every other command, Undo, Redo and Save included. The Entity inspector starts at the top, beside them. The zoom sits under the minimap, and Grid snapping is in the View menu; the hint chip sits alone at the bottom.', {})
+  dir('1', '☰ over the tool column', '', {})
 ];
 
-const FONTS = [
-  ['mono', 'JetBrains Mono (today)', '"JetBrains Mono", ui-monospace, monospace', '"JetBrains Mono", ui-monospace, monospace', 12],
-  ['inter', 'Inter', 'Inter, system-ui, sans-serif', 'Inter, system-ui, sans-serif', 12.5],
-  ['geist', 'Geist', 'Geist, system-ui, sans-serif', 'Geist, system-ui, sans-serif', 12.5],
-  ['mix', 'Inter + mono numbers', 'Inter, system-ui, sans-serif', '"JetBrains Mono", ui-monospace, monospace', 12.5]
-];
 const VIEWS = [['shape', 'A selected shape'], ['whole', 'The whole level'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
 
-let state = { dir: '1', view: 'shape', font: 'mono' };
+let state = { dir: '1', view: 'shape' };
 try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-17') || '{}')); } catch (e) {}
 let S, T;
 
 function tokensCss(t) {
   const v = Object.assign({ bar: t.panel, menu: t.panel, line: 'transparent', grad: t.accent, blur: 0, shadow: 'none' }, t);
-  const f = FONTS.find((x) => x[0] === state.font) || FONTS[0];
   return `--app:${v.app};--panel:${v.panel};--bar:${v.bar};--menu:${v.menu};--raised:${v.raised};--field:${v.field};--hover:${v.hover};--line:${v.line};` +
     `--text:${v.text};--muted:${v.muted};--faint:${v.faint};--accent:${v.accent};--soft:${v.soft};--on:${v.on};--ink:${v.ink};--grad:${v.grad};` +
     `--r:${v.r}px;--r2:${v.r2}px;--rl:${v.rl}px;--rowh:${v.rowh}px;--inset:${v.inset}px;--blur:${v.blur}px;--shadow:${v.shadow};` +
-    `--font-ui:${f[2]};--font-num:${f[3]};--fs:${f[4]}px;`;
+    `--font-ui:"JetBrains Mono", ui-monospace, monospace;--font-num:"JetBrains Mono", ui-monospace, monospace;--fs:12px;`;
 }
 const withS = (over, fn) => { const old = S; S = Object.assign({}, S, over); const out = fn(); S = old; return out; };
 const pos = ([x, y, w, h]) => `left:${x}px;top:${y}px;width:${w}px;${h == null ? '' : `height:${h}px;`}`;
@@ -489,7 +477,7 @@ const handles = (x, y, w, h) => [[0, 0], [.5, 0], [1, 0], [0, .5], [1, .5], [0, 
 
 // A frame's label over its top left corner: the name in bold, then a gap and the size.
 function frameLabel(x, y, name, size) {
-  return `<text x="${x}" y="${y - 7}" font-size="11" fill="rgba(20,28,40,.75)" style="font-family:var(--font-ui)"><tspan font-weight="600" fill="rgba(20,28,40,.9)">${name}</tspan><tspan dx="10">${size}</tspan></text>`;
+  return `<text x="${x}" y="${y - 7}" font-size="12" fill="rgba(20,28,40,.75)" style="font-family:var(--font-ui)"><tspan font-weight="600" fill="rgba(20,28,40,.9)">${name}</tspan><tspan dx="10">${size}</tspan></text>`;
 }
 // One SVG of the level view. Overlays are drawn in screen pixels.
 function scene(w, h, z, cx, cy, opts) {
@@ -693,10 +681,6 @@ function partsSheet() {
 }
 
 // The page around the mockups
-function picksText(d) {
-  const font = FONTS.find((f) => f[0] === state.font);
-  return `Variation ${d.id} ${d.name}, font ${font[1]}`;
-}
 function buttons(id, items, current, onPick) {
   const el = document.getElementById(id);
   el.innerHTML = '';
@@ -712,11 +696,7 @@ function render() {
   const d = DIRS.find((x) => x.id === state.dir) || DIRS[0];
   T = d.t;
   S = Object.assign({}, d.s);
-  buttons('dirs', DIRS.map((x) => [x.id, `${x.id} ${x.name}`]), d.id, (v) => { state.dir = v; const nd = DIRS.find((x) => x.id === v); if (nd.view) state.view = nd.view; render(); });
   buttons('views', VIEWS, state.view, (v) => { state.view = v; render(); });
-  buttons('fonts', FONTS.map((f) => [f[0], f[1]]), state.font, (v) => { state.font = v; render(); });
-  document.getElementById('caption').textContent = d.desc;
-  document.getElementById('picks').textContent = picksText(d);
   const parts = state.view === 'parts';
   const cls = ['ed', 'float', parts ? 'tall' : ''].join(' ');
   document.getElementById('frame').innerHTML = `<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
