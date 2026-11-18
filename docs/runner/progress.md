@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**The runner is built and running** (since 2026-11-14) as the systemd user service `engine-v3-runner`. **Pushing works** since 2026-11-15, after the owner gave the GitHub login the `workflow` scope. **Since 2026-11-16 it waits for CI after each push**, and a failing CI is fixed before the next step. **Now (2026-11-18): moving CI to a public copy**, because GitHub stopped starting CI in the private repo when its free minutes ran out; the plan and where its build stands are in [public-ci.md](public-ci.md). The runner is paused until it's done. **After that: a Discord bot** to replace the webhook, waiting for the owner's answers below.
+**The runner is built and running** (since 2026-11-14) as the systemd user service `engine-v3-runner`. **Pushing works** since 2026-11-15, after the owner gave the GitHub login the `workflow` scope. **Since 2026-11-16 it waits for CI after each push**, and a failing CI is fixed before the next step. **Since 2026-11-18 CI runs in a public copy**, because GitHub stopped starting CI in the private repo when its free minutes ran out; see [public-ci.md](public-ci.md). **Next: a Discord bot** to replace the webhook, waiting for the owner's answers below.
 
 ## Where it stands
 
@@ -15,7 +15,7 @@
 | Acting on CI | Since 2026-11-16: waits for CI after each push; a red CI makes the next session fix it, and three failed fixes pause the runner |
 | Stopping before v2 | Since 2026-11-18: stage 19, the redesign, is the last, and the runner stops only after it (before: stage 18, the before-v2 changes) |
 | Ending a session that won't exit | Since 2026-11-18: a minute after its result line, the runner ends the session and everything it left running |
-| CI in a public copy | Being built since 2026-11-18, see [public-ci.md](public-ci.md). The private repo's CI stopped on 2026-11-18: no free minutes left |
+| CI in a public copy | Done, passing since 2026-11-18, see [public-ci.md](public-ci.md). The private repo's CI stopped that day: no free minutes left |
 | The short prompt | Since 2026-11-15: context, the step's loop, and `STATUS`, `SUMMARY`, `NEEDS` |
 
 ## Known issues

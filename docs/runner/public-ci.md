@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Being built (2026-11-18).** GitHub stopped starting CI in the private repo, `im-nassinger/engine-v3`: a private repo gets about 2,000 free Actions minutes a month, and about 190 pushes of five jobs each used them up in four days. CI is free and unlimited in a public repo, ARM machines included, so the runner now publishes a **public copy** of each pushed commit to `im-nassinger/engine-v3-ci` and waits for CI there. The copy holds only what CI needs: never `docs/`, `CLAUDE.md`, `.claude/`, the runner, or the git history. If this file still says "being built", read "Where the build stands" below and carry on from there.
+**Built and running (2026-11-18).** GitHub stopped starting CI in the private repo, `im-nassinger/engine-v3`: a private repo gets about 2,000 free Actions minutes a month, and about 190 pushes of five jobs each used them up in four days. CI is free and unlimited in a public repo, ARM machines included, so the runner now publishes a **public copy** of each pushed commit to `im-nassinger/engine-v3-ci` and waits for CI there. The copy holds only what CI needs: never `docs/`, `CLAUDE.md`, `.claude/`, the runner, or the git history.
 
 ## Why
 
@@ -36,7 +36,10 @@ Never: `docs/`, `CLAUDE.md`, `.claude/`, `tools/runner/`, `tools/check-docs.js`,
 | 3. `tools/runner/PublicCopy.ts`: build, guard, push | Done. A copy of 1,232 files passes the guard and `check:code` |
 | 4. `CiChecker` reads the public repo; `run.ts` publishes after pushing | Done |
 | 5. Create `im-nassinger/engine-v3-ci` (public) with `gh repo create` | Done |
-| 6. One publish by hand; the owner looks at the public repo before the runner resumes | Published `26360a3` as run 44374954683; waiting for the result and the owner's look |
-| 7. Update [how-it-works.md](how-it-works.md) and [progress.md](progress.md), mark this file built | how-it-works.md done |
+| 6. One publish by hand, then the runner resumes | Done. The owner had the runner resumed on 2026-11-18, and its first publish, `8b6cb7b`, passed all five jobs as run 44380988751 |
+| 7. Update [how-it-works.md](how-it-works.md) and [progress.md](progress.md), mark this file built | Done |
 
-The runner is paused while this is built (`~/.local/state/engine-v3-runner/paused`). The owner resumes it after step 6.
+## Reading a slow run
+
+- **Look at the step's start time, not the job's.** GitHub gives a job's log only after the job ends, but `gh api repos/im-nassinger/engine-v3-ci/actions/runs/<run>/jobs` shows each step's times while it runs. Cancel a run only when one step is clearly stuck. *Why: on 2026-11-18 run 44374954683 was cancelled for its 30 minutes, with 266 of 268 Playwright tests passed and none failed.*
+- **`playwright install --with-deps` can take about 25 minutes**, when Ubuntu's package mirror is slow (94 kB/s on 2026-11-18), against under a minute normally. It hit one job in each of the first two runs. A run past the runner's 45 minutes counts as unknown and the work goes on. If it keeps happening, cache those packages.
