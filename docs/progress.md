@@ -262,7 +262,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 ## Waiting for the owner
 
-Nothing. Pushing works again (2026-11-15), and CI passes on GitHub.
+- **CI can't run (2026-11-18).** GitHub refused to start any job of CI run 44367158402 (commit 8b274e2): "recent account payments have failed or your spending limit needs to be increased". No test failed: `npm run check`, `test:browser`, `test:e2e` and `test:performance` all pass on this computer. The owner fixes the billing under GitHub's Settings → Billing & plans, then re-runs CI (`gh run rerun 44367158402`).
 
 ## Next
 
