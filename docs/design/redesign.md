@@ -6,18 +6,19 @@ The owner wants a new look for the editor before v2 starts (2026-11-17): **clean
 
 ## Settled, in order (all owner, 2026-11-17)
 
-1. **Islands.** The level view fills the window and every panel floats over it as a rounded island with a soft shadow, 10 px from the window's edge and from each other. Slate panels with a bright blue. Every other direction was dropped: Bento tiles, Quiet, Glass, Candy, Neon, Ember, and the palette and density variations of Islands (Midnight, Graphite, Mint, Soft, Compact, Frosted, Warm). Don't bring them back.
+1. **Islands.** The level view fills the window and every panel floats over it as a rounded island, 10 px from the window's edge and from each other. Slate panels with a bright blue. Every other direction was dropped: Bento tiles, Quiet, Glass, Candy, Neon, Ember, and the palette and density variations of Islands (Midnight, Graphite, Mint, Soft, Compact, Frosted, Warm). Don't bring them back.
 2. **The parts** (from the owner's screenshot): the Entities panel only as tall as its rows, panel titles as plain titles (not small caps), Inspector cards split by space only, pill-shaped fields, sliders drawn as a filled field, switches for checkboxes, a blue pill for the selected row, a soft (tinted) active tool, rounded buttons, soft menu hovers, tinted editor messages, square selection handles, and a tinted pill for the Play bar.
 3. **The dock** at the bottom middle of the level view holds the three tools, Undo, Redo, grid snapping and Play.
 4. **Panels hold only their own content.** The owner rejected putting the top bar's controls or the status text at the top or foot of the Inspector or the Entities panel.
 5. **Too many islands** was a complaint: two similar top islands (left and right) and a status bar island were too much. The bottom status bar island looked ugly.
 6. **A level card** at the top left, above the Inspector, as wide as it (300 px) and only as tall as its content, holds the main menu, the level's name, the save state and the zoom. The Inspector starts under it. The Entities panel starts at the top right.
-7. **No View button.** The View menu is the main menu's View submenu, written into [workspace.md](../requirements/editor/workspace.md), the glossary and [rejected.md](../rejected.md). The built editor still has the button until the redesign is built.
-8. **A minimap** at the bottom right, its own island 260 px wide with no padding or border, under the Entities panel: the whole level, with a blue rectangle showing what the level view shows. The mockup's level was widened past the window so the rectangle sits inside it. It is a new feature, not yet in the requirements, so [workspace.md](../requirements/editor/workspace.md) needs it with its version before it is built.
+7. **No shadows, anywhere.** The owner hates them (2026-11-17): no island, menu, dialog, chip or Play bar casts one, and nothing glows. An island stands apart from the level view by its colour alone.
+8. **No View button.** The View menu is the main menu's View submenu, written into [workspace.md](../requirements/editor/workspace.md), the glossary and [rejected.md](../rejected.md). The built editor still has the button until the redesign is built.
+9. **A minimap** at the bottom right, its own island 260 px wide with no padding or border, under the Entities panel: the whole level, with a blue rectangle showing what the level view shows. The mockup's level is a square 8000 px wide, like a new level's bounds, so the rectangle sits inside it, and the minimap is a square too. Its shapes have no outlines. It is a new feature, not yet in the requirements, so [workspace.md](../requirements/editor/workspace.md) needs it with its version before it is built.
 
 ## The tokens of the pick
 
-From the mockup's `SLATE` set: app `#0d0f13`, panels `rgba(24,27,33,.96)`, raised `rgba(255,255,255,.04)`, fields `rgba(255,255,255,.055)`, hover `rgba(255,255,255,.065)`, text `#e4e8ef`, muted `#8b93a1`, faint `#586070`, accent `#4f8cff`, accent soft `rgba(79,140,255,.2)`, accent text `#8fb5ff`. Corners 8 px for controls, 12 px for menus and tiles, 16 px for islands. Rows 30 px, panel inset 14 px. Island shadow `0 10px 40px rgba(0,0,0,.35)`. The status chip and the title chip are `rgba(13,15,19,.8)` pills.
+From the mockup's `SLATE` set: app `#0d0f13`, panels `rgba(24,27,33,.96)`, raised `rgba(255,255,255,.04)`, fields `rgba(255,255,255,.055)`, hover `rgba(255,255,255,.065)`, text `#e4e8ef`, muted `#8b93a1`, faint `#586070`, accent `#4f8cff`, accent soft `rgba(79,140,255,.2)`, accent text `#8fb5ff`. Corners 8 px for controls, 12 px for menus and tiles, 16 px for islands. Rows 30 px, panel inset 14 px. The status chip and the title chip are `rgba(13,15,19,.8)` pills.
 
 ## Open for the owner
 

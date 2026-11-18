@@ -26,7 +26,7 @@
   .picks { font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: #a9aeb8; user-select: all; }
   .stage { flex: 1; position: relative; overflow: hidden; }
   .stage.scroll { overflow-y: auto; }
-  .frame { position: absolute; left: 50%; top: 8px; width: 1440px; margin-left: -720px; transform-origin: top center; box-shadow: 0 10px 50px rgba(0, 0, 0, .6); border-radius: 10px; overflow: hidden; }
+  .frame { position: absolute; left: 50%; top: 8px; width: 1440px; margin-left: -720px; transform-origin: top center; border-radius: 10px; overflow: hidden; }
 
   /* The editor. Its tokens are set per direction on .ed. */
   .ed { position: relative; width: 1440px; height: 900px; overflow: hidden; background: var(--app); color: var(--text); font-family: var(--font-ui); font-size: var(--fs);
@@ -37,7 +37,7 @@
   .abs { position: absolute; }
   .blk { background: var(--panel); }
   .bar { background: var(--bar); }
-  .float .blk, .isl { border-radius: var(--rl); box-shadow: var(--shadow); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+  .float .blk, .isl { border-radius: var(--rl); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
   .isl { background: var(--panel); display: flex; align-items: center; gap: 2px; padding: 0 7px; height: 44px; }
   .viewbox { overflow: hidden; }
   .viewbox svg { display: block; }
@@ -69,16 +69,16 @@
   .tool.hover { background: var(--hover); color: var(--text); }
   .tool.on.fill { background: var(--accent); color: var(--on); }
   .tool.on.soft { background: var(--soft); color: var(--ink); }
-  .tip-box { white-space: nowrap; background: var(--tooltip); color: var(--tooltip-text); border-radius: var(--r); padding: 5px 9px; font-size: 11px; display: inline-flex; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.4); }
+  .tip-box { white-space: nowrap; background: var(--tooltip); color: var(--tooltip-text); border-radius: var(--r); padding: 5px 9px; font-size: 11px; display: inline-flex; gap: 10px; }
   .tip-box .k { color: #8a93a3; }
 
   .onebar .grow { flex: 1; }
   .cnums .warn, .barnums .warn { display: flex; align-items: center; gap: 4px; }
   .cnums svg.i, .barnums svg.i { width: 13px; height: 13px; }
-  .hintchip { position: absolute; transform: translateX(-50%); z-index: 3; white-space: nowrap; background: rgba(13, 15, 19, .8); color: #e4e8ef; border-radius: 999px; padding: 7px 15px; font-size: 11.5px; box-shadow: 0 6px 20px rgba(0,0,0,.25); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  .hintchip { position: absolute; transform: translateX(-50%); z-index: 3; white-space: nowrap; background: rgba(13, 15, 19, .8); color: #e4e8ef; border-radius: 999px; padding: 7px 15px; font-size: 11.5px; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
   .hintchip { display: flex; gap: 16px; align-items: center; }
   .cnums { display: flex; gap: 12px; align-items: center; color: #9aa3b2; font-size: 11px; }
-  .titlechip { position: absolute; transform: translateX(-50%); z-index: 3; display: flex; align-items: center; gap: 10px; padding: 7px 14px; border-radius: 999px; background: rgba(13, 15, 19, .8); color: #e4e8ef; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+  .titlechip { position: absolute; transform: translateX(-50%); z-index: 3; display: flex; align-items: center; gap: 10px; padding: 7px 14px; border-radius: 999px; background: rgba(13, 15, 19, .8); color: #e4e8ef; font-weight: 500; }
   .titlechip .savestate { padding: 0; }
   .lcard { display: flex; flex-direction: column; padding: 6px 8px 8px; overflow: hidden; z-index: 2; }
   .lcard .grow { flex: 1; }
@@ -138,8 +138,8 @@
   .card.tile .f, .card.tile .chead { padding-left: 10px; padding-right: 10px; }
   .card.inset { background: rgba(0, 0, 0, .2); border-radius: var(--r2); margin: 0 8px 8px; padding: 2px 0 6px; }
   .card.inset .f, .card.inset .chead { padding-left: 10px; padding-right: 10px; }
-  .card.island { background: var(--panel); border-radius: var(--rl); box-shadow: var(--shadow); margin-top: 8px; padding: 4px 0 8px; -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
-  .kbox .card.island { margin: 8px 12px 0; box-shadow: 0 4px 16px rgba(0,0,0,.35); background: var(--app); }
+  .card.island { background: var(--panel); border-radius: var(--rl); margin-top: 8px; padding: 4px 0 8px; -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+  .kbox .card.island { margin: 8px 12px 0; background: var(--app); }
   .insp.bare { overflow: visible; }
   .insp.bare .ihead { margin-bottom: 0; }
   .chead { height: 32px; display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); font-weight: 600; }
@@ -201,10 +201,10 @@
   .status svg.i { width: 13px; height: 13px; }
 
   /* What floats: the options strip, menus, dialogs, the Play bar */
-  .opts { position: absolute; z-index: 4; display: flex; gap: 2px; padding: 4px; background: var(--menu); border-radius: var(--r2); box-shadow: 0 6px 20px rgba(0,0,0,.3); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+  .opts { position: absolute; z-index: 4; display: flex; gap: 2px; padding: 4px; background: var(--menu); border-radius: var(--r2); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
   .opts .ib { padding: 0 9px; }
-  .menu { position: absolute; z-index: 6; min-width: 214px; background: var(--menu); border-radius: var(--r2); box-shadow: 0 12px 32px rgba(0,0,0,.45); padding: 6px; -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
-  .menu.static { position: relative; display: inline-block; vertical-align: top; box-shadow: 0 6px 18px rgba(0,0,0,.3); }
+  .menu { position: absolute; z-index: 6; min-width: 214px; background: var(--menu); border-radius: var(--r2); padding: 6px; -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+  .menu.static { position: relative; display: inline-block; vertical-align: top; }
   .mi { height: 28px; display: flex; align-items: center; padding: 0 10px; border-radius: var(--r); gap: 12px; }
   .mi .l { flex: 1; }
   .mi .k { color: var(--muted); font-family: var(--font-num); font-size: 11px; }
@@ -215,8 +215,8 @@
   .menu.soft .mi.hover { background: var(--soft); }
   .msep { height: 7px; }
   .scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, .5); z-index: 7; }
-  .dialog { position: absolute; z-index: 8; left: 50%; top: 290px; width: 400px; margin-left: -200px; background: var(--menu); border-radius: calc(var(--r2) + 4px); box-shadow: 0 20px 60px rgba(0,0,0,.55); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
-  .dialog.static { position: relative; left: auto; top: auto; margin: 0 16px; width: auto; box-shadow: 0 6px 18px rgba(0,0,0,.3); }
+  .dialog { position: absolute; z-index: 8; left: 50%; top: 290px; width: 400px; margin-left: -200px; background: var(--menu); border-radius: calc(var(--r2) + 4px); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+  .dialog.static { position: relative; left: auto; top: auto; margin: 0 16px; width: auto; }
   .dialog h3 { margin: 0; padding: 22px 22px 6px; font-size: calc(var(--fs) + 2px); font-weight: 600; }
   .dialog p { margin: 0; padding: 0 22px 20px; color: var(--muted); line-height: 1.55; }
   .dialog .row { display: flex; justify-content: flex-end; gap: 8px; padding: 0 16px 16px; }
@@ -226,13 +226,13 @@
   .addc { margin: 8px var(--inset) 12px; height: 30px; border-radius: var(--r); display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--raised); color: var(--muted); }
   .addc.pill { border-radius: 999px; }
   .game { position: absolute; inset: 0; background: #000; }
-  .playbar { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 2px; padding: 4px; background: var(--menu); border-radius: var(--r2); box-shadow: 0 6px 24px rgba(0,0,0,.45); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
-  .playbar.static { position: static; transform: none; display: inline-flex; box-shadow: 0 6px 18px rgba(0,0,0,.3); margin: 0 16px 8px; }
+  .playbar { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 2px; padding: 4px; background: var(--menu); border-radius: var(--r2); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+  .playbar.static { position: static; transform: none; display: inline-flex; margin: 0 16px 8px; }
   .playbar.dot, .playbar.tint { border-radius: 999px; padding: 4px 6px; }
   .playbar.tint { background: color-mix(in srgb, var(--pc) 16%, var(--menu)); }
   .playbar .state { display: flex; align-items: center; gap: 7px; padding: 0 10px 0 8px; font-weight: 600; color: var(--pc); letter-spacing: .05em; font-size: 11px; }
   .playbar .state i { width: 8px; height: 8px; border-radius: 50%; background: var(--pc); }
-  .playbar.dot .state i, .playbar.tint .state i { box-shadow: 0 0 10px var(--pc); }
+  .playbar.dot .state i, .playbar.tint .state i { }
   .playbar .ib { padding: 0 10px; }
   .playbar.dot .ib, .playbar.tint .ib { border-radius: 999px; }
   .playbar .k { color: var(--muted); font-size: 11px; }
@@ -324,7 +324,7 @@ const KINDS = [
 // The directions. Each is a set of tokens and one variant of each kind.
 const BASE = { lcard: 'basic', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
 const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
-  accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: '0 10px 40px rgba(0,0,0,.35)' };
+  accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s) => ({ id, name, desc, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
   dir('1', 'Level card', 'A card above the Inspector, as wide as it and only as tall as its content: the menu and Help at its top, the level\'s name large, with Saved and the zoom under it. The View menu\'s switches are in the main menu\'s View submenu. The status text is a chip above the dock. Four islands and a chip.', {}),
@@ -345,7 +345,7 @@ try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-5'
 let S, T;
 
 function tokensCss(t) {
-  const v = Object.assign({ bar: t.panel, menu: t.panel, line: 'transparent', grad: t.accent, blur: 0, shadow: '0 8px 30px rgba(0,0,0,.35)' }, t);
+  const v = Object.assign({ bar: t.panel, menu: t.panel, line: 'transparent', grad: t.accent, blur: 0, shadow: 'none' }, t);
   const f = FONTS.find((x) => x[0] === state.font) || FONTS[0];
   return `--app:${v.app};--panel:${v.panel};--bar:${v.bar};--menu:${v.menu};--raised:${v.raised};--field:${v.field};--hover:${v.hover};--line:${v.line};` +
     `--text:${v.text};--muted:${v.muted};--faint:${v.faint};--accent:${v.accent};--soft:${v.soft};--on:${v.on};--ink:${v.ink};--grad:${v.grad};` +
@@ -374,12 +374,12 @@ function visibleArea() {
   return [-cx / VIEW_Z, -VIEW_CY / VIEW_Z, W / VIEW_Z, H / VIEW_Z];
 }
 // The minimap shows the whole level and outlines the part the level view shows, in level pixels: [x, y, w, h].
-const MAP_AREA = [-4300, -2300, 8600, 3600];
+const MAP_AREA = [-4000, -4000, 8000, 8000];
 
 // The sample level, in level pixels. The origin is the middle of the level, y points down.
 const BG = '#cde3f2';
 const LEVEL = [
-  { id: 'ground', t: 'rect', x: -1100, y: 380, w: 2200, h: 260, fill: '#6ba368', line: '#2f5130' },
+  { id: 'ground', t: 'rect', x: -4000, y: 380, w: 8000, h: 3620, fill: '#6ba368', line: '#2f5130' },
   { id: 'ramp', t: 'poly', p: [[-1000, 380], [-560, 380], [-1000, 170]], fill: '#7db37a', line: '#2f5130' },
   { id: 'platform', t: 'rect', x: 250, y: 60, w: 420, h: 40, fill: '#8a6b4e', line: '#4a3626' },
   { id: 'crate1', t: 'rect', x: 290, y: -40, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
@@ -391,26 +391,27 @@ const LEVEL = [
   { id: 'wheel1', t: 'circle', cx: -370, cy: 338, r: 42, fill: '#3a3a3a', line: '#111111' },
   { id: 'wheel2', t: 'circle', cx: -190, cy: 338, r: 42, fill: '#3a3a3a', line: '#111111' },
   { id: 'rect1', t: 'rect', x: -60, y: 300, w: 160, h: 80, fill: '#4a90d9', line: '#1f3552' },
-  // Off screen: the rest of the level, seen only in the minimap.
-  { id: 'groundL', t: 'rect', x: -4200, y: 380, w: 2150, h: 260, fill: '#6ba368', line: '#2f5130' },
-  { id: 'hillL', t: 'poly', p: [[-4200, 380], [-4200, -200], [-3500, 380]], fill: '#7db37a', line: '#2f5130' },
-  { id: 'ledgeL', t: 'rect', x: -3200, y: -1500, w: 700, h: 50, fill: '#8a6b4e', line: '#4a3626' },
-  { id: 'crateL', t: 'rect', x: -3000, y: -1600, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
-  { id: 'groundR', t: 'rect', x: 1950, y: 380, w: 2250, h: 260, fill: '#6ba368', line: '#2f5130' },
-  { id: 'rampR', t: 'poly', p: [[2600, 380], [3300, 380], [3300, 60]], fill: '#7db37a', line: '#2f5130' },
-  { id: 'towerR', t: 'rect', x: 3300, y: -400, w: 300, h: 780, fill: '#8a6b4e', line: '#4a3626' },
-  { id: 'crateR1', t: 'rect', x: 3350, y: -500, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
-  { id: 'crateR2', t: 'rect', x: 3460, y: -500, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
+  // Off screen: the rest of the level, seen only in the minimap. The level is a square, like a new level's bounds.
+  { id: 'hillL', t: 'poly', p: [[-4000, 380], [-4000, -300], [-3300, 380]], fill: '#7db37a', line: '#2f5130' },
+  { id: 'rampR', t: 'poly', p: [[2500, 380], [3200, 380], [3200, 60]], fill: '#7db37a', line: '#2f5130' },
+  { id: 'towerR', t: 'rect', x: 3200, y: -400, w: 300, h: 780, fill: '#8a6b4e', line: '#4a3626' },
+  { id: 'crateR1', t: 'rect', x: 3250, y: -500, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
+  { id: 'crateR2', t: 'rect', x: 3360, y: -500, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
   { id: 'ballR', t: 'circle', cx: 2300, cy: 300, r: 80, fill: '#f0c419', line: '#8a6d00' },
-  { id: 'ledgeT', t: 'rect', x: -600, y: -2000, w: 1200, h: 50, fill: '#8a6b4e', line: '#4a3626' },
-  { id: 'ledgeT2', t: 'rect', x: 1600, y: -1700, w: 800, h: 50, fill: '#8a6b4e', line: '#4a3626' },
-  { id: 'goal', t: 'circle', cx: 0, cy: -2100, r: 50, fill: '#4a90d9', line: '#1f3552' }
+  { id: 'ledge1', t: 'rect', x: -3200, y: -1500, w: 700, h: 50, fill: '#8a6b4e', line: '#4a3626' },
+  { id: 'crateL', t: 'rect', x: -3000, y: -1600, w: 100, h: 100, fill: '#c68b4e', line: '#6b4423' },
+  { id: 'ledge2', t: 'rect', x: 1600, y: -1700, w: 800, h: 50, fill: '#8a6b4e', line: '#4a3626' },
+  { id: 'ledge3', t: 'rect', x: -600, y: -2200, w: 1200, h: 50, fill: '#8a6b4e', line: '#4a3626' },
+  { id: 'ledge4', t: 'rect', x: -2800, y: -2800, w: 900, h: 50, fill: '#8a6b4e', line: '#4a3626' },
+  { id: 'ledge5', t: 'rect', x: 1200, y: -3300, w: 900, h: 50, fill: '#8a6b4e', line: '#4a3626' },
+  { id: 'goal', t: 'circle', cx: 1650, cy: -3420, r: 60, fill: '#4a90d9', line: '#1f3552' },
+  { id: 'cave', t: 'rect', x: -1600, y: 1600, w: 3200, h: 700, fill: '#4f7d4c', line: '#2f5130' }
 ];
 const HINGES = [[-370, 338], [-190, 338]];
 const PLAYED = { crate3: { dx: 320, dy: 60, rot: 28 }, ball: { dy: 100 }, carbody: { dx: 50 }, cabin: { dx: 50 }, wheel1: { dx: 50 }, wheel2: { dx: 50 } };
 
 function drawShape(s, X, Y, z, opts) {
-  const style = `fill="${s.fill}" stroke="${s.line}" stroke-width="${Math.max(0.6, 2 * z)}" stroke-linejoin="round"`;
+  const style = opts.noLines ? `fill="${s.fill}"` : `fill="${s.fill}" stroke="${s.line}" stroke-width="${Math.max(0.6, 2 * z)}" stroke-linejoin="round"`;
   const m = (opts.play && PLAYED[s.id]) || {};
   const dx = m.dx || 0, dy = m.dy || 0;
   if (s.t === 'rect') {
@@ -553,7 +554,7 @@ function minimap() {
   const g = geo(), [ax, ay, aw] = MAP_AREA, w = g.map[2], h = g.map[3], z = w / aw;
   const [vx, vy, vw, vh] = visibleArea(), X = (x) => (x - ax) * z, Y = (y) => (y - ay) * z;
   const frame = `<rect x="${X(vx)}" y="${Y(vy)}" width="${vw * z}" height="${vh * z}" rx="3" fill="rgba(79,140,255,.1)" style="stroke:var(--accent)" stroke-width="1.5"/>`;
-  const map = scene(w, h, z, -ax * z, -ay * z, { grid: false }).replace('</svg>', frame + '</svg>');
+  const map = scene(w, h, z, -ax * z, -ay * z, { grid: false, noLines: true }).replace('</svg>', frame + '</svg>');
   return `<div class="blk minimap" style="${pos(g.map)}">${map}</div>`;
 }
 function editor(o) {
