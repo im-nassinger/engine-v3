@@ -1,7 +1,7 @@
 name: CI
 
 # Runs only in the public copy, im-nassinger/engine-v3-ci: a private repo's free minutes ran out.
-# See docs/runner/public-ci.md.
+# See docs/runner/public-ci.md. Why the downloads have limits: docs/runner/ci-speed.md.
 on:
     push:
 
@@ -16,6 +16,8 @@ jobs:
         steps:
             - uses: actions/checkout@v7
             - uses: actions/setup-node@v7
+              env:
+                  SEGMENT_DOWNLOAD_TIMEOUT_MINS: 1
               with:
                   node-version-file: .node-version
                   cache: npm
@@ -28,11 +30,20 @@ jobs:
         steps:
             - uses: actions/checkout@v7
             - uses: actions/setup-node@v7
+              env:
+                  SEGMENT_DOWNLOAD_TIMEOUT_MINS: 1
               with:
                   node-version-file: .node-version
                   cache: npm
             - run: npm ci
-            - run: npx playwright install --with-deps chromium firefox webkit
+            - name: Install browsers
+              run: |
+                  for limit in 180 180 1800; do
+                      timeout -k 15 "$limit" npx playwright install --with-deps chromium firefox webkit && exit 0
+                      echo "Browser install did not finish within $limit s"
+                      sudo dpkg --configure -a || true
+                  done
+                  exit 1
             - run: npm run test:browser
             - run: npm run test:performance
             - run: npm run build
@@ -40,17 +51,57 @@ jobs:
     journeys:
         if: ${{ !github.event.repository.private && github.ref == 'refs/heads/master' }}
         runs-on: ubuntu-24.04
+        strategy:
+            fail-fast: false
+            matrix:
+                shard: [1, 2, 3]
         steps:
             - uses: actions/checkout@v7
             - uses: actions/setup-node@v7
+              env:
+                  SEGMENT_DOWNLOAD_TIMEOUT_MINS: 1
               with:
                   node-version-file: .node-version
                   cache: npm
             - run: npm ci
-            - run: npx playwright install --with-deps chromium firefox webkit
-            - run: npm run test:e2e
+            - name: Install browsers
+              run: |
+                  for limit in 180 180 1800; do
+                      timeout -k 15 "$limit" npx playwright install --with-deps chromium firefox webkit && exit 0
+                      echo "Browser install did not finish within $limit s"
+                      sudo dpkg --configure -a || true
+                  done
+                  exit 1
+            - run: npm run test:e2e -- --shard=${{ matrix.shard }}/3
             - uses: actions/upload-artifact@v7
               if: ${{ !cancelled() }}
+              with:
+                  name: blob-report-${{ matrix.shard }}
+                  path: blob-report/
+                  retention-days: 1
+
+    # Joins the three machines' results into one HTML report. A problem here never turns CI red.
+    journeys-report:
+        if: ${{ !cancelled() && !github.event.repository.private && github.ref == 'refs/heads/master' }}
+        needs: journeys
+        continue-on-error: true
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
+              env:
+                  SEGMENT_DOWNLOAD_TIMEOUT_MINS: 1
+              with:
+                  node-version-file: .node-version
+                  cache: npm
+            - run: npm ci
+            - uses: actions/download-artifact@v7
+              with:
+                  pattern: blob-report-*
+                  path: all-blob-reports
+                  merge-multiple: true
+            - run: npx playwright merge-reports --reporter html all-blob-reports
+            - uses: actions/upload-artifact@v7
               with:
                   name: playwright-report
                   path: playwright-report/
@@ -63,9 +114,18 @@ jobs:
         steps:
             - uses: actions/checkout@v7
             - uses: actions/setup-node@v7
+              env:
+                  SEGMENT_DOWNLOAD_TIMEOUT_MINS: 1
               with:
                   node-version-file: .node-version
                   cache: npm
             - run: npm ci
-            - run: npx playwright install --with-deps chromium
+            - name: Install browsers
+              run: |
+                  for limit in 180 180 1800; do
+                      timeout -k 15 "$limit" npx playwright install --with-deps chromium && exit 0
+                      echo "Browser install did not finish within $limit s"
+                      sudo dpkg --configure -a || true
+                  done
+                  exit 1
             - run: npx playwright test --project=phone-chromium

@@ -214,10 +214,12 @@ One workflow, `.github/workflows/ci.yml`. **It runs only in the public copy of t
 |---|---|---|---|
 | check | `ubuntu-24.04` and `ubuntu-24.04-arm` | `npm ci`, `npm run check:code` | Every push |
 | browser | `ubuntu-24.04` | Installs the three browsers, `npm run test:browser`, `npm run test:performance`, `npm run build` | Every push |
-| journeys | `ubuntu-24.04` | Installs the three browsers, `npm run test:e2e` (the phone checks' two projects among them), and keeps the HTML report with its screenshots for 30 days as the `playwright-report` artifact | Pushes to master |
+| journeys | `ubuntu-24.04`, three machines | Installs the three browsers, and each machine runs a third of `npm run test:e2e` (the phone checks' two projects among them) and keeps a blob report for a day | Pushes to master |
+| journeys-report | `ubuntu-24.04` | Joins the three blob reports into the HTML report, with its screenshots, kept for 30 days as the `playwright-report` artifact. If it fails, CI stays green | Pushes to master |
 | phone-arm | `ubuntu-24.04-arm` | Installs Chromium, `npx playwright test --project=phone-chromium`: the determinism page and the editor at a Pixel 7's size on ARM (stage 17 step 7, standing yes, 2026-11-17) | Every push |
 
 - Node comes from `.node-version`. The actions are `actions/checkout@v7` and `actions/setup-node@v7`, with npm's cache.
+- Downloads have limits, because they stalled in every run on 2026-11-18: npm's cache gets 1 minute per part, then the job goes on without it, and the browser install gets two tries of 3 minutes and a last one of 30. See [ci-speed.md](../runner/ci-speed.md).
 - `npx playwright install --with-deps` installs the browsers' system packages on the runner. On the laptop WebKit needed three (`libevent-2.1-7t64`, `libavif16`, `libmanette-0.2-0`), installed once with apt.
 - `tools/check-sources.js` doesn't run in CI: it reads `~/projects/ecs-game-v2`, which only the laptop has.
 - The determinism test joins the check job in stage 13. Running the job on ARM from stage 0 means the ARM runner is known to work long before that test depends on it.

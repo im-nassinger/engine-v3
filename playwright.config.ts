@@ -9,8 +9,9 @@ const PHONE_TESTS = 'phone/**';
 export default defineConfig({
     testDir: 'tests/e2e',
     forbidOnly: Boolean(process.env.CI),
-    // CI keeps the HTML report, with the layout checks' screenshots attached, as the journeys job's artifact.
-    reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+    // CI splits these tests across machines. Each keeps a blob report, and the journeys-report job joins
+    // them into the HTML report, with the layout checks' screenshots attached.
+    reporter: process.env.CI ? [['list'], ['blob']] : 'list',
     use: {
         baseURL: `http://localhost:${PREVIEW_PORT}`,
     },
