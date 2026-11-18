@@ -112,8 +112,8 @@
   .lc-over.top { top: 0; background: linear-gradient(rgba(16,19,24,.92), rgba(16,19,24,0)); padding-bottom: 18px; }
   .lc-over.bot { bottom: 0; background: linear-gradient(rgba(16,19,24,0), rgba(16,19,24,.92)); padding-top: 18px; }
   .lc-over .zoomg { background: rgba(16,19,24,.75); }
-  .minimap { position: absolute; z-index: 2; overflow: hidden; }
-  .minimap svg { display: block; }
+  .minimap { position: absolute; z-index: 2; padding: 3px; }
+  .minimap svg { display: block; border-radius: 13px; }
   .dock { position: absolute; transform: translateX(-50%); height: 46px; z-index: 3; }
   .onebar .hint { color: var(--muted); font-size: 11.5px; white-space: nowrap; }
   .barnums { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 11px; margin-right: 14px; }
@@ -360,7 +360,7 @@ const W = 1440, H = 900, M = 10, GP = 10;
 function geo() {
   const ex = W - M - 260;
   const left = [M, M, 300, H - 2 * M];
-  const mapW = 260, mapH = Math.round(mapW * MAP_AREA[3] / MAP_AREA[2]);
+  const mapW = 180, mapH = Math.round((mapW - 6) * MAP_AREA[3] / MAP_AREA[2]) + 6;
   const map = [W - M - mapW, H - M - mapH, mapW, mapH];
   const ents = [ex, M, 260, S.layout === 'hug' ? null : H - 2 * M - mapH - GP];
   const rx0 = M + 300 + GP, rx1 = ex - GP, cx = (rx0 + rx1) / 2;
@@ -551,7 +551,7 @@ function view(opts) {
   return `<div class="abs viewbox" style="${pos([0, 0, W, H])}">${scene(W, H, VIEW_Z, (g.rx0 + g.rx1) / 2, VIEW_CY, Object.assign({ grid: true, cameraFrame: true, joints: true }, opts))}</div>`;
 }
 function minimap() {
-  const g = geo(), [ax, ay, aw] = MAP_AREA, w = g.map[2], h = g.map[3], z = w / aw;
+  const g = geo(), [ax, ay, aw] = MAP_AREA, w = g.map[2] - 6, h = g.map[3] - 6, z = w / aw;
   const [vx, vy, vw, vh] = visibleArea(), X = (x) => (x - ax) * z, Y = (y) => (y - ay) * z;
   const frame = `<rect x="${X(vx)}" y="${Y(vy)}" width="${vw * z}" height="${vh * z}" rx="3" fill="rgba(79,140,255,.1)" style="stroke:var(--accent)" stroke-width="1.5"/>`;
   const map = scene(w, h, z, -ax * z, -ay * z, { grid: false, noLines: true }).replace('</svg>', frame + '</svg>');
