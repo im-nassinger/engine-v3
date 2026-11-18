@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The owner wants a new look for the editor before v2 starts (2026-11-17): **clean, cool and beautiful, with no borders, separator lines or outlines**, even if it looks less "professional" than commercial tools. Only the look changes (colours, spacing, layout, the parts' shapes); what the screen shows stays. **Settled so far:** the Islands look, the owner's set of parts, the dock at the bottom, panels holding only their own content, a level pill above the Inspector with Play in it, no View button, no shadows, and a minimap at the bottom right with the zoom under it. **Open:** how the top left is arranged (Save and Play, the ☰ button, the name), what Save does, the font, and the status chip. The mockup is [mockups/redesign.html](mockups/redesign.html); the [round 8 design](README.md) stays what is built until this one is written into [tokens.md](tokens.md) and [controls.md](controls.md) and planned as a stage.
+The owner wants a new look for the editor before v2 starts (2026-11-17): **clean, cool and beautiful, with no borders, separator lines or outlines**, even if it looks less "professional" than commercial tools. Only the look changes (colours, spacing, layout, the parts' shapes); what the screen shows stays. **Settled so far:** the Islands look, the owner's set of parts, the dock at the bottom, panels holding only their own content, a level pill above the Inspector with Play in it, no View button, no shadows, and a minimap at the bottom right with the zoom under it. **Open:** how the level's name shows, what Save does, the font, and the status chip. The mockup is [mockups/redesign.html](mockups/redesign.html); the [round 8 design](README.md) stays what is built until this one is written into [tokens.md](tokens.md) and [controls.md](controls.md) and planned as a stage.
 
 ## Settled, in order (all owner, 2026-11-17)
 
@@ -17,6 +17,8 @@ The owner wants a new look for the editor before v2 starts (2026-11-17): **clean
 9. **A minimap** at the bottom right, its own island 180 px wide, with a thin 3 px edge in the panels' colour so it doesn't merge with the level view, under the Entities panel: the whole level, with a blue rectangle showing what the level view shows. The mockup's level is a square 8000 px wide, like a new level's bounds, so the rectangle sits inside it, and the minimap is a square too. Its shapes have no outlines. The zoom (− 40% +) sits by it. It is a new feature, not yet in the requirements, so [workspace.md](../requirements/editor/workspace.md) needs it with its version before it is built.
 10. **The level pill** (the owner's pick of the level cards): an island at the top left, only as wide as its content, holding the main menu, the level's name, a **white dot while the level isn't saved** (nothing once it is), and after some space **Play**, which left the dock. The zoom (− 40% +) sits under the minimap in the same island. The other cards (one row, menu button with a name pill) and zoom places (above, on, or left of the map) were dropped. The white dot replaces the save state's words, a change for [workspace.md](../requirements/editor/workspace.md).
 11. **Play apart, with Save** (owner's pick of the Play variations): Play sits apart from the name's pill, but a blue button straight on the level view clashes with the level's colours, so it sits on a dark island. **A green Save button comes right before Play.** The other Play looks (in the pill, round, soft, wide) were dropped.
+12. **The top left, left to right** (owner's pick, "Quiet buttons"): the ☰ main menu as a round island of its own, the level's name in its own island with the white dot, then **Save and Play as separate dark islands with green and blue words** and no coloured fill (the owner: "amazing"). The other arrangements (Save and Play in one island or in the name's pill, ☰ with the name or with the buttons, the name at the top middle, larger, or with "Not saved" under it) were dropped.
+13. **The name is a written value, not editor text.** The owner wrote it, so it must look like a value in its own component, not a bold title that reads as part of the editor's own words.
 
 ## The tokens of the pick
 
@@ -24,7 +26,7 @@ From the mockup's `SLATE` set: app `#0d0f13`, panels `rgba(24,27,33,.96)`, raise
 
 ## Open for the owner
 
-- **How the top left is arranged**, three choices in the mockup's Mix row, with six variations combining them. Save and Play: solid in one dark island, tinted in one island, inside the name's pill, or each its own dark island with green and blue words. The ☰ button: with the name, its own round island, or with Save and Play. The name: top left in a pill, larger, with "Not saved" written under it, or at the top middle of the level view.
+- **How the name shows as a value:** 1, in a field like the Inspector's name field, in regular weight (Claude's pick: the same component as an entity's name); 2, the field with a level icon in front; 3, the field with a faint pencil at its end; 4, a small "Level" caption above it; 5, a level icon and the name with no field, like a file's tab.
 - **What Save does.** A level autosaves, and Ctrl+S exports the `.editable` file today ([saving.md](../requirements/play-and-save/saving.md)). Claude's suggestion: Save saves now, without waiting for autosave, and the white dot goes away; exporting stays in the File menu. This is a requirement change, so it waits for the owner.
 - **The status text:** today it is one dark chip above the dock with the tool hint, the mouse position, the selection and the warning count. Not yet confirmed.
 - **The font:** JetBrains Mono (round 8's decision) is still the default; the page offers Inter, Geist and Inter with mono numbers.
@@ -35,7 +37,7 @@ From the mockup's `SLATE` set: app `#0d0f13`, panels `rgba(24,27,33,.96)`, raise
 
 ## Next
 
-1. The owner picks the top left's arrangement, what Save does, the status text and the font.
+1. The owner picks how the name shows, what Save does, the status text and the font.
 2. Write the result into [tokens.md](tokens.md), [controls.md](controls.md), [level-view.md](level-view.md) (square handles, the selection colour) and this folder's README, replacing round 8's look; change [workspace.md](../requirements/editor/workspace.md)'s top bar, status bar and toolbar sections to the islands, the dock, the top left with Save, Play and the white dot, and the minimap with the zoom (a requirement change, so with the owner's yes).
 3. Plan the build as a stage in [plan.md](../plan.md) with its steps in [steps/](../steps/README.md), before v2.
 
