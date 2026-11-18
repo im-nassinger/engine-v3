@@ -1,9 +1,9 @@
 import { Check, Eye, TriangleAlert } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import type { SaveIndicator } from '../../../../editor/saving/index.ts';
-import { useVersion } from '../../../hooks/index.ts';
-import { useSaveIndicator } from '../../../save-state/index.ts';
-import { Icon, MenuButton } from '../../../shared/index.ts';
+import type { SaveIndicator } from '../../../editor/saving/index.ts';
+import { useVersion } from '../../hooks/index.ts';
+import { useSaveIndicator } from '../../save-state/index.ts';
+import { Icon, MenuButton } from '../../shared/index.ts';
 import { SaveExplanation } from './SaveExplanation/index.ts';
 import './SaveStateButton.css';
 

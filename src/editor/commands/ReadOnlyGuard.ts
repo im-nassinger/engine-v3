@@ -8,7 +8,6 @@ import type { Availability, CommandOutcome, EditorCommand, MenuPlace, ShortcutSc
 // edits only has to be registered through it.
 export class ReadOnlyGuard implements EditorCommand {
     readonly id: string;
-    readonly label: string;
     readonly menu: MenuPlace | undefined;
     readonly shortcuts: readonly string[];
     readonly shortcutScope: ShortcutScope | undefined;
@@ -21,12 +20,16 @@ export class ReadOnlyGuard implements EditorCommand {
         this.session = session;
         this.command = command;
         this.id = command.id;
-        this.label = command.label;
         this.menu = command.menu;
         this.shortcuts = command.shortcuts;
         this.shortcutScope = command.shortcutScope;
         this.repeatsWhileHeld = command.repeatsWhileHeld;
         this.shortcutsAsBrowserEvents = command.shortcutsAsBrowserEvents;
+    }
+
+    // Read each time, since Undo and Redo name their step.
+    get label() {
+        return this.command.label;
     }
 
     availability(): Availability {

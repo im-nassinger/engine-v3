@@ -6,7 +6,6 @@ import { NOT_PLAYING_REASON } from './playReasons.ts';
 // F8 and the Play bar's button: Pause while playing, Resume while paused.
 export class PauseOrResumeCommand implements EditorCommand {
     readonly id = 'play.pauseOrResume';
-    readonly menu = { menu: 'Play', section: 1, order: 20 } as const;
     readonly shortcuts = ['F8'];
     readonly shortcutScope = 'everywhere';
     readonly runsDuringPlay = true;

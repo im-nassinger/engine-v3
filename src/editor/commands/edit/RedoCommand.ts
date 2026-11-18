@@ -6,13 +6,19 @@ const DURING_A_DRAG = 'Not during a drag';
 
 export class RedoCommand implements EditorCommand {
     readonly id = 'edit.redo';
-    readonly label = 'Redo';
     readonly menu = { menu: 'Edit', section: 1, order: 20 } as const;
     readonly shortcuts = ['Ctrl+Shift+Z', 'Ctrl+Y'];
     private readonly session: EditorSession;
 
     constructor(session: EditorSession) {
         this.session = session;
+    }
+
+    // The main menu's entry names the step: "Redo: Move 3 entities".
+    get label() {
+        const step = this.session.openLevel.history.redoLabel;
+
+        return step === undefined ? 'Redo' : `Redo: ${step}`;
     }
 
     // Ctrl+Z is ignored while a drag holds the mouse.

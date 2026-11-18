@@ -36,9 +36,13 @@ async function openEditor(page: Page) {
     await expect(page.getByRole('button', { name: 'Main menu' })).toBeVisible();
     await expect(page.locator('.level-view-host canvas')).toBeVisible();
 
-    const snapping = page.locator('.top-bar').getByRole('button', { name: 'Grid snapping' });
-    await snapping.click();
-    await expect(snapping).toHaveAttribute('aria-pressed', 'false');
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: 'View', exact: true }).hover();
+    await page.getByRole('menuitem', { name: /^Grid snapping/ }).click();
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: 'View', exact: true }).hover();
+    await expect(page.getByRole('menuitem', { name: /^Grid snapping/ })).toHaveAttribute('aria-checked', 'false');
+    await page.keyboard.press('Escape');
 }
 
 // A new level's camera frame is fitted around the middle of the part no panel covers, with this zoom.
@@ -233,9 +237,10 @@ test('in play an unstyled Hinge draws nothing and a styled Rope its path; after 
     const editor = await editorCamera(page);
     await expect.poll(() => whiteNear(page, hinge), { intervals: [50] }).toBeGreaterThan(0);
 
-    await page.locator('.top-bar').getByRole('button', { name: 'Play', exact: true }).click();
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: /^Play/ }).click();
     await expect(playBar(page)).toHaveAttribute('data-state', 'playing');
-    await expect(page.locator('.top-bar')).toBeHidden();
+    await expect(page.getByRole('region', { name: 'Main menu' })).toBeHidden();
     await page.waitForTimeout(SETTLE_MS);
 
     const play = await playCamera(page);
@@ -251,6 +256,6 @@ test('in play an unstyled Hinge draws nothing and a styled Rope its path; after 
 
     await playBar(page).getByRole('button', { name: /^Stop/ }).click();
     await expect(playBar(page)).toHaveCount(0);
-    await expect(page.locator('.top-bar')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Main menu' })).toBeVisible();
     await expect.poll(() => whiteNear(page, hinge), { intervals: [50] }).toBeGreaterThan(0);
 });

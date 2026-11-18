@@ -1,9 +1,9 @@
 import { createElement } from 'react';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { Level } from '../../../../core/level/index.ts';
-import { SAVE_FAILED_TEXT, SAVED_EXPLANATION, UNSAVED_EXPLANATION } from '../../../../editor/saving/index.ts';
-import { closeEditorPage, editorPageContainer, openEditorPage, showWithEditor } from '../../../testing/editorPage.ts';
+import { Level } from '../../../core/level/index.ts';
+import { SAVE_FAILED_TEXT, SAVED_EXPLANATION, UNSAVED_EXPLANATION } from '../../../editor/saving/index.ts';
+import { closeEditorPage, editorPageContainer, openEditorPage, showWithEditor } from '../../testing/editorPage.ts';
 import { SaveStateButton } from './SaveStateButton.tsx';
 
 beforeEach(() => {

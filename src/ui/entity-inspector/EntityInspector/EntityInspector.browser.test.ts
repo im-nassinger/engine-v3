@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { JointComponent } from '../../../core/components/index.ts';
 import { labelName, Level } from '../../../core/level/index.ts';
 import {
@@ -22,7 +23,10 @@ import {
 // The tooltip waits half a second before it shows.
 const TOOLTIP_WAIT = { timeout: 2000 };
 
-beforeEach(openEntityInspectorPage);
+beforeEach(async () => {
+    openEntityInspectorPage();
+    await parkRealMouse();
+});
 afterEach(closeEntityInspectorPage);
 
 function headTitle() {
@@ -72,6 +76,13 @@ function notesOf(typeName: string) {
 
 function press(element: Element, key: string) {
     element.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+}
+
+// Browser test files share one page, so the real mouse rests where another file's last click left it. Over
+// the Entity inspector's place it would hover a field, whose tooltip a test would read as its own.
+async function parkRealMouse() {
+    const corner = { x: window.innerWidth - 1, y: window.innerHeight - 1 };
+    await userEvent.hover(document.documentElement, { position: corner, force: true });
 }
 
 describe('Entity inspector', () => {

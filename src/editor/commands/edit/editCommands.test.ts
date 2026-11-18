@@ -53,6 +53,19 @@ describe('Undo and Redo', () => {
         expect(redo.run()).toEqual({ kind: 'refused', reason: 'Nothing to redo' });
     });
 
+    test("name their step, as the main menu's entries show it", () => {
+        const { session, registry, square } = buildSession();
+        const undo = requireCommand(registry, 'edit.undo');
+        const redo = requireCommand(registry, 'edit.redo');
+        expect([undo.label, redo.label]).toEqual(['Undo', 'Redo']);
+
+        hideSquare(session, square.id);
+        expect([undo.label, redo.label]).toEqual(['Undo: Hide Square', 'Redo']);
+
+        undo.run();
+        expect([undo.label, redo.label]).toEqual(['Undo', 'Redo: Hide Square']);
+    });
+
     test('say what they did', () => {
         const { session, registry, square } = buildSession();
         const undo = requireCommand(registry, 'edit.undo');

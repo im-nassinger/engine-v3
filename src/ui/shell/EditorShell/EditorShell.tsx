@@ -2,13 +2,13 @@ import { Dialogs } from '../../dialogs/index.ts';
 import { EntitiesViewer } from '../../entities-viewer/index.ts';
 import { EntityInspector } from '../../entity-inspector/index.ts';
 import { LevelViewHost } from '../../level-view-host/index.ts';
+import { MainMenu } from '../../main-menu/index.ts';
 import { usePlaySession } from '../../play/index.ts';
 import { PlayBar } from '../../play-bar/index.ts';
 import { StatusBar } from '../../status-bar/index.ts';
 import { Toolbar } from '../../toolbar/index.ts';
 import { useReading } from '../../hooks/index.ts';
 import { useEditorTools } from '../../tools/index.ts';
-import { TopBar } from '../../top-bar/index.ts';
 import { PanelErrorBoundary } from '../PanelErrorBoundary/index.ts';
 import { FreeArea } from './FreeArea/index.ts';
 import { PanelPlace } from './PanelPlace/index.ts';
@@ -17,7 +17,8 @@ import './EditorShell.css';
 // The tool that draws something not yet an entity, which the Entity inspector can't show (owner, 2026-11-15).
 const HIDES_ENTITY_INSPECTOR = 'shape';
 
-// The level view fills the window, and the islands float over it in fixed places. While the Shape tool is
+// The level view fills the window, and the islands float over it in fixed places: ☰ at the top left, the
+// tool column under it, the Entity inspector beside them. While the Shape tool is
 // active the Entity inspector's island is gone and the free area reaches the tool column. The minimap's
 // island is empty until step 13 of stage 19 draws it. During test play every panel
 // and bar is hidden but kept, so Stop shows them as they were, scrolled and folded, and the Play bar floats
@@ -38,8 +39,8 @@ export function EditorShell() {
                     <PlayBar />
                 </PanelErrorBoundary>
             )}
-            <PanelPlace area="top-bar" label="Top bar">
-                <TopBar />
+            <PanelPlace area="main-menu" label="Main menu">
+                <MainMenu />
             </PanelPlace>
             <PanelPlace area="toolbar" label="Tools">
                 <Toolbar />

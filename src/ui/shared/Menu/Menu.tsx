@@ -9,8 +9,9 @@ import './Menu.css';
 
 export type MenuAlign = 'start' | 'end';
 
-// Above, for a button at the bottom of the window, such as the status bar's.
-export type MenuSide = 'below' | 'above';
+// Above, for a button at the bottom of the window, such as the status bar's. Beside, to the right with
+// its top level with the anchor's: the main menu, beside ☰'s island.
+export type MenuSide = 'below' | 'above' | 'beside';
 
 export type MenuProps = {
     entries: MenuEntry[];
@@ -29,6 +30,8 @@ type OpenSubmenu = {
 };
 
 const MENU_GAP_PX = 4;
+// The mockup's space between ☰'s island and the main menu.
+const BESIDE_GAP_PX = 6;
 
 // Opens on its side of its anchor, or the other side when only that one has room, and inside the window.
 // Esc and a press outside close it.
@@ -38,7 +41,8 @@ export function Menu({ entries, onClose, anchor, align = 'start', side = 'below'
     usePopupClosing(rootRef, anchor, onClose);
 
     const readAnchor = () => rectOf(anchor);
-    usePopupPlacement(rootRef, readAnchor, { side, align, gapPx: MENU_GAP_PX });
+    const gapPx = side === 'beside' ? BESIDE_GAP_PX : MENU_GAP_PX;
+    usePopupPlacement(rootRef, readAnchor, { side, align, gapPx });
 
     const showSubmenu = (submenu: MenuSubmenu, row: HTMLElement) => setOpenSubmenu({ submenu, row });
     const hideSubmenu = () => setOpenSubmenu(undefined);

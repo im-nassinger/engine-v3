@@ -28,7 +28,7 @@ const SIZES: WindowSize[] = [
 const CORNER_INSET_PX = 4;
 // A part may reach this far past the window's edge, for a zoomed page's fractional pixels.
 const EDGE_TOLERANCE_PX = 1;
-// Ten cases open the editor five times each.
+// Each case opens the editor five times.
 const CASE_TIMEOUT_MS = 120_000;
 // A hover or click that can't happen fails the case instead of waiting for its whole time.
 const ACTION_TIMEOUT_MS = 10_000;
@@ -186,23 +186,21 @@ async function inspectMenuButton(page: Page, inspect: Inspect, within: Locator, 
 
 const CASES: CoverCase[] = [
     {
-        name: "the top bar's menus and the save state's explanation",
+        name: "the main menu and the save state's explanation",
         run: async (page, inspect) => {
-            const topBar = region(page, 'Top bar');
-            for (const name of ['Main menu', 'Help', 'View menu', 'Zoom']) {
-                await inspectMenuButton(page, inspect, topBar, name);
-            }
+            await inspectMenuButton(page, inspect, region(page, 'Main menu'), 'Main menu');
 
-            await topBar.getByRole('button', { name: /^Save state/ }).click();
-            await inspect("the save state's explanation", topBar.locator('.save-explanation'));
+            const statusBar = region(page, 'Status bar');
+            await statusBar.getByRole('button', { name: /^Save state/ }).click();
+            await inspect("the save state's explanation", statusBar.locator('.save-explanation'));
         },
     },
     {
         name: "the main menu's submenus",
         run: async (page, inspect) => {
-            const topBar = region(page, 'Top bar');
-            await topBar.getByRole('button', { name: 'Main menu' }).click();
-            const rows = topBar.locator('.menu-submenu-row');
+            const mainMenu = region(page, 'Main menu');
+            await mainMenu.getByRole('button', { name: 'Main menu' }).click();
+            const rows = mainMenu.locator('.menu-submenu-row');
             const count = await rows.count();
             expect(count).toBeGreaterThan(0);
 
@@ -210,14 +208,8 @@ const CASES: CoverCase[] = [
                 const row = rows.nth(index);
                 await row.hover();
                 await expect(row).toHaveAttribute('aria-expanded', 'true');
-                await inspect(`the main menu's ${(await row.textContent()) ?? ''} submenu`, openSubmenu(topBar));
+                await inspect(`the main menu's ${(await row.textContent()) ?? ''} submenu`, openSubmenu(mainMenu));
             }
-        },
-    },
-    {
-        name: "the top bar's tooltips",
-        run: async (page, inspect) => {
-            await inspectTooltips(page, inspect, region(page, 'Top bar').locator('.tooltip'), 'the top bar');
         },
     },
     {
@@ -318,7 +310,8 @@ const CASES: CoverCase[] = [
     {
         name: 'the play bar, its tooltips and its hint',
         run: async (page, inspect) => {
-            await region(page, 'Top bar').getByRole('button', { name: 'Play', exact: true }).click();
+            await region(page, 'Main menu').getByRole('button', { name: 'Main menu' }).click();
+            await page.getByRole('menuitem', { name: /^Play/ }).click();
             const bar = page.getByRole('toolbar', { name: 'Play bar' });
             await expect(bar).toHaveAttribute('data-state', 'playing');
             await inspect('the play bar', bar);
@@ -339,7 +332,8 @@ const CASES: CoverCase[] = [
     {
         name: 'a dialog',
         run: async (page, inspect) => {
-            await region(page, 'Top bar').getByRole('button', { name: 'Help' }).click();
+            await region(page, 'Main menu').getByRole('button', { name: 'Main menu' }).click();
+            await page.getByRole('menuitem', { name: 'Help', exact: true }).hover();
             await page.getByRole('menuitem', { name: /^About/ }).click();
             await inspect('the About dialog', page.getByRole('dialog'));
         },

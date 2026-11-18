@@ -12,9 +12,13 @@ async function openEditor(page: Page) {
     await expect(page.getByRole('button', { name: 'Main menu' })).toBeVisible();
     await expect(page.locator('.level-view-host canvas')).toBeVisible();
 
-    const snapping = page.locator('.top-bar').getByRole('button', { name: 'Grid snapping' });
-    await snapping.click();
-    await expect(snapping).toHaveAttribute('aria-pressed', 'false');
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: 'View', exact: true }).hover();
+    await page.getByRole('menuitem', { name: /^Grid snapping/ }).click();
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: 'View', exact: true }).hover();
+    await expect(page.getByRole('menuitem', { name: /^Grid snapping/ })).toHaveAttribute('aria-checked', 'false');
+    await page.keyboard.press('Escape');
 }
 
 // The middle of the part no panel covers, inside the new level's empty camera frame.
@@ -152,5 +156,7 @@ test('pasting damaged tagged text is refused and changes nothing', async ({ page
     // The paste made no step, so one undo removes the rectangle and nothing is left to undo.
     await page.keyboard.press('ControlOrMeta+z');
     await expect(rectangleRows(page)).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /^Undo/ })).toHaveAttribute('aria-disabled', 'true');
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: 'Edit', exact: true }).hover();
+    await expect(page.getByRole('menuitem', { name: /^Undo/ })).toHaveAttribute('aria-disabled', 'true');
 });

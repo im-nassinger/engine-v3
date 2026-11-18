@@ -7,16 +7,14 @@ import { buildPlayTestSession, editorSnapshot } from './testing/playTestSession.
 import { NOT_PAUSED_REASON, NOT_PLAYING_REASON } from './playReasons.ts';
 
 describe('the Play commands', () => {
-    test('the Play menu holds Play, Pause and Step with their keys', () => {
-        const { registry } = buildPlayTestSession();
+    test('the main menu starts with Play, and Pause and Step are only on the Play bar and their keys', () => {
+        const { requireCommand, registry } = buildPlayTestSession();
 
         const entries = registry.menu('Play').map((command) => [command.label, command.shortcuts]);
 
-        expect(entries).toEqual([
-            ['Play', ['Shift+T', 'Ctrl+Enter']],
-            ['Pause', ['F8']],
-            ['Step', ['F9']],
-        ]);
+        expect(entries).toEqual([['Play', ['Ctrl+Enter', 'Shift+T']]]);
+        expect(requireCommand('play.pauseOrResume').shortcuts).toEqual(['F8']);
+        expect(requireCommand('play.step').shortcuts).toEqual(['F9']);
     });
 
     test('Play or Stop plays, then stops, and its label follows', () => {

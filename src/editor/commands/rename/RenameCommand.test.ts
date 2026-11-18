@@ -12,11 +12,11 @@ function buildSession() {
 }
 
 describe('Rename', () => {
-    test('is F2 in the Edit menu', () => {
+    test('is F2, in no menu for now (owner, 2026-11-18)', () => {
         const { rename } = buildSession();
 
         expect(rename.shortcuts).toEqual(['F2']);
-        expect(rename.menu?.menu).toBe('Edit');
+        expect(rename.menu).toBeUndefined();
     });
 
     test('is disabled with nothing selected, saying why', () => {

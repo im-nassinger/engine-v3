@@ -16,9 +16,13 @@ async function openEditor(page: Page) {
     await expect(page.getByRole('button', { name: 'Main menu' })).toBeVisible();
     await expect(page.locator('.level-view-host canvas')).toBeVisible();
 
-    const snapping = page.locator('.top-bar').getByRole('button', { name: 'Grid snapping' });
-    await snapping.click();
-    await expect(snapping).toHaveAttribute('aria-pressed', 'false');
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: 'View', exact: true }).hover();
+    await page.getByRole('menuitem', { name: /^Grid snapping/ }).click();
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: 'View', exact: true }).hover();
+    await expect(page.getByRole('menuitem', { name: /^Grid snapping/ })).toHaveAttribute('aria-checked', 'false');
+    await page.keyboard.press('Escape');
 }
 
 // The middle of the part no panel covers, inside the new level's empty camera frame.

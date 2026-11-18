@@ -7,7 +7,6 @@ const NOTHING_TO_SELECT = 'Nothing to select';
 export class SelectAllCommand implements EditorCommand {
     readonly id = 'edit.selectAll';
     readonly label = 'Select all';
-    readonly menu = { menu: 'Edit', section: 4, order: 10 } as const;
     readonly shortcuts = ['Ctrl+A'];
     private readonly session: EditorSession;
 

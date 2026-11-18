@@ -1,8 +1,8 @@
 /* From the Entity inspector's right edge, or the tool column's while the Shape tool hides it, to the Entities
-   viewer's left edge, between the top bar's island and the status bar's. */
+   viewer's left edge, from the window's top to the status bar's island. */
 .free-area {
     position: absolute;
-    top: calc(var(--island-gap) + var(--island-bar));
+    top: 0;
     right: calc(var(--island-gap) + var(--entities-viewer));
     bottom: calc(var(--island-gap) + var(--debug-box));
     left: calc(var(--beside-tools) + var(--entity-inspector));

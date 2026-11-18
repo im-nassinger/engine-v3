@@ -26,12 +26,10 @@ test("the status bar shows a status text, then returns to the tool's hint", asyn
     await openEditor(page);
     const statusText = page.locator('.status-bar .status-text');
 
-    await page.getByRole('button', { name: 'Zoom' }).click();
-    const box = page.getByRole('textbox', { name: 'Zoom percentage' });
-    await box.fill('big');
-    await box.press('Enter');
+    await page.locator('.level-view-host canvas').click();
+    await page.keyboard.press('Control+z');
 
-    await expect(statusText).toHaveText('Type a zoom such as 150%');
+    await expect(statusText).toHaveText('Nothing to undo');
     await expect(statusText).toHaveText(/^Click to select\./, { timeout: 6_000 });
 });
 
@@ -49,9 +47,9 @@ test('the status bar shows the mouse position over the level view, and nothing o
     await page.mouse.move(box.x + box.width / 2 + 40, box.y + box.height / 2);
     await expect(mousePosition).not.toHaveText(first ?? '');
 
-    const topBar = await page.getByRole('region', { name: 'Top bar' }).boundingBox();
-    if (topBar === null) throw new Error('The top bar has no box.');
-    await page.mouse.move(topBar.x + topBar.width / 2, topBar.y + topBar.height / 2);
+    const mainMenu = await page.getByRole('region', { name: 'Main menu' }).boundingBox();
+    if (mainMenu === null) throw new Error('☰ has no box.');
+    await page.mouse.move(mainMenu.x + mainMenu.width / 2, mainMenu.y + mainMenu.height / 2);
     await expect(mousePosition).toHaveText('');
 });
 
@@ -75,7 +73,7 @@ test('double-clicking Select locks it, and Esc ends the lock', async ({ page }) 
 
 test('About opens from Help, and Esc closes it', async ({ page }) => {
     await openEditor(page);
-    await page.getByRole('button', { name: 'Help' }).click();
+    await openSubmenu(page, 'Help');
     await page.getByRole('menuitem', { name: /^About/ }).click();
 
     const about = page.getByRole('dialog', { name: 'About engine-v3' });
@@ -89,7 +87,7 @@ test('About opens from Help, and Esc closes it', async ({ page }) => {
 
 test('OK closes About', async ({ page }) => {
     await openEditor(page);
-    await page.getByRole('button', { name: 'Help' }).click();
+    await openSubmenu(page, 'Help');
     await page.getByRole('menuitem', { name: /^About/ }).click();
 
     await page.getByRole('button', { name: 'OK' }).click();

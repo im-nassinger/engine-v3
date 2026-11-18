@@ -9,7 +9,6 @@ const WORLD_REFUSED = "The World can't be renamed";
 export class RenameCommand implements EditorCommand {
     readonly id = 'edit.rename';
     readonly label = 'Rename';
-    readonly menu = { menu: 'Edit', section: 4, order: 20 } as const;
     readonly shortcuts = ['F2'];
     private readonly session: EditorSession;
 

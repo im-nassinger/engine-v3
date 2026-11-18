@@ -23,7 +23,7 @@ const TOOL_COLUMN = 48;
 const ENTITY_INSPECTOR = 300;
 const ENTITIES_VIEWER = 260;
 const MINIMAP = { width: 180, height: 90 };
-const TOP_BAR = 48;
+const MAIN_MENU = 48;
 const STATUS_BAR = 28;
 
 // Wide enough that the free area isn't covered by the Entities viewer, as on a real screen.
@@ -90,21 +90,17 @@ describe('EditorShell', () => {
         showShell();
         await expect.poll(() => entityInspector()).not.toBeNull();
 
-        const topBar = boxOf('Top bar');
-        expect([topBar.left, topBar.top, topBar.width, topBar.height]).toEqual([
+        const mainMenu = boxOf('Main menu');
+        expect([mainMenu.left, mainMenu.top, mainMenu.width, mainMenu.height]).toEqual([
             GAP,
             GAP,
-            WINDOW.width - 2 * GAP,
-            TOP_BAR,
+            MAIN_MENU,
+            MAIN_MENU,
         ]);
         const tools = boxOf('Tools');
-        expect([tools.left, tools.top, tools.width]).toEqual([GAP, topBar.bottom + GAP, TOOL_COLUMN]);
+        expect([tools.left, tools.top, tools.width]).toEqual([GAP, mainMenu.bottom + GAP, TOOL_COLUMN]);
         const inspector = boxOf('Entity inspector');
-        expect([inspector.left, inspector.top, inspector.width]).toEqual([
-            tools.right + GAP,
-            topBar.bottom + GAP,
-            ENTITY_INSPECTOR,
-        ]);
+        expect([inspector.left, inspector.top, inspector.width]).toEqual([tools.right + GAP, GAP, ENTITY_INSPECTOR]);
         const statusBar = boxOf('Status bar');
         expect([statusBar.left, statusBar.bottom, statusBar.width, statusBar.height]).toEqual([
             GAP,
@@ -123,7 +119,7 @@ describe('EditorShell', () => {
         const viewer = boxOf('Entities viewer');
         expect([viewer.right, viewer.top, viewer.bottom, viewer.width]).toEqual([
             WINDOW.width - GAP,
-            topBar.bottom + GAP,
+            GAP,
             minimap.top - GAP,
             ENTITIES_VIEWER,
         ]);
@@ -136,12 +132,12 @@ describe('EditorShell', () => {
         const free = find('.free-area')?.getBoundingClientRect();
         expect(free?.left).toBe(boxOf('Entity inspector').right);
         expect(free?.right).toBe(boxOf('Entities viewer').left);
-        expect(free?.top).toBe(boxOf('Top bar').bottom);
+        expect(free?.top).toBe(0);
         expect(free?.bottom).toBe(boxOf('Status bar').top);
         // Fitting frames the level in what the islands leave free.
         expect(session.view.coveredEdges).toEqual({
             left: 2 * GAP + TOOL_COLUMN + ENTITY_INSPECTOR,
-            top: GAP + TOP_BAR,
+            top: 0,
             right: GAP + ENTITIES_VIEWER,
             bottom: GAP + STATUS_BAR,
         });
@@ -274,18 +270,22 @@ describe('EditorShell', () => {
         expect(tools.controller.active.id).toBe('joint');
     });
 
-    test("the top bar's Play button starts a run", async () => {
+    test("the main menu's first entry, Play, starts a run", async () => {
         const { play } = showShell();
-        await expect.poll(() => playButton()).not.toBeNull();
+        await expect.poll(() => mainMenuButton()).not.toBeNull();
 
-        await userEvent.click(playButton() ?? document.body);
+        await userEvent.click(mainMenuButton() ?? document.body);
+        await expect.poll(() => firstMenuEntry()?.textContent).toBe('PlayCtrl+Enter');
+        await userEvent.click(firstMenuEntry() ?? document.body);
 
         await expect.poll(() => play.state).toBe('playing');
     });
 });
 
-function playButton() {
-    const buttons = [...editorPageContainer().querySelectorAll<HTMLElement>('.top-bar button')];
+function mainMenuButton() {
+    return find('section[aria-label="Main menu"] button');
+}
 
-    return buttons.find((button) => button.textContent === 'Play') ?? null;
+function firstMenuEntry() {
+    return find('.menu [role="menuitem"]');
 }

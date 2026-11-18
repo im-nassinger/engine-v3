@@ -7,4 +7,3 @@ export { commandAction } from './menu-entries/commandAction.ts';
 export { commandSections } from './menu-entries/commandSections.ts';
 export { shortcutText } from './menu-entries/shortcutText.ts';
 export { mainMenuEntries } from './menu-entries/mainMenuEntries.ts';
-export { helpMenuEntries, viewMenuEntries, zoomMenuEntries } from './menu-entries/topBarMenuEntries.ts';

@@ -12,7 +12,8 @@ async function openEditor(page: Page) {
 }
 
 async function isGridOn(page: Page) {
-    await page.getByRole('button', { name: 'View menu' }).click();
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: 'View', exact: true }).hover();
     const grid = page.getByRole('menuitem', { name: /^Grid G/ });
     const checked = await grid.getAttribute('aria-checked');
     await page.keyboard.press('Escape');

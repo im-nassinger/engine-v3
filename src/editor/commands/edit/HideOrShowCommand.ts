@@ -10,7 +10,6 @@ import { stepLabel } from '../shared/stepLabel.ts';
 export class HideOrShowCommand implements EditorCommand {
     readonly id = 'edit.hideOrShow';
     readonly label = 'Hide or show';
-    readonly menu = { menu: 'Edit', section: 4, order: 30 } as const;
     readonly shortcuts = ['Ctrl+Shift+H'];
     private readonly session: EditorSession;
 

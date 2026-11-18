@@ -80,7 +80,20 @@ describe('mainMenuEntries', () => {
         const entries = mainMenuEntries(commands);
         const labels = entries.map((entry) => (entry.kind === 'submenu' ? entry.label : entry.kind));
 
-        expect(labels).toEqual(['Edit', 'View', 'Help']);
+        expect(labels).toEqual(['Edit', 'View', 'separator', 'Help']);
+    });
+
+    test('Play comes first as a plain entry, with a line under it', () => {
+        const play = testCommand({ id: 'play.playOrStop', menu: 'Play', shortcuts: ['Ctrl+Enter'] });
+        const newLevel = testCommand({ id: 'file.new', menu: 'File' });
+        const about = testCommand({ id: 'help.about', menu: 'Help' });
+        const { commands } = buildCommands([about.command, newLevel.command, play.command]);
+
+        const entries = mainMenuEntries(commands);
+        const kinds = entries.map((entry) => (entry.kind === 'separator' ? entry.kind : entry.label));
+
+        expect(kinds).toEqual(['play.playOrStop', 'separator', 'File', 'separator', 'Help']);
+        expect(action(entries, 'play.playOrStop').shortcut).toBe('Ctrl+Enter');
     });
 
     test('a line separates sections, in section and order', () => {

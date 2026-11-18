@@ -2,7 +2,8 @@ import type { SkippedEntity } from '../history/index.ts';
 
 export type CommandId = string;
 
-export type MenuName = 'File' | 'Edit' | 'Arrange' | 'View' | 'Play' | 'Tools' | 'Help';
+// 'Play' isn't a submenu: its commands are plain entries at the top of the main menu.
+export type MenuName = 'Play' | 'File' | 'Edit' | 'Arrange' | 'View' | 'Help';
 
 // Sections are split by a line in the menu; order sorts within a section.
 export type MenuPlace = {
@@ -48,7 +49,9 @@ export type ShortcutScope = 'everywhere' | 'editor' | 'levelView';
 export type EditorCommand = {
     readonly id: CommandId;
     readonly label: string;
-    // Missing for a command only a shortcut runs: the twelve nudges and four turns would crowd the Edit menu.
+    // Missing for a command only a shortcut runs: the twelve nudges and four turns would crowd the Edit menu,
+    // Select all, Rename and Hide or show are in no menu for now (owner, 2026-11-18), and Pause and Step
+    // are on the Play bar.
     readonly menu?: MenuPlace;
     readonly shortcuts: readonly string[];
     // 'editor' when missing.

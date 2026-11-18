@@ -2,5 +2,5 @@ export { DEFAULT_VIEW_SWITCHES, ViewSettings } from './ViewSettings.ts';
 export type { ViewSwitch, ViewSwitches } from './ViewSettings.ts';
 export { FIT_MARGIN_PX, MAX_ZOOM, MIN_ZOOM, ViewState, ZOOM_STEP } from './ViewState.ts';
 export type { CoveredEdges, ViewSize } from './ViewState.ts';
-export { zoomFromPercentText, zoomPercentText } from './zoomPercent.ts';
+export { zoomPercentText } from './zoomPercent.ts';
 export { JOINT_ICON_RADIUS_PX } from './overlaySizes.ts';

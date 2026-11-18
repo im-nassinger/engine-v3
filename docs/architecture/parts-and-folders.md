@@ -103,7 +103,9 @@ src/
     play/              PlayContext: the PlaySession for the shell, the Play button and the Play bar
     play-bar/          PlayBar/ (with PlayBarButton/)
     testing/           editorPage: a component shown with the session, commands and tools, for browser tests
-    top-bar/ main-menu/ tool-options/ level-view-host/ entities-viewer/ entity-inspector/
+    main-menu/ tool-options/ level-view-host/ entities-viewer/ entity-inspector/
+    level-file/        LevelName/, SaveStateButton/: on the status bar until stage 19 step 12 removes them
+    save-state/        SaveIndicatorContext
     fields/            one component per field type: NumberField/, ColourField/, ...
     shared/            Button/, IconButton/, Menu/, MenuButton/, Tooltip/, Icon/
 tests/

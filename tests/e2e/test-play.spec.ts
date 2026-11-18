@@ -99,7 +99,8 @@ async function drawFallingBox(page: Page) {
 }
 
 async function play(page: Page) {
-    await page.locator('.top-bar').getByRole('button', { name: 'Play', exact: true }).click();
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: /^Play/ }).click();
     await expect(playBar(page)).toHaveAttribute('data-state', 'playing');
 }
 
@@ -141,7 +142,7 @@ async function shownBoxTop(page: Page, x: number) {
     return top;
 }
 
-// The canvas is drawn on the next frame, so a change the page shows, such as the top bar coming back
+// The canvas is drawn on the next frame, so a change the page shows, such as ☰ coming back
 // after Stop, may come a frame before the box is drawn where that change puts it.
 async function waitForBoxShown(page: Page, x: number) {
     await expect.poll(async () => (await boxTopAt(page, x)) !== undefined, { intervals: [50] }).toBe(true);
@@ -167,13 +168,23 @@ async function waitForBoxBelow(page: Page, x: number, y: number) {
 }
 
 // Everything a person can read of the level and its history: the rows, the selected box's cards with
-// every value, and what Undo would undo.
+// every value, and what the main menu's Undo would undo.
 async function editorSnapshot(page: Page) {
     return {
         rows: await page.getByRole('tree', { name: 'Entities' }).ariaSnapshot(),
         cards: await entityInspector(page).ariaSnapshot(),
-        undo: await page.getByRole('button', { name: /^Undo/ }).ariaSnapshot(),
+        undo: await undoEntry(page),
     };
+}
+
+// The main menu's Undo entry, which names the step.
+async function undoEntry(page: Page) {
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: 'Edit', exact: true }).hover();
+    const text = await page.getByRole('menuitem', { name: /^Undo/ }).ariaSnapshot();
+    await page.keyboard.press('Escape');
+
+    return text;
 }
 
 // Hides or shows the tab as the browser would, since a test can't send its own tab to the background.
@@ -197,7 +208,7 @@ test('a drawn Dynamic box falls during play, and after Stop the level is exactly
     const editorTop = await settledBoxTop(page, start.x);
 
     await play(page);
-    await expect(page.locator('.top-bar')).toBeHidden();
+    await expect(page.getByRole('region', { name: 'Main menu' })).toBeHidden();
     await expect(entityInspector(page)).toBeHidden();
     const column = await playColumn(page);
     const firstTop = await shownBoxTop(page, column);
@@ -205,7 +216,7 @@ test('a drawn Dynamic box falls during play, and after Stop the level is exactly
 
     await playBarButton(page, 'Stop').click();
     await expect(playBar(page)).toHaveCount(0);
-    await expect(page.locator('.top-bar')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Main menu' })).toBeVisible();
     expect(await editorSnapshot(page)).toEqual(before);
     expect(await settledBoxTop(page, start.x)).toBe(editorTop);
     expect(errors).toEqual([]);
@@ -216,11 +227,11 @@ test('Shift+T plays and stops, and types a T in a field', async ({ page }) => {
 
     await page.keyboard.press('Shift+T');
     await expect(playBar(page)).toHaveAttribute('data-state', 'playing');
-    await expect(page.locator('.top-bar')).toBeHidden();
+    await expect(page.getByRole('region', { name: 'Main menu' })).toBeHidden();
 
     await page.keyboard.press('Shift+T');
     await expect(playBar(page)).toHaveCount(0);
-    await expect(page.locator('.top-bar')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Main menu' })).toBeVisible();
 
     const nameBox = page.getByRole('textbox', { name: 'Level name' });
     await nameBox.click();

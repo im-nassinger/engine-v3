@@ -48,4 +48,13 @@ describe('StatusBar', () => {
         frames.runFrame();
         await expect.poll(() => textOf('.mouse-position')).toBe('');
     });
+
+    test('shows the zoom as a whole percentage, and the level name and save state', async () => {
+        const { session } = showWithEditor(Level.createNew(), createElement(StatusBar));
+
+        session.view.zoomAboutMiddle(2.504);
+        await expect.poll(() => textOf('.zoom')).toBe('250%');
+        expect(editorPageContainer().querySelector<HTMLInputElement>('.level-name')?.value).toBe('Untitled level');
+        expect(editorPageContainer().querySelector('.save-state-button')).not.toBeNull();
+    });
 });

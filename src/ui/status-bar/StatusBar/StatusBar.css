@@ -16,11 +16,13 @@
     }
 
     > .mouse-position,
+    > .zoom,
     > .selection-summary {
         color: var(--muted);
     }
 
-    > .mouse-position {
+    > .mouse-position,
+    > .zoom {
         font-variant-numeric: tabular-nums;
     }
 }

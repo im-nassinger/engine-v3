@@ -16,9 +16,13 @@ async function openEditor(page: Page) {
     await expect(page.getByRole('button', { name: 'Main menu' })).toBeVisible();
     await expect(page.locator('.level-view-host canvas')).toBeVisible();
 
-    const snapping = page.locator('.top-bar').getByRole('button', { name: 'Grid snapping' });
-    await snapping.click();
-    await expect(snapping).toHaveAttribute('aria-pressed', 'false');
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: 'View', exact: true }).hover();
+    await page.getByRole('menuitem', { name: /^Grid snapping/ }).click();
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: 'View', exact: true }).hover();
+    await expect(page.getByRole('menuitem', { name: /^Grid snapping/ })).toHaveAttribute('aria-checked', 'false');
+    await page.keyboard.press('Escape');
 }
 
 // The middle of the part no panel covers. A new level's camera frame is fitted around it, and the
@@ -226,7 +230,9 @@ test('Ctrl+Z while drawing removes the last point and makes no step', async ({ p
     // The drawing was one step, so one undo removes the line, and nothing was undone before it.
     await page.keyboard.press('Control+z');
     await expect(entityRow(page, 'Line 1')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /^Undo/ })).toHaveAttribute('aria-disabled', 'true');
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: 'Edit', exact: true }).hover();
+    await expect(page.getByRole('menuitem', { name: /^Undo/ })).toHaveAttribute('aria-disabled', 'true');
 });
 
 test('two drawn shapes grouped: a double-click goes into the group, and Esc goes out', async ({ page }) => {

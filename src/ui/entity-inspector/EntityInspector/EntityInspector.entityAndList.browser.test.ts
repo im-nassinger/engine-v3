@@ -19,8 +19,9 @@ import {
     showEntityInspector,
 } from './testing/entityInspectorPage.ts';
 
-beforeEach(() => {
+beforeEach(async () => {
     openEntityInspectorPage();
+    await parkRealMouse();
 });
 
 afterEach(() => {
@@ -101,6 +102,13 @@ async function showCameraWithPlayer() {
     await expect.poll(() => followText()).toBe('None');
 
     return { level, player, ...shown };
+}
+
+// Browser test files share one page, so the real mouse rests where another file's last click left it. Over
+// the Entity inspector's place it would hover a field, whose tooltip a test would read as its own.
+async function parkRealMouse() {
+    const corner = { x: window.innerWidth - 1, y: window.innerHeight - 1 };
+    await userEvent.hover(document.documentElement, { position: corner, force: true });
 }
 
 describe('the entity field', () => {

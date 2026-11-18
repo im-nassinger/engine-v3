@@ -1,8 +1,8 @@
 /* Every island has a fixed place over the level view, 10 px from the window's edge and from its neighbours.
-   Until step 7 of stage 19 the top bar is an island across the top, holding ☰, and until step 11 the status bar
-   is one across the bottom, in the debug box's place; the islands between them start under and end above them. */
+   ☰ is a square at the top left with the tool column under it. Until step 11 of stage 19 the status bar is an
+   island across the bottom, in the debug box's place, and the islands above it end above it. */
 .editor-shell {
-    --islands-top: calc(var(--island-gap) * 2 + var(--island-bar));
+    --under-main-menu: calc(var(--island-gap) * 2 + var(--island-bar));
     --islands-bottom: calc(var(--island-gap) * 2 + var(--debug-box));
     --beside-tools: calc(var(--island-gap) * 2 + var(--island-bar));
 
@@ -16,29 +16,29 @@
         box-shadow: var(--shade);
     }
 
-    > [data-area='top-bar'] {
+    > [data-area='main-menu'] {
         top: var(--island-gap);
-        right: var(--island-gap);
         left: var(--island-gap);
+        width: var(--island-bar);
         height: var(--island-bar);
     }
 
     > [data-area='toolbar'] {
-        top: var(--islands-top);
+        top: var(--under-main-menu);
         left: var(--island-gap);
         width: var(--island-bar);
-        max-height: calc(100% - var(--islands-top) - var(--islands-bottom));
+        max-height: calc(100% - var(--under-main-menu) - var(--islands-bottom));
     }
 
     > [data-area='entity-inspector'] {
-        top: var(--islands-top);
+        top: var(--island-gap);
         bottom: var(--islands-bottom);
         left: var(--beside-tools);
         width: var(--entity-inspector);
     }
 
     > [data-area='entities-viewer'] {
-        top: var(--islands-top);
+        top: var(--island-gap);
         right: var(--island-gap);
         bottom: calc(var(--islands-bottom) + var(--minimap-height) + var(--island-gap));
         width: var(--entities-viewer);

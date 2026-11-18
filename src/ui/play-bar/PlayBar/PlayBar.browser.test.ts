@@ -68,7 +68,7 @@ describe('PlayBar', () => {
         expect(label()).toBe('PLAYING');
         expect(keyOf('Pause')).toBe('F8');
         expect(keyOf('Step')).toBe('F9');
-        expect(keyOf('Stop')).toBe('Shift+T');
+        expect(keyOf('Stop')).toBe('Ctrl+Enter');
         expect(button('Pause').getAttribute('aria-disabled')).toBe('false');
         expect(button('Step').getAttribute('aria-disabled')).toBe('true');
         expect(message()).toBe('');

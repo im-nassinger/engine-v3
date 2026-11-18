@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
-import { renameLevel } from '../../../../editor/commands/index.ts';
-import type { Level } from '../../../../core/level/index.ts';
-import { useEditorSession } from '../../../EditorContext.tsx';
-import { useReading, useVersion } from '../../../hooks/index.ts';
+import { renameLevel } from '../../../editor/commands/index.ts';
+import type { Level } from '../../../core/level/index.ts';
+import { useEditorSession } from '../../EditorContext.tsx';
+import { useReading, useVersion } from '../../hooks/index.ts';
 import './LevelName.css';
 
 // The level's name, a box that reads as text until clicked. Enter or leaving the box renames the level

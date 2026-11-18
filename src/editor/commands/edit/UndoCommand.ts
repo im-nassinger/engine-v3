@@ -6,13 +6,19 @@ const DURING_A_DRAG = 'Not during a drag';
 
 export class UndoCommand implements EditorCommand {
     readonly id = 'edit.undo';
-    readonly label = 'Undo';
     readonly menu = { menu: 'Edit', section: 1, order: 10 } as const;
     readonly shortcuts = ['Ctrl+Z'];
     private readonly session: EditorSession;
 
     constructor(session: EditorSession) {
         this.session = session;
+    }
+
+    // The main menu's entry names the step: "Undo: Move 3 entities".
+    get label() {
+        const step = this.session.openLevel.history.undoLabel;
+
+        return step === undefined ? 'Undo' : `Undo: ${step}`;
     }
 
     // Ctrl+Z is ignored while a drag holds the mouse.

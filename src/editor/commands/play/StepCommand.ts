@@ -7,7 +7,6 @@ import { NOT_PAUSED_REASON } from './playReasons.ts';
 export class StepCommand implements EditorCommand {
     readonly id = 'play.step';
     readonly label = 'Step';
-    readonly menu = { menu: 'Play', section: 1, order: 30 } as const;
     readonly shortcuts = ['F9'];
     readonly shortcutScope = 'everywhere';
     readonly runsDuringPlay = true;

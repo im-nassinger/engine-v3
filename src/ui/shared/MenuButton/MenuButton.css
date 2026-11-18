@@ -53,6 +53,27 @@
         }
     }
 
+    &[data-look='island'] {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+
+        > .toggle {
+            width: var(--tool);
+            min-width: 0;
+            height: var(--tool);
+            padding: 0;
+            border-radius: var(--radius-tool);
+            color: var(--muted);
+
+            &[aria-expanded='true'] {
+                color: var(--accent-text);
+            }
+        }
+    }
+
     &[data-look='status'] > .toggle {
         height: var(--input);
         color: inherit;

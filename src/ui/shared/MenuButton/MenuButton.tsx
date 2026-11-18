@@ -13,7 +13,9 @@ export type MenuButtonProps = {
     menu: ReactNode;
     hasArrow?: boolean;
     // 'field' fills its row like a field's box: a choice field's value. 'status' fits the status bar.
-    look?: 'bar' | 'field' | 'status';
+    // 'island' fills its island with a tool-sized button in the middle, so a menu beside it lines up with
+    // the island: ☰.
+    look?: 'bar' | 'field' | 'status' | 'island';
     isDisabled?: boolean;
 };
 
