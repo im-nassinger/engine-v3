@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The owner wants a new look for the editor before v2 starts (2026-11-17): **clean, cool and beautiful, with no borders, separator lines or outlines**, even if it looks less "professional" than commercial tools. Only the look changes (colours, spacing, layout, the parts' shapes); what the screen shows stays. **Settled so far:** the Islands look, the owner's set of parts, panels holding only their own content, no level name, no View button, no shadows, the panels titled **Entity inspector** and **Entities viewer**, and the layout of 17: a menu bar fitted to its words at the top left, the tools in a column under it beside the Entity inspector, ( ↶ ↷ ) ( Save Play ) at the top middle, and a minimap at the bottom right with the zoom and grid snapping under it. **Open:** what Save does, the font, and the status chip. The mockup is [mockups/redesign.html](mockups/redesign.html); the [round 8 design](README.md) stays what is built until this one is written into [tokens.md](tokens.md) and [controls.md](controls.md) and planned as a stage.
+The owner wants a new look for the editor before v2 starts (2026-11-17): **clean, cool and beautiful, with no borders, separator lines or outlines**, even if it looks less "professional" than commercial tools. Only the look changes (colours, spacing, layout, the parts' shapes); what the screen shows stays. **Settled so far:** the Islands look, the owner's set of parts, panels holding only their own content, no level name, no View button, no shadows, the panels titled **Entity inspector** and **Entities viewer**, and the layout of 17: a menu bar fitted to its words at the top left with ( ↶ ↷ ) ( Save Play ) right after it, the tools in a column under it beside the Entity inspector, and a minimap at the bottom right with the zoom and grid snapping under it. **Open:** what Save does, the font, and the status chip. The mockup is [mockups/redesign.html](mockups/redesign.html); the [round 8 design](README.md) stays what is built until this one is written into [tokens.md](tokens.md) and [controls.md](controls.md) and planned as a stage.
 
 ## Settled, in order (all owner, 2026-11-17)
 
@@ -25,7 +25,8 @@ The owner wants a new look for the editor before v2 starts (2026-11-17): **clean
 17. **The controls grouped by job** (owner, 2026-11-17, built on the owner's pick of five groupings, "Two islands, together"):
     - **A menu bar** at the top left replaces ☰: an island as wide as its words, **( File Edit Arrange View Help )**, each opening its menu under it. Not a bar across the window.
     - **The tools** run down a column under the menu bar, and **the Entity inspector** starts beside them, under the menu bar too. The dock at the bottom is gone; the hint chip sits alone there.
-    - **( ↶ ↷ ) ( Save Play )** at the top middle of the level view.
+    - **( ↶ ↷ ) ( Save Play )** right after the menu bar, in the same row (owner, 2026-11-17: first at the top middle).
+    - **Sizes** (owner, 2026-11-17): the top row's islands are 38 px tall, a little smaller than the other islands' 44 px; the tool column is 48 px wide with 34 px tool buttons.
     - **Grid snapping by the zoom**, under the minimap, since both change the level view, not the level (Claude's grouping, kept by the owner).
     - Dropped: the two islands at the level view's two ends, Save joining Undo and Redo as an icon, one island grouped inside, and Play by the tools. Menus are solid, since the Edit menu now opens over the Entity inspector.
     - *For [workspace.md](../requirements/editor/workspace.md), with the owner's yes: the main menu becomes a menu bar, and the toolbar strip is back on the left, under it.*

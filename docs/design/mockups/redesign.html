@@ -146,6 +146,13 @@
   .menubar .menu { top: 38px; left: 0; color: var(--text); }
   .ed .menu { background: rgb(24, 27, 33); }
   .toolcol { z-index: 3; flex-direction: column; height: auto; padding: 7px 0; gap: 4px; }
+  .toolcol .tool { width: 34px; height: 34px; }
+  .toprow { z-index: 5; }
+  .toprow .isl, .toprow .actisl { height: 38px; padding: 0 5px; }
+  .toprow .menubar .mbi { height: 28px; padding: 0 10px; }
+  .toprow .menubar .menu { top: 35px; }
+  .toprow .actisl.edit .ib { width: 28px; height: 28px; }
+  .toprow .act { height: 28px; padding: 0 12px; }
   .mapfoot .snap { margin-left: 6px; border-radius: 999px; width: 28px; height: 28px; }
   .actisl.edit .ib { border-radius: 999px; width: 30px; height: 30px; }
   .actisl .act.save { color: var(--save-ink); }
@@ -383,7 +390,7 @@ const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,2
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s, view) => ({ id, name, desc, view, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'Menu bar and tool column', 'Built on the owner\'s pick, two islands together: ( ↶ ↷ ) ( Save Play ) at the top middle. ☰ is gone: a menu bar as wide as its words ( File Edit Arrange View Help ) sits at the top left, and under it the tools run down a column with the Entity inspector beside it. Grid snapping is by the zoom; the hint chip sits alone at the bottom.', {})
+  dir('1', 'Menu bar and tool column', '☰ is gone: a menu bar as wide as its words ( File Edit Arrange View Help ) sits at the top left, followed in the same row by ( ↶ ↷ ) ( Save Play ). Under it the tools run down a column with the Entity inspector beside it. Grid snapping is by the zoom; the hint chip sits alone at the bottom.', {})
 ];
 
 const FONTS = [
@@ -410,7 +417,7 @@ const withS = (over, fn) => { const old = S; S = Object.assign({}, S, over); con
 const pos = ([x, y, w, h]) => `left:${x}px;top:${y}px;width:${w}px;${h == null ? '' : `height:${h}px;`}`;
 
 // Where each part sits, in window pixels. The panels' widths are the requirement's.
-const W = 1440, H = 900, M = 10, GP = 10, BAR_H = 44, TOOL_W = 44;
+const W = 1440, H = 900, M = 10, GP = 10, BAR_H = 38, TOOL_W = 48;
 function geo() {
   const ex = W - M - 260;
   const below = M + BAR_H + GP, tools = [M, below, TOOL_W];
@@ -596,8 +603,7 @@ function group(o, x, y, anchor, inner) {
   return `<div class="lc-top abs" style="${where}top:${y}px">${inner}</div>`;
 }
 function topIslands(o) {
-  const g = geo();
-  return group(o, g.cx, M, 'centre', isl(HIST()) + isl(actBtn('save', 'Save') + actBtn('play', 'Play')));
+  return `<div class="lc-top abs toprow" style="left:${M}px;top:${M}px">${menuBar(o)}${isl(HIST())}${isl(actBtn('save', 'Save') + actBtn('play', 'Play'))}</div>`;
 }
 const toolHtml = (icon, active, hover) => `<span class="tool${icon === active ? ' on ' + S.tool : ''}${icon === hover ? ' hover' : ''}">${ic(icon)}</span>`;
 const TOOLS = ['select', 'shape', 'joint'];
@@ -640,7 +646,7 @@ function editor(o) {
   setZoom(!!o.whole);
   o = Object.assign({ tool: 'select', hint: 'Select · drag a handle to resize, Shift keeps proportions', pos: 'x 20, y 340', sel: 'Nothing selected' }, o, o.top);
   const g = geo();
-  return view(o.scene || {}) + `<div class="leftcol" style="${pos(g.left)}">${o.noInspector ? shapeStrip() : inspector(o)}</div>` + menuBar(o) + toolColumn(o) + topIslands(o) + entities(o) + minimap() + bottom(o) + (o.extra || '');
+  return view(o.scene || {}) + `<div class="leftcol" style="${pos(g.left)}">${o.noInspector ? shapeStrip() : inspector(o)}</div>` + toolColumn(o) + topIslands(o) + entities(o) + minimap() + bottom(o) + (o.extra || '');
 }
 
 function shapeStrip() {
@@ -658,7 +664,7 @@ function menuBar(o) {
     const open = o.menuOpen && name === 'Edit';
     return `<span class="mbi${open ? ' on' : ''}">${name}${open ? `<div class="menu ${S.menu}" style="min-width:250px">${menuBody(edit)}</div>` : ''}</span>`;
   }).join('');
-  return `<div class="abs isl blk menubar" style="left:${M}px;top:${M}px">${items}</div>`;
+  return `<div class="isl blk menubar">${items}</div>`;
 }
 const dialogBody = () => `<h3>Replace the open level?</h3><p>Export it first if you want to keep it.</p><div class="row"><span class="btn ${S.btn}">Cancel</span><span class="btn primary ${S.btn}">Replace</span></div>`;
 function playbar(paused, extraCls = '') {
