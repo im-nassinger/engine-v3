@@ -16,6 +16,7 @@
 | Stopping before v2 | Since 2026-11-18: stage 19, the redesign, is the last, and the runner stops only after it (before: stage 18, the before-v2 changes) |
 | Ending a session that won't exit | Since 2026-11-18: a minute after its result line, the runner ends the session and everything it left running |
 | CI in a public copy | Done, passing since 2026-11-18, see [public-ci.md](public-ci.md). The private repo's CI stopped that day: no free minutes left |
+| An update at least every 10 minutes | Since 2026-11-18, the owner's rule. It starts when the runner next restarts itself |
 | The short prompt | Since 2026-11-15: context, the step's loop, and `STATUS`, `SUMMARY`, `NEEDS` |
 
 ## Known issues

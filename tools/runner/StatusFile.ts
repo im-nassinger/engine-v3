@@ -89,7 +89,7 @@ export class StatusFile {
             '',
             `## The last ${EVENTS_KEPT} events, newest first`,
             '',
-            'The same messages the runner sends to Discord.',
+            'The same messages the runner sends to Discord, without its ⏳ updates.',
             '',
             ...eventLines,
             '',

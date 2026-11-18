@@ -9,9 +9,11 @@ import { CiChecker } from './CiChecker.ts';
 import type { CiFailure } from './CiChecker.ts';
 import { runClaudeSession } from './ClaudeSession.ts';
 import { DiscordNotifier } from './DiscordNotifier.ts';
+import { Heartbeat } from './Heartbeat.ts';
 import { PidFile } from './PidFile.ts';
 import { PUBLIC_REPO, PublicCopy } from './PublicCopy.ts';
 import { RateLimitTracker } from './RateLimitTracker.ts';
+import { RunnerActivity } from './RunnerActivity.ts';
 import { StatusFile } from './StatusFile.ts';
 import { hasNeeds, parseRunnerLine, parseStatusReport, percentComplete, TASK } from './StatusReport.ts';
 import type { RunnerLine, StatusReport } from './StatusReport.ts';
@@ -55,6 +57,14 @@ const publicCopy = new PublicCopy(projectFolder, stateFolder);
 let ciWasFailing = false;
 
 const statusFile = new StatusFile(statusFilePath, path.join(stateFolder, 'status.json'));
+const activity = new RunnerActivity();
+const heartbeat = new Heartbeat(discord, () => activity.describe());
+
+// The short text is for Discord's updates; the status file can hold more.
+function startActivity(shortText: string, statusText = shortText) {
+    activity.start(shortText);
+    statusFile.setState(statusText);
+}
 
 // Every message goes both to Discord and to the status file.
 async function announce(message: string) {
@@ -89,9 +99,7 @@ async function waitForEarlierSession() {
     let earlierSessionId = sessionPidFile.readLiveProcessId();
     if (earlierSessionId === undefined) return;
 
-    statusFile.setState(
-        `Waiting for an earlier session (process ${earlierSessionId}) to end before starting a new one.`,
-    );
+    startActivity(`Waiting for an earlier session (process ${earlierSessionId}) to end before starting a new one`);
     console.log(`Waiting for an earlier session, process ${earlierSessionId}, to end.`);
 
     while (earlierSessionId !== undefined) {
@@ -122,13 +130,22 @@ function formatTime(timeMs: number) {
     return time.toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' });
 }
 
+function showPaused(reason: string) {
+    startActivity(`Paused: ${reason}`, `Paused: ${reason} To resume: \`rm ${pauseFile}\`.`);
+}
+
 async function pause(reason: string) {
     fs.writeFileSync(pauseFile, `${reason}\n`);
-    statusFile.setState(`Paused: ${reason} To resume: \`rm ${pauseFile}\`.`);
+    showPaused(reason);
     await announce(`⏸️ **Paused:** ${reason}\nTo resume: \`rm ${pauseFile}\``);
 }
 
 async function waitWhilePaused() {
+    if (!fs.existsSync(pauseFile)) return;
+
+    const pauseText = fs.readFileSync(pauseFile, 'utf8');
+    showPaused(pauseText.trim());
+
     while (fs.existsSync(pauseFile)) {
         await sleep(MINUTE_MS);
     }
@@ -149,7 +166,7 @@ async function waitForLimitReset() {
     const resumeText = formatTime(Date.now() + waitMs);
 
     await announce(`🛑 **Usage limit reached.** Resuming at ${resumeText}.`);
-    statusFile.setState(`Waiting for the usage limit to reset, until ${resumeText}.`);
+    startActivity(`Waiting for the usage limit to reset, until ${resumeText}`);
     await sleep(waitMs);
 
     rateLimits.clearAfterReset();
@@ -247,7 +264,7 @@ async function reportNeeds(report: StatusReport) {
 // undefined when it wasn't published, after telling the owner why.
 async function publishPublicCopy(pushedCommit: string) {
     const shortCommit = pushedCommit.slice(0, 7);
-    statusFile.setState(`Publishing the public copy of \`${shortCommit}\` to ${PUBLIC_REPO}.`);
+    startActivity(`Publishing the public copy of \`${shortCommit}\` to ${PUBLIC_REPO}`);
 
     const result = publicCopy.publish(pushedCommit);
     if (result.kind === 'published') return result.publicCommit;
@@ -266,14 +283,14 @@ async function publishPublicCopy(pushedCommit: string) {
     return undefined;
 }
 
-// What comes after CI, for the messages that report its result.
-function describeNextStep() {
+// The step the next session works on, for the messages about it.
+function nameNextStep() {
     const runnerLine = parseRunnerLine(fs.readFileSync(progressFile, 'utf8'));
     const hasNumberedNextStep =
         runnerLine !== undefined && runnerLine.stepCount > 0 && runnerLine.step < runnerLine.stepCount;
-    if (!hasNumberedNextStep) return 'starting the next step';
+    if (!hasNumberedNextStep) return 'the next step';
 
-    return `starting step ${runnerLine.step + 1} of ${runnerLine.stepCount}`;
+    return `step ${runnerLine.step + 1} of ${runnerLine.stepCount}`;
 }
 
 // Waits for CI on what the runner last pushed. Only a failure is returned: when CI can't
@@ -285,8 +302,10 @@ async function checkCi() {
     const publicCommit = await publishPublicCopy(pushedCommit);
     if (publicCommit === undefined) return undefined;
 
-    statusFile.setState(`Waiting for CI on \`${shortCommit}\` before starting the next session.`);
-    const result = await ciChecker.waitForResult(publicCommit, pushedCommit);
+    startActivity(`Waiting for CI on \`${shortCommit}\` before starting the next session`);
+    const result = await ciChecker.waitForResult(publicCommit, pushedCommit, (progress) => {
+        activity.setDetail(progress);
+    });
 
     if (result.kind === 'unknown') {
         const nextText = isLastStageDone() ? 'going on anyway' : 'starting the next step anyway';
@@ -294,7 +313,7 @@ async function checkCi() {
         return undefined;
     }
     if (result.kind === 'passed') {
-        const nextText = isLastStageDone() ? '' : `, ${describeNextStep()}`;
+        const nextText = isLastStageDone() ? '' : `, starting ${nameNextStep()}`;
         await announce(`🟢 **CI passed** on \`${shortCommit}\`${nextText}.`);
         ciWasFailing = false;
         return undefined;
@@ -336,7 +355,11 @@ async function runOneStep(ciFailure: CiFailure | undefined) {
     const logFile = path.join(logFolder, `${startedAt}.jsonl`);
 
     console.log(`Session started, log in ${logFile}`);
-    statusFile.setState(`Running a session, started ${formatTime(Date.now())}. Its full output: \`${logFile}\`.`);
+    const sessionText = ciFailure === undefined ? `Working on ${nameNextStep()}` : 'Fixing the failed CI';
+    startActivity(
+        sessionText,
+        `Running a session, started ${formatTime(Date.now())}. Its full output: \`${logFile}\`.`,
+    );
     const result = await runClaudeSession({
         projectFolder,
         prompt,
@@ -349,6 +372,9 @@ async function runOneStep(ciFailure: CiFailure | undefined) {
         onStarted: (processId) => {
             sessionPidFile.remove();
             sessionPidFile.writeIfAbsent(processId);
+        },
+        onActivity: (sessionActivity) => {
+            activity.setDetail(sessionActivity);
         },
     });
     sessionPidFile.remove();
@@ -387,6 +413,8 @@ async function main() {
     const startingCode = readRunnerCode();
     let failuresInARow = 0;
     let ciFixAttempts = 0;
+
+    heartbeat.start();
 
     const progress = readStartingProgress();
     await announce(`🟢 **Runner started.** ${TASK.name}: ${progress}`);
@@ -437,7 +465,7 @@ async function main() {
                 continue;
             }
 
-            statusFile.setState('Waiting 5 minutes after a session that ended without a status, then trying again.');
+            startActivity('Waiting 5 minutes after a session that ended without a status, then trying again');
             await sleep(FAILURE_RETRY_MS);
             continue;
         }
@@ -462,9 +490,7 @@ async function main() {
             const finalCiFailure = await checkCi();
             if (finalCiFailure !== undefined) continue;
 
-            statusFile.setState(
-                'Finished: v1, the before-v2 changes and the redesign are done, and the runner has stopped.',
-            );
+            startActivity('Finished: v1, the before-v2 changes and the redesign are done, and the runner has stopped');
             await announce(
                 '🎉 **The redesign is built**, after v1 and the before-v2 changes. Every stage of the plan is done. The runner stops before v2.',
             );

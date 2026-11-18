@@ -25,6 +25,7 @@ type SessionOptions = {
     rateLimits: RateLimitTracker;
     onRateLimitEvent: () => void;
     onStarted: (processId: number) => void;
+    onActivity: (activity: string) => void;
 };
 
 // Runs one fresh `claude -p` session and reads its stream until it ends.
@@ -72,6 +73,11 @@ export function runClaudeSession(options: SessionOptions) {
             if (text !== '') {
                 lastAssistantText = text;
             }
+
+            const activity = readSessionActivity(event.message);
+            if (activity !== '') {
+                options.onActivity(activity);
+            }
         }
 
         if (event.type === 'result') {
@@ -118,6 +124,32 @@ function parseJson(line: string): unknown {
     } catch {
         return undefined;
     }
+}
+
+// The newest thing the session said or started doing.
+function readSessionActivity(message: unknown) {
+    if (!isRecord(message) || !Array.isArray(message.content)) return '';
+
+    let activity = '';
+    for (const block of message.content) {
+        const blockActivity = describeContentBlock(block);
+        if (blockActivity !== '') {
+            activity = blockActivity;
+        }
+    }
+
+    return activity;
+}
+
+function describeContentBlock(block: unknown) {
+    if (!isRecord(block)) return '';
+    if (block.type === 'text' && typeof block.text === 'string') return block.text;
+    if (block.type !== 'tool_use') return '';
+
+    const input = block.input;
+    if (isRecord(input) && typeof input.description === 'string') return input.description;
+
+    return `Using ${String(block.name)}`;
 }
 
 function readAssistantText(message: unknown) {

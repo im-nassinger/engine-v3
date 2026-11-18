@@ -8,7 +8,7 @@
 
 - Keep v1 being built, step after step, with no one typing "continue".
 - Give each step a new session with one prompt, never reusing a session.
-- Tell the owner on Discord, briefly: what each step did and the current task's %, the usage limit at 90% and when it's reached, anything that needs `sudo`, and when it's paused or done.
+- Tell the owner on Discord, briefly: what each step did and the current task's %, the usage limit at 90% and when it's reached, anything that needs `sudo`, and when it's paused or done. Never more than 10 minutes without a message.
 - Never decide what the game does. The sessions it starts follow the project's CLAUDE.md and `docs/` like any session.
 
 ## Starting a session that looks after the runner

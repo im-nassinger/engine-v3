@@ -20,6 +20,7 @@ A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: s
 | ⚠️ CI result unknown, with the reason, starting the next step anyway | When `gh` fails, no run starts within 5 minutes, or a run takes over 45 minutes |
 | ⏸️ Paused | When Claude is blocked, three sessions in a row fail, or CI still fails after three sessions tried to fix it. Nothing runs until you resume |
 | 🎉 The redesign is built | Stage 19, the redesign, is done. The runner stops before v2 |
+| ⏳ N min · what it is doing, then the latest detail | After 9 minutes with no message, in every state, paused included. The detail is the session's latest action, or CI's jobs and the step each is on. Not kept in `status.md` |
 
 ## How it knows
 
@@ -30,6 +31,7 @@ A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: s
 - **The usage limit:** `claude -p --output-format stream-json` prints a `rate_limit_event` line with how much of the 5-hour and 7-day windows is used and when each resets. The CLI prints it, not the model, so the runner sees the limit even when the model is cut off mid-step. The next session finishes the cut-off step first.
 - **A change to the runner's own code:** it restarts itself between sessions, so the change applies without stopping a step.
 - **Waiting:** every wait counts by the wall clock, a minute at a time, so a night with the computer asleep doesn't make it wait hours too long. While it runs, it blocks the computer from going to sleep on its own (`systemd-inhibit`). Closing the lid still puts it to sleep.
+- **Never quiet for over 10 minutes (the owner's rule, 2026-11-18):** `tools/runner/Heartbeat.ts` checks every 30 seconds and sends a ⏳ update once Discord has accepted no message for 9 minutes. A message Discord refuses doesn't count, so the next check tries again. It can't send while the computer sleeps, the network is down or the runner isn't running.
 - **A hung session:** no output for 30 minutes ends it, and it counts as a failure.
 - **A session that won't exit:** the CLI waits for every background shell its session started, so a leftover loop keeps it open forever. A minute after the session's result line, the runner ends it and everything under it (`tools/runner/ProcessTree.ts`), and the session counts by its report as usual. The prompt also tells sessions to stop their background commands. *Why: on 2026-11-18 step 5 reported its result at 13:49 and then hung, because two `until ! pgrep -f "playwright test"` loops found their own command lines and never ended.*
 - **Never two at once:** a runner writes its process ID to `~/.local/state/engine-v3-runner/runner.pid` and refuses to start while another live runner holds it (under systemd it tries again a minute later). Each session's process ID goes in `session.pid` next to it, and the runner waits for a session still alive from an earlier runner to end before starting a new one.
@@ -51,6 +53,8 @@ A Node script, `tools/runner/run.ts`, run as a systemd user service. It loops: s
 | `~/.local/state/engine-v3-runner/public-copy/`, `public-copy.json` | The last public copy, and which private commit it was published from, so the same commit isn't pushed twice |
 | `~/.local/state/engine-v3-runner/runner.pid`, `session.pid` | The running runner's and session's process IDs, so a second one never starts |
 | `tools/runner/PidFile.ts` | Reads and writes those two files |
+| `tools/runner/Heartbeat.ts` | Sends an update when Discord has been quiet for 9 minutes |
+| `tools/runner/RunnerActivity.ts` | Holds what the runner is doing now, for those updates |
 
 ## Commands
 
