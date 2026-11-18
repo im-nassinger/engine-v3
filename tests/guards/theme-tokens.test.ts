@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 
@@ -54,7 +54,10 @@ const setByCode = new Set(
 );
 
 describe('the theme tokens', () => {
-    test('are the tokens docs/design/tokens.md names', () => {
+    // CI's public copy of the code has no docs/ (docs/runner/public-ci.md), so this runs only on the laptop.
+    const hasDocs = existsSync(TOKENS_DOC);
+
+    test.skipIf(!hasDocs)('are the tokens docs/design/tokens.md names', () => {
         const documented = new Set(matches(readFileSync(TOKENS_DOC, 'utf8'), /`(--[a-z0-9-]+)`/g));
 
         expect([...themeTokens].sort()).toEqual([...documented].sort());
