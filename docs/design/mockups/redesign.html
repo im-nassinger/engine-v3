@@ -111,6 +111,8 @@
   .lcard.namebox.tab { padding-left: 16px; }
   .lcard.namebox.tab > svg.i { width: 15px; height: 15px; color: var(--muted); margin-right: 8px; }
   .lcard.namebox.plain { padding-left: 18px; }
+  .lcard.namebox.withmenu { padding: 0 6px 0 8px; }
+  .lcard.namebox.withmenu .lc-val { padding-left: 4px; }
   .lc-val.m { font-weight: 500; }
   .lc-val.doc { font-size: 15px; }
   .lcard.namebox .chev { width: 14px; height: 14px; color: var(--muted); margin-right: 8px; }
@@ -343,7 +345,6 @@ const CHEV = ic('down', 'class="i chev"');
 
 // Each choice that changes the look, with its variants. The number of a variant is its place in the list.
 const KINDS = [
-  ['name', 'Level name', 'Ways other apps show a document\'s name. The name is the owner\'s own text.', [['tab', 'A tab, like a code editor\'s'], ['chevron', 'A name with a menu arrow, like a design tool\'s'], ['edited', '"Edited" after the name, like a Mac document'], ['sub', 'Name over a grey line, like a design tool\'s file panel'], ['doc', 'Large plain title, like an online text editor']]],
   ['layout', 'Entities panel height', '', [['hug', 'Fits its rows'], ['float', 'Full height']]],
   ['head', 'Panel titles', '', [['title', 'Title'], ['caps', 'Small caps']]],
   ['card', 'Inspector cards', 'How one component\'s card is told apart from the next.', [['space', 'Space only'], ['tile', 'Tiles'], ['inset', 'Sunken tiles'], ['island', 'Each card an island']]],
@@ -360,16 +361,12 @@ const KINDS = [
 ];
 
 // The directions. Each is a set of tokens and one variant of each kind.
-const BASE = { actions: 'apart', burger: 'own', name: 'tab', zoom: 'footer', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
+const BASE = { actions: 'apart', burger: 'with', name: 'plain', zoom: 'footer', layout: 'hug', head: 'title', card: 'space', field: 'pill', slider: 'fill', check: 'switch', row: 'pill', tool: 'soft', btn: 'rounded', menu: 'soft', note: 'tint', handle: 'square', play: 'tint' };
 const SLATE = { app: '#0d0f13', panel: 'rgba(24,27,33,.96)', raised: 'rgba(255,255,255,.04)', field: 'rgba(255,255,255,.055)', hover: 'rgba(255,255,255,.065)', text: '#e4e8ef', muted: '#8b93a1', faint: '#586070',
   accent: '#4f8cff', soft: 'rgba(79,140,255,.2)', on: '#fff', ink: '#8fb5ff', r: 8, r2: 12, rl: 16, rowh: 30, inset: 14, blur: 0, shadow: 'none' };
 const dir = (id, name, desc, s) => ({ id, name, desc, t: SLATE, s: Object.assign({}, BASE, s) });
 const DIRS = [
-  dir('1', 'Tab', 'Like a code editor\'s or a browser\'s tab: a file icon, the name, and a white dot while it isn\'t saved.', {}),
-  dir('2', 'Menu arrow', 'Like a design tool\'s file name: the name with a small arrow after it; clicking it opens the level\'s menu (rename, export). The dot sits before the arrow.', { name: 'chevron' }),
-  dir('3', 'Edited', 'Like a document\'s title on a Mac: "Car test — Edited" while it isn\'t saved, only "Car test" once it is. No dot.', { name: 'edited' }),
-  dir('4', 'Two lines', 'Like a design tool\'s file panel: the name, with a grey line under it saying "Edited" while it isn\'t saved.', { name: 'sub' }),
-  dir('5', 'Plain title', 'Like an online text editor\'s document title: the name a little larger, plain, which turns into a field when clicked.', { name: 'doc' })
+  dir('1', 'The redesign', 'The top left: the ☰ menu and the level\'s name in one island, the name in regular weight with a white dot while it isn\'t saved, then Save and Play as dark islands with green and blue words. The zoom sits under the minimap.', {})
 ];
 
 const FONTS = [
@@ -381,7 +378,7 @@ const FONTS = [
 const VIEWS = [['shape', 'A selected shape'], ['draw', 'Drawing'], ['menu', 'The main menu'], ['dialog', 'A dialog'], ['play', 'Test play'], ['parts', 'All the parts, side by side']];
 
 let state = { dir: '1', view: 'shape', font: 'mono', over: {} };
-try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-10') || '{}')); } catch (e) {}
+try { Object.assign(state, JSON.parse(localStorage.getItem('engine-v3-islands-11') || '{}')); } catch (e) {}
 let S, T;
 
 function tokensCss(t) {
@@ -560,11 +557,7 @@ function inspector(o) {
 // The top left: the main menu, the level's name and Save and Play, as the Mix row places them.
 const DIRTY = '<span class="dirty" title="Not saved"></span>';
 function nameHtml() {
-  if (S.name === 'chevron') return `<span class="lc-val m">Car test</span>${DIRTY}${ic('down', 'class="i chev"')}`;
-  if (S.name === 'edited') return `<span class="lc-val m">Car test</span><span class="lc-edited">— Edited</span>`;
-  if (S.name === 'sub') return `<span class="lc-two"><span class="lc-val m">Car test</span><span class="lc-cap">Edited</span></span>`;
-  if (S.name === 'doc') return `<span class="lc-val doc">Car test</span>${DIRTY}`;
-  return `${ic('file')}<span class="lc-val">Car test</span>${DIRTY}`;
+  return `<span class="lc-val">Car test</span>${DIRTY}`;
 }
 function nameChip(cls = '', style = '') {
   return `<div class="blk namechip ${cls}" style="${style}"><span>Car test</span>${DIRTY}</div>`;
@@ -576,7 +569,7 @@ function levelCard(o) {
   const inPill = S.actions === 'inpill' && !centred;
   let out = where === 'own' ? `<div class="blk lcbtn">${menu}</div>` : '';
   if (!centred) {
-    const cls = ['blk', 'lcard', 'pill', 'namebox', S.name === 'tab' ? 'tab' : 'plain', S.name].join(' ');
+    const cls = ['blk', 'lcard', 'pill', 'namebox', where === 'name' ? 'withmenu' : 'plain'].join(' ');
     out += `<div class="${cls}">${where === 'name' ? menu : ''}${nameHtml()}${inPill ? `<span class="lc-gap"></span>${buttons}` : ''}</div>`;
   }
   if (!inPill) {
@@ -660,7 +653,6 @@ function schematic() {
   return `<div class="schem"><div class="ed float" style="${tokensCss(T)}position:absolute;left:0;top:0;transform:scale(.2);transform-origin:0 0">${editor({ sel: 'Rectangle 1', scene: { selected: 'rect1' } })}</div></div>`;
 }
 const PARTS = {
-  name: () => topLeftPart(),
   layout: schematic,
   head: () => `<div class="ph ${S.head}">Inspector</div>`,
   card: () => card('TransformComponent', F.vec('Position', '20', '340', 'px') + F.num('Rotation', '0', '°')) + card('ShapeComponent', F.choice('Kind', 'Rectangle') + F.num('Width', '160', 'px')),
@@ -728,7 +720,7 @@ function render() {
   const cls = ['ed', 'float', parts ? 'tall' : ''].join(' ');
   document.getElementById('frame').innerHTML = `<div class="${cls}" style="${tokensCss(T)}">${MOMENTS[state.view]()}</div>`;
   document.getElementById('stage').classList.toggle('scroll', parts);
-  try { localStorage.setItem('engine-v3-islands-10', JSON.stringify(state)); } catch (e) {}
+  try { localStorage.setItem('engine-v3-islands-11', JSON.stringify(state)); } catch (e) {}
   fit();
 }
 function fit() {
