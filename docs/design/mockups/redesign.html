@@ -72,8 +72,8 @@
   .cnums svg.i, .barnums svg.i { width: 13px; height: 13px; }
   .hintchip { position: absolute; transform: translateX(-50%); z-index: 3; white-space: nowrap; background: rgba(13, 15, 19, .8); color: #e4e8ef; border-radius: 999px; padding: 7px 15px; font-size: 12px; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
   .hintchip { display: flex; gap: 18px; align-items: center; }
-  .debug { position: absolute; z-index: 3; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 12px; border-radius: var(--rl); background: var(--panel); color: var(--text); font-size: 10px; line-height: 14px; white-space: pre; font-variant-numeric: tabular-nums; }
-  .debug b { font-weight: 400; color: var(--muted); margin-right: 5px; }
+  .debug { position: absolute; z-index: 3; display: flex; align-items: center; gap: 10px; padding: 0 12px; border-radius: var(--rl); background: var(--panel); color: var(--text); font-size: 10px; line-height: 14px; white-space: pre; font-variant-numeric: tabular-nums; }
+  .debug b { font-weight: 400; color: var(--muted); margin-right: 4px; }
   .cnums { display: flex; gap: 12px; align-items: center; color: #9aa3b2; font-size: 12px; }
   .titlechip { position: absolute; transform: translateX(-50%); z-index: 3; display: flex; align-items: center; gap: 10px; padding: 7px 14px; border-radius: 999px; background: rgba(13, 15, 19, .8); color: #e4e8ef; font-weight: 500; }
   .titlechip .savestate { padding: 0; }
@@ -569,7 +569,7 @@ const DEBUG_H = 28;
 const debugHeight = () => DEBUG_H;
 function bottom(o) {
   const cells = [['X', o.x], ['Y', o.y], ['GRID', '50'], ['ZOOM', zoomText()]].map(([l, v]) => `<span><b>${l}</b>${v}</span>`).join('');
-  return `<div class="debug" style="right:${M}px;top:${H - M - DEBUG_H}px;width:${MAP_W}px;height:${DEBUG_H}px">${cells}</div>`;
+  return `<div class="debug" style="right:${M}px;top:${H - M - DEBUG_H}px;height:${DEBUG_H}px">${cells}</div>`;
 }
 function toolColumn(o) {
   const [x, y, w] = geo().tools;
@@ -580,7 +580,7 @@ function view(opts) {
   return `<div class="abs viewbox" style="${pos([0, 0, W, H])}">${scene(W, H, VIEW_Z, (g.rx0 + g.rx1) / 2, VIEW_CY, Object.assign({ grid: true, cameraFrame: true, joints: true }, opts))}</div>`;
 }
 // The minimap, with its right and bottom edges at r and b, sits right above the debug box.
-const MAP_W = 240;
+const MAP_W = 180;
 function mapParts(r, b) {
   const inner = MAP_W - 6, mapH = Math.round(inner * MAP_AREA[3] / MAP_AREA[2]) + 6;
   return { map: [r - MAP_W, b - mapH, MAP_W, mapH], inner, height: mapH };
