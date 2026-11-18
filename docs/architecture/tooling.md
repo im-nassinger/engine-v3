@@ -55,9 +55,10 @@ tests/
 | `npm run test:performance` | Vitest's speed tests in Chromium alone, with the GPU and React's production build (`NODE_ENV=production`), one at a time (see [performance.md](performance.md#targets-and-their-tests)) | Before a stage closes, and in CI |
 | `npm run test:e2e` | Playwright against the built page | Before a stage closes, and in CI on master |
 | `npm run docs:check` | `node tools/check-docs.js` | |
-| **`npm run check`** | `typecheck`, `lint`, `format:check`, `deps`, `test`, `docs:check`, in that order | **Before every commit** |
+| `npm run check:code` | `typecheck`, `lint`, `format:check`, `deps`, `test`, in that order: `check` without the docs | In CI, whose copy of the code has no `docs/` |
+| **`npm run check`** | `check:code`, then `docs:check` | **Before every commit** |
 
-`npm run check` holds everything fast enough to run every time. It is the one command a session needs to know, and CI runs the same one. There is no git hook: the rule is in `CLAUDE.md`.
+`npm run check` holds everything fast enough to run every time. It is the one command a session needs to know. CI runs `check:code`, the same checks but the docs', because its copy of the code has no `docs/` (owner, 2026-11-18). There is no git hook: the rule is in `CLAUDE.md`.
 
 ## TypeScript
 
@@ -207,11 +208,11 @@ One per test runner, so each pipeline is proven before stage 1 needs it:
 
 ## CI
 
-One workflow, `.github/workflows/ci.yml`:
+One workflow, `.github/workflows/ci.yml`. **It runs only in the public copy of the code, `im-nassinger/engine-v3-ci`**, which the runner pushes after each step: the private repo's free Actions minutes ran out on 2026-11-18, and a public repo's are unlimited. Every job has `if: ${{ !github.event.repository.private }}`, so in this repo they are skipped and use no minutes. The copy has no `docs/`, `CLAUDE.md`, `.claude/`, runner or history (owner, 2026-11-18). How it is built: [public-ci.md](../runner/public-ci.md).
 
 | Job | Runs on | Does | When |
 |---|---|---|---|
-| check | `ubuntu-24.04` and `ubuntu-24.04-arm` | `npm ci`, `npm run check` | Every push |
+| check | `ubuntu-24.04` and `ubuntu-24.04-arm` | `npm ci`, `npm run check:code` | Every push |
 | browser | `ubuntu-24.04` | Installs the three browsers, `npm run test:browser`, `npm run test:performance`, `npm run build` | Every push |
 | journeys | `ubuntu-24.04` | Installs the three browsers, `npm run test:e2e` (the phone checks' two projects among them), and keeps the HTML report with its screenshots for 30 days as the `playwright-report` artifact | Pushes to master |
 | phone-arm | `ubuntu-24.04-arm` | Installs Chromium, `npx playwright test --project=phone-chromium`: the determinism page and the editor at a Pixel 7's size on ARM (stage 17 step 7, standing yes, 2026-11-17) | Every push |

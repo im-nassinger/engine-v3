@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { PUBLIC_REPO } from './PublicCopy.ts';
 import { isRecord } from './RateLimitTracker.ts';
 
 const POLL_INTERVAL_MS = 60 * 1000;
@@ -26,7 +27,8 @@ type CiRun = {
 
 type Sleep = (durationMs: number) => Promise<void>;
 
-// Reads the CI workflow's result for a pushed commit through the `gh` command.
+// Reads the CI workflow's result for a commit of the public copy through the `gh` command.
+// See docs/runner/public-ci.md.
 export class CiChecker {
     private readonly projectFolder: string;
     private readonly sleep: Sleep;
@@ -36,28 +38,29 @@ export class CiChecker {
         this.sleep = sleep;
     }
 
-    // Waits until CI on the commit has finished. Never throws: a `gh` error is an unknown result.
-    async waitForResult(commit: string): Promise<CiResult> {
+    // Waits until CI on the public commit has finished. A failure names the source commit, the
+    // private one a session can find. Never throws: a `gh` error is an unknown result.
+    async waitForResult(publicCommit: string, sourceCommit: string): Promise<CiResult> {
         try {
-            return await this.waitForRun(commit);
+            return await this.waitForRun(publicCommit, sourceCommit);
         } catch (error) {
             const reason = error instanceof Error ? error.message.slice(-300) : String(error);
             return { kind: 'unknown', reason };
         }
     }
 
-    private async waitForRun(commit: string): Promise<CiResult> {
+    private async waitForRun(publicCommit: string, sourceCommit: string): Promise<CiResult> {
         const startedAt = Date.now();
 
         while (true) {
             const waitedMs = Date.now() - startedAt;
-            const run = this.findRun(commit);
+            const run = this.findRun(publicCommit);
 
             if (run === undefined && waitedMs > RUN_APPEAR_TIMEOUT_MS) {
                 return { kind: 'unknown', reason: 'no CI run started for this commit' };
             }
             if (run !== undefined && run.status === 'completed') {
-                return this.readResult(commit, run);
+                return this.readResult(sourceCommit, run);
             }
             if (waitedMs > RUN_FINISH_TIMEOUT_MS) {
                 return { kind: 'unknown', reason: 'CI did not finish within 45 minutes' };
@@ -96,6 +99,8 @@ export class CiChecker {
             fields,
             '--limit',
             '1',
+            '--repo',
+            PUBLIC_REPO,
         );
         const runs: unknown = JSON.parse(output);
         if (!Array.isArray(runs)) return undefined;
@@ -115,7 +120,7 @@ export class CiChecker {
 
     // Names each failed step as "job > step", such as "browser > Run npm run test:performance".
     private readFailedSteps(runId: number) {
-        const output = this.gh('run', 'view', String(runId), '--json', 'jobs');
+        const output = this.gh('run', 'view', String(runId), '--json', 'jobs', '--repo', PUBLIC_REPO);
         const parsed: unknown = JSON.parse(output);
         const failedSteps: string[] = [];
         if (!isRecord(parsed) || !Array.isArray(parsed.jobs)) return failedSteps;
@@ -136,7 +141,7 @@ export class CiChecker {
     // `gh run view --log-failed` prints "job<TAB>step<TAB>timestamp text" lines. Keeps the
     // end of each failed step, where the test runners print their failures and summary.
     private readFailedLog(runId: number) {
-        const output = this.gh('run', 'view', String(runId), '--log-failed');
+        const output = this.gh('run', 'view', String(runId), '--log-failed', '--repo', PUBLIC_REPO);
         const linesByStep = new Map<string, string[]>();
 
         for (const rawLine of output.split('\n')) {

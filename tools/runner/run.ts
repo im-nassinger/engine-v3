@@ -10,6 +10,7 @@ import type { CiFailure } from './CiChecker.ts';
 import { runClaudeSession } from './ClaudeSession.ts';
 import { DiscordNotifier } from './DiscordNotifier.ts';
 import { PidFile } from './PidFile.ts';
+import { PUBLIC_REPO, PublicCopy } from './PublicCopy.ts';
 import { RateLimitTracker } from './RateLimitTracker.ts';
 import { StatusFile } from './StatusFile.ts';
 import { hasNeeds, parseRunnerLine, parseStatusReport, percentComplete, TASK } from './StatusReport.ts';
@@ -50,6 +51,7 @@ const discord = new DiscordNotifier(webhookUrl);
 const rateLimits = new RateLimitTracker();
 const sentNeeds = new Set<string>();
 const ciChecker = new CiChecker(projectFolder, sleep);
+const publicCopy = new PublicCopy(projectFolder, stateFolder);
 let ciWasFailing = false;
 
 const statusFile = new StatusFile(statusFilePath, path.join(stateFolder, 'status.json'));
@@ -237,14 +239,40 @@ async function reportNeeds(report: StatusReport) {
     );
 }
 
+// Publishes the pushed commit's public copy, where CI runs. Returns the copy's commit, or
+// undefined when it wasn't published, after telling the owner why.
+async function publishPublicCopy(pushedCommit: string) {
+    const shortCommit = pushedCommit.slice(0, 7);
+    statusFile.setState(`Publishing the public copy of \`${shortCommit}\` to ${PUBLIC_REPO}.`);
+
+    const result = publicCopy.publish(pushedCommit);
+    if (result.kind === 'published') return result.publicCommit;
+
+    if (result.kind === 'refused') {
+        const files = result.files.join(', ');
+        await announce(
+            `⚠️ **Public copy not pushed:** these files would publish a private path or name, so CI doesn't run for \`${shortCommit}\`: ${files}. See docs/runner/public-ci.md.`,
+        );
+        return undefined;
+    }
+
+    await announce(
+        `⚠️ **Public copy not pushed**, so CI doesn't run for \`${shortCommit}\`.\n\`\`\`\n${result.reason}\n\`\`\``,
+    );
+    return undefined;
+}
+
 // Waits for CI on what the runner last pushed. Only a failure is returned: when CI can't
 // be read, the work goes on rather than stalling on GitHub.
 async function checkCi() {
     const pushedCommit = git('rev-parse', '@{u}');
     const shortCommit = pushedCommit.slice(0, 7);
-    statusFile.setState(`Waiting for CI on \`${shortCommit}\` before starting the next session.`);
 
-    const result = await ciChecker.waitForResult(pushedCommit);
+    const publicCommit = await publishPublicCopy(pushedCommit);
+    if (publicCommit === undefined) return undefined;
+
+    statusFile.setState(`Waiting for CI on \`${shortCommit}\` before starting the next session.`);
+    const result = await ciChecker.waitForResult(publicCommit, pushedCommit);
 
     if (result.kind === 'unknown') {
         console.log(`CI result for ${shortCommit} unknown: ${result.reason}`);
@@ -279,6 +307,7 @@ function buildPrompt(ciFailure: CiFailure | undefined) {
         .replaceAll('{{URL}}', ciFailure.url)
         .replaceAll('{{FAILED_STEPS}}', failedSteps)
         .replaceAll('{{RUN_ID}}', String(ciFailure.runId))
+        .replaceAll('{{REPO}}', PUBLIC_REPO)
         .replaceAll('{{LOG}}', ciFailure.logExcerpt);
 
     return `${fixPrompt}\n${stepPrompt}`;

@@ -84,4 +84,4 @@ Described in [performance.md](performance.md#targets-and-their-tests). They run 
 
 ## In CI
 
-On every push: `npm run check` on x86 and ARM (type checks with each part's own `tsconfig`, ESLint, Prettier's check, dependency-cruiser, unit and guard tests, `node tools/check-docs.js`), and from stage 13 the determinism test in Node on both; browser tests in three browsers, the determinism test among them from stage 13. The journeys run on master, and the phone checks in Chromium on ARM on every push. The jobs are in [tooling.md](tooling.md#ci).
+On every push, in the public copy of the code (see [tooling.md](tooling.md#ci)): `npm run check:code` on x86 and ARM (type checks with each part's own `tsconfig`, ESLint, Prettier's check, dependency-cruiser, unit and guard tests; the docs check runs only on the laptop), and from stage 13 the determinism test in Node on both; browser tests in three browsers, the determinism test among them from stage 13. The journeys run on master, and the phone checks in Chromium on ARM on every push. The jobs are in [tooling.md](tooling.md#ci).
