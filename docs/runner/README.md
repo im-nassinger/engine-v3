@@ -14,7 +14,7 @@
 ## Starting a session that looks after the runner
 
 1. Read `status.md` in this folder: what the runner is doing right now, v1's %, the usage limit, and its last 30 events. The runner writes it itself whenever something changes; it isn't in git. If it's missing, the runner has never run on this computer.
-2. Read [progress.md](progress.md): the runner's known issues and what's next for it.
+2. Read [progress.md](progress.md): the runner's known issues and what's next for it. **If [public-ci.md](public-ci.md) says "being built", finish that first.**
 3. Tell the owner briefly how it's going.
 
 Rules for the session:
@@ -31,3 +31,4 @@ Rules for the session:
 | [progress.md](progress.md) | Where the runner stands, its known issues, and what's next for it (the Discord bot) |
 | [how-it-works.md](how-it-works.md) | The loop, the Discord messages, how it detects the limit, its files and the commands to start, stop and resume it |
 | [decisions.md](decisions.md) | The owner's decisions about the runner, and why |
+| [public-ci.md](public-ci.md) | CI runs in a public copy of the code, `im-nassinger/engine-v3-ci`, because the private repo's free minutes ran out. Being built: its table says where the build stands |

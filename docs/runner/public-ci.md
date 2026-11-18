@@ -1,0 +1,42 @@
+# CI in a public copy
+
+## TL;DR
+
+**Being built (2026-11-18).** GitHub stopped starting CI in the private repo, `im-nassinger/engine-v3`: a private repo gets about 2,000 free Actions minutes a month, and about 190 pushes of five jobs each used them up in four days. CI is free and unlimited in a public repo, ARM machines included, so the runner now publishes a **public copy** of each pushed commit to `im-nassinger/engine-v3-ci` and waits for CI there. The copy holds only what CI needs: never `docs/`, `CLAUDE.md`, `.claude/`, the runner, or the git history. If this file still says "being built", read "Where the build stands" below and carry on from there.
+
+## Why
+
+- **The owner's choice (2026-11-18):** keep CI on GitHub, ARM included, for free, without making the docs, the history or any `/home/...` path public. The game's code (`src/`, `tests/`) does become public: CI can't test what it can't see. The repo has no license, so the code can be read but not reused.
+- Rejected: making `engine-v3` public (publishes the docs and the history); running CI only on the laptop (loses the ARM check); paying for minutes; a self-hosted runner (no ARM, more to look after); emulating ARM in Docker with QEMU (works, but slower and more to set up than a free real ARM machine).
+- How the minutes ran out was a planning miss: when CI was set up in stage 0 and the runner started pushing after every step, nobody checked the private-repo limit.
+
+## How it works
+
+1. After a session, the runner pushes `master` to the private repo as before.
+2. **It builds the copy** of the pushed commit: `git archive` of the listed paths only, into a fresh folder. Listed, not excluded, so a new top-level folder stays private until someone adds it to the list. The list is in `tools/runner/PublicCopy.ts`.
+3. **The guard:** every file in the copy is searched for `ixcsoft`, `/home/`, `ecs-game-v2` and the owner's email. One hit and nothing is pushed: the runner posts ⚠️ to Discord naming the files and goes on without CI for that step.
+4. **It pushes the copy** as one commit with no parent, force-pushed over `master` in the public repo. Its message is the private commit's hash, so old commits and commit messages never reach the public repo.
+5. **CI runs there** with the same workflow, `.github/workflows/ci.yml`. Each job has `if: ${{ !github.event.repository.private }}`, so in the private repo every job is skipped and uses no minutes.
+6. `CiChecker` reads the run from the public repo (`gh run list --repo im-nassinger/engine-v3-ci --commit <public hash>`). A failure is reported and fixed exactly as before, naming the private commit.
+
+`npm run check` reads `docs/`, which the copy doesn't have, so it is split: **`npm run check:code`** runs everything but the docs check, and CI runs that. `npm run check` is `check:code` plus `docs:check`, unchanged for sessions.
+
+## What the copy holds
+
+`src/`, `tests/`, `index.html`, `package.json`, `package-lock.json`, `.npmrc`, `.node-version`, `.gitignore`, `.prettierrc.json`, `.prettierignore`, `.dependency-cruiser.json`, `eslint.config.ts`, `playwright.config.ts`, `vite.config.ts`, the `tsconfig` files, `tools/package.json` and `.github/workflows/ci.yml`.
+
+Never: `docs/`, `CLAUDE.md`, `.claude/`, `tools/runner/`, `tools/check-docs.js`, `tools/check-sources.js`.
+
+## Where the build stands
+
+| Step | State |
+|---|---|
+| 1. This plan in `docs/runner/` | Done |
+| 2. `check:code` in `package.json`; the jobs skip in a private repo | To do |
+| 3. `tools/runner/PublicCopy.ts`: build, guard, push | To do |
+| 4. `CiChecker` reads the public repo; `run.ts` publishes after pushing | To do |
+| 5. Create `im-nassinger/engine-v3-ci` (public) with `gh repo create` | To do |
+| 6. One publish by hand; the owner looks at the public repo before the runner resumes | To do |
+| 7. Update [how-it-works.md](how-it-works.md) and [progress.md](progress.md), mark this file built | To do |
+
+The runner is paused while this is built (`~/.local/state/engine-v3-runner/paused`). The owner resumes it after step 6.
