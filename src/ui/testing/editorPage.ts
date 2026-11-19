@@ -7,7 +7,7 @@ import { ScriptedEngine } from '../../core/simulation/testing/ScriptedPhysics.ts
 import { CommandRunner, createCommandRegistry, OpenDialog } from '../../editor/commands/index.ts';
 import { HeldKeys, PlaySession } from '../../editor/play/index.ts';
 import { DirectGameRunner } from '../../editor/play/testing/index.ts';
-import { SaveIndicator, SaveState } from '../../editor/saving/index.ts';
+import { SAVE_FAILED_TEXT, SaveIndicator, SaveState } from '../../editor/saving/index.ts';
 import { EditorSession } from '../../editor/session/index.ts';
 import { ManualClock, ManualFrames, ManualTimer } from '../../editor/time/testing/index.ts';
 import { CommandsContext } from '../commands/index.ts';
@@ -64,7 +64,11 @@ export function showWithEditor(level: Level, shown: ReactElement) {
         platform: 'other',
     };
     const tools = buildEditorTools(session, commands.registry, frames);
-    const saveIndicator = new SaveIndicator({ state: new SaveState(), mode: 'autosave', failureText: () => undefined });
+    const saveIndicator = new SaveIndicator({
+        state: new SaveState(),
+        mode: 'autosave',
+        failureText: () => SAVE_FAILED_TEXT,
+    });
 
     const withTools = createElement(ToolsContext, { value: tools }, shown);
     const withCommands = createElement(CommandsContext, { value: commands }, withTools);

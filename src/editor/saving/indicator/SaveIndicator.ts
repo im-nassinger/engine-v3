@@ -9,7 +9,7 @@ import type { Opening } from '../opening/LevelOpener.ts';
 // open, or a damaged record couldn't be kept apart, so this tab never saves.
 export type SaveMode = 'autosave' | 'readOnly' | 'nothingSaved';
 
-// The top bar's words for the save state, and what clicking it explains.
+// The save state's words, and what clicking it explains.
 export type SaveStateShown = {
     readonly label: string;
     readonly explanation: string;
@@ -30,7 +30,8 @@ type SaveIndicatorParts = {
     readonly failureText: () => string | undefined;
 };
 
-// What the page shows of saving: the top bar's save state, the tab title's `*` and the leave prompt.
+// What the page shows of saving: the save state, the message pill's failed save, the tab title's `*` and
+// the leave prompt.
 // A read-only tab shows `Read-only` and never counts as unsaved, since leaving it loses nothing.
 export class SaveIndicator {
     readonly state: SaveState;
@@ -71,6 +72,13 @@ export class SaveIndicator {
         if (this.mode === 'readOnly') return false;
 
         return !this.state.isSaved;
+    }
+
+    // For the message pill, until the save is fixed. A tab that never saves keeps it for good.
+    get failedSaveText() {
+        if (this.state.status !== 'failed') return undefined;
+
+        return this.shown.explanation;
     }
 
     get shown(): SaveStateShown {

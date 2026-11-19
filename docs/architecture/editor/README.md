@@ -22,7 +22,7 @@ export class EditorSession {
     readonly view: ViewState;               // pan and zoom of the level view
     readonly viewSettings: ViewSettings;    // grid shown, View menu switches, folded cards
     readonly reader: LevelReader;           // puts removed entities back on undo
-    readonly status: StatusText;            // the status bar's left slot
+    readonly status: StatusText;            // what the message pill shows
     readonly openLevelChanged: VersionCounter;
     // later: tools (stage 9), saving: none, the composition holds Autosave (stage 12, see persistence.md),
     // play: PlaySession (stage 16, see simulation.md), shortcuts (stage 6)

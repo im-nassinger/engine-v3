@@ -42,7 +42,7 @@ function rectangleRows(page: Page) {
 }
 
 function statusText(page: Page) {
-    return page.locator('.status-bar .status-text');
+    return page.locator('.message-pill .message');
 }
 
 // The selected entity's position, read from the Entity inspector's TransformComponent card.

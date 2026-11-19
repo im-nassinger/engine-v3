@@ -17,7 +17,7 @@ import { NOTCH_PX, wheelPixels } from './wheelPixels.ts';
 export type PointerInputParts = {
     readonly tools: Pick<ToolController, 'pointerDown' | 'pointerMove' | 'pointerUp'>;
     readonly escape: Pick<EscapeChain, 'dragLost' | 'focusLost'>;
-    // The status bar's mouse position.
+    // The debug box's mouse position.
     readonly mouse: Pick<MousePosition, 'moveTo' | 'leave'>;
     readonly view: ViewState;
     readonly platform: KeyboardPlatform;

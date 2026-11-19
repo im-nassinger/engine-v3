@@ -59,9 +59,7 @@ export type ToolContext = {
 // directly: it runs a command or uses LiveEdit.
 export type Tool = {
     readonly id: ToolId;
-    // The status bar's tool hint. It may change only when preview moves.
-    readonly hint: string;
-    // Moves when what the tool draws over the level, or its hint, changes.
+    // Moves when what the tool draws over the level changes.
     readonly preview: VersionCounter;
     activate(context: ToolContext): void;
     // Finishes and keeps an unfinished drawing.

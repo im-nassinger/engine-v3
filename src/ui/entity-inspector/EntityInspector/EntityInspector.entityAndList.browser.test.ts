@@ -203,7 +203,7 @@ describe("the entity field's picker", () => {
 
         await userEvent.click(pickButton());
         await expect.poll(() => pickButton().getAttribute('aria-pressed')).toBe('true');
-        expect(controller.hint).toBe('Click an entity to pick it. Esc cancels.');
+        expect(session.status.current).toBe('Click an entity to pick it. Esc cancels.');
 
         controller.pointerDown(leftPressAt({ x: 0, y: 0 }));
         controller.pointerUp(leftPressAt({ x: 0, y: 0 }));

@@ -12,11 +12,6 @@ import { PointEditState } from './states/PointEditState.ts';
 import { PointPressState } from './states/PointPressState.ts';
 import type { SelectState, SelectStateHost } from './states/SelectState.ts';
 
-const POINT_EDIT_HINT = 'Drag points to move them. Double-click an edge to add one. Esc goes back.';
-
-const SELECT_HINT =
-    'Click to select. Drag to move. Drag a handle to resize, or just outside a corner to rotate. Drag on empty space to select with a box. Double-click goes into a group.';
-
 // Picks entities by click, Shift+click and the selection box, moves them by dragging, resizes one entity by
 // its handles and rotates it just outside a corner, goes into and out of groups by double-click, and edits
 // a polygon's or line's points after a double-click on it. It holds one state at a time.
@@ -27,10 +22,6 @@ export class SelectTool implements Tool {
     private box: Bounds | undefined;
     private shownReadout: DragReadout | undefined;
     private context: ToolContext | undefined;
-
-    get hint() {
-        return this.editedPoints === undefined ? SELECT_HINT : POINT_EDIT_HINT;
-    }
 
     // The selection box being dragged, in level positions, for the overlay.
     get selectionBox() {
@@ -63,7 +54,7 @@ export class SelectTool implements Tool {
         const host: SelectStateHost = {
             context,
             picker: new SelectionPicker(context),
-            // Each state change redraws, since the handles and the hint follow the state.
+            // Each state change redraws, since the handles follow the state.
             goTo: (state) => {
                 this.state = state;
                 this.preview.increment();

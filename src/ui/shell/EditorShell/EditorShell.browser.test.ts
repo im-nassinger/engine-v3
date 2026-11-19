@@ -24,7 +24,7 @@ const ENTITY_INSPECTOR = 300;
 const ENTITIES_VIEWER = 260;
 const MINIMAP = { width: 180, height: 90 };
 const MAIN_MENU = 48;
-const STATUS_BAR = 28;
+const DEBUG_BOX = 28;
 const PANEL_HEAD = 40;
 const ROW = 30;
 // Under the last row of the Entities viewer.
@@ -95,10 +95,6 @@ function nameBoxValue() {
     return entityInspector()?.querySelector('input')?.value ?? '';
 }
 
-function statusText() {
-    return find('.status-text')?.textContent ?? '';
-}
-
 function leftClickAt(x: number, y: number): LevelPointerInput {
     return {
         levelPosition: { x, y },
@@ -125,18 +121,20 @@ describe('EditorShell', () => {
         expect([tools.left, tools.top, tools.width]).toEqual([GAP, mainMenu.bottom + GAP, TOOL_COLUMN]);
         const inspector = boxOf('Entity inspector');
         expect([inspector.left, inspector.top, inspector.width]).toEqual([tools.right + GAP, GAP, ENTITY_INSPECTOR]);
-        const statusBar = boxOf('Status bar');
-        expect([statusBar.left, statusBar.bottom, statusBar.width, statusBar.height]).toEqual([
-            GAP,
+        const debugBox = boxOf('Debug box');
+        expect([debugBox.right, debugBox.bottom, debugBox.height]).toEqual([
+            WINDOW.width - GAP,
             WINDOW.height - GAP,
-            WINDOW.width - 2 * GAP,
-            STATUS_BAR,
+            DEBUG_BOX,
         ]);
-        expect(inspector.bottom).toBe(statusBar.top - GAP);
+        // Until step 12 takes the level's name and save state off the screen, they sit under the Entity inspector.
+        const levelFile = boxOf('Level file');
+        expect([levelFile.left, levelFile.bottom, levelFile.height]).toEqual([GAP, WINDOW.height - GAP, DEBUG_BOX]);
+        expect(inspector.bottom).toBe(debugBox.top - GAP);
         const minimap = boxOf('Minimap');
         expect([minimap.right, minimap.bottom, minimap.width, minimap.height]).toEqual([
             WINDOW.width - GAP,
-            statusBar.top - GAP,
+            debugBox.top - GAP,
             MINIMAP.width,
             MINIMAP.height,
         ]);
@@ -148,6 +146,28 @@ describe('EditorShell', () => {
             viewerHeightFor(2),
             ENTITIES_VIEWER,
         ]);
+    });
+
+    test('the debug box is as wide as its entries', async () => {
+        showShell();
+        await expect.poll(() => find('.debug-box')).not.toBeNull();
+
+        const box = boxOf('Debug box');
+        expect(box.width).toBe(find('.debug-box')?.getBoundingClientRect().width);
+        expect(box.width).toBeLessThan(WINDOW.width / 2);
+    });
+
+    test('the message pill sits at the bottom middle of the window, and clicks pass through it', async () => {
+        const { session } = showShell();
+        session.status.show('Nothing to undo');
+        await expect.poll(() => find('.message-pill .message')).not.toBeNull();
+
+        const message = find('.message-pill .message');
+        if (!message) throw new Error('There is no message.');
+        const box = message.getBoundingClientRect();
+        expect(box.left + box.width / 2).toBeCloseTo(WINDOW.width / 2, 0);
+        expect(box.bottom).toBe(WINDOW.height - GAP);
+        expect(getComputedStyle(message).pointerEvents).toBe('none');
     });
 
     test('the Entities viewer grows and shrinks with its rows', async () => {
@@ -182,13 +202,13 @@ describe('EditorShell', () => {
         expect(free?.left).toBe(boxOf('Entity inspector').right);
         expect(free?.right).toBe(boxOf('Entities viewer').left);
         expect(free?.top).toBe(0);
-        expect(free?.bottom).toBe(boxOf('Status bar').top);
+        expect(free?.bottom).toBe(WINDOW.height);
         // Fitting frames the level in what the islands leave free.
         expect(session.view.coveredEdges).toEqual({
             left: 2 * GAP + TOOL_COLUMN + ENTITY_INSPECTOR,
             top: 0,
             right: GAP + ENTITIES_VIEWER,
-            bottom: GAP + STATUS_BAR,
+            bottom: 0,
         });
     });
 
@@ -232,17 +252,6 @@ describe('EditorShell', () => {
         expect(kindButton('Rectangle').getAttribute('aria-pressed')).toBe('false');
     });
 
-    test('the status bar shows each tool hint, following the kind', async () => {
-        const { tools } = showShell();
-        await expect.poll(statusText).toContain('Click to select.');
-
-        tools.controller.pick('shape');
-        await expect.poll(statusText).toContain('Click to place, drag to size.');
-
-        await userEvent.click(kindButton('Polygon'));
-        await expect.poll(statusText).toContain('Click to add points.');
-    });
-
     test('the Joint tool’s kinds menu shows the three types, Hinge on, and changes the type', async () => {
         const { tools } = showShell();
         tools.controller.pick('joint');
@@ -269,15 +278,6 @@ describe('EditorShell', () => {
         await userEvent.hover(kindButton('Hinge'));
 
         await expect.poll(() => find('.kinds-menu [role="tooltip"]')?.textContent).toBe('Hinge (revolute joint)');
-    });
-
-    test('the status bar shows the Joint tool’s hints, following the type', async () => {
-        const { tools } = showShell();
-        tools.controller.pick('joint');
-        await expect.poll(statusText).toContain('Click where two bodies overlap to join them, or on one to pin it.');
-
-        await userEvent.click(kindButton('Rope'));
-        await expect.poll(statusText).toContain('Click the first entity, then the second.');
     });
 
     test('the Entity inspector shows again, with the new shape, once a shape is finished', async () => {

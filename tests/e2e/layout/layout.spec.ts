@@ -14,7 +14,7 @@ const SIZES: WindowSize[] = [
     { name: '1280×720 at 200%', width: 1280, height: 720, zoom: 2 },
 ];
 
-const ISLANDS = ['Main menu', 'Tools', 'Entity inspector', 'Entities viewer', 'Minimap', 'Status bar'];
+const ISLANDS = ['Main menu', 'Tools', 'Entity inspector', 'Entities viewer', 'Minimap', 'Debug box'];
 // From the window's edge and between islands.
 const ISLAND_GAP = 10;
 // The tool column, the Entity inspector and the Entities viewer side by side with their gaps. A narrower
@@ -26,7 +26,7 @@ const MIN_ZOOM = 0.01;
 // A new level's camera size.
 const CAMERA_WIDTH = 1920;
 const CAMERA_HEIGHT = 1080;
-// The status bar shows the zoom as a whole percentage, so the real zoom is up to half a percent more.
+// The debug box shows the zoom as a whole percentage, so the real zoom is up to half a percent more.
 const ZOOM_ROUNDING = 0.005;
 // Boxes at a zoomed page's fractional pixels may meet a little inside each other.
 const EDGE_TOLERANCE_PX = 1;
@@ -111,7 +111,7 @@ for (const size of SIZES) {
             await openEditor(page);
             const free = await freeAreaBox(page);
 
-            const percentText = await page.locator('.status-bar .zoom').textContent();
+            const percentText = await page.locator('.debug-box [data-entry="ZOOM"] .value').textContent();
             const percent = Number((percentText ?? '').replace('%', ''));
             expect(percent).toBeGreaterThan(0);
             const largestZoom = percent / 100 + ZOOM_ROUNDING;

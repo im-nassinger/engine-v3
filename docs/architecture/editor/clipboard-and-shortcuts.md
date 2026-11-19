@@ -20,7 +20,7 @@ export type EditorCommand = {
 };
 
 export type CommandOutcome =
-    | { kind: 'done'; skipped?: readonly SkippedEntity[] }  // "Camera kept" in the status bar
+    | { kind: 'done'; skipped?: readonly SkippedEntity[] }  // "Camera kept" in the message pill
     | { kind: 'refused'; reason: string }                  // "The camera can't be deleted"
     | { kind: 'needsConfirmation'; question: Question; confirm(): CommandOutcome }
     | { kind: 'notice'; notice: Notice };                  // About: a dialog with only OK

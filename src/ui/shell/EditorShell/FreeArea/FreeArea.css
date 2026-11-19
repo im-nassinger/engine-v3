@@ -1,10 +1,10 @@
 /* From the Entity inspector's right edge, or the tool column's while the Shape tool hides it, to the Entities
-   viewer's left edge, from the window's top to the status bar's island. */
+   viewer's left edge, the window's whole height: the debug box sits under the Entities viewer's column. */
 .free-area {
     position: absolute;
     top: 0;
     right: calc(var(--island-gap) + var(--entities-viewer));
-    bottom: calc(var(--island-gap) + var(--debug-box));
+    bottom: 0;
     left: calc(var(--beside-tools) + var(--entity-inspector));
     pointer-events: none;
 

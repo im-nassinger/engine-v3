@@ -28,43 +28,18 @@ async function addComponent(page: Page, typeName: string) {
     await expect(card(page, typeName)).toHaveCount(1);
 }
 
-function messagesCount(page: Page) {
-    return page.getByRole('region', { name: 'Status bar' }).getByRole('button', { name: /^Editor messages/ });
-}
-
-test("a body on a shape shows the SurfaceComponent's note and the count, and its fix clears both", async ({ page }) => {
+test("a body on a shape shows the SurfaceComponent's note, and its fix clears it", async ({ page }) => {
     await openEditorWithCrateSelected(page);
-    await expect(messagesCount(page)).toHaveCount(0);
 
     await addComponent(page, 'BodyComponent');
 
     const note = card(page, 'BodyComponent').getByRole('note');
     await expect(note).toContainText('Needs a Surface to collide.');
-    await expect(messagesCount(page)).toHaveText('1 warning');
-
-    await messagesCount(page).click();
-    const listed = page.getByRole('menuitem', { name: 'Rectangle 1: Needs a Surface to collide.' });
-    await expect(listed).toBeVisible();
-    await page.keyboard.press('Escape');
 
     await note.getByRole('button', { name: 'Add Surface' }).click();
 
     await expect(card(page, 'SurfaceComponent')).toHaveCount(1);
     await expect(note).toHaveCount(0);
-    await expect(messagesCount(page)).toHaveCount(0);
-});
-
-test('picking a message from the count selects its entity', async ({ page }) => {
-    await openEditorWithCrateSelected(page);
-    await addComponent(page, 'BodyComponent');
-
-    await page.getByRole('tree', { name: 'Entities' }).getByRole('treeitem').filter({ hasText: 'World' }).click();
-    await expect(card(page, 'BodyComponent')).toHaveCount(0);
-
-    await messagesCount(page).click();
-    await page.getByRole('menuitem', { name: 'Rectangle 1: Needs a Surface to collide.' }).click();
-
-    await expect(card(page, 'BodyComponent')).toHaveCount(1);
 });
 
 test('a typed Linear damping is one step, and Ctrl+Z puts it back', async ({ page }) => {

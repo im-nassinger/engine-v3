@@ -1,0 +1,17 @@
+.debug-entry {
+    display: inline-flex;
+    gap: var(--space-4);
+
+    > .label {
+        color: var(--muted);
+    }
+
+    > .value {
+        color: var(--text);
+        font-variant-numeric: tabular-nums;
+    }
+
+    &[data-holds-coordinate='true'] > .value {
+        min-width: 5ch;
+    }
+}

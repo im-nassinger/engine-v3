@@ -5,7 +5,7 @@ export type ReportedOutcome =
     | { readonly kind: 'done'; readonly text?: string; readonly skipped?: readonly SkippedEntity[] }
     | { readonly kind: 'refused'; readonly reason: string };
 
-// The status bar's sentence for a command's outcome, or undefined when there is nothing to say.
+// The message pill's sentence for a command's outcome, or undefined when there is nothing to say.
 export function outcomeText(outcome: ReportedOutcome) {
     if (outcome.kind === 'refused') return outcome.reason;
 

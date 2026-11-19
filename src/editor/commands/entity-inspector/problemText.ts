@@ -1,6 +1,6 @@
 import type { ParseProblem } from '../../../core/fields/index.ts';
 
-// The status bar's sentence for a value a field refused, such as "Points needs at least 3".
+// The message pill's sentence for a value a field refused, such as "Points needs at least 3".
 export function problemText(label: string, problem: ParseProblem) {
     switch (problem.reason) {
         case 'wrongType':

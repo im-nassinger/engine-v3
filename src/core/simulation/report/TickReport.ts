@@ -19,7 +19,7 @@ export type TickReport = {
     // Each entity removed with everything inside it, in the order removed: fully outside an open edge of
     // the level bounds, or past the hard limit.
     readonly removed: readonly EntityId[];
-    // Those of removed that went past the hard limit, for the status bar's warning.
+    // Those of removed that went past the hard limit, for the Play bar's warning.
     readonly removedPastHardLimit: readonly EntityId[];
     // The latest path of each Rope and Spring whose path changed during the batch, in the order they first
     // changed. A path follows from its bodies' poses, so it is sent only to be drawn.

@@ -15,7 +15,7 @@ const NOTHING_TO_PASTE = 'Nothing to paste';
 
 // Pastes the clipboard's entities centred on the mouse over the level view, else on the view's middle.
 // From the menu the read is asynchronous: run() starts it, and the paste happens when the text arrives,
-// with its outcome shown in the status bar then. It checks for a read-only level itself, without a
+// with its outcome shown in the message pill then. It checks for a read-only level itself, without a
 // ReadOnlyGuard, because the browser's paste event calls pasteText() directly.
 export class PasteCommand implements EditorCommand {
     readonly id = 'edit.paste';

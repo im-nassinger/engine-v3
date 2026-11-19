@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 import type { MousePosition, ToolController } from '../../editor/tools/index.ts';
 
-// What the tool column, the status bar and the entity field's picker read: the tools, and where the mouse
+// What the tool column, the debug box and the entity field's picker read: the tools, and where the mouse
 // is over the level view.
 export type EditorTools = {
     readonly controller: ToolController;

@@ -140,7 +140,7 @@ test('a click on nothing makes no joint and shows why', async ({ page }) => {
     await pickJointTool(page, 'Hinge');
     await click(page, middle);
 
-    await expect(page.locator('.status-bar .status-text')).toHaveText('Nothing with physics here');
+    await expect(page.locator('.message-pill .message')).toHaveText('Nothing with physics here');
     await expect(rows(page, 'Hinge 1')).toHaveCount(0);
     await expect(page.getByRole('group', { name: 'Kinds menu' })).toBeVisible();
 });

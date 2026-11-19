@@ -74,7 +74,7 @@ src/
     shortcuts/         KeyChord, KeyPress, ShortcutMap, ShortcutDispatcher
     saving/            Autosave, SaveState, ProjectFile, ImportLevel, ExportLevel, contracts
     play/              session/ (PlaySession), pacing/ (TickPacer), watchdog/ (Watchdog), mirror/ (PlayMirror, NoPhysicsEngine), runner/ (the GameRunner contract), inputs/ (HeldKeys, the PageLifecycle contract), fixed-size/ (fixedSizeView), testing/ (DirectGameRunner, FakePageLifecycle)
-    status/            StatusText (the status bar's left slot), the status bar's texts (selectionSummary, mousePositionText)
+    status/            StatusText (what the message pill shows), outcomeText, mouseCoordinateText (the debug box's X and Y)
     time/              Clock, Timer, FrameScheduler, TimeOfDay contracts
   adapters/
     pixi/              PixiLevelView, EntityNode, EntityDrawing, overlays/
@@ -95,16 +95,17 @@ src/
     hooks/             useVersion, useReading, and later useSelection, useEntityVersion, useLevelTree
     theme.css          colour and size tokens of the one dark theme
     shell/             EditorShell/ (with FreeArea/, PanelPlace/), PanelErrorBoundary/
-    status-bar/        StatusBar/
+    debug-box/         DebugBox/ (with DebugEntry/)
+    message-pill/      MessagePill/
     tool-column/       ToolColumn/ (with ToolButton/, KindsMenu/)
     dialogs/           Dialogs/ (with DialogBox/)
     open-windows/      OpenWindowsContext: where menus and the row drag report themselves open
-    tools/             ToolsContext: ToolController and MousePosition for the tool column, status bar and picker; testing/
+    tools/             ToolsContext: ToolController and MousePosition for the tool column, debug box and picker; testing/
     play/              PlayContext: the PlaySession for the shell, the Play button and the Play bar
     play-bar/          PlayBar/ (with PlayBarButton/)
     testing/           editorPage: a component shown with the session, commands and tools, for browser tests
     main-menu/ level-view-host/ entities-viewer/ entity-inspector/
-    level-file/        LevelName/, SaveStateButton/: on the status bar until stage 19 step 12 removes them
+    level-file/        LevelFile/ (an island), LevelName/, SaveStateButton/, until stage 19 step 12 removes them
     save-state/        SaveIndicatorContext
     fields/            one component per field type: NumberField/, ColourField/, ...
     shared/            Button/, IconButton/, Menu/, MenuButton/, Tooltip/, Icon/

@@ -10,7 +10,7 @@ export { SelectTool } from './select/SelectTool.ts';
 export { DRAW_START_PX, ShapeTool } from './shape/ShapeTool.ts';
 export type { ShapePreview, ShapeToolKind } from './shape/ShapeTool.ts';
 export type { LevelPointerInput, Modifiers, PointerButton, Tool, ToolContext, ToolId, ToolKey } from './Tool.ts';
-export { PICK_HINT, ToolController } from './ToolController.ts';
+export { PICK_TEXT, ToolController } from './ToolController.ts';
 export type { PickEntity, ToolServices } from './ToolController.ts';
 export { TOOL_KEYS } from './toolKeys.ts';
 export { JointTool, NOTHING_HERE } from './joint/JointTool.ts';

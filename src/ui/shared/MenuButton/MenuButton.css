@@ -77,9 +77,4 @@
     &[data-look='quiet'] > .toggle {
         color: var(--faint);
     }
-
-    &[data-look='status'] > .toggle {
-        height: var(--input);
-        color: inherit;
-    }
 }

@@ -22,35 +22,39 @@ test('with nothing selected, Delete is greyed and its tooltip says why', async (
     await expect(page.getByRole('tooltip')).toHaveText('Nothing selected');
 });
 
-test("the status bar shows a status text, then returns to the tool's hint", async ({ page }) => {
+test('the message pill shows a status text, then goes', async ({ page }) => {
     await openEditor(page);
-    const statusText = page.locator('.status-bar .status-text');
+    const message = page.locator('.message-pill .message');
+    await expect(message).toHaveCount(0);
 
     await page.locator('.level-view-host canvas').click();
     await page.keyboard.press('Control+z');
 
-    await expect(statusText).toHaveText('Nothing to undo');
-    await expect(statusText).toHaveText(/^Click to select\./, { timeout: 6_000 });
+    await expect(message).toHaveText('Nothing to undo');
+    await expect(message).toHaveCount(0, { timeout: 6_000 });
 });
 
-test('the status bar shows the mouse position over the level view, and nothing once it leaves', async ({ page }) => {
+test('the debug box shows the mouse position over the level view, and nothing once it leaves', async ({ page }) => {
     await openEditor(page);
-    const mousePosition = page.locator('.status-bar .mouse-position');
+    const mouseX = page.locator('.debug-box [data-entry="X"] .value');
+    const mouseY = page.locator('.debug-box [data-entry="Y"] .value');
     const canvas = page.locator('.level-view-host canvas');
     const box = await canvas.boundingBox();
     if (box === null) throw new Error('The level view has no box.');
 
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await expect(mousePosition).toHaveText(/^−?\d+, −?\d+$/);
-    const first = await mousePosition.textContent();
+    await expect(mouseX).toHaveText(/^−?\d+$/);
+    await expect(mouseY).toHaveText(/^−?\d+$/);
+    const first = await mouseX.textContent();
 
     await page.mouse.move(box.x + box.width / 2 + 40, box.y + box.height / 2);
-    await expect(mousePosition).not.toHaveText(first ?? '');
+    await expect(mouseX).not.toHaveText(first ?? '');
 
     const mainMenu = await page.getByRole('region', { name: 'Main menu' }).boundingBox();
     if (mainMenu === null) throw new Error('☰ has no box.');
     await page.mouse.move(mainMenu.x + mainMenu.width / 2, mainMenu.y + mainMenu.height / 2);
-    await expect(mousePosition).toHaveText('');
+    await expect(mouseX).toHaveText('');
+    await expect(mouseY).toHaveText('');
 });
 
 test('the tool column shows Select as the active tool', async ({ page }) => {

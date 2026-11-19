@@ -11,7 +11,7 @@
 | A rule refuses | Moving a group into its own child; deleting the camera | `{ kind: 'refused', reason }` from a command | Status text: "The camera can't be deleted" |
 | Part of a command is skipped | Delete with the camera selected | `{ kind: 'done', skipped }` | Status text: "Camera kept" |
 | A question first | New, Import, a move that changes which body an entity belongs to | `{ kind: 'needsConfirmation', question, confirm }` | A dialog |
-| A setup that may not work | A SurfaceComponent with no ShapeComponent; a joint pointing at a deleted entity | An `EditorMessage` from a rule | A note on the card, counted in the status bar |
+| A setup that may not work | A SurfaceComponent with no ShapeComponent; a joint pointing at a deleted entity | An `EditorMessage` from a rule | A note on the card |
 | A typed value that can't be used | `abc` in a number field; scale 0 | `ValueInputResult` | Red outline and a line under the field |
 | A typed value out of range | 150 in a 0 to 100 field | Clamped, with a note | "Max is 100" under the field, briefly |
 | Untrusted data is bad | A damaged import, a paste of something else | `ReadRefusal` | Import: a dialog with a plain message. Paste: status text |
@@ -31,7 +31,7 @@
 
 | Rule | Kept by |
 |---|---|
-| Editor messages never block saving or Play | `EditorMessages` is read only by the UI and the status bar count |
+| Editor messages never block saving or Play | `EditorMessages` is read only by the UI |
 | A command that fails changes nothing and makes no step | `EditTransaction` rolls back, see [history](editor/history.md) |
 | Import is all or nothing, with a plain message per case | `LevelReader` refusals, mapped to sentences in `editor/saving` |
 | A failed save is never silent, and Export still works | `Autosave` sets `failed`; export doesn't use storage |
@@ -51,7 +51,7 @@ export class StatusText {
 
     constructor(timer: Timer);
     show(text: string): void;               // replaces what is there, clears after 4 seconds
-    get current(): string | undefined;      // undefined: the status bar shows the tool's hint
+    get current(): string | undefined;      // undefined: the message pill shows nothing of it
 }
 ```
 

@@ -1,6 +1,6 @@
 /* Every island has a fixed place over the level view, 10 px from the window's edge and from its neighbours.
-   ☰ is a square at the top left with the tool column under it. Until step 11 of stage 19 the status bar is an
-   island across the bottom, in the debug box's place, and the islands above it end above it. */
+   ☰ is a square at the top left with the tool column under it. The bottom row holds the debug box at the right and,
+   until step 12 of stage 19, the level's name and save state at the left; the islands above it end above it. */
 .editor-shell {
     --under-main-menu: calc(var(--island-gap) * 2 + var(--island-bar));
     --islands-bottom: calc(var(--island-gap) * 2 + var(--debug-box));
@@ -54,15 +54,20 @@
         height: var(--minimap-height);
     }
 
-    > [data-area='status-bar'] {
+    > [data-area='debug-box'] {
         right: var(--island-gap);
+        bottom: var(--island-gap);
+        height: var(--debug-box);
+    }
+
+    > [data-area='level-file'] {
         bottom: var(--island-gap);
         left: var(--island-gap);
         height: var(--debug-box);
     }
 
     /* Hidden, not removed, so the panels keep their scroll and folds and nothing in them is clicked or read. */
-    &[data-playing='true'] > :is(.panel-place, .free-area) {
+    &[data-playing='true'] > :is(.panel-place, .free-area, .message-pill) {
         visibility: hidden;
     }
 }

@@ -316,6 +316,5 @@ describe('the Shape tool’s polygon', () => {
         click(setup, { x: 100, y: 60 });
 
         expect(drawnSoFar(setup)).toHaveLength(3);
-        expect(setup.controller.hint).toContain('Click to add points.');
     });
 });

@@ -9,7 +9,7 @@ export type ToolServices = Omit<ToolContext, 'finished'>;
 
 const SPACE_CODE = 'Space';
 
-export const PICK_HINT = 'Click an entity to pick it. Esc cancels.';
+export const PICK_TEXT = 'Click an entity to pick it. Esc cancels.';
 
 // What the entity field's picker is told: the entity clicked, or undefined for a click on nothing.
 export type PickEntity = (entityId: EntityId | undefined) => void;
@@ -18,8 +18,6 @@ export type PickEntity = (entityId: EntityId | undefined) => void;
 // makes something.
 export class ToolController {
     readonly version = new VersionCounter();
-    // Moves whenever the hint may have changed: the active tool, the picker, or a tool's preview.
-    readonly hintVersion = new VersionCounter();
     private readonly toolsById = new Map<ToolId, Tool>();
     private readonly context: ToolContext;
     private readonly pan: PanGesture;
@@ -35,9 +33,7 @@ export class ToolController {
             if (this.toolsById.has(tool.id)) throw new Error(`Two tools have the id ${tool.id}.`);
 
             this.toolsById.set(tool.id, tool);
-            tool.preview.subscribe(() => this.hintVersion.increment());
         }
-        this.version.subscribe(() => this.hintVersion.increment());
 
         this.context = buildContext(services, (created) => this.finish(created));
         this.pan = pan;
@@ -60,13 +56,6 @@ export class ToolController {
     // Whether this picker is the one waiting, for the entity field whose picker button shows it.
     isWaitingFor(onPicked: PickEntity) {
         return this.pickWaiting === onPicked;
-    }
-
-    // The status bar's hint: the picker's while it waits, else the active tool's.
-    get hint() {
-        if (this.pickWaiting !== undefined) return PICK_HINT;
-
-        return this.current.hint;
     }
 
     // In the order given, for the tool column.
@@ -100,9 +89,10 @@ export class ToolController {
 
     // The entity field's picker: the next left click in the level view picks the topmost entity under
     // the mouse, inside groups, and the tool before it comes back. Asking again replaces the one waiting.
-    // The answer stops it waiting, if it still is.
+    // The answer stops it waiting, if it still is. The message pill says what to do.
     waitForPick(onPicked: PickEntity) {
         this.pickWaiting = onPicked;
+        this.context.status.show(PICK_TEXT);
         this.version.increment();
 
         return () => {

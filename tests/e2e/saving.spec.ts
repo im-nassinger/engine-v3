@@ -35,7 +35,7 @@ function entityRow(page: Page, name: string) {
 }
 
 function statusText(page: Page) {
-    return page.getByRole('status').locator('.status-text');
+    return page.locator('.message-pill .message');
 }
 
 // A click with the Shape tool in the middle of the free area places a rectangle named `Rectangle 1`.
@@ -202,6 +202,7 @@ test('a full disk shows Save failed, and Export still downloads', async ({ page 
     await drawRectangle(page);
 
     await expect(saveState(page, 'Save failed')).toBeVisible({ timeout: SAVE_TIMEOUT_MS });
+    await expect(statusText(page)).toContainText('Saving in this browser failed');
     await expect(page).toHaveTitle('*Untitled level - engine-v3');
 
     const exported = await exportLevel(page);

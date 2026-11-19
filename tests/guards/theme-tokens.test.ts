@@ -7,7 +7,7 @@ import { describe, expect, test } from 'vitest';
 const THEME = 'src/ui/theme.css';
 const TOKENS_DOC = 'docs/design/tokens.md';
 
-// Round 8's tokens, dropped by the redesign (stage 19, step 3). The top bar, the status bar and the
+// Round 8's tokens, dropped by the redesign (stage 19, step 3). The top bar and the
 // tool column keep the redesign's sizes until their own steps replace them.
 const REMOVED = [
     '--line',

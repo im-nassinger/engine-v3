@@ -2,7 +2,7 @@ import type { LimitName, ReadRefusal } from '../../../core/level-data/index.ts';
 
 const CANT_READ = "The pasted entities can't be read";
 
-// The status bar's sentence for a paste the reader refused. A limit names itself with the text the editor
+// The message pill's sentence for a paste the reader refused. A limit names itself with the text the editor
 // already uses for it.
 export function pasteRefusalText(refusal: ReadRefusal) {
     if (refusal.reason === 'overLimit') return limitText(refusal.limit, refusal.max);

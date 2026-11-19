@@ -1,8 +1,7 @@
 import { VersionCounter } from '../../core/events/index.ts';
 import type { Cancel, Timer } from '../time/index.ts';
 
-// The status bar's left slot: the last short result, cleared after 4 seconds. While it is empty,
-// the status bar shows the tool's hint.
+// What the message pill shows: the last short result, cleared after 4 seconds.
 export class StatusText {
     static readonly showMs = 4_000;
 

@@ -13,10 +13,10 @@ import { stepLabel } from '../shared/stepLabel.ts';
 
 const NOTHING_TO_UNGROUP = 'Nothing to ungroup';
 
-// Every component a group can hold without the status bar saying it was removed with it.
+// Every component a group can hold without the message pill saying it was removed with it.
 const UNREPORTED_COMPONENTS = new Set([TransformComponent.schema.typeName, NameComponent.schema.typeName]);
 
-// What one ungrouping removed besides the group itself, for the status bar.
+// What one ungrouping removed besides the group itself, for the message pill.
 type RemovedWithGroups = {
     readonly componentNames: Set<string>;
     readonly jointNames: string[];

@@ -1,6 +1,6 @@
 import { VersionCounter } from '../../core/events/index.ts';
 
-// Why every edit is refused in a tab without the level's lock, as the status bar shows it.
+// Why every edit is refused in a tab without the level's lock, as the message pill shows it.
 export const READ_ONLY_REASON = 'The level is open in another tab';
 
 // Whether this tab may change the level. Shared by the session with every level it opens, so New and

@@ -13,7 +13,6 @@ import { ToolController } from '../ToolController.ts';
 // A tool that writes down what it heard. cancelAnswers says what cancel() returns, in turn.
 export class RecordingTool implements Tool {
     readonly id: ToolId;
-    readonly hint: string;
     readonly preview = new VersionCounter();
     readonly heard: string[] = [];
     readonly moves: LevelPointerInput[] = [];
@@ -25,7 +24,6 @@ export class RecordingTool implements Tool {
 
     constructor(id: ToolId) {
         this.id = id;
-        this.hint = `${id} hint`;
     }
 
     activate(context: ToolContext) {

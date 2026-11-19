@@ -24,7 +24,7 @@ The requirements set speed targets for a level of 10,000 entities on a mid-range
 | **Only moved bodies in tick reports** | The worker sends the poses of bodies Box2D reports as moved, in one transferred buffer | Test play with many bodies |
 | **Interpolated drawing** | The page draws between the last two ticks, so a 144 Hz screen stays smooth without more ticks | Test play |
 | **Preloading** | Box2D's wasm and a spare game worker are ready when the editor opens | "Play starts as fast as possible" |
-| **One render per frame for the status bar's mouse position** | Throttled to the frame | Moving the mouse |
+| **One render per frame for the debug box's mouse position** | Throttled to the frame | Moving the mouse |
 
 ## What only gets a place
 

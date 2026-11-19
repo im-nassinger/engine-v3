@@ -31,7 +31,7 @@ export type Notice = {
     readonly text: string;
 };
 
-// text is what the command did, for the status bar: "Undid: Delete Square". CommandRunner decides how
+// text is what the command did, for the message pill: "Undid: Delete Square". CommandRunner decides how
 // each kind is shown; a command never calls the UI.
 export type CommandOutcome =
     | { readonly kind: 'done'; readonly text?: string; readonly skipped?: readonly SkippedEntity[] }

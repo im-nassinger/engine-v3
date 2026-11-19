@@ -76,6 +76,7 @@ describe('SaveIndicator', () => {
         await autosave.saveNow();
 
         expect(indicator.shown).toEqual({ label: 'Save failed', explanation: SAVE_FAILED_TEXT });
+        expect(indicator.failedSaveText).toBe(SAVE_FAILED_TEXT);
         expect(indicator.hasUnsavedChanges).toBe(true);
         autosave.dispose();
     });
@@ -85,6 +86,7 @@ describe('SaveIndicator', () => {
 
         expect(indicator.mode).toBe('readOnly');
         expect(indicator.shown).toEqual({ label: 'Read-only', explanation: READ_ONLY_REASON });
+        expect(indicator.failedSaveText).toBeUndefined();
         expect(indicator.hasUnsavedChanges).toBe(false);
     });
 
@@ -94,6 +96,7 @@ describe('SaveIndicator', () => {
         expect(indicator.mode).toBe('nothingSaved');
         expect(indicator.state.status).toBe('failed');
         expect(indicator.shown).toEqual({ label: 'Save failed', explanation: NOTHING_SAVED_EXPLANATION });
+        expect(indicator.failedSaveText).toBe(NOTHING_SAVED_EXPLANATION);
         expect(indicator.hasUnsavedChanges).toBe(true);
     });
 });

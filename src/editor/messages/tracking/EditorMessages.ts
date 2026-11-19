@@ -13,7 +13,7 @@ const NONE_READ: readonly EntityId[] = [];
 // Every editor message of one level. The whole level is checked when it opens; after that, only the
 // entities a LevelUpdate names, once per frame, so one edit among 10,000 entities checks one entity.
 export class EditorMessages {
-    // Moves whenever any message comes or goes: the status bar's count.
+    // Moves whenever any message comes or goes.
     readonly version = new VersionCounter();
     // The entities whose messages changed in one check, for an Entity inspector showing some of them.
     readonly changed = new Signal<ReadonlySet<EntityId>>();
@@ -46,7 +46,7 @@ export class EditorMessages {
         return this.byEntity.get(id) ?? NONE;
     }
 
-    // The status bar's count and list: the level-wide messages first, then each entity's.
+    // The level-wide messages first, then each entity's.
     all() {
         const version = this.version.version;
         if (this.allAtVersion?.version === version) return this.allAtVersion.messages;

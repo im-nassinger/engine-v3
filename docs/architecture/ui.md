@@ -89,8 +89,8 @@ EditorShell
 ├── FreeArea                           reports the covered edges for fitting
 ├── EntitiesViewer                     ui/entities-viewer, grows with its rows up to the minimap
 ├── Minimap                            ui, drawing through a small adapter contract (step 13)
-├── DebugBox                           ui/status-bar
-├── MessagePill                        ui/status-bar: StatusText and a failed save
+├── DebugBox                           ui/debug-box
+├── MessagePill                        ui/message-pill: StatusText and a failed save
 ├── PlayBar                            during play, in every island's place
 └── Dialogs                            one at a time, Rename level… among them
 ```
@@ -99,7 +99,7 @@ EditorShell
 - **`LevelViewHost` fills the whole window under the islands**, as the requirement says. The islands sit above it; the browser's own stacking keeps clicks on an island away from the canvas.
 - **The free area** is the level view between the Entity inspector (or the tool column while the Shape tool hides it) and the Entities viewer, so fitting frames the level where it is seen.
 - During play, `EditorShell` hides every island and shows `PlayBar`, reading `PlaySession.version` from `PlayContext`. The islands are hidden with `visibility: hidden`, not removed, so they come back at Stop as they were (stage 16).
-- **The layout as built (stage 19 step 6, standing yes, 2026-11-18):** `EditorShell.css` places each `PanelPlace` absolutely by its `data-area`, with the theme's size tokens; `FreeArea` is placed the same way and still reports the covered edges through its `ResizeObserver`. The minimap's place is an empty `PanelPlace` until step 13. Since step 7 ☰ is its own 48 px island at the top left, with the tool column under it (`--under-main-menu`) and the Entity inspector and the Entities viewer starting at the top; until step 11 the status bar is an island across the bottom, and the islands above end above it through `--islands-bottom`.
+- **The layout as built (stage 19 step 6, standing yes, 2026-11-18):** `EditorShell.css` places each `PanelPlace` absolutely by its `data-area`, with the theme's size tokens; `FreeArea` is placed the same way and still reports the covered edges through its `ResizeObserver`. The minimap's place is an empty `PanelPlace` until step 13. Since step 7 ☰ is its own 48 px island at the top left, with the tool column under it (`--under-main-menu`) and the Entity inspector and the Entities viewer starting at the top; the bottom row holds the debug box at the right (step 11), and the islands above end above it through `--islands-bottom`.
 
 ## The level view and React
 
@@ -148,7 +148,9 @@ export function LevelViewHost() {
 | `PlayBar` | `PlaySession` | Pause or Resume, Step, Stop, and one message |
 | `Dialogs` | Questions from commands (`needsConfirmation`), import refusals, Rename level… | One dialog at a time |
 
-Until stage 19's step 11 lands, the code still has `StatusBar` in its place; ☰ is `MainMenu` in `ui/main-menu` (step 7), and `ToolColumn` with `KindsMenu` is in `ui/tool-column` (step 8). Step 2 gave the code the new names: `EntityInspector` in `ui/entity-inspector` and `EntitiesViewer` in `ui/entities-viewer`.
+☰ is `MainMenu` in `ui/main-menu` (step 7), and `ToolColumn` with `KindsMenu` is in `ui/tool-column` (step 8). Step 2 gave the code the new names: `EntityInspector` in `ui/entity-inspector` and `EntitiesViewer` in `ui/entities-viewer`.
+
+**The debug box and the message pill as built (stage 19 step 11, standing yes, 2026-11-18).** `DebugBox` is an island at the bottom right, as wide as its four `DebugEntry`s; `X` and `Y` keep room for 5 characters, so the box doesn't change width as the mouse moves or leaves. `MessagePill` is not an island: its root is a click-through strip across the bottom of the window, always on the page as the `role="status"` that screen readers follow, and the pill inside it exists only while there is a message, centred on the level view, which fills the window. A status text shows over a failed save (`SaveIndicator.failedSaveText`), which comes back after it. The free area now reaches the window's bottom, since nothing lies across it. **Until step 12** the level's name and the save state are a small `LevelFile` island at the bottom left, under the Entity inspector; step 12 removes it.
 
 **Fields:** `ui/fields/` has one component per field type (`NumberField`, `TextField`, `CheckboxField`, `ChoiceField`, `ColourField`, `VectorField`, `EntityField`). `FieldControl` picks the component from `FieldModel.definition.type.kind` through a lookup table, so a new field type adds one entry and one component. `NumberField` uses `ValueInput` from the editor for parsing and formatting, and serves angles too (standing yes, 2026-11-15).
 

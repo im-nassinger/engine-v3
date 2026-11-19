@@ -2,7 +2,7 @@ import { VersionCounter } from '../../../core/events/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
 import type { Cancel, FrameScheduler } from '../../time/index.ts';
 
-// Where the mouse is over the level view, in level pixels, for the status bar. It moves at most once a
+// Where the mouse is over the level view, in level pixels, for the debug box. It moves at most once a
 // frame, however many pointer events come, so the bar redraws at most once a frame.
 export class MousePosition {
     readonly version = new VersionCounter();

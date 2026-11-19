@@ -189,7 +189,7 @@ test('journey 2: a car of a group, a body and two hinged wheels, exported and im
     await expect(page.getByRole('button', { name: 'Save state: Saved' })).toBeVisible({ timeout: SAVE_TIMEOUT_MS });
 
     await dropFile(page, exported);
-    await expect(page.getByRole('status').locator('.status-text')).toHaveText(`Imported ${exported.name}`);
+    await expect(page.locator('.message-pill .message')).toHaveText(`Imported ${exported.name}`);
     await expect(rows(page, 'Group 1')).toHaveCount(1);
 
     // Every entity and every value: the imported level writes the same level.json as the one exported.

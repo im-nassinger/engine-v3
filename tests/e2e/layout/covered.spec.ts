@@ -190,9 +190,9 @@ const CASES: CoverCase[] = [
         run: async (page, inspect) => {
             await inspectMenuButton(page, inspect, region(page, 'Main menu'), 'Main menu');
 
-            const statusBar = region(page, 'Status bar');
-            await statusBar.getByRole('button', { name: /^Save state/ }).click();
-            await inspect("the save state's explanation", statusBar.locator('.save-explanation'));
+            const levelFile = region(page, 'Level file');
+            await levelFile.getByRole('button', { name: /^Save state/ }).click();
+            await inspect("the save state's explanation", levelFile.locator('.save-explanation'));
         },
     },
     {
@@ -219,13 +219,12 @@ const CASES: CoverCase[] = [
         },
     },
     ...['Shape', 'Joint'].map((tool) => ({
-        name: `the ${tool} tool's kinds menu, its tooltips and its hint`,
+        name: `the ${tool} tool's kinds menu and its tooltips`,
         run: async (page: Page, inspect: Inspect) => {
             const kindsMenu = page.getByRole('group', { name: 'Kinds menu' });
             await pickTool(page, tool);
             await inspect(`the ${tool} tool's kinds menu`, kindsMenu);
             await inspectTooltips(page, inspect, kindsMenu.locator('.tooltip'), `the ${tool} tool's kinds`);
-            await inspect(`the ${tool} tool's hint`, region(page, 'Status bar').locator('.status-text'));
         },
     })),
     {
@@ -286,9 +285,6 @@ const CASES: CoverCase[] = [
             const refusal = card(page, 'BodyComponent').locator('.field-message[data-tone="refused"]');
             await refusal.scrollIntoViewIfNeeded();
             await inspect("a refused value's message", refusal);
-
-            const statusBar = region(page, 'Status bar');
-            await inspectMenuButton(page, inspect, statusBar, /^Editor messages/);
         },
     },
     {

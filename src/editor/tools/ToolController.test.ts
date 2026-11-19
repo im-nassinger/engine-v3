@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest';
 import { ShapeComponent, StyleComponent } from '../../core/components/index.ts';
 import type { EntityId } from '../../core/level/index.ts';
 import { pointerAt, buildToolTestSession, toolKey } from './testing/toolTestSession.ts';
-import { PICK_HINT } from './ToolController.ts';
+import { PICK_TEXT } from './ToolController.ts';
 
 const SPACE = toolKey('Space', ' ');
 
@@ -157,7 +157,7 @@ describe('ToolController', () => {
 
             controller.waitForPick(recordPick);
             expect(controller.isPicking).toBe(true);
-            expect(controller.hint).toBe(PICK_HINT);
+            expect(session.status.current).toBe(PICK_TEXT);
 
             controller.pointerDown(pointerAt({ x: 10, y: 10 }));
             controller.pointerMove(pointerAt({ x: 12, y: 10 }));
@@ -165,7 +165,6 @@ describe('ToolController', () => {
 
             expect(picked).toEqual([square.id]);
             expect(controller.isPicking).toBe(false);
-            expect(controller.hint).toBe('select hint');
             expect(select.heard).toEqual(['activate', 'move']);
             expect(session.openLevel.selection.isEmpty).toBe(true);
         });

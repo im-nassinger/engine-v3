@@ -47,11 +47,6 @@ const TOO_MANY_POINTS = `A polygon holds at most ${MAX_POINTS.toLocaleString('en
 
 const LOCKED = 'This group is locked';
 
-const BOX_HINT =
-    'Click to place, drag to size. Shift keeps proportions, Ctrl+Shift or Alt draws from the centre. Z and X turn it, W, A, S and D size it.';
-const POLYGON_HINT =
-    'Click to add points. Click the first point to close it, Enter to finish as a line. Z and X turn it, W, A, S and D size it.';
-
 // 100 x 100 px at first, a circle 50 px in radius.
 const FIRST_SIZE: BoxSize = { width: 100, height: 100 };
 
@@ -90,7 +85,7 @@ type FinishWay = 'return' | 'keep';
 export class ShapeTool implements Tool {
     readonly id = 'shape';
     readonly preview = new VersionCounter();
-    // Moves when the kind changes, for the kinds menu and the hint.
+    // Moves when the kind changes, for the kinds menu.
     readonly options = new VersionCounter();
     private chosenKind: ShapeToolKind = 'rectangle';
     // Remembered for the session, each kind its own.
@@ -108,12 +103,6 @@ export class ShapeTool implements Tool {
     // A left press for a polygon's point, until it is released.
     private polygonPress: LevelPointerInput | undefined;
     private shownPolygon: PolygonPreview | undefined;
-
-    get hint() {
-        const isPolygon = this.chosenKind === 'polygon' || this.polygon !== undefined;
-
-        return isPolygon ? POLYGON_HINT : BOX_HINT;
-    }
 
     get kind() {
         return this.chosenKind;
@@ -143,8 +132,6 @@ export class ShapeTool implements Tool {
         if (this.press === undefined) {
             this.showHover();
         }
-        // The hint may follow the kind even when the preview drew nothing new.
-        this.preview.increment();
     }
 
     activate(context: ToolContext) {

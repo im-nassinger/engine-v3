@@ -29,10 +29,6 @@ export const NOTHING_HERE = 'Nothing with physics here';
 
 const LOCKED = 'This group is locked';
 
-const HINGE_HINT = 'Click where two bodies overlap to join them, or on one to pin it.';
-const FIRST_END_HINT = 'Click the first entity, then the second.';
-const SECOND_END_HINT = 'Click the second entity, or empty space to pin to the background.';
-
 const TYPE_WORDS: Readonly<Record<JointType, string>> = {
     hinge: 'Hinge',
     rope: 'Rope',
@@ -66,7 +62,7 @@ type PlacePlan = Extract<ClickPlan, { readonly kind: 'place' }>;
 export class JointTool implements Tool {
     readonly id = 'joint';
     readonly preview = new VersionCounter();
-    // Moves when the type changes, for the kinds menu and the hint.
+    // Moves when the type changes, for the kinds menu.
     readonly options = new VersionCounter();
     private chosenType: JointType = 'hinge';
     private context: ToolContext | undefined;
@@ -76,12 +72,6 @@ export class JointTool implements Tool {
     // The last mouse position heard, so Ctrl redraws the preview without a move.
     private lastInput: LevelPointerInput | undefined;
     private shown: JointPreview | undefined;
-
-    get hint() {
-        if (this.chosenType === 'hinge') return HINGE_HINT;
-
-        return this.first === undefined ? FIRST_END_HINT : SECOND_END_HINT;
-    }
 
     get type() {
         return this.chosenType;
@@ -100,8 +90,6 @@ export class JointTool implements Tool {
         this.first = undefined;
         this.options.increment();
         this.showHover();
-        // The hint follows the type even when the preview drew nothing new.
-        this.preview.increment();
     }
 
     activate(context: ToolContext) {

@@ -33,7 +33,7 @@ describe('JointTool, a Hinge', () => {
         expect(joint.get('b')).toBeNull();
     });
 
-    test('a click on nothing makes nothing and shows the hint', () => {
+    test('a click on nothing makes nothing and says so', () => {
         const setup = buildJointTest();
         addSquare(setup, { name: 'Box', at: { x: 300, y: 300 }, size: 100 });
 
@@ -124,7 +124,6 @@ describe('JointTool, a Rope or Spring', () => {
 
         click(setup, { x: 410, y: 120 });
         expect(joints(setup)).toEqual([]);
-        expect(setup.tool.hint).toContain('second');
         click(setup, { x: 390, y: 380 });
 
         const entity = onlyJoint(setup);
@@ -163,7 +162,6 @@ describe('JointTool, a Rope or Spring', () => {
         click(setup, { x: 100, y: 100 });
 
         expect(setup.session.status.current).toBe(NOTHING_HERE);
-        expect(setup.tool.hint).toBe('Click the first entity, then the second.');
     });
 
     test('Esc drops a first click', () => {
@@ -224,7 +222,6 @@ describe('JointTool says why it skips an entity', () => {
 
         click(setup, { x: 400, y: 300 });
         expect(setup.session.status.current).toBe(reason);
-        expect(setup.tool.hint).toBe('Click the first entity, then the second.');
     });
 
     test.each(SKIPS)('a Spring\'s second end over $skip is refused with "$reason"', ({ skip, reason }) => {

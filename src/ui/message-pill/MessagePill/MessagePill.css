@@ -1,0 +1,29 @@
+/* Across the bottom of the window, so the pill is centred on the level view and can use its whole width. Clicks
+   pass through to the level view. */
+.message-pill {
+    position: absolute;
+    right: var(--island-gap);
+    bottom: var(--island-gap);
+    left: var(--island-gap);
+    z-index: var(--stack-floating);
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+
+    > .message {
+        display: flex;
+        gap: var(--space-8);
+        align-items: center;
+        margin: 0;
+        padding: 7px 15px;
+        border-radius: 999px;
+        background: var(--chip);
+        color: var(--text);
+        font-size: var(--text-size);
+
+        > svg {
+            flex: none;
+            color: var(--danger);
+        }
+    }
+}
