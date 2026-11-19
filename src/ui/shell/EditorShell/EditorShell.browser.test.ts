@@ -50,6 +50,14 @@ function showShell(level = Level.createNew()) {
     return showWithEditor(level, withWindows);
 }
 
+// The shell with the World selected, so the Entity inspector shows.
+function showShellWithWorld(level = Level.createNew()) {
+    const shown = showShell(level);
+    shown.session.openLevel.selection.replace([level.world.id]);
+
+    return shown;
+}
+
 function find(selector: string) {
     return editorPageContainer().querySelector<HTMLElement>(selector);
 }
@@ -109,7 +117,7 @@ function leftClickAt(x: number, y: number): LevelPointerInput {
 
 describe('EditorShell', () => {
     test('each island sits 10 px from the window and from its neighbours, in its place', async () => {
-        showShell();
+        showShellWithWorld();
         await expect.poll(() => entityInspector()).not.toBeNull();
 
         const mainMenu = boxOf('Main menu');
@@ -129,7 +137,8 @@ describe('EditorShell', () => {
             WINDOW.height - GAP,
             DEBUG_BOX,
         ]);
-        expect(inspector.bottom).toBe(WINDOW.height - GAP);
+        // As tall as the World's cards, which leave room below.
+        expect(inspector.bottom).toBeLessThan(WINDOW.height - GAP);
         const minimap = boxOf('Minimap');
         expect([minimap.right, minimap.bottom, minimap.width, minimap.height]).toEqual([
             WINDOW.width - GAP,
@@ -194,7 +203,7 @@ describe('EditorShell', () => {
     });
 
     test('the free area is the level view between the Entity inspector and the Entities viewer', async () => {
-        const { session } = showShell();
+        const { session } = showShellWithWorld();
         await expect.poll(() => entityInspector()).not.toBeNull();
 
         const free = find('.free-area')?.getBoundingClientRect();
@@ -212,7 +221,7 @@ describe('EditorShell', () => {
     });
 
     test('while the Shape tool hides the Entity inspector, fitting uses the free area up to the tool column', async () => {
-        const { session, tools } = showShell();
+        const { session, tools } = showShellWithWorld();
         await expect.poll(() => entityInspector()).not.toBeNull();
 
         tools.controller.pick('shape');
@@ -222,7 +231,7 @@ describe('EditorShell', () => {
     });
 
     test('the Shape tool hides the Entity inspector, and the free area reaches the tool column', async () => {
-        const { tools } = showShell();
+        const { tools } = showShellWithWorld();
         await expect.poll(() => entityInspector()).not.toBeNull();
         expect(find('.kinds-menu')).toBeNull();
 
@@ -258,8 +267,8 @@ describe('EditorShell', () => {
         expect(kindButton('Hinge').getAttribute('aria-pressed')).toBe('true');
         expect(kindButton('Rope').getAttribute('aria-pressed')).toBe('false');
         expect(kindButton('Spring').getAttribute('aria-pressed')).toBe('false');
-        // The Entity inspector stays, unlike with the Shape tool.
-        expect(entityInspector()).not.toBeNull();
+        // Its menu stands where the Entity inspector is, so the Entity inspector is hidden, as with the Shape tool.
+        expect(entityInspector()).toBeNull();
 
         await userEvent.click(kindButton('Spring'));
 
@@ -291,6 +300,54 @@ describe('EditorShell', () => {
         expect(session.openLevel.selection.entities.length).toBe(1);
         await expect.poll(nameBoxValue).toBe('Rectangle 1');
         expect(find('.kinds-menu')).toBeNull();
+    });
+
+    test('with nothing selected the Entity inspector is hidden, and the free area stays', async () => {
+        const { session } = showShellWithWorld();
+        await expect.poll(() => entityInspector()).not.toBeNull();
+        const freeLeft = find('.free-area')?.getBoundingClientRect().left;
+
+        session.openLevel.selection.clear();
+
+        await expect.poll(() => entityInspector()).toBeNull();
+        expect(find('.free-area')?.getBoundingClientRect().left).toBe(freeLeft);
+
+        session.openLevel.selection.replace([session.openLevel.level.world.id]);
+        await expect.poll(() => entityInspector()).not.toBeNull();
+    });
+
+    test("after New it follows the new level's selection", async () => {
+        const { session } = showShellWithWorld();
+        await expect.poll(() => entityInspector()).not.toBeNull();
+
+        const level = Level.createNew();
+        session.replaceOpenLevel(level);
+        await expect.poll(() => entityInspector()).toBeNull();
+
+        session.openLevel.selection.replace([level.world.id]);
+        await expect.poll(() => entityInspector()).not.toBeNull();
+    });
+
+    test('the Joint tool, which clears the selection, leaves the Entity inspector hidden after it', async () => {
+        const { tools } = showShellWithWorld();
+        await expect.poll(() => entityInspector()).not.toBeNull();
+
+        tools.controller.pick('joint');
+        await expect.poll(() => entityInspector()).toBeNull();
+        tools.controller.pick('select');
+
+        await expect.poll(() => find('.kinds-menu')).toBeNull();
+        expect(entityInspector()).toBeNull();
+    });
+
+    test('with more cards than fit, the Entity inspector stops 10 px above the window bottom and scrolls', async () => {
+        await page.viewport(WINDOW.width, 400);
+        showShellWithWorld();
+        await expect.poll(() => entityInspector()).not.toBeNull();
+
+        await expect.poll(() => boxOf('Entity inspector').bottom).toBe(400 - GAP);
+        const cards = find('.entity-inspector .cards');
+        expect(cards !== null && cards.scrollHeight > cards.clientHeight).toBe(true);
     });
 
     test('no button on the page starts Play: it is reached from the main menu and the keys', async () => {

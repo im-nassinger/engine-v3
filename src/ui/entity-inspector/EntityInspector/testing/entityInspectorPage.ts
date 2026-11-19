@@ -59,11 +59,13 @@ export function addBareEntity(level: Level, name: string) {
     return entity;
 }
 
-// The session, and the frames its editor messages are checked on. With the Entities panel beside it,
-// for dragging its rows onto the Entity inspector's fields.
+// The session, and the frames its editor messages are checked on, with the World selected, since the shell
+// shows the Entity inspector only with something selected. With the Entities panel beside it, for dragging
+// its rows onto the Entity inspector's fields.
 export function showEntityInspector(level: Level, withPanel = false) {
     const frames = new ManualFrames();
     const session = new EditorSession({ level, clock: new ManualClock(), timer: new ManualTimer(), frames });
+    session.openLevel.selection.replace([level.world.id]);
 
     const commands: EditorCommands = {
         registry: createCommandRegistry(session),

@@ -81,6 +81,9 @@ for (const size of SIZES) {
             page,
         }, testInfo) => {
             await openEditor(page);
+            // The World selected, so the Entity inspector shows.
+            await page.getByRole('tree', { name: 'Entities' }).getByRole('treeitem').first().click();
+            await expect(page.getByRole('region', { name: 'Entity inspector' })).toBeVisible();
             await attachScreenshot(page, testInfo, size);
 
             const islands = await Promise.all(ISLANDS.map((name) => boxOf(page, name)));

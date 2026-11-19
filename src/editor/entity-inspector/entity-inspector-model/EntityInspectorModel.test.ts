@@ -83,8 +83,18 @@ function addableEntry(model: EntityInspectorModel, typeName: string) {
 }
 
 describe('EntityInspectorModel: what is shown', () => {
-    test('nothing selected shows the World, without its TransformComponent', () => {
-        const { level, model } = buildModel();
+    test('nothing selected shows nothing', () => {
+        const { model } = buildModel();
+
+        expect(model.shownEntities).toEqual([]);
+        expect(model.cards).toEqual([]);
+        expect(model.addableComponents).toEqual([]);
+    });
+
+    test('the World selected shows its cards, without its TransformComponent', () => {
+        const { level, selection, model } = buildModel();
+
+        selection.replace([level.world.id]);
 
         expect(model.shownEntities).toEqual([level.world]);
         expect(cardTypes(model)).toEqual(['ShapeComponent', 'StyleComponent', 'PhysicsWorldComponent']);
@@ -166,6 +176,7 @@ describe('EntityInspectorModel: fields', () => {
         rope.addComponent(new NameComponent({ name: 'Rope' }));
         rope.addComponent(new PathComponent());
 
+        selection.replace([level.world.id]);
         expect(requireField(requireCard(model, 'ShapeComponent'), 'kind').isReadOnly).toBe(true);
         expect(requireField(requireCard(model, 'ShapeComponent'), 'width').isReadOnly).toBe(false);
 
@@ -228,7 +239,8 @@ describe('EntityInspectorModel: Add Component, Remove and Reset', () => {
     });
 
     test("greys the BodyComponent and the SurfaceComponent on the World, with Walls' hint", () => {
-        const { model } = buildModel();
+        const { level, selection, model } = buildModel();
+        selection.replace([level.world.id]);
         const reason =
             "The World can't collide. To block the edges of the level, turn on Walls on the PhysicsWorldComponent.";
 
@@ -252,6 +264,7 @@ describe('EntityInspectorModel: Add Component, Remove and Reset', () => {
         rope.addComponent(new NameComponent({ name: 'Rope' }));
         rope.addComponent(new JointComponent({ ...JointComponent.schema.defaults(), a: crate.id }));
 
+        selection.replace([level.world.id]);
         expect(requireCard(model, 'StyleComponent').canRemove).toEqual({
             enabled: false,
             reason: 'The World needs it',

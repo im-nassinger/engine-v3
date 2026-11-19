@@ -97,7 +97,7 @@ async function parkRealMouse() {
 }
 
 describe('Entity inspector', () => {
-    test("with nothing selected it shows the World's cards, without its TransformComponent", async () => {
+    test('with the World selected it shows its cards, without its TransformComponent', async () => {
         const level = Level.createNew();
         showEntityInspector(level);
 
@@ -336,7 +336,7 @@ describe('Entity inspector', () => {
         const imported = Level.createNew();
         const crate = addCrate(imported, 'Crate');
         session.replaceOpenLevel(imported);
-        await expect.poll(() => headTitle()).toBe('World');
+        await expect.poll(() => shownCardTypes()).toEqual([]);
 
         select(session, [crate]);
         await expect.poll(() => headTitle()).toBe('Crate');

@@ -1,6 +1,6 @@
 /* Every island has a fixed place over the level view, 10 px from the window's edge and from its neighbours.
-   ☰ is a square at the top left with the tool column under it, and the Entity inspector runs the window's height
-   beside them. The debug box is at the bottom right, and the islands on that side end above it. */
+   ☰ is a square at the top left with the tool column under it, and the Entity inspector beside them, as tall as
+   its cards. The debug box is at the bottom right, and the islands on that side end above it. */
 .editor-shell {
     --under-main-menu: calc(var(--island-gap) * 2 + var(--island-bar));
     --islands-bottom: calc(var(--island-gap) * 2 + var(--debug-box));
@@ -30,11 +30,14 @@
         max-height: calc(100% - var(--under-main-menu) - var(--island-gap));
     }
 
+    /* As tall as its cards, up to 10 px above the window's bottom. A flex column, so the cards can shrink and scroll. */
     > [data-area='entity-inspector'] {
         top: var(--island-gap);
-        bottom: var(--island-gap);
         left: var(--beside-tools);
+        display: flex;
+        flex-direction: column;
         width: var(--entity-inspector);
+        max-height: calc(100% - var(--island-gap) * 2);
     }
 
     /* As tall as its rows, up to 10 px above the minimap. A flex column, so the list inside can shrink and scroll. */

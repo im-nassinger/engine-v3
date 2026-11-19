@@ -96,10 +96,10 @@ test('a new level opens fitted to its camera frame, between the empty panels', a
 
     expect(await showsColourNear(page, frameLeft + 10, middleY, BACKGROUND)).toBe(true);
 
-    // The Entity inspector sits over the canvas, which fills the whole window.
-    const entityInspector = await page.getByRole('region', { name: 'Entity inspector' }).boundingBox();
-    if (!entityInspector) throw new Error('The Entity inspector has no size.');
-    expect(await showsColourNear(page, entityInspector.x + 20, entityInspector.y + 20, PANEL)).toBe(true);
+    // The Entities viewer sits over the canvas, which fills the whole window.
+    const entitiesViewer = await page.getByRole('region', { name: 'Entities viewer' }).boundingBox();
+    if (!entitiesViewer) throw new Error('The Entities viewer has no size.');
+    expect(await showsColourNear(page, entitiesViewer.x + 20, entitiesViewer.y + 20, PANEL)).toBe(true);
     expect(errors).toEqual([]);
 });
 

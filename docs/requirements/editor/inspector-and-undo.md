@@ -10,7 +10,8 @@ How values are edited and how mistakes are reversed. **v1:** the Entity inspecto
 
 - The Entity inspector shows every component of the selected entity as a card: a title, its fields, and a menu with Remove and Reset to defaults.
 - **A card's title is the component's name without `Component`**: `Transform`, `Shape`, `Style`, `Body`, `Surface`, `Joint`, `Camera`, `PhysicsWorld` (owner: 2026-11-17). Only the title shown changes: the components keep their full names in the file, the glossary and Lua. Cards are split by space only, with no lines between them.
-- **Clicking empty space shows the World's components.** There is no settings window. *Why: the World is an entity like any other, so its settings are its components.*
+- **The World's settings are its components**, shown when its row is selected in the Entities viewer. There is no settings window. *Why: the World is an entity like any other, so its settings are its components.*
+- **With nothing selected the Entity inspector is hidden** (owner: 2026-11-19), replacing showing the World. *Why: what the Entity inspector shows is always what is selected, so the Entities viewer and the Entity inspector never disagree.*
 - The World's TransformComponent is fixed at zero and its card isn't shown, because the World never moves (owner: 2026-11-13).
 - The header shows the entity's name (editable), and its hide switch, and from v3 its lock switch. With several selected it reads `3 entities`.
 - The Entity inspector doesn't show the parent. The Entities viewer tree does.
@@ -30,7 +31,7 @@ How values are edited and how mistakes are reversed. **v1:** the Entity inspecto
 - **Position and rotation can change during play. Scale and skew can't.** *Why: the physics rules already keep scale, and skew changes the shape the same way (owner: 2026-11-14).*
 - During play the Entity inspector is read-only, and shows live values when brought back with Panels.
 
-Source: round 1: C1, C10; round 3: R15; round 4: H2, SEL1; decisions: D14, D15; old: WS-84 to WS-89, WS-124; owner: 2026-11-13, 2026-11-14, 2026-11-17
+Source: round 1: C1, C10; round 3: R15; round 4: H2, SEL1; decisions: D14, D15; old: WS-84 to WS-89, WS-124; owner: 2026-11-13, 2026-11-14, 2026-11-17, 2026-11-19
 
 ### One fixed list of field types · v1
 

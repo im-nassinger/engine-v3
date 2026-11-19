@@ -35,7 +35,7 @@ export type FieldModel = {
 };
 ```
 
-- **What is shown:** with nothing selected, the World's components. While the Shape tool is active the Entity inspector is hidden, see [the Shape tool](drawing-and-points.md#the-shape-tool) (owner, 2026-11-15). With one entity, its components. With several, only the components every selected entity has, and a field whose values differ shows `Mixed`.
+- **What is shown:** with nothing selected, nothing: `shownEntities` is empty and `EditorShell` doesn't show the island (owner, 2026-11-19). While the Shape or Joint tool is active the Entity inspector is hidden, see [the Shape tool](drawing-and-points.md#the-shape-tool) (owner, 2026-11-15; Joint, standing yes, 2026-11-19). With one entity, its components. With several, only the components every selected entity has, and a field whose values differ shows `Mixed`.
 - **Derived fields** (Width, Height, Radius, Points) and **read-only rows** are read when the card is built, so they update as shapes and density change. A `ReadOnlyRow` is a value the Entity inspector adds to a card that isn't the component's own: v1 has one, the BodyComponent's Mass, from `BodyMass` in `core/physics`.
 - **During play** the same model reads the [`PlayMirror`](../simulation.md#the-page-side) level instead of the editor's, with `isReadOnly` set. That is how the v2 Panels button shows live values without new Entity inspector code.
 - **Add Component** is worked out here, not in the registry: it lists every registered component the entity lacks and can take by hand, with disabled entries and their reason for the others. With several selected, it adds to every one that lacks it.

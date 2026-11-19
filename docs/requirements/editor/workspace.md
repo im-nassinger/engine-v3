@@ -13,16 +13,17 @@ Sizes in pixels are starting values until tested.
 - The level view fills the whole window. Every part of the editor floats on top of it as an **island**: a rounded part with a soft shadow, **10 px from the window's edge and from the next island**, in fixed places. *Why: the owner's change, so the level is always as big as it can be, and the owner's redesign (2026-11-17), so the editor looks clean, with no borders or lines.*
 - **Top left: ☰**, a 48 px square. **Under it: the tool column**, 48 px wide. **Beside them, from the top: the Entity inspector.** **Top right: the Entities viewer**, only as tall as its rows. **Bottom right: the minimap**, with the debug box under it. Nothing else sits at the top: there is no bar across the window (owner: 2026-11-17).
 - **The Entities viewer grows with its rows** until it reaches 10 px above the minimap; then a scrollbar appears. The minimap always shows (owner: 2026-11-18).
+- **The Entity inspector grows with its cards** the same way, until it reaches 10 px above the window's bottom; then its cards scroll. With nothing selected it is hidden (owner: 2026-11-19).
 - In v2 the Assets panel and the Console come with scripts; where they go is decided then. *Why: the owner's smaller v1 has no files and no scripts.*
 - Islands can't be dragged to other places or floated. *Why: fixed places are enough for the first version, and docking is a large feature.*
 - Starting sizes: ☰ and the tool column 48 px wide with 34 px buttons, Entity inspector 300 px, Entities viewer 260 px, minimap 180 px.
 - **The free area** is the level view between the Entity inspector and the Entities viewer, so fitting the view frames the level where it is seen.
 - The centre has a permanent `Level` tab. A `.lua` file opens as an extra closable tab beside it, one per file (v2). The tab strip shows only while an extra tab is open.
-- **While the Shape tool is active the Entity inspector is hidden** (owner: 2026-11-15), and the tool's kinds menu stands open beside it, see [drawing](../drawing.md#the-shape-tool--v1). The Joint tool's types have the same menu (owner: 2026-11-18).
+- **While the Shape tool is active the Entity inspector is hidden** (owner: 2026-11-15), and the tool's kinds menu stands open beside it, see [drawing](../drawing.md#the-shape-tool--v1). The Joint tool's types have the same menu (owner: 2026-11-18), and the Entity inspector is hidden with it too (standing yes, 2026-11-19). *Why: the menu stands where the Entity inspector is, and the owner found the Entity inspector showing behind it (2026-11-19).*
 - One dark theme. *Why: art and levels read well on it.*
 - Folded cards and open tabs are editor settings saved in the browser. They are never in the level and never in undo.
 
-Source: round 1: D12; round 3: 01 2.1; old: WS-01 to WS-15; owner: 2026-11-13, 2026-11-14, 2026-11-15, 2026-11-17, 2026-11-18
+Source: round 1: D12; round 3: 01 2.1; old: WS-01 to WS-15; owner: 2026-11-13, 2026-11-14, 2026-11-15, 2026-11-17, 2026-11-18, 2026-11-19
 
 ### Resize and collapse the panels · v3
 

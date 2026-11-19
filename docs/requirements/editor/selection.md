@@ -13,7 +13,7 @@ How entities are picked, moved and arranged in the tree. **v1:** click and drag-
 - Shift+click adds an entity to the selection or removes it.
 - Dragging on empty space draws a selection box. **It selects every entity it touches.** Shift adds to the selection. Ctrl selects entities inside groups instead of their groups. *Why touch: the owner's change from "fully inside".*
 - Ctrl+A selects every entity directly inside the group you are inside. The World and the camera are left out.
-- Clicking empty space clears the selection. The Entity inspector then shows the World.
+- Clicking empty space clears the selection. **With nothing selected the Entity inspector is hidden** (owner: 2026-11-19); the World's settings show when its row is selected.
 - A drag under 3 px is a click.
 - A selection never holds an entity together with one of its parents. Adding the parent drops its selected children.
 - The World can only be selected alone.
@@ -45,7 +45,7 @@ What counts as hit:
 
 Clicks pass through hidden entities and locked entities.
 
-Source: scope SE1; round 1: D19; round 4: SEL1, 02 2.3, 02 2.4; round 5: 02 2.2, 04 2.7; old: SG-01 to SG-14, SG-21 to SG-33
+Source: scope SE1; round 1: D19; round 4: SEL1, 02 2.3, 02 2.4; round 5: 02 2.2, 04 2.7; old: SG-01 to SG-14, SG-21 to SG-33; owner: 2026-11-19
 
 ### Invert selection · v3
 

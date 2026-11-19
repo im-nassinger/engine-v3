@@ -119,7 +119,7 @@ export class Level {
 | Protected by | `Level`: can't be moved, removed or put under a parent | `Level`: always directly inside the World, can't be removed |
 | Commands that skip it | Copy, cut, duplicate, delete, group, hide, rename | Copy, cut, duplicate, delete, group |
 
-The World draws its rectangle with its fill, which is the background. Clicks never hit it: clicking empty space already shows the World in the Entity inspector.
+The World draws its rectangle with its fill, which is the background. Clicks never hit it: its row in the Entities viewer selects it.
 
 ## Change signals
 

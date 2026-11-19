@@ -12,6 +12,7 @@ import { cardModels } from '../cards/cardModels.ts';
 import { entityInspectorHeader } from '../cards/entityInspectorHeader.ts';
 import type { CardFolds } from '../folds/CardFolds.ts';
 import type { AddableComponent } from '../model/AddableComponent.ts';
+import { unavailable } from '../model/Availability.ts';
 import type { CardModel } from '../model/CardModel.ts';
 import type { EntityInspectorHeader } from '../model/EntityInspectorHeader.ts';
 
@@ -31,7 +32,14 @@ type Built = {
     readonly addable: readonly AddableComponent[];
 };
 
-// What the Entity inspector shows: the selected entities, or the World when nothing is selected. Worked out only
+// With nothing selected the Entity inspector isn't shown, so it has nothing to show.
+const NOTHING_SHOWN: Omit<Built, 'atVersion'> = {
+    header: { title: '', entity: undefined, canRename: unavailable('Nothing is selected'), isHidden: false },
+    cards: [],
+    addable: [],
+};
+
+// What the Entity inspector shows: the selected entities. With nothing selected it isn't shown (owner, 2026-11-19). Worked out only
 // from the field schemas, so a new component needs no Entity inspector code. Built when read after a change.
 export class EntityInspectorModel {
     // Moves with the selection, the folds, the shown entities' messages, and any change that can alter what
@@ -59,10 +67,7 @@ export class EntityInspectorModel {
     }
 
     get shownEntities(): readonly Entity[] {
-        const { selection, level } = this.sources;
-        if (selection.isEmpty) return [level.world];
-
-        return selection.entities;
+        return this.sources.selection.entities;
     }
 
     get header() {
@@ -89,6 +94,11 @@ export class EntityInspectorModel {
         if (this.built?.atVersion === atVersion) return this.built;
 
         const entities = this.shownEntities;
+        if (entities.length === 0) {
+            this.built = { atVersion, ...NOTHING_SHOWN };
+            return this.built;
+        }
+
         const { folds, caches, registry, messages } = this.sources;
         const header = entityInspectorHeader(entities);
         const cards = cardModels(entities, { folds, caches, messages });

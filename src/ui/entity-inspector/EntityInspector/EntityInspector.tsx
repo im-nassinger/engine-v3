@@ -5,7 +5,7 @@ import { EntityInspectorCard } from './EntityInspectorCard/index.ts';
 import { EntityInspectorHead } from './EntityInspectorHead/index.ts';
 import './EntityInspector.css';
 
-// The selected entities' components as cards, or the World's when nothing is selected. Everything shown
+// The selected entities' components as cards. The shell doesn't show it with nothing selected. Everything shown
 // comes from the open level's EntityInspectorModel, which moves its version only when what it shows changes.
 export function EntityInspector() {
     // The model's getters give new answers while the model object stays the same, so the React Compiler
