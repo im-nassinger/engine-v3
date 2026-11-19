@@ -7,7 +7,7 @@
     > .none {
         flex: 0 0 auto;
         height: var(--input);
-        padding: 0 var(--space-10);
+        padding: 0 var(--space-4);
         border: none;
         border-radius: calc(var(--input) / 2);
         background: none;

@@ -4,3 +4,23 @@
     flex-direction: column;
     min-width: 0;
 }
+
+/* Half a field is narrow, so the value comes first: the unit wraps onto a hidden second line when both
+   don't fit, rather than cutting the number off. The font is monospaced, so --chars sizes the value. */
+.vector-axis-box > .number-box {
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    overflow: hidden;
+    padding: 0 var(--space-6);
+
+    > .axis,
+    > .unit {
+        line-height: var(--input);
+    }
+
+    > input {
+        flex: 1 1 min(calc(var(--chars) * 1ch), calc(100% - 1ch - var(--space-6)));
+        height: var(--input);
+    }
+}

@@ -39,7 +39,7 @@ A field is a row of `--row` height: the label in `--muted` in a 120 px column, t
 | Mixed (*proposal*) | "Mixed" in `--muted` italics |
 | Disabled (greyed, such as the fields a body type doesn't use) | Label and value in `--faint`. The value is kept |
 
-- **Vector:** two pills side by side, each starting with its axis letter in `--muted`.
+- **Vector:** two pills side by side, each starting with its axis letter in `--muted`. **The value comes first:** when it and the unit don't both fit, the unit is hidden (standing yes, 2026-11-19).
 - **A number with a minimum and a maximum is a filled slider:** one pill whose inside is filled in `--accent-soft` from the left up to the value, the number on top. **Dragging across it sets the value like a slider; a click without a drag types in it** (owner, 2026-11-18). The value follows the pointer, the pill's left edge the minimum and its right edge the maximum; a press becomes a drag after 3 px, and a pill already being typed in takes clicks as text (standing yes, 2026-11-18).
 - **Choice:** the value and a small down arrow, in a pill.
 - **Colour:** a 14 px swatch with 4 px corners, then the code in capitals. **An empty fill** (*proposal*): a swatch crossed by a red line, and "None" in `--muted`.

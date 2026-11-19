@@ -14,6 +14,7 @@ How the editor looks. **Since the redesign** (owner, 2026-11-17, planned as stag
 | [mockups/index.html](mockups/index.html) | Round 8's mockups: six views of v1 with a sample level. Replaced by the redesign's. Nothing in it works |
 | [redesign.md](redesign.md) | **The redesign (owner, 2026-11-17), the source of this folder:** its 29 settled points in order, and the tokens of the pick |
 | [mockups/redesign.html](mockups/redesign.html) | The redesign's mockup page: a selected shape, the whole level, drawing, the main menu, a dialog, test play, and every part side by side |
+| [screenshots/](screenshots/README.md) | The built editor beside the redesign's mockup, one picture per moment, and what still differs |
 | [mockups/collision-grid.html](mockups/collision-grid.html) | A v3 example made to show a friend (owner, 2026-11-16): the World's "Edit collision grid" button and the collision grid window, which works. Claude's proposal for the look, not decided. The rules come from [world.md](../requirements/physics/world.md#the-collision-grid--v3) |
 
 ## Decided in round 8 (replaced by the redesign)

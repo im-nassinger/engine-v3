@@ -9,6 +9,7 @@
         gap: var(--space-6);
         width: 100%;
         height: var(--control);
+        border: none;
         border-radius: var(--radius);
         background: var(--raised);
         color: var(--text);

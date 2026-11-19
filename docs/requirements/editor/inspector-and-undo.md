@@ -48,7 +48,7 @@ Source: round 3: S2; round 4: FT1; owner: 2026-11-15; owner: 2026-11-16
 
 - Enter commits and returns the keyboard to the level view. Tab commits and moves to the next field. Clicking away commits. Esc restores the old value. A value that didn't change makes no undo step.
 - Numbers show up to 2 decimals. A focused field shows the full value. Showing a rounded value never changes the stored one.
-- Units show as a faded suffix and may be typed: `px`, `°`, `%`, `px/s`, `s`. Rotation is in degrees, lengths and speeds in pixels.
+- Units show as a faded suffix and may be typed: `px`, `°`, `%`, `px/s`, `s`. Rotation is in degrees, lengths and speeds in pixels. A vector's box is narrow, so its unit is hidden when it and the value don't both fit (standing yes, 2026-11-19).
 - Both `1.5` and `1,5` are decimals. *Why: the owner's locale and many others use a comma.*
 - A number with both a minimum and a maximum is a filled slider: dragging across the field sets the value, changing the level while dragged and making one undo step when let go; a click without a drag types in it (owner, 2026-11-18).
 - An **entity** field is filled by dragging a row from the Entities viewer, from a dropdown, or with a picker that lets you click an entity in the level view. A deleted target shows a `missing entity` warning.

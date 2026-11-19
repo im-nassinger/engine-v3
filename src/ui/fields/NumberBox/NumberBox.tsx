@@ -1,4 +1,4 @@
-import type { CSSProperties, HTMLAttributes, InputHTMLAttributes } from 'react';
+import type { HTMLAttributes, InputHTMLAttributes } from 'react';
 import type { Unit } from '../../../core/fields/index.ts';
 import './NumberBox.css';
 
@@ -33,9 +33,10 @@ export function NumberBox({
     slider,
 }: NumberBoxProps) {
     const placeholder = isMixed ? 'Mixed' : undefined;
-    let fillStyle: CSSProperties | undefined;
+    const shownText = String(inputProps.value ?? '') || (placeholder ?? '');
+    const boxStyle = { '--chars': shownText.length } as Record<string, string | number>;
     if (slider !== undefined) {
-        fillStyle = { '--filled': `${slider.filledShare * 100}%` } as CSSProperties;
+        boxStyle['--filled'] = `${slider.filledShare * 100}%`;
     }
 
     return (
@@ -44,7 +45,7 @@ export function NumberBox({
             data-refused={isRefused}
             data-disabled={isDisabled}
             data-slider={slider !== undefined}
-            style={fillStyle}
+            style={boxStyle}
             {...slider?.handlers}
         >
             {axisLetter !== undefined && <span className="axis">{axisLetter}</span>}
