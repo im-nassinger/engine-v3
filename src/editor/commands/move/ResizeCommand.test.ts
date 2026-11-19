@@ -50,6 +50,8 @@ function buildResizeTest() {
     const group = level.createEntity(level.world, 0);
     group.addComponent(new TransformComponent());
 
+    // A 10 px grid, so Shift's step is 10 px.
+    level.editorData.setGridSize(10);
     const timer = new ManualTimer();
     const session = new EditorSession({ level, clock: timer.clock, timer, frames: new ManualFrames() });
     const commands = createCommandRegistry(session);
@@ -87,7 +89,7 @@ function positionOf(entity: Entity) {
 }
 
 describe('the resize commands', () => {
-    test('are W, A, S and D, Shift for 10 px, with no menu entry, repeating while held', () => {
+    test('are W, A, S and D, Shift for one grid step, with no menu entry, repeating while held', () => {
         const { commands } = buildResizeTest();
         const resizes = commands.all.filter((command) => command.id.startsWith('edit.resize'));
 
@@ -103,17 +105,27 @@ describe('the resize commands', () => {
         ]);
         expect(resizes.every((command) => command.menu === undefined)).toBe(true);
         expect(resizes.every((command) => command.repeatsWhileHeld === true)).toBe(true);
-        expect(commands.find('edit.resizeShorter10')?.label).toBe('Resize shorter 10 px');
+        expect(commands.find('edit.resizeShorterGrid')?.label).toBe('Resize shorter one grid step');
+    });
+
+    test("Shift steps by the level's grid size", () => {
+        const { level, rectangle, selection, run } = buildResizeTest();
+        level.editorData.setGridSize(25);
+        selection.replace([rectangle.id]);
+
+        run('edit.resizeWiderGrid');
+
+        expect(geometryOf(rectangle)).toEqual({ kind: 'rectangle', width: 125, height: 40 });
     });
 
     test("change a rectangle's width and height, never its TransformComponent", () => {
         const { rectangle, selection, run } = buildResizeTest();
         selection.replace([rectangle.id]);
 
-        run('edit.resizeWider10');
+        run('edit.resizeWiderGrid');
         run('edit.resizeNarrower1');
         run('edit.resizeTaller1');
-        run('edit.resizeShorter10');
+        run('edit.resizeShorterGrid');
 
         expect(geometryOf(rectangle)).toEqual({ kind: 'rectangle', width: 109, height: 31 });
         expect(positionOf(rectangle)).toEqual({ x: 100, y: 100 });
@@ -124,7 +136,7 @@ describe('the resize commands', () => {
         const { turned, selection, run } = buildResizeTest();
         selection.replace([turned.id]);
 
-        run('edit.resizeWider10');
+        run('edit.resizeWiderGrid');
 
         expect(geometryOf(turned)).toEqual({ kind: 'rectangle', width: 110, height: 40 });
         expect(turned.requireComponent(TransformComponent).get('rotation')).toBe(90);
@@ -134,7 +146,7 @@ describe('the resize commands', () => {
         const { circle, selection, run } = buildResizeTest();
         selection.replace([circle.id]);
 
-        run('edit.resizeWider10');
+        run('edit.resizeWiderGrid');
         run('edit.resizeTaller1');
         run('edit.resizeShorter1');
         run('edit.resizeNarrower1');
@@ -146,8 +158,8 @@ describe('the resize commands', () => {
         const { triangle, selection, run } = buildResizeTest();
         selection.replace([triangle.id]);
 
-        run('edit.resizeWider10');
-        run('edit.resizeShorter10');
+        run('edit.resizeWiderGrid');
+        run('edit.resizeShorterGrid');
 
         expect(geometryOf(triangle)).toEqual({
             kind: 'polygon',
@@ -164,7 +176,7 @@ describe('the resize commands', () => {
         const { line, selection, run } = buildResizeTest();
         selection.replace([line.id]);
 
-        run('edit.resizeWider10');
+        run('edit.resizeWiderGrid');
         const outcome = run('edit.resizeTaller1');
 
         expect(geometryOf(line)).toEqual({
@@ -182,7 +194,7 @@ describe('the resize commands', () => {
         selection.replace([rectangle.id, circle.id]);
 
         for (let press = 0; press < 5; press++) {
-            run('edit.resizeShorter10');
+            run('edit.resizeShorterGrid');
         }
         const stepsBefore = history.undoCount;
         const outcome = run('edit.resizeShorter1');
@@ -199,7 +211,7 @@ describe('the resize commands', () => {
 
         run('edit.resizeWider1');
         timer.advance(900);
-        run('edit.resizeWider10');
+        run('edit.resizeWiderGrid');
         timer.advance(900);
         run('edit.resizeTaller1');
 

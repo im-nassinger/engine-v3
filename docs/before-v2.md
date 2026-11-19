@@ -141,7 +141,7 @@ This brings DR4 forward from v3 to before v2, and widens it to the selection.
 
 To build (*proposal*, Claude's picks, for the owner to change):
 
-- **D wider, A narrower, W taller, S shorter**, 1 px per press, Shift 10 px, the same steps as the arrow keys. With the Shape tool, they change the preview, centred on the mouse, as DR4 says; with the Select tool, every selected entity.
+- **D wider, A narrower, W taller, S shorter**, 1 px per press, Shift 10 px, the same steps as the arrow keys. *Since 2026-11-19 Shift is one grid step (owner).* With the Shape tool, they change the preview, centred on the mouse, as DR4 says; with the Select tool, every selected entity.
 - **Each shape keeps its own centre** and grows along its own axes, so a rotated rectangle gets longer along its own width.
 - **A rectangle** changes its width or height. **A circle** grows with D and W and shrinks with A and S, its radius by half a step, so its width changes as a rectangle's would. **A polygon or line** spreads its points out from its bounds' centre, or pulls them in, so its bounds grow by one step; W and S do nothing on a flat line.
 - Sizes stop at the shape's smallest value; a press that changes nothing changes nothing.

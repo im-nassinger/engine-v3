@@ -13,8 +13,10 @@ type Side = {
 };
 
 type Step = {
-    readonly pixels: number;
+    readonly name: string;
+    readonly idPart: string;
     readonly modifiers: string;
+    pixels(session: EditorSession): number;
 };
 
 const SIDES: readonly Side[] = [
@@ -24,13 +26,18 @@ const SIDES: readonly Side[] = [
     { word: 'shorter', idPart: 'Shorter', key: 'S', axis: 'y', sign: -1 },
 ];
 
-// As an arrow moves 1 px and Shift+arrow 10 px. No grid step: the browser keeps Ctrl+Shift+W.
+// 1 px a press, and one grid step with Shift (owner, 2026-11-19).
 const STEPS: readonly Step[] = [
-    { pixels: 1, modifiers: '' },
-    { pixels: 10, modifiers: 'Shift+' },
+    { name: '1 px', idPart: '1', modifiers: '', pixels: () => 1 },
+    {
+        name: 'one grid step',
+        idPart: 'Grid',
+        modifiers: 'Shift+',
+        pixels: (session) => session.openLevel.level.editorData.gridSize,
+    },
 ];
 
-// W, A, S and D resize the selection's shapes, changing their values, Shift for 10 px. Held, the key resizes
+// W, A, S and D resize the selection's shapes, changing their values, Shift for one grid step. Held, the key resizes
 // again with each key repeat. Ctrl+A and Ctrl+S keep their own commands, as a chord only matches its own
 // modifiers.
 export class ResizeCommand implements EditorCommand {
@@ -40,14 +47,16 @@ export class ResizeCommand implements EditorCommand {
     readonly repeatsWhileHeld = true;
     private readonly session: EditorSession;
     private readonly axis: ResizeAxis;
-    private readonly pixels: number;
+    private readonly sign: -1 | 1;
+    private readonly step: Step;
 
     constructor(session: EditorSession, side: Side, step: Step) {
         this.session = session;
         this.axis = side.axis;
-        this.pixels = side.sign * step.pixels;
-        this.id = `edit.resize${side.idPart}${step.pixels}`;
-        this.label = `Resize ${side.word} ${step.pixels} px`;
+        this.sign = side.sign;
+        this.step = step;
+        this.id = `edit.resize${side.idPart}${step.idPart}`;
+        this.label = `Resize ${side.word} ${step.name}`;
         this.shortcuts = [`${step.modifiers}${side.key}`];
     }
 
@@ -64,6 +73,8 @@ export class ResizeCommand implements EditorCommand {
     }
 
     run(): CommandOutcome {
-        return resizeSelection(this.session.openLevel, this.axis, this.pixels);
+        const pixels = this.sign * this.step.pixels(this.session);
+
+        return resizeSelection(this.session.openLevel, this.axis, pixels);
     }
 }

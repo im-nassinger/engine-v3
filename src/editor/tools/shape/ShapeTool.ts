@@ -223,7 +223,8 @@ export class ShapeTool implements Tool {
             return true;
         }
 
-        const step = previewStepOf(key);
+        const gridSize = this.context?.openLevel.level.editorData.gridSize;
+        const step = gridSize === undefined ? undefined : previewStepOf(key, gridSize);
         if (step !== undefined) {
             this.sizeBy(step);
             return true;

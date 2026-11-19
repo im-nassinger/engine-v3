@@ -21,6 +21,14 @@ function press(setup: Setup, key: string, times = 1, shift = false) {
     }
 }
 
+// A 10 px grid, so Shift's step is 10 px.
+function buildSizeTest() {
+    const setup = buildShapeTest();
+    setup.level.editorData.setGridSize(10);
+
+    return setup;
+}
+
 function expectPointsClose(actual: readonly Point[], expected: readonly Point[]) {
     expect(actual).toHaveLength(expected.length);
     actual.forEach((point, index) => {
@@ -34,8 +42,8 @@ function polygonPoints(setup: Setup) {
 }
 
 describe('W, A, S and D with the Shape tool', () => {
-    test('D is wider, A narrower, W taller and S shorter, 1 px a press and 10 px with Shift, centred on the mouse', () => {
-        const setup = buildShapeTest();
+    test('D is wider, A narrower, W taller and S shorter, 1 px a press and one grid step with Shift, centred on the mouse', () => {
+        const setup = buildSizeTest();
         setup.controller.pointerMove(pointer({ x: 70, y: 80 }));
 
         press(setup, 'd', 3);
@@ -51,7 +59,7 @@ describe('W, A, S and D with the Shape tool', () => {
     });
 
     test('a click makes the rectangle at the size the keys set, and the next click remembers it', () => {
-        const setup = buildShapeTest();
+        const setup = buildSizeTest();
         setup.controller.pointerMove(pointer({ x: 30, y: 40 }));
         press(setup, 'a', 2, true);
         press(setup, 's', 1, true);
@@ -65,8 +73,8 @@ describe('W, A, S and D with the Shape tool', () => {
         expect(geometryOf(made(setup))).toEqual({ kind: 'rectangle', width: 80, height: 90 });
     });
 
-    test('Shift+S makes the preview 10 px shorter, stopping at 1 px', () => {
-        const setup = buildShapeTest();
+    test('Shift+S makes the preview one grid step shorter, stopping at 1 px', () => {
+        const setup = buildSizeTest();
         setup.controller.pointerMove(pointer({ x: 0, y: 0 }));
 
         press(setup, 's', 12, true);
@@ -76,7 +84,7 @@ describe('W, A, S and D with the Shape tool', () => {
     });
 
     test('a circle grows with D and W and shrinks with A and S, its width across by the step', () => {
-        const setup = buildShapeTest();
+        const setup = buildSizeTest();
         setup.tool.chooseKind('circle');
         setup.controller.pointerMove(pointer({ x: 30, y: 40 }));
 
@@ -91,7 +99,7 @@ describe('W, A, S and D with the Shape tool', () => {
     });
 
     test('a turned preview grows along its own sides', () => {
-        const setup = buildShapeTest();
+        const setup = buildSizeTest();
         setup.controller.pointerMove(pointer({ x: 0, y: 0 }));
         press(setup, 'x', 9, true);
 
@@ -105,7 +113,7 @@ describe('W, A, S and D with the Shape tool', () => {
     });
 
     test('a polygon in progress spreads its placed points from their middle', () => {
-        const setup = buildShapeTest();
+        const setup = buildSizeTest();
         setup.tool.chooseKind('polygon');
         click(setup, { x: 0, y: 0 });
         click(setup, { x: 100, y: 0 });
@@ -125,7 +133,7 @@ describe('W, A, S and D with the Shape tool', () => {
     });
 
     test('a line grows along its length, and W and S do nothing to a flat line', () => {
-        const setup = buildShapeTest();
+        const setup = buildSizeTest();
         setup.tool.chooseKind('polygon');
         click(setup, { x: 0, y: 0 });
         click(setup, { x: 100, y: 0 });
@@ -149,7 +157,7 @@ describe('W, A, S and D with the Shape tool', () => {
     });
 
     test('a turned line grows along its own width', () => {
-        const setup = buildShapeTest();
+        const setup = buildSizeTest();
         setup.tool.chooseKind('polygon');
         setup.controller.pointerMove(pointer({ x: 0, y: 0 }));
         press(setup, 'x', 9, true);
@@ -165,7 +173,7 @@ describe('W, A, S and D with the Shape tool', () => {
     });
 
     test('a polygon with no points yet takes the keys and changes nothing', () => {
-        const setup = buildShapeTest();
+        const setup = buildSizeTest();
         setup.tool.chooseKind('polygon');
         setup.controller.pointerMove(pointer({ x: 0, y: 0 }));
 
@@ -176,7 +184,7 @@ describe('W, A, S and D with the Shape tool', () => {
     });
 
     test('during a drag the mouse sets the size and the keys change nothing', () => {
-        const setup = buildShapeTest();
+        const setup = buildSizeTest();
         setup.controller.pointerDown(pointer({ x: 0, y: 0 }));
         setup.controller.pointerMove(pointer({ x: 60, y: 40 }));
 
@@ -188,7 +196,7 @@ describe('W, A, S and D with the Shape tool', () => {
     });
 
     test('a press that has not moved yet is sized where it was pressed', () => {
-        const setup = buildShapeTest();
+        const setup = buildSizeTest();
         setup.controller.pointerMove(pointer({ x: 20, y: 30 }));
         setup.controller.pointerDown(pointer({ x: 20, y: 30 }));
 
@@ -200,7 +208,7 @@ describe('W, A, S and D with the Shape tool', () => {
     });
 
     test('Ctrl+S, Ctrl+A and Alt+D are left alone, and sizing makes no undo step', () => {
-        const setup = buildShapeTest();
+        const setup = buildSizeTest();
         setup.controller.pointerMove(pointer({ x: 0, y: 0 }));
         const undoBefore = setup.session.openLevel.history.undoLabel;
 
@@ -214,11 +222,21 @@ describe('W, A, S and D with the Shape tool', () => {
     });
 
     test('a layout with no Latin letters sizes by the physical key', () => {
-        const setup = buildShapeTest();
+        const setup = buildSizeTest();
         setup.controller.pointerMove(pointer({ x: 0, y: 0 }));
 
         setup.controller.keyDown({ ...letter('d'), key: 'в' });
 
         expect(setup.tool.drawing?.drawing.geometry).toEqual({ kind: 'rectangle', width: 101, height: 100 });
+    });
+
+    test("Shift steps by the level's grid size", () => {
+        const setup = buildShapeTest();
+        setup.level.editorData.setGridSize(25);
+        setup.controller.pointerMove(pointer({ x: 0, y: 0 }));
+
+        press(setup, 'd', 1, true);
+
+        expect(setup.tool.drawing?.drawing.geometry).toEqual({ kind: 'rectangle', width: 125, height: 100 });
     });
 });

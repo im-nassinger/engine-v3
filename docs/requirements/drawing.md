@@ -58,13 +58,13 @@ Source: owner: 2026-11-15
 
 ### W, A, S, D set the preview size · v1
 
-- With the Shape tool: D makes the preview wider, A narrower, W taller, S shorter, centred on the mouse. 1 px per press, Shift 10 px. No grid step: the browser keeps Ctrl+Shift+W (owner: 2026-11-17).
+- With the Shape tool: D makes the preview wider, A narrower, W taller, S shorter, centred on the mouse. 1 px per press, Shift one grid step (owner: 2026-11-17; the grid step, owner: 2026-11-19).
 - The preview grows along its own sides, so a turned preview gets longer along its own width. A rectangle changes that side and a circle its width across, whichever the key, each stopping at 1 px; the next click places that size, remembered as a drag's size is. A polygon or line being drawn spreads its placed points from their middle, or pulls them in; W and S do nothing to a flat line (standing yes, 2026-11-17).
 - During a drag the mouse sets the size, so the keys change nothing. Sizing the preview makes no undo step (standing yes, 2026-11-17).
 - The same keys resize selected shapes: see [Handles and arrow keys](editor/selection.md#handles-and-arrow-keys--v1).
 - *Why these steps: they match the arrow keys, so nothing is relearned, and unlike grid-only steps they allow small sizes.*
 
-Source: scope DR4; round 8: SH3; owner: 2026-11-17
+Source: scope DR4; round 8: SH3; owner: 2026-11-17, 2026-11-19
 
 ### Resizing changes the scale · v1
 

@@ -14,10 +14,8 @@ export type PreviewStep = {
     readonly pixels: number;
 };
 
-// As W, A, S and D resize a selection: 1 px a press, 10 px with Shift. No grid step: the browser keeps
-// Ctrl+Shift+W.
+// As W, A, S and D resize a selection: 1 px a press, one grid step with Shift (owner, 2026-11-19).
 const SMALL_STEP_PX = 1;
-const LARGE_STEP_PX = 10;
 
 const STEPS: Readonly<Record<string, PreviewStep>> = {
     D: { axis: 'x', pixels: 1 },
@@ -26,16 +24,16 @@ const STEPS: Readonly<Record<string, PreviewStep>> = {
     S: { axis: 'y', pixels: -1 },
 };
 
-// The step W, A, S or D sizes the preview by: D wider, A narrower, W taller, S shorter. Ctrl+A and Ctrl+S
-// keep their own commands, and Alt is left alone.
-export function previewStepOf(key: ToolKey): PreviewStep | undefined {
+// The step W, A, S or D sizes the preview by: D wider, A narrower, W taller, S shorter, Shift by the level's
+// grid size. Ctrl+A and Ctrl+S keep their own commands, and Alt is left alone.
+export function previewStepOf(key: ToolKey, gridSize: number): PreviewStep | undefined {
     if (key.ctrl || key.alt) return undefined;
 
     const letter = typedLetter(key);
     const step = letter === undefined ? undefined : STEPS[letter];
     if (step === undefined) return undefined;
 
-    return { axis: step.axis, pixels: step.pixels * (key.shift ? LARGE_STEP_PX : SMALL_STEP_PX) };
+    return { axis: step.axis, pixels: step.pixels * (key.shift ? gridSize : SMALL_STEP_PX) };
 }
 
 // The size a click places after the step, as W, A, S and D resize a shape: a rectangle changes that side, a
