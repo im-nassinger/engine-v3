@@ -105,7 +105,7 @@ async function showLevel() {
 
     const drawn = () => levelView.overlays.selection.drawn;
 
-    return { level, view, frames, selection, drawn };
+    return { level, levelView, view, frames, selection, drawn };
 }
 
 function place(level: Level, parent: Entity, x: number, y: number) {
@@ -125,6 +125,19 @@ function addShape(level: Level, parent: Entity, x: number, y: number) {
 }
 
 describe('SelectionOverlay', () => {
+    test('a handle is white inside with an edge in the accent colour', async () => {
+        const { level, levelView, frames, selection } = await showLevel();
+        // On half pixels, so the handle's 1.5 px edge covers a whole column of pixels.
+        selection.select([addShape(level, level.world, 0, 0)], frameOf(new Bounds(-19.5, -19.5, 19.5, 19.5)));
+        frames.runFrame();
+
+        const { pixels, width } = levelView.readPixels();
+        const colourAt = (x: number, y: number) => [...pixels.slice((y * width + x) * 4, (y * width + x) * 4 + 3)];
+
+        expect(colourAt(130, 80)).toEqual([0xff, 0xff, 0xff]);
+        expect(colourAt(126, 80)).toEqual([0x4f, 0x8c, 0xff]);
+    });
+
     test('nothing selected draws nothing', async () => {
         const { drawn } = await showLevel();
 

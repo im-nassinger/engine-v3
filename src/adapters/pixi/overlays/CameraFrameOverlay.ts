@@ -1,39 +1,40 @@
-import { Container, Graphics, Text } from 'pixi.js';
-import type { StrokeStyle } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
 import { CameraComponent } from '../../../core/components/index.ts';
+import { levelBoundsOf } from '../../../core/derived/index.ts';
+import type { Point } from '../../../core/geometry/index.ts';
 import type { Level } from '../../../core/level/index.ts';
+import { FrameLabel, FRAME_LABEL_HEIGHT_PX } from './FrameLabel.ts';
+import { isDarkBackground, worldFillOf } from './levelBackground.ts';
 import type { OverlayScene } from './OverlayScene.ts';
 import { screenRectangleOf } from './screenPixels.ts';
 
-const FRAME_COLOUR = 0x141c28;
-const FRAME_ALPHA = 0.7;
-const FRAME: StrokeStyle = { color: FRAME_COLOUR, alpha: FRAME_ALPHA, width: 1.5, join: 'miter' };
-// The gap between the label's baseline area and the frame's top edge.
-const LABEL_GAP_PX = 4;
-
-export function cameraLabelOf(camera: CameraComponent) {
-    return `Camera ${camera.get('width')} × ${camera.get('height')}`;
-}
+const FRAME_WIDTH_PX = 1.5;
+const ON_LIGHT = { color: 0x141c28, alpha: 0.7 };
+const ON_DARK = { color: 0xecf0f6, alpha: 0.55 };
 
 // The camera sits directly inside the World, so it is hidden when it or the World is.
 function cameraIsHidden(level: Level) {
     return level.camera.isHidden || level.world.isHidden;
 }
 
-// The frame of what players will see, 1.5 screen px at any zoom, with "Camera 1920 × 1080" above its top
-// left corner. Hidden by its View menu switch and with the camera's eye.
+// Whether the label starts inside the level bounds, over the World's fill, and not on the app's dark colour.
+function labelStartsInBounds(level: Level, scene: OverlayScene, frameTopLeft: Point) {
+    const start = scene.view.screenToLevel({ x: frameTopLeft.x, y: frameTopLeft.y - FRAME_LABEL_HEIGHT_PX });
+    const levelBounds = levelBoundsOf(level);
+
+    return levelBounds !== undefined && levelBounds.contains(start);
+}
+
+// The frame of what players will see, 1.5 screen px at any zoom, dark on a light World's fill and light on a
+// dark one, with "Camera 1920 × 1080" above its top left corner, coloured for what it starts on. Hidden by its
+// View menu switch and with the camera's eye.
 export class CameraFrameOverlay {
     readonly container = new Container();
     private readonly frame = new Graphics();
-    private readonly label = new Text({
-        text: '',
-        style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: FRAME_COLOUR },
-    });
+    private readonly label = new FrameLabel('Camera');
 
     constructor() {
-        this.label.alpha = FRAME_ALPHA;
-        this.label.anchor.set(0, 1);
-        this.container.addChild(this.frame, this.label);
+        this.container.addChild(this.frame, this.label.container);
     }
 
     get isShowing() {
@@ -42,6 +43,11 @@ export class CameraFrameOverlay {
 
     get labelText() {
         return this.label.text;
+    }
+
+    // The colour the label was drawn in last. For tests.
+    get labelColour() {
+        return this.label.colour;
     }
 
     update(scene: OverlayScene) {
@@ -56,14 +62,16 @@ export class CameraFrameOverlay {
         this.container.visible = shows;
         if (!shows || camera === undefined) return;
 
+        const look = isDarkBackground(worldFillOf(level)) ? ON_DARK : ON_LIGHT;
         const onScreen = screenRectangleOf(frameBounds, scene.view);
-        this.frame.rect(onScreen.left, onScreen.top, onScreen.width, onScreen.height).stroke(FRAME);
+        this.frame
+            .rect(onScreen.left, onScreen.top, onScreen.width, onScreen.height)
+            .stroke({ ...look, width: FRAME_WIDTH_PX, join: 'miter' });
 
-        const text = cameraLabelOf(camera);
-        if (this.label.text !== text) {
-            this.label.text = text;
-        }
-        this.label.position.set(Math.round(onScreen.left), Math.round(onScreen.top - LABEL_GAP_PX));
+        const size = `${camera.get('width')} × ${camera.get('height')}`;
+        const topLeft = { x: onScreen.left, y: onScreen.top };
+        const labelLook = labelStartsInBounds(level, scene, topLeft) ? look : ON_DARK;
+        this.label.show(size, topLeft, labelLook.color);
     }
 
     destroy() {

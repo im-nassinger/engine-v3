@@ -9,6 +9,7 @@ import {
     TransformComponent,
 } from '../../core/components/index.ts';
 import type { Entity } from '../../core/level/index.ts';
+import { Bounds } from '../../core/geometry/index.ts';
 import type { ShapeGeometry } from '../../core/geometry/index.ts';
 import { BoundsCache, PiecesCache, WorldMatrixCache } from '../../core/derived/index.ts';
 import { Level } from '../../core/level/index.ts';
@@ -343,17 +344,73 @@ describe('PixiLevelView overlays', () => {
         expect(overlays.grid.plan?.spacing).toEqual({ step: 50, fineStep: undefined });
     });
 
-    test('the outside of the level bounds is dimmed, and nothing when the level fills the view', async () => {
-        const { level, frames, overlays } = await showNewLevel();
-        expect(overlays.bounds.dimmedAreas).toEqual([]);
+    function alphaAt(levelView: PixiLevelView, x: number, y: number) {
+        const { pixels, width } = levelView.readPixels();
 
+        return pixels[(y * width + x) * 4 + 3];
+    }
+
+    test('outside the level bounds the canvas stays clear, and the World paints the inside', async () => {
+        const { level, levelView, frames } = await showNewLevel();
         level.world.requireComponent(ShapeComponent).set('geometry', { kind: 'rectangle', width: 200, height: 100 });
         frames.runFrame();
 
-        const areas = overlays.bounds.dimmedAreas;
-        const dimmedPixels = areas.reduce((sum, area) => sum + area.width * area.height, 0);
-        expect(areas).toHaveLength(4);
-        expect(dimmedPixels).toBe(300 * 200 - 200 * 100);
+        expect(alphaAt(levelView, 10, 100)).toBe(0);
+        expect(alphaAt(levelView, 120, 80)).toBe(255);
+    });
+
+    test('an entity outside the level bounds stays visible', async () => {
+        const { level, levelView, frames } = await showNewLevel();
+        level.world.requireComponent(ShapeComponent).set('geometry', { kind: 'rectangle', width: 100, height: 100 });
+        const outside = placeAt(level, level.world, -125, 0);
+        outside.addComponent(new ShapeComponent({ geometry: { kind: 'rectangle', width: 20, height: 20 } }));
+        outside.addComponent(new StyleComponent());
+        frames.runFrame();
+
+        expect(alphaAt(levelView, 25, 100)).toBe(255);
+    });
+
+    test('the grid stops at the level bounds, and is gone when they are out of view', async () => {
+        const { level, view, frames, overlays } = await showNewLevel();
+        level.world.requireComponent(ShapeComponent).set('geometry', { kind: 'rectangle', width: 200, height: 100 });
+        frames.runFrame();
+
+        expect(overlays.grid.area).toEqual(new Bounds(50, 50, 250, 150));
+        const positions = overlays.grid.plan?.vertical.map((line) => line.position) ?? [];
+        expect(Math.min(...positions)).toBe(-100);
+        expect(Math.max(...positions)).toBe(100);
+
+        view.panBy(5000, 0);
+        frames.runFrame();
+        expect(overlays.grid.plan).toBeUndefined();
+    });
+
+    test('the level bounds are labelled World with their size', async () => {
+        const { level, frames, overlays } = await showNewLevel();
+        expect(overlays.bounds.isShowing).toBe(true);
+        expect(overlays.bounds.labelText).toBe('World 20000 × 10000');
+
+        level.world.requireComponent(ShapeComponent).set('geometry', { kind: 'rectangle', width: 200, height: 100 });
+        frames.runFrame();
+        expect(overlays.bounds.labelText).toBe('World 200 × 100');
+    });
+
+    test('the camera label is dark on a light fill and light on a dark one', async () => {
+        const { level, frames, overlays } = await showNewLevel();
+        expect(overlays.cameraFrame.labelColour).toBe(0x141c28);
+
+        level.world.requireComponent(StyleComponent).set('fill', { kind: 'solid', colour: '#1A2140FF' });
+        frames.runFrame();
+        expect(overlays.cameraFrame.labelColour).toBe(0xecf0f6);
+    });
+
+    test('a camera label above the level bounds is light, on the dark outside', async () => {
+        const { level, view, frames, overlays } = await showNewLevel();
+        level.world.requireComponent(ShapeComponent).set('geometry', { kind: 'rectangle', width: 4000, height: 1080 });
+        view.centreOn({ x: -900, y: -500 });
+        frames.runFrame();
+
+        expect(overlays.cameraFrame.labelColour).toBe(0xecf0f6);
     });
 
     test('the camera frame shows its size and hides with its switch or the camera', async () => {

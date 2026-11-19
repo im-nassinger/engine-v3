@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import { Bounds } from '../../../../core/geometry/index.ts';
 
-import { gridSpacingAt, planGrid } from './GridPlan.ts';
+import { gridAreaOf, gridSpacingAt, planGrid } from './GridPlan.ts';
 
 describe('gridSpacingAt', () => {
     test('at 100% the default grid has lines every 50 px and fainter ones every 10 px', () => {
@@ -21,6 +21,22 @@ describe('gridSpacingAt', () => {
 
     test('a small grid at a high zoom keeps its own step', () => {
         expect(gridSpacingAt(5, 10)).toEqual({ step: 5, fineStep: 1 });
+    });
+});
+
+describe('gridAreaOf', () => {
+    const levelBounds = new Bounds(-100, -50, 100, 50);
+
+    test('a view larger than the level bounds keeps only the bounds', () => {
+        expect(gridAreaOf(new Bounds(-500, -500, 500, 500), levelBounds)).toEqual(levelBounds);
+    });
+
+    test('a view across one corner keeps the part they share', () => {
+        expect(gridAreaOf(new Bounds(50, 20, 300, 300), levelBounds)).toEqual(new Bounds(50, 20, 100, 50));
+    });
+
+    test('a view that misses the level bounds has no grid', () => {
+        expect(gridAreaOf(new Bounds(200, 200, 300, 300), levelBounds)).toBeUndefined();
     });
 });
 

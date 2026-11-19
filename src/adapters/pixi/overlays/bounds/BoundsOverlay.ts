@@ -1,24 +1,32 @@
-import { Graphics } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
 import type { StrokeStyle } from 'pixi.js';
 import { levelBoundsOf } from '../../../../core/derived/index.ts';
-import type { Bounds } from '../../../../core/geometry/index.ts';
-import { dimmedAreas } from './dimmedAreas.ts';
+import { FrameLabel } from '../FrameLabel.ts';
 import type { OverlayScene } from '../OverlayScene.ts';
-import { onPixel, screenRectangleOf, wholeViewRectangle } from '../screenPixels.ts';
+import { onPixel, screenRectangleOf } from '../screenPixels.ts';
 
-const OUTSIDE_COLOUR = 0x0a1423;
-const OUTSIDE_ALPHA = 0.35;
-const EDGE: StrokeStyle = { color: OUTSIDE_COLOUR, alpha: 0.5, width: 1, pixelLine: true };
+const FRAME_COLOUR = 0xecf0f6;
+const EDGE: StrokeStyle = { color: FRAME_COLOUR, alpha: 0.35, width: 1, pixelLine: true };
 
-// Dims the view outside the level bounds and draws their 1 px edge. It has no View menu switch: the
-// requirements always dim the outside in the editor.
+// The level bounds' 1 px edge and their label, such as "World 20000 × 10000". Nothing is drawn outside them:
+// the canvas is clear there, so the app's colour shows, and entities placed outside stay visible. It has no
+// View menu switch.
 export class BoundsOverlay {
-    readonly graphics = new Graphics();
-    private dimmed: readonly Bounds[] = [];
+    readonly container = new Container();
+    private readonly edge = new Graphics();
+    private readonly label = new FrameLabel('World');
 
-    // The screen rectangles dimmed last. For tests.
-    get dimmedAreas() {
-        return this.dimmed;
+    constructor() {
+        this.container.addChild(this.edge, this.label.container);
+        this.container.visible = false;
+    }
+
+    get isShowing() {
+        return this.container.visible;
+    }
+
+    get labelText() {
+        return this.label.text;
     }
 
     update(scene: OverlayScene) {
@@ -31,27 +39,24 @@ export class BoundsOverlay {
         if (levelBounds === undefined) return;
 
         const inView = screenRectangleOf(levelBounds, scene.view);
-        this.dimmed = dimmedAreas(wholeViewRectangle(scene.view), inView);
-
-        for (const area of this.dimmed) {
-            this.graphics.rect(area.left, area.top, area.width, area.height);
-        }
-        this.graphics.fill({ color: OUTSIDE_COLOUR, alpha: OUTSIDE_ALPHA });
-
         const left = onPixel(inView.left);
         const top = onPixel(inView.top);
         const right = onPixel(inView.right);
         const bottom = onPixel(inView.bottom);
-        this.graphics.rect(left, top, right - left, bottom - top).stroke(EDGE);
+        this.edge.rect(left, top, right - left, bottom - top).stroke(EDGE);
+
+        const size = `${levelBounds.width} × ${levelBounds.height}`;
+        this.label.show(size, { x: inView.left, y: inView.top }, FRAME_COLOUR);
+        this.container.visible = true;
     }
 
     // Draws nothing, as during play.
     clear() {
-        this.graphics.clear();
-        this.dimmed = [];
+        this.edge.clear();
+        this.container.visible = false;
     }
 
     destroy() {
-        this.graphics.destroy();
+        this.container.destroy({ children: true });
     }
 }

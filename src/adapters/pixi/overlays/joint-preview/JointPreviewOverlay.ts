@@ -2,6 +2,7 @@ import { Container, Graphics, Text } from 'pixi.js';
 import type { StrokeStyle } from 'pixi.js';
 import type { Bounds, Point } from '../../../../core/geometry/index.ts';
 import { dashedLine } from '../dashes.ts';
+import { ACCENT, OVERLAY_FONT, OVERLAY_TEXT_PX } from '../overlayLook.ts';
 import type { OverlayScene } from '../OverlayScene.ts';
 import { screenRectangleOf } from '../screenPixels.ts';
 
@@ -9,8 +10,7 @@ import { planJointPreview } from './planJointPreview.ts';
 import type { JointPreviewPlan } from './planJointPreview.ts';
 import type { JointPreviewSource } from './JointPreviewSource.ts';
 
-// The design's --accent draws the preview, and the joint icon's edge colour the thin lines (proposal).
-const ACCENT = 0x3b82f6;
+// The accent draws the preview, and the joint icon's edge colour the thin lines (proposal).
 const ICON_EDGE = 0x1d2430;
 const PATH: StrokeStyle = { color: ACCENT, width: 1.5, join: 'round', cap: 'round' };
 const OUTLINE: StrokeStyle = { color: ACCENT, width: 1, join: 'miter' };
@@ -40,7 +40,7 @@ export class JointPreviewOverlay {
     private readonly graphics = new Graphics();
     private readonly label = new Text({
         text: '',
-        style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: ACCENT },
+        style: { fontFamily: OVERLAY_FONT, fontSize: OVERLAY_TEXT_PX, fill: ACCENT },
     });
     private shown: DrawnJointPreview = NOTHING_DRAWN;
 

@@ -5,6 +5,7 @@ import type { Bounds, Point } from '../../../../core/geometry/index.ts';
 import { HANDLE_SIZE_PX } from '../../../../editor/tools/index.ts';
 import { toPixiColour } from '../../PixiColour.ts';
 import { dashedLine } from '../dashes.ts';
+import { ACCENT, drawHandle } from '../overlayLook.ts';
 import type { OverlayScene } from '../OverlayScene.ts';
 import { squareAround } from '../screenPixels.ts';
 
@@ -12,14 +13,11 @@ import { planDrawing } from './drawingPlan.ts';
 import type { DrawingPlan } from './drawingPlan.ts';
 import type { DrawingSource } from './DrawingSource.ts';
 
-// The design's --accent, which draws the handles' edges and the first point's ring.
-const ACCENT = 0x3b82f6;
 const FILL = { color: toPixiColour(DEFAULT_FILL_COLOUR).color, alpha: 0.35 };
 const OUTLINE_COLOUR = toPixiColour(DEFAULT_OUTLINE_COLOUR).color;
 // The outline of a new shape, 1.5 screen px at any zoom (proposal).
 const SOLID: StrokeStyle = { color: OUTLINE_COLOUR, width: 1.5, join: 'round', cap: 'round' };
 const DASHED: StrokeStyle = { color: OUTLINE_COLOUR, alpha: 0.6, width: 1.5, cap: 'butt' };
-const HANDLE_EDGE: StrokeStyle = { color: ACCENT, width: 1.5, join: 'miter' };
 const RING_WIDTH_PX = 2;
 const RING: StrokeStyle = { color: ACCENT, width: RING_WIDTH_PX };
 // The design: the first point is a 12 px ring.
@@ -120,7 +118,7 @@ export class DrawingPreviewOverlay {
         const squares = plan.handles.map((point) => squareAround(toScreen(point), HANDLE_SIZE_PX));
 
         for (const square of squares) {
-            this.graphics.rect(square.left, square.top, square.width, square.height).fill(0xffffff).stroke(HANDLE_EDGE);
+            drawHandle(this.graphics, square);
         }
 
         return squares;

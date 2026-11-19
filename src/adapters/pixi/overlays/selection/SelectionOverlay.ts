@@ -8,6 +8,7 @@ import { HANDLE_SIZE_PX } from '../../../../editor/tools/index.ts';
 import { JOINT_ICON_RADIUS_PX } from '../../../../editor/view/index.ts';
 import type { OverlayCaches, OverlayScene } from '../OverlayScene.ts';
 import { dashedLine } from '../dashes.ts';
+import { ACCENT, OVERLAY_FONT, OVERLAY_TEXT_PX, drawHandle } from '../overlayLook.ts';
 import { screenRectangleOf, squareAround } from '../screenPixels.ts';
 
 import { planSelection } from './selectionPlan.ts';
@@ -15,8 +16,6 @@ import type { SelectionPlan } from './selectionPlan.ts';
 import { shapeOutline } from './shapeOutline.ts';
 import type { SelectionSource, ShownFrame, ShownPoints, ShownReadout } from './SelectionSource.ts';
 
-// The design's --accent, which draws every selection.
-const ACCENT = 0x3b82f6;
 const HEAVY_OUTLINE: StrokeStyle = { color: ACCENT, width: 1.5, join: 'round', cap: 'round' };
 const THIN_OUTLINE: StrokeStyle = { color: ACCENT, width: 1, join: 'round', cap: 'round' };
 // The rest of a selected entity's body (proposal): the thin outline, fainter.
@@ -24,7 +23,6 @@ const BODY_OUTLINE: StrokeStyle = { color: ACCENT, alpha: 0.5, width: 1, join: '
 const BOX: StrokeStyle = { color: ACCENT, width: 1, join: 'miter' };
 const RING: StrokeStyle = { color: ACCENT, width: 2 };
 const CAMERA_FRAME: StrokeStyle = { color: ACCENT, width: 3, join: 'miter' };
-const HANDLE_EDGE: StrokeStyle = { color: ACCENT, width: 1.5, join: 'miter' };
 const SELECTION_BOX_FILL: FillStyle = { color: ACCENT, alpha: 0.08 };
 // The ring sits just outside the joint icon's edge.
 const RING_RADIUS_PX = JOINT_ICON_RADIUS_PX + 3;
@@ -39,9 +37,7 @@ const READOUT_PADDING_X_PX = 6;
 const READOUT_PADDING_Y_PX = 3;
 const TOOLTIP = 0x0b0d10;
 const TOOLTIP_TEXT = 0xe8ebf0;
-const RADIUS_PX = 4;
-const FONT = 'JetBrains Mono, monospace';
-const TEXT_SMALL_PX = 11;
+const RADIUS_PX = 8;
 
 // What was drawn last, in screen pixels, for tests.
 export type DrawnSelection = {
@@ -85,13 +81,13 @@ export class SelectionOverlay {
     private readonly handleSquares = new Graphics();
     private readonly countLabel = new Text({
         text: '',
-        style: { fontFamily: FONT, fontSize: TEXT_SMALL_PX, fill: ACCENT },
+        style: { fontFamily: OVERLAY_FONT, fontSize: OVERLAY_TEXT_PX, fill: ACCENT },
     });
     private readonly readoutBox = new Container();
     private readonly readoutBackground = new Graphics();
     private readonly readoutLabel = new Text({
         text: '',
-        style: { fontFamily: FONT, fontSize: TEXT_SMALL_PX, fill: TOOLTIP_TEXT },
+        style: { fontFamily: OVERLAY_FONT, fontSize: OVERLAY_TEXT_PX, fill: TOOLTIP_TEXT },
     });
     private shown: DrawnSelection = NOTHING_DRAWN;
 
@@ -181,10 +177,7 @@ export class SelectionOverlay {
         const squares = frame.handles.map((handle) => squareAround(scene.view.levelToScreen(handle), HANDLE_SIZE_PX));
 
         for (const square of squares) {
-            this.handleSquares
-                .rect(square.left, square.top, square.width, square.height)
-                .fill(0xffffff)
-                .stroke(HANDLE_EDGE);
+            drawHandle(this.handleSquares, square);
         }
 
         return squares;
@@ -196,11 +189,7 @@ export class SelectionOverlay {
         const squares = edited.points.map((point) => squareAround(scene.view.levelToScreen(point), HANDLE_SIZE_PX));
 
         squares.forEach((square, index) => {
-            const inside = selected.has(index) ? ACCENT : 0xffffff;
-            this.handleSquares
-                .rect(square.left, square.top, square.width, square.height)
-                .fill(inside)
-                .stroke(HANDLE_EDGE);
+            drawHandle(this.handleSquares, square, selected.has(index) ? ACCENT : undefined);
         });
 
         return squares;

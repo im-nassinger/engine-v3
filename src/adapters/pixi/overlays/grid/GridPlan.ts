@@ -1,4 +1,4 @@
-import type { Bounds } from '../../../../core/geometry/index.ts';
+import { Bounds } from '../../../../core/geometry/index.ts';
 
 // Lines closer than this on screen are left out, so the grid never turns into a grey wash.
 export const MIN_LINE_SPACING_PX = 8;
@@ -72,7 +72,19 @@ function linesBetween(low: number, high: number, spacing: GridSpacing) {
     return lines;
 }
 
-// The grid lines across the visible level rectangle.
+// The part of the level bounds in view, where the grid is drawn. undefined when none of them is.
+export function gridAreaOf(visible: Bounds, levelBounds: Bounds) {
+    if (!visible.overlaps(levelBounds)) return undefined;
+
+    return new Bounds(
+        Math.max(visible.left, levelBounds.left),
+        Math.max(visible.top, levelBounds.top),
+        Math.min(visible.right, levelBounds.right),
+        Math.min(visible.bottom, levelBounds.bottom),
+    );
+}
+
+// The grid lines across this rectangle of the level.
 export function planGrid(input: GridPlanInput): GridPlan {
     const spacing = gridSpacingAt(input.gridSize, input.zoom);
     const visible = input.visible;

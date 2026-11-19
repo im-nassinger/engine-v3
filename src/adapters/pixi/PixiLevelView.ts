@@ -65,7 +65,8 @@ export class PixiLevelView {
     // again never makes PixiJS rebuild the level's draw instructions: at 10,000 entities that took 27 ms a frame.
     private readonly levelLayer = new Container({ isRenderGroup: true });
     // In front of the level and unzoomed: overlays draw in screen pixels, so they keep their size at any zoom.
-    // The grid is over the level, since the World's fill, drawn first in the level, is the background.
+    // The grid is over the level, since the World's fill, drawn first in the level, is the background. Outside
+    // the level bounds nothing is drawn behind the entities, so the app's colour shows through the clear canvas.
     private readonly gridOverlay = new GridOverlay();
     private readonly boundsOverlay = new BoundsOverlay();
     private readonly cameraFrameOverlay = new CameraFrameOverlay();
@@ -107,7 +108,7 @@ export class PixiLevelView {
         this.stage.addChild(this.levelLayer);
         this.stage.addChild(
             this.gridOverlay.graphics,
-            this.boundsOverlay.graphics,
+            this.boundsOverlay.container,
             this.cameraFrameOverlay.container,
             this.physicsViewOverlay.graphics,
             this.jointPreviewOverlay.container,
@@ -262,7 +263,7 @@ export class PixiLevelView {
 
     // Shows the level through the camera from now on, as Fixed size does: the camera's box fills the
     // window one way, centred, with black bars the other way. Selection, handles, previews, joint icons
-    // and the dimmed outside aren't drawn; the grid, camera frame and physics view follow their switches.
+    // and the level bounds' edge and label aren't drawn; the grid, camera frame and physics view follow their switches.
     showThroughCamera(position: Point, box: CameraBox) {
         this.camera = { position, box };
         this.fitCamera();
