@@ -155,8 +155,9 @@ export class CiChecker {
         return failedSteps;
     }
 
+    // Reads GitHub's API because `gh run view --json jobs` leaves out when each step started.
     private readJobs(runId: number) {
-        const output = this.gh('run', 'view', String(runId), '--json', 'jobs', '--repo', PUBLIC_REPO);
+        const output = this.gh('api', `repos/${PUBLIC_REPO}/actions/runs/${runId}/jobs?per_page=100`);
         const parsed: unknown = JSON.parse(output);
         if (!isRecord(parsed) || !Array.isArray(parsed.jobs)) return [];
 
@@ -222,10 +223,13 @@ function describeRunningJob(job: Record<string, unknown>, nowMs: number) {
     const runningStep = steps.filter(isRecord).find((step) => step.status === 'in_progress');
     if (runningStep === undefined) return jobName;
 
-    const startedAtMs = Date.parse(String(runningStep.startedAt));
+    const stepText = `${jobName} > ${String(runningStep.name)}`;
+    const startedAtMs = Date.parse(String(runningStep.started_at));
+    if (Number.isNaN(startedAtMs)) return stepText;
+
     const runningMinutes = Math.floor((nowMs - startedAtMs) / MINUTE_MS);
 
-    return `${jobName} > ${String(runningStep.name)}, ${runningMinutes} min`;
+    return `${stepText}, ${runningMinutes} min`;
 }
 
 const ESCAPE = String.fromCharCode(27);
