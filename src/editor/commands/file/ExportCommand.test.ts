@@ -24,12 +24,11 @@ function buildCommand(zip = new StoredZipCodec()) {
 }
 
 describe('ExportCommand', () => {
-    test('is in the File menu with Ctrl+S, which works everywhere', () => {
+    test('is in the File menu, without a shortcut', () => {
         const { command } = buildCommand();
 
         expect(command.menu.menu).toBe('File');
-        expect(command.shortcuts).toEqual(['Ctrl+S']);
-        expect(command.shortcutScope).toBe('everywhere');
+        expect(command.shortcuts).toEqual([]);
     });
 
     test('exports and says which file once it is handed out', async () => {

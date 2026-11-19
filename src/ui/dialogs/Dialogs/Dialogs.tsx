@@ -1,9 +1,10 @@
 import { useCommands } from '../../commands/index.ts';
 import { useVersion } from '../../hooks/index.ts';
 import { DialogBox } from './DialogBox/index.ts';
+import { TextDialog } from './TextDialog/index.ts';
 
-// The one open question or notice of CommandRunner. A question's go-ahead button confirms it;
-// Cancel, a notice's OK and Esc close it and change nothing.
+// The one open question, text request or notice of CommandRunner. A go-ahead button answers it; Cancel, a
+// notice's OK and Esc close it and change nothing.
 export function Dialogs() {
     const { runner } = useCommands();
     useVersion(runner.dialog.version);
@@ -19,6 +20,12 @@ export function Dialogs() {
         return (
             <DialogBox title={notice.title} text={notice.text} confirmLabel="OK" onConfirm={close} onClose={close} />
         );
+    }
+
+    if (dialog.kind === 'textRequest') {
+        const submit = (text: string) => runner.submitDialogText(text);
+
+        return <TextDialog request={dialog.request} onSubmit={submit} onClose={close} />;
     }
 
     const question = dialog.question;

@@ -233,11 +233,14 @@ test('Shift+T plays and stops, and types a T in a field', async ({ page }) => {
     await expect(playBar(page)).toHaveCount(0);
     await expect(page.getByRole('region', { name: 'Main menu' })).toBeVisible();
 
-    const nameBox = page.getByRole('textbox', { name: 'Level name' });
+    await page.getByRole('tree', { name: 'Entities' }).getByRole('treeitem').filter({ hasText: 'Camera' }).click();
+    const nameBox = page
+        .getByRole('region', { name: 'Entity inspector' })
+        .getByRole('textbox', { name: 'Entity name' });
     await nameBox.click();
     await nameBox.press('End');
     await nameBox.press('Shift+T');
-    await expect(nameBox).toHaveValue('Untitled levelT');
+    await expect(nameBox).toHaveValue('CameraT');
     await expect(playBar(page)).toHaveCount(0);
 });
 

@@ -3,7 +3,7 @@ import { RenameLevelChange } from '../../history/index.ts';
 import type { EditOutcome } from '../../history/index.ts';
 import type { OpenLevel } from '../../session/index.ts';
 
-// The top bar's level name. Trimmed like an entity's name: an empty one keeps the old name and makes no
+// The Rename level dialog's answer. Trimmed like an entity's name: an empty one keeps the old name and makes no
 // step, and a longer one is refused, not cut, so the old name stays.
 export function renameLevel(openLevel: OpenLevel, text: string): EditOutcome {
     const { level, editor } = openLevel;

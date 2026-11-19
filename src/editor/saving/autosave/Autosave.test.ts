@@ -276,6 +276,24 @@ describe('Autosave', () => {
         expect(autosave.state.status).toBe('saved');
     });
 
+    test('two saveNow calls during a running save write one at a time', async () => {
+        const { timer, store, autosave, change } = buildAutosave();
+        store.holdsSaves = true;
+        change();
+        await advance(timer, 2_000);
+        change();
+
+        const saving = Promise.all([autosave.saveNow(), autosave.saveNow()]);
+        store.finishHeld();
+        await settle();
+        expect(store.heldCount).toBe(1);
+
+        store.finishHeld();
+        await saving;
+        expect(store.saveCount).toBe(2);
+        expect(autosave.state.status).toBe('saved');
+    });
+
     test('a failed save is failed', async () => {
         const { timer, store, autosave, change } = buildAutosave();
         store.refusesSaves = true;

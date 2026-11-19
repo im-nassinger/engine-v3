@@ -98,14 +98,13 @@ src/
     debug-box/         DebugBox/ (with DebugEntry/)
     message-pill/      MessagePill/
     tool-column/       ToolColumn/ (with ToolButton/, KindsMenu/)
-    dialogs/           Dialogs/ (with DialogBox/)
+    dialogs/           Dialogs/ (with DialogBox/, TextDialog/)
     open-windows/      OpenWindowsContext: where menus and the row drag report themselves open
     tools/             ToolsContext: ToolController and MousePosition for the tool column, debug box and picker; testing/
     play/              PlayContext: the PlaySession for the shell, the Play button and the Play bar
     play-bar/          PlayBar/ (with PlayBarButton/)
     testing/           editorPage: a component shown with the session, commands and tools, for browser tests
     main-menu/ level-view-host/ entities-viewer/ entity-inspector/
-    level-file/        LevelFile/ (an island), LevelName/, SaveStateButton/, until stage 19 step 12 removes them
     save-state/        SaveIndicatorContext
     fields/            one component per field type: NumberField/, ColourField/, ...
     shared/            Button/, IconButton/, Menu/, MenuButton/, Tooltip/, Icon/

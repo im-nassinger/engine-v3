@@ -186,13 +186,9 @@ async function inspectMenuButton(page: Page, inspect: Inspect, within: Locator, 
 
 const CASES: CoverCase[] = [
     {
-        name: "the main menu and the save state's explanation",
+        name: 'the main menu',
         run: async (page, inspect) => {
             await inspectMenuButton(page, inspect, region(page, 'Main menu'), 'Main menu');
-
-            const levelFile = region(page, 'Level file');
-            await levelFile.getByRole('button', { name: /^Save state/ }).click();
-            await inspect("the save state's explanation", levelFile.locator('.save-explanation'));
         },
     },
     {
@@ -332,6 +328,15 @@ const CASES: CoverCase[] = [
             await page.getByRole('menuitem', { name: 'Help', exact: true }).hover();
             await page.getByRole('menuitem', { name: /^About/ }).click();
             await inspect('the About dialog', page.getByRole('dialog'));
+        },
+    },
+    {
+        name: 'the Rename level dialog',
+        run: async (page, inspect) => {
+            await region(page, 'Main menu').getByRole('button', { name: 'Main menu' }).click();
+            await page.getByRole('menuitem', { name: 'File', exact: true }).hover();
+            await page.getByRole('menuitem', { name: /^Rename level/ }).click();
+            await inspect('the Rename level dialog', page.getByRole('dialog'));
         },
     },
 ];

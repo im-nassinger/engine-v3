@@ -17,6 +17,7 @@ import { ExportCommand } from './file/ExportCommand.ts';
 import type { FileParts } from './file/FileParts.ts';
 import { ImportCommand } from './file/ImportCommand.ts';
 import { NewCommand } from './file/NewCommand.ts';
+import { SaveCommand } from './file/SaveCommand.ts';
 import { AboutCommand } from './help/AboutCommand.ts';
 import { HideOrShowCommand } from './edit/HideOrShowCommand.ts';
 import { RedoCommand } from './edit/RedoCommand.ts';
@@ -36,6 +37,7 @@ import { PlayOrStopCommand } from './play/PlayOrStopCommand.ts';
 import { StepCommand } from './play/StepCommand.ts';
 import { ReadOnlyGuard } from './ReadOnlyGuard.ts';
 import { RenameCommand } from './rename/RenameCommand.ts';
+import { RenameLevelCommand } from './rename/RenameLevelCommand.ts';
 import { ZoomToActualSizeCommand } from './view/ZoomToActualSizeCommand.ts';
 
 // Every command built so far, each reading the session's open level when it runs, so replacing the
@@ -57,7 +59,9 @@ export function createCommandRegistry(
         registerEditing(new NewCommand(session, fileParts));
         // Import checks for a read-only tab itself: dropping a file calls it directly.
         registry.register(new ImportCommand(session, fileParts));
+        registerEditing(new SaveCommand(session, fileParts));
         registry.register(new ExportCommand(session, fileParts));
+        registerEditing(new RenameLevelCommand(session));
     }
 
     registerEditing(new UndoCommand(session));

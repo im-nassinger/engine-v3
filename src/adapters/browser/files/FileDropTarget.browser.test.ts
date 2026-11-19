@@ -36,7 +36,15 @@ function buildEditor() {
         exporter: new FakeFiles(),
     });
     const levelImport = new LevelImport({ importer, reader: session.reader });
-    const parts = { levelExport, levelImport, picker: new FakeFilePicker(), saving, outcomes: runner };
+    const parts = {
+        levelExport,
+        levelImport,
+        picker: new FakeFilePicker(),
+        saving,
+        saveFailure: () => undefined,
+        commitTyping: () => undefined,
+        outcomes: runner,
+    };
     const registry = createCommandRegistry(session, undefined, parts);
     const target = new FileDropTarget(new FileDropEvents(registry, runner), window);
     disconnects.push(target.connect());

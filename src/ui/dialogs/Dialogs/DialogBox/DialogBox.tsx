@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef } from 'react';
-import type { KeyboardEvent } from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
 import { Button } from '../../../shared/index.ts';
 import './DialogBox.css';
 
@@ -12,18 +12,20 @@ export type DialogBoxProps = {
     cancelLabel?: string;
     onConfirm: () => void;
     onClose: () => void;
+    // What the dialog asks for, between its text and its buttons.
+    children?: ReactNode;
 };
 
-// Centred over the scrim, the safe button first and the primary one last. The primary button takes
-// the focus, so Enter answers it; Esc closes the dialog from anywhere inside it.
-export function DialogBox({ title, text, confirmLabel, cancelLabel, onConfirm, onClose }: DialogBoxProps) {
+// Centred over the scrim, the safe button first and the primary one last. A field in it takes the focus,
+// and otherwise the primary button, so Enter answers it; Esc closes the dialog from anywhere inside it.
+export function DialogBox({ title, text, confirmLabel, cancelLabel, onConfirm, onClose, children }: DialogBoxProps) {
     const titleId = useId();
     const textId = useId();
     const boxRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const primaryButton = boxRef.current?.querySelector<HTMLButtonElement>('.buttons > :last-child');
-        primaryButton?.focus();
+        const first = boxRef.current?.querySelector<HTMLElement>('input, .buttons > :last-child');
+        first?.focus();
     }, []);
 
     const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -46,6 +48,7 @@ export function DialogBox({ title, text, confirmLabel, cancelLabel, onConfirm, o
             >
                 <h2 id={titleId}>{title}</h2>
                 <p id={textId}>{text}</p>
+                {children}
                 <div className="buttons">
                     {cancelLabel && <Button label={cancelLabel} onClick={onClose} />}
                     <Button label={confirmLabel} variant="primary" onClick={onConfirm} />

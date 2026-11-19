@@ -13,7 +13,7 @@ const IMPORT_TITLE = 'Import';
 // instead of being wrapped in ReadOnlyGuard, because dropping a file calls importDropped directly.
 export class ImportCommand implements EditorCommand {
     readonly id = 'file.import';
-    readonly label = 'Import';
+    readonly label = 'Import…';
     readonly menu = { menu: 'File', section: 1, order: 20 } as const;
     readonly shortcuts = ['Ctrl+O'];
     private readonly session: EditorSession;

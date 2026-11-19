@@ -4,7 +4,7 @@ import { VersionCounter } from '../../../core/events/index.ts';
 // written. failed: the last save didn't work, and the level is kept only in this tab.
 export type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'failed';
 
-// What the top bar shows of saving, and what arms the leave prompt.
+// What the tab title's `*`, the message pill's failed save and the leave prompt follow.
 export class SaveState {
     readonly version = new VersionCounter();
     private current: SaveStatus = 'saved';

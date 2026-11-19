@@ -16,7 +16,7 @@
 | A typed value out of range | 150 in a 0 to 100 field | Clamped, with a note | "Max is 100" under the field, briefly |
 | Untrusted data is bad | A damaged import, a paste of something else | `ReadRefusal` | Import: a dialog with a plain message. Paste: status text |
 | Over a limit | A paste past 100,000 entities | `{ reason: 'overLimit', limit, max }` | The message names the limit: "A level holds at most 100,000 entities" |
-| A detail fails | IndexedDB full; no storage in a private window | `SaveState` `failed` | The save state in the top bar and a level-wide warning |
+| A detail fails | IndexedDB full; no storage in a private window | `SaveState` `failed` | The message pill until a save works, and a level-wide warning |
 | A run fails | The worker stops answering or throws | `PlaySession` state `ended` with a reason | A message on the Play bar, one click from the editor |
 | A bug | An exception nobody expected | An exception | Below |
 

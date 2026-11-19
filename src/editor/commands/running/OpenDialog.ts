@@ -1,8 +1,9 @@
 import { VersionCounter } from '../../../core/events/index.ts';
-import type { CommandOutcome, Notice, Question } from '../EditorCommand.ts';
+import type { CommandOutcome, Notice, Question, TextRequest } from '../EditorCommand.ts';
 
 export type Dialog =
     | { readonly kind: 'question'; readonly question: Question; confirm(): CommandOutcome }
+    | { readonly kind: 'textRequest'; readonly request: TextRequest; submit(text: string): CommandOutcome }
     | { readonly kind: 'notice'; readonly notice: Notice };
 
 // The one dialog on screen. A dialog that comes while one is open waits behind it, in order, so the

@@ -14,5 +14,9 @@ export type FileParts = {
     readonly picker: FilePicker;
     // Autosave: New and Import save the level that replaced the open one at once.
     readonly saving: SavesNow;
+    // Why saving doesn't work, while that stands: SaveIndicator's failed save.
+    saveFailure(): string | undefined;
+    // Ends the typing in a focused field, so Save writes what is on screen.
+    commitTyping(): void;
     readonly outcomes: LateOutcomes;
 };

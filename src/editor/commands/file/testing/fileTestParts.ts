@@ -6,7 +6,8 @@ import type { EditorSession } from '../../../session/index.ts';
 import type { CommandOutcome } from '../../EditorCommand.ts';
 import type { FileParts } from '../FileParts.ts';
 
-// The File menu's parts on fakes: a store-less save that counts its calls, a picker giving castle.editable,
+// The File menu's parts on fakes: a store-less save that counts its calls and fails with `failure` when a
+// test sets it, a count of the typing ended, a picker giving castle.editable,
 // an importer answering "not a level" until a test sets its answer, and every late outcome kept in order.
 export function buildFileTestParts(session: EditorSession, zip: ZipCodec = new StoredZipCodec()) {
     const files = new FakeFiles();
@@ -15,6 +16,8 @@ export function buildFileTestParts(session: EditorSession, zip: ZipCodec = new S
     const lateOutcomes: CommandOutcome[] = [];
     const saving = {
         saveCount: 0,
+        commitCount: 0,
+        failure: undefined as string | undefined,
         saveNow() {
             saving.saveCount += 1;
 
@@ -29,7 +32,17 @@ export function buildFileTestParts(session: EditorSession, zip: ZipCodec = new S
     });
     const levelImport = new LevelImport({ importer, reader: session.reader });
     const outcomes = { showOutcome: (outcome: CommandOutcome) => lateOutcomes.push(outcome) };
-    const parts: FileParts = { levelExport, levelImport, picker, saving, outcomes };
+    const parts: FileParts = {
+        levelExport,
+        levelImport,
+        picker,
+        saving,
+        saveFailure: () => saving.failure,
+        commitTyping: () => {
+            saving.commitCount += 1;
+        },
+        outcomes,
+    };
 
     return { parts, files, picker, importer, saving, lateOutcomes, levelExport };
 }

@@ -38,12 +38,5 @@ export type { FilePicker, PickedFile } from './contracts/FilePicker.ts';
 export { LevelImport } from './import/LevelImport.ts';
 export type { LevelImportOptions } from './import/LevelImport.ts';
 export { importRefusalText } from './import/importRefusalText.ts';
-export {
-    NOTHING_SAVED_EXPLANATION,
-    READ_ONLY_LABEL,
-    SAVED_EXPLANATION,
-    SAVING_EXPLANATION,
-    SaveIndicator,
-    UNSAVED_EXPLANATION,
-} from './indicator/SaveIndicator.ts';
-export type { SaveMode, SaveStateShown } from './indicator/SaveIndicator.ts';
+export { NOTHING_SAVED_WARNING, SaveIndicator } from './indicator/SaveIndicator.ts';
+export type { SaveMode } from './indicator/SaveIndicator.ts';

@@ -105,7 +105,7 @@ export class EditorComposition {
     readonly mouse: MousePosition;
     // The page's menus and the Entities panel's row drag report here, so Esc leaves them to close.
     readonly openWindows: OpenWindowCount;
-    // What the page shows of saving: the top bar's save state, the tab title's `*` and the leave prompt.
+    // What the page shows of saving: the message pill's failed save, the tab title's `*` and the leave prompt.
     readonly saveIndicator: SaveIndicator;
     // Test play: Play, Stop, Pause and Step, and what the Play bar shows.
     readonly play: PlaySession;
@@ -220,7 +220,15 @@ export class EditorComposition {
             heldKeys,
         });
         const runner = new CommandRunner(session.status, { dialog, play });
-        const fileParts = { levelExport, levelImport, picker, saving, outcomes: runner };
+        const fileParts = {
+            levelExport,
+            levelImport,
+            picker,
+            saving,
+            saveFailure: () => saveIndicator.failedSaveText,
+            commitTyping: () => commitFocusedField(document),
+            outcomes: runner,
+        };
         const commands = createCommandRegistry(session, { clipboard, mouse }, fileParts, play);
         const platform = keyboardPlatform(navigator.platform);
         const levelView = await PixiLevelView.create({

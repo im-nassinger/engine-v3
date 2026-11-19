@@ -186,7 +186,7 @@ test('journey 2: a car of a group, a body and two hinged wheels, exported and im
     await answerReplace(page);
     await expect(rows(page, 'Group 1')).toHaveCount(0);
     await expect(rows(page, 'Rectangle 1')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Save state: Saved' })).toBeVisible({ timeout: SAVE_TIMEOUT_MS });
+    await expect(page).toHaveTitle(/^[^*]/, { timeout: SAVE_TIMEOUT_MS });
 
     await dropFile(page, exported);
     await expect(page.locator('.message-pill .message')).toHaveText(`Imported ${exported.name}`);

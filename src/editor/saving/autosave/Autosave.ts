@@ -85,11 +85,12 @@ export class Autosave {
         this.stopFollowingSession = options.session.openLevelChanged.subscribe(() => this.followNewLevel());
     }
 
-    // For what can't wait for the timers: the tab hidden, test play starting, an export. Waits for a running
-    // save, then saves if anything is unsaved, even during a drag. Resolves when it is written or failed.
+    // For what can't wait for the timers: File → Save, the tab hidden, test play starting, an export. Waits for
+    // running saves, then saves if anything is unsaved, even during a drag. Resolves when it is written or
+    // failed. A loop, since another caller waiting too may have started the next save first.
     async saveNow(): Promise<void> {
         if (this.session.readOnly) return;
-        if (this.running !== undefined) {
+        while (this.running !== undefined) {
             await this.running;
         }
         if (!this.hasUnsavedChanges()) return;

@@ -98,13 +98,13 @@ describe('ShortcutDispatcher', () => {
     });
 
     test('an everywhere key works while typing', () => {
-        const exportFile = fakeCommand('file.export', ['Ctrl+S'], { scope: 'everywhere' });
-        const { dispatcher } = buildDispatcher([exportFile]);
+        const save = fakeCommand('file.save', ['Ctrl+S'], { scope: 'everywhere' });
+        const { dispatcher } = buildDispatcher([save]);
 
         const used = dispatcher.handleKeyDown(CTRL_S, 'textField', false);
 
         expect(used).toBe(true);
-        expect(exportFile.runCount).toBe(1);
+        expect(save.runCount).toBe(1);
     });
 
     test('an unused key returns false', () => {

@@ -17,7 +17,7 @@ export type LevelExportOptions = {
     readonly exporter: FileExporter;
 };
 
-// Export and Ctrl+S: save to the browser first, as the requirement says, then pack the open level and hand
+// Export: save to the browser first, as the requirement says, then pack the open level and hand
 // it out, even when the save failed, because Export must work with a full disk.
 export class LevelExport {
     private readonly session: EditorSession;

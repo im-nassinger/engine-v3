@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 import type { PlaySession } from '../../editor/play/index.ts';
 
-// Test play, for the shell, the top bar's Play button and the Play bar.
+// Test play, for the shell and the Play bar.
 export const PlayContext = createContext<PlaySession | undefined>(undefined);
 
 export function usePlaySession() {

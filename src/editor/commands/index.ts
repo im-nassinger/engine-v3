@@ -34,6 +34,8 @@ export {
     NewCommand,
     REPLACE_LABEL,
     REPLACE_QUESTION_TEXT,
+    SAVED_TEXT,
+    SaveCommand,
 } from './file/index.ts';
 export type { FileParts, LateOutcomes } from './file/index.ts';
 export { AboutCommand, GAME_NAME } from './help/AboutCommand.ts';
@@ -53,6 +55,7 @@ export type {
     Notice,
     Question,
     ShortcutScope,
+    TextRequest,
 } from './EditorCommand.ts';
 export { CommandRunner } from './running/CommandRunner.ts';
 export type { CommandRunnerParts, PlayGate } from './running/CommandRunner.ts';
@@ -79,6 +82,7 @@ export { deletePoints } from './points/deletePoints.ts';
 export { nudgePoints } from './points/nudgePoints.ts';
 export { PointsMove } from './points/PointsMove.ts';
 export { RenameCommand } from './rename/RenameCommand.ts';
+export { RENAME_LEVEL_TEXT, RenameLevelCommand } from './rename/RenameLevelCommand.ts';
 export { renameEntity } from './rename/renameEntity.ts';
 export { renameLevel } from './rename/renameLevel.ts';
 export { EntityNamer } from './shared/EntityNamer.ts';

@@ -74,7 +74,18 @@ export class CommandRunner {
         this.showOutcome(outcome);
     }
 
-    // Cancel on a question, OK on a notice, or Esc on either: closes it and changes nothing.
+    // The text request's go-ahead button, or Enter in its field.
+    submitDialogText(text: string) {
+        const dialog = this.dialog.current;
+        if (dialog === undefined) return;
+        if (dialog.kind !== 'textRequest') return;
+
+        this.dialog.closeCurrent();
+        const outcome = dialog.submit(text);
+        this.showOutcome(outcome);
+    }
+
+    // Cancel on a question or a text request, OK on a notice, or Esc on any: closes it and changes nothing.
     closeDialog() {
         this.dialog.closeCurrent();
     }
@@ -84,6 +95,12 @@ export class CommandRunner {
         if (outcome.kind === 'needsConfirmation') {
             const confirm = () => outcome.confirm();
             this.dialog.open({ kind: 'question', question: outcome.question, confirm });
+            return;
+        }
+
+        if (outcome.kind === 'needsText') {
+            const submit = (text: string) => outcome.submit(text);
+            this.dialog.open({ kind: 'textRequest', request: outcome.request, submit });
             return;
         }
 

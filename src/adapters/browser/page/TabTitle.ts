@@ -17,7 +17,7 @@ export function tabTitleText(levelName: string, hasUnsavedChanges: boolean, isRu
     return `${runMark}${mark}${levelName} - ${GAME_NAME}`;
 }
 
-// The browser tab's title follows the open level's name, the save state and test play.
+// The browser tab's title follows the open level's name, unsaved changes and test play.
 export class TabTitle {
     private readonly session: EditorSession;
     private readonly indicator: SaveIndicator;

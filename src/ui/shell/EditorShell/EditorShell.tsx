@@ -2,7 +2,6 @@ import { DebugBox } from '../../debug-box/index.ts';
 import { Dialogs } from '../../dialogs/index.ts';
 import { EntitiesViewer } from '../../entities-viewer/index.ts';
 import { EntityInspector } from '../../entity-inspector/index.ts';
-import { LevelFile } from '../../level-file/index.ts';
 import { LevelViewHost } from '../../level-view-host/index.ts';
 import { MainMenu } from '../../main-menu/index.ts';
 import { MessagePill } from '../../message-pill/index.ts';
@@ -59,9 +58,6 @@ export function EditorShell() {
             <PanelPlace area="minimap" label="Minimap" />
             <PanelPlace area="debug-box" label="Debug box">
                 <DebugBox />
-            </PanelPlace>
-            <PanelPlace area="level-file" label="Level file">
-                <LevelFile />
             </PanelPlace>
             <PanelErrorBoundary>
                 <MessagePill />

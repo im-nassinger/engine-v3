@@ -6,8 +6,10 @@ import type { Page } from '@playwright/test';
 const MAIN_MENU: Record<string, [string, string][]> = {
     File: [
         ['New', ''],
-        ['Import', 'Ctrl+O'],
-        ['Export', 'Ctrl+S'],
+        ['Import…', 'Ctrl+O'],
+        ['Save', 'Ctrl+S'],
+        ['Export…', ''],
+        ['Rename level…', ''],
     ],
     Edit: [
         ['Undo', 'Ctrl+Z'],
@@ -124,43 +126,53 @@ test('a switch shows its tick, and choosing it closes the menu', async ({ page }
     await expect(page.getByRole('menuitem', { name: /^Grid G/ })).toHaveAttribute('aria-checked', 'false');
 });
 
+async function openRenameDialog(page: Page) {
+    await openSubmenu(page, 'File');
+    await page.getByRole('menuitem', { name: /^Rename level/ }).click();
+
+    return page.getByRole('dialog').getByRole('textbox', { name: 'Level name' });
+}
+
 test("renaming the level is an undo step, Edit's Undo names it, and the tab title follows", async ({ page }) => {
     await openEditor(page);
-    const nameBox = page.getByRole('textbox', { name: 'Level name' });
-
-    await expect(nameBox).toHaveValue('Untitled level');
     await expect(page).toHaveTitle('Untitled level - engine-v3');
     await openSubmenu(page, 'Edit');
     await expect(page.getByRole('menuitem', { name: /^Undo/ })).toHaveAttribute('aria-disabled', 'true');
     await page.keyboard.press('Escape');
 
-    await nameBox.click();
+    const nameBox = await openRenameDialog(page);
+    await expect(nameBox).toHaveValue('Untitled level');
+    await expect(nameBox).toBeFocused();
     await nameBox.fill('Bridge');
     await nameBox.press('Enter');
 
-    await expect(nameBox).toHaveValue('Bridge');
-    await expect(page).toHaveTitle('Bridge - engine-v3');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(page).toHaveTitle(/^\*?Bridge - engine-v3$/);
     await openSubmenu(page, 'Edit');
     await page.getByRole('menuitem', { name: /^Undo: Rename level/ }).click();
 
-    await expect(nameBox).toHaveValue('Untitled level');
-    await expect(page).toHaveTitle('Untitled level - engine-v3');
+    await expect(page).toHaveTitle(/^\*?Untitled level - engine-v3$/);
     await openSubmenu(page, 'Edit');
     await expect(page.getByRole('menuitem', { name: /^Redo: Rename level/ })).toHaveAttribute('aria-disabled', 'false');
 });
 
-test('Esc puts the name back, and leaving the box renames like Enter', async ({ page }) => {
+test('Esc and Cancel keep the name, and a name too long is refused with the reason', async ({ page }) => {
     await openEditor(page);
-    const nameBox = page.getByRole('textbox', { name: 'Level name' });
 
-    await nameBox.click();
+    let nameBox = await openRenameDialog(page);
     await nameBox.fill('Cave');
     await nameBox.press('Escape');
-    await expect(nameBox).toHaveValue('Untitled level');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(page).toHaveTitle('Untitled level - engine-v3');
 
-    await nameBox.click();
+    nameBox = await openRenameDialog(page);
     await nameBox.fill('Cave');
-    await openMainMenu(page);
-    await expect(nameBox).toHaveValue('Cave');
-    await expect(page).toHaveTitle('Cave - engine-v3');
+    await page.getByRole('dialog').getByRole('button', { name: 'Cancel' }).click();
+    await expect(page).toHaveTitle('Untitled level - engine-v3');
+
+    nameBox = await openRenameDialog(page);
+    await nameBox.fill('x'.repeat(61));
+    await page.getByRole('dialog').getByRole('button', { name: 'Rename' }).click();
+    await expect(page.locator('.message-pill .message')).toHaveText('A level name can be at most 60 characters');
+    await expect(page).toHaveTitle('Untitled level - engine-v3');
 });

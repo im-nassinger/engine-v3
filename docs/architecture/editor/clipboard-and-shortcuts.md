@@ -49,7 +49,7 @@ export class CommandRegistry {
 
 | Menu | v1 commands |
 |---|---|
-| File | New, Import (Ctrl+O), Export (Ctrl+S) |
+| File | New, Import… (Ctrl+O), Save (Ctrl+S), Export…, Rename level… |
 | Edit | Undo, Redo, Cut, Copy, Paste, Duplicate, Delete, Select all, Rename (F2), Hide or show (Ctrl+Shift+H) |
 | Arrange | Group (Ctrl+G), Ungroup (Ctrl+Shift+G), Go into group (Enter) |
 | View | Grid (G), Grid snapping (Shift+G), Joint icons, Camera frame, Physics view (Shift+P), Zoom in, Zoom out, 100% (Shift+0), Whole level, Selection (F), Camera frame (Shift+3) |

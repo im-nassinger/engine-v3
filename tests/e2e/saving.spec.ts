@@ -10,6 +10,9 @@ const BOMB_UNPACKED_BYTES = 300 * MB;
 const BOMB_DECLARED_BYTES = 1000;
 const TOO_BIG_TEXT = 'This file is too big: a level holds at most 256 MB';
 const READ_ONLY_TEXT = 'The level is open in another tab';
+const SAVE_FAILED_START = 'Saving in this browser failed';
+const SAVED_TITLE = 'Untitled level - engine-v3';
+const UNSAVED_TITLE = '*Untitled level - engine-v3';
 // Long enough for a save after the 2 s quiet delay, and for the slowest browser on CI.
 const SAVE_TIMEOUT_MS = 15_000;
 // WebKit's download gives the name with its spaces turned into `_`; the page asked for `Untitled level.editable`.
@@ -22,12 +25,9 @@ async function openEditor(page: Page) {
     await expect(page.locator('.level-view-host canvas')).toBeVisible();
 }
 
-function saveState(page: Page, label: string) {
-    return page.getByRole('button', { name: `Save state: ${label}` });
-}
-
+// The tab title is the only place that shows unsaved changes: `*` in front of the name until a save.
 async function expectSaved(page: Page) {
-    await expect(saveState(page, 'Saved')).toBeVisible({ timeout: SAVE_TIMEOUT_MS });
+    await expect(page).toHaveTitle(SAVED_TITLE, { timeout: SAVE_TIMEOUT_MS });
 }
 
 function entityRow(page: Page, name: string) {
@@ -123,12 +123,41 @@ test('a drawn shape is there after a reload', async ({ page }) => {
     await openEditor(page);
     await drawRectangle(page);
     await expectSaved(page);
-    await expect(page).toHaveTitle('Untitled level - engine-v3');
 
     await page.reload();
 
     await expect(entityRow(page, 'Rectangle 1')).toBeVisible();
-    await expect(saveState(page, 'Saved')).toBeVisible();
+    await expect(page).toHaveTitle(SAVED_TITLE);
+});
+
+test('Ctrl+S saves now, says so and downloads nothing', async ({ page }) => {
+    let downloads = 0;
+    page.on('download', () => {
+        downloads += 1;
+    });
+    await openEditor(page);
+    await drawRectangle(page);
+    await expect(page).toHaveTitle(UNSAVED_TITLE);
+
+    await page.keyboard.press('Control+s');
+
+    await expect(statusText(page)).toHaveText('Saved in this browser');
+    await expect(page).toHaveTitle(SAVED_TITLE);
+    await page.reload();
+    await expect(entityRow(page, 'Rectangle 1')).toBeVisible();
+    expect(downloads).toBe(0);
+});
+
+test("File's Save saves now, and the level's name and save state are not on screen", async ({ page }) => {
+    await openEditor(page);
+    await drawRectangle(page);
+
+    await runFileCommand(page, 'Save');
+
+    await expect(statusText(page)).toHaveText('Saved in this browser');
+    await expect(page).toHaveTitle(SAVED_TITLE);
+    await expect(page.getByRole('region', { name: 'Level file' })).toHaveCount(0);
+    await expect(page.getByRole('textbox', { name: 'Level name' })).toHaveCount(0);
 });
 
 test('a second tab is read-only and refuses edits', async ({ page, context }) => {
@@ -139,7 +168,6 @@ test('a second tab is read-only and refuses edits', async ({ page, context }) =>
     const second = await context.newPage();
     await openEditor(second);
 
-    await expect(saveState(second, 'Read-only')).toBeVisible();
     await expect(statusText(second)).toHaveText(READ_ONLY_TEXT);
     await expect(entityRow(second, 'Rectangle 1')).toBeVisible();
 
@@ -150,16 +178,19 @@ test('a second tab is read-only and refuses edits', async ({ page, context }) =>
     await expect(statusText(second)).toHaveText(READ_ONLY_TEXT);
     await expect(entityRow(second, 'Rectangle 1')).toBeVisible();
 
-    // Its level name can't be changed either.
-    const nameBox = second.getByRole('textbox', { name: 'Level name' });
-    await nameBox.click();
-    await nameBox.fill('Cave');
-    await nameBox.press('Enter');
-    await expect(nameBox).toHaveValue('Untitled level');
-    await expect(saveState(second, 'Read-only')).toBeVisible();
+    // Saving and renaming are refused too, and leaving it would lose nothing, so its title has no `*`.
+    await second.keyboard.press('Control+s');
+    await expect(statusText(second)).toHaveText(READ_ONLY_TEXT);
+    await second.getByRole('button', { name: 'Main menu' }).click();
+    await second.getByRole('menuitem', { name: 'File', exact: true }).hover();
+    await expect(second.getByRole('menuitem', { name: /^Save/ })).toHaveAttribute('aria-disabled', 'true');
+    await expect(second.getByRole('menuitem', { name: /^Rename level/ })).toHaveAttribute('aria-disabled', 'true');
+    await expect(second).toHaveTitle(SAVED_TITLE);
 
     // The first tab still saves.
-    await expect(saveState(page, 'Saved')).toBeVisible();
+    await page.bringToFront();
+    await page.keyboard.press('Control+s');
+    await expect(statusText(page)).toHaveText('Saved in this browser');
 });
 
 test('an exported level, dropped on the page, imports back', async ({ page }) => {
@@ -181,7 +212,7 @@ test('an exported level, dropped on the page, imports back', async ({ page }) =>
     await expectSaved(page);
 });
 
-test('a full disk shows Save failed, and Export still downloads', async ({ page }) => {
+test('a full disk warns until a save works, and Export still downloads', async ({ page }) => {
     // Every write to IndexedDB fails as a full disk does, once the test turns it on.
     await page.addInitScript(() => {
         const store = IDBObjectStore.prototype;
@@ -201,13 +232,25 @@ test('a full disk shows Save failed, and Export still downloads', async ({ page 
 
     await drawRectangle(page);
 
-    await expect(saveState(page, 'Save failed')).toBeVisible({ timeout: SAVE_TIMEOUT_MS });
-    await expect(statusText(page)).toContainText('Saving in this browser failed');
-    await expect(page).toHaveTitle('*Untitled level - engine-v3');
+    await expect(statusText(page)).toContainText(SAVE_FAILED_START, { timeout: SAVE_TIMEOUT_MS });
+    await expect(page).toHaveTitle(UNSAVED_TITLE);
+
+    // Ctrl+S doesn't claim to have saved.
+    await page.keyboard.press('Control+s');
+    await expect(statusText(page)).toContainText(SAVE_FAILED_START);
+    await expect(page).toHaveTitle(UNSAVED_TITLE);
 
     const exported = await exportLevel(page);
     expect(exported.name).toMatch(EXPORTED_NAME);
     expect(exported.bytes.length).toBeGreaterThan(0);
+
+    // Room again: the next save clears the warning.
+    await page.evaluate(() => {
+        (window as { diskFull?: boolean }).diskFull = false;
+    });
+    await page.keyboard.press('Control+s');
+    await expect(statusText(page)).toHaveText('Saved in this browser');
+    await expect(page).toHaveTitle(SAVED_TITLE);
 });
 
 test('a zip bomb is refused while the page keeps drawing', async ({ page }) => {
@@ -238,5 +281,5 @@ test('a zip bomb is refused while the page keeps drawing', async ({ page }) => {
     expect(frames?.count).toBeGreaterThan(10);
     // The unpacking runs in the worker, so the page never stops drawing for long.
     expect(frames?.longestGapMs).toBeLessThan(1000);
-    await expect(page.getByRole('textbox', { name: 'Level name' })).toHaveValue('Untitled level');
+    await expect(page).toHaveTitle(SAVED_TITLE);
 });

@@ -30,7 +30,7 @@ Running a level and keeping it. **In v1** Play runs a copy of the level with the
 | A warning when saving fails | v1 | saving |
 | Ask the browser to keep the saved level | v1 | saving |
 | A second tab is read-only | v1 | saving |
-| The project file: Export, Import, Ctrl+S | v1 | saving |
+| The project file: Export, Import | v1 | saving |
 | The file format version | v1 | saving |
 | The physics version | v1 | saving |
 | Limits: 100,000 entities, 256 MB | v1 | saving |

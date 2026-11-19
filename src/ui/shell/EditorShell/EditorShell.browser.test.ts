@@ -127,10 +127,7 @@ describe('EditorShell', () => {
             WINDOW.height - GAP,
             DEBUG_BOX,
         ]);
-        // Until step 12 takes the level's name and save state off the screen, they sit under the Entity inspector.
-        const levelFile = boxOf('Level file');
-        expect([levelFile.left, levelFile.bottom, levelFile.height]).toEqual([GAP, WINDOW.height - GAP, DEBUG_BOX]);
-        expect(inspector.bottom).toBe(debugBox.top - GAP);
+        expect(inspector.bottom).toBe(WINDOW.height - GAP);
         const minimap = boxOf('Minimap');
         expect([minimap.right, minimap.bottom, minimap.width, minimap.height]).toEqual([
             WINDOW.width - GAP,

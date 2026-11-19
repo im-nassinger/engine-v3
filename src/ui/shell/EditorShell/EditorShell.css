@@ -1,6 +1,6 @@
 /* Every island has a fixed place over the level view, 10 px from the window's edge and from its neighbours.
-   ☰ is a square at the top left with the tool column under it. The bottom row holds the debug box at the right and,
-   until step 12 of stage 19, the level's name and save state at the left; the islands above it end above it. */
+   ☰ is a square at the top left with the tool column under it, and the Entity inspector runs the window's height
+   beside them. The debug box is at the bottom right, and the islands on that side end above it. */
 .editor-shell {
     --under-main-menu: calc(var(--island-gap) * 2 + var(--island-bar));
     --islands-bottom: calc(var(--island-gap) * 2 + var(--debug-box));
@@ -27,12 +27,12 @@
         top: var(--under-main-menu);
         left: var(--island-gap);
         width: var(--island-bar);
-        max-height: calc(100% - var(--under-main-menu) - var(--islands-bottom));
+        max-height: calc(100% - var(--under-main-menu) - var(--island-gap));
     }
 
     > [data-area='entity-inspector'] {
         top: var(--island-gap);
-        bottom: var(--islands-bottom);
+        bottom: var(--island-gap);
         left: var(--beside-tools);
         width: var(--entity-inspector);
     }
@@ -57,12 +57,6 @@
     > [data-area='debug-box'] {
         right: var(--island-gap);
         bottom: var(--island-gap);
-        height: var(--debug-box);
-    }
-
-    > [data-area='level-file'] {
-        bottom: var(--island-gap);
-        left: var(--island-gap);
         height: var(--debug-box);
     }
 

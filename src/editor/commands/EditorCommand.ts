@@ -31,12 +31,22 @@ export type Notice = {
     readonly text: string;
 };
 
+// A line of text a command asks for before it acts: the level's new name. value is what the field starts with.
+export type TextRequest = {
+    readonly title: string;
+    readonly text: string;
+    readonly fieldLabel: string;
+    readonly value: string;
+    readonly confirmLabel: string;
+};
+
 // text is what the command did, for the message pill: "Undid: Delete Square". CommandRunner decides how
 // each kind is shown; a command never calls the UI.
 export type CommandOutcome =
     | { readonly kind: 'done'; readonly text?: string; readonly skipped?: readonly SkippedEntity[] }
     | { readonly kind: 'refused'; readonly reason: string }
     | { readonly kind: 'needsConfirmation'; readonly question: Question; confirm(): CommandOutcome }
+    | { readonly kind: 'needsText'; readonly request: TextRequest; submit(text: string): CommandOutcome }
     | { readonly kind: 'notice'; readonly notice: Notice };
 
 // Where a command's shortcuts work, from the requirement's shortcut table: 'everywhere' even while

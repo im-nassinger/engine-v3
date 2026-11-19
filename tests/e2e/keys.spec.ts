@@ -11,6 +11,13 @@ async function openEditor(page: Page) {
     await expect(page.getByRole('button', { name: 'Main menu' })).toBeVisible();
 }
 
+// The Entity inspector's name box, for the camera: a text field that is always there to type in.
+async function cameraNameBox(page: Page) {
+    await page.getByRole('tree', { name: 'Entities' }).getByRole('treeitem').filter({ hasText: 'Camera' }).click();
+
+    return page.getByRole('region', { name: 'Entity inspector' }).getByRole('textbox', { name: 'Entity name' });
+}
+
 async function isGridOn(page: Page) {
     await page.getByRole('button', { name: 'Main menu' }).click();
     await page.getByRole('menuitem', { name: 'View', exact: true }).hover();
@@ -38,7 +45,7 @@ async function recordKeysLeftToTheBrowser(page: Page) {
     });
 }
 
-test('G hides the grid, but G typed into the level name box does not', async ({ page }) => {
+test('G hides the grid, but G typed into a name box does not', async ({ page }) => {
     await openEditor(page);
     expect(await isGridOn(page)).toBe(true);
 
@@ -46,18 +53,18 @@ test('G hides the grid, but G typed into the level name box does not', async ({ 
     await page.keyboard.press('g');
     expect(await isGridOn(page)).toBe(false);
 
-    const nameBox = page.getByRole('textbox', { name: 'Level name' });
+    const nameBox = await cameraNameBox(page);
     await nameBox.click();
     await nameBox.press('End');
     await nameBox.press('g');
-    await expect(nameBox).toHaveValue('Untitled levelg');
+    await expect(nameBox).toHaveValue('Camerag');
     await nameBox.press('Escape');
     expect(await isGridOn(page)).toBe(false);
 });
 
 test('Ctrl+Z undoes a rename once the keyboard is out of the box', async ({ page }) => {
     await openEditor(page);
-    const nameBox = page.getByRole('textbox', { name: 'Level name' });
+    const nameBox = await cameraNameBox(page);
 
     await nameBox.click();
     await nameBox.fill('Bridge');
@@ -66,7 +73,22 @@ test('Ctrl+Z undoes a rename once the keyboard is out of the box', async ({ page
     await nameBox.blur();
 
     await page.keyboard.press('Control+z');
-    await expect(nameBox).toHaveValue('Untitled level');
+    await expect(nameBox).toHaveValue('Camera');
+});
+
+test('Ctrl+S ends the typing in a field and saves what was typed', async ({ page }) => {
+    await openEditor(page);
+    const nameBox = await cameraNameBox(page);
+
+    await nameBox.click();
+    await nameBox.fill('Lens');
+    await nameBox.press('Control+s');
+    await expect(page.locator('.message-pill .message')).toHaveText('Saved in this browser');
+
+    await page.reload();
+    await expect(
+        page.getByRole('tree', { name: 'Entities' }).getByRole('treeitem').filter({ hasText: 'Lens' }),
+    ).toHaveCount(1);
 });
 
 test('Ctrl+0, F5 and Ctrl+R keep their default, and G does not', async ({ page }) => {
