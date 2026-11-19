@@ -99,7 +99,7 @@ tests/
 - **`src/app/main.tsx`** finds `#root` and renders the project's name inside React's `StrictMode`, until `EditorShell` replaces it in stage 6. `EditorComposition.ts` comes with stage 5.
 - **`src/app/workers/game.worker.ts` and `import.worker.ts`** held `export {};` until stages 16 and 12; `import.worker.ts` is built (stage 12 step 9).
 - **`index.html`:** a `#root` element and one script tag for `src/app/main.tsx`. No styles until `theme.css` in stage 6.
-- **`vite.config.ts`:** `react()` plus `babel({ presets: [reactCompilerPreset()] })`. The tests are set up in the same file as two Vitest projects, so tests see the same code as the app:
+- **`vite.config.ts`:** `react()` plus `babel({ presets: [reactCompilerPreset()] })`. The dev server always uses port 5173 (`strictPort`), so a second `npm run dev` stops with "Port 5173 is already in use" instead of moving to another port. It also waits until a changed file has stayed the same size for 300 ms before reading it (`awaitWriteFinish`), because it once read a half-saved CSS file and kept serving the empty copy (owner, 2026-11-19; see [tech-notes.md](../tech-notes.md#editor)). The tests are set up in the same file as two Vitest projects, so tests see the same code as the app:
 
 | Project | Files | Runs in |
 |---|---|---|

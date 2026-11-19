@@ -11,6 +11,15 @@ const PERFORMANCE_TESTS = 'tests/performance/**/*.browser.test.ts';
 
 export default defineConfig({
     plugins: [react(), babel({ presets: [reactCompiler] })],
+    server: {
+        // One address for the dev server: a second `npm run dev` stops with "Port 5173 is already in use"
+        // instead of moving to 5174 while the tab keeps showing the old server.
+        port: 5173,
+        strictPort: true,
+        // A file being saved can be empty for a moment. Without this the server can read it then, and keep
+        // serving the empty copy until the file changes again (it did with EditorShell.css on 2026-11-18).
+        watch: { awaitWriteFinish: { stabilityThreshold: 300, pollInterval: 50 } },
+    },
     test: {
         projects: [
             {

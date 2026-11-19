@@ -27,6 +27,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Hit testing and hover** need a spatial index over level bounds to meet the speed targets. Bounds are derived, so a move must invalidate a subtree cheaply.
 - **Hide and lock from parents** are derived by walking up the tree. Cache per subtree. The play copy must carry the hidden state so play draws the same thing.
 - **Entities viewer.** A fixed row height allows a virtualised list. Virtualisation plus drag and drop is where hand-made trees tend to break, so prototype both together at 10,000 rows. Browser find can't see off-screen rows, which is one reason for the panel's own search.
+- **Vite's dev server can keep a half-saved file.** A file being written can be empty for a moment. If the dev server reads it then, it can keep serving the empty copy until the file changes again. On 2026-11-18 it kept an empty `EditorShell.css` for 14 hours, so the islands stacked down the page while the code was fine. A test with a page open broke it on 9 of 25 saves that wrote the file empty first. With `server.watch.awaitWriteFinish` it broke on none. A fresh `npm run dev` always serves the real file. See [tooling.md](architecture/tooling.md#the-folders-and-the-page).
 - **Order keys.** If draw order uses fractional keys, repeated inserts between the same neighbours run out of precision. Rebalance quietly, outside undo.
 - **Negative scale** must be allowed (mirroring, Flip). Polygon winding and joint limits need a rule under mirroring.
 
