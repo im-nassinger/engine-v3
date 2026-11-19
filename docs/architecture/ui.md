@@ -63,7 +63,7 @@ export function useEditorSession() {
 
 ## The screen
 
-The redesign's tree (stage 19, standing yes, 2026-11-18). Stage 19 builds it step by step; until a step lands, the code still has the parts it replaces ([steps/stage-19.md](../steps/stage-19.md)).
+The redesign's tree (stage 19, standing yes, 2026-11-18). Stage 19 built it, all seventeen steps done on 2026-11-19 ([steps/stage-19.md](../steps/stage-19.md)).
 
 ```
 ┌──────────────────────────────────────────────────────────────┐

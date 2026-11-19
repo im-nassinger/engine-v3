@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Every named value of the editor's look: colours, the font, sizes, spacing, corners and the shadow. **Each token is a CSS custom property in `ui/theme.css`**, with the name given here and no other (a guard test compares the two), and no component writes a colour or a size of its own. **These are the redesign's values** (owner, 2026-11-17, see [redesign.md](redesign.md)): the Slate colours of its [mockup](mockups/redesign.html), islands with 14 px corners, no borders or lines anywhere, and one soft shadow under every grey container. They replace round 8's flush panels, which stage 19 rebuilds. Sizes marked *requirement* come from [workspace.md](../requirements/editor/workspace.md) and change only with it.
+Every named value of the editor's look: colours, the font, sizes, spacing, corners and the shadow. **Each token is a CSS custom property in `ui/theme.css`**, with the name given here and no other (a guard test compares the two), and no component writes a colour or a size of its own. **These are the redesign's values** (owner, 2026-11-17, see [redesign.md](redesign.md)): the Slate colours of its [mockup](mockups/redesign.html), islands with 14 px corners, no borders or lines anywhere, and one soft shadow under every grey container. They replace round 8's flush panels, which stage 19 rebuilt (2026-11-19). Sizes marked *requirement* come from [workspace.md](../requirements/editor/workspace.md) and change only with it.
 
 ## Colours
 
