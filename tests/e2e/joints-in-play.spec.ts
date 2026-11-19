@@ -102,7 +102,7 @@ async function drawBody(page: Page, centre: ScreenPoint, name: string, type: 'Dy
     const from = offset(centre, -BOX_HALF_PX, -BOX_HALF_PX);
     const to = offset(centre, BOX_HALF_PX, BOX_HALF_PX);
     await page.mouse.move(from.x, from.y);
-    await page.keyboard.press('4');
+    await page.keyboard.press('2');
     await page.mouse.down();
     await page.mouse.move(centre.x, centre.y, { steps: 4 });
     await page.mouse.move(to.x, to.y, { steps: 4 });

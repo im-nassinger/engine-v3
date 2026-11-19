@@ -14,7 +14,7 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 
 | Keys | What it does | Works | Feature |
 |---|---|---|---|
-| 1 to 7 | Pick a tool: Select, Pencil, Bézier pen, Shape, Text, Joint, Trigger. Twice locks the tool | Editor | Tools, v1 (Select, Shape, Joint), v2 (the others) |
+| 1 to 3 | Pick a tool: Select, Shape, Joint (owner: 2026-11-19). Twice locks the tool. v2's tools get their keys in v2 | Editor | Tools, v1 |
 | Space (hold) | Pan | Editor | Pan and zoom, v1 |
 | F | Zoom to the selection, or to the whole level with nothing selected | Editor | Pan and zoom, v1 |
 | + or = or Ctrl+=, - or Ctrl+- | Zoom in, zoom out: the key that holds + zooms in with or without Shift, as - zooms out, and the numpad's + and - work too | Editor | Pan and zoom, v1 |
@@ -90,4 +90,4 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 
 Alignment has buttons and menu entries but no shortcuts, because Alt+letter collides with browser menus.
 
-Source: round 1: D13; round 3: 01 2.5; round 4: 02 2.7; round 5: TK2, 02 2.5; round 6: CP1; round 12: SV1; old: WS-41, WS-45, section 2.5 of 01; owner: 2026-11-18
+Source: round 1: D13; round 3: 01 2.5; round 4: 02 2.7; round 5: TK2, 02 2.5; round 6: CP1; round 12: SV1; old: WS-41, WS-45, section 2.5 of 01; owner: 2026-11-18, 2026-11-19

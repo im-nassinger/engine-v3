@@ -19,7 +19,7 @@ async function drawRectangle(page: Page) {
     const free = await page.locator('.free-area').boundingBox();
     if (!free) throw new Error('The free area has no size.');
 
-    await page.keyboard.press('4');
+    await page.keyboard.press('2');
     await page.mouse.click(free.x + free.width / 2, free.y + free.height / 2);
     await expect(entityInspector(page).getByRole('textbox', { name: 'Position X' })).toBeVisible();
 }

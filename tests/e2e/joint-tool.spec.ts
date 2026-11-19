@@ -58,7 +58,7 @@ async function drawBody(page: Page, box: ScreenBox, name: string) {
     const from = offset(box.centre, -box.half, -box.half);
     const to = offset(box.centre, box.half, box.half);
     await page.mouse.move(from.x, from.y);
-    await page.keyboard.press('4');
+    await page.keyboard.press('2');
     await page.mouse.down();
     await page.mouse.move(box.centre.x, box.centre.y, { steps: 4 });
     await page.mouse.move(to.x, to.y, { steps: 4 });
@@ -103,13 +103,13 @@ async function drawTwoBodies(page: Page) {
     return { left, right };
 }
 
-test('key 6 picks the Joint tool, and a click on one box pins it with a Hinge', async ({ page }) => {
+test('key 3 picks the Joint tool, and a click on one box pins it with a Hinge', async ({ page }) => {
     await openEditor(page);
     const middle = await levelMiddle(page);
     await drawBody(page, { centre: middle, half: BOX_HALF_PX }, 'Rectangle 1');
 
     await page.mouse.move(middle.x, middle.y);
-    await page.keyboard.press('6');
+    await page.keyboard.press('3');
     await expect(page.getByRole('group', { name: 'Kinds menu' })).toBeVisible();
     await click(page, offset(middle, BOX_HALF_PX / 2, 0));
 

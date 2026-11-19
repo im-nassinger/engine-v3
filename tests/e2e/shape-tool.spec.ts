@@ -98,14 +98,14 @@ async function expectFinished(page: Page, name: string) {
     await expect(shapeCard(page)).toHaveCount(1);
 }
 
-test('key 4 picks the Shape tool and hides the Entity inspector, and a click places a rectangle of the first size', async ({
+test('key 2 picks the Shape tool and hides the Entity inspector, and a click places a rectangle of the first size', async ({
     page,
 }) => {
     await openEditor(page);
     const middle = await levelMiddle(page);
 
     await page.mouse.move(middle.x, middle.y);
-    await page.keyboard.press('4');
+    await page.keyboard.press('2');
     await expect(page.getByRole('group', { name: 'Kinds menu' })).toBeVisible();
     await expect(entityInspector(page)).toHaveCount(0);
 

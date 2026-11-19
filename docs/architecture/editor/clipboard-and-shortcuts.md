@@ -54,7 +54,7 @@ export class CommandRegistry {
 | Arrange | Group (Ctrl+G), Ungroup (Ctrl+Shift+G), Go into group (Enter) |
 | View | Grid (G), Grid snapping (Shift+G), Joint icons, Camera frame, Physics view (Shift+P), Zoom in, Zoom out, 100% (Shift+0), Whole level, Selection (F), Camera frame (Shift+3) |
 | Play | Play or Stop (Shift+T, Ctrl+Enter), Pause (F8), Step (F9) |
-| Tools | Select (1), Shape (4), Joint (6) |
+| Tools | Select (1), Shape (2), Joint (3) (owner, 2026-11-19) |
 | Help | Keyboard shortcuts, About |
 
 ## Keys

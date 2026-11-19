@@ -29,10 +29,10 @@ async function levelMiddle(page: Page): Promise<ScreenPoint> {
     return { x: free.x + free.width / 2, y: free.y + free.height / 2 };
 }
 
-// Key 4 picks the Shape tool, whose first kind is the rectangle, and a click places one, selected.
+// Key 2 picks the Shape tool, whose first kind is the rectangle, and a click places one, selected.
 async function drawRectangle(page: Page, at: ScreenPoint) {
     await page.mouse.move(at.x, at.y);
-    await page.keyboard.press('4');
+    await page.keyboard.press('2');
     await page.mouse.click(at.x, at.y);
     await expect(rectangleRows(page)).not.toHaveCount(0);
 }

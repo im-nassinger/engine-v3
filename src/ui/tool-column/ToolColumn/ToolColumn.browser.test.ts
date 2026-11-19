@@ -90,14 +90,14 @@ describe('ToolColumn', () => {
         expect(toolButton('joint').getAttribute('aria-label')).toBe('Joint');
     });
 
-    test('key 4 picks the Shape tool, and its button shows it on', async () => {
+    test('key 2 picks the Shape tool, and its button shows it on', async () => {
         const { session, commands, tools } = showWithEditor(Level.createNew(), createElement(ToolColumn));
         const escape = new EscapeChain(session, tools.controller, new OpenWindowCount());
         const toolKeys = { tools: tools.controller, escape };
         const dispatcher = new ShortcutDispatcher(commands.registry, commands.runner, 'other', toolKeys);
         await expect.poll(() => selectButton().getAttribute('aria-pressed')).toBe('true');
 
-        const used = dispatcher.handleKeyDown(digitPress('4'), 'level', true);
+        const used = dispatcher.handleKeyDown(digitPress('2'), 'level', true);
 
         expect(used).toBe(true);
         expect(tools.controller.active.id).toBe('shape');
@@ -105,14 +105,14 @@ describe('ToolColumn', () => {
         expect(selectButton().getAttribute('aria-pressed')).toBe('false');
     });
 
-    test('key 6 picks the Joint tool, and its button shows it on', async () => {
+    test('key 3 picks the Joint tool, and its button shows it on', async () => {
         const { session, commands, tools } = showWithEditor(Level.createNew(), createElement(ToolColumn));
         const escape = new EscapeChain(session, tools.controller, new OpenWindowCount());
         const toolKeys = { tools: tools.controller, escape };
         const dispatcher = new ShortcutDispatcher(commands.registry, commands.runner, 'other', toolKeys);
         await expect.poll(() => selectButton().getAttribute('aria-pressed')).toBe('true');
 
-        const used = dispatcher.handleKeyDown(digitPress('6'), 'level', true);
+        const used = dispatcher.handleKeyDown(digitPress('3'), 'level', true);
 
         expect(used).toBe(true);
         expect(tools.controller.active.id).toBe('joint');
@@ -181,10 +181,10 @@ describe('ToolColumn', () => {
         const dispatcher = new ShortcutDispatcher(commands.registry, commands.runner, 'other', toolKeys);
         await expect.poll(() => selectButton().getAttribute('aria-pressed')).toBe('true');
 
-        dispatcher.handleKeyDown(digitPress('4'), 'level', true);
+        dispatcher.handleKeyDown(digitPress('2'), 'level', true);
         await expect.poll(kindLabels).toEqual(['Rectangle', 'Circle', 'Polygon']);
 
-        dispatcher.handleKeyDown(digitPress('6'), 'level', true);
+        dispatcher.handleKeyDown(digitPress('3'), 'level', true);
         await expect.poll(kindLabels).toEqual(['Hinge', 'Rope', 'Spring']);
     });
 

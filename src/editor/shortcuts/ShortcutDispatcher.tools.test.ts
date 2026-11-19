@@ -9,7 +9,7 @@ import { GERMAN_KEYS, recordedKey, US_KEYS } from './testing/recordedKeys.ts';
 
 const ESC = recordedKey('Escape', 'Escape');
 const SPACE = recordedKey('Space', ' ');
-const DIGIT_4 = recordedKey('Digit4', '4');
+const DIGIT_2 = recordedKey('Digit2', '2');
 const ENTER = recordedKey('Enter', 'Enter');
 
 // Test play as the runner sees it, with a run going or not as the test sets.
@@ -48,8 +48,8 @@ describe('ShortcutDispatcher with the tools', () => {
     test('a held number key picks once and never locks', () => {
         const { dispatcher, controller } = buildDispatcher();
 
-        dispatcher.handleKeyDown(DIGIT_4, 'level', true);
-        dispatcher.handleKeyDown({ ...DIGIT_4, repeat: true }, 'level', true);
+        dispatcher.handleKeyDown(DIGIT_2, 'level', true);
+        dispatcher.handleKeyDown({ ...DIGIT_2, repeat: true }, 'level', true);
 
         expect(controller.active.id).toBe('shape');
         expect(controller.isLocked).toBe(false);
@@ -66,9 +66,9 @@ describe('ShortcutDispatcher with the tools', () => {
 
     test('a key for a tool v1 does not have is left alone', () => {
         const { dispatcher } = buildDispatcher();
-        const digit2 = recordedKey('Digit2', '2');
+        const digit4 = recordedKey('Digit4', '4');
 
-        expect(dispatcher.handleKeyDown(digit2, 'level', true)).toBe(false);
+        expect(dispatcher.handleKeyDown(digit4, 'level', true)).toBe(false);
     });
 
     test('tool keys and Esc are ignored while typing', () => {
