@@ -19,7 +19,7 @@
 
 Rules for the session:
 
-- **Don't change the game's code or the game's docs.** The runner's sessions are editing them.
+- **Don't change the game's code or the game's docs.** The runner's sessions are editing them. **One exception:** when your change settles or changes something [../progress.md](../progress.md) states about CI or the runner (such as an entry under "Waiting for the owner"), fix that text in the same commit, with the runner stopped or between sessions. *Why: on 2026-11-18 CI moved to the public copy here, but progress.md kept saying "CI can't run", and a later session told the owner to fix billing that was already handled.*
 - When you change the runner, update this folder in the same commit, and commit only the runner's files (`tools/runner/`, `docs/runner/`) by naming them in `git commit -- <paths>`, never with `git add -A`.
 - `tools/runner/` code changes apply on their own: the runner restarts itself between sessions. **Never restart or stop the service to apply a change**: that kills the session in the middle of a step, with its work half done and not committed. **The exception is a paused runner:** it doesn't reread its code when the pause ends, so a change made during a pause needs a restart, with the owner's yes and no session running. Push first: the runner publishes what's on `origin`.
 

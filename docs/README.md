@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Everything known about the project: a 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved, and the code is built stage by stage from [plan.md](plan.md). Stages 0 and 1, the project setup and the model, are done. The owner gave a standing yes on 2026-11-14, so Claude decides the smaller questions and lists them in [decisions.md](decisions.md). **Start with [progress.md](progress.md)** to see where things stand, then [overview.md](overview.md) for the whole game in one page. Every file opens with a TL;DR, and the docs read from high level down to detail.
+Everything known about the project: a 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved, and the code is built stage by stage from [plan.md](plan.md). v1 is built: stages 0 to 19, including the changes before v2 and the redesign; nothing of v2 is planned yet. The owner gave a standing yes on 2026-11-14, so Claude decides the smaller questions and lists them in [decisions.md](decisions.md). **Start with [progress.md](progress.md)** to see where things stand, then [overview.md](overview.md) for the whole game in one page. Every file opens with a TL;DR, and the docs read from high level down to detail.
 
 ## Files
 
@@ -16,7 +16,7 @@ Everything known about the project: a 2D physics game with a level editor, for t
 | [requirements/](requirements/README.md) | The exact rules, in eight topics, plus the features not designed yet |
 | [architecture/](architecture/README.md) | How the game is built: the stack, the parts of the code, the classes, saving, test play, tests, the tooling and checks |
 | [design/](design/README.md) | How the editor looks: the round 8 answers, the mockups, and later the design system |
-| [plan.md](plan.md) | The v1 plan in 18 stages, each with the docs it implements |
+| [plan.md](plan.md) | The v1 plan in 20 stages, 0 to 19, each with the docs it implements |
 | [steps/](steps/README.md) | Each stage's steps, one file per stage, written when the stage starts |
 | [deploying.md](deploying.md) | Publishing the editor on Netlify: the URL, the steps, and that the owner is already logged in |
 | [review.html](review.html) | The review page where the owner answers questions in the browser. Earlier rounds are in git history |

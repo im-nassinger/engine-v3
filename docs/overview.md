@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-A 2D physics game for the browser, built around a level editor. A creator builds a level out of shapes, text, physics bodies, joints, triggers and Lua scripts, presses Play to test it, and exports it as a file. These docs hold the functional requirements (what the game does), the scope (which version each feature ships in), the [architecture](architecture/README.md) and the [plan](plan.md) the code is built from. Stage 0, the project setup, is done. v1 is the smallest thing that can be tested: build one level, watch it run, export it. Logic, and so playing a level, comes in v2.
+A 2D physics game for the browser, built around a level editor. A creator builds a level out of shapes, text, physics bodies, joints, triggers and Lua scripts, presses Play to test it, and exports it as a file. These docs hold the functional requirements (what the game does), the scope (which version each feature ships in), the [architecture](architecture/README.md) and the [plan](plan.md) the code is built from. v1 is built (stages 0 to 19, 2026-11-19), and v2 is next to plan. v1 is the smallest thing that can be tested: build one level, watch it run, export it. Logic, and so playing a level, comes in v2.
 
 ## What it is
 
