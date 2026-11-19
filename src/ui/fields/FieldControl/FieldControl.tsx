@@ -6,7 +6,7 @@ import { ReadOnlyValue } from '../ReadOnlyValue/index.ts';
 // The control for one field: the field type's component, or the plain value when it is read-only.
 export function FieldControl(props: FieldProps) {
     const { field } = props;
-    if (field.kind === 'readOnlyRow' || field.isReadOnly) return <ReadOnlyValue field={field} />;
+    if (field.isReadOnly) return <ReadOnlyValue field={field} />;
 
     const kind = field.definition.type.kind;
     if (kind === 'list') return <ListField {...props} />;

@@ -190,9 +190,30 @@ describe('EntityInspectorModel: fields', () => {
         selection.replace([crate.id]);
         const mass = requireField(requireCard(model, 'BodyComponent'), 'mass');
 
-        expect(mass.kind).toBe('readOnlyRow');
-        expect(mass.isReadOnly).toBe(true);
+        expect(mass.kind).toBe('mass');
+        expect(mass.isReadOnly).toBe(false);
         expect(mass.value).toBeCloseTo(4);
+    });
+
+    test('shows one Mass and a Mixed Density for bodies of different sizes set to the same mass', () => {
+        const { crate, other, selection, model } = buildModel();
+        other.requireComponent(TransformComponent).set('scale', { x: 3, y: 3 });
+        crate.requireComponent(SurfaceComponent).set('density', 2.5);
+        other.requireComponent(SurfaceComponent).set('density', 10 / 36);
+
+        selection.replace([crate.id, other.id]);
+
+        expect(requireField(requireCard(model, 'BodyComponent'), 'mass').value).toBeCloseTo(10);
+        expect(requireField(requireCard(model, 'SurfaceComponent'), 'density').value).toBe(MIXED);
+    });
+
+    test('makes Mass read-only on a body with no area, since no density gives it a mass', () => {
+        const { crate, selection, model } = buildModel();
+        crate.removeComponent(SurfaceComponent);
+
+        selection.replace([crate.id]);
+
+        expect(requireField(requireCard(model, 'BodyComponent'), 'mass').isReadOnly).toBe(true);
     });
 
     test('hides Mass on a body that is not Dynamic', () => {

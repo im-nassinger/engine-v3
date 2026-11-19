@@ -28,7 +28,7 @@ export type CardModel = {
 };
 
 export type FieldModel = {
-    readonly definition: FieldDefinition<object, never> | DerivedFieldDefinition<object, unknown> | ReadOnlyRow;
+    readonly definition: FieldDefinition<object, never> | DerivedFieldDefinition<object, unknown> | MassRow;
     readonly value: unknown | typeof MIXED;
     readonly isEnabled: boolean;           // appliesWhen; greyed values are kept
     readonly isReadOnly: boolean;          // derived without write, or during play
@@ -36,7 +36,7 @@ export type FieldModel = {
 ```
 
 - **What is shown:** with nothing selected, nothing: `shownEntities` is empty and `EditorShell` doesn't show the island (owner, 2026-11-19). While the Shape or Joint tool is active the Entity inspector is hidden, see [the Shape tool](drawing-and-points.md#the-shape-tool) (owner, 2026-11-15; Joint, standing yes, 2026-11-19). With one entity, its components. With several, only the components every selected entity has, and a field whose values differ shows `Mixed`.
-- **Derived fields** (Width, Height, Radius, Points) and **read-only rows** are read when the card is built, so they update as shapes and density change. A `ReadOnlyRow` is a value the Entity inspector adds to a card that isn't the component's own: v1 has one, the BodyComponent's Mass, from `BodyMass` in `core/physics`.
+- **Derived fields** (Width, Height, Radius, Points) and **Mass** are read when the card is built, so they update as shapes and density change. A `MassRow` is the one value the Entity inspector adds to a card that isn't the component's own: the BodyComponent's Mass, from `BodyMass` in `core/physics`. *Update (owner, 2026-11-19):* Mass is typed like a number; `CardField` commits it through `setBodyMass`, which sets the surfaces' densities. It is read-only only on a body with no area, and two masses count as the same within a billionth of the larger, since densities set for one typed mass can differ in their last bits.
 - **During play** the same model reads the [`PlayMirror`](../simulation.md#the-page-side) level instead of the editor's, with `isReadOnly` set. That is how the v2 Panels button shows live values without new Entity inspector code.
 - **Add Component** is worked out here, not in the registry: it lists every registered component the entity lacks and can take by hand, with disabled entries and their reason for the others. With several selected, it adds to every one that lacks it.
 

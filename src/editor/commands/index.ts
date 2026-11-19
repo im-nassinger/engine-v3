@@ -101,5 +101,6 @@ export { FieldSlide } from './entity-inspector/FieldSlide.ts';
 export type { SlidField } from './entity-inspector/FieldSlide.ts';
 export { removeComponent } from './entity-inspector/removeComponent.ts';
 export { resetComponent } from './entity-inspector/resetComponent.ts';
+export { setBodyMass } from './entity-inspector/setBodyMass.ts';
 export { setFieldValue, setVectorAxis } from './entity-inspector/setFieldValue.ts';
 export type { Axis } from './entity-inspector/setFieldValue.ts';

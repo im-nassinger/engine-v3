@@ -39,15 +39,17 @@ Source: scope PH1; round 1: C6, D36, D39; round 2: O8; round 6: 05 2.1, 05 2.2, 
 | Angular damping | Slows spinning over time. Raise it to make balls stop rolling | 0 to 100 | 0 | Dynamic |
 | Fixed rotation | Never tips or spins. Use for players | On or off | Off | Dynamic |
 | Bullet | Extra checks so a very fast entity doesn't pass through other moving things | On or off | Off | Dynamic |
-| Mass | Read-only, in kg. Updates as shapes and density change. You set density, never mass | | | Dynamic |
+| Mass | In kg: the shapes' area × density, so it updates as shapes and density change. Typing a mass sets the density that gives it | 0 or more | | Dynamic |
 
+- **Mass is never stored.** Typing a mass sets the Density of the body's surfaces, its merged ones too, so the body weighs that much. Each body gets its own density, so bodies of different sizes set to one mass show a Mixed Density. A body whose surfaces have different densities keeps their ratios, and one whose densities are all 0 gets one density everywhere *(standing yes, 2026-11-19)*.
+- A mass that would need a density above 100 is refused with `That mass needs a density above 100`. A body with no area (no surfaces, or only lines) shows Mass read-only, since no density gives it a mass *(standing yes, 2026-11-19)*.
 - *Why these names: the owner wanted common terms. These are Box2D's (Unity and Godot are nearly the same), so the Entity inspector, the Lua API and tutorials match.*
 - Only the fields that matter for the chosen type are enabled. The others are greyed, with their values kept.
 - All of these can change during play.
 - Speed is capped at 6,000 px/s and spin at 7.5 turns per second (2,700 °/s). Higher values are quietly limited.
 - *Why 7.5 turns, not the 15 first written: Box2D 3.2 turns a body at most 45° a step, so 15 turns per second can't happen. The closest fix to the owner's cap is Box2D's own (standing yes, 2026-11-16).*
 
-Source: scope PH2; round 3: P1; round 7: 05 2.4; old: PH-17 to PH-19
+Source: scope PH2; round 3: P1; round 7: 05 2.4; old: PH-17 to PH-19; owner: 2026-11-19
 
 ## Surfaces
 

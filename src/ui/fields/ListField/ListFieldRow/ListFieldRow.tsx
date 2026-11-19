@@ -49,7 +49,7 @@ export function ListFieldRow({ field, subject, items, itemType, index, onCommit 
 
 // The item as a field of its own, named after the list and its number, such as "Points 2".
 function itemFieldOf(field: FieldModel, itemType: FieldType<unknown>, index: number, item: unknown): FieldModel {
-    if (field.kind === 'readOnlyRow') throw new Error('A read-only row has no items.');
+    if (field.kind === 'mass') throw new Error('Mass has no items.');
 
     const label = `${field.definition.label} ${index + 1}`;
     const key = `${field.definition.key}.${index}`;

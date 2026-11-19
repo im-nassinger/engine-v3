@@ -4,17 +4,19 @@ import type {
     ComponentValues,
     DerivedFieldDefinition,
 } from '../../../core/components/index.ts';
-import type { Unit } from '../../../core/fields/index.ts';
+import type { NumberFieldType, Unit } from '../../../core/fields/index.ts';
 
 import type { Availability } from './Availability.ts';
 import type { CardNote } from './CardNote.ts';
 
-// A value the Entity inspector adds to a card that isn't the component's own. v1 has one: the BodyComponent's Mass.
-export type ReadOnlyRow = {
-    readonly key: string;
+// The BodyComponent's Mass, a value the Entity inspector adds to the card that isn't the component's own.
+// Typing one sets the densities of the body's surfaces (owner, 2026-11-19).
+export type MassRow = {
+    readonly key: 'mass';
     readonly label: string;
     readonly description: string;
     readonly unit: Unit;
+    readonly type: NumberFieldType;
 };
 
 // value is MIXED when the selected entities hold different values; a vector's is a MixedVector instead.
@@ -36,11 +38,12 @@ export type FieldModel =
           readonly isReadOnly: boolean;
       }
     | {
-          readonly kind: 'readOnlyRow';
-          readonly definition: ReadOnlyRow;
+          readonly kind: 'mass';
+          readonly definition: MassRow;
           readonly value: unknown;
           readonly isEnabled: true;
-          readonly isReadOnly: true;
+          // When a shown body has no area, so no density gives it a mass.
+          readonly isReadOnly: boolean;
       };
 
 export type CardModel = {

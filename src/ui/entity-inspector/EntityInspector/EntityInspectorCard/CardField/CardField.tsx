@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { ComponentTypeName } from '../../../../../core/components/index.ts';
 import type { EntityId } from '../../../../../core/level/index.ts';
 import type { EditOutcome } from '../../../../../editor/history/index.ts';
-import { FieldSlide, setFieldValue, setVectorAxis } from '../../../../../editor/commands/index.ts';
+import { FieldSlide, setBodyMass, setFieldValue, setVectorAxis } from '../../../../../editor/commands/index.ts';
 import type { Axis } from '../../../../../editor/commands/index.ts';
 import type { FieldModel } from '../../../../../editor/entity-inspector/index.ts';
 import type { OpenLevel } from '../../../../../editor/session/index.ts';
@@ -20,7 +20,7 @@ export type CardFieldProps = {
 };
 
 // One field's row: its label, whose hover shows the description if it has one, and the field type's control. A
-// committed value is one step on every shown entity; a refused one gives its reason as status text. A
+// committed value is one step on every shown entity, Mass through the densities; a refused one gives its reason as status text. A
 // slider changes the level while dragged and makes its one step when let go.
 export function CardField({ openLevel, typeName, entityIds, field }: CardFieldProps) {
     const session = useEditorSession();
@@ -39,7 +39,10 @@ export function CardField({ openLevel, typeName, entityIds, field }: CardFieldPr
     };
 
     const commit = (value: unknown) => {
-        const outcome = setFieldValue(openLevel, entityIds, typeName, key, value);
+        const outcome =
+            field.kind === 'mass'
+                ? setBodyMass(openLevel, entityIds, value as number)
+                : setFieldValue(openLevel, entityIds, typeName, key, value);
         showRefusal(outcome);
     };
 

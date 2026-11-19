@@ -54,8 +54,6 @@ export function ListField({ field, subject, onCommit }: FieldProps) {
 }
 
 function itemTypeOf(field: FieldProps['field']) {
-    if (field.kind === 'readOnlyRow') throw new Error('A read-only row has no items.');
-
     const type = field.definition.type;
     if (!(type instanceof ListFieldType)) throw new Error(`${field.definition.label} isn't a list field.`);
 

@@ -49,8 +49,6 @@ function ChoiceMenu({ options, chosenValue, onChoose }: ChoiceMenuProps) {
 }
 
 function optionsOf(field: FieldProps['field']): readonly Option[] {
-    if (field.kind === 'readOnlyRow') throw new Error('A read-only row has no options.');
-
     const type = field.definition.type;
     if (!(type instanceof ChoiceFieldType)) throw new Error(`${field.definition.label} isn't a choice field.`);
 

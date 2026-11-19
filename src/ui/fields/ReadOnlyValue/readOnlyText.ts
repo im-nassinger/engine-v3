@@ -35,8 +35,6 @@ function precisionOf(field: FieldModel) {
 }
 
 function choiceLabelOf(field: FieldModel, value: unknown) {
-    if (field.kind === 'readOnlyRow') return undefined;
-
     const type = field.definition.type;
     if (!(type instanceof ChoiceFieldType)) return undefined;
 

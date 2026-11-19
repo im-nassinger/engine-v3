@@ -10,7 +10,7 @@ export type { EntityInspectorModelSources } from './entity-inspector-model/Entit
 export type { AddableComponent } from './model/AddableComponent.ts';
 export type { Availability } from './model/Availability.ts';
 export type { CardNote } from './model/CardNote.ts';
-export type { CardModel, FieldModel, ReadOnlyRow } from './model/CardModel.ts';
+export type { CardModel, FieldModel, MassRow } from './model/CardModel.ts';
 export type { EntityInspectorHeader } from './model/EntityInspectorHeader.ts';
 export { MIXED } from './model/MIXED.ts';
 export type { Mixed } from './model/MIXED.ts';

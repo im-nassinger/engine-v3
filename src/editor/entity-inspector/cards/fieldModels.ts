@@ -6,12 +6,13 @@ import type {
     ComponentValues,
     DerivedFieldDefinition,
 } from '../../../core/components/index.ts';
+import { NumberFieldType } from '../../../core/fields/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { BodyMass, mergesInto } from '../../../core/physics/index.ts';
 import type { BodyMassCaches } from '../../../core/physics/index.ts';
 
-import type { FieldModel, ReadOnlyRow } from '../model/CardModel.ts';
+import type { FieldModel, MassRow } from '../model/CardModel.ts';
 import { isWorldsKind } from '../rules/componentRules.ts';
 
 import { sameOrMixed, sharedAxes, valuesOf } from './componentValues.ts';
@@ -23,12 +24,17 @@ export type HeldComponents = {
     readonly components: readonly AnyComponent[];
 };
 
-const MASS_ROW: ReadOnlyRow = {
+const MASS_ROW: MassRow = {
     key: 'mass',
     label: 'Mass',
-    description: 'How heavy the body is. It follows the shapes and their density: you set density, never mass.',
+    description: 'How heavy the body is: its shapes’ area × density. Typing a mass sets the density for it.',
     unit: 'kg',
+    type: new NumberFieldType({ min: 0 }),
 };
+
+// Masses worked out from densities set for one typed mass can differ in their last bits, so they count as
+// the same when this close.
+const SAME_MASS_SHARE = 1e-9;
 
 // The card's fields: its own, then the derived ones, then the read-only rows.
 export function fieldModels(held: HeldComponents, caches: BodyMassCaches) {
@@ -110,6 +116,7 @@ function derivedFieldModel(
 }
 
 // Shown only when every shown entity is a Dynamic body with a mass of its own, not merged into another.
+// Read-only when a body has no area, such as one with no surfaces or only lines: no density gives it a mass.
 function massRowModel(held: HeldComponents, caches: BodyMassCaches): FieldModel | undefined {
     if (held.schema.typeName !== BodyComponent.schema.typeName) return undefined;
 
@@ -117,14 +124,22 @@ function massRowModel(held: HeldComponents, caches: BodyMassCaches): FieldModel 
     if (!allDynamic) return undefined;
 
     const masses: number[] = [];
+    let hasBodyWithoutArea = false;
     for (const entity of held.entities) {
         const mass = BodyMass.of(entity, caches);
         if (mass === undefined) return undefined;
 
         masses.push(mass.mass);
+        hasBodyWithoutArea ||= mass.area === 0;
     }
 
-    const value = sameOrMixed(masses, (first, second) => first === second);
+    const value = sameOrMixed(masses, isSameMass);
 
-    return { kind: 'readOnlyRow', definition: MASS_ROW, value, isEnabled: true, isReadOnly: true };
+    return { kind: 'mass', definition: MASS_ROW, value, isEnabled: true, isReadOnly: hasBodyWithoutArea };
+}
+
+function isSameMass(first: number, second: number) {
+    const largest = Math.max(Math.abs(first), Math.abs(second));
+
+    return Math.abs(first - second) <= largest * SAME_MASS_SHARE;
 }
