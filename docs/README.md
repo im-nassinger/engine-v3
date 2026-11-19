@@ -18,6 +18,7 @@ Everything known about the project: a 2D physics game with a level editor, for t
 | [design/](design/README.md) | How the editor looks: the round 8 answers, the mockups, and later the design system |
 | [plan.md](plan.md) | The v1 plan in 18 stages, each with the docs it implements |
 | [steps/](steps/README.md) | Each stage's steps, one file per stage, written when the stage starts |
+| [deploying.md](deploying.md) | Publishing the editor on Netlify: the URL, the steps, and that the owner is already logged in |
 | [review.html](review.html) | The review page where the owner answers questions in the browser. Earlier rounds are in git history |
 | [before-v2.md](before-v2.md) | Changes the owner asked for that are built after v1's stages and before v2 |
 | [proposals/](proposals/README.md) | Proposals waiting for the owner's answer. Empty now |
