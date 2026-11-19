@@ -293,6 +293,16 @@ describe('EditorShell', () => {
         expect(find('.kinds-menu')).toBeNull();
     });
 
+    test('no button on the page starts Play: it is reached from the main menu and the keys', async () => {
+        showShell();
+        const readButtons = () => [...editorPageContainer().querySelectorAll('button')];
+        await expect.poll(() => readButtons().length).toBeGreaterThan(0);
+
+        const names = readButtons().map((each) => each.getAttribute('aria-label') ?? each.textContent);
+
+        expect(names.filter((name) => name.startsWith('Play'))).toEqual([]);
+    });
+
     test('Play hides every panel and bar, the Play bar shows, and Stop brings them back as they were', async () => {
         const { play, tools } = showShell();
         tools.controller.pick('joint');

@@ -23,10 +23,10 @@ function keepFocus(event: MouseEvent) {
     event.preventDefault();
 }
 
-// Floats at the top centre during test play: a coloured frame, the state's label with a dot, Pause or
-// Resume, Step and Stop with their keys, and under them one message: why the run ended, "The game isn't
-// responding", or a hint such as "Stop to edit". Clicking it takes the keyboard from the game, so every
-// key held is let go, and the run goes on.
+// Floats at the top centre during test play: a pill tinted with the state's colour, holding the state's
+// label with a dot, Pause or Resume, Step and Stop with their keys, and under it one message: why the run
+// ended, "The game isn't responding", or a hint such as "Stop to edit". Clicking it takes the keyboard from
+// the game, so every key held is let go, and the run goes on.
 export function PlayBar() {
     // The state and the messages are read from the same session object each time it moves, so the React
     // Compiler must not keep an old answer.

@@ -3,9 +3,9 @@
     align-items: center;
     gap: var(--space-6);
     height: var(--control);
-    padding: 0 var(--space-8);
+    padding: 0 var(--space-10);
     border: none;
-    border-radius: var(--radius);
+    border-radius: 999px;
     background: none;
     color: var(--text);
     cursor: default;

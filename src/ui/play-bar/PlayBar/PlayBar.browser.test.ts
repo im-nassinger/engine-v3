@@ -61,6 +61,24 @@ function keyOf(name: string) {
     return button(name).querySelector('.shortcut')?.textContent;
 }
 
+function pill() {
+    const found = bar()?.querySelector<HTMLElement>('.controls');
+    if (found === undefined || found === null) throw new Error('The Play bar has no pill.');
+
+    return found;
+}
+
+// What the browser makes of a state's colour at 16% over the panels' colour, which each browser writes its own way.
+function tintOf(stateToken: string) {
+    const probe = document.createElement('div');
+    probe.style.background = `color-mix(in srgb, var(${stateToken}) 16%, var(--panel))`;
+    editorPageContainer().append(probe);
+    const tint = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+
+    return tint;
+}
+
 describe('PlayBar', () => {
     test('while playing: PLAYING, Pause, Step off and Stop, each with its key', async () => {
         await showPlaying();
@@ -98,6 +116,36 @@ describe('PlayBar', () => {
 
         await userEvent.click(button('Stop'));
         expect(play.state).toBe('idle');
+    });
+
+    test('the pill is fully round, has the shade and no edge, and takes the tint of its state', async () => {
+        await showPlaying();
+        const look = getComputedStyle(pill());
+
+        expect(look.borderTopLeftRadius).toBe('999px');
+        expect(look.boxShadow).not.toBe('none');
+        expect(look.borderTopStyle).toBe('none');
+        expect(getComputedStyle(bar() ?? document.body).boxShadow).toBe('none');
+        expect(look.backgroundColor).toBe(tintOf('--playing'));
+
+        await userEvent.click(button('Pause'));
+        await expect.poll(label).toBe('PAUSED');
+
+        expect(getComputedStyle(pill()).backgroundColor).toBe(tintOf('--paused'));
+        expect(tintOf('--paused')).not.toBe(tintOf('--playing'));
+    });
+
+    test('its buttons are round, and a message sits under the pill, not in it', async () => {
+        const { commands } = await showPlaying();
+        const selectAll = commands.registry.find('edit.selectAll');
+        if (selectAll === undefined) throw new Error('No Select all.');
+
+        commands.runner.run(selectAll);
+        await expect.poll(message).toBe(STOP_TO_EDIT_TEXT);
+
+        expect(getComputedStyle(button('Stop')).borderTopLeftRadius).toBe('999px');
+        const messageBox = bar()?.querySelector('.message')?.getBoundingClientRect();
+        expect(messageBox?.top).toBeGreaterThanOrEqual(pill().getBoundingClientRect().bottom);
     });
 
     test('an edit during play shows "Stop to edit" under the buttons', async () => {

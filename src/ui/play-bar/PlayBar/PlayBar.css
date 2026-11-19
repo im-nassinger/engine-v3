@@ -1,8 +1,8 @@
 .play-bar {
-    --frame: transparent;
+    --state-colour: var(--muted);
 
     position: absolute;
-    top: var(--space-8);
+    top: var(--island-gap);
     right: 0;
     left: 0;
     z-index: var(--stack-floating);
@@ -12,54 +12,49 @@
     flex-direction: column;
     align-items: center;
     gap: var(--space-4);
-    padding: var(--space-4) var(--space-6);
-    border: 1.5px solid var(--frame);
-    border-radius: var(--radius);
-    background: var(--panel);
-    box-shadow: var(--shade);
 
     &[data-state='starting'],
     &[data-state='playing'] {
-        --frame: var(--playing);
+        --state-colour: var(--playing);
     }
 
     &[data-state='paused'] {
-        --frame: var(--paused);
+        --state-colour: var(--paused);
     }
 
     > .controls {
         display: flex;
         align-items: center;
         gap: var(--space-4);
+        padding: var(--space-4) var(--space-6);
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--state-colour) 16%, var(--panel));
+        box-shadow: var(--shade);
 
         > .state-label {
             display: flex;
             align-items: center;
             gap: var(--space-6);
-            padding: 0 var(--space-8);
-            color: var(--frame);
+            padding: 0 var(--space-10) 0 var(--space-8);
+            color: var(--state-colour);
             font-weight: var(--weight-heading);
+            letter-spacing: var(--caps-spacing);
 
             > .dot {
                 width: 8px;
                 height: 8px;
                 border-radius: 50%;
-                background: var(--frame);
+                background: var(--state-colour);
             }
         }
     }
 
-    &[data-state='ended'] > .controls > .state-label {
-        color: var(--muted);
-
-        > .dot {
-            background: var(--muted);
-        }
-    }
-
+    /* On a chip, since it sits straight on the game, whose colours can be anything. */
     > .message {
         margin: 0;
-        padding: 0 var(--space-8) var(--space-4);
+        padding: var(--space-4) var(--space-10);
+        border-radius: 999px;
+        background: var(--chip);
         color: var(--text);
         font-size: var(--text-size);
         white-space: nowrap;
