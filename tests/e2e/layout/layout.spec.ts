@@ -114,7 +114,7 @@ for (const size of SIZES) {
             await openEditor(page);
             const free = await freeAreaBox(page);
 
-            const percentText = await page.locator('.debug-box [data-entry="ZOOM"] .value').textContent();
+            const percentText = await page.locator('.debug-box [data-entry="ZOOM"] .value').inputValue();
             const percent = Number((percentText ?? '').replace('%', ''));
             expect(percent).toBeGreaterThan(0);
             const largestZoom = percent / 100 + ZOOM_ROUNDING;

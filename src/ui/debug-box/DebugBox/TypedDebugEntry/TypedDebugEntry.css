@@ -1,0 +1,29 @@
+.typed-debug-entry {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+
+    > .label {
+        color: var(--muted);
+    }
+
+    /* Reads as plain text until hovered or typed in. */
+    > .value {
+        width: calc(var(--chars) * 1ch + 8px);
+        margin: 0 -4px;
+        padding: 1px 4px;
+        border: 0;
+        border-radius: var(--radius);
+        outline: none;
+        background: transparent;
+        color: var(--text);
+        font: inherit;
+        font-variant-numeric: tabular-nums;
+        cursor: text;
+
+        &:hover,
+        &:focus {
+            background: var(--field);
+        }
+    }
+}

@@ -85,6 +85,7 @@ export { RenameCommand } from './rename/RenameCommand.ts';
 export { RENAME_LEVEL_TEXT, RenameLevelCommand } from './rename/RenameLevelCommand.ts';
 export { renameEntity } from './rename/renameEntity.ts';
 export { renameLevel } from './rename/renameLevel.ts';
+export { GRID_SIZE_NOT_A_NUMBER, setGridSize } from './grid/setGridSize.ts';
 export { EntityNamer } from './shared/EntityNamer.ts';
 export { FitCameraFrameCommand } from './view/FitCameraFrameCommand.ts';
 export { FitSelectionCommand } from './view/FitSelectionCommand.ts';

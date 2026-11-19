@@ -60,11 +60,11 @@ Source: round 3: 01 2.2, 2.3; round 8: VW1; old: WS-16 to WS-27; owner: 2026-11-
 
 ### The debug box and the message pill · v1
 
-- **The debug box** is an island under the minimap, its right edge on the minimap's, as wide as its entries: `X: -3120  Y: -2410  GRID: 50  ZOOM: 9%`. The mouse position in level pixels, the grid size and the zoom; labels muted in capitals, values in tabular figures. It only shows them: the zoom changes with the mouse wheel, the keys and the View menu (owner: 2026-11-17).
+- **The debug box** is an island under the minimap, its right edge on the minimap's, as wide as its entries: `X: -3120  Y: -2410  GRID: 50  ZOOM: 9%`. The mouse position in level pixels, the grid size and the zoom; labels muted in capitals, values in tabular figures. **The grid size and the zoom can be clicked and typed over** (owner: 2026-11-19, replacing "it only shows them" of 2026-11-17): Enter or clicking away sets the value, Esc keeps the old one, and both give the keyboard back to the level view. A typed grid size is one undo step, `Change grid size`, rounded to a whole number and kept between 5 and 1,000; a typed zoom, such as `150` or `150%`, zooms about the middle of the level view, inside the zoom range. Text that isn't a number changes nothing and the message pill says why. The zoom also changes with the mouse wheel, the keys and the View menu.
 - **The message pill** sits at the bottom middle of the level view, shown only while there is a message: a status text such as `Undid: Move 3 entities` or `The camera can't be deleted` for 4 seconds, or a failed save until it is fixed (owner: 2026-11-18).
 - No lasting tool hint, no selection summary and no message count. *Why: the tool column shows the tool, the Entities viewer and the Entity inspector show the selection, and each editor message already shows on its card (owner: 2026-11-17, 2026-11-18).*
 
-Source: round 3: 01 2.2, 2.3; round 8: WN1; round 10: EM1; old: WS-29 to WS-31; owner: 2026-11-17, 2026-11-18
+Source: round 3: 01 2.2, 2.3; round 8: WN1; round 10: EM1; old: WS-29 to WS-31; owner: 2026-11-17, 2026-11-18, 2026-11-19
 
 ### The minimap · v1
 
@@ -149,7 +149,7 @@ Source: scope ED1; round 3: 01 2.6; round 5: 02 2.5; old: WS-46 to WS-52, WS-56,
 
 ### The grid · v1
 
-- The grid can be shown or hidden, its size can be set, and entities can snap to it.
+- The grid can be shown or hidden, its size can be set by typing it in the debug box (owner: 2026-11-19), and entities can snap to it.
 - Default size: **50 px**, which is 1 metre, with fainter lines every 10 px. Lines fade out when they get too close together on screen. The lines through the level's origin are slightly stronger.
 - Grid lines adapt to the background colour so they stay visible.
 - With grid snapping on, the edges and centre of what you move, resize or draw jump to the nearest grid line. Pasted entities snap too.
@@ -159,7 +159,7 @@ Source: scope ED1; round 3: 01 2.6; round 5: 02 2.5; old: WS-46 to WS-52, WS-56,
 - **The grid size is a whole number of pixels from 5 to 1,000.** *Why: whole numbers keep snapped positions whole, and the range covers fine tiles and coarse layout (standing yes, 2026-11-14).*
 - The grid size is saved in the project file, and changing it is an undo step (owner: 2026-11-13). Whether the grid is shown is saved in the browser.
 
-Source: scope ED4; round 3: 01 2.6; round 5: FMT1; round 7: BND2; old: WS-53, WS-54, WS-58 to WS-62; owner: 2026-11-13, 2026-11-14
+Source: scope ED4; round 3: 01 2.6; round 5: FMT1; round 7: BND2; old: WS-53, WS-54, WS-58 to WS-62; owner: 2026-11-13, 2026-11-14, 2026-11-19
 
 ### Snapping to other entities · v3
 
