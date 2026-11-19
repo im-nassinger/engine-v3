@@ -5,6 +5,7 @@ import { CommandsContext } from '../ui/commands/index.ts';
 import type { EditorCommands } from '../ui/commands/index.ts';
 import { EditorContext } from '../ui/EditorContext.tsx';
 import { LevelViewMountContext } from '../ui/level-view-host/index.ts';
+import { MinimapMountContext } from '../ui/minimap/index.ts';
 import { OpenWindowsContext } from '../ui/open-windows/index.ts';
 import { PlayContext } from '../ui/play/index.ts';
 import { SaveIndicatorContext } from '../ui/save-state/index.ts';
@@ -44,7 +45,9 @@ root.render(
                         <SaveIndicatorContext value={composition.saveIndicator}>
                             <PlayContext value={composition.play}>
                                 <LevelViewMountContext value={composition.levelView}>
-                                    <EditorShell />
+                                    <MinimapMountContext value={composition.minimap}>
+                                        <EditorShell />
+                                    </MinimapMountContext>
                                 </LevelViewMountContext>
                             </PlayContext>
                         </SaveIndicatorContext>

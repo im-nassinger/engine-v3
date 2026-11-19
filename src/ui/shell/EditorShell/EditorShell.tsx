@@ -5,6 +5,7 @@ import { EntityInspector } from '../../entity-inspector/index.ts';
 import { LevelViewHost } from '../../level-view-host/index.ts';
 import { MainMenu } from '../../main-menu/index.ts';
 import { MessagePill } from '../../message-pill/index.ts';
+import { Minimap } from '../../minimap/index.ts';
 import { usePlaySession } from '../../play/index.ts';
 import { PlayBar } from '../../play-bar/index.ts';
 import { ToolColumn } from '../../tool-column/index.ts';
@@ -20,9 +21,8 @@ const HIDES_ENTITY_INSPECTOR = 'shape';
 
 // The level view fills the window, and the islands float over it in fixed places: ☰ at the top left, the
 // tool column under it, the Entity inspector beside them. While the Shape tool is
-// active the Entity inspector's island is gone and the free area reaches the tool column. The minimap's
-// island is empty until step 13 of stage 19 draws it. During test play every panel
-// and bar is hidden but kept, so Stop shows them as they were, scrolled and folded, and the Play bar floats
+// active the Entity inspector's island is gone and the free area reaches the tool column. During test play
+// every panel and bar is hidden but kept, so Stop shows them as they were, scrolled and folded, and the Play bar floats
 // over the game.
 export function EditorShell() {
     const { controller } = useEditorTools();
@@ -55,7 +55,9 @@ export function EditorShell() {
             <PanelPlace area="entities-viewer" label="Entities viewer">
                 <EntitiesViewer />
             </PanelPlace>
-            <PanelPlace area="minimap" label="Minimap" />
+            <PanelPlace area="minimap" label="Minimap">
+                <Minimap />
+            </PanelPlace>
             <PanelPlace area="debug-box" label="Debug box">
                 <DebugBox />
             </PanelPlace>

@@ -2,17 +2,11 @@ import { Matrix } from 'pixi.js';
 import type { Graphics, StrokeStyle } from 'pixi.js';
 import { PathComponent, ShapeComponent, StyleComponent } from '../../core/components/index.ts';
 import type { Entity } from '../../core/level/index.ts';
-import type {
-    Matrix2D,
-    PathGeometry,
-    PathPoint,
-    Point,
-    ShapeGeometry,
-    ShapePiecesResult,
-} from '../../core/geometry/index.ts';
+import type { Matrix2D, Point, ShapeGeometry, ShapePiecesResult } from '../../core/geometry/index.ts';
 import { outlineStretchOf } from '../../core/derived/index.ts';
 import type { PiecesCache } from '../../core/derived/index.ts';
 import { toPixiColour } from './PixiColour.ts';
+import { tracePath } from './tracePath.ts';
 
 export type EntityDrawingOptions = {
     // The editor shows a shape or path with no StyleComponent as a thin line; play shows nothing.
@@ -182,39 +176,6 @@ function drawShape(graphics: Graphics, pen: Pen, shape: ShapeComponent, look: Lo
         traceShapeOutline(pen, geometry, result);
         graphics.stroke(look.stroke);
     }
-}
-
-function traceCurve(pen: Pen, from: PathPoint, to: PathPoint) {
-    const isStraight = from.handleOut === null && to.handleIn === null;
-    if (isStraight) {
-        pen.lineTo(to);
-        return;
-    }
-
-    const handleOut = from.handleOut ?? { x: 0, y: 0 };
-    const handleIn = to.handleIn ?? { x: 0, y: 0 };
-    const firstControl = { x: from.x + handleOut.x, y: from.y + handleOut.y };
-    const secondControl = { x: to.x + handleIn.x, y: to.y + handleIn.y };
-
-    pen.curveTo(firstControl, secondControl, to);
-}
-
-function tracePath(pen: Pen, path: PathGeometry) {
-    const first = path.points[0];
-    if (first === undefined) return;
-
-    pen.moveTo(first);
-
-    let previous = first;
-    for (const point of path.points.slice(1)) {
-        traceCurve(pen, previous, point);
-        previous = point;
-    }
-
-    if (!path.closed) return;
-
-    traceCurve(pen, previous, first);
-    pen.closePath();
 }
 
 function drawPath(graphics: Graphics, pen: Pen, pathComponent: PathComponent, look: Look) {

@@ -20,6 +20,7 @@ export type LevelViewPage = {
     readonly tools: ToolController;
     readonly levelView: PixiLevelView;
     readonly frames: ManualFrames;
+    readonly timer: ManualTimer;
     readonly close: () => void;
 };
 
@@ -28,7 +29,8 @@ export type LevelViewPage = {
 // A headless browser's own frames come at a fixed rate whatever the work, so they would measure nothing.
 export async function openLevelViewPage(level: Level): Promise<LevelViewPage> {
     const frames = new ManualFrames();
-    const session = new EditorSession({ level, clock: new ManualClock(), timer: new ManualTimer(), frames });
+    const timer = new ManualTimer();
+    const session = new EditorSession({ level, clock: new ManualClock(), timer, frames });
     const commands = createCommandRegistry(session);
     const pixelRatio = {
         current: () => 1,
@@ -60,7 +62,7 @@ export async function openLevelViewPage(level: Level): Promise<LevelViewPage> {
         host.remove();
     };
 
-    return { session, tools, levelView, frames, close };
+    return { session, tools, levelView, frames, timer, close };
 }
 
 // Runs frames until none is asked for, as the browser would before the next input.

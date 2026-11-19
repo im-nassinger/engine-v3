@@ -16,7 +16,7 @@ import {
     SystemClock,
     TabTitle,
 } from '../adapters/browser/index.ts';
-import { PixiLevelView } from '../adapters/pixi/index.ts';
+import { MinimapView, PixiLevelView } from '../adapters/pixi/index.ts';
 import { ImportWorkerClient, WorkerGameRunner } from '../adapters/worker/index.ts';
 import {
     BrowserPersistence,
@@ -74,6 +74,7 @@ type EditorParts = {
     readonly runner: CommandRunner;
     readonly platform: KeyboardPlatform;
     readonly levelView: PixiLevelView;
+    readonly minimap: MinimapView;
     readonly keyboard: KeyboardInput;
     readonly pointer: PointerInput;
     readonly clipboardBridge: ClipboardBridge;
@@ -101,6 +102,7 @@ export class EditorComposition {
     readonly runner: CommandRunner;
     readonly platform: KeyboardPlatform;
     readonly levelView: PixiLevelView;
+    readonly minimap: MinimapView;
     readonly tools: ToolController;
     readonly mouse: MousePosition;
     // The page's menus and the Entities panel's row drag report here, so Esc leaves them to close.
@@ -128,6 +130,7 @@ export class EditorComposition {
         this.runner = parts.runner;
         this.platform = parts.platform;
         this.levelView = parts.levelView;
+        this.minimap = parts.minimap;
         this.keyboard = parts.keyboard;
         this.pointer = parts.pointer;
         this.clipboardBridge = parts.clipboardBridge;
@@ -231,13 +234,15 @@ export class EditorComposition {
         };
         const commands = createCommandRegistry(session, { clipboard, mouse }, fileParts, play);
         const platform = keyboardPlatform(navigator.platform);
+        const pixelRatio = new DevicePixelRatio();
         const levelView = await PixiLevelView.create({
             view: session.view,
             settings: session.viewSettings,
             frames,
-            pixelRatio: new DevicePixelRatio(),
+            pixelRatio,
             drawing: { showUnstyled: true },
         });
+        const minimap = new MinimapView({ view: session.view, timer, pixelRatio });
         const tools = createTools(session, commands);
         const openWindows = new OpenWindowCount();
         const escape = new EscapeChain(session, tools, openWindows);
@@ -260,6 +265,7 @@ export class EditorComposition {
             runner,
             platform,
             levelView,
+            minimap,
             keyboard,
             pointer,
             clipboardBridge,
@@ -286,6 +292,7 @@ export class EditorComposition {
         // Before the first draw, so a reload shows the place the last session left.
         const viewRestored = this.settings.follow(this.session);
         this.levelView.follow(this.session);
+        this.minimap.follow(this.session);
         this.levelView.showSelection(new EditorSelectionSource(this.session, this.tools));
         this.levelView.showDrawing(new EditorDrawingSource(this.tools));
         this.levelView.showJointPreview(new EditorJointPreviewSource(this.session, this.tools, this.mouse));

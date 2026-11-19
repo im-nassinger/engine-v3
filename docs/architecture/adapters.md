@@ -10,6 +10,7 @@ Every detail is reached through **one small contract declared where it is needed
 |---|---|---|---|
 | `PhysicsEngine`, `PhysicsWorld` | core/physics | `Box2dPhysicsEngine`, `Box2dPhysicsWorld` | Tests use the real Box2D in Node; `RecordingPhysicsWorld` checks what the builder asked for |
 | `LevelViewMount` | ui/level-view-host | `PixiLevelView` | none: tested in a browser |
+| `MinimapMount` | ui/minimap | `MinimapView` | none: tested in a browser |
 | `LevelStore` | editor/saving | `IndexedDbLevelStore` | `InMemoryLevelStore` |
 | `SettingsStore` | editor/saving | `LocalStorageSettings` | `InMemorySettingsStore` |
 | `TabGuard` | editor/saving | `WebLockTabGuard` | `FakeTabGuard` |
@@ -76,6 +77,25 @@ export type PhysicsWorld = {
 - **During play** the view follows the camera from the tick reports: Fixed size scales the camera's box to fit the window, centred, with black bars. Editor-only drawing (handles, the camera frame) is hidden unless a View menu switch shows it. **Joint icons are never drawn in play**, whatever their switch, so an unstyled joint is invisible like any entity, and they come back after Stop (owner, 2026-11-17).
 - **Sharp at any browser zoom:** the renderer's resolution follows `devicePixelRatio` and a `ResizeObserver` on the host, as the tech notes say. Antialiasing is on.
 - Culling and batching are described in [performance.md](performance.md).
+
+### The minimap
+
+`MinimapView` (`adapters/pixi/minimap/`) draws the [minimap](../requirements/editor/workspace.md#the-minimap--v1): the whole level bounds, fitted and centred in the island, each entity's fill without outlines, and an accent rectangle for what the level view shows. Built in stage 19 step 13 (standing yes, 2026-11-18).
+
+| Part | Job |
+|---|---|
+| `MinimapView` | The canvas, the host's size, and when to paint |
+| `paintEntityFill` | One entity's fill on a 2D canvas: a shape's filled outlines and circle, or a closed path |
+| `minimapFit`, `viewRectangle` | Plain sums: where the level bounds sit in the picture, and where the view's rectangle sits on them |
+
+- **A plain 2D canvas, not a second PixiJS renderer.** *Why: a second renderer means a second WebGL context and a second `Graphics` for every entity, while the minimap is 174 × 87 px and draws fills only.* It stays in `adapters/pixi` because it shares `tracePath` and the colour reading with `EntityDrawing`.
+- **It never works inside the level view's frame.** It runs on `Timer`, not `FrameScheduler`. *Why: dragging 1,000 of 10,000 entities already takes about 15 ms of a frame's 16.7.*
+- **Painting is cut into slices** of 100 entities, 16 ms apart, on a canvas nobody sees. When the last slice is done that picture replaces the shown one, so a half-painted level never shows. A level of 100 entities or fewer paints at once; one of 10,000 takes about 1.6 s. Each slice ends by reading one pixel, on a canvas kept on the CPU. *Why: the browser otherwise saves up every fill and plays them back when the picture is first used, 4 to 6 ms at 10,000 entities, enough to drop a frame.*
+- **At most four updates a second:** a change waits 250 ms, and every change in that time joins the same update. A change during painting waits for the painting to end. An idle editor runs nothing.
+- **The view's rectangle** is drawn over the finished picture, so moving the view repaints no entity. It is at least 4 px wide and tall, so it stays visible at high zoom, and it is left out when the view shows none of the level.
+- **Painting skips** hidden entities, lines, unfilled shapes and shapes with no StyleComponent, and an entity removed while the painting runs.
+- **The draw order is kept between paintings** until an entity is added, removed or moved in the tree. *Why: listing 10,000 entities takes about 2 ms, and a drag changes no order.*
+- **The island is 180 × 93 px**, so the picture inside its 3 px edge is 174 × 87, the 2:1 of a new level. **Level bounds of another shape** leave bars of the app's colour beside them: the island keeps its size, because the Entities viewer's height is worked out from it.
 
 ### Stage 4's choices
 

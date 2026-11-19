@@ -88,7 +88,7 @@ EditorShell
 ├── EntityInspector                    ui/entity-inspector, hidden while the Shape tool is active
 ├── FreeArea                           reports the covered edges for fitting
 ├── EntitiesViewer                     ui/entities-viewer, grows with its rows up to the minimap
-├── Minimap                            ui, drawing through a small adapter contract (step 13)
+├── Minimap                            ui/minimap, a box MinimapView draws in through MinimapMount
 ├── DebugBox                           ui/debug-box
 ├── MessagePill                        ui/message-pill: StatusText and a failed save
 ├── PlayBar                            during play, in every island's place
@@ -99,7 +99,7 @@ EditorShell
 - **`LevelViewHost` fills the whole window under the islands**, as the requirement says. The islands sit above it; the browser's own stacking keeps clicks on an island away from the canvas.
 - **The free area** is the level view between the Entity inspector (or the tool column while the Shape tool hides it) and the Entities viewer, so fitting frames the level where it is seen.
 - During play, `EditorShell` hides every island and shows `PlayBar`, reading `PlaySession.version` from `PlayContext`. The islands are hidden with `visibility: hidden`, not removed, so they come back at Stop as they were (stage 16).
-- **The layout as built (stage 19 step 6, standing yes, 2026-11-18):** `EditorShell.css` places each `PanelPlace` absolutely by its `data-area`, with the theme's size tokens; `FreeArea` is placed the same way and still reports the covered edges through its `ResizeObserver`. The minimap's place is an empty `PanelPlace` until step 13. Since step 7 ☰ is its own 48 px island at the top left, with the tool column under it (`--under-main-menu`) and the Entity inspector and the Entities viewer starting at the top; the debug box is at the bottom right (step 11), and the minimap and the Entities viewer end above it through `--islands-bottom`. Since step 12 the Entity inspector runs to 10 px from the window's bottom, as in the mockup.
+- **The layout as built (stage 19 step 6, standing yes, 2026-11-18):** `EditorShell.css` places each `PanelPlace` absolutely by its `data-area`, with the theme's size tokens; `FreeArea` is placed the same way and still reports the covered edges through its `ResizeObserver`. The minimap's place holds `Minimap` since step 13. Since step 7 ☰ is its own 48 px island at the top left, with the tool column under it (`--under-main-menu`) and the Entity inspector and the Entities viewer starting at the top; the debug box is at the bottom right (step 11), and the minimap and the Entities viewer end above it through `--islands-bottom`. Since step 12 the Entity inspector runs to 10 px from the window's bottom, as in the mockup.
 
 ## The level view and React
 
@@ -142,7 +142,7 @@ export function LevelViewHost() {
 | `KindsMenu` | The active tool | Open beside the Shape tool (Rectangle, Circle, Polygon) or the Joint tool (Hinge, Rope, Spring) while it is active |
 | `EntitiesViewer` | `EntitiesRows` | Virtual list, below |
 | `EntityInspector` | `EntityInspectorModel` | One `Card` per card model, one field component per field type; card titles from one function |
-| `Minimap` | The level, `ViewState` | Show-only in v1, redrawn a few times a second at most |
+| `Minimap` | `MinimapMount`: `MinimapView` follows the level and `ViewState`, see [adapters.md](adapters.md#the-minimap) | Show-only in v1, redrawn four times a second at most |
 | `DebugBox` | The mouse position, the grid size, `ViewState`'s zoom | |
 | `MessagePill` | `StatusText`, `SaveState` | Shown only while there is a message |
 | `PlayBar` | `PlaySession` | Pause or Resume, Step, Stop, and one message |

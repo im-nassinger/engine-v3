@@ -77,7 +77,7 @@ src/
     status/            StatusText (what the message pill shows), outcomeText, mouseCoordinateText (the debug box's X and Y)
     time/              Clock, Timer, FrameScheduler, TimeOfDay contracts
   adapters/
-    pixi/              PixiLevelView, EntityNode, EntityDrawing, overlays/
+    pixi/              PixiLevelView, EntityNode, EntityDrawing, overlays/, minimap/ (MinimapView)
     box2d/             Box2dPhysicsEngine, Box2dPhysicsWorld, Box2dShapes, Box2dJoints
     storage/           IndexedDbLevelStore, LocalStorageSettings, WebLockTabGuard, BrowserPersistence
     browser/           keyboard/ (KeyboardInput, commitFocusedField), pointer/ (PointerInput, ClickCounter, wheelPixels),
@@ -104,7 +104,7 @@ src/
     play/              PlayContext: the PlaySession for the shell, the Play button and the Play bar
     play-bar/          PlayBar/ (with PlayBarButton/)
     testing/           editorPage: a component shown with the session, commands and tools, for browser tests
-    main-menu/ level-view-host/ entities-viewer/ entity-inspector/
+    main-menu/ level-view-host/ minimap/ entities-viewer/ entity-inspector/
     save-state/        SaveIndicatorContext
     fields/            one component per field type: NumberField/, ColourField/, ...
     shared/            Button/, IconButton/, Menu/, MenuButton/, Tooltip/, Icon/

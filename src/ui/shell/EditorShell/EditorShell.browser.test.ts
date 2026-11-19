@@ -5,6 +5,7 @@ import { Level } from '../../../core/level/index.ts';
 import { JointTool, OpenWindowCount, ShapeTool } from '../../../editor/tools/index.ts';
 import type { LevelPointerInput } from '../../../editor/tools/index.ts';
 import { LevelViewMountContext } from '../../level-view-host/index.ts';
+import { MinimapMountContext } from '../../minimap/index.ts';
 import type { LevelViewMount } from '../../level-view-host/index.ts';
 import { OpenWindowsContext } from '../../open-windows/index.ts';
 import { closeEditorPage, editorPageContainer, openEditorPage, showWithEditor } from '../../testing/editorPage.ts';
@@ -22,7 +23,7 @@ const GAP = 10;
 const TOOL_COLUMN = 48;
 const ENTITY_INSPECTOR = 300;
 const ENTITIES_VIEWER = 260;
-const MINIMAP = { width: 180, height: 90 };
+const MINIMAP = { width: 180, height: 93 };
 const MAIN_MENU = 48;
 const DEBUG_BOX = 28;
 const PANEL_HEAD = 40;
@@ -42,7 +43,8 @@ afterEach(() => {
 
 function showShell(level = Level.createNew()) {
     const shell = createElement(EditorShell);
-    const withView = createElement(LevelViewMountContext, { value: NO_LEVEL_VIEW }, shell);
+    const withMinimap = createElement(MinimapMountContext, { value: NO_LEVEL_VIEW }, shell);
+    const withView = createElement(LevelViewMountContext, { value: NO_LEVEL_VIEW }, withMinimap);
     const withWindows = createElement(OpenWindowsContext, { value: new OpenWindowCount() }, withView);
 
     return showWithEditor(level, withWindows);
