@@ -100,7 +100,6 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 - **Round 10**, every card at Claude's pick: see [decisions.md](decisions.md#decided-under-the-standing-yes).
 - **An owner decision built differently** (2026-11-14): the owner said to ask again if `clipper2-ts` failed. Its fill works, but **its triangulation drops areas** (a one-stroke star loses its middle) while reporting success. The unattended runner can't ask, so it took the closest fix: `clipper2-ts` only fills, and the game's own `EarClipping` triangulates. See [geometry.md](architecture/core-model/geometry.md#the-polygon-pipeline); the owner can overturn it.
-
 - **An owner decision built differently** (2026-11-16): the requirement capped spin at 15 turns per second, but Box2D 3.2 turns a body at most 45° a step, 7.5 turns per second, with no setting to raise it. The closest fix is Box2D's own cap: [bodies.md](requirements/physics/bodies.md#body-settings--v1) now says 7.5, and the Hinge's motor speed range is ±2,700 °/s instead of ±5,400. See [adapters.md](architecture/adapters.md#physics); the owner can overturn it.
 - **An owner decision built differently** (2026-11-16): the requirement let a Hinge's Min and Max angle go to a full turn, ±360°, but Box2D 3.2 clamps a Hinge's limits to ±180°. The closest fix is Box2D's own: [joints.md](requirements/physics/joints.md#settings-of-each-joint--v1) and the JointComponent's schema now range over ±180°. See [adapters.md](architecture/adapters.md#physics); the owner can overturn it.
 
@@ -270,11 +269,12 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 ## Waiting for the owner
 
-Nothing. When something waits for the owner, it is listed here, and removed here in the same commit that settles it, wherever that commit is made (the runner's docs included).
+Each item is removed in the same commit that settles it, wherever that commit is made (the runner's docs included).
+- **Round 11, v2's scope** (2026-11-19): answer the cards on the [review page](review.html) and paste the copied answers into the chat.
 
 ## Next
 
-1. **The owner decides v2.** Stages 0 to 19 are built; the runner is stopped and nothing of v2 is planned or built.
+1. **v2 is being planned the way v1 was** (owner, 2026-11-19). The order: a scope review of v2 (round 11, on the [review page](review.html), waiting for the owner's answers), the open questions about variables below, checking the v2 requirements against what v1 built, the design of v2's screen parts in the islands layout, the architecture review for v2, then v2's stage plan and steps, and the runner again. Nothing of v2 is built.
 2. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
 
 ## How to change a requirement
@@ -289,7 +289,7 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 
 ## Open questions for the owner
 
-Under the owner's standing yes (2026-11-14), Claude decides what the docs don't answer and lists it in [decisions.md](decisions.md#decided-under-the-standing-yes) for the owner to review whenever they like. The [review page](review.html) holds only round 10's record.
+Under the owner's standing yes (2026-11-14), Claude decides what the docs don't answer and lists it in [decisions.md](decisions.md#decided-under-the-standing-yes) for the owner to review whenever they like. The [review page](review.html) holds round 11, v2's scope, waiting for the owner; round 10's record is in git history.
 
 Left open by 2026-11-16's variables change, all for v2 unless marked. None blocks v1:
 

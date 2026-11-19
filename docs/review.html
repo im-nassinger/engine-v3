@@ -69,7 +69,7 @@
 <body>
 <header>
   <div class="bar">
-    <h1>Review, round 10</h1>
+    <h1>Review, round 11: v2's scope</h1>
     <span class="progress" id="progress"></span>
     <label class="filter"><input type="checkbox" id="onlyOpen"> Unanswered only</label>
     <button class="copy" id="copyTop">Copy answers</button>
@@ -77,7 +77,7 @@
   <div class="pbar"><i id="pfill"></i></div>
 </header>
 <main>
-  <p class="intro"><b>Round 10 is settled</b> by the owner’s standing yes (2026-11-14): every card took Claude’s pick, and the answers are written into the docs. The cards stay here only as a record; nothing is waiting for an answer.</p>
+  <p class="intro"><b>What v2 holds, before anything of it is designed or built</b> (2026-11-19). v1 was cut to "the smallest thing that can be tested"; v2 never had that pass. This round does it: one test for v2, then each feature kept in v2 or moved to v3. <b>Yes</b> means you agree with the card as written; <b>No</b> means the opposite (keep what the card moves, or move what it keeps). <b>More</b> shows the background. Answers stay in this browser; press <b>Copy answers</b> and paste them into the chat. What you settle is then written into scope.md and each topic's version headings.</p>
   <details class="glossary"><summary>Glossary</summary><dl id="glossary"></dl></details>
   <div id="list"></div>
   <div class="footer">
@@ -88,80 +88,87 @@
 <script>
 // Glossary: [term, meaning, words that link to it].
 const GLOSSARY = [
-["World","The root entity. Its rectangle is the level bounds and its fill is the background.",["World"]],
-["Level bounds","The World's rectangle: the edge of the level. 20000 × 10000 px by default.",["level bounds","bounds"]],
-["Change value","The trigger action that sets a component value during play, from v2.",["Change value"]],
-["Attribute","One value of a component, as the Lua API names it: \"Linear damping\" is linear_damping. Scripts change it with set_attribute.",["attribute","attributes","set_attribute"]],
-["level.json","The level as text, inside the project file and in the browser's storage. A value missing from it reads as its default.",["level.json"]],
-["Description","The text shown when hovering a field's label.",["description","descriptions"]],
-["Add Component","The menu at the bottom of the Inspector that adds a component to the selected entities.",["Add Component"]],
-["Joint tool","The tool that places a joint: one click for a Hinge, two for a Rope or Spring.",["Joint tool"]],
-["Match drawn distance","The Rope and Spring setting that keeps the length equal to the gap between the two ends.",["Match drawn distance"]]
+["Trigger","A rule on an entity's TriggerComponent: When something happens, If checks pass, Do actions. No code.",["trigger","triggers"]],
+["Variable","A named value on an entity (number, string, boolean and more) that triggers and scripts read and change. Example: coins = 0.",["variable","variables"]],
+["Input","A named action on the World, such as jump on Space and W, that triggers and scripts read instead of raw keys.",["input","inputs"]],
+["Sensor","A SurfaceComponent setting: the surface notices touches but nothing bumps into it. Coins and finish zones use it.",["sensor","sensors"]],
+[".entity file","A saved selection of entities. Dragged into the level it places a copy; triggers and scripts spawn copies during play.",[".entity file",".entity files",".entity"]],
+["Spawn","Making a copy of an .entity file during play, from a trigger or a script.",["spawn","spawning","spawned"]],
+["Assets panel","The panel holding the level's files in folders: .lua and .entity files in v2, plus the builtin folder.",["Assets panel"]],
+["Console","The panel where print() lines, script errors and warnings show.",["Console"]],
+["Panels button","The Play bar button that brings the Entity inspector, the Entities viewer and the Console back during play, read-only, showing live values.",["Panels button","Panels"]],
+["Live values","The run's current values shown in the Entity inspector and the Entities viewer during play.",["live values"]],
+["Builtin player","An .entity file with the builtin platformer script (run, jump, double jump, ledge grace time, slopes). Any creator could rebuild it.",["builtin player"]],
+["End window","The window a run shows when it is won or lost: the title, the time, Restart and Leave.",["end window"]],
+["Path","A shape made of curves, drawn with the pen or the Pencil. It never collides; Convert to polygon is v3.",["path","paths"]],
+["Seed","The number all of a run's random values come from. Each run gets a new one.",["seed"]]
 ];
 
 // Groups: [title, note, cards]. A card: [id, short, detail, myView, options, pick, multi].
 // options: [[label, sub, previewHtml]]; pick: index of my pick. No options: a Yes/No card.
-const sw = (c) => '<span style="display:inline-block;width:48px;height:20px;border-radius:4px;border:1px solid #8888;vertical-align:middle;background:' + c + '"></span>';
 const GROUPS = [
-["The plan", "Stage 2 builds the eight other v1 components and level.json. The full plan, with eight places where the docs can't be built as written, is in docs/proposals/stage-2.md.", [
-["A1","Approve the stage 2 plan in docs/proposals/stage-2.md, with its eight changes.",
- "Background: the eight changes, in one line each. 1: a shape's kind and size are one stored value, so a rectangle can never hold points. 2: a stored value is a field the Inspector never shows. 3: a path stores curve handles from v1, so v2's pen never changes saved files. 4: the fill's field kind is 'fill', so the colour control never gets a value it can't read; you still see a colour field that can be emptied. 5: the StyleComponent's note ends when the entity has either a ShapeComponent or a PathComponent. 6: Level.createNew takes no registry. 7: the 256 MB limit is checked in stage 12, where the bytes are. 8: the grid size and folded rows are built now, because the file holds them.",
- "Yes: none of them changes what you see; each removes a way the data could disagree with itself, or a change saved files would need later."]
+["The test", "One sentence decides every card below: a feature stays in v2 only if this needs it.", [
+["S1","v2 is done when you can build a small platformer and play it to the end: a player you steer, coins to collect, hazards, a goal, and Win or Lose.",
+ "Background: v1's cut was \"no logic\", because the smallest player you can steer is the builtin player, a Lua script, so any logic brings Lua, the code editor and the Console. v2 is \"logic and play\" and holds 32 scope features and 12 small ones, some of them decoration that moved to v2 only because v1 was made smaller. A comment can reword the sentence.",
+ "Yes: it is the smallest game that proves logic and play work, and everything it needs is already written in the requirements."]
 ]],
-["The World", "A new level's World has a rectangle (the level bounds) and a StyleComponent whose fill is the background.", [
-["W1","Which soft light blue is a new level's background? The World's StyleComponent starts with that fill and no outline.",
- "Background: the requirement says \"a soft light blue\" and the architecture left the exact colour to stage 2. Its outline is 0 px, because the editor already draws the bounds as a thin frame. Grid lines adapt to the background, so any of these works.",
- "#BFE3F5: light enough that every default shape colour (#4A90D9 fill, #1F3552 outline) stands out on it.",
- [["#BFE3F5","Light", sw("#BFE3F5")],["#D6ECF7","Paler", sw("#D6ECF7")],["#A9D4EE","Stronger", sw("#A9D4EE")]], 0, false],
-["W2","Custom gravity's angle starts at 90°, which is down, and takes any angle, like Rotation.",
- "Background: Gravity direction is Down, Up, Left, Right or Custom, and the angle applies only with Custom. Angles are degrees clockwise on screen, with 0° pointing right, so 90° points down. Starting at 90° means picking Custom changes nothing until you type.",
- "Yes: picking Custom never flips gravity by surprise."],
-["W3","The grid size is a whole number of pixels from 5 to 1,000.",
- "Background: the grid's size is saved in the project file, 50 px by default, but has no range. Below 5 px snapping lands almost everywhere and the lines fade out at most zooms; 1,000 px is a twentieth of the default level's width.",
- "Yes: whole numbers keep snapped positions whole, and the range covers fine tiles and coarse layout."]
+["Kept in v2", "Each of these is needed by the test. Yes keeps it in v2; No moves it to v3.", [
+["K1","Keep triggers in v2: When, If, Do; the events (touched, no longer touched, collision, key or input, timer, level start, custom event, destroyed, a variable changes); \"no entity with this tag is left\"; the If checks; the actions (Change value, Spawn, Destroy, Push, Fire custom event, Wait, Win, Lose, Restart); Repeat; the Trigger tool; and their limits.",
+ "Background: scope TR1, TR2, TR3, TR6, TR7, TR8, and the Trigger tool. Small features kept with them: 32 waiting runs per trigger, and trigger names made from their When. Mouse events, while touching and left the level stay v3.",
+ "Yes: coins, hazards and a goal are each one trigger. No-code logic is a core idea of the game."],
+["K2","Keep variables and inputs in v2: variables on any entity with their types and number limits, and the World's inputs with the five a new level starts with (left, right, up, down, jump).",
+ "Background: scope VA1 and IN1, and the owner's 2026-11-16 change that variables replace the values scripts kept. Keys a level can't bind (Esc, Tab, F1 to F12, Shift+T and others) come with inputs. Keep between runs, gamepads and remapping stay v3. Five questions about variables are still open; they are the next round, not this one.",
+ "Yes: a coin count is a variable, and the player reads inputs."],
+["K3","Keep sensors noticing touches in v2.",
+ "Background: in v1 a Sensor surface is already a setting, but nothing listens to it. v2 makes it fire touched and no longer touched.",
+ "Yes: a coin and a finish zone are sensors."],
+["K4","Keep scripts in v2: the ScriptComponent, the Lua API as approved, events with on(), spawn(path), wait(2), Lua 5.4's safe parts, script errors, scripts that can't freeze the editor, and the random seed.",
+ "Background: scope LU1 and LU5, the approved Lua API, and the seed (each run gets a new one). Small feature kept: the same file listed twice on one entity runs twice. Pinning the seed stays v3.",
+ "Yes: the builtin player is a script, so the test needs scripts."],
+["K5","Keep the code editor and the Console in v2: Monaco with colours and find and replace, print(), one shape for every Console line, repeated lines shown once with a count, drafts kept every few seconds, and Clear.",
+ "Background: scope LU2 and LU6, and two small features (drafts, Clear the Console). Suggestions and hover help, filtering the Console and trigger messages stay v3.",
+ "Yes: writing or changing a script needs an editor, and a script error needs somewhere to show."],
+["K6","Keep the Assets panel in v2: folders, the builtin folder, and file paths that update themselves when a file moves or is renamed.",
+ "Background: scope AS1 and AS2. Search and sort, replacing a file, packages and My files stay v3.",
+ "Yes: .lua and .entity files must live somewhere, and a move that silently breaks every spawn is worse than no folders."],
+["K7","Keep .entity files and spawning in v2: save a selection as an .entity file, drag one in to place a copy, and spawn copies during play.",
+ "Background: scope EF1. Small features kept: an .entity file's origin (the centre of the selection by default), and a spawned entity sitting at the top of the tree, never merging into a body above it. Linked copies and placing several copies stay v3.",
+ "Yes: the builtin player is an .entity file, and hazards that shoot need spawning."],
+["K8","Keep the builtin platformer player in v2, with its script, as plain files any creator could rebuild.",
+ "Background: scope EF4. The rest of the builtin library stays v3.",
+ "Yes: it is the fastest way to test a level, and it proves a creator can build a player with what they have."],
+["K9","Keep Win and Lose in v2, with the end window (the time, Restart and Leave).",
+ "Background: scope PL2. Restart on the end window starts a fresh run, so the test can be played again without the pause menu.",
+ "Yes: ending is what makes a level a level."]
 ]],
-["The camera", "The CameraComponent's Width, Height and Smoothing have no range in the docs, and Smoothing no default.", [
-["C1","The camera's Width and Height each go from 160 to 7,680 px.",
- "Background: the default is 1920 × 1080. The v3 View size list already allows custom sizes from 160 to 7,680. Using that range now means v3 never has to narrow it, which could refuse saved levels.",
- "Yes: the one range already in the requirements."],
-["C2","What does a new camera's Smoothing start at?",
- "Background: Smoothing is roughly how long the camera takes to catch up, in seconds, and 0 locks it to the target. It goes from 0 to 5 s in all three options. The safety margin keeps the target at least 10% inside the view however soft it is.",
- "0.3 s: soft enough that a jump doesn't jerk the view, quick enough that a running player stays near the centre.",
- [["0.3 s","Soft but close"],["0.5 s","Softer, lags more"],["0 s","Locked, no smoothing"]], 0, false]
+["Moved to v3", "None of these is needed by the test. Yes moves it to v3; No keeps it in v2.", [
+["M1","Move the Bézier pen and the Pencil to v3, with the path point field type they bring.",
+ "Background: a path never collides, and Convert to polygon is already v3, so in v2 a path would be decoration only. They moved to v2 only because v1 was made smaller (2026-11-13). Paths already exist in the file format; this only moves the tools that draw them.",
+ "Yes: decoration, not logic. Shapes are enough to build a platformer."],
+["M2","Move gradients to v3.",
+ "Background: gradients add a fill field type beside the solid colour v1 has. Same reason as the pen: moved to v2 only when v1 was made smaller.",
+ "Yes: decoration. Solid colours are enough to play a level."],
+["M3","Move the searchable list of shortcuts (the ? sheet) to v3.",
+ "Background: the main menu already lists every command with its shortcut, and every icon button already has a tooltip with its name and shortcut. The sheet adds searching and staying open while you work.",
+ "Yes: the main menu already does its job."],
+["M4","Move the pause menu (Tab, with Resume and Restart on R) to v3, together with its Controls and Settings pages already there.",
+ "Background: in test play, Pause on the Play bar already pauses, Stop then Play already starts again, and the end window has Restart. The pause menu matters when someone plays outside the editor, which is the play file, v3. Its rules (Tab, no restart key outside it, a level can't hide it) stay written for v3.",
+ "Yes: everything it does in test play already has a button."],
+["M5","Move the Panels button and live values to v3, with their four small features (selecting on the game while paused, the selection carried back on Stop, a destroyed selection greyed, panels after a run ends). The Console still opens by itself on a script error during play, and keeps the run's lines after Stop.",
+ "Background: today the Panels button is also how the Console comes back during play. With it in v3, the Console shows itself on a script error (already a rule) and keeps the run's lines after Stop (already a rule), so print() and errors are still seen. What is lost until v3: reading a body's values mid-run in the Entity inspector.",
+ "Yes: Pause, Step, print() and the Console cover debugging a small platformer. Live values are the most work of the debugging set: a read-only inspector fed from the game worker."],
+["M6","Move the camera following a tag to v3.",
+ "Background: it exists because a spawned player doesn't exist in the editor, so it can't be picked as the camera's target. A builtin player dragged in from its .entity file is a plain entity in the level, so the camera follows it like any entity. Only a level that spawns its player at the start needs a tag, and a script can move the camera in v3 anyway.",
+ "Yes: the test places its player by dragging it in."]
 ]],
-["Joints", "Three gaps in the JointComponent.", [
-["J1","Joints come only from the Joint tool: the JointComponent isn't in the Add Component menu.",
- "Background: the Add Component rules list what can't be added by hand (the TransformComponent, the camera's CameraComponent, the World's components) and don't mention the JointComponent. Added by hand, a joint would have no ends and no A: it would do nothing until deleted and placed again, since re-attaching an end is v3. The menu shows it disabled, with \"Use the Joint tool to place a joint.\"",
- "Yes: a joint always has its ends where you clicked."],
-["J2","Rope and Spring share one Match drawn distance setting.",
- "Background: every setting of every joint type is stored, whatever the type, and Rope and Spring both have a setting called Match drawn distance. Two settings with one name would also give Lua two attributes called match_drawn_distance. With one, switching a Rope to a Spring in v3 keeps it, as the joints rules ask for what the two share.",
- "Yes: one name, one setting."],
-["J3","Length and Rest length are 100 px when a file leaves them out. The Joint tool always sets them from the drawn gap.",
- "Background: their default is \"as drawn\", which isn't a number, and a value missing from level.json reads as its default. Only a file edited by hand, or written before a setting existed, can leave one out. With Match drawn distance on, which is the default, the length follows the gap anyway.",
- "Yes: a plain number for a case that almost never happens."]
-]],
-["Shapes", "One rule that can't hold as written.", [
-["S1","A line drawn perfectly flat shows Height 0, and typing a height for it is refused with a status text.",
- "Background: the docs say Width and Height are at least 1 px. A line whose points are all on one row has no height, and typing a height can't spread points that are all on one row. A rectangle or ellipse is still at least 1 px each side, and a polygon has an area. Example: a 300 px floor line drawn with Shift.",
- "Yes: the line keeps exactly what was drawn. To slope it, move a point."]
-]],
-["During play", "Each field says whether Lua's set_attribute and Change value (both v2) may set it. The requirements say this for most fields, but not these.", [
-["P1","All StyleComponent values can change during play. The camera's Width and Height, Walls and Merge can't.",
- "Background: the background colour changes during play, which is the World's fill, so the fill must. Outline and opacity are only how things look, like the fill. The camera's size is the area every player sees; zoom in v3 is the way to change it. The bounds don't change during play, so Walls doesn't. Merge decides which bodies exist, which play builds once at the start.",
- "Yes: what only changes the look may change; what decides which bodies, walls or view exist doesn't."]
-]],
-["Reading a file", "The reader needs a rule for files missing the two components every entity has.", [
-["R1","An entity missing its TransformComponent or NameComponent in level.json gets the defaults. A file without exactly one World and one camera is damaged.",
- "Background: a value missing from level.json reads as its default, and a missing name already reads as \"Entity\". Every entity has a TransformComponent and a NameComponent, so leaving one out can only mean its defaults. The World and the camera can't be made up: their components and children are the level.",
- "Yes: the same rule as a missing value; only what can't be filled in makes the file damaged."]
-]],
-["Descriptions", "The text shown when hovering each label. Where the requirements have a \"What it does\" column, it is used as written.", [
-["D1","The descriptions of the new fields are these. <b>Shape</b>: Kind \"What the shape is. Set when it is drawn.\" Width \"How wide the shape is, in pixels, before scale. On a polygon or line, typing moves the points.\" Height, the same for tall. Points \"How many points it has. Double-click the shape to edit them.\" <b>Path</b>: Points \"How many points the path has. A rope or spring keeps them on its two ends.\" <b>Style</b>: Fill \"The colour inside. Empty paints nothing.\" Outline colour \"The colour of the outline.\" Outline width \"How thick the outline is, in pixels. 0 means no outline.\" Opacity \"How see-through it is. 0% is invisible.\" <b>Body</b>: Type \"Static stays put, Dynamic falls and gets pushed, Kinematic moves only when told to.\" Merge \"Inside a group with a body, joins that body. Untick to move by its own.\" Mass \"In kg, from the shapes' size and density. You set density, never mass.\" <b>Camera</b>: Width, Height \"How wide (tall) an area players see, in pixels.\" Follow \"The entity the camera follows during play.\" Smoothing \"Roughly how long the camera takes to catch up, in seconds. 0 locks it on.\" <b>World</b>: Gravity strength \"How hard gravity pulls, in m/s². Earth is 9.8.\" Gravity direction \"Which way things fall.\" Gravity angle \"Which way things fall, in degrees clockwise from the right. 90° is down.\" Walls \"Makes the four edges of the level bounds walls. Off, entities leave through them and are removed.\" <b>Joint</b>: Type \"Hinge turns around one point, Rope keeps a longest distance, Spring pulls back to a rest length.\" A \"The first entity it connects.\" B \"The second entity. Empty pins A to the background.\" Motor speed \"The speed the motor aims for, in °/s.\" Rest length \"The length the spring pulls back to.\" The rest come from the requirements' tables.",
- "Background: round 9 approved the TransformComponent's and the name's. The Body, Surface and Joint rules have a \"What it does\" column for most fields, used word for word: Gravity scale, Linear damping, Fixed rotation, Density, Friction, Stiffness and the others. A comment can rewrite any of them.",
- "Yes: short, plain, and each says its unit or its limit."]
+["Your call", "One pair I don't have a strong view on.", [
+["T1","The Text tool, and entities inside the camera staying fixed on the screen: v2 or v3?",
+ "Background: both exist for one reason, a score or a timer on the screen. The Text tool also brings fonts and sharp text at every zoom; entities inside the camera bring screen positions, a warning on physics and joint cards, and drawing above the level. Win and Lose work without either, but a coin game with no visible count feels unfinished. Text alone, without the camera rule, can only label things in the level.",
+ "Slightly towards v3 for both: the test can be played to the end without a number on screen, and the two are the largest drawing work left in v2. But a visible count is the most natural first thing a creator adds, so keeping both is reasonable too.",
+ [["Both v3","Win and Lose are enough"],["Both v2","A visible score is part of the test"],["Text v2, camera v3","Labels in the level only"]], 0, false]
 ]]
 ];
-const KEY = "engine-v3-review-10";
+const KEY = "engine-v3-review-11";
 let answers = {};
 try { answers = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { answers = {}; }
 function persist() { try { localStorage.setItem(KEY, JSON.stringify(answers)); } catch (e) {} }
@@ -364,7 +371,7 @@ function buildText() {
     }
     if (groupLines.length) lines.push("## " + group, ...groupLines, "");
   }
-  const head = ["Review answers, round 10", "Answered " + (total - open.length) + " of " + total, ""];
+  const head = ["Review answers, round 11: v2 scope", "Answered " + (total - open.length) + " of " + total, ""];
   const tail = open.length ? ["Unanswered: " + open.join(", ")] : ["All questions answered."];
   return head.concat(lines, tail).join("\n");
 }
