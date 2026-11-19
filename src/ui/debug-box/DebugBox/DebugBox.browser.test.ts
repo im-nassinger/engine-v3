@@ -120,7 +120,7 @@ describe('DebugBox', () => {
         await expect.poll(() => valueOf('ZOOM')).toBe('250%');
     });
 
-    test('typing a grid size and Enter sets it as one undo step', async () => {
+    test('typing a grid size and Enter sets it, with no undo step', async () => {
         const { session } = showWithEditor(Level.createNew(), createElement(DebugBox));
         await expect.poll(() => valueOf('GRID')).toBe('50');
 
@@ -128,7 +128,7 @@ describe('DebugBox', () => {
 
         await expect.poll(() => session.openLevel.level.editorData.gridSize).toBe(25);
         expect(valueOf('GRID')).toBe('25');
-        expect(session.openLevel.history.undoLabel).toBe('Change grid size');
+        expect(session.openLevel.history.undoCount).toBe(0);
         expect(document.activeElement).not.toBe(valueBox('GRID'));
     });
 

@@ -6,7 +6,7 @@ const MIN_GRID_SIZE = 5;
 const MAX_GRID_SIZE = 1000;
 
 // What only the editor reads, saved in level.json's `editor`: the grid size and the folded Entities panel
-// rows. Folding is never an undo step; changing the grid size is, through the editor's command.
+// rows. Neither folding nor changing the grid size is an undo step (owner, 2026-11-19).
 export class LevelEditorData {
     static readonly minGridSize = MIN_GRID_SIZE;
     static readonly maxGridSize = MAX_GRID_SIZE;

@@ -5,7 +5,6 @@ export {
     RemoveComponentChange,
     RemoveEntitiesChange,
     RenameLevelChange,
-    SetGridSizeChange,
     SetSwitchChange,
     SetValueChange,
 } from './changes/index.ts';

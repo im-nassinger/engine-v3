@@ -49,7 +49,7 @@ function gridSizeText(level: Level) {
     return String(level.editorData.gridSize);
 }
 
-// One undo step; a refusal, such as text that isn't a number, says why in the message pill.
+// Never an undo step; a refusal, such as text that isn't a number, says why in the message pill.
 function typedGridSize(session: EditorSession, text: string) {
     const outcome = setGridSize(session.openLevel, text);
     if (outcome.kind === 'refused') {

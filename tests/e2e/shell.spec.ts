@@ -57,7 +57,9 @@ test('the debug box shows the mouse position over the level view, and nothing on
     await expect(mouseY).toHaveText('');
 });
 
-test('the grid size and the zoom are typed in the debug box, and Ctrl+Z puts the grid size back', async ({ page }) => {
+test('the grid size and the zoom are typed in the debug box, and Ctrl+Z leaves the grid size alone', async ({
+    page,
+}) => {
     await openEditor(page);
     const grid = page.getByRole('textbox', { name: 'GRID' });
     const zoom = page.getByRole('textbox', { name: 'ZOOM' });
@@ -75,9 +77,10 @@ test('the grid size and the zoom are typed in the debug box, and Ctrl+Z puts the
     await page.keyboard.press('Enter');
     await expect(zoom).toHaveValue('200%');
 
-    // Enter gave the keyboard back to the level view, so Ctrl+Z undoes.
+    // Enter gave the keyboard back to the level view; changing the grid size is not an undo step.
     await page.keyboard.press('ControlOrMeta+z');
-    await expect(grid).toHaveValue('50');
+    await expect(page.locator('.message-pill .message')).toHaveText('Nothing to undo');
+    await expect(grid).toHaveValue('25');
 });
 
 test('the tool column shows Select as the active tool', async ({ page }) => {

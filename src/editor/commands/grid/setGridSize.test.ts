@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
-import { buildCommandTestSession, expectRoundTrip } from '../testing/commandTestSession.ts';
+import { buildCommandTestSession } from '../testing/commandTestSession.ts';
 
 import { GRID_SIZE_NOT_A_NUMBER, setGridSize } from './setGridSize.ts';
 
@@ -12,16 +12,15 @@ function buildSession() {
 }
 
 describe('setGridSize', () => {
-    test('sets the grid size as one undo step, passing the run, undo, redo round trip', () => {
+    test('sets the grid size, which is never an undo step', () => {
         const { session } = buildSession();
         const editorData = session.openLevel.level.editorData;
 
-        const trip = expectRoundTrip(session, () => setGridSize(session.openLevel, ' 25 '));
+        const outcome = setGridSize(session.openLevel, ' 25 ');
 
-        expect(trip.afterUndo).toEqual(trip.before);
-        expect(trip.afterRedo).toEqual(trip.after);
+        expect(outcome).toEqual({ kind: 'done' });
         expect(editorData.gridSize).toBe(25);
-        expect(session.openLevel.history.undoLabel).toBe('Change grid size');
+        expect(session.openLevel.history.undoCount).toBe(0);
     });
 
     test('takes a px after the number, rounds a decimal and keeps a size inside 5 to 1,000', () => {
