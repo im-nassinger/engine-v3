@@ -322,6 +322,8 @@ export class LevelDisplay {
         node.destroy();
         this.nodes.delete(entity);
         this.staleDrawings.delete(entity);
+        // Play can place a body and remove it before the next render, as when it falls past the level bounds.
+        this.placedSinceRender.delete(entity);
     }
 
     private handleComponentChange(entity: Entity, component: AnyComponent) {

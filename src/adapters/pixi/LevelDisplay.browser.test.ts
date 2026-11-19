@@ -5,9 +5,11 @@ import { PathComponent, ShapeComponent, StyleComponent, TransformComponent } fro
 import { BoundsCache, PiecesCache, WorldMatrixCache } from '../../core/derived/index.ts';
 import type { Entity } from '../../core/level/index.ts';
 import { Level } from '../../core/level/index.ts';
-import { Bounds } from '../../core/geometry/index.ts';
+import { Bounds, Matrix2D } from '../../core/geometry/index.ts';
 import type { ShapeGeometry } from '../../core/geometry/index.ts';
 import { LevelDisplay } from './LevelDisplay.ts';
+import type { PlayBodies } from './LevelDisplay.ts';
+import { Signal } from '../../core/events/index.ts';
 
 const cleanups: (() => void)[] = [];
 
@@ -121,6 +123,27 @@ describe('LevelDisplay', () => {
         level.removeEntity(firstGroup);
         expectNodesLikeTree(display, level);
         expect(display.nodeOf(firstGroup)).toBeUndefined();
+    });
+
+    test('a body play places and then removes before the next render is not placed', () => {
+        const level = Level.createNew();
+        const ball = addShape(level, level.world, SQUARE);
+        const placed = new Signal<Entity>();
+        const playBodies: PlayBodies = { matrixOf: () => Matrix2D.identity(), placed };
+        const worldMatrices = new WorldMatrixCache(level);
+        const display = new LevelDisplay({
+            level,
+            caches: { pieces: new PiecesCache(level), bounds: new BoundsCache(level, worldMatrices), worldMatrices },
+            playBodies,
+            options: { showUnstyled: true },
+            onChange: () => undefined,
+        });
+        cleanups.push(() => display.dispose());
+
+        placed.emit(ball);
+        level.removeEntity(ball);
+
+        expect(() => display.prepare()).not.toThrow();
     });
 
     test('a World with hundreds of children keeps them like the tree across its render chunks', () => {
