@@ -69,7 +69,7 @@
 <body>
 <header>
   <div class="bar">
-    <h1>Review, round 11: v2's scope</h1>
+    <h1>Review, round 12: small versions</h1>
     <span class="progress" id="progress"></span>
     <label class="filter"><input type="checkbox" id="onlyOpen"> Unanswered only</label>
     <button class="copy" id="copyTop">Copy answers</button>
@@ -77,7 +77,7 @@
   <div class="pbar"><i id="pfill"></i></div>
 </header>
 <main>
-  <p class="intro"><b>What v2 holds, before anything of it is designed or built</b> (2026-11-19). v1 was cut to "the smallest thing that can be tested"; v2 never had that pass. This round does it: one test for v2, then each feature kept in v2 or moved to v3. <b>Yes</b> means you agree with the card as written; <b>No</b> means the opposite (keep what the card moves, or move what it keeps). <b>More</b> shows the background. Answers stay in this browser; press <b>Copy answers</b> and paste them into the chat. What you settle is then written into scope.md and each topic's version headings.</p>
+  <p class="intro"><b>The versions after v1, cut small</b> (2026-11-20). Round 11 cut v2 with one big test and pulled almost everything in; you asked for more versions with smaller steps instead. This round replaces it: the rule, then one card per version from v2 to v7, then what waits in Later. <b>Yes</b> means you agree with the card as written; <b>No</b> means the opposite. <b>More</b> shows the background. Answers stay in this browser; press <b>Copy answers</b> and paste them into the chat. What you settle is then written into scope.md and each feature's version heading.</p>
   <details class="glossary"><summary>Glossary</summary><dl id="glossary"></dl></details>
   <div id="list"></div>
   <div class="footer">
@@ -96,6 +96,8 @@ const GLOSSARY = [
 ["Spawn","Making a copy of an .entity file during play, from a trigger or a script.",["spawn","spawning","spawned"]],
 ["Assets panel","The panel holding the level's files in folders: .lua and .entity files in v2, plus the builtin folder.",["Assets panel"]],
 ["Console","The panel where print() lines, script errors and warnings show.",["Console"]],
+["Tag","A text label on an entity, such as player or coin, that triggers and scripts look for.",["tag","tags"]],
+["Later","Not in a planned version yet. Its rules can already be written.",["Later"]],
 ["Panels button","The Play bar button that brings the Entity inspector, the Entities viewer and the Console back during play, read-only, showing live values.",["Panels button","Panels"]],
 ["Live values","The run's current values shown in the Entity inspector and the Entities viewer during play.",["live values"]],
 ["Builtin player","An .entity file with the builtin platformer script (run, jump, double jump, ledge grace time, slopes). Any creator could rebuild it.",["builtin player"]],
@@ -107,68 +109,54 @@ const GLOSSARY = [
 // Groups: [title, note, cards]. A card: [id, short, detail, myView, options, pick, multi].
 // options: [[label, sub, previewHtml]]; pick: index of my pick. No options: a Yes/No card.
 const GROUPS = [
-["The test", "One sentence decides every card below: a feature stays in v2 only if this needs it.", [
-["S1","v2 is done when you can build a small platformer and play it to the end: a player you steer, coins to collect, hazards, a goal, and Win or Lose.",
- "Background: v1's cut was \"no logic\", because the smallest player you can steer is the builtin player, a Lua script, so any logic brings Lua, the code editor and the Console. v2 is \"logic and play\" and holds 32 scope features and 12 small ones, some of them decoration that moved to v2 only because v1 was made smaller. A comment can reword the sentence.",
- "Yes: it is the smallest game that proves logic and play work, and everything it needs is already written in the requirements."]
+["How versions work", "You asked for more versions with smaller steps (2026-11-20). These two cards set the rule.", [
+["P1","After v1, each version adds one thing you can try at once, with the most value for the least work first. Only the next few versions are planned; everything else waits.",
+ "Background: round 11 tried one test for all of v2, \"a small platformer played to the end\". That test pulled in Lua, the code editor, the Console, the Assets panel and .entity files, because the builtin player is a script. Small versions avoid that: each has its own test, and each is designed, built and played before the next is planned in detail.",
+ "Yes: you see the game grow every few days, and a version that turns out wrong costs little."],
+["P2","What happens to features that are in no planned version yet: today's v3 (polish), v4 (accounts and publishing) and Later?",
+ "Background: today every feature has v1, v2, v3, v4 or Later. With small versions, v3 and v4 would mean something different from what the docs say now. Their rules stay written either way; only the version mark changes.",
+ "Mark them all Later, and give a feature a version number only when it joins a planned version. Accounts and publishing stay the last thing in Later, as now.",
+ [["All become Later","Later means \"not in a planned version yet\". The docs only number what is planned"],["Keep v3 and v4 as names","Renumber them after the small versions, such as v8 and v9, and keep their contents together"]], 0, false]
 ]],
-["Kept in v2", "Each of these is needed by the test. Yes keeps it in v2; No moves it to v3.", [
-["K1","Keep triggers in v2: When, If, Do; the events (touched, no longer touched, collision, key or input, timer, level start, custom event, destroyed, a variable changes); \"no entity with this tag is left\"; the If checks; the actions (Change value, Spawn, Destroy, Push, Fire custom event, Wait, Win, Lose, Restart); Repeat; the Trigger tool; and their limits.",
- "Background: scope TR1, TR2, TR3, TR6, TR7, TR8, and the Trigger tool. Small features kept with them: 32 waiting runs per trigger, and trigger names made from their When. Mouse events, while touching and left the level stay v3.",
- "Yes: coins, hazards and a goal are each one trigger. No-code logic is a core idea of the game."],
-["K2","Keep variables and inputs in v2: variables on any entity with their types and number limits, and the World's inputs with the five a new level starts with (left, right, up, down, jump).",
- "Background: scope VA1 and IN1, and the owner's 2026-11-16 change that variables replace the values scripts kept. Keys a level can't bind (Esc, Tab, F1 to F12, Shift+T and others) come with inputs. Keep between runs, gamepads and remapping stay v3. Five questions about variables are still open; they are the next round, not this one.",
- "Yes: a coin count is a variable, and the player reads inputs."],
-["K3","Keep sensors noticing touches in v2.",
- "Background: in v1 a Sensor surface is already a setting, but nothing listens to it. v2 makes it fire touched and no longer touched.",
- "Yes: a coin and a finish zone are sensors."],
-["K4","Keep scripts in v2: the ScriptComponent, the Lua API as approved, events with on(), spawn(path), wait(2), Lua 5.4's safe parts, script errors, scripts that can't freeze the editor, and the random seed.",
- "Background: scope LU1 and LU5, the approved Lua API, and the seed (each run gets a new one). Small feature kept: the same file listed twice on one entity runs twice. Pinning the seed stays v3.",
- "Yes: the builtin player is a script, so the test needs scripts."],
-["K5","Keep the code editor and the Console in v2: Monaco with colours and find and replace, print(), one shape for every Console line, repeated lines shown once with a count, drafts kept every few seconds, and Clear.",
- "Background: scope LU2 and LU6, and two small features (drafts, Clear the Console). Suggestions and hover help, filtering the Console and trigger messages stay v3.",
- "Yes: writing or changing a script needs an editor, and a script error needs somewhere to show."],
-["K6","Keep the Assets panel in v2: folders, the builtin folder, and file paths that update themselves when a file moves or is renamed.",
- "Background: scope AS1 and AS2. Search and sort, replacing a file, packages and My files stay v3.",
- "Yes: .lua and .entity files must live somewhere, and a move that silently breaks every spawn is worse than no folders."],
-["K7","Keep .entity files and spawning in v2: save a selection as an .entity file, drag one in to place a copy, and spawn copies during play.",
- "Background: scope EF1. Small features kept: an .entity file's origin (the centre of the selection by default), and a spawned entity sitting at the top of the tree, never merging into a body above it. Linked copies and placing several copies stay v3.",
- "Yes: the builtin player is an .entity file, and hazards that shoot need spawning."],
-["K8","Keep the builtin platformer player in v2, with its script, as plain files any creator could rebuild.",
- "Background: scope EF4. The rest of the builtin library stays v3.",
- "Yes: it is the fastest way to test a level, and it proves a creator can build a player with what they have."],
-["K9","Keep Win and Lose in v2, with the end window (the time, Restart and Leave).",
- "Background: scope PL2. Restart on the end window starts a fresh run, so the test can be played again without the pause menu.",
- "Yes: ending is what makes a level a level."]
+["The next versions", "Each card is one version: what it adds and how you test it. Yes takes it as written; No or a comment changes it.", [
+["V2","v2: the Bézier pen and the Pencil, with the path point field type they bring. Test: draw curvy art beside your shapes.",
+ "Background: your answer to round 11's M1: not hard, and a lot of value. A path never collides until Convert to polygon, so in v2 paths are art. Paths already exist in the file format.",
+ "Yes: it is drawing, which v1 already has the tools and panels for, so nothing else has to come with it."],
+["V3","v3: the first triggers. Sensors noticing touches, tags, the TriggerComponent (When, If, Do) with the events touched, no longer touched, key or input, timer, level start and \"no entity with this tag is left\"; the If checks \"other has a tag\" and \"a variable compared with a number\"; the actions Change value, Destroy, Push, Win, Lose and Restart; Repeat; the Trigger tool; number variables on the World; the World's inputs with left, right, up, down and jump; and Win and Lose with the end window. Test: steer a ball with the arrow keys, collect every coin, avoid spikes, reach the goal.",
+ "Background: \"When right is held, Push\" already steers a body, so a whole small game needs no code. Small features with it: trigger names, keys that can't be bound. Left for v4: collision, custom events, destroyed, a variable changes, Fire custom event, Wait, Spawn, comparing a component value, other variable types and variables on other entities. Warnings that would go to the Console show in the message pill until the Console exists.",
+ "Yes: the smallest set that makes a level a game you can win or lose."],
+["V4","v4: the rest of the triggers. The events collision, custom event, destroyed and a variable changes; Fire custom event and Wait, with the limit of 32 waiting runs; comparing a component value; flipping a boolean; string and boolean variables; and variables on any entity. Test: a button that opens a door 2 seconds later, and a light switch.",
+ "Background: everything here builds on v3's triggers without anything new around them. Spawn waits for .entity files (v7). The variable types that only scripts need (entity, asset, colour, vector, angle, tags) come with scripts in v5.",
+ "Yes: cheap once v3 works, and it covers doors, switches and timed hazards."],
+["V5","v5: scripts. The ScriptComponent with its variables warning, the Lua API as approved, on(), wait(2), Lua 5.4's safe parts, the random seed, the Monaco code editor, the Console with print() and script errors, and the Assets panel with folders to hold .lua files. Test: write a jumping player in Lua.",
+ "Background: the biggest version, since a script needs a place to live, an editor and somewhere to show errors. Small features with it: drafts, Clear the Console, the same file listed twice runs twice. The builtin folder comes with the builtin files in v7.",
+ "Yes: it can't be split much further, because each part is useless without the others."],
+["V6","v6: text on screen. The Text tool, and entities inside the camera staying fixed on the screen. Test: a coin count in the corner, updated by a short script.",
+ "Background: showing a variable needs a script (automatic text such as Coins: {coins} was rejected for the builtin Show Variable script), so text comes after scripts. Before v6, a level can still label things with shapes.",
+ "Yes: a visible score is the first thing a creator adds once logic works."],
+["V7","v7: reuse. .entity files: save a selection as one, drag it in to place a copy, Spawn in triggers and spawn() in scripts; the builtin folder; and the builtin platformer player. Test: drag in a ready-made player, and a cannon that spawns balls.",
+ "Background: your round 11 comments on K7 and K8 asked for these later. The builtin player is a script and an .entity file, so it comes with both. Small features with it: an .entity file's origin, where a spawned entity sits.",
+ "Yes: by then everything the builtin player needs exists."]
 ]],
-["Moved to v3", "None of these is needed by the test. Yes moves it to v3; No keeps it in v2.", [
-["M1","Move the Bézier pen and the Pencil to v3, with the path point field type they bring.",
- "Background: a path never collides, and Convert to polygon is already v3, so in v2 a path would be decoration only. They moved to v2 only because v1 was made smaller (2026-11-13). Paths already exist in the file format; this only moves the tools that draw them.",
- "Yes: decoration, not logic. Shapes are enough to build a platformer."],
-["M2","Move gradients to v3.",
- "Background: gradients add a fill field type beside the solid colour v1 has. Same reason as the pen: moved to v2 only when v1 was made smaller.",
- "Yes: decoration. Solid colours are enough to play a level."],
-["M3","Move the searchable list of shortcuts (the ? sheet) to v3.",
- "Background: the main menu already lists every command with its shortcut, and every icon button already has a tooltip with its name and shortcut. The sheet adds searching and staying open while you work.",
+["In no planned version", "Today these are v2, but none of v2 to v7 needs them. Yes marks them Later; No puts them in a version (say which in a comment).", [
+["L1","Gradients.",
+ "Background: a fill field type beside the solid colour. Moved to v2 only when v1 was made smaller.",
+ "Yes: decoration, and solid colours work."],
+["L2","The searchable list of shortcuts (the ? sheet).",
+ "Background: the main menu already lists every command with its shortcut, and every icon button's tooltip shows its shortcut.",
  "Yes: the main menu already does its job."],
-["M4","Move the pause menu (Tab, with Resume and Restart on R) to v3, together with its Controls and Settings pages already there.",
- "Background: in test play, Pause on the Play bar already pauses, Stop then Play already starts again, and the end window has Restart. The pause menu matters when someone plays outside the editor, which is the play file, v3. Its rules (Tab, no restart key outside it, a level can't hide it) stay written for v3.",
+["L3","The pause menu on Tab, with Resume and Restart, and its Controls and Settings pages.",
+ "Background: in test play, Pause on the Play bar pauses, Stop then Play starts again, and the end window has Restart. The pause menu matters when someone plays outside the editor, which is the play file, already Later.",
  "Yes: everything it does in test play already has a button."],
-["M5","Move the Panels button and live values to v3, with their four small features (selecting on the game while paused, the selection carried back on Stop, a destroyed selection greyed, panels after a run ends). The Console still opens by itself on a script error during play, and keeps the run's lines after Stop.",
- "Background: today the Panels button is also how the Console comes back during play. With it in v3, the Console shows itself on a script error (already a rule) and keeps the run's lines after Stop (already a rule), so print() and errors are still seen. What is lost until v3: reading a body's values mid-run in the Entity inspector.",
- "Yes: Pause, Step, print() and the Console cover debugging a small platformer. Live values are the most work of the debugging set: a read-only inspector fed from the game worker."],
-["M6","Move the camera following a tag to v3.",
- "Background: it exists because a spawned player doesn't exist in the editor, so it can't be picked as the camera's target. A builtin player dragged in from its .entity file is a plain entity in the level, so the camera follows it like any entity. Only a level that spawns its player at the start needs a tag, and a script can move the camera in v3 anyway.",
- "Yes: the test places its player by dragging it in."]
-]],
-["Your call", "One pair I don't have a strong view on.", [
-["T1","The Text tool, and entities inside the camera staying fixed on the screen: v2 or v3?",
- "Background: both exist for one reason, a score or a timer on the screen. The Text tool also brings fonts and sharp text at every zoom; entities inside the camera bring screen positions, a warning on physics and joint cards, and drawing above the level. Win and Lose work without either, but a coin game with no visible count feels unfinished. Text alone, without the camera rule, can only label things in the level.",
- "Slightly towards v3 for both: the test can be played to the end without a number on screen, and the two are the largest drawing work left in v2. But a visible count is the most natural first thing a creator adds, so keeping both is reasonable too.",
- [["Both v3","Win and Lose are enough"],["Both v2","A visible score is part of the test"],["Text v2, camera v3","Labels in the level only"]], 0, false]
+["L4","The Panels button and live values, with their four small features (selecting on the game while paused, the selection carried back on Stop, a destroyed selection greyed, panels after a run ends).",
+ "Background: from v5 the Console opens by itself on a script error and keeps the run's lines after Stop, so print() and errors are still seen. Lost until then: reading a body's values mid-run.",
+ "Yes: the most work of the debugging set, and Pause, Step and print() cover a small game."],
+["L5","The camera following a tag.",
+ "Background: it is for a player spawned at the start, which can't be picked in the editor. A player dragged in from an .entity file is an ordinary entity the camera can follow.",
+ "Yes: no version up to v7 needs it."]
 ]]
 ];
-const KEY = "engine-v3-review-11";
+const KEY = "engine-v3-review-12";
 let answers = {};
 try { answers = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { answers = {}; }
 function persist() { try { localStorage.setItem(KEY, JSON.stringify(answers)); } catch (e) {} }
@@ -371,7 +359,7 @@ function buildText() {
     }
     if (groupLines.length) lines.push("## " + group, ...groupLines, "");
   }
-  const head = ["Review answers, round 11: v2 scope", "Answered " + (total - open.length) + " of " + total, ""];
+  const head = ["Review answers, round 12: small versions", "Answered " + (total - open.length) + " of " + total, ""];
   const tail = open.length ? ["Unanswered: " + open.join(", ")] : ["All questions answered."];
   return head.concat(lines, tail).join("\n");
 }
