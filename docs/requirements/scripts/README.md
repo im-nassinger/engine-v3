@@ -25,6 +25,7 @@ Code for what triggers can't do. **Nothing here is in v1.** **In v2** an entity'
 | The Monaco code editor | v2 | code-editor-and-console |
 | Console lines, repeated lines with a count | v2 | code-editor-and-console |
 | Debugging: live values, `print()`, Pause and Step | v2 | code-editor-and-console |
+| Switching a script off, from its checkbox or a trigger | v3 | scripts |
 | Hints in script errors | v3 | scripts |
 | Suggestions and hover help | v3 | code-editor-and-console |
 | Script help and tutorial levels | v3 | code-editor-and-console |

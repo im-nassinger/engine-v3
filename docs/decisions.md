@@ -272,6 +272,10 @@ That led to a bigger change. A script used to keep its own values on the ScriptC
 
 This replaces round 10's SC1 ("script settings"), widens the owner's three variable types (2026-11-14), and partly brings back "a table shared by an entity's scripts", rejected on 2026-11-13: an entity's scripts now share its variables. The new reason is one concept for named values, which triggers can use too. Written in [variables](requirements/triggers/variables-and-inputs.md), [scripts.md](requirements/scripts/scripts.md), [lua-api.md](requirements/scripts/lua-api.md), [lua-examples.md](requirements/scripts/lua-examples.md), the [glossary](glossary.md) and [scope.md](scope.md). What is still open is in [progress.md](progress.md#open-questions-for-the-owner).
 
+## 2026-11-20: Convert a trigger into a script
+
+Triggers have no branches or loops on purpose, so the owner asked for a way out: **Convert to script (v3)** replaces a trigger with a `.lua` file that does the same. Triggers that switched it on or off keep working, because a script gets an on/off checkbox that Change value can flip. This brings back "view this trigger as Lua", left out with no reason, in another shape. Written in [triggers.md](requirements/triggers/triggers.md#convert-to-script--v3), [scripts.md](requirements/scripts/scripts.md#switching-a-script-off--v3) and [scope.md](scope.md).
+
 ## Still to decide
 
 Under the standing yes, new questions are decided and listed above instead of asked. The open points of 2026-11-16's variables change wait for the owner: see [progress.md](progress.md#open-questions-for-the-owner).

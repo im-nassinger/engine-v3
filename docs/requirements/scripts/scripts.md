@@ -139,6 +139,15 @@ Source: round 9: 10 2.11; round 10: LP1; old: LU-88; owner: 2026-11-13
 
 Source: round 3: D68; round 9: 10 2.12; round 10: 11 2.9, UI1; old: LU-95 to LU-97; owner: 2026-11-13
 
+### Switching a script off · v3
+
+- **Each file in the ScriptComponent's list has an on/off checkbox.** A script that is off listens for no events.
+- **The checkbox is a value like any other**, so a trigger switches a script on or off with Change value, the same way it switches another trigger.
+- Switching a script off cancels its waits, like switching a trigger off.
+- *Why: a trigger converted into a script keeps every link that switched it on or off (owner: 2026-11-20). See [Convert to script](../triggers/triggers.md#convert-to-script--v3).*
+
+Source: owner: 2026-11-14; owner: 2026-11-20
+
 ### Hints in script errors · v3
 
 - Common mistakes get a plain hint. Example: "attempt to call a nil value" also says "Did you mean `get_entity_by_name`?".
@@ -154,6 +163,5 @@ Small features from the old draft and review that the scope review never asked a
 |---|---|---|
 | More ways to wait | Waiting a number of ticks, waiting until something is true, running a function later or every N seconds | v3 |
 | Running a script once more for each list entry | The same file listed twice on one entity runs twice. Both copies share the entity's variables | v2 |
-| Switching a script off | A checkbox on each file in the list | v3 |
 
 Source: old: LU-05 to LU-12, LU-43 to LU-49, LU-51 to LU-56; owner: 2026-11-14

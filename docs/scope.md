@@ -43,6 +43,7 @@ These versions were decided during the requirements review, or by the owner afte
 | Variables on any entity, number limits, and a warning on the ScriptComponent's card that adds the variables a script needs | v2 | They replace the values scripts kept on the ScriptComponent, which were v2 (owner: 2026-11-16) |
 | Flip a boolean variable in a trigger | v2 | A light switch is then one trigger (owner: 2026-11-14) |
 | Sensors noticing touches, the random seed | v2 | Only triggers and scripts use them (owner: 2026-11-13) |
+| Convert a trigger into a script, and switching a script off with a checkbox that triggers can change | v3 | A way out when a trigger needs branches or loops; links that switched the trigger switch the script (owner: 2026-11-20) |
 | Weld, Rod, Slider and Wheel joints | v3 | Merging shapes into one body already glues them, and Rod is Rope that can't go slack |
 | The EffectsComponent: pixelate, shadow, blur | v3 | Each effect needs a shader pass per entity |
 | Accounts and publishing | v4 | Planned as the version after polish (owner: 2026-11-13) |

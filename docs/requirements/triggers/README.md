@@ -29,5 +29,6 @@ Logic without code. **Nothing here is in v1.** **In v2** an entity's TriggerComp
 | "While touching" and "left the level" | v3 | triggers |
 | Play sound, Stop sound, Camera shake | v3 | triggers |
 | Arrows to what a trigger affects | v3 | triggers |
+| Convert to script | v3 | triggers |
 | Keep between runs | v3 | variables-and-inputs |
 | Gamepads, remapping, the mouse for scripts | v3 | variables-and-inputs |

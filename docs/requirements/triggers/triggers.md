@@ -185,6 +185,19 @@ Source: scope LU8; round 10: TL1, TL2
 
 Source: owner: 2026-11-13
 
+## When a trigger isn't enough
+
+### Convert to script · v3
+
+- **Each trigger's `…` menu has Convert to script.** It makes a new `.lua` file in the Assets panel that does what the trigger did, named after the trigger, and adds it to the entity's ScriptComponent, adding the component if there is none. The trigger is removed. Example: "When touched, Do: Change value coins + 1, Destroy this" becomes a script with `on("touched", ...)` that adds to `coins` and destroys `this`.
+- **Triggers that switched it on or off with Change value now switch the script instead**, through the script's own on/off checkbox (see [scripts](../scripts/scripts.md#switching-a-script-off--v3)). A trigger that was off becomes a script that is off.
+- The new file is ordinary readable Lua, to edit like any other script.
+- **It is one Undo step, and Undo is the only way back.** There is no converting a script into a trigger.
+- Every event, If check and action a trigger has must have a Lua equivalent, so every trigger can be converted.
+- *Why: triggers have no branches, loops or random choice on purpose. When a trigger needs one, this is the way out without rewriting it in Lua by hand (owner: 2026-11-20).*
+
+Source: owner: 2026-11-20
+
 ## Small features
 
 Small features from the old draft and review that the scope review never asked about. The owner gave each its version in round 7 of the architecture review.
