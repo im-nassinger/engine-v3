@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>v2 Drawing Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* The page around the moments. The editor's tokens are the redesign's (tokens.md). */
+  :root {
+    --page: #0b0c0e; --page-2: #17181c; --page-text: #d4d7dd; --page-muted: #80858f;
+    --app: #0d0f13; --panel: rgb(24, 27, 33); --raised: rgba(255,255,255,.04); --field: rgba(255,255,255,.055); --hover: rgba(255,255,255,.065);
+    --text: #e4e8ef; --muted: #8b93a1; --faint: #586070; --accent: #4f8cff; --soft: rgba(79,140,255,.2); --on: #fff; --ink: #8fb5ff;
+    --tooltip: #0b0d10; --r: 8px; --rl: 14px; --rowh: 30px; --inset: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--page); color: var(--page-text); font: 12px/1.4 "JetBrains Mono", ui-monospace, monospace; }
+  .hdr { padding: 16px 16px 6px; max-width: 980px; margin: 0 auto; }
+  .hdr h1 { font-size: 16px; margin: 0 0 6px; font-weight: 600; }
+  .hdr p { margin: 0; color: var(--page-muted); line-height: 1.55; }
+  .moment { max-width: 980px; margin: 18px auto 30px; padding: 0 10px; }
+  .moment h2 { font-size: 14px; font-weight: 600; margin: 0 0 4px; }
+  .moment > p { margin: 0 0 10px; color: var(--page-muted); line-height: 1.55; }
+  .ed { position: relative; width: 960px; height: 600px; overflow: hidden; border-radius: 10px; color: var(--text); background: var(--app); }
+  .ed > svg.view { position: absolute; inset: 0; display: block; }
+  svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+  .shade { box-shadow: 0 2px 5px rgba(0,0,0,.3); }
+  .isl { position: absolute; background: var(--panel); border-radius: var(--rl); }
+
+  /* ☰ and the tool column */
+  .burger { left: 10px; top: 10px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; }
+  .toolcol { left: 10px; top: 68px; width: 48px; padding: 7px 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .tool { width: 34px; height: 34px; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: var(--muted); position: relative; }
+  .tool.on { background: var(--soft); color: var(--ink); }
+  .burger .tool { color: var(--muted); }
+
+  /* A kinds menu standing beside its tool */
+  .menu { position: absolute; background: var(--panel); border-radius: 12px; padding: 6px; min-width: 170px; }
+  .menu.kinds::before { content: ""; position: absolute; left: -6px; top: calc(50% - 7px); border: 7px solid transparent; border-left: 0; border-right-color: var(--panel); }
+  .mt { height: 24px; display: flex; align-items: center; padding: 0 10px; font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .mi { height: 28px; display: flex; align-items: center; gap: 12px; padding: 0 10px; border-radius: var(--r); }
+  .mi svg.i { color: var(--muted); }
+  .mi.on { background: var(--soft); color: var(--ink); }
+  .mi.on svg.i { color: var(--ink); }
+
+  /* The Entity inspector */
+  .insp { left: 68px; top: 10px; width: 300px; padding-bottom: 6px; }
+  .ihead { height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); }
+  .ihead .kind { color: var(--muted); display: flex; }
+  .ihead .nm { flex: 1; height: 28px; display: flex; align-items: center; padding: 0 12px; border-radius: 999px; background: var(--field); font-weight: 500; }
+  .ihead .eye { color: var(--muted); display: flex; }
+  .chead { height: 32px; display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); }
+  .chead .t { flex: 1; font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .chead svg.i { width: 14px; height: 14px; color: var(--faint); }
+  .card { padding-bottom: 8px; }
+  .f { height: var(--rowh); display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); }
+  .f > label { width: 96px; color: var(--muted); flex-shrink: 0; white-space: nowrap; }
+  .f.sub > label { padding-left: 14px; }
+  .vals { flex: 1; display: flex; gap: 6px; min-width: 0; align-items: center; }
+  .inp { flex: 1; min-width: 0; height: 25px; padding: 0 11px; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; border-radius: 999px; background: var(--field); }
+  .inp .ax, .inp .unit { color: var(--muted); }
+  .inp .unit { margin-left: auto; color: var(--faint); }
+  .inp .chev { margin-left: auto; width: 12px; height: 12px; color: var(--muted); }
+  .inp.fill { background: linear-gradient(90deg, var(--soft) 0 var(--p), var(--field) var(--p)); }
+  .inp.short { flex: 0 0 92px; }
+  .swc { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.25); }
+  .idx { width: 18px; color: var(--faint); text-align: right; flex-shrink: 0; }
+  .fold { width: 14px; height: 14px; color: var(--muted); }
+  .prow.sel { background: var(--soft); border-radius: var(--r); margin: 0 6px; padding: 0 8px; }
+  .prow.sel .idx { color: var(--ink); }
+
+  /* The gradient editor in the Fill */
+  .gbar { margin: 4px var(--inset) 0 calc(var(--inset) + 104px); height: 22px; border-radius: 999px; position: relative;
+    background-image: var(--g), linear-gradient(45deg, #2a2e36 25%, transparent 25%, transparent 75%, #2a2e36 75%), linear-gradient(45deg, #2a2e36 25%, #3a3f49 25%, #3a3f49 75%, #2a2e36 75%);
+    background-size: 100% 100%, 8px 8px, 8px 8px; background-position: 0 0, 0 0, 4px 4px; }
+  .stops { position: relative; height: 22px; margin: 2px var(--inset) 2px calc(var(--inset) + 104px); }
+  .stop { position: absolute; top: 4px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; box-shadow: 0 0 0 2px #fff, 0 1px 3px rgba(0,0,0,.5); }
+  .stop.sel { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--accent); }
+  .linkbtn { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); }
+  .linkbtn.dis { color: var(--faint); }
+  .ibtn { width: 25px; height: 25px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: var(--muted); }
+
+  /* The message pill and the debug box */
+  .pill { position: absolute; left: 50%; bottom: 52px; transform: translateX(-50%); background: rgba(13,15,19,.8); color: #e4e8ef; border-radius: 999px; padding: 7px 15px; white-space: nowrap; }
+  .debug { right: 10px; bottom: 10px; height: 28px; display: flex; align-items: center; gap: 10px; padding: 0 12px; font-size: 10px; white-space: pre; }
+  .debug b { font-weight: 400; color: var(--muted); margin-right: 4px; }
+  .readout { position: absolute; background: var(--tooltip); color: #e8ebf0; border-radius: var(--r); padding: 4px 8px; font-size: 12px; }
+
+  /* The parts sheet */
+  .sheet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .part { background: var(--panel); border-radius: 12px; padding: 12px 14px; color: var(--text); }
+  .part h4 { margin: 0 0 6px; font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .part p { margin: 6px 0 0; color: var(--faint); line-height: 1.45; }
+  .part svg.pic { display: block; border-radius: 6px; }
+  .prop { color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="hdr">
+  <h1>v2: curves and gradients</h1>
+  <p>Claude's proposal (standing yes, 2026-11-20), in the redesign's look. Every part here is new in v2; the rest of the editor is as built in stage 19. The rules are in <code>controls.md</code> and <code>level-view.md</code>. Nothing on this page works.</p>
+</div>
+<div id="out"></div>
+<script>
+// Outline icons in Lucide's style, as in the redesign mockup.
+const ICON = {
+  menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  select: '<path d="M6 3l12 8-5.5 1.5L10 19z"/>',
+  shape: '<rect x="3" y="3" width="10" height="10" rx="1"/><circle cx="15.5" cy="15.5" r="5.5"/>',
+  joint: '<circle cx="7" cy="17" r="3"/><circle cx="17" cy="7" r="3"/><path d="M9.2 14.8l5.6-5.6"/>',
+  pen: '<path d="M15.7 21.3a1 1 0 0 1-1.4 0l-1.6-1.6a1 1 0 0 1 0-1.4l5.6-5.6a1 1 0 0 1 1.4 0l1.6 1.6a1 1 0 0 1 0 1.4z"/><path d="M18 13l-1.4-6.9a1 1 0 0 0-.7-.8L3.2 2a1 1 0 0 0-1.2 1.2l3.3 12.7a1 1 0 0 0 .8.7L13 18"/><path d="M2.3 2.3l7.3 7.3"/><circle cx="11" cy="11" r="2"/>',
+  pencil: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/>',
+  path: '<path d="M3 18c3-9 6-12 9-6s6 3 9-6"/>',
+  eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  right: '<path d="M9 6l6 6-6 6"/>',
+  down: '<path d="M6 9l6 6 6-6"/>',
+  dots: '<path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  minus: '<path d="M5 12h14"/>',
+  rect: '<rect x="4" y="6" width="16" height="12" rx="1"/>',
+  smoothLow: '<path d="M3 14l3-5 2 6 3-8 2 7 3-6 2 5 3-4"/>',
+  smoothMid: '<path d="M3 14l4-4 3 4 4-5 3 4 4-3"/>',
+  smoothHigh: '<path d="M3 14c4-6 7-6 9 0s5 6 9 0"/>'
+};
+const ic = (n, cls = 'i') => `<svg class="${cls}" viewBox="0 0 24 24">${ICON[n]}</svg>`;
+const CHEV = ic('down', 'i chev');
+
+// The level view: the default soft light blue World with its grid, from level-view.md.
+const WORLD = '#CDE3F2', FILL = '#4A90D9', LINE = '#1F3552', ACCENT = '#4f8cff';
+function grid(w, h) {
+  let s = '';
+  for (let x = 0; x <= w; x += 10) s += `<path d="M${x} 0V${h}" stroke="#1E3C5F" stroke-opacity="${x % 50 ? 0.07 : 0.13}"/>`;
+  for (let y = 0; y <= h; y += 10) s += `<path d="M0 ${y}H${w}" stroke="#1E3C5F" stroke-opacity="${y % 50 ? 0.07 : 0.13}"/>`;
+  return s;
+}
+const ground = '<path d="M0 520 L180 505 L340 530 L520 500 L700 515 L960 495 V600 H0Z" fill="#5a9a62" stroke="#2f5a35" stroke-width="2"/>';
+const view = (inner) => `<svg class="view" width="960" height="600" viewBox="0 0 960 600"><rect width="960" height="600" fill="${WORLD}"/>${grid(960, 600)}${ground}${inner}</svg>`;
+
+// Point marks on the level view (level-view.md, v2): a sharp point is a square, a smooth one round; a selected one is filled.
+const sq = (x, y, sel) => `<rect x="${x - 4}" y="${y - 4}" width="8" height="8" rx="1.5" fill="${sel ? ACCENT : '#fff'}" stroke="${ACCENT}" stroke-width="1.5"/>`;
+const rd = (x, y, sel) => `<circle cx="${x}" cy="${y}" r="4.5" fill="${sel ? ACCENT : '#fff'}" stroke="${ACCENT}" stroke-width="1.5"/>`;
+const ring = (x, y, hot) => `<circle cx="${x}" cy="${y}" r="6" fill="${hot ? 'rgba(79,140,255,.25)' : 'none'}" stroke="${ACCENT}" stroke-width="1.5"/>`;
+const hnd = (x, y, hx, hy) => `<path d="M${x} ${y}L${hx} ${hy}" stroke="${ACCENT}" stroke-width="1"/><circle cx="${hx}" cy="${hy}" r="3" fill="#fff" stroke="${ACCENT}" stroke-width="1.5"/>`;
+
+const burger = `<div class="isl shade burger"><div class="tool">${ic('menu')}</div></div>`;
+const tools = (on) => `<div class="isl shade toolcol">${['select', 'shape', 'joint', 'pen', 'pencil'].map((t) => `<div class="tool${t === on ? ' on' : ''}">${ic(t)}</div>`).join('')}</div>`;
+// The middle of tool n (0-based) in window pixels: 68 + 7 + 17 + n × 38.
+const toolMid = (n) => 68 + 7 + 17 + n * 38;
+const debug = '<div class="isl shade debug"><span><b>X</b>412</span><span><b>Y</b>-96</span><span><b>GRID</b>50</span><span><b>ZOOM</b>100%</span></div>';
+
+const M = [];
+
+// 1. The Bézier pen, placing its fourth point with a drag.
+M.push(['The Bézier pen', 'Key 4. No menu beside it, and the Entity inspector is hidden as with every drawing tool. Three points are placed: a sharp corner, a smooth curve point and a sharp corner. The fourth is being dragged out: its two mirrored handles follow the mouse, and the segment it makes is dashed until the mouse is released. The first point is a ring, because clicking it closes the path.',
+  view(`
+    <path d="M250 420 C250 420 340 290 410 290 C480 290 520 360 560 360" fill="none" stroke="${LINE}" stroke-width="2"/>
+    <path d="M560 360 C560 360 610 250 700 250" fill="none" stroke="${LINE}" stroke-width="2" stroke-dasharray="6 5" stroke-opacity=".6"/>
+    ${ring(250, 420)}${sq(250, 420)}${rd(410, 290)}${sq(560, 360)}
+    ${hnd(700, 250, 630, 270)}${hnd(700, 250, 770, 230)}${rd(700, 250, true)}
+    <path d="M770 230l9 14 3-6 6-1z" fill="#111" stroke="#fff" stroke-width="1"/>
+  `) + burger + tools('pen') + debug]);
+
+// 2. The Pencil, with its smoothness menu, about to close a stroke.
+const stroke = (() => { let s = 'M260 330', a = 0; for (let i = 1; i <= 60; i++) { a = i / 60 * Math.PI * 1.92; const r = 130 + Math.sin(i * 1.7) * 5 + Math.sin(i * 0.5) * 12; s += ` L${(400 + Math.cos(a + Math.PI) * r * 1.1).toFixed(1)} ${(330 - Math.sin(a) * r * 0.75).toFixed(1)}`; } return s; })();
+M.push(['The Pencil', 'Key 5. Its smoothness stands open beside it as a kinds menu, Medium at first, remembered after. The stroke is drawn as it is dragged, a thin accent line; on release it becomes a path with a few curve points in the default look. The mouse is within 12 px of the start, so the start ring fills: releasing here closes the path.',
+  view(`<path d="${stroke}" fill="none" stroke="${ACCENT}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${ring(260, 330, true)}
+    <path d="M268 338l9 14 3-6 6-1z" fill="#111" stroke="#fff" stroke-width="1"/>`) +
+  burger + tools('pencil') +
+  `<div class="menu kinds shade" style="left:70px;top:${toolMid(4)}px;transform:translateY(-50%)"><div class="mt">Smoothness</div>` +
+  [['smoothLow', 'Low'], ['smoothMid', 'Medium', true], ['smoothHigh', 'High']].map(([i, l, on]) => `<div class="mi${on ? ' on' : ''}">${ic(i)}<span>${l}</span></div>`).join('') + '</div>' + debug]);
+
+// 3. Editing a path's points.
+const pts = [[300, 470, 'sharp'], [330, 300, 'smooth', [-10, 60], [10, -60]], [470, 210, 'smooth', [-80, 0], [80, 0]], [640, 300, 'separate', [-20, -70], [40, 30]], [680, 470, 'sharp']];
+function pathD(ps, closed) {
+  const P = (p) => ({ x: p[0], y: p[1], i: p[3] || [0, 0], o: p[4] || [0, 0] });
+  let d = `M${ps[0][0]} ${ps[0][1]}`;
+  const seg = (a, b) => ` C${a.x + a.o[0]} ${a.y + a.o[1]} ${b.x + b.i[0]} ${b.y + b.i[1]} ${b.x} ${b.y}`;
+  for (let k = 1; k < ps.length; k++) d += seg(P(ps[k - 1]), P(ps[k]));
+  if (closed) d += seg(P(ps[ps.length - 1]), P(ps[0])) + 'Z';
+  return d;
+}
+const marks = pts.map((p, k) => (p[2] === 'sharp' ? sq : rd)(p[0], p[1], k === 2)).join('');
+const prow = (k, p, sel) => `<div class="f prow${sel ? ' sel' : ''}"><span class="idx">${k + 1}</span>${ic(sel ? 'down' : 'right', 'i fold')}<div class="vals"><div class="inp"><span class="ax">x</span>${p[0] - 490}<span class="ax">y</span>${p[1] - 390}</div><div class="inp short">${p[2] === 'separate' ? 'Separate' : p[2][0].toUpperCase() + p[2].slice(1)}${CHEV}</div></div></div>`;
+M.push(['Editing a path\'s points', 'Select, after a double-click on the path. A sharp point is a square, a smooth one round. The selected point (3) is filled and shows its two handles. In the Entity inspector the Path card lists the points as path points: each row is its position and its corner, and its handles fold out under it; the selected point\'s row is the blue pill and unfolded.',
+  view(`<g transform="translate(140 0)"><path d="${pathD(pts, true)}" fill="${FILL}" stroke="${LINE}" stroke-width="2"/>${hnd(470, 210, 390, 210)}${hnd(470, 210, 550, 210)}${marks}</g>`) +
+  burger + tools('select') +
+  `<div class="isl shade insp"><div class="ihead"><span class="kind">${ic('path')}</span><div class="nm">Path 1</div><span class="eye">${ic('eye')}</span></div>
+    <div class="chead">${ic('right')}<span class="t">Transform</span>${ic('dots')}</div>
+    <div class="card"><div class="chead">${ic('down')}<span class="t">Path</span>${ic('dots')}</div>
+      <div class="f"><label>Points</label><div class="vals" style="color:var(--muted)">5</div></div>
+      ${pts.map((p, k) => prow(k, p, k === 2) + (k === 2 ? `<div class="f sub"><label>Handle in</label><div class="vals"><div class="inp"><span class="ax">x</span>-80<span class="ax">y</span>0</div></div></div><div class="f sub"><label>Handle out</label><div class="vals"><div class="inp"><span class="ax">x</span>80<span class="ax">y</span>0</div></div></div>` : '')).join('')}
+    </div>
+    <div class="chead">${ic('right')}<span class="t">Style</span>${ic('dots')}</div></div>` + debug]);
+
+// 4. A linear gradient, in the Entity inspector and on the level.
+const G = 'linear-gradient(90deg, #FFB36B 0%, #E0607E 45%, #5B4FC4 100%)';
+M.push(['A linear gradient', 'The Style card is unfolded and its Fill is Linear, so the gradient handles show on the level: a line from the start to the end, each end a dot in its own stop\'s colour. Under the Fill, a bar shows the gradient, with its colour stops under it; the chosen stop (the middle one) is ringed in the accent, and its colour and place are the two fields below. Start and End are shares of the shape\'s box.',
+  view(`<defs><linearGradient id="g1" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0" stop-color="#FFB36B"/><stop offset=".45" stop-color="#E0607E"/><stop offset="1" stop-color="#5B4FC4"/></linearGradient></defs>
+    <rect x="480" y="140" width="300" height="300" fill="url(#g1)" stroke="${LINE}" stroke-width="2"/>
+    <rect x="480" y="140" width="300" height="300" fill="none" stroke="${ACCENT}" stroke-width="1.5"/>
+    ${[[480, 140], [630, 140], [780, 140], [780, 290], [780, 440], [630, 440], [480, 440], [480, 290]].map(([x, y]) => sq(x, y)).join('')}
+    <path d="M630 140V440" stroke="#1D2430" stroke-width="3.5" stroke-opacity=".6"/><path d="M630 140V440" stroke="#fff" stroke-width="1.5"/>
+    <circle cx="630" cy="275" r="3.5" fill="#E0607E" stroke="#fff" stroke-width="1.5"/>
+    <circle cx="630" cy="140" r="7" fill="#FFB36B" stroke="#fff" stroke-width="2"/><circle cx="630" cy="440" r="7" fill="#5B4FC4" stroke="#fff" stroke-width="2"/>
+    <circle cx="630" cy="140" r="9" fill="none" stroke="#1D2430" stroke-opacity=".6"/><circle cx="630" cy="440" r="9" fill="none" stroke="#1D2430" stroke-opacity=".6"/>`) +
+  burger + tools('select') +
+  `<div class="isl shade insp"><div class="ihead"><span class="kind">${ic('rect')}</span><div class="nm">Rectangle 3</div><span class="eye">${ic('eye')}</span></div>
+    <div class="chead">${ic('right')}<span class="t">Transform</span>${ic('dots')}</div>
+    <div class="chead">${ic('right')}<span class="t">Shape</span>${ic('dots')}</div>
+    <div class="card"><div class="chead">${ic('down')}<span class="t">Style</span>${ic('dots')}</div>
+      <div class="f"><label>Fill</label><div class="vals"><div class="inp">Linear${CHEV}</div></div></div>
+      <div class="gbar" style="--g:${G}"></div>
+      <div class="stops"><span class="stop" style="left:0%;background:#FFB36B"></span><span class="stop sel" style="left:45%;background:#E0607E"></span><span class="stop" style="left:100%;background:#5B4FC4"></span></div>
+      <div class="f sub"><label>Colour</label><div class="vals"><div class="inp"><span class="swc" style="background:#E0607E"></span>#E0607EFF</div><span class="ibtn">${ic('minus')}</span></div></div>
+      <div class="f sub"><label>Place</label><div class="vals"><div class="inp fill" style="--p:45%">45<span class="unit">%</span></div></div></div>
+      <div class="f"><label></label><div class="vals"><span class="linkbtn">${ic('plus')}Add stop</span></div></div>
+      <div class="f"><label>Start</label><div class="vals"><div class="inp"><span class="ax">x</span>50<span class="ax">y</span>0<span class="unit">%</span></div></div></div>
+      <div class="f"><label>End</label><div class="vals"><div class="inp"><span class="ax">x</span>50<span class="ax">y</span>100<span class="unit">%</span></div></div></div>
+      <div class="f"><label>Outline colour</label><div class="vals"><div class="inp"><span class="swc" style="background:${LINE}"></span>#1F3552FF</div></div></div>
+      <div class="f"><label>Outline width</label><div class="vals"><div class="inp fill" style="--p:1%">2<span class="unit">px</span></div></div></div>
+    </div></div>` + debug]);
+
+// 5. The parts, side by side.
+const pic = (w, h, inner) => `<svg class="pic" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="${WORLD}"/>${inner}</svg>`;
+const parts = [
+  ['The new tools', `<div style="display:flex;gap:6px">${['pen', 'pencil'].map((t, k) => `<div class="tool${k ? '' : ' on'}" style="background:${k ? 'transparent' : 'var(--soft)'}">${ic(t)}</div>`).join('')}<span class="readout" style="position:static">Bézier pen <span style="color:#8a93a3">4</span></span></div>`, 'Lucide\'s pen-tool and pencil. Tooltips "Bézier pen 4" and "Pencil 5".'],
+  ['Points', pic(260, 60, `${sq(40, 30)}${sq(90, 30, true)}${rd(150, 30)}${rd(200, 30, true)}`), 'Sharp: an 8 px square, as on a polygon. Smooth and separate: a 9 px circle. Selected: filled in the accent.'],
+  ['Curve handles', pic(260, 60, `${hnd(130, 30, 60, 30)}${hnd(130, 30, 200, 30)}${rd(130, 30, true)}`), 'A 1 px accent line to a 6 px white dot with an accent edge. Shown on the selected points, and on the point being placed.'],
+  ['Ends of a kept open path', pic(260, 60, `<path d="M40 40 C90 0 170 60 220 20" fill="none" stroke="${LINE}" stroke-width="2"/>${ring(40, 40)}${sq(40, 40)}${ring(220, 20, true)}${sq(220, 20)}`), 'With the pen chosen and an open path kept selected, its two ends are rings; the one under the mouse fills. Clicking it continues the path.'],
+  ['Radial gradient handles', pic(260, 120, `<defs><radialGradient id="g2"><stop offset="0" stop-color="#FFF3B0"/><stop offset="1" stop-color="#F28C38"/></radialGradient></defs><circle cx="110" cy="60" r="50" fill="url(#g2)" stroke="${LINE}" stroke-width="2"/><circle cx="110" cy="60" r="50" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="4 3"/><path d="M110 60H160" stroke="#fff" stroke-width="1.5"/><circle cx="110" cy="60" r="7" fill="#FFF3B0" stroke="#fff" stroke-width="2"/><circle cx="160" cy="60" r="7" fill="#F28C38" stroke="#fff" stroke-width="2"/>`), 'The centre dot in the first stop\'s colour, the radius dot in the last, joined by a line, and the radius as a dashed white circle.'],
+  ['Colour stops', `<div class="gbar" style="--g:${G};margin:4px 8px 0"></div><div class="stops" style="margin:2px 8px"><span class="stop" style="left:0%;background:#FFB36B"></span><span class="stop sel" style="left:45%;background:#E0607E"></span><span class="stop" style="left:100%;background:#5B4FC4"></span></div>`, 'A 22 px gradient bar over a check pattern, so see-through stops show. A stop is a 14 px swatch with a white ring; the chosen one has an accent ring. Dragging a stop along the bar sets its place; clicking the bar adds one.'],
+  ['The Fill choice', `<div class="menu shade" style="position:static;display:inline-block">${['None', 'Solid', 'Linear', 'Radial'].map((l) => `<div class="mi${l === 'Linear' ? ' on' : ''}">${l}</div>`).join('')}</div>`, 'The Fill row\'s choice pill opens this. Solid shows the colour field of v1 under it; Linear and Radial show the gradient editor.'],
+  ['A gradient in the minimap', pic(260, 50, '<rect x="20" y="10" width="220" height="30" fill="#E7867A"/>'), 'The minimap paints a gradient as one colour: the mix of its stops, weighted by how much of the bar each covers.']
+];
+const sheet = `<div class="sheet">${parts.map(([h, body, p]) => `<div class="part"><h4>${h}</h4>${body}<p>${p}</p></div>`).join('')}</div>`;
+
+document.getElementById('out').innerHTML = M.map(([h, p, ed], k) => `<section class="moment"><h2>${k + 1}. ${h}</h2><p>${p}</p><div class="ed">${ed}</div></section>`).join('') +
+  `<section class="moment"><h2>${M.length + 1}. The parts, side by side</h2><p>Each new part on its own.</p>${sheet}</section>`;
+</script>
+</body>
+</html>

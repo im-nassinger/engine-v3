@@ -75,7 +75,22 @@ A field is a row of `--row` height: the label in `--muted` in a 120 px column, t
 - **Dialog:** 400 px wide, centred, over the `--scrim`, `--panel` with `--radius-island` corners and the `--shade`. A title in `--text-title` and weight 600, the text in `--muted`, then the buttons at the right with no line above them: the safe one first, the primary one last.
 - **Play bar:** a fully round pill at the top centre of the window, tinted with its state's colour at 16% over `--panel`, with the `--shade`. A label with a dot: PLAYING in `--playing`, PAUSED in `--paused`. Then Pause (Resume while paused), Step (disabled while running), Stop, each a round icon button with its key in `--muted`. STARTING (in `--playing`) while the game loads and ENDED (in `--muted`) once a run ended (stage 16). One line of `--text-size` under the pill shows why a run ended, "The game isn't responding", or a hint such as "Stop to edit".
 
+## v2: the pen, the Pencil and gradients
+
+Claude's proposal (standing yes, 2026-11-20), drawn in the [v2 mockup](mockups/v2.html). It changes until the owner comments.
+
+- **The Bézier pen (4) and the Pencil (5)** are tool buttons under Joint, with Lucide's `pen-tool` and `pencil`. Tooltips: `Bézier pen 4`, `Pencil 5`.
+- **Both hide the Entity inspector**, as the Shape and Joint tools do. The pen has no menu beside it.
+- **The Pencil's smoothness is a kinds menu** beside it, titled `SMOOTHNESS` in small caps, with Low, Medium and High, each with a line icon from jagged to smooth. It starts on Medium and remembers the last one.
+- **A path's Points** in the Entity inspector are a list of path points. Each row is the point's number, a fold arrow, its position as a vector and its corner as a choice (Sharp, Smooth, Separate). Unfolded, **Handle in** and **Handle out** show under it as vectors. The rows of selected points are the blue pill and unfolded.
+- **The Fill** is a choice pill: None, Solid, Linear, Radial. Solid shows v1's colour field. Linear and Radial show the gradient editor under it:
+  - **The gradient bar**, 22 px high and fully round, over a check pattern so see-through stops show.
+  - **The colour stops** under it, 14 px swatches with a white ring; the chosen one has an `--accent` ring too. Dragging a stop along the bar sets its place, and clicking the bar adds a stop there.
+  - **The chosen stop's Colour and Place**, the place a filled slider from 0 to 100%, and a `−` button to remove it, disabled with 2 stops. **+ Add stop** under them, a link in `--accent-text`, disabled with 8.
+  - **Start and End** (linear) or **Centre and Radius** (radial), in % of the entity's box.
+- **The minimap paints a gradient as one colour**: its stops mixed, each weighted by how much of the bar it covers.
+
 ## Icons
 
 - **Outline icons** (owner, 2026-11-14): 24 px drawings shown at 16 px, a 1.6 px stroke with round ends and corners, no fill. One open set for every icon: `lucide-react`, picked in stage 6 (standing yes, 2026-11-15, see [ui.md](../architecture/ui.md#stage-6s-choices)).
-- v1 needs these: ☰, Select, Shape, Joint, the four shape kinds (rectangle, circle, polygon, line), the three joint types (hinge, rope, spring), group, World, camera, the eye and the eye crossed out, fold arrows (right and down), Play, Pause, Step, Stop, warning, tip, the target picker, `…`, plus, the right arrow of a submenu and the down arrow of a choice.
+- v1 needs these: ☰, Select, Shape, Joint, the four shape kinds (rectangle, circle, polygon, line), the three joint types (hinge, rope, spring), group, World, camera, the eye and the eye crossed out, fold arrows (right and down), Play, Pause, Step, Stop, warning, tip, the target picker, `…`, plus, the right arrow of a submenu and the down arrow of a choice. **v2 adds** the Bézier pen, the Pencil, a path's kind icon, and Low, Medium and High smoothness.

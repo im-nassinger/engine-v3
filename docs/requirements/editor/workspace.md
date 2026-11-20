@@ -19,7 +19,7 @@ Sizes in pixels are starting values until tested.
 - Starting sizes: ☰ and the tool column 48 px wide with 34 px buttons, Entity inspector 300 px, Entities viewer 260 px, minimap 180 px.
 - **The free area** is the level view between the Entity inspector and the Entities viewer, so fitting the view frames the level where it is seen.
 - The centre has a permanent `Level` tab. A `.lua` file opens as an extra closable tab beside it, one per file (v5). The tab strip shows only while an extra tab is open.
-- **While the Shape tool is active the Entity inspector is hidden** (owner: 2026-11-15), and the tool's kinds menu stands open beside it, see [drawing](../drawing.md#the-shape-tool--v1). The Joint tool's types have the same menu (owner: 2026-11-18), and the Entity inspector is hidden with it too (standing yes, 2026-11-19). *Why: the menu stands where the Entity inspector is, and the owner found the Entity inspector showing behind it (2026-11-19).*
+- **While the Shape tool is active the Entity inspector is hidden** (owner: 2026-11-15), and the tool's kinds menu stands open beside it, see [drawing](../drawing.md#the-shape-tool--v1). The Joint tool's types have the same menu (owner: 2026-11-18), and the Entity inspector is hidden with it too (standing yes, 2026-11-19). So do v2's Bézier pen and Pencil, the Pencil with its smoothness in the same kind of menu (standing yes, 2026-11-20). *Why: the menu stands where the Entity inspector is, and the owner found the Entity inspector showing behind it (2026-11-19).*
 - One dark theme. *Why: art and levels read well on it.*
 - Folded cards and open tabs are editor settings saved in the browser. They are never in the level and never in undo.
 

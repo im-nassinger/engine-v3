@@ -98,7 +98,7 @@ Source: round 1: D24; round 5: 03 2.5; old: DR-33 to DR-45; owner: 2026-11-13, 2
 
 - Drag to draw freehand. On release the drawing becomes an ordinary path with a small number of curve points.
 - If you finish near the start (within 12 screen pixels), the path closes.
-- Smoothness is Low, Medium or High, Medium by default.
+- Smoothness is Low, Medium or High, Medium by default, chosen in a menu standing beside the Pencil like the Shape tool's kinds menu, and remembered (standing yes, 2026-11-20).
 - *Why it exists: the pen is the hardest tool in vector drawing, and lumpy ground is exactly what a level needs. It adds no new kind of data.*
 - *Why v2: the same as the Bézier pen.*
 
@@ -163,7 +163,7 @@ Source: round 1: D23; round 6: ST2; old: DR-90 to DR-94; owner: 2026-11-13, 2026
 - Gradients add a **fill** field type to the fixed list of field types: nothing, a solid colour or a gradient, and Later an image. *Why: a new need adds a type to the list, never a special field on one component (owner: 2026-11-13).*
 - **A gradient is edited in the Entity inspector and with gradient handles on the level** (owner: 2026-11-20). *Why: the owner picked both over the Entity inspector alone, to work like Figma.*
 - In the Entity inspector the Fill is a choice of **None, Solid, Linear and Radial**, with the gradient's colour stops under it (standing yes, 2026-11-20).
-- A gradient has **2 to 8 colour stops**. Each has a colour, see-through allowed, and a place from 0% to 100%. Stops are added and removed in the Entity inspector (standing yes, 2026-11-20: enough for sky and ground, and a short list to show).
+- A gradient has **2 to 8 colour stops**. Each has a colour, see-through allowed, and a place from 0% to 100%. Stops are added and removed in the Entity inspector: clicking the gradient bar adds one there, and dragging one along the bar moves it (standing yes, 2026-11-20: enough for sky and ground, and a short list to show).
 - A linear gradient has a **start and an end**; a radial one a **centre and a radius**. They are measured in the entity's own space, as shares of its box, so a gradient turns, scales and resizes with what it fills (standing yes, 2026-11-20).
 - **Gradient handles show** while one entity is selected and its gradient is open in the Entity inspector. Dragging a handle is one undo step. Shift keeps a linear gradient's direction to 15° steps, as Shift does when drawing (standing yes, 2026-11-20).
 - Switching Solid to a gradient starts with two stops: the solid colour, and the same colour fully see-through. Switching between Linear and Radial keeps the stops. Switching a gradient to Solid keeps its first stop's colour (standing yes, 2026-11-20).

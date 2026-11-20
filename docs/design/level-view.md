@@ -49,6 +49,22 @@ The accent colour draws every selection (owner, 2026-11-14: blue, chosen over or
 - **The faded preview** of the Shape tool: the new shape's default fill at 35%, its outline solid for placed segments and dashed at 60% from the last point to the mouse and back to the first point.
 - **Placed points:** the same 8 px handles. **The first point** of a polygon is a 12 px ring, because clicking it closes the polygon.
 
+## v2: paths and gradient handles
+
+Claude's proposal (standing yes, 2026-11-20), drawn in the [v2 mockup](mockups/v2.html).
+
+| Part | Look |
+|---|---|
+| A path being drawn with the pen | Its placed segments in the default outline, 2 px `#1F3552`. The segment being made is dashed at 60%, until the next click or release places it |
+| A sharp point | The same 8 px square as a polygon's |
+| A smooth or separate point | A 9 px circle, white with a 1.5 px `--accent` edge |
+| A selected point, or the one being placed | Filled in `--accent` |
+| A curve handle | A 1 px `--accent` line from its point to a 6 px white dot with a 1.5 px `--accent` edge. Shown on selected points and the point being placed |
+| The first point while drawing, the ends of a kept open path | A 12 px `--accent` ring around the point. Under the mouse, or with a Pencil stroke within 12 px of its start, it fills at 25% |
+| A Pencil stroke being dragged | A 2 px `--accent` line with round joins, exactly as dragged |
+| Linear gradient handles | A 1.5 px white line from start to end over a 3.5 px `#1D2430` line at 60%, so it shows on any colour. Each end a 14 px dot in its stop's colour with a 2 px white edge and a thin dark ring; each stop between them a 7 px dot on the line |
+| Radial gradient handles | The centre dot in the first stop's colour, the radius dot in the last, joined by the same line, and the radius as a dashed white circle |
+
 ## The physics view
 
 - Every collision piece is drawn in **orange `#FF8A3D`**, a 1.5 px outline over a 15% fill, on top of the level (*proposal*). Orange stays visible next to the blue selection and the default blue shapes.
