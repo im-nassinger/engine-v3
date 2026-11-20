@@ -77,7 +77,7 @@ A field is a row of `--row` height: the label in `--muted` in a 120 px column, t
 
 ## v2: the pen, the Pencil and gradients
 
-Claude's proposal (standing yes, 2026-11-20), drawn in the [v2 mockup](mockups/v2.html). It changes until the owner comments.
+Claude's proposal (standing yes, 2026-11-20), drawn in the [v2 mockup](mockups/v2.html), **approved by the owner** the same day.
 
 - **The Bézier pen (4) and the Pencil (5)** are tool buttons under Joint, with Lucide's `pen-tool` and `pencil`. Tooltips: `Bézier pen 4`, `Pencil 5`.
 - **Both hide the Entity inspector**, as the Shape and Joint tools do. The pen has no menu beside it.

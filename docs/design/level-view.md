@@ -51,7 +51,7 @@ The accent colour draws every selection (owner, 2026-11-14: blue, chosen over or
 
 ## v2: paths and gradient handles
 
-Claude's proposal (standing yes, 2026-11-20), drawn in the [v2 mockup](mockups/v2.html).
+Claude's proposal (standing yes, 2026-11-20), drawn in the [v2 mockup](mockups/v2.html), **approved by the owner** the same day.
 
 | Part | Look |
 |---|---|
