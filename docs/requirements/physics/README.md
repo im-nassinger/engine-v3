@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-How entities move, collide and connect. **In v1** you add a body in one click, set Box2D's body and surface settings, merge shapes in a group into one body, see physics with the physics view, set gravity and level bounds on the World, and connect bodies with three joints: Hinge, Rope and Spring. **In v2** sensors start noticing touches, for triggers and scripts. **In v3** come one-way platforms, the collision grid with its Collision check, gravity buttons, game speed, four more joints, breaking joints, and warnings for bad setups. Core rules: touching is detected by the physics engine alone, the collision grid is the one place that decides what hits what, and a joint is an ordinary entity.
+How entities move, collide and connect. **In v1** you add a body in one click, set Box2D's body and surface settings, merge shapes in a group into one body, see physics with the physics view, set gravity and level bounds on the World, and connect bodies with three joints: Hinge, Rope and Spring. **In v3** sensors start noticing touches, for triggers and scripts. **Later** come one-way platforms, the collision grid with its Collision check, gravity buttons, game speed, four more joints, breaking joints, and warnings for bad setups. Core rules: touching is detected by the physics engine alone, the collision grid is the one place that decides what hits what, and a joint is an ordinary entity.
 
 ## Files
 
@@ -19,7 +19,7 @@ How entities move, collide and connect. **In v1** you add a body in one click, s
 | Add a body in one click | v1 | bodies |
 | Body settings | v1 | bodies |
 | The SurfaceComponent | v1 | bodies |
-| Sensors and touching | v2 | bodies |
+| Sensors and touching | v3 | bodies |
 | Shapes in a group merge into one body | v1 | bodies |
 | The physics view | v1 | bodies |
 | Gravity and background colour | v1 | world |
@@ -27,10 +27,10 @@ How entities move, collide and connect. **In v1** you add a body in one click, s
 | Hinge, Rope, Spring and the Joint tool | v1 | joints |
 | Typed joint settings | v1 | joints |
 | Rope and Spring show in play | v1 | joints |
-| One-way platforms | v3 | bodies |
-| Warnings for physics and joints | v3 | bodies, joints |
-| The collision grid, the Collision check | v3 | world |
-| Gravity buttons, game speed, background image | v3 | world |
-| Weld, Rod, Slider, Wheel | v3 | joints |
-| Drag limits, re-attach an end, change type | v3 | joints |
-| Joints that break | v3 | joints |
+| One-way platforms | Later | bodies |
+| Warnings for physics and joints | Later | bodies, joints |
+| The collision grid, the Collision check | Later | world |
+| Gravity buttons, game speed, background image | Later | world |
+| Weld, Rod, Slider, Wheel | Later | joints |
+| Drag limits, re-attach an end, change type | Later | joints |
+| Joints that break | Later | joints |

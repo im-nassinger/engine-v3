@@ -14,7 +14,7 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 
 | Keys | What it does | Works | Feature |
 |---|---|---|---|
-| 1 to 3 | Pick a tool: Select, Shape, Joint (owner: 2026-11-19). Twice locks the tool. v2's tools get their keys in v2 | Editor | Tools, v1 |
+| 1 to 3 | Pick a tool: Select, Shape, Joint (owner: 2026-11-19). Twice locks the tool. Later tools get their keys in their own version | Editor | Tools, v1 |
 | Space (hold) | Pan | Editor | Pan and zoom, v1 |
 | F | Zoom to the selection, or to the whole level with nothing selected | Editor | Pan and zoom, v1 |
 | + or = or Ctrl+=, - or Ctrl+- | Zoom in, zoom out: the key that holds + zooms in with or without Shift, as - zooms out, and the numpad's + and - work too | Editor | Pan and zoom, v1 |
@@ -33,7 +33,7 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 | Z, X | Rotate the selection 1° counter-clockwise, clockwise; with the Shape tool, turn its preview (owner, 2026-11-17) | Editor | Handles, v1; the Shape tool, v1 |
 | Shift+Z, Shift+X | Rotate the selection 10° counter-clockwise, clockwise (owner, 2026-11-17) | Editor | Handles, v1 |
 | D, A, W, S | Resize the selection's shapes 1 px wider, narrower, taller, shorter, changing their values; with the Shape tool, size its preview (owner, 2026-11-17) | Editor | Handles, v1; the Shape tool, v1 |
-| Shift+D, Shift+A, Shift+W, Shift+S | Resize the selection's shapes, or the Shape tool's preview, one grid step (owner, 2026-11-19). Shift+S was v3's Snapping to entities, which gets another key (owner, 2026-11-17) | Editor | Handles, v1; the Shape tool, v1 |
+| Shift+D, Shift+A, Shift+W, Shift+S | Resize the selection's shapes, or the Shape tool's preview, one grid step (owner, 2026-11-19). Shift+S was Snapping to entities' key (Later), which gets another key (owner, 2026-11-17) | Editor | Handles, v1; the Shape tool, v1 |
 | Ctrl+G, Ctrl+Shift+G | Group, ungroup | Editor | Groups, v1 |
 | Enter | Go into the selected group | Editor | Groups, v1 |
 | F2 | Rename the selected entity | Editor | Entities viewer, v1 |
@@ -48,12 +48,12 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 | Ctrl+Enter | Play, or Stop while playing, the second way. In a field it commits the field first | Everywhere | Test play, v1 |
 | F8 | Pause or resume test play | Everywhere | Pause and Step, v1 |
 | F9 | Step one tick while paused | Everywhere | Pause and Step, v1 |
-| ? | The shortcut list | Editor | Shortcut list, v2 |
-| Ctrl+J | Open or close the Console | Everywhere | Console, v2 |
-| (a key v3 picks) | Snapping to entities on or off. It was Shift+S, which now resizes one grid step shorter; it gets another key when v3 plans it (owner, 2026-11-17) | Editor | Snapping to entities, v3 |
-| Ctrl+Alt+C, Ctrl+Alt+V | Copy and paste the component card under the mouse | Editor | Copy values, v3 |
-| Ctrl+I | Invert the selection | Editor | Invert selection, v3 |
-| Ctrl+Shift+L | Lock or unlock the selection | Editor | Lock, v3 |
+| ? | The shortcut list | Editor | Shortcut list, v4 |
+| Ctrl+J | Open or close the Console | Everywhere | Console, v5 |
+| (a key Later picks) | Snapping to entities on or off. It was Shift+S, which now resizes one grid step shorter; it gets another key when Later plans it (owner, 2026-11-17) | Editor | Snapping to entities, Later |
+| Ctrl+Alt+C, Ctrl+Alt+V | Copy and paste the component card under the mouse | Editor | Copy values, Later |
+| Ctrl+I | Invert the selection | Editor | Invert selection, Later |
+| Ctrl+Shift+L | Lock or unlock the selection | Editor | Lock, Later |
 | Ctrl+Shift+H | Hide or show the selection | Editor | Hide, v1 |
 | Page Up, Page Down | Bring forward, send backward | Editor | Draw order commands, unscoped |
 | Home, End | Bring to front, send to back | Editor | Draw order commands, unscoped |
@@ -71,8 +71,8 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 | Shift while dragging | Lock a move to one axis, keep proportions, or snap a rotation to 15° | Handles, v1 |
 | Alt or Ctrl+Shift while resizing or drawing | Resize or draw from the centre | Handles, v1 |
 | Ctrl while dragging | Turn snapping off | Grid, v1 |
-| Double-click | Go into a group, edit points. Edit text from v2 | v1 |
-| Alt+click | Select the next entity underneath | Next underneath, v3 |
+| Double-click | Go into a group, edit points. Edit text from v6 | v1 |
+| Alt+click | Select the next entity underneath | Next underneath, Later |
 | Alt+drag an entity | Drag out a copy | Unscoped |
 | Right-click | Context menu | Unscoped |
 

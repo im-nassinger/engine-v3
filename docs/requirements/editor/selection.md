@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-How entities are picked, moved and arranged in the tree. **v1:** click and drag-box selection, handles to move, resize and rotate one entity, arrow-key moves, grouping with Ctrl+G, going into groups by double-click, the Entities viewer as the real tree, and the eye icon. **v3:** resizing and rotating several entities together, the path bar, Alt+click for the entity underneath, hover outlines, Entities viewer search, the lock icon, and invert selection. Core rules: one selection everywhere, one row is one entity, and moving an entity between groups never moves it on screen.
+How entities are picked, moved and arranged in the tree. **v1:** click and drag-box selection, handles to move, resize and rotate one entity, arrow-key moves, grouping with Ctrl+G, going into groups by double-click, the Entities viewer as the real tree, and the eye icon. **Later:** resizing and rotating several entities together, the path bar, Alt+click for the entity underneath, hover outlines, Entities viewer search, the lock icon, and invert selection. Core rules: one selection everywhere, one row is one entity, and moving an entity between groups never moves it on screen.
 
 ## Selecting
 
@@ -47,20 +47,20 @@ Clicks pass through hidden entities and locked entities.
 
 Source: scope SE1; round 1: D19; round 4: SEL1, 02 2.3, 02 2.4; round 5: 02 2.2, 04 2.7; old: SG-01 to SG-14, SG-21 to SG-33; owner: 2026-11-19
 
-### Invert selection · v3
+### Invert selection · Later
 
 - Selects every entity directly inside the current group that isn't selected. "Select same type" and "Select same tag" are dropped.
 
 Source: scope SE12; round 4: 02 2.5
 
-### Next entity underneath · v3
+### Next entity underneath · Later
 
 - Each Alt+click on the same spot selects the next entity underneath, children of groups included. After the bottom it starts again from the top.
 - There is no Ctrl+click for the deepest entity. *Why: one key is enough. Reaching the deepest entity is a few more clicks, with fewer keys to learn.*
 
 Source: scope SE6; round 4: 02 2.2; round 5: 02 2.2
 
-### Hover outlines · v3
+### Hover outlines · Later
 
 - Hovering outlines what a click would select: the whole group, not the child under the mouse.
 - Hovering an Entities viewer row outlines that entity in the level view, and hovering in the level view tints its row.
@@ -93,7 +93,7 @@ Source: round 6: LY2; old: SG-39 to SG-42
 
 - One Select tool moves, resizes and rotates, with no separate modes. Eight handles resize: four corners, four sides. Dragging just outside a corner rotates. There are no skew handles.
 - Arrow keys move the selection 1 px. Shift+arrow moves 10 px. **Ctrl+Shift+arrow moves one grid step.** Moves follow the level's axes whatever the rotation.
-- **Z and X rotate the selection** (owner: 2026-11-17): Z counter-clockwise and X clockwise on screen, 1° a press, Shift+Z and Shift+X 10°. Each entity turns around the centre of its own box, as the rotate drag does, until v3 turns several entities around the selection box's centre. A run of presses within 1 s is one undo step, `Rotate <name>`. The World and the camera are skipped with the skip rule's text; locked entities are left out. Ctrl+Z and Ctrl+X stay Undo and Cut.
+- **Z and X rotate the selection** (owner: 2026-11-17): Z counter-clockwise and X clockwise on screen, 1° a press, Shift+Z and Shift+X 10°. Each entity turns around the centre of its own box, as the rotate drag does, until Later turns several entities around the selection box's centre. A run of presses within 1 s is one undo step, `Rotate <name>`. The World and the camera are skipped with the skip rule's text; locked entities are left out. Ctrl+Z and Ctrl+X stay Undo and Cut.
 - **W, A, S and D resize the selection's shapes** (owner: 2026-11-17): D wider, A narrower, W taller, S shorter, 1 px a press, **Shift one grid step** (owner: 2026-11-19, replacing 10 px). Unlike the handles they **change the shape's values**, so an outline keeps its width: a rectangle's Width or Height, a circle's Radius by half a step on either axis, a polygon's or line's points spread from or pulled towards its bounds' centre. Each shape keeps its own centre and grows along its own axes, so a rotated rectangle gets longer along its own width. A size stops at its smallest, 1 px, and W and S do nothing on a flat line. A run of presses within 1 s is one undo step, `Resize <name>`. The World and the camera are skipped with the skip rule's text; locked entities and entities with no ShapeComponent are left out.
 - A handle always follows the mouse on screen, whatever the rotation or scale of the parents.
 - The box of one rotated entity follows its rotation, so resizing works along the entity's own sides.
@@ -114,7 +114,7 @@ Source: round 6: LY2; old: SG-39 to SG-42
 
 Source: scope SE2; round 1: D21; round 4: 02 2.7; round 5: 03 2.4; old: SG-43 to SG-48, SG-52, SG-53, SG-55, SG-56; owner: 2026-11-16, 2026-11-19
 
-### Several entities together · v3
+### Several entities together · Later
 
 - A multi-selection resizes and rotates together. Rotation turns the entities around the centre of the selection box. Resizing keeps the opposite side or corner fixed. Alt or Ctrl+Shift resizes from the centre. Shift keeps proportions.
 - *Why: it matches single entities and groups, so nothing changes when you group them, and it uses the same keys as the drawing tools.*
@@ -152,7 +152,7 @@ Source: scope SE3; round 5: 02 2.8; round 6: MS1; old: SG-57 to SG-61
 
 Source: scope SE4; round 1: C2, D16; round 2: O7; round 4: G2, 02 2.9; decisions: D20; old: SG-62 to SG-81, SG-87
 
-### The path bar · v3
+### The path bar · Later
 
 - A bar above the level view shows which group you are inside, such as World › Car › Wheel. Click a name to jump there. It shows only when you are inside a group.
 
@@ -172,7 +172,7 @@ Source: round 6: RP1; old: SG-135 to SG-137
 ### The tree of entities · v1
 
 - The Entities viewer shows the real tree of entities. There is no separate layer system.
-- **One row is one entity.** A row has an arrow to fold it, an icon for its kind, its name and an eye, and from v3 a lock. Nothing else. *Why the lock waits: Lock is v3 (owner: 2026-11-14).* *Why: joints are their own rows, so showing them inside another row breaks the picture.*
+- **One row is one entity.** A row has an arrow to fold it, an icon for its kind, its name and an eye, and Later a lock. Nothing else. *Why the lock waits: Lock is Later (owner: 2026-11-14).* *Why: joints are their own rows, so showing them inside another row breaks the picture.*
 - **The top row is drawn in front.** The World is the top row, because it is the root. A new entity appears at the top of the group you are inside.
 - The camera is an ordinary row that can be moved up and down. Where it sits changes nothing, because what is inside the camera is always drawn over the level.
 - Click selects a row, Ctrl+click adds or removes one, Shift+click selects a range.
@@ -188,7 +188,7 @@ Source: round 6: RP1; old: SG-135 to SG-137
 
 Source: scope SE8; round 1: C2; round 3: N1; round 4: 02 2.11, 02 2.12; round 5: FMT1; round 6: LY2; old: SG-88 to SG-107, SG-122 to SG-128; owner: 2026-11-14
 
-### Search · v3
+### Search · Later
 
 - A search box filters rows by name as you type. Filters can be added: kind, tag, hidden, locked, has a script, has a trigger, has a warning.
 - Results stay a tree: the matches plus their dimmed parents, with a count such as "12 of 3,410". Dragging rows is off while a filter is on.
@@ -204,7 +204,7 @@ Source: scope SE9; round 4: 02 2.12; old: SG-108 to SG-110
 
 Source: scope SE10; round 1: C5; round 2: R7; round 5: 02 2.13; decisions: D7; old: SG-113, SG-115 to SG-119
 
-### Lock · v3
+### Lock · Later
 
 - The lock icon stops an entity from being grabbed in the level view. Example: lock a big background so that dragging over it draws a selection box.
 - A locked entity can still be selected from its row in the Entities viewer and edited in the Entity inspector.
@@ -246,14 +246,14 @@ Small features from the old draft and review that the scope review never asked a
 
 | Feature | Rule | Version |
 |---|---|---|
-| Dimming outside a group | While you are inside a group, the rest of the level dims to about 50%. A View menu switch turns it off | v3 |
-| Pivot marker | The selection shows the point it rotates around. Drag it to rotate around another point. It resets when the selection changes | v3 |
-| Set origin to pivot | Moves an entity's origin for good without moving it on screen. This is how a door gets its hinge point | v3 |
-| Tab to the next entity | Tab and Shift+Tab select the next and previous entity in the same group | v3 |
-| Auto-pan | The view pans by itself when a drag nears the edge of the level view | v3 |
-| Solo | Alt+click an eye shows only that entity and its children until repeated. Never saved, never affects play | v3 |
-| Drag across eyes | Dragging across eye or lock icons sets every row touched to the same state | v3 |
-| Keyboard in the Entities viewer | Arrows move, Right unfolds, Left folds, typing a letter jumps to a name | v3 |
-| Entities viewer footer | Counts of selected, hidden and locked entities | v3 |
+| Dimming outside a group | While you are inside a group, the rest of the level dims to about 50%. A View menu switch turns it off | Later |
+| Pivot marker | The selection shows the point it rotates around. Drag it to rotate around another point. It resets when the selection changes | Later |
+| Set origin to pivot | Moves an entity's origin for good without moving it on screen. This is how a door gets its hinge point | Later |
+| Tab to the next entity | Tab and Shift+Tab select the next and previous entity in the same group | Later |
+| Auto-pan | The view pans by itself when a drag nears the edge of the level view | Later |
+| Solo | Alt+click an eye shows only that entity and its children until repeated. Never saved, never affects play | Later |
+| Drag across eyes | Dragging across eye or lock icons sets every row touched to the same state | Later |
+| Keyboard in the Entities viewer | Arrows move, Right unfolds, Left folds, typing a letter jumps to a name | Later |
+| Entities viewer footer | Counts of selected, hidden and locked entities | Later |
 
 Source: old: SG-16 to SG-19, SG-32, SG-49 to SG-51, SG-82, SG-97, SG-111, SG-112, SG-118b, SG-120; owner: 2026-11-14

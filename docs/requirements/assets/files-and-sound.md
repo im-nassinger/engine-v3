@@ -2,41 +2,41 @@
 
 ## TL;DR
 
-The Assets panel is a small file system: folders of raw files, each with a path, plus a read-only `builtin` folder. **v2:** the panel with folders, holding `.lua` and `.entity` files, and paths that update themselves when a file moves. **v3:** importing images and sounds, playing sounds from triggers and scripts, replacing and deleting files safely, search and sort, packages, and the My files folder. **Later:** trimming a sound. Core rule: **an asset is only the raw file.** Its settings live where it is used.
+The Assets panel is a small file system: folders of raw files, each with a path, plus a read-only `builtin` folder. **v5:** the panel with folders, holding `.lua` files, and paths that update themselves when a file moves. **v7:** `.entity` files and the `builtin` folder. **Later:** importing images and sounds, playing sounds from triggers and scripts, replacing and deleting files safely, search and sort, packages, the My files folder, and trimming a sound. Core rule: **an asset is only the raw file.** Its settings live where it is used.
 
 ## The Assets panel
 
-### Folders of files · v2
+### Folders of files · v5
 
-- Each level has its own files, shown in the Assets panel as folders, like a file system. In v2 they are `.lua` files and `.entity` files. Images and sounds join in v3.
+- Each level has its own files, shown in the Assets panel as folders, like a file system. In v5 they are `.lua` files; `.entity` files join in v7, images and sounds Later.
 - Entities point to files and never hold their own copies. Fixing a file fixes every use.
 - **An asset is only the raw file. Settings never live on the asset.** They live where it is used: on an image fill, on a "Play sound" action. *Why: you never wonder where a setting is, and two places can use one file with different settings without copying it.*
-- A read-only **`builtin` folder** holds the files that come with the game. See [builtin-content.md](builtin-content.md).
+- From v7 a read-only **`builtin` folder** holds the files that come with the game. See [builtin-content.md](builtin-content.md).
 - **Builtin files can't be changed.** To change one, duplicate it into one of your own folders and edit the copy. *Why: builtin files never change once released, so a game update never changes how a level plays (owner: 2026-11-13).*
 - Selecting a file shows its details at the bottom of the panel, not in the Entity inspector, so the selection in the level is kept.
 - F2 or a double-click renames a file. Del deletes it.
 - The panel is read-only during play.
-- *Why v2: it holds .lua and .entity files, which both come in v2.*
+- *Why v5: it holds .lua files, which come in v5 (owner: 2026-11-20).*
 
 Source: scope AS1; round 1: C13, C14; round 3: D67; round 5: 04 2.1; round 6: ST3, SND1; old: AS-01, AS-02, AS-05, AS-09; owner: 2026-11-13
 
-### File paths that update themselves · v2
+### File paths that update themselves · v5
 
 - Every path starts from the top of the Assets panel, such as `images/coin.png` or `pickups/coin.entity`.
 - Files are moved and renamed only in the Assets panel, which then updates every path that points to them, in the level and inside `.entity` files.
 - No two files can have the same path.
 - *Why paths: paths from the top mean moving an `.entity` file never breaks it, and auto-updating covers moving what it points to, like code editors updating imports. Hidden ids would never break either, but the files would stop being readable text.*
-- *Why v2: it comes with the Assets panel.*
+- *Why v5: it comes with the Assets panel.*
 
 Source: scope AS2; round 8: AP1; owner: 2026-11-13
 
-### Search and sort · v3
+### Search and sort · Later
 
 - A search box filters by name. Sort by name, newest, size or most used.
 
 Source: scope AS3; round 5: 04 2.1; old: AS-04
 
-### Replacing and deleting · v3
+### Replacing and deleting · Later
 
 - **Replace file** keeps the path and every use. Same kind of file only. Builtin files can't be replaced.
 - **Deleting a file in use warns with a count**, such as "14 entities use coin.lua. Delete it?". Deleting never deletes entities: their uses become missing. Undo restores everything.
@@ -45,7 +45,7 @@ Source: scope AS3; round 5: 04 2.1; old: AS-04
 
 Source: scope AS7; round 1: D30; round 5: 04 2.4; old: AS-08, AS-26, AS-29 to AS-31
 
-### Packages · v3
+### Packages · Later
 
 - An `.entity` file is always plain text that points to its files by path. It never carries them inside.
 - To share one, **Export package** makes a `.zip` with the `.entity` file and every file it points to, in their folders. It works on a folder too.
@@ -55,18 +55,18 @@ Source: scope AS7; round 1: D30; round 5: 04 2.4; old: AS-08, AS-26, AS-29 to AS
 
 Source: scope AS8; round 6: E4, FMT2; round 8: AP1
 
-### The My files folder · v3
+### The My files folder · Later
 
 - A **My files** folder in the Assets panel is shared by every level in this browser.
-- *Why v3: v1 holds one level, so there is nothing to share it with yet.*
+- *Why Later: v1 holds one level, so there is nothing to share it with yet.*
 
 Source: scope AS9; round 2: O6; decisions: D59
 
 ## Images
 
-### Importing images · v3
+### Importing images · Later
 
-Images ship in v3 together with the image fill, see [drawing](../drawing.md).
+Images ship Later together with the image fill, see [drawing](../drawing.md).
 
 - Import PNG, JPEG, WebP or GIF with the Import button, by dropping files on the panel or the level, or by pasting.
 - An animated GIF or WebP imports its first frame only, with a note. The kind of file is read from its contents, not its name. SVG is refused: "Export it as PNG".
@@ -80,7 +80,7 @@ Source: scope DR11; round 1: D30; round 5: 04 2.2, 04 2.3; old: AS-10 to AS-24, 
 
 ## Sound
 
-### Playing sounds · v3
+### Playing sounds · Later
 
 - **Sounds are played by triggers and scripts, never by a component.** There is no sound component and no music setting on the World.
 - Import WAV, MP3 or OGG, the same ways as images.
@@ -97,7 +97,7 @@ Source: scope DR11; round 1: D30; round 5: 04 2.2, 04 2.3; old: AS-10 to AS-24, 
 
 Source: scope AS4; round 5: 04 2.2, 04 2.12; round 6: SND1, 04 2.13; round 7: 04 2.14; round 8: FX3; old: AS-104, AS-105, AS-111, AS-118 to AS-120, AS-127
 
-### Use as level music · v3
+### Use as level music · Later
 
 - Right-click a sound: **Use as level music**. It adds a trigger on the World that plays the sound on a loop at level start. It is an ordinary trigger, visible and editable.
 
@@ -112,7 +112,7 @@ Source: scope AS6; round 6: SND1
 
 ## Limits
 
-### Limits per level · v3
+### Limits per level · Later
 
 They matter once images and sounds exist. All are starting values. The 64 MB total is the owner's number (owner: 2026-11-13).
 
@@ -136,10 +136,10 @@ Small features from the old draft and review that the scope review never asked a
 | Feature | Rule | Version |
 |---|---|---|
 | Extra "Play sound" settings | The old draft had pitch, random pitch, fade in, and "if already playing: play another, restart, keep playing". The review kept only volume, loop, and start and end times | Later |
-| Too many of one sound | One file starts at most 3 times per tick, so 20 coins picked up together don't spike the volume | v3 |
-| Usage bar | The panel shows "23.4 of 64 MB", and turns amber at 80% | v3 |
-| Remove unused | Lists files with no uses and removes the ticked ones | v3 |
-| Swap with another file | Points every use of one file to another of the same kind | v3 |
-| Mute in test play | A mute switch on the Play bar, saved in the browser | v3 |
+| Too many of one sound | One file starts at most 3 times per tick, so 20 coins picked up together don't spike the volume | Later |
+| Usage bar | The panel shows "23.4 of 64 MB", and turns amber at 80% | Later |
+| Remove unused | Lists files with no uses and removes the ticked ones | Later |
+| Swap with another file | Points every use of one file to another of the same kind | Later |
+| Mute in test play | A mute switch on the Play bar, saved in the browser | Later |
 
 Source: old: AS-28, AS-32, AS-112, AS-118, AS-126, AS-129; owner: 2026-11-14

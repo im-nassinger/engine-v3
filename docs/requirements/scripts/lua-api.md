@@ -6,7 +6,7 @@ Every function the game gives scripts. Example scripts are in [lua-examples.md](
 
 The Status column says which functions the review named and which the owner decided after it. The owner approved the whole list on 2026-11-13.
 
-## Conventions · v2
+## Conventions · v5
 
 - **Every function is top level**, such as `spawn(path)`, never `world.spawn(path)`. Lua's own libraries (`string`, `table`, `math`) stay as Lua has them.
 - **Functions take ids, never objects.** An id is a number. A destroyed entity's id no longer exists: functions given one do nothing, and `exists(id)` returns false.
@@ -24,7 +24,7 @@ Source: round 3: D66; round 9: 10 2.7, 10 2.8; round 10: API1; owner: 2026-11-13
 
 Status: **Review** means the review named it. **Owner** means the owner decided it after the review.
 
-### Events · v2
+### Events · v5
 
 | Function | Does | Status |
 |---|---|---|
@@ -48,7 +48,7 @@ Script event names are the trigger events in snake_case.
 
 Source: round 9: 10 2.3; round 10: EV1; owner: 2026-11-13
 
-### Entities · v2
+### Entities · v5
 
 | Function | Does | Status |
 |---|---|---|
@@ -58,13 +58,13 @@ Source: round 9: 10 2.3; round 10: EV1; owner: 2026-11-13
 | `get_world()`, `get_camera()` | The World's id, the camera's id | Owner |
 | `get_parent(id)`, `get_children(id)` | The parent's id, a list of the children's ids | Owner |
 | `exists(id)` | False once the entity is destroyed | Owner |
-| `spawn(path)` | Creates an entity from an `.entity` file. Returns its id, or `nil` at the spawn limit | Review |
+| `spawn(path)` | Creates an entity from an `.entity` file. Returns its id, or `nil` at the spawn limit. Comes in v7, with `.entity` files | Review |
 | `destroy(id)` | Destroys the entity and its children at the end of the tick | Review |
 | `has_tag(id, tag)`, `add_tag(id, tag)`, `remove_tag(id, tag)` | Tags | Owner |
 
 Source: round 3: D66; round 9: 10 2.2, 10 2.4; owner: 2026-11-13
 
-### Component attributes · v2
+### Component attributes · v5
 
 | Function | Does | Status |
 |---|---|---|
@@ -74,7 +74,7 @@ Source: round 3: D66; round 9: 10 2.2, 10 2.4; owner: 2026-11-13
 
 Source: round 3: D66; round 9: 10 2.8; owner: 2026-11-13
 
-### Moving and physics · v2
+### Moving and physics · v5
 
 | Function | Does | Status |
 |---|---|---|
@@ -90,7 +90,7 @@ Source: round 3: D66; round 9: 10 2.8; owner: 2026-11-13
 
 Source: round 9: 10 2.7; owner: 2026-11-13
 
-### Variables, keys, the run · v2
+### Variables, keys, the run · v5
 
 | Function | Does | Status |
 |---|---|---|
@@ -105,7 +105,7 @@ Source: round 9: 10 2.7; owner: 2026-11-13
 
 Source: round 9: 10 2.5, 10 2.7; round 11: CL1; owner: 2026-11-13
 
-### Variables · v2
+### Variables · v5
 
 | Function | Type of the variable | Status |
 |---|---|---|
@@ -123,7 +123,7 @@ Source: round 9: 10 2.5, 10 2.7; round 11: CL1; owner: 2026-11-13
 
 Source: round 10: SC1; owner: 2026-11-13; owner: 2026-11-16
 
-### Comes with v3 features · v3
+### Comes with later features · Later
 
 | Function | Comes with | Status |
 |---|---|---|

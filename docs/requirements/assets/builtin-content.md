@@ -2,11 +2,11 @@
 
 ## TL;DR
 
-What comes with the game, in the read-only `builtin` folder: plain `.lua` and `.entity` files, with no private powers. **v2:** one platformer player and its script, built from coloured shapes. **v3:** the rest of the library (platforms, enemies, hazards, pickups, gadgets, projectiles, physics toys, the ragdoll), the other builtin scripts, and Kenney art. The v3 lists below are a starting design carried over from the old draft: the review accepted the categories, not each entry. Core rule: **a creator must be able to rebuild anything builtin using only what they have.**
+What comes with the game, in the read-only `builtin` folder: plain `.lua` and `.entity` files, with no private powers. **v7:** one platformer player and its script, built from coloured shapes. **Later:** the rest of the library (platforms, enemies, hazards, pickups, gadgets, projectiles, physics toys, the ragdoll), the other builtin scripts, and Kenney art. The Later lists below are a starting design carried over from the old draft: the review accepted the categories, not each entry. Core rule: **a creator must be able to rebuild anything builtin using only what they have.**
 
 ## The builtin folder
 
-### Plain files, no private powers · v2
+### Plain files, no private powers · v7
 
 - **There is no "behaviour".** A ready-made script is a plain `.lua` file in the read-only `builtin` folder. You drag one onto an entity's ScriptComponent.
 - Builtin entities are plain `.entity` files in the same folder. A builtin `.entity` file can hold scripts and art like any other.
@@ -15,23 +15,23 @@ What comes with the game, in the read-only `builtin` folder: plain `.lua` and `.
 - Builtin files can be opened and read, so they work as examples.
 - **Builtin files never change once released.** A new version is a new file. *Why: a game update must never change how an existing level plays.*
 - The folder shows the licence and author of each file.
-- *Why v2: it comes with the builtin folder.*
+- *Why v7: it comes with the builtin folder.*
 
 Source: round 1: C13, C15; round 2: R9; round 5: 04 2.5; old: PP-35, PP-38, AS-38, AS-40; owner: 2026-11-13
 
-## v2 content
+## v7 content
 
-### The builtin platformer player · v2
+### The builtin platformer player · v7
 
 - One `.entity` file: a group tagged `player`, with a Dynamic body with Fixed rotation, a shape to collide with, a narrower sensor at its feet to detect ground, and the builtin platformer script.
-- In v2 it is drawn with coloured shapes, because images come in v3.
+- In v7 it is drawn with coloured shapes, because images come Later.
 - It reads the inputs `left`, `right`, `down` and `jump`, which a new level defines on the World's InputComponent.
 - The camera follows it through the camera's own follow setting. Nothing is connected in a hidden way.
-- *Why: it proves a creator can build a player with only what they have, and it is the fastest way to test a level. Why v2: it is a script that reads inputs, and both come in v2.*
+- *Why: it proves a creator can build a player with only what they have, and it is the fastest way to test a level. Why v7: it is a script in an `.entity` file, and `.entity` files come in v7 (owner: 2026-11-20).*
 
 Source: scope EF4; round 1: C15; round 7: 08 2.4, 08 2.12; old: PP-33; owner: 2026-11-13
 
-### The builtin platformer script · v2
+### The builtin platformer script · v7
 
 Run, jump, double jump, ledge grace time and slopes.
 
@@ -44,7 +44,7 @@ Run, jump, double jump, ledge grace time and slopes.
 - Run speed is measured against the surface under the player, so a player on a moving platform moves with it and can walk on it.
 - The script assumes gravity points down.
 - All defaults are starting values for playtesting.
-- v3 adds one setting when one-way platforms arrive: Drop through one-way (Down plus Jump), on by default.
+- One setting comes Later, when one-way platforms arrive: Drop through one-way (Down plus Jump), on by default.
 
 | Setting | Range | Default |
 |---|---|---|
@@ -68,13 +68,13 @@ Run, jump, double jump, ledge grace time and slopes.
 | Keep platform speed on jump | On or off | On |
 | Left, Right, Down, Jump | An input each | `left`, `right`, `down`, `jump` |
 
-- *Why v2: it is the builtin player's script.*
+- *Why v7: it is the builtin player's script.*
 
 Source: scope EF4; round 3: P1; round 7: 08 2.7; decisions: D6; old: PP-46 to PP-56; owner: 2026-11-13
 
-## v3 content
+## Later content
 
-### The rest of the builtin .entity files · v3
+### The rest of the builtin .entity files · Later
 
 | Kind | Files | Made of |
 |---|---|---|
@@ -93,7 +93,7 @@ Source: scope EF4; round 3: P1; round 7: 08 2.7; decisions: D6; old: PP-46 to PP
 
 Source: scope EF5; round 1: D32, D61; round 7: 08 2.4, 08 2.12; round 8: CT1; old: PP-33, PP-34
 
-### The rest of the builtin scripts · v3
+### The rest of the builtin scripts · Later
 
 Scripts for movement, enemies, health, pickups, the camera and showing variables. Speeds are px/s, times are seconds.
 

@@ -3,7 +3,7 @@
 //   2. no doc is longer than 300 lines
 //   3. every relative link points to a file that exists
 //   4. in docs/requirements, every "###" feature heading ends in its version
-//      (· v1, · v2, · v3, · v4 or · Later) and is closed by a "Source:" line
+//      (· v1, · v2 and so on, or · Later) and is closed by a "Source:" line
 //   5. dropped words (the glossary's "Dropped words" table) are used nowhere
 //      except glossary.md and rejected.md. Naming one inside "double quotes" or
 //      `backticks` is fine: that is talking about the word, not using it, and so
@@ -100,7 +100,7 @@ for (const file of files) {
         openFeature = null;
       }
       if (line.startsWith("### ")) {
-        if (!/ · (v1|v2|v3|v4|Later)$/.test(line)) problems.push(`${where}: heading doesn't end in · v1, · v2, · v3, · v4 or · Later`);
+        if (!/ · (v[1-9]|Later)$/.test(line)) problems.push(`${where}: heading doesn't end in · v1, · v2 and so on, or · Later`);
         openFeature = { where, title: line.slice(4) };
       }
       if (line.startsWith("Source: ")) openFeature = null;

@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The frame around everything: where the islands sit, ☰ and the main menu, the debug box and the minimap, the seven tools, moving around the level view, the grid and snapping, and how the editor behaves inside a browser. **v1:** islands on top of a full-window level view (the redesign, owner: 2026-11-17), a show-only minimap, three of the seven tools on their number keys, pan and zoom from 1% to 1000%, and a grid you can snap to. **v2:** the other four tools and the searchable shortcut list. **v3:** resizing and collapsing panels, moving the view with the minimap, and snapping to other entities with pink guides. The shortcut table itself is in [shortcuts.md](shortcuts.md).
+The frame around everything: where the islands sit, ☰ and the main menu, the debug box and the minimap, the seven tools, moving around the level view, the grid and snapping, and how the editor behaves inside a browser. **v1:** islands on top of a full-window level view (the redesign, owner: 2026-11-17), a show-only minimap, three of the seven tools on their number keys, pan and zoom from 1% to 1000%, and a grid you can snap to. **v2 to v6:** the other four tools, each with its version. **v4:** the searchable shortcut list. **Later:** resizing and collapsing panels, moving the view with the minimap, and snapping to other entities with pink guides. The shortcut table itself is in [shortcuts.md](shortcuts.md).
 
 Sizes in pixels are starting values until tested.
 
@@ -14,18 +14,18 @@ Sizes in pixels are starting values until tested.
 - **Top left: ☰**, a 48 px square. **Under it: the tool column**, 48 px wide. **Beside them, from the top: the Entity inspector.** **Top right: the Entities viewer**, only as tall as its rows. **Bottom right: the minimap**, with the debug box under it. Nothing else sits at the top: there is no bar across the window (owner: 2026-11-17).
 - **The Entities viewer grows with its rows** until it reaches 10 px above the minimap; then a scrollbar appears. The minimap always shows (owner: 2026-11-18).
 - **The Entity inspector grows with its cards** the same way, until it reaches 10 px above the window's bottom; then its cards scroll. With nothing selected it is hidden (owner: 2026-11-19).
-- In v2 the Assets panel and the Console come with scripts; where they go is decided then. *Why: the owner's smaller v1 has no files and no scripts.*
+- In v5 the Assets panel and the Console come with scripts; where they go is decided then. *Why: the owner's smaller v1 has no files and no scripts.*
 - Islands can't be dragged to other places or floated. *Why: fixed places are enough for the first version, and docking is a large feature.*
 - Starting sizes: ☰ and the tool column 48 px wide with 34 px buttons, Entity inspector 300 px, Entities viewer 260 px, minimap 180 px.
 - **The free area** is the level view between the Entity inspector and the Entities viewer, so fitting the view frames the level where it is seen.
-- The centre has a permanent `Level` tab. A `.lua` file opens as an extra closable tab beside it, one per file (v2). The tab strip shows only while an extra tab is open.
+- The centre has a permanent `Level` tab. A `.lua` file opens as an extra closable tab beside it, one per file (v5). The tab strip shows only while an extra tab is open.
 - **While the Shape tool is active the Entity inspector is hidden** (owner: 2026-11-15), and the tool's kinds menu stands open beside it, see [drawing](../drawing.md#the-shape-tool--v1). The Joint tool's types have the same menu (owner: 2026-11-18), and the Entity inspector is hidden with it too (standing yes, 2026-11-19). *Why: the menu stands where the Entity inspector is, and the owner found the Entity inspector showing behind it (2026-11-19).*
 - One dark theme. *Why: art and levels read well on it.*
 - Folded cards and open tabs are editor settings saved in the browser. They are never in the level and never in undo.
 
 Source: round 1: D12; round 3: 01 2.1; old: WS-01 to WS-15; owner: 2026-11-13, 2026-11-14, 2026-11-15, 2026-11-17, 2026-11-18, 2026-11-19
 
-### Resize and collapse the panels · v3
+### Resize and collapse the panels · Later
 
 - Drag a panel's edge to make it wider or narrower: the Entities viewer and the Assets panel 200 to 480 px, the Entity inspector 260 to 520 px, the Console 120 px to 60% of the window.
 - Click a panel's title to fold it away. A folded panel becomes a 28 px strip. Double-clicking an edge restores the default size.
@@ -54,7 +54,7 @@ Source: scope ED6; round 1: D12; old: WS-02, WS-10, WS-12, WS-13
 - *Why no buttons for Undo, Redo, Save or Play: each extra island at the top made the editor busier, and the owner tried them in many places before choosing one button for everything (owner: 2026-11-17). The keys stay.*
 - **The level's name isn't shown in the editor** (owner: 2026-11-17). The level keeps its name in the file; File → Rename level… changes it in a small dialog (owner: 2026-11-18). Renaming is an undo step.
 - **The browser tab title shows the level's name, with `*` in front while there are unsaved changes** (owner: 2026-11-18). There is no save state on screen; a failed save shows in the message pill until it is fixed.
-- Space for publishing and account controls is decided in v4.
+- Space for publishing and account controls is decided Later.
 
 Source: round 3: 01 2.2, 2.3; round 8: VW1; old: WS-16 to WS-27; owner: 2026-11-14, 2026-11-17, 2026-11-18
 
@@ -73,7 +73,7 @@ Source: round 3: 01 2.2, 2.3; round 8: WN1; round 10: EM1; old: WS-29 to WS-31; 
 
 Source: owner: 2026-11-17, 2026-11-18
 
-### Moving the view with the minimap · v3
+### Moving the view with the minimap · Later
 
 - Clicking on the minimap centres the level view there; dragging moves it.
 
@@ -90,11 +90,11 @@ Source: owner: 2026-11-18
 | 3 | Joint | A joint between two entities | [joints](../physics/joints.md) |
 | v2 | Pencil | A freehand path | [drawing](../drawing.md) |
 | v2 | Bézier pen | A path with curves | [drawing](../drawing.md) |
-| v2 | Text | A text entity | [drawing](../drawing.md) |
-| v2 | Trigger | A rectangle that notices touching, with a trigger | [triggers](../triggers/triggers.md) |
+| v6 | Text | A text entity | [drawing](../drawing.md) |
+| v3 | Trigger | A rectangle that notices touching, with a trigger | [triggers](../triggers/triggers.md) |
 
 - *Why seven: the owner wanted fewer tools. Point editing moved into Select (double-click) as in Inkscape and Figma, and panning is Space, so neither needs a tool.*
-- **v1 has three of them: Select (1), Shape (2) and Joint (3)** (owner: 2026-11-19, replacing 1, 4 and 6). The Pencil, the Bézier pen, Text and Trigger come in v2, and their keys are decided then. *Why: in the smaller v1 a path is decoration only, text was for a score, and there are no triggers; the owner wants v1's tools on the first three keys for now.*
+- **v1 has three of them: Select (1), Shape (2) and Joint (3)** (owner: 2026-11-19, replacing 1, 4 and 6). The Pencil and the Bézier pen come in v2, Trigger in v3 and Text in v6, and their keys are decided then. *Why: in the smaller v1 a path is decoration only, text was for a score, and there are no triggers; the owner wants v1's tools on the first three keys for now.*
 - The tools are 34 px buttons in the tool column. Exactly one tool is active, drawn in the soft accent.
 - **After making something, every tool returns to Select** with the new entity selected, the Joint tool included. To make many in a row, use tool lock. *Why: one rule for every tool, and tool lock already covers placing many joints (owner: 2026-11-13).*
 - **Tool lock:** double-clicking a tool button, or pressing its number key twice, keeps the tool active until another tool is picked or Esc is pressed.
@@ -121,7 +121,7 @@ So Esc walks outward and never only deselects inside a group. During play, Esc o
 
 Source: round 2: O7; old: WS-40, SG-79
 
-### The searchable list of shortcuts · v2
+### The searchable list of shortcuts · v4
 
 - `?` opens a sheet listing every shortcut by area. It stays open while you work and can be searched.
 - Every icon button has a tooltip with its name and shortcut.
@@ -129,7 +129,7 @@ Source: round 2: O7; old: WS-40, SG-79
 - Shortcuts can't be changed by the user.
 - On a Mac, Ctrl is Cmd and Alt is Option.
 - The shortcuts themselves are in [shortcuts.md](shortcuts.md).
-- *Why v2: it was settled before the scope review, so it never went through "smallest thing that can be tested". In v1 the main menu already lists every command with its shortcut.*
+- *Why v4: the owner wants it then (owner: 2026-11-20). In v1 the main menu already lists every command with its shortcut.*
 
 Source: round 3: 01 2.5; old: WS-42 to WS-44, WS-140; owner: 2026-11-13
 
@@ -161,7 +161,7 @@ Source: scope ED1; round 3: 01 2.6; round 5: 02 2.5; old: WS-46 to WS-52, WS-56,
 
 Source: scope ED4; round 3: 01 2.6; round 5: FMT1; round 7: BND2; old: WS-53, WS-54, WS-58 to WS-62; owner: 2026-11-13, 2026-11-14, 2026-11-19
 
-### Snapping to other entities · v3
+### Snapping to other entities · Later
 
 - With it on, the edges and centre of what you move snap to the edges and centres of other entities, to the camera frame and to the level bounds. Equal gaps between neighbours snap too.
 - Thin pink guide lines show what is aligned, with a small distance label and equal-gap marks. They disappear on release.
@@ -190,14 +190,14 @@ Small features from the old draft and review that the scope review never asked a
 | No page gestures | Page scrolling, overscroll bounce and swipe-back are off on the editor page, because they would wreck a drag. The middle mouse button never starts the browser's autoscroll, and Alt alone never opens the browser menu | v1 |
 | Losing focus mid-drag | If the window loses focus during a drag, the drag cancels and held keys count as released | v1 |
 | Browser zoom | Browser zoom scales the interface. The level view stays sharp and the mouse stays accurate at any browser zoom | v1 |
-| Small windows | Under 1280 px wide the panels get narrower. Under 1024 px the Console, then the Entities viewer and the Assets panel, then the Entity inspector fold away by themselves and come back when there is room. Under 640×480 a notice asks for a bigger window. The level is never lost | v3 |
-| Touch devices | On a touch-only device a notice says the editor needs a mouse and keyboard | v3 |
-| First-run hints | A hint card in an empty level ("Press 4 and drag to draw a shape"), then one hint pointing to Play. Hints end after the first Play | v3 |
-| Hide all panels | `Ctrl+\` hides every island, leaving the level view and a small restore button | v3 |
-| Temporary zoom tool | Hold Z: drag draws a zoom box, click zooms in, Alt+click zooms out | v3 |
-| Scroll wheel pans | A setting for trackpads: two-finger scroll pans, pinch still zooms | v3 |
-| Rulers | Rulers along the top and left in level pixels, off by default | v3 |
-| Whole pixels | A snapping switch that keeps positions on whole pixels, on by default | v3 |
-| Short motion | Animations in the editor take 150 ms or less, and are off when the system asks for reduced motion | v3 |
+| Small windows | Under 1280 px wide the panels get narrower. Under 1024 px the Console, then the Entities viewer and the Assets panel, then the Entity inspector fold away by themselves and come back when there is room. Under 640×480 a notice asks for a bigger window. The level is never lost | Later |
+| Touch devices | On a touch-only device a notice says the editor needs a mouse and keyboard | Later |
+| First-run hints | A hint card in an empty level ("Press 4 and drag to draw a shape"), then one hint pointing to Play. Hints end after the first Play | Later |
+| Hide all panels | `Ctrl+\` hides every island, leaving the level view and a small restore button | Later |
+| Temporary zoom tool | Hold Z: drag draws a zoom box, click zooms in, Alt+click zooms out | Later |
+| Scroll wheel pans | A setting for trackpads: two-finger scroll pans, pinch still zooms | Later |
+| Rulers | Rulers along the top and left in level pixels, off by default | Later |
+| Whole pixels | A snapping switch that keeps positions on whole pixels, on by default | Later |
+| Short motion | Animations in the editor take 150 ms or less, and are off when the system asks for reduced motion | Later |
 
 Source: round 3: 01 2.13; old: WS-11, WS-36, WS-51, WS-55, WS-59, WS-137 to WS-139, WS-145 to WS-153; owner: 2026-11-14

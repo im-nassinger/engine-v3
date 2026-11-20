@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-How values are edited and how mistakes are reversed. **v1:** the Entity inspector shows each component as a card, built from one fixed list of field types; a component that needs a partner shows a note with a button instead of adding it; warnings sit on the card they are about; copy, paste, duplicate and delete; undo with 512 steps. **v3:** copying values and whole components between entities, tips, the physics and joint warnings, and the Used by list.
+How values are edited and how mistakes are reversed. **v1:** the Entity inspector shows each component as a card, built from one fixed list of field types; a component that needs a partner shows a note with a button instead of adding it; warnings sit on the card they are about; copy, paste, duplicate and delete; undo with 512 steps. **Later:** copying values and whole components between entities, tips, the physics and joint warnings, and the Used by list.
 
 ## The Entity inspector
 
@@ -13,7 +13,7 @@ How values are edited and how mistakes are reversed. **v1:** the Entity inspecto
 - **The World's settings are its components**, shown when its row is selected in the Entities viewer. There is no settings window. *Why: the World is an entity like any other, so its settings are its components.*
 - **With nothing selected the Entity inspector is hidden** (owner: 2026-11-19), replacing showing the World. *Why: what the Entity inspector shows is always what is selected, so the Entities viewer and the Entity inspector never disagree.*
 - The World's TransformComponent is fixed at zero and its card isn't shown, because the World never moves (owner: 2026-11-13).
-- The header shows the entity's name (editable), and its hide switch, and from v3 its lock switch. With several selected it reads `3 entities`.
+- The header shows the entity's name (editable), and its hide switch, and Later its lock switch. With several selected it reads `3 entities`.
 - The Entity inspector doesn't show the parent. The Entities viewer tree does.
 - Cards appear in one fixed order, the same on every entity: TransformComponent, shape, path, text, style, body, surface, joint, camera, tags, scripts, triggers. Users can't reorder them.
 - Clicking a card's title folds it. The folded state is remembered per component type, in the browser.
@@ -78,7 +78,7 @@ Source: round 3: 01 2.5; old: WS-114, WS-115, WS-119 to WS-122, WS-125, WS-126; 
 
 Source: round 5: AD2; old: WS-101, WS-102, WS-106, WS-112; owner: 2026-11-13, 2026-11-14, 2026-11-17
 
-### Copy values and components · v3
+### Copy values and components · Later
 
 - Right-click any field: **Copy value**, **Paste value**.
 - Right-click a card's title: **Copy component**, then **Paste** onto the selection. Paste updates that component on every selected entity and adds it where it is missing.
@@ -87,7 +87,7 @@ Source: round 5: AD2; old: WS-101, WS-102, WS-106, WS-112; owner: 2026-11-13, 20
 
 Source: scope ED7; round 6: CP1
 
-### The Used by list · v3
+### The Used by list · Later
 
 - At the bottom of the Entity inspector, a list shows every entity that points to the selected one, and from where, such as "Hinge 1 (JointComponent, A)". Click a line to select that entity.
 - *Why: a joints-only list would be a special case. "What points to this?" is the general question, the same idea as assets showing where they're used.*
@@ -106,16 +106,16 @@ Source: scope SE13; round 8: LK1
 
 Source: scope ED8; round 7: 06 2.13; round 8: WN1; round 10: EM1; old: WS-141 to WS-143; owner: 2026-11-18
 
-### Tips · v3
+### Tips · Later
 
 - A tip says something works but there is an easier way. Example: an entity with more than 12 triggers gets a tip suggesting a script.
 
 Source: scope ED9; round 9: 09 2.16; round 10: EM1
 
-### Warnings for physics and joints · v3
+### Warnings for physics and joints · Later
 
 - Warnings for setups likely to behave badly, such as a joint end that is off its entity, or a small, fast Dynamic body without Bullet that may pass through walls. The full lists are in [bodies](../physics/bodies.md) and [joints](../physics/joints.md).
-- *Why v3: each warning is its own small rule to find and write.*
+- *Why Later: each warning is its own small rule to find and write.*
 
 Source: scope ED10; round 6: 05 2.9; round 7: 06 2.13
 
@@ -184,17 +184,17 @@ Small features from the old draft and review that the scope review never asked a
 | Feature | Rule | Version |
 |---|---|---|
 | Editing several entities at once | Only components present on every selected entity appear. Different values show as `Mixed`. Typing a value sets it on all | v1 |
-| Relative edits | In a mixed number field, `+=10`, `-=`, `*=`, `/=` change each entity from its own value | v3 |
-| Arithmetic in fields | Number fields accept `100/2+8` | v3 |
-| Scrubbing | Dragging a number field's label changes it live: 1 per pixel, Shift 10, Alt 0.1. One undo step. Up and Down in a focused field do the same | v3 |
-| Reset to default | Right-click a field: Reset to default | v3 |
-| Align and distribute | Buttons at the top of the Entity inspector and in the Arrange menu: align left, centre, right, top, middle, bottom, and spread evenly. A group counts as one entity. One-off moves, unlike Flex | v3 |
-| Draw order commands | Bring forward, send backward, to front, to back, within the same group. Dragging rows in the Entities viewer already does this | v3 |
-| Paste in place | Ctrl+Shift+V pastes at the original level position. `Paste here` in the context menu uses the right-click position | v3 |
-| Repeat duplicate | Move a duplicate, press Ctrl+D again, and the next copy repeats the same move | v3 |
-| Alt+drag copy | Alt+drag an entity drags out a copy, as one undo step | v3 |
-| Paste between levels | Copied entities survive the session and paste into another level or tab, bringing the files they use. Text or an image on the clipboard pastes as a text entity or a new image file | v3 |
-| Context menus | The editor replaces the browser's right-click menu, except in text fields and the code editor. Every entry shows its shortcut, and disabled entries stay visible | v3 |
-| Undo list | An arrow beside Undo lists the last 50 steps. Clicking one goes back to it | v3 |
+| Relative edits | In a mixed number field, `+=10`, `-=`, `*=`, `/=` change each entity from its own value | Later |
+| Arithmetic in fields | Number fields accept `100/2+8` | Later |
+| Scrubbing | Dragging a number field's label changes it live: 1 per pixel, Shift 10, Alt 0.1. One undo step. Up and Down in a focused field do the same | Later |
+| Reset to default | Right-click a field: Reset to default | Later |
+| Align and distribute | Buttons at the top of the Entity inspector and in the Arrange menu: align left, centre, right, top, middle, bottom, and spread evenly. A group counts as one entity. One-off moves, unlike Flex | Later |
+| Draw order commands | Bring forward, send backward, to front, to back, within the same group. Dragging rows in the Entities viewer already does this | Later |
+| Paste in place | Ctrl+Shift+V pastes at the original level position. `Paste here` in the context menu uses the right-click position | Later |
+| Repeat duplicate | Move a duplicate, press Ctrl+D again, and the next copy repeats the same move | Later |
+| Alt+drag copy | Alt+drag an entity drags out a copy, as one undo step | Later |
+| Paste between levels | Copied entities survive the session and paste into another level or tab, bringing the files they use. Text or an image on the clipboard pastes as a text entity or a new image file | Later |
+| Context menus | The editor replaces the browser's right-click menu, except in text fields and the code editor. Every entry shows its shortcut, and disabled entries stay visible | Later |
+| Undo list | An arrow beside Undo lists the last 50 steps. Clicking one goes back to it | Later |
 
 Source: round 4: FX1; old: WS-66 to WS-70, WS-73 to WS-79, WS-83, WS-105, WS-108 to WS-111, WS-116 to WS-118, WS-123, WS-134, WS-144; owner: 2026-11-14

@@ -174,7 +174,7 @@ on("heal", function(sender, amount)
 end)
 ```
 
-## Dragging with the mouse · v3
+## Dragging with the mouse · Later
 
 ```lua
 on("tick", function()

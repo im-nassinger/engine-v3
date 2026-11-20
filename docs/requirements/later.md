@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Features that come after v3 and were left out of both reviews on purpose: a main menu with a list of levels, level ids, thumbnails, component presets, accounts and publishing (planned as v4), public uploads and moderation, replays, sprite sheets and animations. **Nothing here is decided.** The notes are what the old draft said, kept so the thinking isn't lost. Each needs its own review before it is planned. The principle: don't plan for what is certainly later.
+Later features that aren't designed yet, left out of both reviews on purpose: a main menu with a list of levels, level ids, thumbnails, component presets, accounts and publishing (planned as the last thing in Later), public uploads and moderation, replays, sprite sheets and animations. **Nothing here is decided.** The notes are what the old draft said, kept so the thinking isn't lost. Each needs its own review before it is planned. The principle: don't plan for what is certainly later.
 
 Other Later features are described where they belong: parallax and more than one camera in [camera.md](camera.md), trimming a sound in [assets](assets/files-and-sound.md), touch controls in [variables and inputs](triggers/variables-and-inputs.md).
 
@@ -53,7 +53,7 @@ Source: round 1: D28; round 5: 04 2.9–2.11; decisions: D29
 
 ### Accounts and publishing · Later
 
-Planned as v4: v1 is a level you build and watch, v2 adds logic and play, v3 adds polish and content, v4 adds accounts and publishing. Notes from the old draft:
+Planned as the last thing in Later, after every small version that builds and plays levels (owner: 2026-11-20). Notes from the old draft:
 
 - **Accounts** are needed to publish, rate, comment and follow, never to play or to report. The editor stays fully usable with no account.
 - **Publishing** uploads a copy of a local level and gives it a permanent link. Checks run first: the level is valid, within the published limits, and runs. A level declares whether it has a goal. If it does, its creator must win it first, which is why a run records won and lost apart.

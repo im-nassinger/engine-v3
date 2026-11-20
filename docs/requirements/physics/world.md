@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The level-wide physics settings, all on the World entity. **v1:** gravity as one vector, the background colour (the World's StyleComponent), and level bounds (the World's rectangle ShapeComponent) whose edges are all walls or all open. **v3:** the collision grid (which tags hit which), the Collision check, gravity buttons, game speed, and a background image. Core rule: **the collision grid on the World is the one place that decides what hits what.** There is no second system beside it.
+The level-wide physics settings, all on the World entity. **v1:** gravity as one vector, the background colour (the World's StyleComponent), and level bounds (the World's rectangle ShapeComponent) whose edges are all walls or all open. **Later:** the collision grid (which tags hit which), the Collision check, gravity buttons, game speed, and a background image. Core rule: **the collision grid on the World is the one place that decides what hits what.** There is no second system beside it.
 
 ## World settings
 
@@ -13,19 +13,19 @@ The level-wide physics settings, all on the World entity. **v1:** gravity as one
 - Zero gravity is 0, 0, so it keeps no direction. Typing a new vector sets both again.
 - Sizes and speeds are in pixels. Gravity is in m/s², like real life, and mass is in kg. These are the only physical units.
 - The 9.8 default feels floaty for a platformer. The fix is the player's Gravity scale, not the world's gravity: the builtin platformer script sets it from its jump variables.
-- **The background colour is the fill of the World's StyleComponent**, which paints the World's rectangle, the level bounds. A soft light blue by default, **`#BFE3F5`**, with no outline, because the editor already draws the bounds as a thin frame. *Why: a StyleComponent already holds a fill, so the background needs no setting of its own, and in v3 an image fill becomes the background image (owner: 2026-11-13). Why this blue: every default shape colour stands out on it (standing yes, 2026-11-14).*
+- **The background colour is the fill of the World's StyleComponent**, which paints the World's rectangle, the level bounds. A soft light blue by default, **`#BFE3F5`**, with no outline, because the editor already draws the bounds as a thin frame. *Why: a StyleComponent already holds a fill, so the background needs no setting of its own, and Later an image fill becomes the background image (owner: 2026-11-13). Why this blue: every default shape colour stands out on it (standing yes, 2026-11-14).*
 - Triggers and scripts can change gravity and the World's whole StyleComponent during play, the background colour included. **Walls can't change during play**, because the bounds don't (standing yes, 2026-11-14). Changing gravity wakes every sleeping body, so nothing hangs in mid-air.
 - The World's settings are edited in the Entity inspector, like any entity's.
 
 Source: scope PH9; round 1: C3, D6, D38; round 3: D75, R15; round 6: 05 2.14; round 7: CF1; old: PH-82 to PH-84, PH-88, PH-89; owner: 2026-11-13, 2026-11-14, 2026-11-15
 
-### Buttons for gravity · v3
+### Buttons for gravity · Later
 
 - Quick buttons for how strong gravity is: Earth 9.8, Moon 1.6, Arcade 30, None 0. Each sets the vector's length and keeps its direction; from 0, 0 they point down (standing yes, 2026-11-15: gravity became a vector, and the buttons are about strength, not direction).
 
 Source: scope PH10; round 6: 05 2.14; old: PH-85; owner: 2026-11-15
 
-### Game speed · v3
+### Game speed · Later
 
 - A World setting: 1 is normal, 0.5 half, 2 double. Triggers and scripts can change it, such as slow motion for 2 seconds after a bomb.
 - It slows physics, timers and script waits together. Keys and sound stay at real speed.
@@ -34,7 +34,7 @@ Source: scope PH10; round 6: 05 2.14; old: PH-85; owner: 2026-11-15
 
 Source: scope PH11; round 3: D75; round 6: 05 2.14; round 9: 09 2.10; old: PH-87
 
-### Background image · v3
+### Background image · Later
 
 - The background can be an image instead of a colour: the World's StyleComponent gets an image fill. It comes with images.
 - A missing image falls back to the colour.
@@ -43,7 +43,7 @@ Source: scope DR11; round 6: 05 2.14; old: PH-88
 
 ## What hits what
 
-### The collision grid · v3
+### The collision grid · Later
 
 - **The collision grid uses tags.** You pick which tags appear in the grid, and tick which of them hit each other. An entity's tags decide what its surfaces hit.
 - Tags that aren't in the grid don't affect collisions.
@@ -60,7 +60,7 @@ Source: scope DR11; round 6: 05 2.14; old: PH-88
 
 Source: scope PH6; round 6: 05 2.12, 05 2.13; round 7: CF1; round 8: CF3, CF4, CT1; old: PH-64 to PH-77
 
-### The Collision check · v3
+### The Collision check · Later
 
 - Right-click two entities: **"Why do these collide?"**. It answers "These collide", or names the first rule that stops them.
 
@@ -100,11 +100,11 @@ Small features from the old draft and review that the scope review never asked a
 | Feature | Rule | Version |
 |---|---|---|
 | "Keep going" past an open edge | A setting to keep entities instead of removing them. The review only kept removal | Later |
-| Hard limit | Any body 100,000 px from the origin is removed, with a warning: the status text in v1, the Console from v2 | v1 |
+| Hard limit | Any body 100,000 px from the origin is removed, with a warning: the status text in v1, the Console from v5 | v1 |
 | Maximum level size | 200,000×200,000 px | v1 |
-| Gravity in pixels hint | Under Gravity: "490 px/s². An entity falls 245 px in the first second." | v3 |
-| Background image layout | Fill the screen or tile, and how much it scrolls with the camera, from 0% to 100% | v3 |
-| Grid window details | Colours per tag, drag across cells to paint, "Collide with all" and "Collide with none" per row | v3 |
-| Removal line in the Console | "Crate left the level and was removed." | v3 |
+| Gravity in pixels hint | Under Gravity: "490 px/s². An entity falls 245 px in the first second." | Later |
+| Background image layout | Fill the screen or tile, and how much it scrolls with the camera, from 0% to 100% | Later |
+| Grid window details | Colours per tag, drag across cells to paint, "Collide with all" and "Collide with none" per row | Later |
+| Removal line in the Console | "Crate left the level and was removed." | Later |
 
 Source: old: PH-73, PH-74, PH-86, PH-88, PH-93, PH-95, PH-96, PH-99; owner: 2026-11-14
