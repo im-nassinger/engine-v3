@@ -27,12 +27,15 @@ The full list, with the review decision behind each, is in [principles.md](princ
 | Version | What it is | In short |
 |---|---|---|
 | **v1** | Build and watch. The smallest thing that can be tested | One level of coloured shapes, physics with three joints, the camera following an entity, Play, Stop, Pause and Step, the determinism test, saving in the browser, export and import. Nothing reacts to keys |
-| **v2** | Logic and play | Triggers, variables, inputs, scripts with the code editor and the Console, the Assets panel, `.entity` files and spawning, the builtin player, Win and Lose, the pause menu, text, paths, gradients |
-| **v3** | Polish and content | Images, sound, four more joints, the collision grid, Flex and Fill window, linked copies, the builtin library, remapping and gamepads, editor comforts, the play file |
-| **v4** | Accounts and publishing | Not designed yet |
-| **Later** | Not designed yet | A main menu with a list of levels, component presets, replays, sprite sheets |
+| **v2** | Draw curves | The Bézier pen, the Pencil, gradients |
+| **v3** | A first game without code | Sensors, tags, the first triggers, number variables on the World, inputs, Win and Lose |
+| **v4** | Things that react to each other and to time | The rest of the triggers, string and boolean variables on any entity, the shortcut list |
+| **v5** | Code | Scripts, the code editor, the Console, the Assets panel |
+| **v6** | Text on screen | The Text tool, entities inside the camera |
+| **v7** | Reuse and a ready-made player | `.entity` files, spawning, the builtin folder and player |
+| **Later** | In no planned version yet | Images, sound, more joints, the collision grid, Flex, the pause menu, live values, editor comforts, the play file, and last accounts and publishing |
 
-117 features went through the scope review. The owner then made v1 smaller, so today: 31 in v1, 20 in v2, 65 in v3, 1 Later, plus the features settled outside the review. Every one is listed in [scope.md](scope.md) with its reason.
+After v1 every version is small and adds one thing you can try at once, the most value for the least work first, and only the next few are planned (owner, 2026-11-20). Every feature is listed in [scope.md](scope.md) with its version and reason.
 
 ## How to read these docs
 

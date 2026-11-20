@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-What each stage of [plan.md](plan.md) showed when it was built, newest first: the modules it added, the choices it made, CI's failures and what it left for later. Moved out of [progress.md](progress.md) on 2026-11-20 to keep that file short. Stages 0 to 19 are built; nothing of v2 is.
+What each stage of [plan.md](plan.md) showed when it was built, newest first: the modules it added, the choices it made, CI's failures and what it left for later. Moved out of [progress.md](progress.md) on 2026-11-20 to keep that file short. **The versions named here are the old ones** (v2 logic and play, v3 polish); since 2026-11-20 they are spread over v2 to v7 and Later, see [scope.md](scope.md). Stages 0 to 19 are built; nothing of v2 is.
 
 ## Stage 19, the redesign, built on 2026-11-19
 

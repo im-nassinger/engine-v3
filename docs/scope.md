@@ -123,7 +123,7 @@ Rules: [requirements/assets](requirements/assets/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
-| AS1 | The Assets panel, with folders and the builtin folder, holding your .lua and .entity files. | v5 | It holds .lua and .entity files, which both come in v2. Was v1 in the scope review: Scripts and .entity files live there. |
+| AS1 | The Assets panel, with folders and the builtin folder, holding your .lua and .entity files. | v5 | It holds .lua files, which come in v5 (owner: 2026-11-20). Was v1 in the scope review: Scripts and .entity files live there. |
 | AS2 | Moving or renaming a file in the Assets panel updates every file path that points to it. Example: moving coin.entity into a pickups folder keeps every spawn of it working. | v5 | Comes with the Assets panel. Was v1 in the scope review: Otherwise moving a file silently breaks everything that uses it. |
 | AS3 | Search and sort in the Assets panel. | Later | A test level has few files. |
 | AS4 | Sound: import WAV, MP3 or OGG, then triggers and scripts start and stop sounds, with volume, loop, and start and end times. | Later | A silent level can still be tested. Sound brings importing, playing up to 32 at once, and the player's Volume slider with it. |

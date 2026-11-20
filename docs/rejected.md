@@ -31,7 +31,7 @@ What we decided against, and why. **Check here before proposing something**: an 
 | A Line choice in the Shape tool's options strip | A polygon finished open with Enter is a line | One choice draws both | owner: 2026-11-15 |
 | A separate tool for editing points, and tools for each shape | Double-click with Select, one Shape tool | The owner wanted fewer tools | round 4: TK1; round 5: TK2 |
 | Ctrl+click for the deepest entity | Alt+click for the next entity underneath | One key is enough | round 4: 02 2.2 |
-| An "Entities here" list in the right-click menu | The Entities panel, and Alt+click in v3 | Two ways to reach a hidden entity are enough | owner: 2026-11-14 |
+| An "Entities here" list in the right-click menu | The Entities panel, and Alt+click (Later) | Two ways to reach a hidden entity are enough | owner: 2026-11-14 |
 | "Select same type" and "Select same tag" | Select all and Invert only | Dropped by the owner | round 4: 02 2.5 |
 | A selection box that needs entities fully inside | It selects anything it touches | The owner's change | round 1: D19 |
 | Duplicate with an offset | The copy sits on top of the original | The owner's change | round 3: 01 2.9 |
@@ -98,7 +98,7 @@ What we decided against, and why. **Check here before proposing something**: an 
 | Ctrl+S saves a version | Ctrl+S exports the project file | Version history was dropped, and a Ctrl+S that did nothing would look like a save | round 12: SV1 |
 | One `.level` file | `.editable` to keep editing, `.playable` to play | The owner's names: they say what each file is for | round 11: 12 A10; round 12: EXT1 |
 | Limits of 10,000 entities and a 100 MB file | 100,000 entities and 256 MB | The owner's numbers | round 11: 12 A8 |
-| 2,000 files in a level and 250 MB unpacked, beside the 256 MB file limit | One 256 MB limit counted unpacked, and 500 files per level from v3 | One number covers both, and 500 files already limits the count | owner: 2026-11-13 |
+| 2,000 files in a level and 250 MB unpacked, beside the 256 MB file limit | One 256 MB limit counted unpacked, and 500 files per level once images and sounds come | One number covers both, and 500 files already limits the count | owner: 2026-11-13 |
 | 50 MB of imported files per level | 64 MB | The owner's number | owner: 2026-11-13 |
 | 500 undo steps | 512 steps | The owner's number | owner: 2026-11-13 |
 | A camera with no eye icon | An eye like every row, hiding everything inside the camera | No special cases | owner: 2026-11-13 |
@@ -108,7 +108,7 @@ What we decided against, and why. **Check here before proposing something**: an 
 | Level bounds as fields on the PhysicsWorldComponent | A rectangle ShapeComponent on the World | A rectangle already has a size, a card and handles | owner: 2026-11-13 |
 | A Wall or Open choice for each edge of the level bounds | One Walls checkbox: all four edges walls, or all open | One toggle is enough | owner: 2026-11-13 |
 | The Joint tool stays active after each joint | It returns to Select like every tool. Tool lock keeps it | One rule for every tool | owner: 2026-11-13 |
-| "Play as player": a test run with no debug tools | Play | Play already hides the panels, and v3 runs the play file | owner: 2026-11-13 |
+| "Play as player": a test run with no debug tools | Play | Play already hides the panels, and the play file (Later) runs it outside the editor | owner: 2026-11-13 |
 | "Transform" as the component's name | TransformComponent; only its card's title reads `Transform` | Component names end in `Component`; card titles drop it (owner: 2026-11-17) | owner: 2026-11-13, 2026-11-17 |
 | An import that compares level ids and asks Keep both or Replace | Import replaces the open level after asking | v1 keeps no list of levels, so there is nothing to compare against | round 11: 12 A11; round 12: LV1 |
 | CodeMirror | Monaco | The owner's choice | round 9: 10 2.13 |
@@ -136,11 +136,11 @@ Not planned for any version. Each would need its own review.
 
 **Drawing:** union and subtract of shapes (a group with a body already merges shapes, and subtract needs holes), polygons with holes, dashed outlines, outlines drawn inside or outside the edge, rich text, text on a path, fonts uploaded by users, a radius per corner, star, arc and pie tools, a polygon that updates by itself when its path changes, collision that follows the outer edge of a thick outline (it follows the centre), joining two paths into one, brushes and arrowheads, shared named styles, group opacity.
 
-**Physics:** storing a mass of its own (typed Mass sets density), setting the centre of mass directly, changing the collision grid or level bounds during play, changing shape or scale during play, a physics preview in the editor, radial gravity, wind and water, several background layers, tracing an image into a collision polygon, showing pixels per metre as a setting, Pulley and Gear joints (after v3), motor, friction and mouse joints, a chain generator tool, switching a joint off and on during play (destroy covers it), joint presets, separate force and torque limits for breaking.
+**Physics:** storing a mass of its own (typed Mass sets density), setting the centre of mass directly, changing the collision grid or level bounds during play, changing shape or scale during play, a physics preview in the editor, radial gravity, wind and water, several background layers, tracing an image into a collision polygon, showing pixels per metre as a setting, Pulley and Gear joints (after the other Later joints), motor, friction and mouse joints, a chain generator tool, switching a joint off and on during play (destroy covers it), joint presets, separate force and torque limits for breaking.
 
 **Camera:** camera rotation, automatic framing of several targets, vertical look-ahead, pixel-perfect scaling, art in the bars, a fade-to-colour action (a rectangle inside the camera does it), text input fields, a constant-size screen layout, a player-controlled camera, split screen, picture-in-picture.
 
-**Triggers:** branches, loops or nested actions in a trigger, random choice in a trigger, changing a value smoothly over time, a visual node graph, mouse drag, the right and middle buttons as trigger events, "view this trigger as Lua" (Convert to script, v3, replaces the trigger with a script instead).
+**Triggers:** branches, loops or nested actions in a trigger, random choice in a trigger, changing a value smoothly over time, a visual node graph, mouse drag, the right and middle buttons as trigger events, "view this trigger as Lua" (Convert to script, Later, replaces the trigger with a script instead).
 
 **Scripts:** typed Lua, external editors, stepping through code, hot reload, profiler charts.
 

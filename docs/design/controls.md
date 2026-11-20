@@ -65,7 +65,7 @@ A field is a row of `--row` height: the label in `--muted` in a 120 px column, t
 | Drop line while dragging (*proposal*) | A 2 px `--accent` line with round ends and a small ring at its start, indented to the depth the row will land at |
 
 - Each level of the tree is indented 16 px. The World's row has no eye, because the World can't be hidden.
-- v1 rows have no lock icon. Lock comes with v3 (owner, 2026-11-14).
+- v1 rows have no lock icon. Lock comes Later (owner, 2026-11-14).
 
 ## Menus, dialogs, the Play bar
 

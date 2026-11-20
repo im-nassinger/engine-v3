@@ -156,7 +156,7 @@ Made under the standing yes (2026-11-16), before building. The [plan](../../step
 - **The keys come through the browser's events:** `ShortcutDispatcher` returns false for Ctrl+C, Ctrl+X and Ctrl+V, so the browser goes on to send `copy`, `cut` and `paste`, which `ClipboardBridge` answers outside text fields by running the commands with the event's data and stopping the default. The commands still list those shortcuts, so the menu shows them. Ctrl+D is an ordinary shortcut, since no event comes with it. *Why: the events need no permission, as the tech notes say.*
 - **Cut is one step** `Cut 3 entities`: it copies, then deletes as Delete does, attached joints included, even though they were not copied. *Why: Cut is Copy and Delete, and Delete's rule is the requirement's.*
 - **Duplicate** puts each copied root at its original's own index in the same group, so it sits directly above it in the panel and is drawn on top, and selects the copies. Links inside the duplicated set are rewired and links outside it kept, through `IdRemapping` with the open level's own token.
-- **Pasting or duplicating inside a locked group is refused** with `This group is locked`, as drawing is, though locking is v3.
+- **Pasting or duplicating inside a locked group is refused** with `This group is locked`, as drawing is, though locking is Later.
 - **The steps read** `Paste Crate`, `Paste 3 entities`, `Duplicate 3 entities`, `Cut 3 entities`, through `stepLabel` as Delete's do.
 
 **As built, step 2 (standing yes, 2026-11-16):**
@@ -171,7 +171,7 @@ Made under the standing yes (2026-11-16), before building. The [plan](../../step
 
 - **`IdRemapping.remap(fragment, target)`** in `editor/clipboard/remapping/` takes a `PasteTarget` (`level`, `sourceToken`), which an `OpenLevel` is, and gives the entities ready for `LevelReader`, leaving the fragment as it was. New ids come from `Level.allocateId`, parents first in panel order, and are used up even when the paste is refused. *Why: ids are never reused in a session, so a refused paste wasting a few is harmless.*
 - **It works on the raw data, before the reader checks it**, and passes anything not shaped as an entity on as it is, so the reader refuses it with its own reason. *Why: the reader stays the only code that checks data, and remapping first lets it check the ids the level will really get.*
-- **Only fields of the `entity` kind are rewired**, found through the registry's schemas, so a v2 component with an entity field needs nothing here. Two links to the same outside entity from another opening get the same fresh id. A `null` link stays empty.
+- **Only fields of the `entity` kind are rewired**, found through the registry's schemas, so a later component with an entity field needs nothing here. Two links to the same outside entity from another opening get the same fresh id. A `null` link stays empty.
 - **`LevelReader.checkSubtree(level, raw, parent)`** gives a `ReadCheck` (`{ ok: true }` or the refusal) by running `readSubtree`'s reading and checks without building.
 
 **As built, step 4 (standing yes, 2026-11-16):**
@@ -195,7 +195,7 @@ Made under the standing yes (2026-11-16), before building. The [plan](../../step
 
 - **`DuplicateCommand`** in `editor/commands/clipboard/` writes the copied roots with `LevelWriter.writeSubtree` as they are, with no TransformComponent rewritten, since each copy stays in its original's group. `IdRemapping.remap` takes a `RemapSource` (the `sourceToken` and the `entities`), which a fragment is, so Duplicate remaps the whole set at once with the open level's own token without making a box it doesn't need.
 - **One `AddEntitiesChange` per root**, put at its original's index read just before, so the copy sits directly above it even when several roots share a group. Each root is checked with `checkSubtree` against the level as the earlier copies left it, so the entity limit counts them all, and a refusal rolls back the copies already in. *Why: the roots can be in different groups, and one change puts its roots side by side in one place.*
-- **Ctrl+D works everywhere**, also while typing in a text field, as the requirement's table says ("Everywhere except the code editor"). The code editor is v2, so v2 gives the shortcut a scope that leaves it out. *Why: the dispatcher's scopes have no "everywhere but the code editor" yet, and v1 has no code editor.*
+- **Ctrl+D works everywhere**, also while typing in a text field, as the requirement's table says ("Everywhere except the code editor"). The code editor is v5, so v5 gives the shortcut a scope that leaves it out. *Why: the dispatcher's scopes have no "everywhere but the code editor" yet, and v1 has no code editor.*
 - **Its refusals** are the skip rule's (`The World can't be duplicated`), `This group is locked`, and the paste's limit texts through `pasteRefusalText`.
 
 **As built, step 7 (standing yes, 2026-11-16):**

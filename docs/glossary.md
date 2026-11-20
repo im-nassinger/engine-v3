@@ -206,23 +206,23 @@ Component names end in `Component`, the TransformComponent included (owner: 2026
 |---|---|---|
 | TransformComponent | Position, rotation, scale, skew, measured from the parent | Every entity |
 | NameComponent | The entity's name, filled automatically ("Rectangle 1"). Not unique | Every entity |
-| TagsComponent | The entity's tags (v2) | Any entity |
+| TagsComponent | The entity's tags (v3) | Any entity |
 | ShapeComponent | A rectangle, circle, polygon or line. On the World, a rectangle: the level bounds | Any entity, the World included |
 | PathComponent | A curved path. Read-only on Rope, Spring and Rod joints | Any entity |
-| TextComponent | Text and its font settings (v2) | Any entity |
+| TextComponent | Text and its font settings (v6) | Any entity |
 | StyleComponent | Fill, outline and opacity, for a shape, path or text. On the World, its fill is the background | Any entity that draws, the World included |
-| EffectsComponent | Pixelate, shadow, blur (v3) | Any entity that draws |
+| EffectsComponent | Pixelate, shadow, blur (Later) | Any entity that draws |
 | BodyComponent | Body type and how it moves | Any entity |
 | SurfaceComponent | How a shape collides | Any entity with a shape |
 | JointComponent | The joint type, its two entities A and B, and its settings | A joint |
 | CameraComponent | The camera's size, mode and follow settings | The camera |
-| FlexComponent | Arranges children in a row or column (v3) | Any entity |
-| TriggerComponent | A list of triggers (v2) | Any entity, the World included |
-| ScriptComponent | A list of `.lua` files (v2). Their values are the entity's variables | Any entity |
-| AssetComponent | Marks a linked copy and records its `.entity` file (v3) | A linked copy |
+| FlexComponent | Arranges children in a row or column (Later) | Any entity |
+| TriggerComponent | A list of triggers (v3) | Any entity, the World included |
+| ScriptComponent | A list of `.lua` files (v5). Their values are the entity's variables | Any entity |
+| AssetComponent | Marks a linked copy and records its `.entity` file (Later) | A linked copy |
 | PhysicsWorldComponent | Gravity, game speed, the collision grid | The World |
-| VariablesComponent | Variables (v2): the level's on the World, an entity's own on any other entity | Any entity, the World included |
-| InputComponent | The level's inputs (v2) | The World |
+| VariablesComponent | Variables: the level's on the World (v3), an entity's own on any other entity (v4) | Any entity, the World included |
+| InputComponent | The level's inputs (v3) | The World |
 
 ## Parts gone from the editor
 

@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**One data shape, `LevelData`, is the level as plain data.** `LevelWriter` makes it and `LevelReader` reads it back with every check an import needs; nothing else turns a level into data. **`level.json`** is that data as JSON. It starts with the file format version and the physics version, both whole numbers starting at 1. **The project file** (`.editable`) is a zip holding `level.json` and, from v2, the level's files. **In the browser** the level lives in IndexedDB as the same `level.json` text, saved by `Autosave` 2 seconds after the last change or at most 20 seconds after the first unsaved one, all or nothing. Small editor settings live in `localStorage`. **Import** runs in a worker, checks everything before changing anything, and refuses a file that unpacks past 256 MB.
+**One data shape, `LevelData`, is the level as plain data.** `LevelWriter` makes it and `LevelReader` reads it back with every check an import needs; nothing else turns a level into data. **`level.json`** is that data as JSON. It starts with the file format version and the physics version, both whole numbers starting at 1. **The project file** (`.editable`) is a zip holding `level.json` and, from v5, the level's files. **In the browser** the level lives in IndexedDB as the same `level.json` text, saved by `Autosave` 2 seconds after the last change or at most 20 seconds after the first unsaved one, all or nothing. Small editor settings live in `localStorage`. **Import** runs in a worker, checks everything before changing anything, and refuses a file that unpacks past 256 MB.
 
 ## level.json
 
@@ -42,7 +42,7 @@
 - **`children` is always written**, `[]` when there are none *(standing yes, 2026-11-15)*. *Why: every entity holds exactly the same keys, as the reader requires.*
 - **Components are keyed by type name, in card order. Their values are keyed by attribute name** (the field's label in snake_case), the same names Lua uses, then the stored values under their key in snake_case (a shape's `geometry`). Values are written by each type's `serialize`.
 - **The writer writes every value, defaults included** *(standing yes, 2026-11-14)*: the file says exactly what the level held, and a later change of a default can't change an old level.
-- **Editor-only data** is `editor` (grid size, folded rows) and each entity's `locked`. The v3 play file drops them; `hidden` stays.
+- **Editor-only data** is `editor` (grid size, folded rows) and each entity's `locked`. The later play file drops them; `hidden` stays.
 - **A missing value reads as its default**, so a field added to a component later needs no upgrade code. An unknown component type or an unknown value makes the file "damaged".
 - **The physics version** is a whole number that goes up whenever the game's Box2D build changes. A table in `core/level-data/versions/PhysicsVersions.ts` names the build for each number (1: `box2d3-wasm` 6.0.0, Box2D 3.2). v1 only records it, as the requirement says.
 
@@ -71,7 +71,7 @@ export class LevelReader {
     constructor(registry: ComponentRegistry, limits: LevelLimits, upgrader: FormatUpgrader);
     readJson(text: string): ReadOutcome<Level>;                   // level.json's text; not JSON is notALevel
     read(raw: unknown): ReadOutcome<Level>;                       // a whole level
-    readFragment(raw: unknown): ReadOutcome<EntityFragment>;      // the clipboard, .entity files (v2)
+    readFragment(raw: unknown): ReadOutcome<EntityFragment>;      // the clipboard, .entity files (v7)
 }
 
 export type ReadOutcome<T> = { ok: true; value: T } | { ok: false; refusal: ReadRefusal };
@@ -81,7 +81,7 @@ export type ReadRefusal =
     | { reason: 'damaged'; detail: string }
     | { reason: 'newerVersion'; fileVersion: number }
     | { reason: 'overLimit'; limit: 'entities' | 'depth' | 'points' | 'size'; max: number }
-    | { reason: 'missingFile'; path: string };                    // v2
+    | { reason: 'missingFile'; path: string };                    // v5
 ```
 
 - **Parse at the boundary:** `raw` is `unknown` until `LevelReader` has checked every entity, its children, components and values with their field types. After that, the rules trust the types.
@@ -113,14 +113,14 @@ export type ReadRefusal =
   | Over 100,000 entities, deeper than 256, more than 1,000 points in a shape or path | `overLimit` |
 
 - **The 256 MB limit is checked where the bytes are** (stage 2, standing yes, 2026-11-14), not by the reader: `read` takes data already parsed from JSON, so it can't count bytes, and measuring the level after each change would be slow. `LevelLimits` holds the number; the import worker counts the unpacked bytes and the save measures the text it already has, both in stage 12.
-- **The same reader** reads imports, the browser's saved level, the clipboard, the play copy in the worker and (v2) `.entity` files. So a damaged saved level and a damaged import fail the same way.
+- **The same reader** reads imports, the browser's saved level, the clipboard, the play copy in the worker and (v7) `.entity` files. So a damaged saved level and a damaged import fail the same way.
 
 ## The project file
 
 ```
 castle.editable          a zip, under its own extension
   level.json
-  files/                 from v2: the Assets panel's files, by their path
+  files/                 from v5: the Assets panel's files, by their path
     scripts/coin.lua
 ```
 
@@ -145,9 +145,9 @@ export class ProjectFile {
 | What | Where | When |
 |---|---|---|
 | The level | IndexedDB `engine-v3`, store `level`, one record: `{ levelJson, savedAtMs }` | Autosave |
-| The level's files (v2) | The same database, store `files`, each stored once by its hash, as the tech notes suggest | With the level |
+| The level's files (v5) | The same database, store `files`, each stored once by its hash, as the tech notes suggest | With the level |
 | Editor settings: view position and zoom, grid shown, View menu switches, folded cards, "persist already asked" | `localStorage`, `engine-v3/settings`, JSON | When they change |
-| Kept variables (v3), the pinned seed (v3) | `localStorage` | When they change |
+| Kept variables (Later), the pinned seed (Later) | `localStorage` | When they change |
 
 **Autosave:**
 

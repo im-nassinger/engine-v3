@@ -37,8 +37,8 @@
 | A failed save is never silent, and Export still works | `Autosave` sets `failed`; export doesn't use storage |
 | Nothing is deleted when saving fails | Autosave only ever writes the whole record in one transaction |
 | A game that stops responding ends the run with a message | `Watchdog`, see [simulation.md](simulation.md) |
-| A missing file doesn't stop a run (v2) | The simulation skips the use and adds a Console line |
-| Script errors stay in the Console (v2), never as editor messages | `ScriptEngine` errors go to the run's Console lines |
+| A missing file doesn't stop a run (v5) | The simulation skips the use and adds a Console line |
+| Script errors stay in the Console (v5), never as editor messages | `ScriptEngine` errors go to the run's Console lines |
 | A disabled button still says why | `Availability` carries a reason, shown in the tooltip |
 
 ## The status text
@@ -63,4 +63,4 @@ Every command's outcome passes through one place, `CommandRunner`, which shows `
 - **Each panel has a React error boundary.** A panel that throws while drawing shows "This panel hit a problem. Your level is safe." with a Reload button, and the rest of the editor keeps working. The level view's adapter catches errors in its own frame callback the same way and stops drawing until reload.
 - **An exception inside a command** rolls its transaction back and is rethrown, so the level stays as it was and the bug still surfaces.
 - **The saved level is never at risk:** a save writes a full, checked `level.json` or nothing.
-- `window` `error` and `unhandledrejection` are logged to the browser console. Sending reports anywhere is not planned: there is no server before v4.
+- `window` `error` and `unhandledrejection` are logged to the browser console. Sending reports anywhere is not planned: there is no server before Later.

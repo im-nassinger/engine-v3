@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Each component type declares its fields once, in a `ComponentSchema`** (owner, 2026-11-13). A field names its **field type** (one class per type in the fixed list: number, text, checkbox, choice, colour, vector, angle, entity, and from v2 asset, variable, tags, list), its label, default, unit, range, description, and whether it can change during play. From that one list the Entity inspector draws the card, the file stores and checks the values, undo records them, copy clones them, and in v2 Lua's `get_attribute` and `set_attribute` and the trigger's Change value find them. A component class holds a typed values record and adds no logic of its own beyond what its values need. Component class names end in `Component`. **Imports go one way, entities → components → fields → events:** a component never imports `Entity`, and a schema never reads one.
+**Each component type declares its fields once, in a `ComponentSchema`** (owner, 2026-11-13). A field names its **field type** (one class per type in the fixed list: number, text, checkbox, choice, colour, vector, angle, entity, and from v3 asset, variable, tags, list), its label, default, unit, range, description, and whether it can change during play. From that one list the Entity inspector draws the card, the file stores and checks the values, undo records them, copy clones them, and in v5 Lua's `get_attribute` and `set_attribute` and the trigger's Change value find them. A component class holds a typed values record and adds no logic of its own beyond what its values need. Component class names end in `Component`. **Imports go one way, entities → components → fields → events:** a component never imports `Entity`, and a schema never reads one.
 
 ## Value types and field types
 
@@ -26,7 +26,7 @@ export type ValueType<T> = {
 
 export type FieldKind =
     | 'number' | 'text' | 'checkbox' | 'choice' | 'colour' | 'vector' | 'angle' | 'entity' | 'fill' | 'list'
-    | 'asset' | 'variable' | 'tags' | 'pathPoint';     // these four come with v2
+    | 'asset' | 'variable' | 'tags' | 'pathPoint';     // pathPoint comes in v2, tags in v3, variable and asset in v5
 
 export type FieldType<T> = ValueType<T> & {
     readonly kind: FieldKind;
@@ -49,8 +49,8 @@ export type FieldType<T> = ValueType<T> & {
 - **`parse` checks the shape, `normalize` clamps** (as built, 2026-11-14): `parse` refuses the wrong type, a number that isn't finite, an unknown choice, a colour not written `#RRGGBBAA`, and the two values a field refuses (`refuseZero`, `refuseLimits`). A value out of range parses, and `normalize` clamps it, which is what import does with a joint limit past its range. A field that refuses its limits never clamps. `ParseProblem` is a code with data, not the sentence the first draft had, because [core returns reasons, never sentences](../errors.md#where-the-sentences-come-from).
 - **A colour** is read in either case and stored uppercase, so two equal colours compare equal. **A text's length** counts characters (code points), so a character outside the basic plane is never cut in half. **A vector** is geometry's `Point`; `refuseZero` refuses 0 in x or in y, since either makes a matrix that can't be inverted. `JsonValue` is declared in `core/fields` with `EntityId`.
 - **`ColourFieldType` has no `canBeEmpty`** (as built, 2026-11-14): the only colour that could be emptied was the fill, which uses `SolidFillFieldType`, so nothing in v1 needs it.
-- **The fixed list is v1, but each field type is built when the first component needs it.** v1 builds the ten above. Asset, variable, tags and path point come with the v2 components that use them (path point with the Bézier pen: `{ x, y, handle_in, handle_out, corner }`, the stored shape below), and list moved to v1 for Points (owner, 2026-11-15), and the fill field type comes with gradients (owner, 2026-11-13).
-- **The fill in v1** (owner, 2026-11-13): the StyleComponent's fill uses `SolidFillFieldType`, which the Entity inspector shows as a colour field that can be emptied, but whose value is already the tagged value `{ kind: 'none' } | { kind: 'solid', colour }`. In v2 it is replaced by `FillFieldType` with the same stored shape plus gradients, and in v3 images. Saved levels never change.
+- **The fixed list is v1, but each field type is built when the first component needs it.** v1 builds the ten above. Asset, variable, tags and path point come with the later components that use them (path point with the Bézier pen: `{ x, y, handle_in, handle_out, corner }`, the stored shape below), and list moved to v1 for Points (owner, 2026-11-15), and the fill field type comes with gradients (owner, 2026-11-13).
+- **The fill in v1** (owner, 2026-11-13): the StyleComponent's fill uses `SolidFillFieldType`, which the Entity inspector shows as a colour field that can be emptied, but whose value is already the tagged value `{ kind: 'none' } | { kind: 'solid', colour }`. In v2 it is replaced by `FillFieldType` with the same stored shape plus gradients, and in Later images. Saved levels never change.
 - **`SolidFillFieldType`'s kind is already `'fill'`** (stage 2, standing yes, 2026-11-14), not `'colour'`. *Why: the Entity inspector picks a field's control by its kind, and the colour control reads `#RRGGBBAA` text, not the tagged value. With `'fill'` now, v2's `FillFieldType` takes the kind over and no kind changes.* The user still sees a colour field that can be emptied.
 - **An entity field is stored as `{ "entity": 12 }`**, not a bare number, so a later "follow by tag" (open question 15) can store `{ "tag": "player" }` beside it without changing saved levels.
 - Internal value types, never shown as fields, use the same `ValueType` contract: `ShapeGeometryValue`, `PathGeometryValue`, `JointEndsValue`. They hold the stored values below.
@@ -158,7 +158,7 @@ export type ComponentClass<T extends Component> = {
 - **A component never knows which entity holds it.** `set` and `writeValue` raise the component's own `changed` signal. `Entity.addComponent` subscribes to it and turns it into the level's `valueChanged` update, and `removeComponent` unsubscribes.
 - **Partner notes come from the schema** (Q5 and Q6, owner 2026-11-13): a component lists, as plain data, the partners it needs and when they are needed. The editor's `MissingPartnerRule` turns them into editor messages with an [Add ...] button. Removing a component removes only that one, so the cards left behind show their notes.
 - **Every note reads "Needs a X to Y. [Add X]"** (owner, 2026-11-13), with Y written per partner in the schema: "to draw anything" for a StyleComponent, "to collide" for a SurfaceComponent and a BodyComponent.
-- **`alsoSatisfiedBy`** (stage 2, standing yes, 2026-11-14): the StyleComponent's note shows only when the entity has neither a ShapeComponent nor a PathComponent, so its rule names ShapeComponent as `partner` (what the button adds) and PathComponent in `alsoSatisfiedBy`. v2 adds the TextComponent to the list. *Why: one `partner` can't say "either of two".*
+- **`alsoSatisfiedBy`** (stage 2, standing yes, 2026-11-14): the StyleComponent's note shows only when the entity has neither a ShapeComponent nor a PathComponent, so its rule names ShapeComponent as `partner` (what the button adds) and PathComponent in `alsoSatisfiedBy`. v6 adds the TextComponent to the list. *Why: one `partner` can't say "either of two".*
 
 ## Stored values
 
@@ -169,7 +169,7 @@ export type ComponentClass<T extends Component> = {
 | ShapeComponent | `geometry` | `ShapeGeometryValue` | The kind and what that kind needs (below) |
 | PathComponent | `path` | `PathGeometryValue` | `closed` and the points with their handles (below) |
 | JointComponent | `ends` | `JointEndsValue` | `{ a: { x, y }, b: { x, y } }`, the two ends in the joint's own space |
-| CameraComponent | `mode` | a choice | `fixedSize` until v3 |
+| CameraComponent | `mode` | a choice | `fixedSize` until Later |
 
 **A shape's kind and size are one stored value** (stage 2, standing yes, 2026-11-14):
 
@@ -223,7 +223,7 @@ export function createV1Registry(): ComponentRegistry;
 ```
 
 - **As built (2026-11-14):** the registry holds `ComponentClass<AnyComponent>`, refuses a type registered twice, and has `all()`, the classes in the order they were registered, which the schema tests run over. **`indexOf` is that order**, and an unknown name throws. `createV1Registry` registers the ten v1 components in a fixed order, and new types only ever go at the end, so a component id in Lua never changes. *Why: the index must be the same in every run and every version, and the order of registration is the one order nothing else moves (standing yes, 2026-11-14).*
-- The reader finds a component by its type name in the file, the Entity inspector's Add Component menu lists what the entity lacks (see [the Entity inspector](../editor/inspector-and-entities.md)), and v2 registers its components into the same registry. Nothing else changes when a component type is added.
+- The reader finds a component by its type name in the file, the Entity inspector's Add Component menu lists what the entity lacks (see [the Entity inspector](../editor/inspector-and-entities.md)), and each later version registers its components into the same registry. Nothing else changes when a component type is added.
 
 ## The v1 components
 
@@ -237,26 +237,26 @@ export function createV1Registry(): ComponentRegistry;
 | BodyComponent | 6 | Type: choice. Gravity scale, Linear damping, Angular damping, Fixed rotation, Bullet: as in [bodies](../../requirements/physics/bodies.md). Merge: checkbox, on. The card also shows a read-only Mass, see below | | SurfaceComponent, only when the entity has a ShapeComponent and no SurfaceComponent |
 | SurfaceComponent | 7 | Density 0 to 100, 1. Friction 0 to 5, 0.3. Restitution 0 to 2, 0. Sensor: checkbox | | ShapeComponent |
 | JointComponent | 8 | Type: choice Hinge, Rope, Spring. A, B: entity. Let connected objects collide. Hinge: Limit rotation, Min angle, Max angle, Motor, Motor speed, Motor strength, Resistance. Rope: Match drawn distance, Length. Spring: Match drawn distance, Rest length, Stiffness, Damping. Ranges and defaults as in [joints](../../requirements/physics/joints.md) | `ends`: the two ends, in the joint's own space | |
-| CameraComponent | 9 | Width, Height: number px, 160 to 7,680, 1920 × 1080. Follow: entity, empty. Smoothing: number s, 0 to 5, 0.3. Not in the Add Component menu | `mode`: `fixedSize` until v3 | |
+| CameraComponent | 9 | Width, Height: number px, 160 to 7,680, 1920 × 1080. Follow: entity, empty. Smoothing: number s, 0 to 5, 0.3. Not in the Add Component menu | `mode`: `fixedSize` until Later | |
 | PhysicsWorldComponent | 10, World only | Gravity: vector m/s², each axis −100 to 100, 0, 9.8 (owner, 2026-11-15). Walls: checkbox, off (all four edges of the level bounds walls, or all open) | | |
 
 - **Mass isn't a field of the BodyComponent**, because it adds up the shapes of other entities merged into the body. `BodyMass.of(entity, caches)` in `core/physics`, which knows which shapes merge, works it out from [geometry](geometry.md#mass), and the Entity inspector shows it as a row at the end of the BodyComponent's card. **A typed Mass sets density** (owner, 2026-11-19): `densitiesForMass(body, mass, caches)` in `core/physics/mass` gives each of the body's surfaces (`BodyMass.surfacesOf`) the density that makes the body weigh that much, keeping their ratios, or refuses with `noArea` or `tooDense`; `setBodyMass` in `editor/commands` makes the one undo step `Change Mass`.
-- Every setting of every joint type is stored, whatever the current type, so switching type in v3 keeps them, as the joints rules ask.
-- **Which camera and world values change during play** (standing yes, 2026-11-14): Follow and Smoothing do, because v3's Change value sets them, and so does Gravity, as the World's rules say. The camera's width and height and Walls don't.
+- Every setting of every joint type is stored, whatever the current type, so switching type later keeps them, as the joints rules ask.
+- **Which camera and world values change during play** (standing yes, 2026-11-14): Follow and Smoothing do, because the later Change value sets them, and so does Gravity, as the World's rules say. The camera's width and height and Walls don't.
 - **The PhysicsWorldComponent's card comes last, at 10** (standing yes, 2026-11-14), after the World's ShapeComponent and StyleComponent, so the bounds and the background read first.
 - **Merge** is a checkbox on the BodyComponent, on by default (owner, 2026-11-13).
 - **Which values change during play** (owner, 2026-11-14): the TransformComponent's position and rotation; not its scale or skew, and not the name. **The hover descriptions** of these five fields are in the [Entity inspector's requirements](../../requirements/editor/inspector-and-undo.md#cards-for-the-selection--v1).
 - **A new level names its World `World` and its camera `Camera`**, the names the round 9 cards used.
-- **The TagsComponent is v2** (owner, 2026-11-13): nothing in v1 reads tags.
+- **The TagsComponent is v3** (owner, 2026-11-20): nothing reads tags before triggers.
 - **The World has a ShapeComponent and a StyleComponent** (owner, 2026-11-13). The rectangle's width and height are the level bounds, 20000 × 10000 by default (owner, 2026-11-18, see [world.md](../../requirements/physics/world.md)); the fill is the background colour. Both are World components: they can't be removed, and the shape's kind is always rectangle. The World can't take a BodyComponent or a SurfaceComponent: the Add Component menu shows them disabled, with the reason. The rectangle is centred on the level's origin, and a resize changes both opposite edges by the same amount, so the centre never moves (owner, 2026-11-13).
 
-## v2 and v3 seams
+## Seams for later versions
 
 | Later need | Where it plugs in | Changes to v1 code |
 |---|---|---|
-| TriggerComponent, ScriptComponent, VariablesComponent, InputComponent, TextComponent, TagsComponent (v2) | New component folders, registered in the registry | None |
-| Variables of nine types on any entity (v2) | Each variable on a VariablesComponent is drawn with its type's field type, limits included. A script's `variables` table is only read to offer [Add variables] | None |
-| `get_attribute`, `set_attribute`, Change value (v2) | `schema.findFieldByAttribute`, `writeValue`, guarded by `changeableInPlay` | None |
-| Gradients, images as fills (v2, v3) | `FillFieldType` replaces `SolidFillFieldType` on StyleComponent | One line in the StyleComponent schema |
-| Linked copies (v3) | AssetComponent, and the Entity inspector's read-only mode, which play already uses | None in the model |
+| TriggerComponent, ScriptComponent, VariablesComponent, InputComponent, TextComponent, TagsComponent (v3 to v6) | New component folders, registered in the registry | None |
+| Variables of nine types on any entity (v4 and v5) | Each variable on a VariablesComponent is drawn with its type's field type, limits included. A script's `variables` table is only read to offer [Add variables] | None |
+| `get_attribute`, `set_attribute`, Change value (v3) | `schema.findFieldByAttribute`, `writeValue`, guarded by `changeableInPlay` | None |
+| Gradients, images as fills (v2, Later) | `FillFieldType` replaces `SolidFillFieldType` on StyleComponent | One line in the StyleComponent schema |
+| Linked copies (Later) | AssetComponent, and the Entity inspector's read-only mode, which play already uses | None in the model |
 | Component presets (Later) | A preset is a saved values record, applied with `writeValue` | None |

@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Everything known about the project: a 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved, and the code is built stage by stage from [plan.md](plan.md). v1 is built: stages 0 to 19, including the changes before v2 and the redesign; nothing of v2 is planned yet. The owner gave a standing yes on 2026-11-14, so Claude decides the smaller questions and lists them in [decisions.md](decisions.md). **Start with [progress.md](progress.md)** to see where things stand, then [overview.md](overview.md) for the whole game in one page. Every file opens with a TL;DR, and the docs read from high level down to detail.
+Everything known about the project: a 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved, and the code is built stage by stage from [plan.md](plan.md). v1 is built: stages 0 to 19, including the changes before v2 and the redesign; after it come small versions, v2 to v7 (owner, 2026-11-20), and nothing of v2 is planned yet. The owner gave a standing yes on 2026-11-14, so Claude decides the smaller questions and lists them in [decisions.md](decisions.md). **Start with [progress.md](progress.md)** to see where things stand, then [overview.md](overview.md) for the whole game in one page. Every file opens with a TL;DR, and the docs read from high level down to detail.
 
 ## Files
 

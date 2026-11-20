@@ -98,7 +98,7 @@ Polygon steps:
   - Segments lying along each other (a line turning back on itself) aren't cut, because cutting can't separate them. *Why: chains only must not cross; Box2D handles an overlap like two segments in the same place.*
   - Only `+ − × ÷` and comparisons, like the polygon steps. A test checks that 500 random lines give chains that don't cross themselves, with points at least 0.25 px apart.
 
-**What the editor can't draw:** a polygon whose every piece is too small has no collision. The v3 warning "Too small to collide" reads the same pipeline.
+**What the editor can't draw:** a polygon whose every piece is too small has no collision. The later warning "Too small to collide" reads the same pipeline.
 
 ## Mass
 
@@ -129,4 +129,4 @@ export class DeterministicMath {
 - Box2D does its own trigonometry inside the wasm build, which is the same everywhere.
 - `exp` is fdlibm's `e_exp`, like `sin`, `cos` and `atan2` are fdlibm's: the argument is split into k · ln 2 + r, a polynomial gives eʳ, and 2ᵏ is built by exact multiplication of powers of two, not by setting the number's bits. It gives Infinity above about 709.78 and 0 below about −745.1, like `Math.exp`, and can be one bit away from V8's (`exp(1)` is). *(standing yes, 2026-11-14)*
 - Accuracy target: within 1e-12 of `Math` over the range the game uses, checked by a test. For `exp` that is relative, over −700 to 700, where the result neither overflows nor reaches 0 (standing yes, 2026-11-14). Exactness matters less than sameness.
-- Random numbers (v2) come from `SeededRandom` in the same module: a small integer generator (xoshiro128**) seeded from the run's seed.
+- Random numbers (v5) come from `SeededRandom` in the same module: a small integer generator (xoshiro128**) seeded from the run's seed.

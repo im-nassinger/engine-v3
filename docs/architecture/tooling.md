@@ -149,7 +149,7 @@ One file, `eslint.config.ts`, with one block per part. ESLint needs `jiti` to re
 
 | Where | Refused | Instead |
 |---|---|---|
-| core | All 22 `Math` functions the JavaScript standard lets a browser approximate (`sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`, `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh`, `exp`, `expm1`, `log`, `log1p`, `log2`, `log10`, `cbrt`, `pow`, `hypot`), and `Math.random` | `DeterministicMath`, and the seeded random of v2 |
+| core | All 22 `Math` functions the JavaScript standard lets a browser approximate (`sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`, `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh`, `exp`, `expm1`, `log`, `log1p`, `log2`, `log10`, `cbrt`, `pow`, `hypot`), and `Math.random` | `DeterministicMath`, and the seeded random of v5 |
 | core | The `**` operator, which is `Math.pow` written another way | Multiplying, or `DeterministicMath` |
 | core | `Date` and `Intl` whole, and the methods that follow the computer's language (`localeCompare`, `toLocaleString` and their family) | The clock time comes in with the run's start |
 | core | `for ... in`, whose order over numeric and text keys differs from the order they were added | `for ... of` over a known order |

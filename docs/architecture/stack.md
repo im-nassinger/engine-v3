@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed** means the owner chose it; **recommended** means the architecture chose it (all were approved in review card D11). Five things are fixed: TypeScript, Vite, React, PixiJS 8 and Box2D v3. Beside them: Vitest and Playwright for tests, ESLint and Prettier for code quality, `box2d3-wasm` for Box2D, `clipper2-ts` for polygons (tried in stage 3), `fflate` for zips, `idb` for browser storage, TanStack Virtual for the Entities viewer, and the React Compiler, with `jiti` and `dependency-cruiser` for the checks in [tooling.md](tooling.md). **Node.js 26** runs the tools. **Each library is installed by the stage that first uses it**, at the version here, checked again on that day. Lua and Monaco come with v2 and aren't installed in v1. **TypeScript is 6.0, not 7**, because the ESLint TypeScript tools don't support 7 yet.
+Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed** means the owner chose it; **recommended** means the architecture chose it (all were approved in review card D11). Five things are fixed: TypeScript, Vite, React, PixiJS 8 and Box2D v3. Beside them: Vitest and Playwright for tests, ESLint and Prettier for code quality, `box2d3-wasm` for Box2D, `clipper2-ts` for polygons (tried in stage 3), `fflate` for zips, `idb` for browser storage, TanStack Virtual for the Entities viewer, and the React Compiler, with `jiti` and `dependency-cruiser` for the checks in [tooling.md](tooling.md). **Node.js 26** runs the tools. **Each library is installed by the stage that first uses it**, at the version here, checked again on that day. Lua and Monaco come with v5 and aren't installed in v1. **TypeScript is 6.0, not 7**, because the ESLint TypeScript tools don't support 7 yet.
 
 ## Fixed
 
@@ -52,14 +52,14 @@ Every package, pinned to an exact version checked on npm on 2026-11-13. **Fixed*
 
 **Installed when its stage comes** (owner, 2026-11-14): stage 0 installs the tools plus `react` and `react-dom`. `clipper2-ts` waits for stage 3, `pixi.js` for stage 4, `lucide-react` and `@fontsource/jetbrains-mono` for stage 6, `@tanstack/react-virtual` for stage 7, `fflate` and `idb` for stage 12, `box2d3-wasm` for stage 13. *Why: `package.json` lists only what the code uses, and each library gets a real look when a stage starts using it.* The whole v1 stack was checked to install together with no conflict on 2026-11-14.
 
-### Not installed until v2
+### Not installed until v5
 
 | Package | Version today | Job |
 |---|---|---|
 | `wasmoon` | 1.16.0 | Lua 5.4 in wasm, for scripts and for reading the variables a script needs |
 | `monaco-editor` | 0.57.0 | The code editor |
 
-Their versions are checked again when v2 starts.
+Their versions are checked again when v5 starts.
 
 ### Left out on purpose
 

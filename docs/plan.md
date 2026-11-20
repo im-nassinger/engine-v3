@@ -41,4 +41,4 @@ Each stage's steps are written when the stage starts, one file per stage in [ste
 
 ## After v1
 
-v2 starts with its own plan, written the same way, from the seams in the architecture: new components in the registry, new tick phases, `ScriptEngine` with `wasmoon`, the Assets panel's files in the project file and IndexedDB, Monaco, and the v2 tools.
+Each version after v1 is small (owner, 2026-11-20) and gets its own plan, written the same way, when it starts, from the seams in the architecture: new components in the registry, new tick phases, and for scripts in v5 `ScriptEngine` with `wasmoon`, the Assets panel's files in the project file and IndexedDB, and Monaco. v2, the pen and the Pencil, is first.

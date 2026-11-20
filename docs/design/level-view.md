@@ -52,4 +52,4 @@ The accent colour draws every selection (owner, 2026-11-14: blue, chosen over or
 ## The physics view
 
 - Every collision piece is drawn in **orange `#FF8A3D`**, a 1.5 px outline over a 15% fill, on top of the level (*proposal*). Orange stays visible next to the blue selection and the default blue shapes.
-- v1 draws the plain pieces only. v3 adds a colour per body, hatching for Static, dashes for sensors and a legend (see [bodies](../requirements/physics/bodies.md)).
+- v1 draws the plain pieces only. Later brings a colour per body, hatching for Static, dashes for sensors and a legend (see [bodies](../requirements/physics/bodies.md)).

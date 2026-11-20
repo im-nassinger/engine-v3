@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Project-level choices and why: starting over, how the requirements were settled, how versions were set, and how these docs are organised. **What the game does is not decided here.** Those decisions are in [requirements/](requirements/README.md), each with its reason and source, and what was decided against is in [rejected.md](rejected.md).
+Project-level choices and why: starting over, how the requirements were settled, how versions were set, and how these docs are organised. **What the game does is not decided here.** Those decisions are in [requirements/](requirements/README.md), each with its reason and source, and what was decided against is in [rejected.md](rejected.md). **Entries before 2026-11-20 name the old versions** (v2 logic and play, v3 polish, v4 accounts); [scope.md](scope.md) has the new ones.
 
 ## 2026-11-13: Start over from scratch
 
