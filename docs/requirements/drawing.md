@@ -86,13 +86,13 @@ It works like Illustrator's pen.
 - Space during a drag moves the point being placed.
 - Clicking the first point closes the path. Dragging on it shapes the closing curve.
 - Enter, Esc, double-click, right-click or choosing another tool finishes an open path.
-- With an open path selected, clicking either end continues drawing from it. With nothing selected, the pen always starts a new path.
+- **Choosing the pen keeps the selection when it is one open path**, so clicking either of its ends continues drawing from it. Any other selection is cleared, as other drawing tools clear it, and the pen starts a new path. *Why: continuing a path needs it selected, and every other drawing tool clears the selection (owner: 2026-11-20).*
 - A path is one continuous line: no branches, no separate parts. It is open or closed. Only a closed path can be filled.
 - The result is an entity with a TransformComponent, a PathComponent and a StyleComponent.
 - Limit: 2,000 points in a path.
 - *Why v2: drawing curves is a lot of value for little work, and it needs nothing else to come with it (owner: 2026-11-20). A path never collides, and Convert to polygon is Later, so for now a path is decoration only.*
 
-Source: round 1: D24; round 5: 03 2.5; old: DR-33 to DR-45; owner: 2026-11-13
+Source: round 1: D24; round 5: 03 2.5; old: DR-33 to DR-45; owner: 2026-11-13, 2026-11-20
 
 ### The Pencil · v2
 
@@ -159,11 +159,18 @@ Source: round 1: D23; round 6: ST2; old: DR-90 to DR-94; owner: 2026-11-13, 2026
 
 ### Gradients · v2
 
-- A fill can be a linear or a radial gradient.
+- A fill can be a **linear** or a **radial** gradient.
 - Gradients add a **fill** field type to the fixed list of field types: nothing, a solid colour or a gradient, and Later an image. *Why: a new need adds a type to the list, never a special field on one component (owner: 2026-11-13).*
+- **A gradient is edited in the Entity inspector and with gradient handles on the level** (owner: 2026-11-20). *Why: the owner picked both over the Entity inspector alone, to work like Figma.*
+- In the Entity inspector the Fill is a choice of **None, Solid, Linear and Radial**, with the gradient's colour stops under it (standing yes, 2026-11-20).
+- A gradient has **2 to 8 colour stops**. Each has a colour, see-through allowed, and a place from 0% to 100%. Stops are added and removed in the Entity inspector (standing yes, 2026-11-20: enough for sky and ground, and a short list to show).
+- A linear gradient has a **start and an end**; a radial one a **centre and a radius**. They are measured in the entity's own space, as shares of its box, so a gradient turns, scales and resizes with what it fills (standing yes, 2026-11-20).
+- **Gradient handles show** while one entity is selected and its gradient is open in the Entity inspector. Dragging a handle is one undo step. Shift keeps a linear gradient's direction to 15° steps, as Shift does when drawing (standing yes, 2026-11-20).
+- Switching Solid to a gradient starts with two stops: the solid colour, and the same colour fully see-through. Switching between Linear and Radial keeps the stops. Switching a gradient to Solid keeps its first stop's colour (standing yes, 2026-11-20).
+- The outline stays a solid colour (standing yes, 2026-11-20: the requirement only names fills).
 - *Why: the owner changed this from "solid colours first". Why v2: it is drawing, like the pen, and the owner wants it early (owner: 2026-11-20).*
 
-Source: round 1: D25; round 6: ST2; owner: 2026-11-13
+Source: round 1: D25; round 6: ST2; owner: 2026-11-13, 2026-11-20
 
 ### Colour picker extras · Later
 

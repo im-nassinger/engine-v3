@@ -102,6 +102,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 - **Convert to script, Later** (owner; v3 when decided, which became Later with round 12): a trigger's `…` menu turns it into a `.lua` file that does the same, and triggers that switched it on or off now switch the script's on/off checkbox. See [triggers](requirements/triggers/triggers.md#convert-to-script--v3) and [scripts](requirements/scripts/scripts.md#switching-a-script-off--v3).
 - **Many small versions instead of one big v2** (owner): round 11 cut v2 with one test, a small platformer, which pulled in almost everything. The owner stopped half way and asked for more versions with smaller steps, the most value for the least work first. Round 11 is dropped; its answers that still count: the pen and the Pencil stay in v2 ("not hard, and a lot of value"), and `.entity` files and the builtin player go later. **Round 12 settled it** the same day: v2 curves and gradients, v3 a first game without code, v4 the rest of the triggers and the shortcut list, v5 scripts, v6 text, v7 `.entity` files and the builtin player; everything else, the old v3 and v4 included, is Later. The owner moved gradients to v2 and the shortcut list to v4 in comments. Written into [scope.md](scope.md), every requirement heading and the architecture. **Version marks in the entries above this one are the old ones.**
+- **Planning v2, step 1: the requirements checked against v1** (owner): the Bézier pen is key 4 and the Pencil key 5; choosing the pen keeps the selection when it is one open path, so its ends can be continued; a gradient is edited in the Entity inspector and with gradient handles on the level, its details under the standing yes. See [drawing](requirements/drawing.md#gradients--v2) and [workspace](requirements/editor/workspace.md#seven-tools-on-number-keys--v1). The check found v1 already stores curved paths and a tagged fill, and already draws and hit-tests curves; v2 must add point editing on paths and the path point field type.
 
 ### Settled under the standing yes, 2026-11-14
 
@@ -122,7 +123,7 @@ Nothing.
 
 ## Next
 
-1. **Plan v2, the Bézier pen, the Pencil and gradients**, the way v1 was planned: its requirements checked against what v1 built, its screen parts designed in the islands layout, its architecture, then its stage plan and steps, and the runner again. Then v3, and so on (owner, 2026-11-20). The open questions about variables below wait for the version that brings them. Nothing after v1 is built.
+1. **Plan v2, the Bézier pen, the Pencil and gradients**, the way v1 was planned: its requirements checked against what v1 built (done, 2026-11-20), its screen parts designed in the islands layout, its architecture, then its stage plan and steps, and the runner again. Then v3, and so on (owner, 2026-11-20). The open questions about variables below wait for the version that brings them. Nothing after v1 is built.
 2. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
 
 ## How to change a requirement

@@ -72,6 +72,9 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Path | A curved line drawn with the Bézier pen or the Pencil. It is only drawn. It never collides. |
 | Path point | One point of a path: its position, its two curve handles and its corner. A field type of its own (v2). |
 | Fill | What paints the inside of a shape, path or text: nothing, a solid colour, a gradient or an image. |
+| Gradient | A fill that blends between colours: **linear**, along a line from a start to an end, or **radial**, out from a centre to a radius. |
+| Colour stop | One colour of a gradient and where along it that colour is, from 0% to 100%. A gradient has 2 to 8. |
+| Gradient handles | The dots on the level view that move a gradient's start and end, or its centre and radius. |
 | Outline | The line drawn around a shape, path or text: a colour and a width. With **Scale outline** off, the entity's own scale doesn't stretch it. |
 | Image | Not a kind of entity: a shape whose fill is an image file. |
 | Text | An entity with a TextComponent, typed on the level. |
