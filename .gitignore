@@ -14,6 +14,4 @@ playwright/.cache/
 __screenshots__/
 .vitest/
 
-# Written by the runner while it runs. See docs/runner/README.md.
-docs/runner/status.md
 .netlify/

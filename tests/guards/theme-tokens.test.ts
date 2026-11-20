@@ -54,7 +54,7 @@ const setByCode = new Set(
 );
 
 describe('the theme tokens', () => {
-    // CI's public copy of the code has no docs/ (docs/runner/public-ci.md), so this runs only on the laptop.
+    // CI's public copy of the code has no docs/ (docs/architecture/tooling.md, "CI"), so this runs only on the laptop.
     const hasDocs = existsSync(TOKENS_DOC);
 
     test.skipIf(!hasDocs)('are the tokens docs/design/tokens.md names', () => {

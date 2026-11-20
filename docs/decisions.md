@@ -69,7 +69,7 @@ The owner: "from now on, I agree with all your decisions, since they are minor d
 
 ## 2026-11-14: The runner builds v1 without the owner
 
-The owner asked for v1 to be built to the end with nobody typing "continue": one fresh Claude session per step, progress on Discord, and waiting out the usage limit on its own. That is the [runner](runner/README.md). For it to finish alone, the owner agreed to three changes: **Claude pushes `master` after each step** (before, pushes waited for the owner to ask), **stage 17's layout and phone checks are Playwright tests** instead of checks by hand, and **anything that needs `sudo` is sent to Discord** while the work goes on without it.
+The owner asked for v1 to be built to the end with nobody typing "continue": one fresh Claude session per step, progress on Discord, and waiting out the usage limit on its own. That is the runner, moved out of this project on 2026-11-20 to `~/projects/claude-bridge/old-runner/`. For it to finish alone, the owner agreed to three changes: **Claude pushes `master` after each step** (before, pushes waited for the owner to ask), **stage 17's layout and phone checks are Playwright tests** instead of checks by hand, and **anything that needs `sudo` is sent to Discord** while the work goes on without it.
 
 ### Decided under the standing yes
 

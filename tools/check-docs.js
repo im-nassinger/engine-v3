@@ -55,12 +55,7 @@ function escapeRegExp(text) {
 }
 
 const problems = [];
-// The runner writes docs/runner/status.md while it runs. It isn't in git, and its
-// events quote the sessions' own words, so it isn't held to these rules.
-const runnerStatusFile = path.join(docsDir, "runner", "status.md");
-const files = [...markdownFiles(docsDir), path.join(root, "CLAUDE.md")].filter(
-  (file) => fs.existsSync(file) && file !== runnerStatusFile,
-);
+const files = [...markdownFiles(docsDir), path.join(root, "CLAUDE.md")].filter((file) => fs.existsSync(file));
 const dropped = droppedWords().map((word) => ({
   word,
   // A leading dot (".level") can't use \b on its left side.

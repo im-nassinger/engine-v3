@@ -1,7 +1,7 @@
 name: CI
 
 # Runs only in the public copy, im-nassinger/engine-v3-ci: a private repo's free minutes ran out.
-# See docs/runner/public-ci.md. Why the downloads have limits: docs/runner/ci-speed.md.
+# See docs/architecture/tooling.md, "CI".
 on:
     push:
 

@@ -26,7 +26,6 @@ Everything known about the project: a 2D physics game with a level editor, for t
 | [rejected.md](rejected.md) | What we decided against, and why. Check it before proposing something |
 | [decisions.md](decisions.md) | Project-level choices: starting over, the reviews, how these docs are organised |
 | [tech-notes.md](tech-notes.md) | Facts and warnings for the architecture work. Not requirements |
-| [runner/](runner/README.md) | The runner, which builds v1 without the owner: how it works, its decisions and its own progress |
 
 ## Reading order
 
