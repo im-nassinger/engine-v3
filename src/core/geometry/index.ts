@@ -8,6 +8,8 @@ export { LineChains } from './pieces/LineChains.ts';
 export { MassProperties } from './pieces/MassProperties.ts';
 export { Matrix2D } from './Matrix2D.ts';
 export type { PathCorner, PathGeometry, PathPoint } from './PathGeometry.ts';
+export { fitCurves } from './fitting/fitCurves.ts';
+export type { CurveFit, CurveFitOptions } from './fitting/fitCurves.ts';
 export { curveBetween, pointOnCubic } from './path/cubicCurve.ts';
 export type { CubicCurve } from './path/cubicCurve.ts';
 export { nearestOnCurve } from './path/nearestOnCurve.ts';

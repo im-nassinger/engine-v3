@@ -42,7 +42,7 @@ The tasks that build v2 (curves and gradients), in the orchestrator's format: ea
 - [x] 12. Point editing on paths: curve handles
   - Read: versions/v2/architecture.md#point-editing-on-paths, design/level-view.md#v2-paths-and-gradient-handles
   - Done when: the selected points' handles show and `HandleDragState` drags them, one step each, smooth points keeping theirs opposite, Alt making a point separate, Shift, snapping and Esc as the architecture says; the selected points' rows in the Points list show as the blue pill, unfolded; Node tests and a Playwright test (drag a handle, switch a point, add a point on a curve) pass
-- [ ] 13. Fit a drag into curves
+- [x] 13. Fit a drag into curves
   - Read: versions/v2/architecture.md#the-pencil
   - Done when: `fitCurves` is in `core/geometry/fitting/` with Node tests: every dragged point within the tolerance, a closed loop closes, a straight drag gives two points, the same drag twice gives the same path, and an over-detailed fit stays within 2,000 points
 - [ ] 14. The Pencil
