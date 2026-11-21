@@ -208,7 +208,7 @@ One per test runner, so each pipeline is proven before stage 1 needs it:
 
 ## CI
 
-One workflow, `.github/workflows/ci.yml`. **It runs only in the public copy of the code, `im-nassinger/engine-v3-ci`**, which the runner pushes after each step: the private repo's free Actions minutes ran out on 2026-11-18, and a public repo's are unlimited. Every job has `if: ${{ !github.event.repository.private }}`, so in this repo they are skipped and use no minutes. The copy has no `docs/`, `CLAUDE.md`, `.claude/`, runner or history (owner, 2026-11-18). The runner built and pushed that copy (its `PublicCopy.ts`); it moved to `~/projects/claude-bridge/old-runner/` on 2026-11-20, so **nothing publishes the copy now, and no push gets CI** until the new tool does.
+One workflow, `.github/workflows/ci.yml`. **It runs only in the public copy of the code, `im-nassinger/engine-v3-ci`**, which the runner pushes after each step: the private repo's free Actions minutes ran out on 2026-11-18, and a public repo's are unlimited. Every job has `if: ${{ !github.event.repository.private }}`, so in this repo they are skipped and use no minutes. The copy has no `docs/`, `CLAUDE.md`, `.claude/`, runner or history (owner, 2026-11-18). The runner built and pushed that copy (its `PublicCopy.ts`); it moved to `~/projects/orchestrator/old-runner/` on 2026-11-20, so **nothing publishes the copy now, and no push gets CI** until the new tool does.
 
 | Job | Runs on | Does | When |
 |---|---|---|---|
@@ -219,7 +219,7 @@ One workflow, `.github/workflows/ci.yml`. **It runs only in the public copy of t
 | phone-arm | `ubuntu-24.04-arm` | Installs Chromium, `npx playwright test --project=phone-chromium`: the determinism page and the editor at a Pixel 7's size on ARM (stage 17 step 7, standing yes, 2026-11-17) | Every push |
 
 - Node comes from `.node-version`. The actions are `actions/checkout@v7` and `actions/setup-node@v7`, with npm's cache.
-- Downloads have limits, because they stalled in every run on 2026-11-18: npm's cache gets 1 minute per part, then the job goes on without it, and the browser install gets two tries of 3 minutes and a last one of 30. The measurements are in `~/projects/claude-bridge/old-runner/docs/ci-speed.md`.
+- Downloads have limits, because they stalled in every run on 2026-11-18: npm's cache gets 1 minute per part, then the job goes on without it, and the browser install gets two tries of 3 minutes and a last one of 30. The measurements are in `~/projects/orchestrator/old-runner/docs/ci-speed.md`.
 - `npx playwright install --with-deps` installs the browsers' system packages on the runner. On the laptop WebKit needed three (`libevent-2.1-7t64`, `libavif16`, `libmanette-0.2-0`), installed once with apt.
 - `tools/check-sources.js` doesn't run in CI: it reads `~/projects/ecs-game-v2`, which only the laptop has.
 - The determinism test joins the check job in stage 13. Running the job on ARM from stage 0 means the ARM runner is known to work long before that test depends on it.

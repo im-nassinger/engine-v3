@@ -187,7 +187,7 @@ Words for how the game is built, used in [architecture/](architecture/README.md)
 | Browser event | Something the browser reports to the page, such as a key press or a paste. Never a game event. |
 | Body pose | A body's position and angle during play, as the physics engine reports it. |
 | Render chunk | A run of the World's children, next to each other in the draw order, that PixiJS draws as its own render group. Moving an entity uploads again only the shapes of its render chunk, not the whole level's. |
-| Runner | The script that built v1, stages 0 to 19, without the owner: one fresh Claude session per step, with reports to Discord. Moved out of this project on 2026-11-20, to `~/projects/claude-bridge/old-runner/`, to become a tool for any project. |
+| Runner | The script that built v1, stages 0 to 19, without the owner: one fresh Claude session per step, with reports to Discord. Moved out of this project on 2026-11-20, to `~/projects/orchestrator/old-runner/`, to become a tool for any project. |
 
 ## The look
 
