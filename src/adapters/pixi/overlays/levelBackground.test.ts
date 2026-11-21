@@ -8,6 +8,21 @@ describe('isDarkBackground', () => {
         expect(isDarkBackground({ kind: 'solid', colour: '#1A2140FF' })).toBe(true);
     });
 
+    test("a gradient is as dark as its stops' mixed colour", () => {
+        const sky = (top: string, bottom: string) => ({
+            kind: 'linear' as const,
+            stops: [
+                { colour: top, place: 0 },
+                { colour: bottom, place: 1 },
+            ],
+            start: { x: 0.5, y: 0 },
+            end: { x: 0.5, y: 1 },
+        });
+
+        expect(isDarkBackground(sky('#87CEEBFF', '#FFFFFFFF'))).toBe(false);
+        expect(isDarkBackground(sky('#0B1030FF', '#3A2A60FF'))).toBe(true);
+    });
+
     test('no fill shows the dark app behind the canvas', () => {
         expect(isDarkBackground({ kind: 'none' })).toBe(true);
         expect(isDarkBackground(undefined)).toBe(true);

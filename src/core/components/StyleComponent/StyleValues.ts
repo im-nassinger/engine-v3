@@ -1,7 +1,7 @@
-import type { SolidFill } from '../../fields/index.ts';
+import type { Fill } from '../../fields/index.ts';
 
 export type StyleValues = {
-    fill: SolidFill;
+    fill: Fill;
     outlineColour: string;
     outlineWidth: number;
     // Off: the entity's own scale and skew don't stretch the outline. A parent group's still do.

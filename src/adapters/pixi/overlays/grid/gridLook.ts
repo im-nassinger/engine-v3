@@ -1,4 +1,4 @@
-import type { SolidFill } from '../../../../core/fields/index.ts';
+import type { Fill } from '../../../../core/fields/index.ts';
 import { isDarkBackground } from '../levelBackground.ts';
 import type { GridLineStrength } from './GridPlan.ts';
 
@@ -18,6 +18,6 @@ const ON_DARK: GridLook = {
     alpha: { fine: 0.03, step: 0.05, origin: 0.14 },
 };
 
-export function gridLookFor(background: SolidFill | undefined) {
+export function gridLookFor(background: Fill | undefined) {
     return isDarkBackground(background) ? ON_DARK : ON_LIGHT;
 }

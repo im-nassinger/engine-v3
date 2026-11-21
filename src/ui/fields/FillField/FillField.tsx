@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { SolidFill } from '../../../core/fields/index.ts';
+import type { Fill } from '../../../core/fields/index.ts';
 import { MIXED } from '../../../editor/entity-inspector/index.ts';
 import { ColourBox } from '../ColourBox/index.ts';
 import type { FieldProps } from '../FieldProps.ts';
@@ -11,7 +11,7 @@ const WHITE = '#FFFFFFFF';
 // off brings back the last colour shown, or the field's default. Typing or picking a colour fills it.
 export function FillField({ field, onCommit }: FieldProps) {
     const lastColour = useRef(defaultColourOf(field));
-    const fill = field.value === MIXED ? undefined : (field.value as SolidFill);
+    const fill = field.value === MIXED ? undefined : (field.value as Fill);
 
     let colour: string | undefined;
     if (fill?.kind === 'solid') {
@@ -65,7 +65,7 @@ export function FillField({ field, onCommit }: FieldProps) {
 function defaultColourOf(field: FieldProps['field']) {
     if (field.kind !== 'field') return WHITE;
 
-    const fill = field.definition.defaultValue as SolidFill;
+    const fill = field.definition.defaultValue as Fill;
     if (fill.kind === 'solid') return fill.colour;
 
     return WHITE;

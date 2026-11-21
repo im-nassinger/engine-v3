@@ -1,11 +1,17 @@
-import { CheckboxFieldType, ColourFieldType, NumberFieldType, SolidFillFieldType } from '../../fields/index.ts';
+import {
+    CheckboxFieldType,
+    ColourFieldType,
+    DEFAULT_FILL_COLOUR,
+    FillFieldType,
+    NumberFieldType,
+} from '../../fields/index.ts';
 
 import { ComponentSchema } from '../schema/ComponentSchema.ts';
 
 import type { StyleValues } from './StyleValues.ts';
 
-// The one default look of v1's new shapes.
-export const DEFAULT_FILL_COLOUR = '#4A90D9FF';
+// The one default look of v1's new shapes. The fill colour lives with the Fill, which switches on from it.
+export { DEFAULT_FILL_COLOUR };
 export const DEFAULT_OUTLINE_COLOUR = '#1F3552FF';
 
 export const styleSchema = new ComponentSchema<StyleValues>({
@@ -18,7 +24,7 @@ export const styleSchema = new ComponentSchema<StyleValues>({
         {
             key: 'fill',
             label: 'Fill',
-            type: new SolidFillFieldType(),
+            type: new FillFieldType(),
             defaultValue: { kind: 'solid', colour: DEFAULT_FILL_COLOUR },
             description: 'The colour inside. Empty paints nothing.',
             changeableInPlay: true,

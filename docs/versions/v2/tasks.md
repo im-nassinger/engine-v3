@@ -9,7 +9,7 @@ The tasks that build v2 (curves and gradients), in the orchestrator's format: ea
 - [x] 1. Fix the tool keys and split the point limit
   - Read: versions/v2/architecture.md#two-things-v1-left-that-v2-fixes-first
   - Done when: `TOOL_KEYS` gives the pen 4 and the Pencil 5; `LevelLimits` has `maxShapePoints` 1,000 and `maxPathPoints` 2,000, and the reader refuses a shape over 1,000 points and a path over 2,000 as `overLimit` `points` with the max of its kind; their tests pass
-- [ ] 2. Build the fill field type
+- [x] 2. Build the fill field type
   - Read: versions/v2/architecture.md#the-fill-field-type, requirements/drawing.md#gradients--v2
   - Done when: `Fill`, `FillFieldType`, `switchFillKind` and `mixedColour` are in `core/fields` with Node tests (parse, refusals, sorting the stops, every switch the requirement lists); the StyleComponent uses `FillFieldType` and `SolidFillFieldType` is gone; `levelBackground` and the minimap use `mixedColour`; every v1 test and saved test level still passes unchanged
 - [ ] 3. Draw gradients with PixiJS

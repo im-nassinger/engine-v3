@@ -1,5 +1,6 @@
 import { PathComponent, ShapeComponent, StyleComponent } from '../../../core/components/index.ts';
 import type { HiddenCache } from '../../../core/derived/index.ts';
+import { mixedColour } from '../../../core/fields/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import type { PathGeometry, Point, ShapePiecesResult } from '../../../core/geometry/index.ts';
 import type { LevelDisplayCaches } from '../LevelDisplay.ts';
@@ -87,7 +88,7 @@ function placeEntity(context: CanvasRenderingContext2D, entity: Entity, caches: 
     context.setTransform(matrix.a * scale, matrix.b * scale, matrix.c * scale, matrix.d * scale, offsetX, offsetY);
 }
 
-// One entity's fill, with no outline. Hidden and unstyled entities paint nothing.
+// One entity's fill, with no outline, in one colour. Hidden and unstyled entities paint nothing.
 export function paintEntityFill(
     context: CanvasRenderingContext2D,
     entity: Entity,
@@ -99,8 +100,9 @@ export function paintEntityFill(
     const style = entity.getComponent(StyleComponent);
     if (style === undefined) return;
 
-    const fill = style.get('fill');
-    if (fill.kind !== 'solid') return;
+    // Too small to show a gradient: it paints its mixed colour.
+    const colour = mixedColour(style.get('fill'));
+    if (colour === undefined) return;
 
     const area = fillAreaOf(entity, caches);
     if (area === undefined) return;
@@ -113,8 +115,8 @@ export function paintEntityFill(
         traceShape(context, area);
     }
 
-    const { alpha } = toPixiColour(fill.colour);
+    const { alpha } = toPixiColour(colour);
     context.globalAlpha = alpha * style.get('opacity');
-    context.fillStyle = fill.colour.slice(0, COLOUR_DIGITS_END);
+    context.fillStyle = colour.slice(0, COLOUR_DIGITS_END);
     context.fill();
 }

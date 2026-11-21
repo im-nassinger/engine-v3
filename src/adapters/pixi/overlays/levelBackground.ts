@@ -1,5 +1,6 @@
 import { StyleComponent } from '../../../core/components/index.ts';
-import type { SolidFill } from '../../../core/fields/index.ts';
+import { mixedColour } from '../../../core/fields/index.ts';
+import type { Fill } from '../../../core/fields/index.ts';
 import type { Level } from '../../../core/level/index.ts';
 
 const LARGEST_CHANNEL = 255;
@@ -24,9 +25,12 @@ export function worldFillOf(level: Level) {
     return level.world.getComponent(StyleComponent)?.get('fill');
 }
 
-// No fill shows the app's dark colour behind the canvas, so it counts as dark.
-export function isDarkBackground(background: SolidFill | undefined) {
-    if (background === undefined || background.kind === 'none') return true;
+// No fill shows the app's dark colour behind the canvas, so it counts as dark. A gradient asks of its mixed colour.
+export function isDarkBackground(background: Fill | undefined) {
+    if (background === undefined) return true;
 
-    return isDarkColour(background.colour);
+    const colour = mixedColour(background);
+    if (colour === undefined) return true;
+
+    return isDarkColour(colour);
 }

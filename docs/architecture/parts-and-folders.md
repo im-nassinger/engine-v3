@@ -40,6 +40,7 @@ src/
     fields/            FieldType, ValueType, FieldDefinition, EntityId, Unit
       field-types/       one file per field type: NumberFieldType, ColourFieldType, ...
       values/            the value types that aren't fields: shape and path geometry, joint ends
+      fill/              the Fill value and its rules: Fill, switchFillKind, mixedColour (v2)
     components/        Component, AnyComponent, ComponentValues, then one folder per component
       schema/            ComponentSchema, the stored and derived field definitions, PartnerRule
       registry/          ComponentRegistry, createV1Registry
