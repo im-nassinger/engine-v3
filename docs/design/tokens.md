@@ -31,6 +31,9 @@ Slate islands and one bright blue accent (owner, 2026-11-17). **There is no line
 | `--tooltip-text` | `#e8ebf0` | Text on them |
 | `--chip` | `rgba(13,15,19,.8)` | The message pill |
 | `--scrim` | `#000000` at 50% | Behind a dialog |
+| `--check-dark` | `#2a2e36` | The darker squares of the check pattern under the gradient bar, so see-through stops show (v2, from the [v2 mockup](mockups/v2.html)) |
+| `--check-light` | `#3a3f49` | Its lighter squares |
+| `--stop-ring` | `#ffffff` | The white ring around a colour stop's swatch |
 
 The level view's own colours are in [level-view.md](level-view.md).
 

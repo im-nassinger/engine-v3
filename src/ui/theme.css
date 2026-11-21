@@ -26,6 +26,9 @@
     --tooltip-text: #e8ebf0;
     --chip: rgb(13 15 19 / 80%);
     --scrim: rgb(0 0 0 / 50%);
+    --check-dark: #2a2e36;
+    --check-light: #3a3f49;
+    --stop-ring: #ffffff;
 
     --font: 'JetBrains Mono', ui-monospace, monospace;
     --text-tiny: 10px;

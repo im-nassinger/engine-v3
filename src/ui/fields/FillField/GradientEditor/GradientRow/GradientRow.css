@@ -1,0 +1,37 @@
+/* The editor sits in the Fill's value column, so its rows reach back over the label column. */
+.gradient-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-8);
+    min-height: var(--row);
+    margin-left: calc(-1 * (var(--label) + var(--space-8)));
+
+    > .label {
+        box-sizing: border-box;
+        flex: 0 0 var(--label);
+        overflow: hidden;
+        color: var(--muted);
+        line-height: var(--row);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &[data-sub='true'] > .label {
+        padding-left: var(--space-14);
+    }
+
+    > .value {
+        display: flex;
+        flex: 1;
+        align-items: center;
+        gap: var(--space-6);
+        min-width: 0;
+        min-height: var(--row);
+
+        /* The row's field takes the room a button beside it leaves. */
+        > :first-child {
+            flex: 1;
+            min-width: 0;
+        }
+    }
+}

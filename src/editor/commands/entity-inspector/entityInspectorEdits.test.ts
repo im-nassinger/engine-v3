@@ -1,6 +1,14 @@
 import { describe, expect, test } from 'vitest';
 
-import { BodyComponent, ShapeComponent, SurfaceComponent, TransformComponent } from '../../../core/components/index.ts';
+import {
+    BodyComponent,
+    ShapeComponent,
+    StyleComponent,
+    SurfaceComponent,
+    TransformComponent,
+} from '../../../core/components/index.ts';
+import { switchFillKind } from '../../../core/fields/index.ts';
+import type { Fill } from '../../../core/fields/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { buildCommandTestSession, expectRoundTrip } from '../testing/commandTestSession.ts';
@@ -8,7 +16,7 @@ import { buildCommandTestSession, expectRoundTrip } from '../testing/commandTest
 import { addComponent } from './addComponent.ts';
 import { removeComponent } from './removeComponent.ts';
 import { resetComponent } from './resetComponent.ts';
-import { setFieldValue, setVectorAxis } from './setFieldValue.ts';
+import { setFieldValue, setFieldValueEach, setVectorAxis } from './setFieldValue.ts';
 
 // The square and the child as crates: a shape, a body and a surface each.
 function buildSession() {
@@ -158,6 +166,31 @@ describe('setFieldValue', () => {
         setFieldValue(session.openLevel, [square.id], 'ShapeComponent', 'kind', 'rectangle');
 
         expect(session.openLevel.history.undoCount).toBe(0);
+    });
+});
+
+describe('setFieldValueEach', () => {
+    test('switches each entity from its own fill, as one step', () => {
+        const { session, square, child } = buildSession();
+        square.addComponent(new StyleComponent({ ...StyleComponent.schema.defaults(), fill: { kind: 'none' } }));
+        child.addComponent(
+            new StyleComponent({ ...StyleComponent.schema.defaults(), fill: { kind: 'solid', colour: '#FF0000FF' } }),
+        );
+        const toLinear = (fill: unknown) => switchFillKind(fill as Fill, 'linear');
+
+        const trip = expectRoundTrip(session, () =>
+            setFieldValueEach(session.openLevel, [square.id, child.id], 'StyleComponent', 'fill', toLinear),
+        );
+
+        expect(trip.afterUndo).toEqual(trip.before);
+        const stopsOf = (entity: Entity) => {
+            const fill = entity.requireComponent(StyleComponent).get('fill');
+            return fill.kind === 'linear' ? fill.stops.map((stop) => stop.colour) : [];
+        };
+        expect(stopsOf(square)).toEqual(['#4A90D9FF', '#4A90D900']);
+        expect(stopsOf(child)).toEqual(['#FF0000FF', '#FF000000']);
+        expect(session.openLevel.history.undoCount).toBe(1);
+        expect(session.openLevel.history.undoLabel).toBe('Change Fill');
     });
 });
 

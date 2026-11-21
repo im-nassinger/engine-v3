@@ -244,35 +244,3 @@ describe('Entity inspector: the colour field', () => {
         await expect.poll(() => codeBox('outlineColour').value).toBe('');
     });
 });
-
-describe('Entity inspector: the fill field', () => {
-    test('emptying a fill shows None, and switching None off brings the colour back, one step each', async () => {
-        const { crates, session } = await showCrates(1);
-        const crate = crates[0] as Entity;
-        const noneSwitch = requireElement<HTMLButtonElement>(fieldRow('StyleComponent', 'fill'), 'button.none');
-
-        await userEvent.click(noneSwitch);
-
-        await expect.poll(() => styleOf(crate).get('fill')).toEqual({ kind: 'none' });
-        expect(codeBox('fill').value).toBe('');
-        expect(codeBox('fill').placeholder).toBe('None');
-        expect(noneSwitch.getAttribute('aria-pressed')).toBe('true');
-        const swatch = requireElement<HTMLElement>(fieldRow('StyleComponent', 'fill'), '.colour-swatch');
-        expect(swatch.dataset['none']).toBe('true');
-
-        await userEvent.click(noneSwitch);
-
-        await expect.poll(() => styleOf(crate).get('fill')).toEqual({ kind: 'solid', colour: '#4A90D9FF' });
-        expect(undoCount(session)).toBe(2);
-    });
-
-    test('typing a code into an empty fill fills it', async () => {
-        const { crates } = await showCrates(1);
-        const crate = crates[0] as Entity;
-        styleOf(crate).set('fill', { kind: 'none' });
-
-        await typeInto(codeBox('fill'), '123456');
-
-        await expect.poll(() => styleOf(crate).get('fill')).toEqual({ kind: 'solid', colour: '#123456FF' });
-    });
-});

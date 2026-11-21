@@ -1,0 +1,19 @@
+.gradient-bar {
+    --check: 8px;
+
+    height: 22px;
+    margin-top: var(--space-4);
+    border-radius: 11px;
+    background-color: var(--check-light);
+    background-image:
+        var(--gradient), linear-gradient(45deg, var(--check-dark) 25%, transparent 25% 75%, var(--check-dark) 75%),
+        linear-gradient(45deg, var(--check-dark) 25%, transparent 25% 75%, var(--check-dark) 75%);
+    background-position:
+        0 0,
+        0 0,
+        calc(var(--check) / 2) calc(var(--check) / 2);
+    background-size:
+        100% 100%,
+        var(--check) var(--check),
+        var(--check) var(--check);
+}

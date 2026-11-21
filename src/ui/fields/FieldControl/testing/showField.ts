@@ -66,6 +66,7 @@ export function showField(
         subject,
         onCommit: (newValue) => committed.push(newValue),
         onCommitAxis: (axis, newValue) => committed.push({ [axis]: newValue }),
+        onCommitEach: (valueFor) => committed.push(valueFor(value)),
     });
     root.render(createElement(CommandsContext, { value: commands }, control));
 

@@ -15,7 +15,7 @@ The tasks that build v2 (curves and gradients), in the orchestrator's format: ea
 - [x] 3. Draw gradients with PixiJS
   - Read: versions/v2/architecture.md#drawing-a-gradient, tech-notes.md
   - Done when: `PixiFill` and `GradientTextures` are in `adapters/pixi` and `EntityDrawing` draws linear and radial fills; a browser test in Chromium, Firefox and WebKit reads the pixels of a linear and a radial gradient on a rectangle, a turned one, a see-through stop over the background and a closed path; equal fills share one texture, released when unused; what PixiJS did is written in tech-notes.md
-- [ ] 4. The Fill's choice and the gradient editor's fields
+- [x] 4. The Fill's choice and the gradient editor's fields
   - Read: versions/v2/architecture.md#the-fills-editor, design/controls.md#v2-the-pen-the-pencil-and-gradients, design/mockups/v2.html
   - Done when: `FillField` shows the None, Solid, Linear and Radial choice, Solid's colour field, and for a gradient the stop swatches, the chosen stop's Colour and Place, `−`, `+ Add stop`, and Start and End or Centre and Radius in %; each change is one step; several selected entities show `Mixed` as the architecture says; browser tests pass
 - [ ] 5. The gradient bar: add a stop by clicking, move one by dragging

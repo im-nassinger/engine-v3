@@ -6,7 +6,15 @@ export type { ChoiceOption } from './field-types/ChoiceFieldType.ts';
 export { ColourFieldType } from './field-types/ColourFieldType.ts';
 export type { EntityId } from './EntityId.ts';
 export { EntityFieldType } from './field-types/EntityFieldType.ts';
-export { DEFAULT_FILL_COLOUR, isGradient, MAX_STOPS, MIN_STOPS } from './fill/Fill.ts';
+export {
+    DEFAULT_FILL_COLOUR,
+    isGradient,
+    MAX_POSITION,
+    MAX_RADIUS,
+    MAX_STOPS,
+    MIN_POSITION,
+    MIN_STOPS,
+} from './fill/Fill.ts';
 export type { ColourStop, Fill, FillKind, GradientFill } from './fill/Fill.ts';
 export { FillFieldType } from './field-types/FillFieldType.ts';
 export type { FieldDefinition } from './FieldDefinition.ts';
@@ -22,6 +30,8 @@ export { mixedColour } from './fill/mixedColour.ts';
 export { PathGeometryValue } from './values/PathGeometryValue.ts';
 export { isPlainObject } from './rawChecks.ts';
 export { ShapeGeometryValue } from './values/ShapeGeometryValue.ts';
+export { colourAt, withoutStop, withStopAdded, withStopChanged } from './fill/gradientStops.ts';
+export type { EditedStops } from './fill/gradientStops.ts';
 export { switchFillKind } from './fill/switchFillKind.ts';
 export { TextFieldType } from './field-types/TextFieldType.ts';
 export type { TextFieldOptions } from './field-types/TextFieldType.ts';

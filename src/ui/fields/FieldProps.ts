@@ -21,11 +21,13 @@ export type FieldSlideHandlers = {
 
 // What every field component takes: the field with its value (or MIXED), and where a new value goes.
 // onCommit makes the undo step on every shown entity; a refusal comes back as status text. A vector's
-// box commits only its own axis, so each entity keeps its other one.
+// box commits only its own axis, so each entity keeps its other one. onCommitEach makes one step of a value
+// made from each entity's own, such as the Fill's choice switching each selected entity's fill.
 export type FieldProps = {
     field: FieldModel;
     subject: FieldSubject;
     onCommit: (value: unknown) => void;
     onCommitAxis: (axis: Axis, value: number) => void;
+    onCommitEach: (valueFor: (value: unknown) => unknown) => void;
     slide?: FieldSlideHandlers;
 };

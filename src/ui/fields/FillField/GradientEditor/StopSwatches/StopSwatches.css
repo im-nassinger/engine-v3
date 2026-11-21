@@ -1,0 +1,35 @@
+/* 7 px each side, so the swatches at 0% and 100% stay inside the column. */
+.stop-swatches {
+    position: relative;
+    height: 22px;
+    margin: 0 7px;
+
+    > .stop {
+        position: absolute;
+        top: 4px;
+        width: 14px;
+        height: 14px;
+        margin-left: -7px;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        background: var(--swatch);
+        box-shadow: 0 0 0 2px var(--stop-ring);
+        cursor: pointer;
+
+        &[aria-pressed='true'] {
+            box-shadow:
+                0 0 0 2px var(--stop-ring),
+                0 0 0 4px var(--accent);
+        }
+
+        &:focus-visible {
+            outline: 1px solid var(--accent);
+            outline-offset: 5px;
+        }
+
+        &:disabled {
+            cursor: default;
+        }
+    }
+}

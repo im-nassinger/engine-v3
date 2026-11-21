@@ -34,6 +34,18 @@ export function setFieldValue(
     return editEach(openLevel, entityIds, componentType, key, () => value);
 }
 
+// A value made from each entity's own, as one step: the Fill's choice switches each selected entity's fill
+// from what it holds, so Solid to Linear keeps each one's colour. Refused like setFieldValue.
+export function setFieldValueEach(
+    openLevel: OpenLevel,
+    entityIds: readonly EntityId[],
+    componentType: ComponentTypeName,
+    key: string,
+    valueFor: (value: unknown) => unknown,
+): EditOutcome {
+    return editEach(openLevel, entityIds, componentType, key, (held) => valueFor(held.component.readValue(key)));
+}
+
 // One box of a vector field: the typed axis on every entity, each keeping its own other axis, so a
 // Position whose y is Mixed can have its x typed. One step, refused like setFieldValue.
 export function setVectorAxis(

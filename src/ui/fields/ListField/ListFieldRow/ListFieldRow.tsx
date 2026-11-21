@@ -34,9 +34,17 @@ export function ListFieldRow({ field, subject, items, itemType, index, onCommit 
         commitItem(newVector);
     };
 
+    const commitItemEach = (valueFor: (value: unknown) => unknown) => commitItem(valueFor(item));
+
     const remove = () => onCommit(ListItems.without(items, index, itemType));
 
-    const itemProps: FieldProps = { field: itemField, subject, onCommit: commitItem, onCommitAxis: commitItemAxis };
+    const itemProps: FieldProps = {
+        field: itemField,
+        subject,
+        onCommit: commitItem,
+        onCommitAxis: commitItemAxis,
+        onCommitEach: commitItemEach,
+    };
 
     return (
         <div className="list-field-row" data-index={index}>

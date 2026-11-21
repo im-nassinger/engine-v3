@@ -2,7 +2,13 @@ import { useEffect, useRef } from 'react';
 import type { ComponentTypeName } from '../../../../../core/components/index.ts';
 import type { EntityId } from '../../../../../core/level/index.ts';
 import type { EditOutcome } from '../../../../../editor/history/index.ts';
-import { FieldSlide, setBodyMass, setFieldValue, setVectorAxis } from '../../../../../editor/commands/index.ts';
+import {
+    FieldSlide,
+    setBodyMass,
+    setFieldValue,
+    setFieldValueEach,
+    setVectorAxis,
+} from '../../../../../editor/commands/index.ts';
 import type { Axis } from '../../../../../editor/commands/index.ts';
 import type { FieldModel } from '../../../../../editor/entity-inspector/index.ts';
 import type { OpenLevel } from '../../../../../editor/session/index.ts';
@@ -51,6 +57,11 @@ export function CardField({ openLevel, typeName, entityIds, field }: CardFieldPr
         showRefusal(outcome);
     };
 
+    const commitEach = (valueFor: (value: unknown) => unknown) => {
+        const outcome = setFieldValueEach(openLevel, entityIds, typeName, key, valueFor);
+        showRefusal(outcome);
+    };
+
     const startedSlide = () => {
         if (slideRef.current === undefined) {
             slideRef.current = new FieldSlide({ openLevel, entityIds, componentType: typeName, key });
@@ -86,6 +97,7 @@ export function CardField({ openLevel, typeName, entityIds, field }: CardFieldPr
                     subject={subject}
                     onCommit={commit}
                     onCommitAxis={commitAxis}
+                    onCommitEach={commitEach}
                     slide={slide}
                 />
             </span>
