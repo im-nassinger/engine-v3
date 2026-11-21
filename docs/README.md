@@ -10,6 +10,7 @@ Everything known about the project: a 2D physics game with a level editor, for t
 |---|---|
 | [overview.md](overview.md) | What the game is, its main ideas, the versions in short, how to read the docs |
 | [progress.md](progress.md) | Where things stand, what's next, open questions for the owner |
+| [settled.md](settled.md) | What the owner settled while v1 was planned and built, day by day |
 | [stages-built.md](stages-built.md) | What each stage showed when it was built: modules, choices, CI failures, what it left for later |
 | [glossary.md](glossary.md) | Every agreed word, the list of components, and the words we dropped |
 | [principles.md](principles.md) | The rules every requirement follows, and the rules for proposing a change |
