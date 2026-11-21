@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-v1 in **18 small stages**, 0 to 17, then stage 18, **Before v2**, the owner's changes to build before v2 starts, and stage 19, **The redesign**, the editor's new look (owner, 2026-11-18); each stage is tested on its own before the next starts. The order goes from the inside out: the model and its data format first, then geometry, then drawing a level, then editing it (history, panels, tools, clipboard), then saving, then physics and the determinism test, then test play. **Every stage names the requirement files it implements** and when it is done. The small features the owner put in v1 (owner, 2026-11-14) are built in their stage. How each part is built is in [architecture/](architecture/README.md).
+**This plan is v1's only, and v1 is built.** Each later version is planned in [versions/](versions/README.md), with a `tasks.md` the orchestrator builds. v1 in **18 small stages**, 0 to 17, then stage 18, **Before v2**, the owner's changes to build before v2 starts, and stage 19, **The redesign**, the editor's new look (owner, 2026-11-18); each stage is tested on its own before the next starts. The order goes from the inside out: the model and its data format first, then geometry, then drawing a level, then editing it (history, panels, tools, clipboard), then saving, then physics and the determinism test, then test play. **Every stage names the requirement files it implements** and when it is done. The small features the owner put in v1 (owner, 2026-11-14) are built in their stage. How each part is built is in [architecture/](architecture/README.md).
 
 ## How a stage works
 

@@ -1,6 +1,6 @@
 # engine-v3
 
-A 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved (2026-11-14). The work goes stage by stage through `docs/plan.md`; `docs/progress.md` says which stage is current.
+A 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved (2026-11-14). v1 was built stage by stage through `docs/plan.md`. Each later version is planned in `docs/versions/vN/` and built by the orchestrator from its `tasks.md`, the way the `orchestrator-workflow` skill describes; `docs/progress.md` says where things stand.
 
 Start at `docs/README.md`, then `docs/progress.md`.
 

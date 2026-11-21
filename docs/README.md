@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Everything known about the project: a 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved, and the code is built stage by stage from [plan.md](plan.md). v1 is built: stages 0 to 19, including the changes before v2 and the redesign; after it come small versions, v2 to v7 (owner, 2026-11-20), and v2's requirements are checked and its screen parts designed; its architecture and tasks come next. The owner gave a standing yes on 2026-11-14, so Claude decides the smaller questions and lists them in [decisions.md](decisions.md). **Start with [progress.md](progress.md)** to see where things stand, then [overview.md](overview.md) for the whole game in one page. Every file opens with a TL;DR, and the docs read from high level down to detail.
+Everything known about the project: a 2D physics game with a level editor, for the browser. The requirements, the scope and the architecture are approved. v1 is built, stage by stage from [plan.md](plan.md): stages 0 to 19, including the changes before v2 and the redesign. After it come small versions, v2 to v7 (owner, 2026-11-20), each planned in [versions/](versions/README.md) and built by the orchestrator; v2's requirements and design are done, its architecture and tasks come next. The owner gave a standing yes on 2026-11-14, so Claude decides the smaller questions and lists them in [decisions.md](decisions.md). **Start with [progress.md](progress.md)** to see where things stand, then [overview.md](overview.md) for the whole game in one page. Every file opens with a TL;DR, and the docs read from high level down to detail.
 
 ## Files
 
@@ -17,7 +17,8 @@ Everything known about the project: a 2D physics game with a level editor, for t
 | [requirements/](requirements/README.md) | The exact rules, in eight topics, plus the features not designed yet |
 | [architecture/](architecture/README.md) | How the game is built: the stack, the parts of the code, the classes, saving, test play, tests, the tooling and checks |
 | [design/](design/README.md) | How the editor looks: the round 8 answers, the mockups, and later the design system |
-| [plan.md](plan.md) | The v1 plan in 20 stages, 0 to 19, each with the docs it implements |
+| [plan.md](plan.md) | The v1 plan in 20 stages, 0 to 19, each with the docs it implements. v1 only |
+| [versions/](versions/README.md) | Every version after v1, one folder each: its requirements, design, architecture and the tasks the orchestrator builds |
 | [steps/](steps/README.md) | Each stage's steps, one file per stage, written when the stage starts |
 | [deploying.md](deploying.md) | Publishing the editor on Netlify: the URL, the steps, and that the owner is already logged in |
 | [review.html](review.html) | The review page where the owner answers questions in the browser. Earlier rounds are in git history |
@@ -32,4 +33,4 @@ Everything known about the project: a 2D physics game with a level editor, for t
 - **To catch up:** progress, overview, then scope.
 - **To work on a feature:** its row in scope, then its topic in requirements. Check the words in the glossary.
 - **To propose something:** principles, then rejected.
-- **To write code:** [plan.md](plan.md) and the current stage's file in [steps/](steps/README.md), then [architecture/](architecture/README.md) and the requirement files the stage names.
+- **To write code:** the version's folder in [versions/](versions/README.md), its task in `tasks.md` and the docs the task's **Read** names, then [architecture/](architecture/README.md). v1's stages are in [plan.md](plan.md) and [steps/](steps/README.md).
