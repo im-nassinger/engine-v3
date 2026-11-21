@@ -4,6 +4,7 @@ name: CI
 # See docs/architecture/tooling.md, "CI".
 on:
     push:
+    workflow_dispatch:
 
 jobs:
     check:
