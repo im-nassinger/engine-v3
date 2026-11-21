@@ -52,7 +52,8 @@ export class PointsMove {
             const start = this.points.toLevel(point);
             const levelPosition = { x: start.x + offset.x, y: start.y + offset.y };
 
-            return this.points.toOwn(levelPosition);
+            // A path point carries its handles, which are measured from it.
+            return { ...point, ...this.points.toOwn(levelPosition) };
         });
         const geometry = this.points.geometryWith(moved);
 

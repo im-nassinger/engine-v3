@@ -1,12 +1,14 @@
-import { ShapeComponent } from '../../../../core/components/index.ts';
-import type { Bounds, Point } from '../../../../core/geometry/index.ts';
+import { curveBetween, pathBox, pointOnCubic } from '../../../../core/geometry/index.ts';
+import type { Bounds, Matrix2D, PathCorner, PathGeometry, Point } from '../../../../core/geometry/index.ts';
 import type { Entity } from '../../../../core/level/index.ts';
 import type { OpenLevel } from '../../../session/index.ts';
-import { geometryBox } from '../../../commands/index.ts';
+import { editablePointsOf, geometryBox } from '../../../commands/index.ts';
+import type { EditablePoints } from '../../../commands/index.ts';
+import { CURVE_STEP_COUNT } from '../../../hit-testing/index.ts';
 
 import { PointHits } from './PointHits.ts';
 
-// The polygon or line whose points are being edited, and which of its points are selected, as indexes
+// The polygon, line or path whose points are being edited, and which of its points are selected, as indexes
 // into its points. Calls changed() each time the selected points change, so the overlay draws again.
 export class EditedPoints {
     readonly openLevel: OpenLevel;
@@ -29,42 +31,58 @@ export class EditedPoints {
         return this.selected.includes(index);
     }
 
-    // Still in the level, shown and not locked, a polygon or line, and the only one selected.
+    // Still in the level, shown and not locked, a polygon, line or path (not a Rope's or Spring's), and the
+    // only one selected.
     get isEditable() {
         const { level, selection, caches } = this.openLevel;
         const isInLevel = level.findEntity(this.entity.id) === this.entity;
         const isOnlySelected = selection.entities.length === 1 && selection.has(this.entity.id);
         const isReachable = !caches.hidden.isHidden(this.entity) && !caches.hidden.isLocked(this.entity);
 
-        return isInLevel && isOnlySelected && isReachable && this.points() !== undefined;
+        return isInLevel && isOnlySelected && isReachable && this.editable() !== undefined;
     }
 
     get isClosed() {
-        return this.geometry()?.kind === 'polygon';
+        return this.editable()?.closed ?? false;
+    }
+
+    get isPath() {
+        return this.editable()?.kind === 'path';
     }
 
     // The points in level positions.
     levelPoints(): Point[] {
-        const matrix = this.openLevel.caches.worldMatrices.matrixOf(this.entity);
-        const points = this.points() ?? [];
+        const matrix = this.levelMatrix();
+        const points = this.editable()?.points ?? [];
 
         return points.map((point) => matrix.apply(point));
     }
 
-    hits() {
-        const levelPoints = this.levelPoints();
+    // Each point's corner, in order: a polygon's and a line's points are all sharp.
+    corners(): PathCorner[] {
+        const editable = this.editable();
+        if (editable === undefined) return [];
+        if (editable.kind !== 'path') return editable.points.map(() => 'sharp');
 
-        return new PointHits(levelPoints, this.isClosed);
+        return editable.points.map((point) => point.corner);
+    }
+
+    hits() {
+        const editable = this.editable();
+        const levelPoints = this.levelPoints();
+        if (editable?.kind !== 'path') return new PointHits(levelPoints, this.isClosed);
+
+        return new PointHits(levelPoints, editable.closed, curveSteps(editable.path, this.levelMatrix()));
     }
 
     // Inside the shape's own box, or on one of its edges, which counts a line's thin box.
     isOnFrame(position: Point, zoom: number) {
-        const geometry = this.geometry();
-        const inverse = this.openLevel.caches.worldMatrices.matrixOf(this.entity).invert();
-        if (geometry === undefined || inverse === undefined) return false;
+        const editable = this.editable();
+        const inverse = this.levelMatrix().invert();
+        if (editable === undefined || inverse === undefined) return false;
 
         const ownPosition = inverse.apply(position);
-        const isInBox = geometryBox(geometry).contains(ownPosition);
+        const isInBox = ownBoxOf(editable).contains(ownPosition);
         const isOnEdge = this.hits().edgeAt(position, zoom) !== undefined;
 
         return isInBox || isOnEdge;
@@ -102,21 +120,17 @@ export class EditedPoints {
 
     // Leaves out the selected points the entity no longer has.
     dropMissing() {
-        const count = this.points()?.length ?? 0;
+        const count = this.editable()?.points.length ?? 0;
         const remaining = this.selected.filter((index) => index < count);
         this.set(remaining);
     }
 
-    private geometry() {
-        return this.entity.getComponent(ShapeComponent)?.get('geometry');
+    private editable() {
+        return editablePointsOf(this.entity);
     }
 
-    private points() {
-        const geometry = this.geometry();
-        const hasPoints = geometry?.kind === 'polygon' || geometry?.kind === 'line';
-        if (!hasPoints) return undefined;
-
-        return geometry.points;
+    private levelMatrix() {
+        return this.openLevel.caches.worldMatrices.matrixOf(this.entity);
     }
 
     private set(indexes: readonly number[]) {
@@ -129,4 +143,35 @@ export class EditedPoints {
         this.selected = inOrder;
         this.changed();
     }
+}
+
+function ownBoxOf(editable: EditablePoints) {
+    const box = editable.kind === 'path' ? pathBox(editable.path) : geometryBox(editable);
+    if (box === undefined) throw new Error('Edited points are never empty.');
+
+    return box;
+}
+
+// Each of the path's edges in level positions, from its start point to the next: a straight one as its
+// two ends, a curve as the steps hit testing cuts it into.
+function curveSteps(path: PathGeometry, matrix: Matrix2D) {
+    const { points, closed } = path;
+    const edgeCount = closed ? points.length : points.length - 1;
+    const edges: Point[][] = [];
+
+    for (let startIndex = 0; startIndex < edgeCount; startIndex += 1) {
+        const from = points[startIndex];
+        const to = points[(startIndex + 1) % points.length];
+        if (from === undefined || to === undefined) break;
+
+        const curve = curveBetween(from, to);
+        const isStraight = from.handleOut === null && to.handleIn === null;
+        const stepCount = isStraight ? 1 : CURVE_STEP_COUNT;
+        const steps = Array.from({ length: stepCount + 1 }, (_unused, step) =>
+            matrix.apply(pointOnCubic(curve, step / stepCount)),
+        );
+        edges.push(steps);
+    }
+
+    return edges;
 }

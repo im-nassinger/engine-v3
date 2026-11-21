@@ -54,7 +54,7 @@ export class EditorSelectionSource implements SelectionSource {
         const edited = this.selectTool?.editedPoints;
         if (edited === undefined) return undefined;
 
-        return { points: edited.levelPoints(), selected: edited.selectedIndexes };
+        return { points: edited.levelPoints(), corners: edited.corners(), selected: edited.selectedIndexes };
     }
 
     isHidden(entity: Entity) {

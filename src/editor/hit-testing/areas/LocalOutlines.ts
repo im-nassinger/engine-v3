@@ -4,8 +4,8 @@ import type { PathGeometry, PathPoint, Point, ShapeGeometry, ShapePiecesResult }
 // The level view draws a circle round, so its hit outline has more points than its collision outline:
 // at 128 the edge is off by under 0.03% of the radius.
 const CIRCLE_HIT_POINT_COUNT = 128;
-// The steps one curved path segment is cut into. v1 only makes straight paths, so this is for v2's pen.
-const CURVE_STEP_COUNT = 16;
+// The steps one curved path segment is cut into, for hit testing and point editing's edges.
+export const CURVE_STEP_COUNT = 16;
 
 // Lines and fills in an entity's own space, before its matrix.
 export type OwnSpaceOutlines = {

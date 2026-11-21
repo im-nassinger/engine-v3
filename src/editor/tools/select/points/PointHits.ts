@@ -12,15 +12,18 @@ export type EdgeHit = {
     readonly position: Point;
 };
 
-// What lies under the mouse among a polygon's or line's points, all in level positions. A polygon has an
-// edge from its last point back to its first; a line doesn't.
+// What lies under the mouse among a polygon's, line's or path's points, all in level positions. A polygon
+// and a closed path have an edge from their last point back to their first; a line and an open path don't.
+// A path's curved edge is given as the straight steps it is cut into, from its start point to the next.
 export class PointHits {
     private readonly points: readonly Point[];
     private readonly isClosed: boolean;
+    private readonly edgeSteps: readonly (readonly Point[])[] | undefined;
 
-    constructor(points: readonly Point[], isClosed: boolean) {
+    constructor(points: readonly Point[], isClosed: boolean, edgeSteps?: readonly (readonly Point[])[]) {
         this.points = points;
         this.isClosed = isClosed;
+        this.edgeSteps = edgeSteps;
     }
 
     // The index of the nearest point within reach, the topmost (last) one on a tie.
@@ -48,14 +51,12 @@ export class PointHits {
         let nearestDistance = Infinity;
 
         for (let startIndex = 0; startIndex < this.edgeCount(); startIndex += 1) {
-            const start = this.requirePoint(startIndex);
-            const end = this.requirePoint((startIndex + 1) % this.points.length);
-            const distance = PlanarGeometry.distanceToSegment(position, start, end);
-            const isNearer = distance <= reach && distance < nearestDistance;
+            const onEdge = nearestOnLine(this.edgeLine(startIndex), position);
+            const isNearer = onEdge !== undefined && onEdge.distance <= reach && onEdge.distance < nearestDistance;
             if (!isNearer) continue;
 
-            nearest = { startIndex, position: nearestOnSegment(position, start, end) };
-            nearestDistance = distance;
+            nearest = { startIndex, position: onEdge.position };
+            nearestDistance = onEdge.distance;
         }
 
         return nearest;
@@ -81,12 +82,40 @@ export class PointHits {
         return this.points.length - 1;
     }
 
+    // The edge from point `startIndex` to the next, as the straight steps it is drawn with.
+    private edgeLine(startIndex: number): readonly Point[] {
+        const steps = this.edgeSteps?.[startIndex];
+        if (steps !== undefined) return steps;
+
+        const start = this.requirePoint(startIndex);
+        const end = this.requirePoint((startIndex + 1) % this.points.length);
+
+        return [start, end];
+    }
+
     private requirePoint(index: number) {
         const point = this.points[index];
         if (point === undefined) throw new Error(`No point ${index}`);
 
         return point;
     }
+}
+
+// The nearest place to the position on a line of straight steps, and how far it is.
+function nearestOnLine(line: readonly Point[], position: Point) {
+    let nearest: { readonly position: Point; readonly distance: number } | undefined;
+
+    line.forEach((end, index) => {
+        const start = line[index - 1];
+        if (start === undefined) return;
+
+        const distance = PlanarGeometry.distanceToSegment(position, start, end);
+        if (nearest !== undefined && distance >= nearest.distance) return;
+
+        nearest = { position: nearestOnSegment(position, start, end), distance };
+    });
+
+    return nearest;
 }
 
 function nearestOnSegment(position: Point, start: Point, end: Point): Point {

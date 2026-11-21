@@ -16,7 +16,7 @@ import type { SelectState, SelectStateHost } from './states/SelectState.ts';
 
 // Picks entities by click, Shift+click and the selection box, moves them by dragging, resizes one entity by
 // its handles, rotates it just outside a corner and drags its gradient's handles, goes into and out of
-// groups by double-click, and edits a polygon's or line's points after a double-click on it. It holds one
+// groups by double-click, and edits a polygon's, line's or path's points after a double-click on it. It holds one
 // state at a time.
 export class SelectTool implements Tool {
     readonly id = 'select';
@@ -53,7 +53,7 @@ export class SelectTool implements Tool {
         return GradientHandles.of(this.context.openLevel);
     }
 
-    // The polygon or line whose points are being edited, with its selected points, for the overlay.
+    // The polygon, line or path whose points are being edited, with its selected points, for the overlay.
     get editedPoints() {
         const editing = pointEditingOf(this.state);
         if (editing === undefined || !editing.isEditing) return undefined;

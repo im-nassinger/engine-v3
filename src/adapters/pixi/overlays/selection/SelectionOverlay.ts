@@ -8,7 +8,7 @@ import { HANDLE_SIZE_PX } from '../../../../editor/tools/index.ts';
 import { JOINT_ICON_RADIUS_PX } from '../../../../editor/view/index.ts';
 import type { OverlayCaches, OverlayScene } from '../OverlayScene.ts';
 import { dashedLine } from '../dashes.ts';
-import { ACCENT, OVERLAY_FONT, OVERLAY_TEXT_PX, drawHandle } from '../overlayLook.ts';
+import { ACCENT, OVERLAY_FONT, OVERLAY_TEXT_PX, ROUND_POINT_PX, drawHandle, drawRoundPoint } from '../overlayLook.ts';
 import { screenRectangleOf, squareAround } from '../screenPixels.ts';
 
 import { planSelection } from './selectionPlan.ts';
@@ -47,8 +47,10 @@ export type DrawnSelection = {
     readonly cameraFrames: number;
     readonly padlocks: number;
     readonly handles: readonly Bounds[];
-    // The edited polygon's or line's points, and how many of them draw as selected.
+    // The edited polygon's, line's or path's points, how many draw as circles (smooth or separate), and how
+    // many as selected.
     readonly points: readonly Bounds[];
+    readonly roundPoints: number;
     readonly selectedPoints: number;
     readonly sharedBox: Bounds | undefined;
     readonly hiddenBox: Bounds | undefined;
@@ -65,6 +67,7 @@ const NOTHING_DRAWN: DrawnSelection = {
     padlocks: 0,
     handles: [],
     points: [],
+    roundPoints: 0,
     selectedPoints: 0,
     sharedBox: undefined,
     hiddenBox: undefined,
@@ -124,6 +127,7 @@ export class SelectionOverlay {
             padlocks: this.drawPadlocks(plan, scene),
             handles,
             points,
+            roundPoints: source.editedPoints?.corners.filter((corner) => corner !== 'sharp').length ?? 0,
             selectedPoints: source.editedPoints?.selected.length ?? 0,
             sharedBox: this.drawSharedBox(plan, scene),
             hiddenBox: this.drawHiddenBox(plan, scene),
@@ -183,16 +187,24 @@ export class SelectionOverlay {
         return squares;
     }
 
-    // Each point an 8 px handle at any zoom: the selected ones filled with the accent colour, the others hollow.
+    // Each point the same size at any zoom: a sharp one an 8 px square, a smooth or separate one a 9 px circle,
+    // the selected ones filled with the accent colour and the others hollow.
     private drawPoints(edited: ShownPoints, scene: OverlayScene) {
         const selected = new Set(edited.selected);
-        const squares = edited.points.map((point) => squareAround(scene.view.levelToScreen(point), HANDLE_SIZE_PX));
 
-        squares.forEach((square, index) => {
-            drawHandle(this.handleSquares, square, selected.has(index) ? ACCENT : undefined);
+        return edited.points.map((point, index) => {
+            const centre = scene.view.levelToScreen(point);
+            const inside = selected.has(index) ? ACCENT : undefined;
+            const isRound = edited.corners[index] !== undefined && edited.corners[index] !== 'sharp';
+            if (!isRound) {
+                const square = squareAround(centre, HANDLE_SIZE_PX);
+                drawHandle(this.handleSquares, square, inside);
+                return square;
+            }
+
+            drawRoundPoint(this.handleSquares, centre, inside);
+            return squareAround(centre, ROUND_POINT_PX);
         });
-
-        return squares;
     }
 
     private drawRings(rings: readonly Point[], scene: OverlayScene) {

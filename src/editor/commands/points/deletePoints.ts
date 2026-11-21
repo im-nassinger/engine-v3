@@ -7,7 +7,7 @@ import type { CommandOutcome } from '../EditorCommand.ts';
 import { isPointsRefusal, PointsTarget } from './PointsTarget.ts';
 
 // Delete or Backspace while editing points: the selected points go, as one step. A polygon keeps at least
-// 3 points and a line 2; a delete that would leave fewer deletes nothing and says why.
+// 3 points, a line and an open path 2, and a closed path 3; a delete that would leave fewer deletes nothing and says why.
 export function deletePoints(openLevel: OpenLevel, entity: Entity, indexes: readonly number[]): CommandOutcome {
     const points = PointsTarget.of(openLevel, entity);
     if (isPointsRefusal(points)) return points;
@@ -18,7 +18,7 @@ export function deletePoints(openLevel: OpenLevel, entity: Entity, indexes: read
     if (deletesNothing) return { kind: 'refused', reason: 'No points selected' };
 
     if (remaining.length < points.minPoints) {
-        return { kind: 'refused', reason: `A ${points.kind} keeps at least ${points.minPoints} points` };
+        return { kind: 'refused', reason: points.minPointsReason };
     }
 
     const label = `Delete points of ${labelName(entity)}`;

@@ -1,6 +1,6 @@
 import type { Entity } from '../../../../core/level/index.ts';
 import type { Unsubscribe } from '../../../../core/events/index.ts';
-import { addPoint, deletePoints, nudgePoints } from '../../../commands/index.ts';
+import { addPoint, deletePoints, nudgePoints, setCorner } from '../../../commands/index.ts';
 import type { CommandOutcome } from '../../../commands/index.ts';
 import type { LevelPointerInput, ToolKey } from '../../Tool.ts';
 import { EditedPoints } from '../points/EditedPoints.ts';
@@ -10,10 +10,10 @@ import { pointNudgeOffset } from '../points/pointNudgeOffset.ts';
 import { PointPressState } from './PointPressState.ts';
 import type { SelectState, SelectStateHost } from './SelectState.ts';
 
-// Editing a polygon's or line's points, entered by double-clicking it. The entity stays selected, so
+// Editing a polygon's, line's or path's points, entered by double-clicking it. The entity stays selected, so
 // the Entity inspector shows its Points. Ends with Esc, a press on another entity (handed to IdleState, which
 // selects it), a click on empty space outside the shape's frame, a change of selection from elsewhere,
-// the entity going away, or it being hidden or stopping being a polygon or line. Undo and Redo clear the selected points, since their indexes may not match.
+// the entity going away, or it being hidden or stopping having points to edit. Undo and Redo clear the selected points, since their indexes may not match.
 export class PointEditState implements SelectState {
     readonly points: EditedPoints;
     private readonly host: SelectStateHost;
@@ -36,7 +36,7 @@ export class PointEditState implements SelectState {
         this.unsubscribes = [followSelection, followUndo, followLevel];
     }
 
-    // False once the level was replaced, or the shape stopped being a polygon or line, before the next press.
+    // False once the level was replaced, or the entity stopped having points to edit, before the next press.
     get isEditing() {
         const isSameLevel = this.host.context.openLevel === this.points.openLevel;
 
@@ -56,6 +56,12 @@ export class PointEditState implements SelectState {
         const pointIndex = this.points.hits().pointAt(input.levelPosition, zoom);
 
         // An unselected point is selected on the press, so a drag moves it; a selected one narrows on release.
+        const switchesCorner = input.clickCount === 2 && pointIndex !== undefined && this.points.isPath;
+        if (switchesCorner) {
+            this.switchCorner(pointIndex);
+            return;
+        }
+
         const addsOnEdge = input.clickCount === 2 && pointIndex === undefined;
         if (addsOnEdge) {
             const edge = this.points.hits().edgeAt(input.levelPosition, zoom);
@@ -129,6 +135,16 @@ export class PointEditState implements SelectState {
         }
 
         this.points.selectOnly(outcome.index);
+    }
+
+    // A double-click on a path's point: sharp becomes smooth, and smooth or separate becomes sharp.
+    private switchCorner(index: number) {
+        const corner = this.points.corners()[index];
+        const switched = corner === 'sharp' ? 'smooth' : 'sharp';
+        const outcome = setCorner(this.host.context.openLevel, this.points.entity, index, switched);
+
+        this.points.selectOnly(index);
+        this.showRefusal(outcome);
     }
 
     private nudgeSelected(offset: { x: number; y: number }) {

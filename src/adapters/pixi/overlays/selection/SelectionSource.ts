@@ -1,5 +1,5 @@
 import type { Unsubscribe } from '../../../../core/events/index.ts';
-import type { Bounds, Point } from '../../../../core/geometry/index.ts';
+import type { Bounds, PathCorner, Point } from '../../../../core/geometry/index.ts';
 import type { Entity } from '../../../../core/level/index.ts';
 
 // The handles' frame of one selected entity, in level positions: the Select tool's SelectionFrame.
@@ -15,10 +15,11 @@ export type ShownReadout = {
     readonly at: Point;
 };
 
-// The polygon or line whose points are being edited: its points in level positions, and the indexes of the
-// selected ones.
+// The polygon, line or path whose points are being edited: its points in level positions, each one's corner
+// (a polygon's and a line's all sharp), and the indexes of the selected ones.
 export type ShownPoints = {
     readonly points: readonly Point[];
+    readonly corners: readonly PathCorner[];
     readonly selected: readonly number[];
 };
 

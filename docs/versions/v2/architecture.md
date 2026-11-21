@@ -118,6 +118,7 @@ v1's `PointEditState` and its edits learn paths. A path's double-click enters po
 - **A double-click on an edge** adds a point there. On a curve, **`splitCurve`** cuts it at the share `nearestOnCurve` finds (de Casteljau's method), so the path's look doesn't change; the new point is smooth, and the two neighbours' handles shorten to match. On a straight segment the new point is sharp.
 - **Deleting** stops at an open path's 2 points (`A path keeps at least 2 points`) and a closed path's 3 (`A closed path keeps at least 3 points`).
 - **The overlay** draws sharp points as v1's 8 px squares and smooth or separate points as 9 px circles, and the handles of the selected points, as the v2 table says. `SelectTool.editedPoints` gains each point's corner and handles in level positions.
+- **As built in task 11** (standing yes, 2026-11-21): `editablePointsOf` in `editor/commands/points/` says which entities have points to edit, for `PointsTarget`, `EditedPoints` and the double-click; `PointsTarget` writes a path's `path` value, an open path's ends dropping their outer handles; `PointHits` takes a path's curves as the steps `LocalOutlines` cuts them into; `setCorner` takes the corner to give; `nearestOnCurve` gives a straight segment's share along its length; `EditedPoints.corners()` feeds the overlay's `ShownPoints.corners`. The handles and `HandleDragState` are task 12's.
 
 ## Gradient handles
 

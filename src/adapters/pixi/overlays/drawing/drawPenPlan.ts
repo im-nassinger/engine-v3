@@ -4,7 +4,7 @@ import type { Bounds, Point } from '../../../../core/geometry/index.ts';
 import { HANDLE_SIZE_PX } from '../../../../editor/tools/index.ts';
 import { toPixiColour } from '../../PixiColour.ts';
 import { dashedPolyline } from '../dashes.ts';
-import { ACCENT, drawHandle } from '../overlayLook.ts';
+import { ACCENT, ROUND_POINT_PX, drawHandle, drawRoundPoint } from '../overlayLook.ts';
 import { squareAround } from '../screenPixels.ts';
 
 import type { PenPlan } from './penPlan.ts';
@@ -17,8 +17,7 @@ const EDGE_PX = 1.5;
 const EDGE: StrokeStyle = { color: ACCENT, width: EDGE_PX };
 const HANDLE_LINE: StrokeStyle = { color: ACCENT, width: 1 };
 const WHITE = 0xffffff;
-// A smooth or separate point is a 9 px circle, a handle's end a 6 px dot.
-export const ROUND_POINT_PX = 9;
+// A handle's end is a 6 px dot.
 export const HANDLE_DOT_PX = 6;
 // The first point's ring: 12 px, as a polygon's, filling at 25% when a press there closes the path.
 const RING_PX = 12;
@@ -132,10 +131,7 @@ function drawPoints(graphics: Graphics, plan: PenPlan, toScreen: ToScreen) {
         }
 
         if (mark.isRound) {
-            graphics
-                .circle(centre.x, centre.y, (ROUND_POINT_PX - EDGE_PX) / 2)
-                .fill(inside)
-                .stroke(EDGE);
+            drawRoundPoint(graphics, centre, inside);
             circles.push(squareAround(centre, ROUND_POINT_PX));
         } else {
             const square = squareAround(centre, HANDLE_SIZE_PX);

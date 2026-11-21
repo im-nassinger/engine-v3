@@ -283,6 +283,7 @@ describe('SelectionOverlay', () => {
                 { x: 10, y: -10 },
                 { x: 10, y: 10 },
             ],
+            corners: ['sharp', 'sharp', 'sharp'],
             selected: [1],
         };
         selection.select([shape], undefined);
@@ -299,6 +300,30 @@ describe('SelectionOverlay', () => {
         }
         expect(drawn().selectedPoints).toBe(1);
         expect(drawn().handles).toEqual([]);
+    });
+
+    test("a path's sharp points draw as 8 px squares and its smooth or separate ones as 9 px circles", async () => {
+        const { level, view, frames, selection, drawn } = await showLevel();
+        const shape = addShape(level, level.world, 0, 0);
+        selection.editedPoints = {
+            points: [
+                { x: -10, y: -10 },
+                { x: 10, y: -10 },
+                { x: 10, y: 10 },
+            ],
+            corners: ['sharp', 'smooth', 'separate'],
+            selected: [1],
+        };
+        selection.select([shape], undefined);
+        view.zoomAboutMiddle(2);
+        frames.runFrame();
+
+        const [square, circle, separate] = drawn().points;
+        expect(square?.width).toBe(8);
+        expect(circle?.width).toBe(9);
+        expect(separate?.width).toBe(9);
+        expect(drawn().roundPoints).toBe(2);
+        expect(drawn().selectedPoints).toBe(1);
     });
 
     test('no point handles when no points are edited', async () => {

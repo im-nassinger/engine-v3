@@ -50,7 +50,7 @@ describe('the point edits', () => {
 
         expect(deletePoints(openLevel, rectangle, [0])).toEqual({
             kind: 'refused',
-            reason: 'Only a polygon or a line has points',
+            reason: 'Only a polygon, a line or a path has points',
         });
 
         openLevel.liveEdit.begin([]);
