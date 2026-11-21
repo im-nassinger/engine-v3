@@ -71,6 +71,8 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Line | An open chain of straight segments, 2 points or more. Used for ground. Drawn as a polygon finished with Enter instead of closed. |
 | Path | A curved line drawn with the Bézier pen or the Pencil. It is only drawn. It never collides. |
 | Path point | One point of a path: its position, its two curve handles and its corner. A field type of its own (v2). |
+| Curve handle | One of the two dots on a path point that set how the curve leaves and enters it. A sharp point has none; a smooth point keeps its two in one line; a separate point's move on their own. |
+| Smoothness | The Pencil's setting, Low, Medium or High: how closely the path it makes follows the drag. |
 | Fill | What paints the inside of a shape, path or text: nothing, a solid colour, a gradient or an image. |
 | Gradient | A fill that blends between colours: **linear**, along a line from a start to an end, or **radial**, out from a centre to a radius. |
 | Colour stop | One colour of a gradient and where along it that colour is, from 0% to 100%. A gradient has 2 to 8. |

@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**v1 is built** (stages 0 to 19, done 2026-11-19), with 2,048 tests in Node, 1,269 browser tests and 292 Playwright tests in three browsers. **The versions after v1 are small** (owner, round 12, 2026-11-20): v2 curves and gradients, v3 a first game without code, v4 the rest of the triggers, v5 scripts, v6 text, v7 `.entity` files and the builtin player; see [scope.md](scope.md). **Next is planning v2's architecture**, then its tasks, in [versions/v2/](versions/README.md), for the orchestrator to build. The repo is public since 2026-11-20, so CI runs on every push.
+**v1 is built** (stages 0 to 19, done 2026-11-19), with 2,048 tests in Node, 1,269 browser tests and 292 Playwright tests in three browsers. **The versions after v1 are small** (owner, round 12, 2026-11-20): v2 curves and gradients, v3 a first game without code, v4 the rest of the triggers, v5 scripts, v6 text, v7 `.entity` files and the builtin player; see [scope.md](scope.md). **v2's architecture is drafted** in [versions/v2/architecture.md](versions/v2/architecture.md) and waits for the owner's yes; then its `tasks.md`, for the orchestrator to build. The repo is public since 2026-11-20, so CI runs on every push.
 
 ## Where things stand
 
@@ -10,7 +10,7 @@
 |---|---|
 | Requirements, scope, glossary, principles, the [architecture](architecture/README.md), the [design system](design/README.md) | Done and approved (owner, 2026-11-14), kept up to date |
 | v1 | Built: stages 0 to 19 in [plan.md](plan.md). What each stage showed is in [stages-built.md](stages-built.md), its steps in [steps/](steps/README.md), and what was settled along the way in [settled.md](settled.md) |
-| [v2](versions/README.md) | [Requirements](versions/v2/requirements.md) checked against v1 and [design](versions/v2/design.md) approved (2026-11-20). [Architecture](versions/v2/architecture.md) next, then `tasks.md` |
+| [v2](versions/README.md) | [Requirements](versions/v2/requirements.md) checked against v1 and [design](versions/v2/design.md) approved (2026-11-20). [Architecture](versions/v2/architecture.md) drafted (2026-11-20), waiting for the owner's yes. Then `tasks.md` |
 | v3 to v7, Later | One line each in [scope.md](scope.md); their rules are in [requirements/](requirements/README.md) |
 | The orchestrator | Built in `~/projects/orchestrator`, waiting for the owner's first try. It builds a version from `docs/versions/<version>/tasks.md`. The old runner that built v1 is in its `old-runner/` |
 | Talking to Claude | Through `~/projects/discord-bridge`, in this project's Discord channel, since 2026-11-20 |
@@ -23,11 +23,11 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 Each item is removed in the same commit that settles it, wherever that commit is made.
 
-Nothing.
+- **A yes on [v2's architecture](versions/v2/architecture.md)** (2026-11-20). Its picks are also listed in [decisions.md](decisions.md#decided-under-the-standing-yes).
 
 ## Next
 
-1. **Plan v2's architecture** in [versions/v2/architecture.md](versions/v2/architecture.md), from what v1 already decided, for the owner's yes.
+1. **The owner reads [v2's architecture](versions/v2/architecture.md)** and says yes or what to change.
 2. **Write v2's `tasks.md`** in the orchestrator's format, with try points, for the owner's yes. Then the owner starts the orchestrator with `orchestrator start v2`.
 3. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
 
