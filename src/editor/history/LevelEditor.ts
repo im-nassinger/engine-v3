@@ -3,6 +3,7 @@ import type { EntityId, Level } from '../../core/level/index.ts';
 import type { LevelChange } from './changes/index.ts';
 import type { EditOutcome } from './EditOutcome.ts';
 import { EditTransaction } from './EditTransaction.ts';
+import { JointEndFollow } from './joint-ends/JointEndFollow.ts';
 import type { History } from './History.ts';
 import { READ_ONLY_REASON, ReadOnlyMode } from './ReadOnlyMode.ts';
 
@@ -57,10 +58,15 @@ export class LevelEditor {
         const selectionBefore = this.selection.ids;
         const groupPathBefore = this.currentGroup.path;
         const transaction = new EditTransaction(this.level);
+        const jointEnds = JointEndFollow.watch(this.level);
 
         let outcome: EditOutcome;
         try {
             outcome = work(transaction);
+            // Rope and Spring ends stay on the entities they join, in the same step.
+            for (const change of jointEnds.changes(this.level)) {
+                transaction.apply(change);
+            }
         } catch (error) {
             this.rollBack(transaction, selectionBefore, groupPathBefore);
             throw error;

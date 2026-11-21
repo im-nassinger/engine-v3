@@ -12,7 +12,9 @@ import { labelName } from '../../../core/level/index.ts';
 import type { Entity, EntityId } from '../../../core/level/index.ts';
 import { jointPathPoints } from '../../../core/physics/index.ts';
 import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
+import { setFieldValue } from '../entity-inspector/setFieldValue.ts';
 import { nudgeSelection } from '../move/nudgeSelection.ts';
+import { SelectionMove } from '../move/SelectionMove.ts';
 import { buildCommandTestSession, expectRoundTrip } from '../testing/commandTestSession.ts';
 import { levelMatrixOf } from '../testing/levelMatrices.ts';
 import { placeJoint } from './placeJoint.ts';
@@ -220,7 +222,7 @@ describe('placeJoint', () => {
         expect(joint.get('b')).toBe(carCopy.id);
     });
 
-    test('moving one body alone leaves the joint where it was', () => {
+    test("moving one body alone carries the Rope's end on it, centres the Rope again and redraws its path", () => {
         const built = buildSession();
         const { session, wheel } = built;
         const rope = place(built, ropeBetween(built, { x: 200, y: 0 }, { x: 400, y: 0 }));
@@ -229,7 +231,89 @@ describe('placeJoint', () => {
         nudgeSelection(session.openLevel, { x: 0, y: 30 });
 
         expect(wheel.requireComponent(TransformComponent).get('position')).toEqual({ x: 200, y: 30 });
+        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 300, y: 15 });
+        expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 30 }, b: { x: 400, y: 0 } });
+        const pathPoints = rope.requireComponent(PathComponent).get('path').points;
+        expect(pathPoints.map((point) => ({ x: point.x, y: point.y }))).toEqual([
+            { x: -100, y: 15 },
+            { x: 100, y: -15 },
+        ]);
+
+        session.openLevel.editor.undo();
         expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 300, y: 0 });
+        expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 0 }, b: { x: 400, y: 0 } });
+    });
+
+    test('moving the Rope alone carries both its ends, as before', () => {
+        const built = buildSession();
+        const { session } = built;
+        const rope = place(built, ropeBetween(built, { x: 200, y: 0 }, { x: 400, y: 0 }));
+        session.openLevel.selection.replace([rope.id]);
+
+        nudgeSelection(session.openLevel, { x: 0, y: 30 });
+
+        expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 30 }, b: { x: 400, y: 30 } });
+    });
+});
+
+describe('Rope and Spring ends follow the entities they join', () => {
+    test('a typed position carries the end, as one step with the typing', () => {
+        const built = buildSession();
+        const { session, car } = built;
+        const springPlacement: JointPlacement = {
+            type: 'spring',
+            a: built.wheel.id,
+            b: car.id,
+            endA: { x: 200, y: 0 },
+            endB: { x: 400, y: 0 },
+        };
+        const spring = place(built, springPlacement);
+
+        setFieldValue(session.openLevel, [car.id], 'TransformComponent', 'position', { x: 400, y: 100 });
+
+        expect(levelEnds(built, spring)).toEqual({ a: { x: 200, y: 0 }, b: { x: 400, y: 100 } });
+        const ends = spring.requireComponent(JointComponent).get('ends');
+        const path = spring.requireComponent(PathComponent).get('path');
+        expect(path).toEqual(jointPathPoints('spring', ends.a, ends.b));
+
+        session.openLevel.editor.undo();
+        expect(levelEnds(built, spring)).toEqual({ a: { x: 200, y: 0 }, b: { x: 400, y: 0 } });
+    });
+
+    test('a drag carries the end as it goes, and Esc puts the joint back', () => {
+        const built = buildSession();
+        const { session, wheel } = built;
+        const rope = place(built, ropeBetween(built, { x: 200, y: 0 }, { x: 400, y: 0 }));
+        session.openLevel.selection.replace([wheel.id]);
+        const move = SelectionMove.ofSelection(session.openLevel);
+        if (!(move instanceof SelectionMove)) throw new Error('Nothing to move.');
+        session.openLevel.liveEdit.begin(move.targets);
+
+        move.moveBy({ x: -50, y: 0 });
+        expect(levelEnds(built, rope).a).toEqual({ x: 150, y: 0 });
+
+        move.moveBy({ x: 0, y: 0 });
         expect(levelEnds(built, rope).a).toEqual({ x: 200, y: 0 });
+        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 300, y: 0 });
+
+        move.moveBy({ x: -50, y: 0 });
+        session.openLevel.liveEdit.cancel();
+        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 300, y: 0 });
+        expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 0 }, b: { x: 400, y: 0 } });
+    });
+
+    test('an end on a turned entity turns with it, and one on a moved group moves with it', () => {
+        const built = buildSession();
+        const { session, level, wheel, car } = built;
+        const rope = place(built, ropeBetween(built, { x: 210, y: 0 }, { x: 400, y: 0 }));
+
+        setFieldValue(session.openLevel, [wheel.id], 'TransformComponent', 'rotation', 90);
+        expectNear(levelEnds(built, rope).a, { x: 200, y: 10 });
+
+        const group = level.createEntity(level.world, 0);
+        group.addComponent(new TransformComponent());
+        level.moveEntity(car, group, 0);
+        setFieldValue(session.openLevel, [group.id], 'TransformComponent', 'position', { x: 0, y: 40 });
+        expectNear(levelEnds(built, rope).b, { x: 400, y: 40 });
     });
 });

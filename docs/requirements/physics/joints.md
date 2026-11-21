@@ -169,15 +169,16 @@ Source: scope JO3; round 6: JB1; round 7: 06 2.5; decisions: D47; old: JT-39, JT
 
 ### Only what is selected moves or copies · v1
 
-- **A joint moves like any entity: only when it is selected.** Moving a connected entity alone leaves the joint where it is, so it attaches at a different spot. To move both, select both.
+- **A joint moves like any entity: only when it is selected.** Moving a Hinge's connected entity alone leaves the Hinge where it is, so it attaches at a different spot. To move both, select both.
+- **A Rope's or Spring's ends stay on the entities they join** (owner: 2026-11-21, replacing "moving a connected entity alone leaves the joint where it is" for these two). Moving, turning or resizing one of them, or a group holding one, carries the end on it along, and the joint is centred again between its ends with its path drawn between them, all in the same undo step. Moving the joint alone still carries both its ends with it, so it attaches at different spots. *Why: the owner found a Rope's path left behind when a body moved, which the game would never show, and agreed the ends should follow their bodies.*
 - During play the physics engine moves the joint.
 - A joint inside a group moves with the group.
 - **Copying copies a joint only when it is selected.** A copied joint connects the copies of its entities if they were copied too. Otherwise it connects the originals in the same level, or shows them as missing in another level. `.entity` files follow the same rule.
-- *Why: the same rule as everything else. It also makes placing an end easy. The old rule, that a joint's position comes from its two bodies, is only true in play.*
+- *Why: the same rule as everything else. It also makes placing an end easy.*
 - Deleting an entity deletes the joints attached to it. Deleting a joint deletes only the joint. Removing physics from an end doesn't delete the joint.
 - Where a joint's row sits in the Entities viewer only affects the tree, never what it connects.
 
-Source: round 1: D45; round 7: 06 2.9, 06 2.10, 06 2.11; round 8: JM1, JC1; old: JT-55, JT-63 to JT-78
+Source: round 1: D45; round 7: 06 2.9, 06 2.10, 06 2.11; round 8: JM1, JC1; old: JT-55, JT-63 to JT-78; owner: 2026-11-21
 
 ### Warnings for joints · Later
 

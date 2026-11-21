@@ -6,6 +6,7 @@ import type { EntityId, Level } from '../../core/level/index.ts';
 import { SetValueChange } from './changes/index.ts';
 import { requireComponentByType } from './changes/requireComponentByType.ts';
 import { writeKnownValue } from './changes/writeKnownValue.ts';
+import { JointEndFollow } from './joint-ends/JointEndFollow.ts';
 import type { LevelEditor } from './LevelEditor.ts';
 
 // One value a drag changes: a field or stored value of one entity's component.
@@ -30,6 +31,8 @@ export class LiveEdit {
     private readonly editor: LevelEditor;
     private started = new Map<string, StartedValue>();
     private active = false;
+    // Rope and Spring ends follow the entities they join as the drag moves them.
+    private jointEnds: JointEndFollow | undefined;
 
     constructor(level: Level, editor: LevelEditor) {
         this.level = level;
@@ -56,6 +59,7 @@ export class LiveEdit {
         }
 
         this.started = started;
+        this.jointEnds = JointEndFollow.watch(this.level);
         this.active = true;
         this.activeChanged.increment();
 
@@ -67,8 +71,10 @@ export class LiveEdit {
     update(target: ValueTarget, value: unknown): ParseOutcome<unknown> {
         const { entry } = this.requireStarted(target);
         const component = this.componentOf(target);
+        const outcome = component.writeValue(target.key, entry.type.serialize(value));
+        this.followJointEnds(target);
 
-        return component.writeValue(target.key, entry.type.serialize(value));
+        return outcome;
     }
 
     // One step from the start values to the current ones; values back where they started make none.
@@ -86,6 +92,7 @@ export class LiveEdit {
         for (const { target, entry, startValue } of this.started.values()) {
             writeKnownValue(this.componentOf(target), entry, startValue);
         }
+        this.jointEnds?.restore(this.level);
 
         this.end();
 
@@ -109,14 +116,27 @@ export class LiveEdit {
             });
             changes.push(change);
         }
+        // After the dragged values, so undoing the step puts the joints back before the entities they follow.
+        const jointChanges = this.jointEnds?.changesSinceStart(this.level) ?? [];
+        changes.push(...jointChanges);
 
         this.end();
 
         return changes;
     }
 
+    private followJointEnds(target: ValueTarget) {
+        const jointEnds = this.jointEnds;
+        if (jointEnds === undefined || !jointEnds.moves(target.entityId)) return;
+
+        for (const change of jointEnds.changesFollowing(this.level, target.entityId)) {
+            change.apply(this.level);
+        }
+    }
+
     private end() {
         this.started = new Map();
+        this.jointEnds = undefined;
         this.active = false;
         this.activeChanged.increment();
     }
