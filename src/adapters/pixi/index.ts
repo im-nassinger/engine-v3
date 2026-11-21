@@ -22,6 +22,7 @@ export type {
     ShownGradientEdge,
     ShownJointPreview,
     ShownPoints,
+    ShownPenPreview,
     ShownPolygonPreview,
     ShownReadout,
     ShownShapePreview,

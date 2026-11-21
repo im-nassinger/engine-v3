@@ -4,6 +4,7 @@ import { PathComponent, TransformComponent } from '../../../core/components/inde
 import { labelName } from '../../../core/level/index.ts';
 import { TENS_SNAPPER } from '../shape/testing/shapeToolTest.ts';
 
+import { PEN_HINT } from './PenTool.ts';
 import {
     BACKSPACE,
     ENTER,
@@ -55,6 +56,12 @@ describe('PenTool clicks', () => {
         setup.controller.pick('pen');
 
         expect(setup.session.openLevel.selection.isEmpty).toBe(true);
+    });
+
+    test('picking the pen shows its hint', () => {
+        const setup = buildPenTest();
+
+        expect(setup.session.status.current).toBe(PEN_HINT);
     });
 
     test('a click snaps as a point, and Ctrl turns snapping off', () => {

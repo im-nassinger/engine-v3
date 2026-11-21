@@ -15,6 +15,9 @@ export const CLOSE_PX = 8;
 
 const LOCKED = 'This group is locked';
 
+// Shown in the message pill when the pen is picked, since no tool has a lasting hint.
+export const PEN_HINT = 'Click for a corner, drag for a curve. Click the first point to close. Enter finishes.';
+
 const MODIFIER_CODES = new Set(['ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'ControlLeft', 'ControlRight']);
 
 // What the pen draws over the level, all in level positions, each handle measured from its point. points
@@ -61,6 +64,7 @@ export class PenTool implements Tool {
     activate(context: ToolContext) {
         this.toolContext = context;
         context.openLevel.selection.clear();
+        context.status.show(PEN_HINT);
         this.goIdle();
     }
 

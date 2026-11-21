@@ -7,7 +7,7 @@ export { MousePosition } from './mouse/MousePosition.ts';
 export { PanGesture } from './pan/PanGesture.ts';
 export { HANDLE_SIZE_PX } from './select/frame/FrameHandle.ts';
 export { SelectTool } from './select/SelectTool.ts';
-export { PenTool } from './pen/PenTool.ts';
+export { PEN_HINT, PenTool } from './pen/PenTool.ts';
 export type { PenDrawing } from './pen/PenTool.ts';
 export { DRAW_START_PX, ShapeTool } from './shape/ShapeTool.ts';
 export type { ShapePreview, ShapeToolKind } from './shape/ShapeTool.ts';

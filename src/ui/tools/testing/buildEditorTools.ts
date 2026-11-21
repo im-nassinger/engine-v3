@@ -6,13 +6,14 @@ import {
     MousePosition,
     JointTool,
     PanGesture,
+    PenTool,
     SelectTool,
     ShapeTool,
     ToolController,
 } from '../../../editor/tools/index.ts';
 import type { EditorTools } from '../ToolsContext.ts';
 
-// The real tools on a test's session, as the page builds them: Select, Shape and Joint, snapping to the open
+// The real tools on a test's session, as the page builds them: Select, Shape, Joint and the pen, snapping to the open
 // level's grid.
 export function buildEditorTools(session: EditorSession, commands: CommandRegistry, frames: FrameScheduler) {
     const services = {
@@ -28,7 +29,11 @@ export function buildEditorTools(session: EditorSession, commands: CommandRegist
         reader: session.reader,
     };
     const pan = new PanGesture(session.view);
-    const controller = new ToolController([new SelectTool(), new ShapeTool(), new JointTool()], services, pan);
+    const controller = new ToolController(
+        [new SelectTool(), new ShapeTool(), new JointTool(), new PenTool()],
+        services,
+        pan,
+    );
     const tools: EditorTools = { controller, mouse: new MousePosition(frames) };
 
     return tools;

@@ -18,13 +18,13 @@ import { PanelPlace } from './PanelPlace/index.ts';
 import './EditorShell.css';
 
 // The tools whose kinds menu stands where the Entity inspector is: the Shape tool's (owner, 2026-11-15) and
-// the Joint tool's (standing yes, 2026-11-19).
-const HIDES_ENTITY_INSPECTOR: ReadonlySet<string> = new Set(['shape', 'joint']);
+// the Joint tool's (standing yes, 2026-11-19). The pen has no menu but hides it too, as the v2 design says.
+const HIDES_ENTITY_INSPECTOR: ReadonlySet<string> = new Set(['shape', 'joint', 'pen']);
 
 // The level view fills the window, and the islands float over it in fixed places: ☰ at the top left, the
-// tool column under it, the Entity inspector beside them. While the Shape or Joint tool is active the Entity
-// inspector's island is gone and the free area reaches the tool column. With nothing selected the island is
-// gone too, but the free area stays, so selecting doesn't move what fitting frames (owner, 2026-11-19). During test play
+// tool column under it, the Entity inspector beside them. While the Shape or Joint tool or the pen is
+// active the Entity inspector's island is gone and the free area reaches the tool column. With nothing
+// selected the island is gone too, but the free area stays, so selecting doesn't move what fitting frames (owner, 2026-11-19). During test play
 // every panel and bar is hidden but kept, so Stop shows them as they were, scrolled and folded, and the Play bar floats
 // over the game.
 export function EditorShell() {

@@ -7,7 +7,7 @@ import { ManualFrames } from '../../../../editor/time/testing/index.ts';
 import { ViewSettings, ViewState } from '../../../../editor/view/index.ts';
 import { PixiLevelView } from '../../PixiLevelView.ts';
 
-import type { DrawingSource, ShownPolygonPreview, ShownShapePreview } from './DrawingSource.ts';
+import type { DrawingSource, ShownPenPreview, ShownPolygonPreview, ShownShapePreview } from './DrawingSource.ts';
 
 const cleanups: (() => void)[] = [];
 
@@ -20,6 +20,7 @@ afterEach(() => {
 class FakeDrawing implements DrawingSource {
     shape: ShownShapePreview | undefined;
     polygon: ShownPolygonPreview | undefined;
+    pen: ShownPenPreview | undefined;
     private readonly changed = new VersionCounter();
 
     subscribe(listener: () => void) {
@@ -29,6 +30,11 @@ class FakeDrawing implements DrawingSource {
     show(shape: ShownShapePreview | undefined, polygon: ShownPolygonPreview | undefined) {
         this.shape = shape;
         this.polygon = polygon;
+        this.changed.increment();
+    }
+
+    showPen(pen: ShownPenPreview | undefined) {
+        this.pen = pen;
         this.changed.increment();
     }
 }
@@ -136,5 +142,35 @@ describe('DrawingPreviewOverlay', () => {
 
         expect(drawn().closing).toBe(true);
         expect(drawn().dashedSegments).toBe(1);
+    });
+
+    test('the pen’s points keep their sizes at three zooms, the placed one square, the placing one round', async () => {
+        const { view, frames, drawing, drawn } = await showLevel();
+        const corner = { x: -10, y: -10, handleIn: null, handleOut: null, corner: 'sharp' as const };
+        const placing = {
+            x: 10,
+            y: -10,
+            handleIn: { x: -5, y: 0 },
+            handleOut: { x: 5, y: 0 },
+            corner: 'smooth' as const,
+        };
+        drawing.showPen({ points: [corner, placing], next: undefined, placing: 1, closing: false });
+
+        for (const zoom of [0.25, 1, 8]) {
+            view.zoomAboutMiddle(zoom);
+            frames.runFrame();
+
+            const path = drawn().path;
+            expect(path?.squares.map((square) => square.width)).toEqual([8]);
+            expect(path?.circles.map((circle) => circle.width)).toEqual([9]);
+            expect(path?.filledPoints).toBe(1);
+            expect(path?.handleDots.map((dot) => dot.width)).toEqual([6, 6]);
+            expect(path?.ring?.width).toBe(12);
+            expect(path?.makingPoints).toBeGreaterThan(2);
+        }
+
+        drawing.showPen(undefined);
+        frames.runFrame();
+        expect(drawn().path).toBeUndefined();
     });
 });

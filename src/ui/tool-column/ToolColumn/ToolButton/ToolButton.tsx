@@ -23,7 +23,7 @@ type ToolLook = {
 const TOOL_LOOKS: Readonly<Record<ToolId, ToolLook>> = {
     select: { label: 'Select', icon: MousePointer2 },
     pencil: { label: 'Pencil', icon: Pencil },
-    pen: { label: 'Pen', icon: PenTool },
+    pen: { label: 'Bézier pen', icon: PenTool },
     shape: { label: 'Shape', icon: Shapes },
     text: { label: 'Text', icon: Type },
     joint: { label: 'Joint', icon: Link2 },

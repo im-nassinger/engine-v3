@@ -5,7 +5,7 @@ import { KindsMenu } from './KindsMenu/index.ts';
 import { ToolButton } from './ToolButton/index.ts';
 import './ToolColumn.css';
 
-// One button per tool ToolController holds, in its order: Select, Shape and Joint in v1. Clicking a tool picks
+// One button per tool ToolController holds, in its order: Select, Shape, Joint and the pen. Clicking a tool picks
 // it; clicking the active one again locks it. The active tool's kinds, if it has any, stand open beside it.
 export function ToolColumn() {
     // The active tool and the lock are read from the same controller object each time it moves, so the

@@ -2,7 +2,9 @@ import { Matrix2D } from '../../../../core/geometry/index.ts';
 import type { Point } from '../../../../core/geometry/index.ts';
 import { shapeOutline } from '../selection/shapeOutline.ts';
 
-import type { ShownPolygonPreview, ShownShapePreview } from './DrawingSource.ts';
+import type { ShownPenPreview, ShownPolygonPreview, ShownShapePreview } from './DrawingSource.ts';
+import { planPen } from './penPlan.ts';
+import type { PenPlan } from './penPlan.ts';
 
 // What the faded preview draws, in level positions. The overlay turns it into screen pixels.
 export type DrawingPlan = {
@@ -18,6 +20,8 @@ export type DrawingPlan = {
     readonly ring: Point | undefined;
     // A click now closes the polygon.
     readonly closing: boolean;
+    // A path being drawn with the pen, drawn its own way.
+    readonly path: PenPlan | undefined;
 };
 
 const NOTHING: DrawingPlan = {
@@ -27,9 +31,15 @@ const NOTHING: DrawingPlan = {
     handles: [],
     ring: undefined,
     closing: false,
+    path: undefined,
 };
 
-export function planDrawing(shape: ShownShapePreview | undefined, polygon: ShownPolygonPreview | undefined) {
+export function planDrawing(
+    shape: ShownShapePreview | undefined,
+    polygon: ShownPolygonPreview | undefined,
+    pen: ShownPenPreview | undefined,
+): DrawingPlan {
+    if (pen !== undefined) return { ...NOTHING, path: planPen(pen) };
     if (polygon !== undefined) return planPolygon(polygon);
     if (shape !== undefined) return planShape(shape);
 
@@ -73,5 +83,6 @@ function planPolygon(polygon: ShownPolygonPreview): DrawingPlan {
         handles: placed.slice(1),
         ring: first,
         closing,
+        path: undefined,
     };
 }

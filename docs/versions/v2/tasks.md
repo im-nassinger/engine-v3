@@ -30,7 +30,7 @@ The tasks that build v2 (curves and gradients), in the orchestrator's format: ea
 - [x] 8. The pen draws a new path
   - Read: versions/v2/architecture.md#the-pen, requirements/drawing.md#the-bézier-pen--v2
   - Done when: `PenTool` and its states and the `createPath` edit are built: clicks, drags, Alt, Space and Shift during a drag, snapping, closing on the first point, every way of finishing, Ctrl+Z and Backspace, the 2,001st point refused; the new path is one step, named `Path 1`, and selected; Node tests through `toolTestSession` pass
-- [ ] 9. The pen on the page
+- [x] 9. The pen on the page
   - Read: versions/v2/architecture.md#the-pen, design/level-view.md#v2-paths-and-gradient-handles, design/controls.md#v2-the-pen-the-pencil-and-gradients
   - Done when: the pen's button and key 4 pick it and it hides the Entity inspector; `planDrawing` draws `penDrawing` as the design's table says; the hint shows; a Playwright test draws an open path by clicks and drags and closes another on its first point
 - [ ] 10. The pen continues an open path
