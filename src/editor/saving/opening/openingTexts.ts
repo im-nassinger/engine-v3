@@ -38,7 +38,7 @@ export function overLimitReason(limit: LimitName, max: number) {
         case 'depth':
             return `its groups are nested more than ${groupDigits(max)} deep`;
         case 'points':
-            return `a shape has more than ${groupDigits(max)} points`;
+            return `a shape or path has more than ${groupDigits(max)} points`;
         case 'size':
             return `it is over ${groupDigits(Math.round(max / MEGABYTE))} MB`;
         case 'levelSize':

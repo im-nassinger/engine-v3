@@ -25,7 +25,14 @@ type EditableLevel = Record<string, unknown> & {
     world: EditableEntity;
 };
 
-const SMALL_LIMITS: LevelLimits = { maxEntities: 4, maxDepth: 2, maxPoints: 4, maxBytes: 1000, maxLevelSize: 200_000 };
+const SMALL_LIMITS: LevelLimits = {
+    maxEntities: 4,
+    maxDepth: 2,
+    maxShapePoints: 4,
+    maxPathPoints: 6,
+    maxBytes: 1000,
+    maxLevelSize: 200_000,
+};
 
 const DEFAULT_TRANSFORM = {
     position: { x: 0, y: 0 },
@@ -457,21 +464,43 @@ describe('LevelReader limits', () => {
         overLimit.world.children.push(shapeEntity(3, { kind, points: pointsOf(5) }));
 
         expectRead(atLimit, SMALL_LIMITS);
-        expectOverLimit(overLimit, 'points', SMALL_LIMITS.maxPoints);
+        expectOverLimit(overLimit, 'points', SMALL_LIMITS.maxShapePoints);
     });
 
     test('reads a path with the most points allowed, and refuses one more', () => {
         const pathPoint = { x: 0, y: 0, handle_in: null, handle_out: null, corner: 'sharp' };
         const atLimit = newLevelData();
         atLimit.world.children.push(
-            plainEntity(3, { PathComponent: { path: { closed: false, points: Array(4).fill(pathPoint) } } }),
+            plainEntity(3, { PathComponent: { path: { closed: false, points: Array(6).fill(pathPoint) } } }),
         );
         const overLimit = newLevelData();
         overLimit.world.children.push(
-            plainEntity(3, { PathComponent: { path: { closed: false, points: Array(5).fill(pathPoint) } } }),
+            plainEntity(3, { PathComponent: { path: { closed: false, points: Array(7).fill(pathPoint) } } }),
         );
 
         expectRead(atLimit, SMALL_LIMITS);
-        expectOverLimit(overLimit, 'points', SMALL_LIMITS.maxPoints);
+        expectOverLimit(overLimit, 'points', SMALL_LIMITS.maxPathPoints);
+    });
+
+    test('holds a shape to 1,000 points and a path to 2,000, naming the max of the kind it hit', () => {
+        const pathPoint = { x: 0, y: 0, handle_in: null, handle_out: null, corner: 'sharp' };
+        const pathOf = (count: number) =>
+            plainEntity(3, { PathComponent: { path: { closed: false, points: Array(count).fill(pathPoint) } } });
+        const longPath = newLevelData();
+        longPath.world.children.push(pathOf(2_000));
+        const overlongPath = newLevelData();
+        overlongPath.world.children.push(pathOf(2_001));
+        const overlongShape = newLevelData();
+        overlongShape.world.children.push(shapeEntity(3, { kind: 'polygon', points: pointsOf(1_001) }));
+
+        expectRead(longPath);
+        expect(createReader().read(overlongPath)).toEqual({
+            ok: false,
+            refusal: { reason: 'overLimit', limit: 'points', max: 2_000 },
+        });
+        expect(createReader().read(overlongShape)).toEqual({
+            ok: false,
+            refusal: { reason: 'overLimit', limit: 'points', max: 1_000 },
+        });
     });
 });

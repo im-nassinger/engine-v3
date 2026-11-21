@@ -66,7 +66,7 @@ What the owner settled from 2026-11-13 to 2026-11-20, day by day, as it was writ
 
 ## Settled under the standing yes, 2026-11-14
 
-- **Round 10**, every card at Claude's pick: see [decisions.md](decisions.md#decided-under-the-standing-yes).
+- **Round 10**, every card at Claude's pick: see [decisions.md](decisions-v1.md#the-decisions).
 - **An owner decision built differently** (2026-11-14): the owner said to ask again if `clipper2-ts` failed. Its fill works, but **its triangulation drops areas** (a one-stroke star loses its middle) while reporting success. The unattended runner can't ask, so it took the closest fix: `clipper2-ts` only fills, and the game's own `EarClipping` triangulates. See [geometry.md](architecture/core-model/geometry.md#the-polygon-pipeline); the owner can overturn it.
 - **An owner decision built differently** (2026-11-16): the requirement capped spin at 15 turns per second, but Box2D 3.2 turns a body at most 45° a step, 7.5 turns per second, with no setting to raise it. The closest fix is Box2D's own cap: [bodies.md](requirements/physics/bodies.md#body-settings--v1) now says 7.5, and the Hinge's motor speed range is ±2,700 °/s instead of ±5,400. See [adapters.md](architecture/adapters.md#physics); the owner can overturn it.
 - **An owner decision built differently** (2026-11-16): the requirement let a Hinge's Min and Max angle go to a full turn, ±360°, but Box2D 3.2 clamps a Hinge's limits to ±180°. The closest fix is Box2D's own: [joints.md](requirements/physics/joints.md#settings-of-each-joint--v1) and the JointComponent's schema now range over ±180°. See [adapters.md](architecture/adapters.md#physics); the owner can overturn it.

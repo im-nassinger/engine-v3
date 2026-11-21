@@ -11,7 +11,14 @@ import { LevelReader } from './LevelReader.ts';
 import { LevelWriter } from '../writing/LevelWriter.ts';
 
 // The test level holds 6 entities, the deepest 2 deep.
-const SMALL_LIMITS: LevelLimits = { maxEntities: 7, maxDepth: 2, maxPoints: 4, maxBytes: 1000, maxLevelSize: 200_000 };
+const SMALL_LIMITS: LevelLimits = {
+    maxEntities: 7,
+    maxDepth: 2,
+    maxShapePoints: 4,
+    maxPathPoints: 6,
+    maxBytes: 1000,
+    maxLevelSize: 200_000,
+};
 
 function createReader(limits = V1_LEVEL_LIMITS) {
     return new LevelReader(createV1Registry(), limits, FormatUpgrader.createV1());

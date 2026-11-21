@@ -42,7 +42,7 @@ export const DRAW_START_PX = 4;
 // A click this close to the first point's middle closes the polygon: the 12 px ring with a little room.
 export const CLOSE_PX = 8;
 
-const MAX_POINTS = V1_LEVEL_LIMITS.maxPoints;
+const MAX_POINTS = V1_LEVEL_LIMITS.maxShapePoints;
 const TOO_MANY_POINTS = `A polygon holds at most ${MAX_POINTS.toLocaleString('en-US')} points`;
 
 const LOCKED = 'This group is locked';

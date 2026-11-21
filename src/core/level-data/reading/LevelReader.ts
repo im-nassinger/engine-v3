@@ -313,9 +313,9 @@ export class LevelReader {
             if (!written.ok) throw ReadRefused.damaged(`${what}'s ${fileKey} is refused: ${written.problem.reason}`);
         }
 
-        const pointCount = pointCountOf(component);
-        if (pointCount > this.limits.maxPoints) {
-            throw new ReadRefused({ reason: 'overLimit', limit: 'points', max: this.limits.maxPoints });
+        const maxPoints = component instanceof PathComponent ? this.limits.maxPathPoints : this.limits.maxShapePoints;
+        if (pointCountOf(component) > maxPoints) {
+            throw new ReadRefused({ reason: 'overLimit', limit: 'points', max: maxPoints });
         }
 
         return component;

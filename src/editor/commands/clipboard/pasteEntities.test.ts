@@ -232,9 +232,9 @@ describe('pasteEntities over a limit', () => {
             { x: 0, y: 10 },
         ];
         polygon.addComponent(new ShapeComponent({ geometry: { kind: 'polygon', points } }));
-        const target = limitedSession({ maxPoints: 3 });
+        const target = limitedSession({ maxShapePoints: 3 });
 
-        expectRefused(target, copy(session, [polygon]), 'A polygon holds at most 3 points');
+        expectRefused(target, copy(session, [polygon]), 'A shape or path holds at most 3 points');
     });
 });
 
@@ -249,7 +249,7 @@ describe('pasteRefusalText', () => {
         expect(texts).toEqual([
             'A level holds at most 100,000 entities',
             'Groups can be at most 256 deep',
-            'A polygon holds at most 1,000 points',
+            'A shape or path holds at most 1,000 points',
         ]);
     });
 

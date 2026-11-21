@@ -16,7 +16,7 @@ function limitText(limit: LimitName, max: number) {
 
     if (limit === 'entities') return `A level holds at most ${maxText} entities`;
     if (limit === 'depth') return `Groups can be at most ${maxText} deep`;
-    if (limit === 'points') return `A polygon holds at most ${maxText} points`;
+    if (limit === 'points') return `A shape or path holds at most ${maxText} points`;
 
     return `${CANT_READ}: they are too big`;
 }

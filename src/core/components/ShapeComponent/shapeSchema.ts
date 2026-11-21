@@ -24,7 +24,7 @@ const kindType = new ChoiceFieldType<ShapeKind>([
 // reader refuses.
 const sizeType = new NumberFieldType({ min: MIN_SHAPE_SIZE, max: MAX_SHAPE_SIZE });
 const radiusType = new NumberFieldType({ min: MIN_SHAPE_SIZE / 2 });
-// A line needs 2 points and a polygon 3, which the write checks. 1,000 is LevelLimits' maxPoints.
+// A line needs 2 points and a polygon 3, which the write checks. 1,000 is LevelLimits' maxShapePoints.
 const MIN_LINE_POINTS = 2;
 const MIN_POLYGON_POINTS = 3;
 const MAX_POINTS = 1_000;

@@ -4,7 +4,7 @@ import type { Entity } from '../../../core/level/index.ts';
 import type { ValueTarget } from '../../history/index.ts';
 import type { OpenLevel } from '../../session/index.ts';
 
-// The fewest points each kind keeps, and the most a ShapeComponent holds (LevelLimits' maxPoints).
+// The fewest points each kind keeps, and the most a ShapeComponent holds (LevelLimits' maxShapePoints).
 const MIN_POLYGON_POINTS = 3;
 const MIN_LINE_POINTS = 2;
 const MAX_POINTS = 1_000;
