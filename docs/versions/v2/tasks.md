@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The tasks that build v2 (curves and gradients), in the orchestrator's format: each fits one session, has a **Done when** the session can check, and names what it must **Read**. They follow the [architecture's](architecture.md#build-order-for-tasksmd) build order: gradients first, then the pen, point editing on paths, the Pencil, and the closing tests and docs. **Try points** stop the orchestrator so the owner can try what is built. Every task also needs `npm run check` to pass. The owner starts it with `orchestrator start v2`.
+The tasks that build v2 (curves and gradients), in the orchestrator's format: each fits one session, has a **Done when** the session can check, and names what it must **Read**. They follow the [architecture's](architecture.md#build-order-for-tasksmd) build order: gradients first, then the pen, point editing on paths, the Pencil, and the closing tests and docs. **Try points** stop the orchestrator so the owner can try what is built. Every task also needs `npm run check` to pass. Approved by the owner on 2026-11-20.
 
 ## Tasks
 
