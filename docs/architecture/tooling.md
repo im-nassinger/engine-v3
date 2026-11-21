@@ -34,7 +34,7 @@ tests/
   e2e/       whole-app tests
 ```
 
-`tools/check-docs.js` and `tools/check-sources.js` stay as they are, in JavaScript. ESLint and Prettier skip them. **`tools/package.json`** holds only `"type": "commonjs"`: the project's `package.json` says `"type": "module"`, which would make Node refuse the two tools' `require` (found in stage 0).
+`tools/check-docs.js`, `tools/check-sources.js` and `tools/check-safety.js` are plain JavaScript. ESLint and Prettier skip them. **`tools/package.json`** holds only `"type": "commonjs"`: the project's `package.json` says `"type": "module"`, which would make Node refuse the tools' `require` (found in stage 0).
 
 **The package manager is npm.** `package-lock.json` is committed and CI installs from it with `npm ci`. `.npmrc` sets `save-exact=true`, so an install can't write a version range, and `engine-strict=true`, so a wrong Node version stops the install instead of failing later in a strange way.
 
@@ -55,10 +55,15 @@ tests/
 | `npm run test:performance` | Vitest's speed tests in Chromium alone, with the GPU and React's production build (`NODE_ENV=production`), one at a time (see [performance.md](performance.md#targets-and-their-tests)) | Before a stage closes, and in CI |
 | `npm run test:e2e` | Playwright against the built page | Before a stage closes, and in CI on master |
 | `npm run docs:check` | `node tools/check-docs.js` | |
-| `npm run check:code` | `typecheck`, `lint`, `format:check`, `deps`, `test`, in that order: `check` without the docs | In CI, whose copy of the code has no `docs/` |
+| `npm run safety` | `node tools/check-safety.js`: the [safety check](#the-safety-check) | |
+| `npm run check:code` | `typecheck`, `lint`, `format:check`, `deps`, `test`, `safety`, in that order: `check` without the docs | In CI, whose copy of the code has no `docs/` |
 | **`npm run check`** | `check:code`, then `docs:check` | **Before every commit** |
 
 `npm run check` holds everything fast enough to run every time. It is the one command a session needs to know. CI runs `check:code`, the same checks but the docs', because its copy of the code has no `docs/` (owner, 2026-11-18). There is no git hook: the rule is in `CLAUDE.md`.
+
+### The safety check
+
+`tools/check-safety.js` keeps anything private out of a public repo (owner, 2026-11-20, from the `orchestrator-workflow` skill). It searches every file git tracks or would add for home-folder paths, email addresses other than no-reply ones, GitHub, Anthropic and AWS keys, private keys and Discord webhooks, and for the owner's **private words**, such as a real name, read one per line from `~/.config/engine-v3/private-words`, outside the repo. Without that file, as in CI, it checks only the patterns. It is the orchestrator's own safety check, rewritten as one plain script. A leak caught here never reaches git history, which a public repo keeps for good.
 
 ## TypeScript
 

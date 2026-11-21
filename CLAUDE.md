@@ -12,6 +12,6 @@ Start at `docs/README.md`, then `docs/progress.md`.
 - **Requirements say what the game does, not how it is built.** How it is built goes in `docs/architecture/` (the approved design); facts and warnings about browsers, Box2D and Lua go in `docs/tech-notes.md`.
 - A requirement file follows the format in `docs/requirements/README.md`: a version on every feature heading, a `Source:` line under every feature.
 - **No folder holds files with different jobs.** When a folder you add to starts mixing them, split it into subfolders, one per area, whatever the number of files. See `docs/architecture/parts-and-folders.md`.
-- **Run `npm run check` before every commit.** It runs the type checks, ESLint, Prettier's check, dependency-cruiser, the unit and guard tests, and `tools/check-docs.js`. See `docs/architecture/tooling.md`.
+- **Run `npm run check` before every commit.** It runs the type checks, ESLint, Prettier's check, dependency-cruiser, the unit and guard tests, the safety check (`tools/check-safety.js`) and `tools/check-docs.js`. See `docs/architecture/tooling.md`.
 - After changing docs, also run `node tools/check-sources.js` (it reads `~/projects/ecs-game-v2`, so it isn't in `npm run check`).
 - `~/projects/ecs-game-v2` is the read-only source these docs were written from. Never change it.
