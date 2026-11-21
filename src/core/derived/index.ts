@@ -5,6 +5,7 @@ export { HiddenCache } from './caches/HiddenCache.ts';
 export { OwnBounds } from './caches/OwnBounds.ts';
 export { PiecesCache } from './caches/PiecesCache.ts';
 export { WorldMatrixCache } from './caches/WorldMatrixCache.ts';
+export { fillBoxOf } from './fillBoxOf.ts';
 export { levelBoundsOf } from './levelBoundsOf.ts';
 export { outlineScaleOf, outlineStretchOf } from './outlineStretchOf.ts';
 export type { OutlineStretch } from './outlineStretchOf.ts';

@@ -12,7 +12,7 @@ The tasks that build v2 (curves and gradients), in the orchestrator's format: ea
 - [x] 2. Build the fill field type
   - Read: versions/v2/architecture.md#the-fill-field-type, requirements/drawing.md#gradients--v2
   - Done when: `Fill`, `FillFieldType`, `switchFillKind` and `mixedColour` are in `core/fields` with Node tests (parse, refusals, sorting the stops, every switch the requirement lists); the StyleComponent uses `FillFieldType` and `SolidFillFieldType` is gone; `levelBackground` and the minimap use `mixedColour`; every v1 test and saved test level still passes unchanged
-- [ ] 3. Draw gradients with PixiJS
+- [x] 3. Draw gradients with PixiJS
   - Read: versions/v2/architecture.md#drawing-a-gradient, tech-notes.md
   - Done when: `PixiFill` and `GradientTextures` are in `adapters/pixi` and `EntityDrawing` draws linear and radial fills; a browser test in Chromium, Firefox and WebKit reads the pixels of a linear and a radial gradient on a rectangle, a turned one, a see-through stop over the background and a closed path; equal fills share one texture, released when unused; what PixiJS did is written in tech-notes.md
 - [ ] 4. The Fill's choice and the gradient editor's fields

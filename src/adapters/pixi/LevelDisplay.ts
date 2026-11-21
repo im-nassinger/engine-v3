@@ -8,6 +8,7 @@ import type { Bounds, Matrix2D } from '../../core/geometry/index.ts';
 import { EntityDrawing } from './EntityDrawing.ts';
 import type { EntityDrawingOptions } from './EntityDrawing.ts';
 import { EntityNode } from './EntityNode.ts';
+import { GradientTextures } from './GradientTextures.ts';
 
 // The level's caches the display reads. DerivedCaches has them all.
 export type LevelDisplayCaches = {
@@ -69,6 +70,7 @@ export class LevelDisplay {
     private readonly unsubscribe: Unsubscribe;
     private readonly stopFollowingBodies: Unsubscribe | undefined;
     private readonly worldNode: EntityNode;
+    private readonly gradients = new GradientTextures();
     private drawingBuilds = 0;
 
     constructor(parts: LevelDisplayParts) {
@@ -92,6 +94,11 @@ export class LevelDisplay {
         return this.drawingBuilds;
     }
 
+    // How many gradient textures the drawings hold, for tests.
+    get gradientTextureCount() {
+        return this.gradients.count;
+    }
+
     nodeOf(entity: Entity) {
         return this.nodes.get(entity);
     }
@@ -104,7 +111,11 @@ export class LevelDisplay {
             const node = this.nodes.get(entity);
             if (node === undefined) continue;
 
-            EntityDrawing.draw(node.graphics, entity, this.parts.caches.pieces, this.parts.options);
+            // Held before the old one is let go of, so an unchanged gradient keeps its texture.
+            const previousGradient = node.heldGradient;
+            const parts = { pieces: this.parts.caches.pieces, gradients: this.gradients, options: this.parts.options };
+            node.heldGradient = EntityDrawing.draw(node.graphics, entity, parts);
+            this.letGoOfGradient(previousGradient);
             node.drawnOutlineStretch = outlineStretchOf(entity)?.stretch;
             this.drawingBuilds += 1;
         }
@@ -139,6 +150,7 @@ export class LevelDisplay {
         this.stopFollowingBodies?.();
         this.placedSinceRender.clear();
         this.worldNode.destroy();
+        this.gradients.dispose();
         this.nodes.clear();
         this.staleDrawings.clear();
         this.changedSinceCull.clear();
@@ -320,6 +332,7 @@ export class LevelDisplay {
         if (node === undefined) return;
 
         node.destroy();
+        this.letGoOfGradient(node.heldGradient);
         this.nodes.delete(entity);
         this.staleDrawings.delete(entity);
         // Play can place a body and remove it before the next render, as when it falls past the level bounds.
@@ -345,6 +358,12 @@ export class LevelDisplay {
         if (sameStretch(stretch, node.drawnOutlineStretch)) return;
 
         this.staleDrawings.add(entity);
+    }
+
+    private letGoOfGradient(key: string | undefined) {
+        if (key === undefined) return;
+
+        this.gradients.letGo(key);
     }
 
     private requireNode(entity: Entity) {

@@ -26,6 +26,7 @@
 | Code | Folder | Part |
 |---|---|---|
 | `Fill`, `FillFieldType`, `PathPointFieldType`, `mixedColour` | `core/fields/` | core |
+| `fillBoxOf` (an entity's box) | `core/derived/` | core |
 | `pathBox`, `splitCurve`, `nearestOnCurve`, `smoothHandles` | `core/geometry/path/` | core |
 | `fitCurves` (the Pencil's fitting) | `core/geometry/fitting/` | core |
 | `PenTool` and its states | `editor/tools/pen/` | editor |
@@ -62,7 +63,7 @@ export type Fill =
 ## Drawing a gradient
 
 - **`PixiFill`** turns a `Fill` into what `Graphics.fill` takes: a colour, or a PixiJS `FillGradient` (linear, or radial with the inner radius 0 at the centre) with `textureSpace: 'local'`, which maps 0 to 1 onto the filled shape's bounds. Those bounds are the box above, since the outline is drawn by `stroke`, not `fill`. *Why local: the gradient turns, scales and resizes with the entity for free, and the ellipse of a radial gradient is PixiJS's own.*
-- **The first task tries it** in a browser test that reads pixels: a linear and a radial gradient on a rectangle, a turned one, a see-through stop over the background, and a closed path. If PixiJS's bounds ever differ from `pathBox` by more than a pixel, `PixiFill` uses `textureSpace: 'global'` with a matrix from the box instead. The result goes into [tech-notes.md](../../tech-notes.md).
+- **The first task tries it** in a browser test that reads pixels: a linear and a radial gradient on a rectangle, a turned one, a see-through stop over the background, and a closed path. If PixiJS's bounds ever differ from `pathBox` by more than a pixel, `PixiFill` uses `textureSpace: 'global'` with a matrix from the box instead. The result goes into [tech-notes.md](../../tech-notes.md). **It did** (task 3, standing yes, 2026-11-21): `local` restarts on each traced shape and mirrors some linear directions, so `PixiFill` uses `global` with a matrix from `fillBoxOf`'s box for every gradient, and `GradientTextures` shares a texture between gradients of the same kind and stops.
 - **`GradientTextures` shares one `FillGradient` between equal fills**, counted, and destroys it when its last entity lets go. *Why: each `FillGradient` makes a texture, and a level of 10,000 copied platforms with one gradient would otherwise hold 10,000.*
 - The play mirror draws through the same `EntityDrawing`, so gradients play as they show. A StyleComponent value can change during play (v1), and a changed fill rebuilds the drawing as before.
 

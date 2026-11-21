@@ -13,6 +13,8 @@ export class EntityNode {
     readonly graphics = new Graphics();
     // The outline stretch its drawing was last built with, so a change of scale that changes it rebuilds it.
     drawnOutlineStretch: Matrix2D | undefined;
+    // The GradientTextures key its drawing holds, let go of when it is drawn again or destroyed.
+    heldGradient: string | undefined;
     // Holds the children's nodes, the top row last so it is drawn in front.
     readonly childrenLayer: Container;
     // Only the World's children are split into render chunks: they hold the whole level.

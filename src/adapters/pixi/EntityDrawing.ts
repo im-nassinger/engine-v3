@@ -3,9 +3,12 @@ import type { Graphics, StrokeStyle } from 'pixi.js';
 import { PathComponent, ShapeComponent, StyleComponent } from '../../core/components/index.ts';
 import type { Entity } from '../../core/level/index.ts';
 import type { Matrix2D, Point, ShapeGeometry, ShapePiecesResult } from '../../core/geometry/index.ts';
-import { outlineStretchOf } from '../../core/derived/index.ts';
+import { fillBoxOf, outlineStretchOf } from '../../core/derived/index.ts';
 import type { PiecesCache } from '../../core/derived/index.ts';
+import type { Fill } from '../../core/fields/index.ts';
+import type { GradientTextures } from './GradientTextures.ts';
 import { toPixiColour } from './PixiColour.ts';
+import { PixiFill } from './PixiFill.ts';
 import { tracePath } from './tracePath.ts';
 
 export type EntityDrawingOptions = {
@@ -18,7 +21,7 @@ const UNSTYLED_LINE: StrokeStyle = { color: 0x1d2430, alpha: 0.6, width: 1, pixe
 const IDENTITY = new Matrix();
 
 type Look = {
-    readonly fill: { readonly color: number; readonly alpha: number } | undefined;
+    readonly fill: Fill;
     readonly stroke: StrokeStyle | undefined;
     readonly opacity: number;
 };
@@ -27,16 +30,10 @@ function lookOf(style: StyleComponent | undefined, options: EntityDrawingOptions
     if (style === undefined) {
         if (!options.showUnstyled) return undefined;
 
-        return { fill: undefined, stroke: UNSTYLED_LINE, opacity: 1 };
+        return { fill: { kind: 'none' }, stroke: UNSTYLED_LINE, opacity: 1 };
     }
 
-    const storedFill = style.get('fill');
     const outlineWidth = style.get('outlineWidth');
-
-    let fill: Look['fill'];
-    if (storedFill.kind === 'solid') {
-        fill = toPixiColour(storedFill.colour);
-    }
 
     // Round joins and caps keep the outline within half its width of the shape, which BoundsCache counts on.
     let stroke: StrokeStyle | undefined;
@@ -45,7 +42,7 @@ function lookOf(style: StyleComponent | undefined, options: EntityDrawingOptions
         stroke = { ...outlineColour, width: outlineWidth, join: 'round', cap: 'round' };
     }
 
-    return { fill, stroke, opacity: style.get('opacity') };
+    return { fill: style.get('fill'), stroke, opacity: style.get('opacity') };
 }
 
 // Traces into a Graphics, each point first moved by a stretch when there is one. A stretched circle is
@@ -163,13 +160,24 @@ function traceShapeOutline(pen: Pen, geometry: ShapeGeometry, result: ShapePiece
     }
 }
 
-function drawShape(graphics: Graphics, pen: Pen, shape: ShapeComponent, look: Look, result: ShapePiecesResult) {
+// What drawing one entity needs besides its components. The fill is made only when one is drawn, so an
+// entity holds a gradient's texture only while it shows it.
+type DrawingContext = {
+    readonly graphics: Graphics;
+    readonly pen: Pen;
+    readonly look: Look;
+    readonly makeFill: () => PixiFill | undefined;
+};
+
+function drawShape(context: DrawingContext, shape: ShapeComponent, result: ShapePiecesResult) {
+    const { graphics, pen, look } = context;
     const geometry = shape.get('geometry');
 
     const canFill = geometry.kind !== 'line';
-    if (canFill && look.fill !== undefined) {
+    const fill = canFill ? context.makeFill() : undefined;
+    if (fill !== undefined) {
         traceFilledOutlines(pen, result);
-        graphics.fill(look.fill);
+        fill.fill(graphics);
     }
 
     if (look.stroke !== undefined) {
@@ -178,15 +186,17 @@ function drawShape(graphics: Graphics, pen: Pen, shape: ShapeComponent, look: Lo
     }
 }
 
-function drawPath(graphics: Graphics, pen: Pen, pathComponent: PathComponent, look: Look) {
+function drawPath(context: DrawingContext, pathComponent: PathComponent) {
+    const { graphics, pen, look } = context;
     const path = pathComponent.get('path');
     const hasEnoughPoints = path.points.length >= 2;
     if (!hasEnoughPoints) return;
 
     // Only a closed path can be filled.
-    if (path.closed && look.fill !== undefined) {
+    const fill = path.closed ? context.makeFill() : undefined;
+    if (fill !== undefined) {
         tracePath(pen, path);
-        graphics.fill(look.fill);
+        fill.fill(graphics);
     }
 
     if (look.stroke !== undefined) {
@@ -207,10 +217,18 @@ function placeGraphics(graphics: Graphics, unstretch: Matrix2D | undefined) {
     graphics.setFromMatrix(matrix);
 }
 
+// What one drawing needs from the display it is drawn for.
+export type EntityDrawingParts = {
+    readonly pieces: PiecesCache;
+    readonly gradients: GradientTextures;
+    readonly options: EntityDrawingOptions;
+};
+
 // Builds what one entity draws into its Graphics, in the entity's own space. Each entity draws one
-// thing: a path before a shape (text, v2, will come before both).
+// thing: a path before a shape (text, v2, will come before both). Gives the GradientTextures key the
+// drawing holds, which the caller lets go of once the Graphics is drawn again or destroyed.
 export class EntityDrawing {
-    static draw(graphics: Graphics, entity: Entity, pieces: PiecesCache, options: EntityDrawingOptions) {
+    static draw(graphics: Graphics, entity: Entity, parts: EntityDrawingParts): string | undefined {
         graphics.clear();
         graphics.alpha = 1;
         placeGraphics(graphics, undefined);
@@ -220,7 +238,7 @@ export class EntityDrawing {
         if (pathComponent === undefined && shape === undefined) return;
 
         const style = entity.getComponent(StyleComponent);
-        const look = lookOf(style, options);
+        const look = lookOf(style, parts.options);
         if (look === undefined) return;
 
         graphics.alpha = look.opacity;
@@ -229,16 +247,26 @@ export class EntityDrawing {
         placeGraphics(graphics, outlineStretch?.unstretch);
         const pen = new Pen(graphics, outlineStretch?.stretch);
 
+        let heldKey: string | undefined;
+        const makeFill = () => {
+            const place = { box: fillBoxOf(entity), stretch: outlineStretch?.stretch };
+            const fill = PixiFill.of(look.fill, place, parts.gradients);
+            heldKey = fill?.heldKey;
+            return fill;
+        };
+        const context: DrawingContext = { graphics, pen, look, makeFill };
+
         if (pathComponent !== undefined) {
-            drawPath(graphics, pen, pathComponent, look);
-            return;
+            drawPath(context, pathComponent);
+            return heldKey;
         }
 
-        if (shape === undefined) return;
+        if (shape === undefined) return undefined;
 
-        const result = pieces.piecesOf(entity);
-        if (result === undefined) return;
+        const result = parts.pieces.piecesOf(entity);
+        if (result === undefined) return undefined;
 
-        drawShape(graphics, pen, shape, look, result);
+        drawShape(context, shape, result);
+        return heldKey;
     }
 }
