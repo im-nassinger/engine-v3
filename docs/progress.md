@@ -23,11 +23,11 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 Each item is removed in the same commit that settles it, wherever that commit is made.
 
-Nothing until the first try point, task 7.
+Nothing until the try point at the end of v2, task 18. The owner dropped the try points in between (2026-11-21), so the orchestrator builds without waiting.
 
 ## Next
 
-1. The orchestrator builds v2; the owner tries it at each try point (tasks 7, 12, 17 and 21).
+1. The orchestrator builds v2; the owner tries it at the one try point, task 18, at the end.
 2. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
 
 ## How to change a requirement

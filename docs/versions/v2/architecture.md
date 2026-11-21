@@ -145,8 +145,10 @@ v1's `PointEditState` and its edits learn paths. A path's double-click enters po
 ## Build order, for tasks.md
 
 1. The tool keys, the split point limit, `FillFieldType` and `PixiFill` with the pixel try; gradients then draw from a typed level.
-2. The Fill in the Entity inspector, then the gradient handles. **Try point:** gradients.
-3. `PathPointFieldType`, the Points list, `createPath`, then the pen, then continuing a path. **Try point:** the pen.
+2. The Fill in the Entity inspector, then the gradient handles.
+3. `PathPointFieldType`, the Points list, `createPath`, then the pen, then continuing a path.
 4. Point editing on paths.
-5. `fitCurves` and the Pencil. **Try point:** the Pencil and point editing.
+5. `fitCurves` and the Pencil.
 6. The Playwright journeys and the speed tests, then the docs moved into [architecture/](../../architecture/README.md).
+
+The one **Try point** is at the end: the owner dropped the three in between, after gradients, the pen and the Pencil (2026-11-21), so the build runs without waiting.
