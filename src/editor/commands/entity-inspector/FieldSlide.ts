@@ -14,10 +14,14 @@ export type SlidField = {
     readonly key: string;
 };
 
-// The Entity inspector's slider while dragged: each move changes the level through LiveEdit, with no history,
-// and the release makes one step, "Change Linear damping", as typing the value would. Esc during the
-// drag puts the start values back and the release then makes no step. A derived field, or a drag
-// begun while another live edit runs, only changes the level on release.
+// How a slide ended: as an edit, or put back by Esc, so the dragged control can show the start again.
+export type SlideOutcome = EditOutcome | { readonly kind: 'putBack' };
+
+// A field of the Entity inspector while dragged, a number's slider or a gradient's stop: each move changes the
+// level through LiveEdit, with no history, and the release makes one step, "Change Linear damping", as typing
+// the value would. Esc during the drag puts the start values back; later moves change nothing and the release
+// makes no step. A derived field, or a drag begun while another live edit runs, only changes the level on
+// release.
 export class FieldSlide {
     private readonly slid: SlidField;
     private targets: readonly ValueTarget[] = [];
@@ -28,23 +32,25 @@ export class FieldSlide {
         this.slid = slid;
     }
 
-    slideTo(value: number) {
+    slideTo(value: unknown) {
         if (!this.isLive && !this.begin()) return;
 
         const { liveEdit } = this.slid.openLevel;
+        if (!liveEdit.isActive) return;
+
         for (const target of this.targets) {
             liveEdit.update(target, value);
         }
     }
 
-    release(value: number): EditOutcome {
+    release(value: unknown): SlideOutcome {
         const { openLevel, entityIds, componentType, key } = this.slid;
         if (!this.isLive) return setFieldValue(openLevel, entityIds, componentType, key, value);
 
         this.isLive = false;
         const { liveEdit } = openLevel;
         const wasCancelled = !liveEdit.isActive;
-        if (wasCancelled) return { kind: 'done' };
+        if (wasCancelled) return { kind: 'putBack' };
 
         liveEdit.commit(`Change ${this.label}`);
 

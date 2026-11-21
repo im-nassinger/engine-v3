@@ -1,8 +1,12 @@
 .gradient-bar {
     --check: 8px;
 
+    display: block;
+    width: 100%;
     height: 22px;
     margin-top: var(--space-4);
+    padding: 0;
+    border: none;
     border-radius: 11px;
     background-color: var(--check-light);
     background-image:
@@ -16,4 +20,9 @@
         100% 100%,
         var(--check) var(--check),
         var(--check) var(--check);
+    cursor: copy;
+
+    &[aria-disabled='true'] {
+        cursor: default;
+    }
 }

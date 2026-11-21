@@ -27,7 +27,7 @@ export type CardFieldProps = {
 
 // One field's row: its label, whose hover shows the description if it has one, and the field type's control. A
 // committed value is one step on every shown entity, Mass through the densities; a refused one gives its reason as status text. A
-// slider changes the level while dragged and makes its one step when let go.
+// slider or a gradient's stop changes the level while dragged and makes its one step when let go.
 export function CardField({ openLevel, typeName, entityIds, field }: CardFieldProps) {
     const session = useEditorSession();
     const { key, label, description } = field.definition;
@@ -75,7 +75,11 @@ export function CardField({ openLevel, typeName, entityIds, field }: CardFieldPr
         release: (value) => {
             const outcome = startedSlide().release(value);
             slideRef.current = undefined;
+            if (outcome.kind === 'putBack') return false;
+
             showRefusal(outcome);
+
+            return true;
         },
     };
 

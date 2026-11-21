@@ -18,7 +18,7 @@ const KIND_TYPE = new ChoiceFieldType<FillKind>([
 // The Fill: a choice of None, Solid, Linear and Radial, then Solid's colour or the gradient editor. Picking a
 // kind switches each selected entity from its own fill, as one step. Fills that differ show Mixed and no
 // editor; equal ones show the editor, as equal values do.
-export function FillField({ field, subject, onCommit, onCommitEach }: FieldProps) {
+export function FillField({ field, subject, onCommit, onCommitEach, slide }: FieldProps) {
     let fill: Fill | undefined;
     if (field.value !== MIXED) {
         fill = field.value as Fill;
@@ -48,7 +48,7 @@ export function FillField({ field, subject, onCommit, onCommitEach }: FieldProps
                 />
             )}
             {fill && isGradient(fill) && (
-                <GradientEditor field={field} subject={subject} fill={fill} onCommit={onCommit} />
+                <GradientEditor field={field} subject={subject} fill={fill} onCommit={onCommit} slide={slide} />
             )}
         </div>
     );

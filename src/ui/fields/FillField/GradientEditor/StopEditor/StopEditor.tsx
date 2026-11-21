@@ -4,7 +4,7 @@ import type { ColourStop } from '../../../../../core/fields/index.ts';
 import type { FieldModel } from '../../../../../editor/entity-inspector/index.ts';
 import { IconButton } from '../../../../shared/index.ts';
 import { ColourBox } from '../../../ColourBox/index.ts';
-import type { FieldSubject } from '../../../FieldProps.ts';
+import type { FieldSlideHandlers, FieldSubject } from '../../../FieldProps.ts';
 import { NumberField } from '../../../NumberField/index.ts';
 import { innerFieldOf, innerPropsOf } from '../../inner-fields/innerField.ts';
 import { GradientRow } from '../GradientRow/index.ts';
@@ -16,6 +16,7 @@ export type StopEditorProps = {
     stopCount: number;
     onChange: (stop: ColourStop) => void;
     onRemove: () => void;
+    placeSlide: FieldSlideHandlers | undefined;
 };
 
 const PLACE = {
@@ -28,12 +29,13 @@ const PLACE = {
 } as const;
 
 // The chosen stop's Colour, with `−` to remove it, and its Place as a slider from 0 to 100%. Each change is
-// one step; the place's slider commits when let go.
-export function StopEditor({ field, subject, stop, stopCount, onChange, onRemove }: StopEditorProps) {
+// one step; the place's slider changes the level while dragged, through placeSlide, and commits when let go.
+export function StopEditor({ field, subject, stop, stopCount, onChange, onRemove, placeSlide }: StopEditorProps) {
     const isDisabled = !field.isEnabled;
     const placeField = innerFieldOf(field, PLACE, stop.place);
     const commitPlace = (place: unknown) => onChange({ ...stop, place: place as number });
     const commitColour = (colour: string) => onChange({ ...stop, colour });
+    const placeProps = { ...innerPropsOf(subject, placeField, commitPlace), slide: placeSlide };
 
     let removeReason: string | undefined;
     if (stopCount <= MIN_STOPS) {
@@ -61,7 +63,7 @@ export function StopEditor({ field, subject, stop, stopCount, onChange, onRemove
                 />
             </GradientRow>
             <GradientRow label="Place" isSub>
-                <NumberField {...innerPropsOf(subject, placeField, commitPlace)} />
+                <NumberField {...placeProps} />
             </GradientRow>
         </div>
     );

@@ -18,7 +18,7 @@ The tasks that build v2 (curves and gradients), in the orchestrator's format: ea
 - [x] 4. The Fill's choice and the gradient editor's fields
   - Read: versions/v2/architecture.md#the-fills-editor, design/controls.md#v2-the-pen-the-pencil-and-gradients, design/mockups/v2.html
   - Done when: `FillField` shows the None, Solid, Linear and Radial choice, Solid's colour field, and for a gradient the stop swatches, the chosen stop's Colour and Place, `−`, `+ Add stop`, and Start and End or Centre and Radius in %; each change is one step; several selected entities show `Mixed` as the architecture says; browser tests pass
-- [ ] 5. The gradient bar: add a stop by clicking, move one by dragging
+- [x] 5. The gradient bar: add a stop by clicking, move one by dragging
   - Read: versions/v2/architecture.md#the-fills-editor
   - Done when: clicking the bar adds a stop with the colour already there, so the look doesn't change; dragging a stop is a live edit through the widened `FieldSlide`, one step on release, put back by Esc; the chosen stop stays chosen as the stops re-sort; tests pass
 - [ ] 6. Gradient handles on the level view

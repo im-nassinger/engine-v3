@@ -50,6 +50,13 @@ export function withStopAdded(stops: readonly ColourStop[]): EditedStops {
     return withStopChanged([...stops.slice(0, widestIndex), stop, ...stops.slice(widestIndex)], widestIndex, stop);
 }
 
+// A click on the bar: a stop at that place, with the colour already there so the look doesn't change.
+export function withStopAt(stops: readonly ColourStop[], place: number): EditedStops {
+    const stop = { colour: colourAt(stops, place), place };
+
+    return withStopChanged([...stops, stop], stops.length, stop);
+}
+
 // The stop at index taken out; the stop after it is chosen, or the new last one.
 export function withoutStop(stops: readonly ColourStop[], index: number): EditedStops {
     const left = stops.filter((_, stopIndex) => stopIndex !== index);

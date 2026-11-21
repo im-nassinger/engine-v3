@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { BodyComponent, ShapeComponent } from '../../../core/components/index.ts';
+import { BodyComponent, ShapeComponent, StyleComponent } from '../../../core/components/index.ts';
+import type { Fill } from '../../../core/fields/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { buildCommandTestSession } from '../testing/commandTestSession.ts';
@@ -55,9 +56,11 @@ describe('FieldSlide', () => {
 
         slide.slideTo(2);
         openLevel.liveEdit.cancel();
-        const outcome = slide.release(2);
+        slide.slideTo(3);
+        expect(dampingOf(square)).toBe(startDamping);
+        const outcome = slide.release(3);
 
-        expect(outcome).toEqual({ kind: 'done' });
+        expect(outcome).toEqual({ kind: 'putBack' });
         expect(dampingOf(square)).toBe(startDamping);
         expect(openLevel.history.undoCount).toBe(0);
     });
@@ -94,5 +97,34 @@ describe('FieldSlide', () => {
         expect(dampingOf(square)).toBe(startDamping);
         expect(openLevel.liveEdit.isActive).toBe(false);
         expect(openLevel.history.undoCount).toBe(0);
+    });
+
+    test('slides any field value, such as a gradient whose stop is dragged', () => {
+        const { openLevel, square } = buildSession();
+        square.addComponent(new StyleComponent());
+        const style = square.requireComponent(StyleComponent);
+        const componentType = 'StyleComponent';
+        const fillSlide = new FieldSlide({ openLevel, entityIds: [square.id], componentType, key: 'fill' });
+        const startFill = style.get('fill');
+        const gradient = (place: number): Fill => ({
+            kind: 'linear',
+            stops: [
+                { colour: '#FF0000FF', place: 0 },
+                { colour: '#00FF00FF', place },
+            ],
+            start: { x: 0, y: 0.5 },
+            end: { x: 1, y: 0.5 },
+        });
+
+        fillSlide.slideTo(gradient(0.5));
+        expect(style.get('fill')).toEqual(gradient(0.5));
+        expect(openLevel.history.undoCount).toBe(0);
+
+        fillSlide.release(gradient(0.7));
+        expect(openLevel.history.undoLabel).toBe('Change Fill');
+        expect(openLevel.history.undoCount).toBe(1);
+
+        openLevel.editor.undo();
+        expect(style.get('fill')).toEqual(startFill);
     });
 });

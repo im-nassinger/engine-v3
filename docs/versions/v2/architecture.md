@@ -133,6 +133,7 @@ v1's `PointEditState` and its edits learn paths. A path's double-click enters po
 - **Dragging a stop along the bar** is a live edit, as the number slider's is: v1's `FieldSlide` is widened from a number to any field value, begins a `LiveEdit` on the first move, and commits `Change Fill` on release. The chosen stop is the ui's own state, followed by its index as the stops re-sort.
 - **Several entities selected** with different fills show `Mixed` in the choice pill and no editor under it; picking a kind sets it on each, each from its own fill. Equal fills show the editor, as equal values do in v1.
 - **Built (task 4, standing yes, 2026-11-21):** the choice and the gradient's fields reuse v1's choice, number and vector fields, shown in %; picking a kind goes through a new `onCommitEach` on every field and `setFieldValueEach`, so each entity switches from its own fill. `+ Add stop` uses `withStopAdded`, and `colourAt` in `core/fields` gives the colour already at a place, ready for task 5's click on the bar. None shows nothing under the choice. Radius is typed, kept between 1% and 2,100%.
+- **Built (task 5, standing yes, 2026-11-21):** `withStopAt` in `core/fields` adds the bar's stop; places land on whole percents. `FieldSlide` slides any value and its release says `putBack` after Esc, so the editor chooses the dragged stop where it started. The stop's Place slider is live through the same `FieldSlide`.
 
 ## The tests
 

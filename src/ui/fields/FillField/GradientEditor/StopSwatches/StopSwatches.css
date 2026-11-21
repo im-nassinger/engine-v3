@@ -3,6 +3,7 @@
     position: relative;
     height: 22px;
     margin: 0 7px;
+    user-select: none;
 
     > .stop {
         position: absolute;
@@ -15,7 +16,8 @@
         border-radius: 50%;
         background: var(--swatch);
         box-shadow: 0 0 0 2px var(--stop-ring);
-        cursor: pointer;
+        cursor: ew-resize;
+        touch-action: none;
 
         &[aria-pressed='true'] {
             box-shadow:

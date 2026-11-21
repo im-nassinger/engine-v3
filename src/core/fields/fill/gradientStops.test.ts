@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { colourAt, withoutStop, withStopAdded, withStopChanged } from './gradientStops.ts';
+import { colourAt, withoutStop, withStopAdded, withStopAt, withStopChanged } from './gradientStops.ts';
 
 const BLACK = '#000000FF';
 const WHITE = '#FFFFFFFF';
@@ -59,6 +59,20 @@ describe('withStopAdded', () => {
         ];
 
         expect(withStopAdded(stops).stops[1]).toEqual({ colour: '#808080FF', place: 0.25 });
+    });
+});
+
+describe('withStopAt', () => {
+    test('adds a stop at the place with the colour already there, and chooses it', () => {
+        const edited = withStopAt(twoStops, 0.4);
+
+        expect(edited.stops).toEqual([twoStops[0], { colour: '#808080FF', place: 0.4 }, twoStops[1]]);
+        expect(edited.index).toBe(1);
+    });
+
+    test("before the first stop or after the last takes that stop's colour, so the look doesn't change", () => {
+        expect(withStopAt(twoStops, 0)).toEqual({ stops: [{ colour: BLACK, place: 0 }, ...twoStops], index: 0 });
+        expect(withStopAt(twoStops, 1)).toEqual({ stops: [...twoStops, { colour: WHITE, place: 1 }], index: 2 });
     });
 });
 

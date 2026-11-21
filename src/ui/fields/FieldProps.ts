@@ -12,11 +12,12 @@ export type FieldSubject = {
     readonly entityIds: readonly EntityId[];
 };
 
-// A slider dragged changes the level as it moves and makes its one step on release. Without it, a
-// slider commits through onCommit when let go, as a list's item does.
+// A slider or a gradient's stop dragged changes the level as it moves and makes its one step on release,
+// which says false when Esc put the start value back. Without it, a drag commits through onCommit when let
+// go, as a list's item does.
 export type FieldSlideHandlers = {
-    readonly slideTo: (value: number) => void;
-    readonly release: (value: number) => void;
+    readonly slideTo: (value: unknown) => void;
+    readonly release: (value: unknown) => boolean;
 };
 
 // What every field component takes: the field with its value (or MIXED), and where a new value goes.

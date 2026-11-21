@@ -30,7 +30,7 @@ export { mixedColour } from './fill/mixedColour.ts';
 export { PathGeometryValue } from './values/PathGeometryValue.ts';
 export { isPlainObject } from './rawChecks.ts';
 export { ShapeGeometryValue } from './values/ShapeGeometryValue.ts';
-export { colourAt, withoutStop, withStopAdded, withStopChanged } from './fill/gradientStops.ts';
+export { colourAt, withoutStop, withStopAdded, withStopAt, withStopChanged } from './fill/gradientStops.ts';
 export type { EditedStops } from './fill/gradientStops.ts';
 export { switchFillKind } from './fill/switchFillKind.ts';
 export { TextFieldType } from './field-types/TextFieldType.ts';

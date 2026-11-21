@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { StyleComponent } from '../../../core/components/index.ts';
+import { colourAt } from '../../../core/fields/index.ts';
 import type { Fill } from '../../../core/fields/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { Level } from '../../../core/level/index.ts';
@@ -112,6 +113,37 @@ function menuEntryNamed(label: string) {
     const entries = document.querySelectorAll<HTMLElement>('[role="menuitem"], [role="menuitemcheckbox"]');
 
     return [...entries].find((entry) => entry.textContent.trim() === label);
+}
+
+// A pointer on the element, at this share of its width from the left.
+function pointerAt(element: HTMLElement, share: number) {
+    const { left, top, width, height } = element.getBoundingClientRect();
+
+    return { clientX: left + share * width, clientY: top + height / 2, bubbles: true, button: 0, isPrimary: true };
+}
+
+function clickBarAt(share: number) {
+    const bar = requireElement<HTMLElement>(fillRow(), '.gradient-bar');
+    const pointer = pointerAt(bar, share);
+    bar.dispatchEvent(new MouseEvent('click', pointer));
+}
+
+// Presses the stop and drags it to this share of the swatches' row, without letting go.
+function dragStop(index: number, share: number) {
+    const swatch = stopSwatches()[index] as HTMLButtonElement;
+    const row = requireElement<HTMLElement>(fillRow(), '.stop-swatches');
+    const swatchBox = swatch.getBoundingClientRect();
+    const pressX = swatchBox.left + swatchBox.width / 2;
+    swatch.dispatchEvent(new PointerEvent('pointerdown', { ...pointerAt(row, 0), clientX: pressX }));
+    window.dispatchEvent(new PointerEvent('pointermove', pointerAt(row, share)));
+}
+
+function letGo() {
+    window.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+}
+
+function chosenStops() {
+    return stopSwatches().map((stop) => stop.getAttribute('aria-pressed'));
 }
 
 async function typeInto(box: HTMLInputElement, text: string) {
@@ -309,5 +341,96 @@ describe('Entity inspector: the Fill', () => {
 
         await expect.poll(() => fillOf(crates[0] as Entity)).toMatchObject({ end: { x: 1, y: 0 } });
         expect(fillOf(crates[1] as Entity)).toMatchObject({ end: { x: 1, y: 0 } });
+    });
+
+    test('a click on the bar adds a stop there with the colour already there, chosen, as one step', async () => {
+        const { crates, session } = await showCrates([linear]);
+
+        clickBarAt(0.25);
+
+        const added = { colour: colourAt(linear.stops, 0.25), place: 0.25 };
+        await expect.poll(() => stopSwatches().length).toBe(3);
+        expect(fillOf(crates[0] as Entity)).toMatchObject({ stops: [linear.stops[0], added, linear.stops[1]] });
+        expect(chosenStops()).toEqual(['false', 'true', 'false']);
+        expect(rowInput('Place').value).toBe('25');
+        expect(undoCount(session)).toBe(1);
+        expect(session.openLevel.history.undoLabel).toBe('Change Fill');
+    });
+
+    test('a click on the bar adds nothing with 8 stops', async () => {
+        const stops = Array.from({ length: 8 }, (_, index) => ({ colour: RED, place: index / 7 }));
+        const { crates, session } = await showCrates([{ ...linear, stops }]);
+
+        clickBarAt(0.5);
+
+        expect(fillOf(crates[0] as Entity)).toMatchObject({ stops });
+        expect(undoCount(session)).toBe(0);
+    });
+
+    test('dragging a stop past another changes the level live, keeps it chosen, and is one step on release', async () => {
+        const stops = [
+            { colour: RED, place: 0 },
+            { colour: GREEN, place: 0.5 },
+        ];
+        const { crates, session } = await showCrates([{ ...linear, stops }]);
+        const crate = crates[0] as Entity;
+
+        dragStop(0, 0.8);
+
+        const moved = [
+            { colour: GREEN, place: 0.5 },
+            { colour: RED, place: 0.8 },
+        ];
+        await expect.poll(() => fillOf(crate)).toMatchObject({ stops: moved });
+        expect(undoCount(session)).toBe(0);
+        await expect.poll(() => chosenStops()).toEqual(['false', 'true']);
+        expect(rowInput('Colour').value).toBe(RED);
+
+        letGo();
+
+        await expect.poll(() => undoCount(session)).toBe(1);
+        expect(session.openLevel.history.undoLabel).toBe('Change Fill');
+        expect(fillOf(crate)).toMatchObject({ stops: moved });
+        expect(chosenStops()).toEqual(['false', 'true']);
+
+        session.openLevel.editor.undo();
+        expect(fillOf(crate)).toMatchObject({ stops });
+    });
+
+    test("Esc during a stop's drag puts the stops back, the stop chosen where it was, and makes no step", async () => {
+        const stops = [
+            { colour: RED, place: 0 },
+            { colour: GREEN, place: 0.5 },
+        ];
+        const { crates, session } = await showCrates([{ ...linear, stops }]);
+
+        dragStop(0, 0.8);
+        await expect.poll(() => chosenStops()).toEqual(['false', 'true']);
+
+        session.openLevel.liveEdit.cancel();
+        letGo();
+
+        await expect.poll(() => chosenStops()).toEqual(['true', 'false']);
+        expect(fillOf(crates[0] as Entity)).toMatchObject({ stops });
+        expect(rowInput('Colour').value).toBe(RED);
+        expect(undoCount(session)).toBe(0);
+    });
+
+    test('the Place slider moves the chosen stop live and is one step when let go', async () => {
+        const { crates, session } = await showCrates([linear]);
+        const crate = crates[0] as Entity;
+        const pill = requireElement<HTMLElement>(gradientRow('Place'), '.number-box');
+
+        pill.dispatchEvent(new PointerEvent('pointerdown', pointerAt(pill, 0)));
+        window.dispatchEvent(new PointerEvent('pointermove', pointerAt(pill, 0.4)));
+
+        await expect.poll(() => fillOf(crate)).toMatchObject({ stops: [{ colour: RED, place: 0.4 }, linear.stops[1]] });
+        expect(undoCount(session)).toBe(0);
+
+        letGo();
+
+        await expect.poll(() => undoCount(session)).toBe(1);
+        expect(session.openLevel.history.undoLabel).toBe('Change Fill');
+        expect(chosenStops()).toEqual(['true', 'false']);
     });
 });
