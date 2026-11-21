@@ -2,7 +2,7 @@ import { Matrix2D } from '../../../../core/geometry/index.ts';
 import type { Point } from '../../../../core/geometry/index.ts';
 import { shapeOutline } from '../selection/shapeOutline.ts';
 
-import type { ShownPenPreview, ShownPolygonPreview, ShownShapePreview } from './DrawingSource.ts';
+import type { ShownPenPreview, ShownPencilStroke, ShownPolygonPreview, ShownShapePreview } from './DrawingSource.ts';
 import { planPen } from './penPlan.ts';
 import type { PenPlan } from './penPlan.ts';
 
@@ -22,6 +22,8 @@ export type DrawingPlan = {
     readonly closing: boolean;
     // A path being drawn with the pen, drawn its own way.
     readonly path: PenPlan | undefined;
+    // A Pencil stroke: a 2 px accent line as dragged, and its start's ring, filled when a release closes it.
+    readonly stroke: ShownPencilStroke | undefined;
 };
 
 const NOTHING: DrawingPlan = {
@@ -32,13 +34,16 @@ const NOTHING: DrawingPlan = {
     ring: undefined,
     closing: false,
     path: undefined,
+    stroke: undefined,
 };
 
 export function planDrawing(
     shape: ShownShapePreview | undefined,
     polygon: ShownPolygonPreview | undefined,
     pen: ShownPenPreview | undefined,
+    pencil?: ShownPencilStroke,
 ): DrawingPlan {
+    if (pencil !== undefined) return pencil.points.length >= 2 ? { ...NOTHING, stroke: pencil } : NOTHING;
     if (pen !== undefined) return { ...NOTHING, path: planPen(pen) };
     if (polygon !== undefined) return planPolygon(polygon);
     if (shape !== undefined) return planShape(shape);
@@ -84,5 +89,6 @@ function planPolygon(polygon: ShownPolygonPreview): DrawingPlan {
         ring: first,
         closing,
         path: undefined,
+        stroke: undefined,
     };
 }

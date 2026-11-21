@@ -7,7 +7,13 @@ import { ManualFrames } from '../../../../editor/time/testing/index.ts';
 import { ViewSettings, ViewState } from '../../../../editor/view/index.ts';
 import { PixiLevelView } from '../../PixiLevelView.ts';
 
-import type { DrawingSource, ShownPenPreview, ShownPolygonPreview, ShownShapePreview } from './DrawingSource.ts';
+import type {
+    DrawingSource,
+    ShownPenPreview,
+    ShownPencilStroke,
+    ShownPolygonPreview,
+    ShownShapePreview,
+} from './DrawingSource.ts';
 
 const cleanups: (() => void)[] = [];
 
@@ -21,6 +27,7 @@ class FakeDrawing implements DrawingSource {
     shape: ShownShapePreview | undefined;
     polygon: ShownPolygonPreview | undefined;
     pen: ShownPenPreview | undefined;
+    pencil: ShownPencilStroke | undefined;
     private readonly changed = new VersionCounter();
 
     subscribe(listener: () => void) {
@@ -35,6 +42,11 @@ class FakeDrawing implements DrawingSource {
 
     showPen(pen: ShownPenPreview | undefined) {
         this.pen = pen;
+        this.changed.increment();
+    }
+
+    showPencil(pencil: ShownPencilStroke | undefined) {
+        this.pencil = pencil;
         this.changed.increment();
     }
 }
@@ -172,5 +184,32 @@ describe('DrawingPreviewOverlay', () => {
         drawing.showPen(undefined);
         frames.runFrame();
         expect(drawn().path).toBeUndefined();
+    });
+
+    test('the Pencil’s stroke is drawn as dragged, its start ring 12 px at three zooms and filled when closing', async () => {
+        const { view, frames, drawing, drawn } = await showLevel();
+        const points = [
+            { x: -10, y: -10 },
+            { x: 10, y: -10 },
+            { x: 10, y: 10 },
+        ];
+        drawing.showPencil({ points, closing: false });
+
+        for (const zoom of [0.25, 1, 8]) {
+            view.zoomAboutMiddle(zoom);
+            frames.runFrame();
+
+            expect(drawn().stroke?.points).toBe(3);
+            expect(drawn().stroke?.ring.width).toBe(12);
+            expect(drawn().stroke?.closing).toBe(false);
+        }
+
+        drawing.showPencil({ points, closing: true });
+        frames.runFrame();
+        expect(drawn().stroke?.closing).toBe(true);
+
+        drawing.showPencil(undefined);
+        frames.runFrame();
+        expect(drawn().stroke).toBeUndefined();
     });
 });

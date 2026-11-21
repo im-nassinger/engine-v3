@@ -90,7 +90,8 @@ function drawFirstRing(graphics: Graphics, plan: PenPlan, toScreen: ToScreen) {
     return drawRing(graphics, centre, plan.closing);
 }
 
-function drawRing(graphics: Graphics, centre: Point, filled: boolean) {
+// A 12 px accent ring, filled at 25% when a press, or a Pencil's release, there closes the path.
+export function drawRing(graphics: Graphics, centre: Point, filled: boolean) {
     // The 12 px is the ring's outside; the stroke is centred on the circle.
     graphics.circle(centre.x, centre.y, (RING_PX - RING_WIDTH_PX) / 2);
     if (filled) {

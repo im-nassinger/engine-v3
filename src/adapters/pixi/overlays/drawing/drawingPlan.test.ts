@@ -281,3 +281,28 @@ describe('planDrawing for the pen', () => {
         expect(path.making.at(-1)).toEqual({ x: 0, y: 0 });
     });
 });
+
+describe('planDrawing for the Pencil', () => {
+    test('hands the stroke on as it is, with nothing else drawn', () => {
+        const stroke = {
+            points: [
+                { x: 0, y: 0 },
+                { x: 10, y: 5 },
+            ],
+            closing: true,
+        };
+
+        const plan = planDrawing(undefined, undefined, undefined, stroke);
+
+        expect(plan.stroke).toBe(stroke);
+        expect(plan.path).toBeUndefined();
+        expect(plan.fill).toBeUndefined();
+        expect(plan.handles).toEqual([]);
+    });
+
+    test('draws nothing for a stroke of one point', () => {
+        const plan = planDrawing(undefined, undefined, undefined, { points: [{ x: 0, y: 0 }], closing: false });
+
+        expect(plan.stroke).toBeUndefined();
+    });
+});

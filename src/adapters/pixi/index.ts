@@ -23,6 +23,7 @@ export type {
     ShownJointPreview,
     ShownPoints,
     ShownPenPreview,
+    ShownPencilStroke,
     ShownPolygonPreview,
     ShownReadout,
     ShownShapePreview,

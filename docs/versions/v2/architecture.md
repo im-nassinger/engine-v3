@@ -36,7 +36,7 @@
 | `GradientHandles`, `GradientDragState`, `moveGradientHandle` | `editor/tools/select/gradient/`, `editor/commands/fill/` | editor |
 | `PixiFill`, `GradientTextures` | `adapters/pixi/` | adapters |
 | `GradientHandleOverlay`, `planGradientHandles` | `adapters/pixi/overlays/gradient/` | adapters |
-| `PencilOptions`, `PathPointRow`, `FillField` and the gradient editor | `ui/tool-options/`, `ui/fields/` | ui |
+| `PencilOptions`, `PathPointRow`, `FillField` and the gradient editor | `ui/tool-column/ToolColumn/KindsMenu/` (as built in task 14), `ui/fields/` | ui |
 | `EditorGradientSource`, the new tools in `createTools` | `app/` | app |
 
 Nothing crosses a part boundary that v1 didn't already cross: tools publish plain values, overlays read them through a source built in `app`, as `EditorDrawingSource` already does.
@@ -105,7 +105,7 @@ export type Fill =
 - **Finishing runs `createPath`**, the pen's edit, so the result is an ordinary path, named `Path 1`. With tool lock on, the Pencil stays active.
 - **Esc during a drag** drops the stroke, since nothing is placed before the release (the Shape tool's drag does the same). Picking another tool or Play during a drag keeps it, through `deactivate`.
 - **The smoothness menu** is `PencilOptions` in `ToolOptions`, like `ShapeOptions`, with the design's three line icons. The choice is kept in memory for the session, as the Shape tool's kind is.
-- **The preview** is `pencilStroke`: the dragged points in level positions and whether the release would close. The overlay draws the 2 px accent line and the start's ring. The hint: `Drag to draw. End near the start to close.`
+- **The preview** is `pencilStroke`: the dragged points in level positions and whether the release would close. The overlay draws the 2 px accent line and the start's ring. The hint: `Drag to draw. End near the start to close.` **As built in task 14** (standing yes, 2026-11-21): a release closes only once the stroke has gone farther than 12 px from its press; the tolerance goes into the group's own space through the zoom and the group's average stretch; `PencilOptions` stands beside `ShapeKinds` in `ui/tool-column/ToolColumn/KindsMenu/`, where v1 built the kinds menus; `planDrawing` hands `pencilStroke` on as its `stroke`, and `drawPencilStroke` draws it with the pen's start ring.
 
 ## Point editing on paths
 

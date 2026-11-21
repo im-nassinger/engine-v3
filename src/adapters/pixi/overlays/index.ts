@@ -22,6 +22,7 @@ export type { DrawingPlan } from './drawing/drawingPlan.ts';
 export type {
     DrawingSource,
     ShownPenPreview,
+    ShownPencilStroke,
     ShownPolygonPreview,
     ShownShapePreview,
 } from './drawing/DrawingSource.ts';

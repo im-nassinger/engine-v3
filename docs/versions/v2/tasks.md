@@ -45,7 +45,7 @@ The tasks that build v2 (curves and gradients), in the orchestrator's format: ea
 - [x] 13. Fit a drag into curves
   - Read: versions/v2/architecture.md#the-pencil
   - Done when: `fitCurves` is in `core/geometry/fitting/` with Node tests: every dragged point within the tolerance, a closed loop closes, a straight drag gives two points, the same drag twice gives the same path, and an over-detailed fit stays within 2,000 points
-- [ ] 14. The Pencil
+- [x] 14. The Pencil
   - Read: versions/v2/architecture.md#the-pencil, requirements/drawing.md#the-pencil--v2, design/controls.md#v2-the-pen-the-pencil-and-gradients
   - Done when: `PencilTool`, `PencilOptions` and the stroke's preview are built; key 5 and the button pick it; a release near the start closes the path; Esc drops a stroke; the smoothness is kept for the session; Node tests and a Playwright test (a closed and an open stroke at each smoothness) pass
 - [ ] 15. The rest of v2's Playwright journeys

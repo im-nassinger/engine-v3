@@ -12,6 +12,8 @@ import { squareAround } from '../screenPixels.ts';
 import { planDrawing } from './drawingPlan.ts';
 import { drawPenPlan } from './drawPenPlan.ts';
 import type { DrawnPath } from './drawPenPlan.ts';
+import { drawPencilStroke } from './drawPencilStroke.ts';
+import type { DrawnStroke } from './drawPencilStroke.ts';
 import type { DrawingPlan } from './drawingPlan.ts';
 import type { DrawingSource } from './DrawingSource.ts';
 
@@ -36,6 +38,8 @@ export type DrawnDrawing = {
     readonly closing: boolean;
     // The pen's path being drawn.
     readonly path: DrawnPath | undefined;
+    // The Pencil's stroke being dragged.
+    readonly stroke: DrawnStroke | undefined;
 };
 
 const NOTHING_DRAWN: DrawnDrawing = {
@@ -46,12 +50,13 @@ const NOTHING_DRAWN: DrawnDrawing = {
     ring: undefined,
     closing: false,
     path: undefined,
+    stroke: undefined,
 };
 
-// The Shape tool's faded preview and the pen's path, as the level view's colours say. The Shape tool's is
+// The Shape tool's faded preview, the pen's path and the Pencil's stroke, as the level view's colours say. The Shape tool's is
 // the default fill at 35%, the placed outline solid, the segments to the mouse and back to the first point
 // dashed at 60%, the placed points as 8 px handles and the first one as a 12 px ring; the pen's is
-// drawPenPlan's. Drawn in screen pixels, so it keeps its size at any zoom.
+// drawPenPlan's and the Pencil's drawPencilStroke's. Drawn in screen pixels, so it keeps its size at any zoom.
 export class DrawingPreviewOverlay {
     readonly graphics = new Graphics();
     private shown: DrawnDrawing = NOTHING_DRAWN;
@@ -65,7 +70,7 @@ export class DrawingPreviewOverlay {
         this.shown = NOTHING_DRAWN;
         if (source === undefined) return;
 
-        const plan = planDrawing(source.shape, source.polygon, source.pen);
+        const plan = planDrawing(source.shape, source.polygon, source.pen, source.pencil);
         const toScreen = (point: Point) => scene.view.levelToScreen(point);
 
         this.shown = {
@@ -76,6 +81,7 @@ export class DrawingPreviewOverlay {
             ring: this.drawRing(plan, toScreen),
             closing: plan.closing,
             path: plan.path === undefined ? undefined : drawPenPlan(this.graphics, plan.path, toScreen),
+            stroke: plan.stroke === undefined ? undefined : drawPencilStroke(this.graphics, plan.stroke, toScreen),
         };
     }
 

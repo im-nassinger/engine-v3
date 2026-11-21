@@ -83,12 +83,13 @@ describe('ToolColumn', () => {
 
         await expect.poll(() => selectButton().getAttribute('aria-pressed')).toBe('true');
         const buttons = editorPageContainer().querySelectorAll('.tool-button');
-        expect(buttons.length).toBe(4);
+        expect(buttons.length).toBe(5);
         expect(selectButton().getAttribute('aria-label')).toBe('Select');
         expect(toolButton('shape').getAttribute('aria-label')).toBe('Shape');
         expect(toolButton('shape').getAttribute('aria-pressed')).toBe('false');
         expect(toolButton('joint').getAttribute('aria-label')).toBe('Joint');
         expect(toolButton('pen').getAttribute('aria-label')).toBe('Bézier pen');
+        expect(toolButton('pencil').getAttribute('aria-label')).toBe('Pencil');
     });
 
     test('key 4 picks the pen, its button shows it on, and it has no kinds menu', async () => {
@@ -113,6 +114,40 @@ describe('ToolColumn', () => {
         await userEvent.click(toolButton('pen'));
 
         expect(tools.controller.active.id).toBe('pen');
+    });
+
+    test('key 5 picks the Pencil and opens its smoothness, Medium on', async () => {
+        const { session, commands, tools } = showWithEditor(Level.createNew(), createElement(ToolColumn));
+        const escape = new EscapeChain(session, tools.controller, new OpenWindowCount());
+        const toolKeys = { tools: tools.controller, escape };
+        const dispatcher = new ShortcutDispatcher(commands.registry, commands.runner, 'other', toolKeys);
+        await expect.poll(() => selectButton().getAttribute('aria-pressed')).toBe('true');
+
+        const used = dispatcher.handleKeyDown(digitPress('5'), 'level', true);
+
+        expect(used).toBe(true);
+        expect(tools.controller.active.id).toBe('pencil');
+        await expect.poll(() => toolButton('pencil').getAttribute('aria-pressed')).toBe('true');
+        await expect.poll(kindLabels).toEqual(['Low', 'Medium', 'High']);
+        expect(kindsMenu()?.querySelector('.pencil-options > .title')?.textContent).toBe('Smoothness');
+        expect(kindButton('Medium').getAttribute('aria-pressed')).toBe('true');
+    });
+
+    test('clicking the Pencil’s button picks it, and its smoothness is kept when it is picked again', async () => {
+        const { tools } = showWithEditor(Level.createNew(), createElement(ToolColumn));
+        await expect.poll(() => toolButton('pencil').getAttribute('aria-pressed')).toBe('false');
+
+        await userEvent.click(toolButton('pencil'));
+        expect(tools.controller.active.id).toBe('pencil');
+        await expect.poll(kindLabels).toEqual(['Low', 'Medium', 'High']);
+        await userEvent.click(kindButton('High'));
+        await expect.poll(() => kindButton('High').getAttribute('aria-pressed')).toBe('true');
+
+        await userEvent.click(selectButton());
+        await expect.poll(kindsMenu).toBeNull();
+        await userEvent.click(toolButton('pencil'));
+        await expect.poll(() => kindButton('High').getAttribute('aria-pressed')).toBe('true');
+        expect(kindButton('Medium').getAttribute('aria-pressed')).toBe('false');
     });
 
     test('key 2 picks the Shape tool, and its button shows it on', async () => {

@@ -38,12 +38,20 @@ export type ShownPenEnd = {
     readonly underMouse: boolean;
 };
 
-// What the drawing preview overlay reads: the Shape tool's or the pen's preview, when it is the active
-// tool. The composition root builds it from the tools.
+// A Pencil stroke being dragged, in level positions, exactly as dragged. closing is set when a release now
+// closes the path.
+export type ShownPencilStroke = {
+    readonly points: readonly Point[];
+    readonly closing: boolean;
+};
+
+// What the drawing preview overlay reads: the Shape tool's, the pen's or the Pencil's preview, when it is
+// the active tool. The composition root builds it from the tools.
 export type DrawingSource = {
     readonly shape: ShownShapePreview | undefined;
     readonly polygon: ShownPolygonPreview | undefined;
     readonly pen: ShownPenPreview | undefined;
+    readonly pencil: ShownPencilStroke | undefined;
     // Any of the above changed.
     subscribe(listener: () => void): Unsubscribe;
 };
