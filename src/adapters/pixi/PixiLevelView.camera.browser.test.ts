@@ -183,15 +183,16 @@ describe('PixiLevelView through the camera', () => {
         expect(levelView.overlays.letterbox.bars).toEqual([]);
     });
 
-    test('the level bounds are not drawn, and the grid follows its switch', async () => {
+    test('neither the level bounds nor the grid are drawn, whatever its switch, and the grid comes back after Stop', async () => {
         const { levelView, settings, frames } = await showRedLevel(320, 240);
+        settings.set('grid', true);
 
         levelView.showThroughCamera({ x: 0, y: 0 }, CAMERA_BOX);
         frames.runFrame();
         expect(levelView.overlays.bounds.isShowing).toBe(false);
         expect(levelView.overlays.grid.plan).toBeUndefined();
 
-        settings.toggle('grid');
+        levelView.stopShowingThroughCamera();
         frames.runFrame();
         expect(levelView.overlays.grid.plan).toBeDefined();
     });

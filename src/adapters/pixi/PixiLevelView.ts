@@ -283,8 +283,9 @@ export class PixiLevelView {
     }
 
     // Shows the level through the camera from now on, as Fixed size does: the camera's box fills the
-    // window one way, centred, with black bars the other way. Selection, handles, previews, joint icons
-    // and the level bounds' edge and label aren't drawn; the grid, camera frame and physics view follow their switches.
+    // window one way, centred, with black bars the other way. Selection, handles, previews, joint icons,
+    // the grid and the level bounds' edge and label aren't drawn; the camera frame and physics view follow
+    // their switches.
     showThroughCamera(position: Point, box: CameraBox) {
         this.camera = { position, box };
         this.fitCamera();
@@ -426,13 +427,13 @@ export class PixiLevelView {
             caches: this.caches,
         };
 
-        this.gridOverlay.update(scene);
         this.cameraFrameOverlay.update(scene);
         this.physicsViewOverlay.update(scene);
 
         if (throughCamera) {
             // Editor-only drawing: play shows none of it, whatever the editor holds behind the view.
             // A joint has no drawing of its own in play, so an unstyled one is invisible, as any entity.
+            this.gridOverlay.clear();
             this.jointIconOverlay.clear();
             this.boundsOverlay.clear();
             this.jointPreviewOverlay.update(scene, undefined);
@@ -442,6 +443,7 @@ export class PixiLevelView {
             return;
         }
 
+        this.gridOverlay.update(scene);
         this.jointIconOverlay.update(scene);
         this.boundsOverlay.update(scene);
         this.jointPreviewOverlay.update(scene, this.jointPreview);

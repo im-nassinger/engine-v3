@@ -183,18 +183,28 @@ describe('HitTester hit areas', () => {
         expect(tester.topmostAt({ x: 400, y: 50 }, probe)).toBe(open);
     });
 
-    test('a joint is hit by its icon, the same size on screen at any zoom, and only while icons are shown', () => {
+    test('a joint is hit by its icon, 7 level px across at most zooms, and only while icons are shown', () => {
         const { level, settings, tester } = buildTester();
         const joint = place(level, level.world, { x: 100, y: 100 });
         joint.addComponent(new JointComponent());
         const probe = probeAt(level, 2);
 
-        expect(tester.topmostAt({ x: 103, y: 100 }, probe)).toBe(joint);
-        expect(tester.topmostAt({ x: 104, y: 100 }, probe)).toBeUndefined();
+        expect(tester.topmostAt({ x: 107, y: 100 }, probe)).toBe(joint);
+        expect(tester.topmostAt({ x: 108, y: 100 }, probe)).toBeUndefined();
 
         settings.set('jointIcons', false);
 
         expect(tester.topmostAt({ x: 100, y: 100 }, probe)).toBeUndefined();
+    });
+
+    test('zoomed far out, a joint is still hit within 5 screen px', () => {
+        const { level, tester } = buildTester();
+        const joint = place(level, level.world, { x: 100, y: 100 });
+        joint.addComponent(new JointComponent());
+        const probe = probeAt(level, 0.1);
+
+        expect(tester.topmostAt({ x: 149, y: 100 }, probe)).toBe(joint);
+        expect(tester.topmostAt({ x: 151, y: 100 }, probe)).toBeUndefined();
     });
 
     test('the camera is hit on its frame, not inside, and only while the frame is shown', () => {

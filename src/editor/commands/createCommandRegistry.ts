@@ -51,7 +51,10 @@ export function createCommandRegistry(
     play?: PlaySession,
 ) {
     const registry = new CommandRegistry();
-    const clipboard = clipboardParts ?? { clipboard: new EditorClipboard(), mouse: { current: undefined } };
+    const clipboard = clipboardParts ?? {
+        clipboard: new EditorClipboard(),
+        mouse: { current: undefined, screenPosition: undefined },
+    };
     // In a read-only tab these are disabled with the reason; the rest only look, select or copy.
     const registerEditing = (command: EditorCommand) => registry.register(new ReadOnlyGuard(session, command));
 
@@ -93,8 +96,8 @@ export function createCommandRegistry(
         registry.register(new ViewSwitchCommand(session, entry));
     }
 
-    registry.register(new ZoomInCommand(session));
-    registry.register(new ZoomOutCommand(session));
+    registry.register(new ZoomInCommand(session, clipboard.mouse));
+    registry.register(new ZoomOutCommand(session, clipboard.mouse));
     registry.register(new ZoomToActualSizeCommand(session));
     registry.register(new FitWholeLevelCommand(session));
     registry.register(new FitSelectionCommand(session));

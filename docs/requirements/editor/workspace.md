@@ -138,6 +138,7 @@ Source: round 3: 01 2.5; old: WS-42 to WS-44, WS-140; owner: 2026-11-13
 ### Pan and zoom · v1
 
 - Space and drag pans. The mouse wheel zooms, keeping the point under the mouse fixed. Shift+wheel pans sideways.
+- **+ and - zoom at the mouse too**, like the wheel, while the mouse is over the level view; otherwise, as from the View menu, about the middle of the view. *Why: the owner expected the keys to zoom where they look, as the wheel does (owner: 2026-11-21).*
 - Zoom goes from **1% to 1000%**. 100% means one level pixel per screen pixel. *Why: the owner's range.*
 - **F** zooms to the selection, or to the whole level with nothing selected. Selecting never moves the view by itself.
 - Moving or zooming the view is never an undo step.
@@ -145,7 +146,7 @@ Source: round 3: 01 2.5; old: WS-42 to WS-44, WS-140; owner: 2026-11-13
 - Panning stops well outside the level. If the view holds nothing, a `Back to level` button appears.
 - The view position and zoom are remembered in the browser. They are not in the level file.
 
-Source: scope ED1; round 3: 01 2.6; round 5: 02 2.5; old: WS-46 to WS-52, WS-56, WS-57, SG-36; owner: 2026-11-17
+Source: scope ED1; round 3: 01 2.6; round 5: 02 2.5; old: WS-46 to WS-52, WS-56, WS-57, SG-36; owner: 2026-11-17, 2026-11-21
 
 ### The grid · v1
 
@@ -158,8 +159,9 @@ Source: scope ED1; round 3: 01 2.6; round 5: 02 2.5; old: WS-46 to WS-52, WS-56,
 - Typed values and arrow-key moves are never snapped. Ctrl+Shift+arrow moves one grid step.
 - **The grid size is a whole number of pixels from 5 to 1,000.** *Why: whole numbers keep snapped positions whole, and the range covers fine tiles and coarse layout (standing yes, 2026-11-14).*
 - The grid size is saved in the project file. **Changing it is not an undo step** (owner: 2026-11-19, replacing 2026-11-13's undo step): Ctrl+Z never changes the grid size. Whether the grid is shown is saved in the browser.
+- **The grid is never drawn during play**, whatever its switch; it comes back at Stop. *Why: the owner wants it only in the editor, before testing the level (owner: 2026-11-21).*
 
-Source: scope ED4; round 3: 01 2.6; round 5: FMT1; round 7: BND2; old: WS-53, WS-54, WS-58 to WS-62; owner: 2026-11-13, 2026-11-14, 2026-11-19
+Source: scope ED4; round 3: 01 2.6; round 5: FMT1; round 7: BND2; old: WS-53, WS-54, WS-58 to WS-62; owner: 2026-11-13, 2026-11-14, 2026-11-19, 2026-11-21
 
 ### Snapping to other entities · Later
 

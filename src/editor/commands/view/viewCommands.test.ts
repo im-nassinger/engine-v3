@@ -7,6 +7,8 @@ import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { FIT_MARGIN_PX, MAX_ZOOM, MIN_ZOOM } from '../../view/index.ts';
 import type { ViewState } from '../../view/index.ts';
 import { buildCommandTestSession } from '../testing/commandTestSession.ts';
+import { ZoomInCommand } from './ZoomInCommand.ts';
+import { ZoomOutCommand } from './ZoomOutCommand.ts';
 
 const VIEW_WIDTH = 800;
 const VIEW_HEIGHT = 600;
@@ -55,6 +57,23 @@ describe('Zoom in, Zoom out and 100%', () => {
         requireCommand('view.zoomTo100').run();
         expect(view.zoom).toBe(1);
         expect(view.middle).toEqual({ x: 0, y: 0 });
+    });
+
+    test('zoom in and out at the mouse while it is over the level view, as the wheel does', () => {
+        const { session } = buildSession();
+        const view = session.view;
+        const screenPoint = { x: 600, y: 150 };
+        const mouse = { current: view.screenToLevel(screenPoint), screenPosition: screenPoint };
+        const levelPointUnderMouse = view.screenToLevel(screenPoint);
+
+        new ZoomInCommand(session, mouse).run();
+        expect(view.zoom).toBe(2);
+        expect(view.levelToScreen(levelPointUnderMouse)).toEqual(screenPoint);
+
+        new ZoomOutCommand(session, mouse).run();
+        new ZoomOutCommand(session, mouse).run();
+        expect(view.zoom).toBe(0.5);
+        expect(view.levelToScreen(levelPointUnderMouse)).toEqual(screenPoint);
     });
 
     test('are disabled at the ends of the zoom range', () => {

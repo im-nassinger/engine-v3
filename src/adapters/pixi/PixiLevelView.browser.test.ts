@@ -458,7 +458,7 @@ describe('PixiLevelView overlays', () => {
         return entity;
     }
 
-    test('a joint icon sits at its position with the same size at any zoom, one per type', async () => {
+    test('a joint icon sits at its position at any zoom, one per type', async () => {
         const { level, view, frames, overlays } = await showNewLevel();
         addJoint(level, 10, 20, 'hinge');
         addJoint(level, -40, 0, 'rope');
@@ -476,18 +476,25 @@ describe('PixiLevelView overlays', () => {
         expect(zoomedHinge?.screenPosition).toEqual({ x: 190, y: 180 });
     });
 
-    test('a joint icon keeps its size on screen at any zoom', async () => {
+    test('a joint icon grows and shrinks with the zoom, never under 8 px across', async () => {
         const { level, view, frames, overlays } = await showNewLevel();
         addJoint(level, 0, 0, 'hinge');
         frames.runFrame();
         const widthAtFirst = overlays.jointIcons.graphics.getLocalBounds().width;
 
-        view.zoomAboutMiddle(8);
+        view.zoomAboutMiddle(4);
         frames.runFrame();
+        const widthZoomedIn = overlays.jointIcons.graphics.getLocalBounds().width;
+
+        view.zoomAboutMiddle(0.1);
+        frames.runFrame();
+        const widthZoomedOut = overlays.jointIcons.graphics.getLocalBounds().width;
 
         expect(widthAtFirst).toBeGreaterThanOrEqual(14);
         expect(widthAtFirst).toBeLessThan(17);
-        expect(overlays.jointIcons.graphics.getLocalBounds().width).toBe(widthAtFirst);
+        expect(widthZoomedIn).toBeCloseTo(widthAtFirst * 4, 0);
+        expect(widthZoomedOut).toBeGreaterThanOrEqual(8);
+        expect(widthZoomedOut).toBeLessThan(10);
     });
 
     test('joint icons hide with their switch, the eye and a hidden parent', async () => {

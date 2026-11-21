@@ -14,13 +14,13 @@ All lengths are pixels and all angles are degrees. Positive angles and speeds ar
 - It can hold children, triggers and scripts, like any entity. *Why: one rule for every entity. Treating joints as special was left over from an earlier design.*
 - The JointComponent names its two entities in fields **A** and **B**. Clicking a field selects that entity. An empty B pins A to the background.
 - Joints connect bodies. A sensor or a line can be an end.
-- Joints show an editor-only icon so they can be selected, one shape per type, always the same size on screen. "Joint icons" in the View menu hides them.
+- Joints show an editor-only icon so they can be selected, one shape per type. **The icon grows and shrinks with the zoom**, like the level, but never gets too small to see or click. "Joint icons" in the View menu hides them. *Why: the owner found an icon of one fixed size on screen looked wrong beside the zoomed level (owner: 2026-11-21, replacing "always the same size on screen").*
 - Hovering or selecting a joint shows thin lines to its two entities.
 - **Joints have no special drawing in play.** An unstyled joint is invisible, like any entity.
 - A hidden joint still works.
 - Joints don't run inside the camera, because positions there are screen positions.
 
-Source: round 1: C9, D43; round 4: G2, R44; round 5: R45; round 6: LY2; round 8: VW1, HUD2; decisions: D44; old: JT-07, JT-47 to JT-53
+Source: round 1: C9, D43; round 4: G2, R44; round 5: R45; round 6: LY2; round 8: VW1, HUD2; decisions: D44; old: JT-07, JT-47 to JT-53; owner: 2026-11-21
 
 ### Three joints: Hinge, Rope, Spring · v1
 

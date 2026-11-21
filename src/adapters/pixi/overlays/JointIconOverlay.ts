@@ -4,15 +4,15 @@ import { JointComponent } from '../../../core/components/index.ts';
 import type { JointType } from '../../../core/components/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
-import { JOINT_ICON_RADIUS_PX } from '../../../editor/view/index.ts';
+import { JOINT_ICON_RADIUS, jointIconRadiusPx } from '../../../editor/view/index.ts';
 import type { OverlayScene } from './OverlayScene.ts';
 
-// The design's joint icon: a white circle of JOINT_ICON_RADIUS_PX with a 1.5 px edge.
+// The design's joint icon: a white circle with a 1.5 px edge. Every size here is the one at 100%; the
+// icon is scaled by the zoom as a whole, as jointIconRadiusPx says.
 const EDGE_COLOUR = 0x1d2430;
-const EDGE: StrokeStyle = { color: EDGE_COLOUR, width: 1.5 };
-const MARK: StrokeStyle = { color: EDGE_COLOUR, width: 1.5, cap: 'round', join: 'round' };
-const HINGE_DOT_RADIUS_PX = 2;
-const ROPE_HALF_LENGTH_PX = 3.5;
+const EDGE_WIDTH = 1.5;
+const HINGE_DOT_RADIUS = 2;
+const ROPE_HALF_LENGTH = 3.5;
 const SPRING_ZIGZAG: readonly Point[] = [
     { x: -4, y: 0 },
     { x: -2, y: -2.5 },
@@ -39,9 +39,9 @@ function isHiddenWithParents(entity: Entity) {
     return false;
 }
 
-function isOffScreen(position: Point, scene: OverlayScene) {
+function isOffScreen(position: Point, radiusPx: number, scene: OverlayScene) {
     const size = scene.view.size;
-    const margin = JOINT_ICON_RADIUS_PX + 1;
+    const margin = radiusPx + 1;
 
     return (
         position.x < -margin ||
@@ -51,7 +51,7 @@ function isOffScreen(position: Point, scene: OverlayScene) {
     );
 }
 
-// One icon per joint at its position, the same size at any zoom: Hinge has a dot in the middle, Rope a short
+// One icon per joint at its position, growing and shrinking with the zoom as the level does: Hinge has a dot in the middle, Rope a short
 // upright line, Spring a small zigzag. Editor only, never drawn in play; hidden by its View menu switch and
 // with the joint's eye.
 export class JointIconOverlay {
@@ -73,6 +73,8 @@ export class JointIconOverlay {
         if (!isOn || level === undefined || caches === undefined) return;
 
         const shown: ShownJointIcon[] = [];
+        const radiusPx = jointIconRadiusPx(scene.view.zoom);
+        const scale = radiusPx / JOINT_ICON_RADIUS;
 
         for (const entity of level.entitiesInDrawOrder()) {
             const joint = entity.getComponent(JointComponent);
@@ -80,10 +82,10 @@ export class JointIconOverlay {
 
             const matrix = caches.worldMatrices.matrixOf(entity);
             const screenPosition = scene.view.levelToScreen({ x: matrix.tx, y: matrix.ty });
-            if (isOffScreen(screenPosition, scene)) continue;
+            if (isOffScreen(screenPosition, radiusPx, scene)) continue;
 
             const type = joint.get('type');
-            this.drawIcon(type, screenPosition);
+            this.drawIcon(type, screenPosition, scale);
             shown.push({ joint: entity, type, screenPosition });
         }
 
@@ -100,29 +102,36 @@ export class JointIconOverlay {
         this.graphics.destroy();
     }
 
-    private drawIcon(type: JointType, centre: Point) {
+    private drawIcon(type: JointType, centre: Point, scale: number) {
         const graphics = this.graphics;
-        graphics.circle(centre.x, centre.y, JOINT_ICON_RADIUS_PX).fill(0xffffff).stroke(EDGE);
+        const edge: StrokeStyle = { color: EDGE_COLOUR, width: EDGE_WIDTH * scale };
+        const mark: StrokeStyle = { ...edge, cap: 'round', join: 'round' };
+        const radius = JOINT_ICON_RADIUS * scale;
+        graphics.circle(centre.x, centre.y, radius).fill(0xffffff).stroke(edge);
 
         switch (type) {
-            case 'hinge':
-                graphics.circle(centre.x, centre.y, HINGE_DOT_RADIUS_PX).fill(EDGE_COLOUR);
+            case 'hinge': {
+                const dotRadius = HINGE_DOT_RADIUS * scale;
+                graphics.circle(centre.x, centre.y, dotRadius).fill(EDGE_COLOUR);
                 return;
-            case 'rope':
+            }
+            case 'rope': {
+                const halfLength = ROPE_HALF_LENGTH * scale;
                 graphics
-                    .moveTo(centre.x, centre.y - ROPE_HALF_LENGTH_PX)
-                    .lineTo(centre.x, centre.y + ROPE_HALF_LENGTH_PX)
-                    .stroke(MARK);
+                    .moveTo(centre.x, centre.y - halfLength)
+                    .lineTo(centre.x, centre.y + halfLength)
+                    .stroke(mark);
                 return;
+            }
             case 'spring': {
                 const [first, ...rest] = SPRING_ZIGZAG;
                 if (first === undefined) return;
 
-                graphics.moveTo(centre.x + first.x, centre.y + first.y);
+                graphics.moveTo(centre.x + first.x * scale, centre.y + first.y * scale);
                 for (const point of rest) {
-                    graphics.lineTo(centre.x + point.x, centre.y + point.y);
+                    graphics.lineTo(centre.x + point.x * scale, centre.y + point.y * scale);
                 }
-                graphics.stroke(MARK);
+                graphics.stroke(mark);
                 return;
             }
         }

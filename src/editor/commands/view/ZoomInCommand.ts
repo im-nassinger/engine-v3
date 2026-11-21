@@ -1,10 +1,12 @@
 import { MAX_ZOOM } from '../../view/index.ts';
 import type { EditorSession } from '../../session/index.ts';
+import type { MouseOverView } from '../clipboard/index.ts';
 import type { Availability, CommandOutcome, EditorCommand } from '../EditorCommand.ts';
 
 const ZOOMED_IN_FULLY = 'Already at 1000%';
 
-// Doubles the zoom about the view's middle. Never a step. '=' is the key that holds '+' on most
+// Doubles the zoom at the mouse while it is over the level view, as the wheel does, else about the
+// view's middle (from the View menu, the mouse is over the menu). Never a step. '=' is the key that holds '+' on most
 // layouts, so it zooms in with or without Shift, as '-' zooms out.
 export class ZoomInCommand implements EditorCommand {
     readonly id = 'view.zoomIn';
@@ -13,9 +15,11 @@ export class ZoomInCommand implements EditorCommand {
     readonly shortcuts = ['+', '=', 'Ctrl+='];
     readonly repeatsWhileHeld = true;
     private readonly session: EditorSession;
+    private readonly mouse: MouseOverView;
 
-    constructor(session: EditorSession) {
+    constructor(session: EditorSession, mouse: MouseOverView) {
         this.session = session;
+        this.mouse = mouse;
     }
 
     availability(): Availability {
@@ -27,7 +31,7 @@ export class ZoomInCommand implements EditorCommand {
     run(): CommandOutcome {
         if (this.isZoomedInFully()) return { kind: 'refused', reason: ZOOMED_IN_FULLY };
 
-        this.session.view.zoomIn();
+        this.session.view.zoomIn(this.mouse.screenPosition);
 
         return { kind: 'done' };
     }

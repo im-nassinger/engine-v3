@@ -44,7 +44,10 @@ beforeEach(() => {
     session.openLevel.selection.replace([crate.id]);
 
     const clipboard = new EditorClipboard(new RefusingSystemClipboard());
-    const registry = createCommandRegistry(session, { clipboard, mouse: { current: undefined } });
+    const registry = createCommandRegistry(session, {
+        clipboard,
+        mouse: { current: undefined, screenPosition: undefined },
+    });
     const runner = new CommandRunner(session.status);
     const bridge = new ClipboardBridge(new ClipboardEvents(registry, runner), window);
     disconnect = bridge.connect();

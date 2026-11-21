@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-What the editor draws over the level: the grid, the dark outside, the bounds' and camera frame's labels, the camera frame, joint icons, selections and handles, the drawing preview and the physics view. **Overlays keep their size on screen at any zoom**, as the requirements say. The level's own colours (a new shape's `#4A90D9` fill and `#1F3552` outline, the light blue background) belong to the level and are set by the [requirements](../requirements/drawing.md), not here. Values are drawn in the [mockups](mockups/index.html) and, **since the redesign** (owner, 2026-11-17), in its [mockup](mockups/redesign.html): outside the level bounds the editor's own `#0d0f13`, the World's fill and the grid only inside, the bounds labelled **World** and their size, and square handles. **Values marked *proposal* are Claude's** (2026-11-14), not yet seen by the owner in a moment.
+What the editor draws over the level: the grid, the dark outside, the bounds' and camera frame's labels, the camera frame, joint icons, selections and handles, the drawing preview and the physics view. **Overlays keep their size on screen at any zoom**, as the requirements say, except the joint icons, which grow and shrink with the level (owner, 2026-11-21). The level's own colours (a new shape's `#4A90D9` fill and `#1F3552` outline, the light blue background) belong to the level and are set by the [requirements](../requirements/drawing.md), not here. Values are drawn in the [mockups](mockups/index.html) and, **since the redesign** (owner, 2026-11-17), in its [mockup](mockups/redesign.html): outside the level bounds the editor's own `#0d0f13`, the World's fill and the grid only inside, the bounds labelled **World** and their size, and square handles. **Values marked *proposal* are Claude's** (2026-11-14), not yet seen by the owner in a moment.
 
 ## The background and the grid
 
@@ -25,7 +25,7 @@ What the editor draws over the level: the grid, the dark outside, the bounds' an
 | Part | Look |
 |---|---|
 | Camera frame | 1.5 px, `#141C28` at 70% on a light fill, `#ECF0F6` at 55% on a dark one, with its label written like the bounds': **Camera** 1920 × 1080. The label is coloured for what it starts on, so above the level bounds it is the light one (standing yes, 2026-11-18) |
-| Joint icon | A 14 px white circle with a 1.5 px `#1D2430` edge and a dot in its middle |
+| Joint icon | A 14 px white circle with a 1.5 px `#1D2430` edge and a dot in its middle at 100%, all of it scaled with the zoom, never under 8 px across (standing yes, 2026-11-21) |
 | Drag readout | A small `--tooltip` box near the mouse, such as "175 × 85" |
 
 All of them are hidden during test play unless a View menu switch shows them.

@@ -17,7 +17,7 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 | 1 to 3 | Pick a tool: Select, Shape, Joint (owner: 2026-11-19). Twice locks the tool. Later tools get their keys in their own version | Editor | Tools, v1 |
 | Space (hold) | Pan | Editor | Pan and zoom, v1 |
 | F | Zoom to the selection, or to the whole level with nothing selected | Editor | Pan and zoom, v1 |
-| + or = or Ctrl+=, - or Ctrl+- | Zoom in, zoom out: the key that holds + zooms in with or without Shift, as - zooms out, and the numpad's + and - work too | Editor | Pan and zoom, v1 |
+| + or = or Ctrl+=, - or Ctrl+- | Zoom in, zoom out, at the mouse while it is over the level view, else about the view's middle: the key that holds + zooms in with or without Shift, as - zooms out, and the numpad's + and - work too | Editor | Pan and zoom, v1 |
 | Shift+0 | Zoom to 100% | Editor | Pan and zoom, v1 |
 | Shift+3 | Zoom to the camera frame | Editor | Pan and zoom, v1 |
 | Ctrl+Z | Undo | Editor | Undo, v1 |

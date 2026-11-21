@@ -62,6 +62,13 @@ export class GridOverlay {
         }
     }
 
+    clear() {
+        this.graphics.clear();
+        this.graphics.visible = false;
+        this.lastPlan = undefined;
+        this.lastArea = undefined;
+    }
+
     destroy() {
         this.graphics.destroy();
     }

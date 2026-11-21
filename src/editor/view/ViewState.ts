@@ -157,14 +157,24 @@ export class ViewState {
         this.change(this.middleX, this.middleY, newZoom);
     }
 
-    zoomIn() {
+    // At the screen point when given, else about the middle.
+    zoomIn(screenPoint?: Point) {
         const zoom = this.currentZoom * ZOOM_STEP;
-        this.zoomAboutMiddle(zoom);
+        this.zoomAtOrAboutMiddle(screenPoint, zoom);
     }
 
-    zoomOut() {
+    zoomOut(screenPoint?: Point) {
         const zoom = this.currentZoom / ZOOM_STEP;
-        this.zoomAboutMiddle(zoom);
+        this.zoomAtOrAboutMiddle(screenPoint, zoom);
+    }
+
+    private zoomAtOrAboutMiddle(screenPoint: Point | undefined, zoom: number) {
+        if (screenPoint === undefined) {
+            this.zoomAboutMiddle(zoom);
+            return;
+        }
+
+        this.zoomAt(screenPoint, zoom);
     }
 
     // Fills the part of the view the panels leave free with the rectangle, less FIT_MARGIN_PX on each

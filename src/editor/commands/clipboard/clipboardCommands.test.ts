@@ -44,7 +44,10 @@ function buildSession() {
 
     const system = new FakeSystemClipboard();
     const clipboard = new EditorClipboard(system);
-    const mouse: { current: Point | undefined } = { current: undefined };
+    const mouse: { current: Point | undefined; screenPosition: Point | undefined } = {
+        current: undefined,
+        screenPosition: undefined,
+    };
     const registry = createCommandRegistry(session, { clipboard, mouse });
     const runner = new CommandRunner(session.status);
     // Off unless a test turns it on, so a paste lands exactly on the mouse.

@@ -16,12 +16,12 @@ Keys, inputs and remapping are in [variables and inputs](../triggers/variables-a
 - **Play starts as fast as possible**, with no fixed number. *Why: the owner's rule. It should start as soon as you hit Play.* Stop during loading cancels the start.
 - **Play hides every panel**, so the game looks as it will for players. A small **Play bar** stays, with Stop, Pause, Step and (Later) Panels. The Play bar is tinted with the state's colour and carries a PLAYING or PAUSED label, and the browser tab title says the game is running. *Why: the game should look like the real thing, but debugging needs the panels somewhere.*
 - **You can't edit the level during play.** Trying shows a "Stop to edit" hint. Nothing you try is silently lost.
-- Editor-only drawing (handles, the camera frame) is hidden during play, unless a View menu switch shows it. **Joint icons are never drawn in play**, whatever their switch: an unstyled joint is invisible, like any entity. *Why: the owner found joints drawn in play that the game wouldn't show (2026-11-17).*
+- Editor-only drawing (handles, the camera frame) is hidden during play, unless a View menu switch shows it. **Joint icons and the grid are never drawn in play**, whatever their switch: an unstyled joint is invisible, like any entity. *Why: the owner found joints drawn in play that the game wouldn't show (2026-11-17), and wants the grid only in the editor (2026-11-21).*
 - **Stop is instant** and puts the editor back exactly as it was: the view, the tool, the group you were inside and the panels.
 - A run holds no unsaved work. Closing or reloading the page during a run loses the run and nothing else.
 - *Why v1: the core of the game.*
 
-Source: scope PL1; round 1: C18, D13; round 9: 11 2.1, 11 2.2, 11 2.3; round 10: UI1; old: PL-01, PL-02, PL-05, PL-06, PL-10, PL-11, PL-14, PL-15, PL-17, PL-18; owner: 2026-11-17
+Source: scope PL1; round 1: C18, D13; round 9: 11 2.1, 11 2.2, 11 2.3; round 10: UI1; old: PL-01, PL-02, PL-05, PL-06, PL-10, PL-11, PL-14, PL-15, PL-17, PL-18; owner: 2026-11-17, 2026-11-21
 
 ### Pause and Step · v1
 

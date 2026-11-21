@@ -10,7 +10,7 @@ import type { DerivedCaches } from '../../../core/derived/index.ts';
 import type { Matrix2D, Point } from '../../../core/geometry/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import type { ViewSettings } from '../../view/index.ts';
-import { JOINT_ICON_RADIUS_PX } from '../../view/index.ts';
+import { jointIconRadiusPx } from '../../view/index.ts';
 import type { HitArea } from './HitArea.ts';
 import { JointIconHitArea } from './JointIconHitArea.ts';
 import { LocalOutlines } from './LocalOutlines.ts';
@@ -64,7 +64,9 @@ function jointArea(entity: Entity, context: HitAreaContext) {
 
     const matrix = context.caches.worldMatrices.matrixOf(entity);
     const centre = { x: matrix.tx, y: matrix.ty };
-    const radius = JOINT_ICON_RADIUS_PX * context.levelPerScreenPx;
+    const zoom = 1 / context.levelPerScreenPx;
+    const radiusPx = Math.max(context.tolerancePx, jointIconRadiusPx(zoom));
+    const radius = radiusPx * context.levelPerScreenPx;
 
     return new JointIconHitArea(centre, radius);
 }

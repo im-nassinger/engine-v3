@@ -103,7 +103,7 @@ export class PointerInput {
         const screenPosition = this.screenPositionOf(event);
         this.lastClickCount = this.clicks.press(button, screenPosition, event.timeStamp);
         const input = this.inputOf(event, button, screenPosition);
-        this.parts.mouse.moveTo(input.levelPosition);
+        this.parts.mouse.moveTo(input.levelPosition, screenPosition);
         this.parts.tools.pointerDown(input);
     }
 
@@ -120,7 +120,7 @@ export class PointerInput {
         const screenPosition = this.screenPositionOf(event);
         const heldButton = heldButtonOf(event);
         const input = this.inputOf(event, heldButton, screenPosition);
-        this.parts.mouse.moveTo(input.levelPosition);
+        this.parts.mouse.moveTo(input.levelPosition, screenPosition);
         this.parts.tools.pointerMove(input);
     }
 

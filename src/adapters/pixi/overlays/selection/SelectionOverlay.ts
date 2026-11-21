@@ -5,7 +5,7 @@ import { Bounds } from '../../../../core/geometry/index.ts';
 import type { Point } from '../../../../core/geometry/index.ts';
 import type { Entity } from '../../../../core/level/index.ts';
 import { HANDLE_SIZE_PX } from '../../../../editor/tools/index.ts';
-import { JOINT_ICON_RADIUS_PX } from '../../../../editor/view/index.ts';
+import { jointIconRadiusPx } from '../../../../editor/view/index.ts';
 import type { OverlayCaches, OverlayScene } from '../OverlayScene.ts';
 import { dashedLine } from '../dashes.ts';
 import {
@@ -34,9 +34,9 @@ const RING: StrokeStyle = { color: ACCENT, width: 2 };
 const CAMERA_FRAME: StrokeStyle = { color: ACCENT, width: 3, join: 'miter' };
 const SELECTION_BOX_FILL: FillStyle = { color: ACCENT, alpha: 0.08 };
 // The ring sits just outside the joint icon's edge.
-const RING_RADIUS_PX = JOINT_ICON_RADIUS_PX + 3;
+const RING_GAP_PX = 3;
 // A hidden joint has no size, so its dashed box is at least this big.
-const MIN_HIDDEN_BOX_PX = 2 * RING_RADIUS_PX;
+const MIN_HIDDEN_BOX_PX = 20;
 const PADLOCK_WIDTH_PX = 8;
 const PADLOCK_GAP_PX = 3;
 const LABEL_GAP_PX = 4;
@@ -232,9 +232,11 @@ export class SelectionOverlay {
     }
 
     private drawRings(rings: readonly Point[], scene: OverlayScene) {
+        const ringRadius = jointIconRadiusPx(scene.view.zoom) + RING_GAP_PX;
+
         for (const ring of rings) {
             const centre = scene.view.levelToScreen(ring);
-            this.lines.circle(centre.x, centre.y, RING_RADIUS_PX).stroke(RING);
+            this.lines.circle(centre.x, centre.y, ringRadius).stroke(RING);
         }
 
         return rings.length;

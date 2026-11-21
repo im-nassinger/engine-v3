@@ -3,7 +3,7 @@ import { Bounds } from '../../core/geometry/index.ts';
 import type { Point } from '../../core/geometry/index.ts';
 import type { Entity, Level } from '../../core/level/index.ts';
 import type { ViewSettings } from '../view/index.ts';
-import { JOINT_ICON_RADIUS_PX } from '../view/index.ts';
+import { jointIconRadiusPx } from '../view/index.ts';
 import { HitAreas } from './areas/HitAreas.ts';
 import type { HitAreaContext } from './areas/HitAreas.ts';
 import type { HitProbe } from './HitProbe.ts';
@@ -11,9 +11,6 @@ import type { SpatialIndex } from './spatial-index/SpatialIndex.ts';
 
 // The requirement's "at least 5 px of tolerance at any zoom".
 export const HIT_TOLERANCE_PX = 5;
-
-// How far outside its cached bounds an entity can still be hit: the tolerance, or a joint's icon.
-const WIDEST_REACH_PX = Math.max(HIT_TOLERANCE_PX, JOINT_ICON_RADIUS_PX);
 
 // Answers "what is under this point" and "what does this box touch" with the requirement's hit areas.
 // Clicks pass through the World, hidden and locked entities unless the probe asks for them, and entities
@@ -92,7 +89,9 @@ export class HitTester {
     }
 
     private candidatesFrontToBack(area: Bounds, probe: HitProbe) {
-        const reach = WIDEST_REACH_PX / probe.zoom;
+        // How far outside its cached bounds an entity can still be hit: the tolerance, or a joint's icon.
+        const widestReachPx = Math.max(HIT_TOLERANCE_PX, jointIconRadiusPx(probe.zoom));
+        const reach = widestReachPx / probe.zoom;
         const searchArea = area.expandedBy(reach);
         const insideTheCamera: Entity[] = [];
         const inTheLevel: Entity[] = [];
