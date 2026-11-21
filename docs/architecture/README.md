@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-How engine-v3 is built: the stack, the five parts of the code and their folders, the model as classes, the editor, React's place, the simulation and test play, the adapters, performance, saving, errors, tests, and a v1 plan in 18 stages. **Approved by the owner on 2026-11-14** after seven review rounds on the [review page](../review.html). Code follows it; a change to it is proposed and approved like any other decision. The core idea: **the game's rules never import a detail.** core and editor hold every rule and are tested without a browser; Box2D, PixiJS, React, storage and the clock sit behind small contracts. Test play runs in a worker from v1, and one data format serves saving, undo, the clipboard and the play copy.
+How engine-v3 is built: the stack, the five parts of the code and their folders, the model as classes, the editor, React's place, the simulation and test play, the adapters, performance, saving, errors, tests, and a v1 plan in 18 stages. **Approved by the owner on 2026-11-14** after seven review rounds on the [review page](../review.html). **It holds what v2 built too** (curves and gradients), moved in from [v2's architecture](../versions/v2/architecture.md) when v2 closed. Code follows it; a change to it is proposed and approved like any other decision. The core idea: **the game's rules never import a detail.** core and editor hold every rule and are tested without a browser; Box2D, PixiJS, React, storage and the clock sit behind small contracts. Test play runs in a worker from v1, and one data format serves saving, undo, the clipboard and the play copy.
 
 ## Reading order
 
@@ -24,16 +24,17 @@ How engine-v3 is built: the stack, the five parts of the code and their folders,
 | [parts-and-folders.md](parts-and-folders.md) | core, editor, adapters, ui, app; what may import what; how ESLint and TypeScript enforce it; where tests go |
 | [core-model/README.md](core-model/README.md) | The model in one picture and the rules it keeps |
 | [core-model/entities-and-level.md](core-model/entities-and-level.md) | `Entity`, `Level`, ids, order, the World and the camera, change signals, derived caches, `EntityData` |
-| [core-model/components-and-fields.md](core-model/components-and-fields.md) | Value types, field types, schemas, `Component`, the registry, every v1 component |
+| [core-model/components-and-fields.md](core-model/components-and-fields.md) | Value types, field types, schemas, `Component`, the registry, every v1 component, the fill and paths (v2) |
 | [core-model/geometry.md](core-model/geometry.md) | Units, matrices, bounds, collision pieces, mass, `DeterministicMath` |
 | [editor/README.md](editor/README.md) | `EditorSession`, `OpenLevel`, how an edit flows |
 | [editor/history.md](editor/history.md) | Changes, edit transactions, 512 history steps, drags |
-| [editor/selection-and-tools.md](editor/selection-and-tools.md) | Selection, current group, hit testing, tools, Esc, snapping |
+| [editor/selection-and-tools.md](editor/selection-and-tools.md) | Selection, current group, hit testing, tools, gradient handles, Esc, snapping |
+| [editor/drawing-and-points.md](editor/drawing-and-points.md) | The Shape tool, the pen, the Pencil, point editing |
 | [editor/inspector-and-entities.md](editor/inspector-and-entities.md) | The Entity inspector's model, typed values, editor messages, the Entities viewer's rows and drops |
 | [editor/clipboard-and-shortcuts.md](editor/clipboard-and-shortcuts.md) | Commands, the main menu, keys, the clipboard |
 | [ui.md](ui.md) | `useVersion`, the one context, the screen, the level view's mount, panels, styles |
 | [simulation.md](simulation.md) | The game worker, pacing, the tick phases, bodies, determinism, the play mirror |
-| [adapters.md](adapters.md) | Physics, rendering, storage, input, time, workers, and the places for Lua and audio |
+| [adapters.md](adapters.md) | Physics, rendering (gradients included), storage, input, time, workers, and the places for Lua and audio |
 | [performance.md](performance.md) | What v1 builds, what only gets a place, the speed tests |
 | [persistence.md](persistence.md) | `level.json`, the reader and writer, the project file, autosave, opening the editor |
 | [errors.md](errors.md) | Kinds of problem, where the user sees each, bugs |

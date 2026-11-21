@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**`Selection`** holds the selected ids and keeps the requirement's invariants (never an entity with one of its parents, the World only alone). **`CurrentGroup`** is the group you are inside. **`HitTester`** answers "what is under this point" and "what does this box touch" with the requirement's hit areas, using cached bounds. A **tool** is a class behind one small contract that receives pointer and key input in level positions, already converted from the browser, so every tool is tested without a browser. **`ToolController`** picks the active tool, keeps tool lock, handles panning before any tool, and returns to Select after a tool makes something. The Select tool uses the State pattern for its drags. Snapping is a contract with one v1 implementation, the grid.
+**`Selection`** holds the selected ids and keeps the requirement's invariants (never an entity with one of its parents, the World only alone). **`CurrentGroup`** is the group you are inside. **`HitTester`** answers "what is under this point" and "what does this box touch" with the requirement's hit areas, using cached bounds. A **tool** is a class behind one small contract that receives pointer and key input in level positions, already converted from the browser, so every tool is tested without a browser. **`ToolController`** picks the active tool, keeps tool lock, handles panning before any tool, and returns to Select after a tool makes something. The Select tool uses the State pattern for its drags; from v2 it also drags a path's curve handles and a gradient's handles. v2 adds the pen and the Pencil as two more tool classes. Snapping is a contract with one v1 implementation, the grid.
 
 ## Selection and the current group
 
@@ -82,7 +82,7 @@ export type LevelPointerInput = {
 };
 
 export type Tool = {
-    readonly id: ToolId;                      // 'select' | 'shape' | 'joint', later 'pencil' and others
+    readonly id: ToolId;                      // 'select' | 'shape' | 'joint' | 'pen' | 'pencil', later others
     readonly preview: VersionCounter;         // the overlay redraws what the tool shows
     activate(context: ToolContext): void;
     deactivate(): void;                       // finishes and keeps an unfinished drawing
@@ -125,9 +125,9 @@ export class ToolController {
 }
 ```
 
-- **Panning comes before any tool:** middle drag pans at any time, and holding Space pans with any tool and returns to it on release. `PanGesture` changes `ViewState` only, so it never makes a step.
+- **Panning comes before any tool:** middle drag pans at any time, and holding Space pans with any tool and returns to it on release. **Except while one of the active tool's buttons is down** (v2, standing yes, 2026-11-21): then Space goes to the tool first, so the pen can move the point being placed, and a tool that doesn't take it leaves it to panning. `PanGesture` changes `ViewState` only, so it never makes a step.
 - **After making something the tool returns to Select** with the new entity selected, unless tool lock is on (open question 4 stays as written).
-- v1 registers three tools. Later versions add the Pencil and the Bézier pen (v2), Trigger (v3) and Text (v6) as new classes on their keys, and nothing else changes.
+- v1 registered three tools; v2 added the Bézier pen and the Pencil (`PenTool`, `PencilTool`, in [drawing-and-points.md](drawing-and-points.md#the-pen-v2)) to `createTools` in `app`, with nothing else in the controller changed but Space above. Trigger (v3) and Text (v6) come the same way.
 - **The tool contract and `ToolController` as built** (standing yes, 2026-11-15):
   - A tool's `keyDown` and `keyUp` take a `ToolKey` (code, key, Ctrl, Shift, Alt, repeat) instead of a `KeyChord`, which is a written shortcut, not a press. `editor/shortcuts`' `KeyPress` has that shape, so `editor/tools` never imports the shortcuts and the dispatcher can import the tools. *Why: a tool reads the key pressed, and the other way round the two modules would import each other.*
   - The constructor takes `ToolServices`, the context without `finished`, which the controller adds. The context reads the services when used, so a replaced open level reaches every tool. The tools' number keys are `TOOL_KEYS`: Select 1, Shape 2, Joint 3 (owner, 2026-11-19), the pen 4 and the Pencil 5 (v2, as the requirement gives them), and Text 6 and Trigger 7 only as placeholders until their version decides.
@@ -152,7 +152,9 @@ The Select tool holds one **drag state** at a time (the State pattern):
 | `ResizeState` | Pressing one of the eight handles | One step. One shape or a group: its scale (stage 18). The World's rectangle always resizes from its centre, as if Alt were held, because the World never moves |
 | `RotateState` | Pressing just outside a corner | One step. Shift snaps to 15° |
 | `BoxSelectState` | Pressing empty space and moving | Selects everything the box touches |
-| `PointEditState` | Double-clicking a polygon or line | Esc. Each point drag, add or delete is one step, see [drawing-and-points.md](drawing-and-points.md#point-editing) |
+| `PointEditState` | Double-clicking a polygon, line or path (not a Rope's or Spring's) | Esc. Each point drag, add or delete is one step, see [drawing-and-points.md](drawing-and-points.md#point-editing) |
+| `HandleDragState` (v2) | Pressing a selected path point's curve handle | One step: `Move a handle of Path 1`, see [drawing-and-points.md](drawing-and-points.md#point-editing-on-paths-v2) |
+| `GradientDragState` (v2) | Pressing a gradient handle, before anything else | One step: `Change the fill of Rectangle 1`, see [gradient handles](#gradient-handles-v2) |
 
 - **`IdleState`, `PressState` and `BoxSelectState` as built** (standing yes, 2026-11-15):
   - **An unselected entity is selected on the press**, so the drag that follows moves it; a selected one narrows on release, as the press table says. Shift waits for the release and toggles; Shift+click on empty space changes nothing. *Why: the table selects an unselected entity for both a click and a drag, so doing it at once makes the Entity inspector follow at once.*
@@ -183,9 +185,16 @@ The Select tool holds one **drag state** at a time (the State pattern):
 - Double-click follows the requirement's table: go into a group, edit points, go into the camera, go up one group on empty space.
 - **Moving an entity into another group keeps its place on screen** with the maths in [geometry](../core-model/geometry.md#matrix2d-and-the-transformcomponent). If it changes which body the entity belongs to, the command asks first, see [errors.md](../errors.md).
 
-## The Shape tool
+## Gradient handles (v2)
 
-The Shape tool and point editing are in [drawing-and-points.md](drawing-and-points.md).
+- **`GradientHandles.of`** (`tools/select/gradient/`) gives the handles of the one selected entity, in level positions: a linear gradient's start and end, or a radial one's centre and radius dot (the centre plus the radius along the box's own x), and the stops between them. **It gives none unless exactly one entity is selected, it is neither hidden nor locked, its fill is a gradient, and its StyleComponent's card is unfolded** (`CardFolds`, which `OpenLevel` holds for the session), as the requirement's "its gradient is open in the Entity inspector" asks; none for a line or an open path, whose fill never paints. They show while nothing is dragged and during their own drag only, as the frame's handles do.
+- **The Select tool takes a press on a gradient handle first**, before the frame's handles and the entities, within 8 screen px of its middle. `GradientDragState` (in `tools/select/states/` with the other drag states, since `IdleState` starts it) writes the fill through `LiveEdit` and keeps the press's distance from the handle's middle. **`moveGradientHandle`** (`editor/commands/fill/`) turns the mouse into the entity's own space and then into shares of its box through **`FillPlacement`**, landing on tenths of a percent within the typed fields' limits. A radius dot sets the radius from its distance to the centre.
+- **Shift keeps a linear gradient's direction to 15° steps on screen**, around the end not dragged. *Why on screen: in a box that isn't square, 15° in shares looks like another angle.* Esc puts the drag back. The stops' dots only show where they are; stops move in the Entity inspector.
+- **The overlay** is `GradientHandleOverlay` with `planGradientHandles`, in [adapters.md](../adapters.md#gradients-v2); `EditorGradientSource` in `app` builds its source from the selection, the caches and `CardFolds`.
+
+## The Shape tool, the pen and the Pencil
+
+They are in [drawing-and-points.md](drawing-and-points.md), with point editing.
 
 ## The Joint tool
 

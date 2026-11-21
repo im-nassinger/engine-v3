@@ -48,6 +48,8 @@ src/
       BodyComponent/ SurfaceComponent/ JointComponent/ CameraComponent/ PhysicsWorldComponent/
     geometry/          Matrix2D, Point, Bounds, ShapeGeometry, PathGeometry, JointEnds
       pieces/            the polygon pipeline from a shape to collision pieces, line chains, mass
+      path/              pathBox, splitCurve, nearestOnCurve, smoothHandles: a path's curves (v2)
+      fitting/           fitCurves: the Pencil's drag fitted into curves (v2)
     math/              DeterministicMath, units (px and metres, degrees and radians)
     derived/           DerivedCaches, levelBoundsOf
       caches/            WorldMatrixCache, BoundsCache, HiddenCache, PiecesCache
@@ -64,7 +66,7 @@ src/
     history/           History, HistoryStep, EditTransaction, changes/
     selection/         Selection
     commands/          EditorCommand, CommandRegistry, createCommandRegistry, then file/ edit/ arrange/ view/ play/, rename/ (renameEntity, renameLevel), hide/ (toggleEntityHidden, a row's eye), shared/ (skip rule, step labels, EntityNamer, attached joints, keeping in place), testing/
-    tools/             Tool, ToolController (with the entity field's picker), escape/ (EscapeChain), pan/, mouse/ (MousePosition), select/ shape/ joint/
+    tools/             Tool, ToolController (with the entity field's picker), escape/ (EscapeChain), pan/, mouse/ (MousePosition), select/ shape/ joint/, pen/ pencil/ (v2)
     hit-testing/       HitTester, HitProbe; areas/ (each entity's hit area), spatial-index/ (SpatialIndex, LinearSpatialIndex)
     snapping/          Snapper, GridSnapper
     view/              ViewState (pan and zoom), ViewSettings, the overlay sizes the drawing and hitting share

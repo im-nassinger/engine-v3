@@ -62,6 +62,7 @@ for (const testLevel of determinismLevels) {
 - **Storage:** a save and a load round trip in IndexedDB; a failed write (quota) becomes `SaveState` `failed`; a second tab gets no lock.
 - **Workers:** a Play, ten ticks and a Stop through the real `WorkerGameRunner`; a worker that never answers is ended by the watchdog.
 - **Keys and clipboard:** reserved keys are left to the browser; AltGr never fires a Ctrl+Alt shortcut; copy and paste events carry the tagged text.
+- **Gradients (v2):** `GradientDrawing.browser.test.ts` reads the pixels of a linear and a radial gradient on a rectangle, a turned one, a see-through stop over the background and a closed path; `GradientTextures` shares equal gradients and lets go of unused ones; the Points list turns virtual above 100 rows (`EntityInspector.pathPoints.browser.test.ts`).
 
 The tech notes ask for keyboard layout tests (US, Brazilian ABNT2, and one AltGr-heavy layout). Browsers can't switch layout in a test, so `KeyChord` is unit-tested with recorded key data from each layout, and the layouts are checked by hand once per release.
 
@@ -72,7 +73,12 @@ The tech notes ask for keyboard layout tests (US, Brazilian ABNT2, and one AltGr
 3. Reload the page: the level is still there.
 4. Open a second tab: it says the level is open elsewhere and is read-only.
 
-Journey 1 is in `test-play.spec.ts`, 2 in `car-journey.spec.ts` (stage 17), 3 and 4 in `saving.spec.ts`. Journey 2 checks every entity and value by exporting the imported level again and comparing its `level.json` with the first export's.
+5. (v2) The pen draws an open path by clicks and drags, closes one on its first point, and continues an open path from its first end.
+6. (v2) The Pencil draws a stroke that closes near its start and one that doesn't, at each smoothness.
+7. (v2) A path's handle is dragged, a point is switched sharp and smooth, and a point is added on a curve.
+8. (v2) A rectangle's fill goes Solid to Linear, gets a stop, has its end handle dragged, and Ctrl+Z puts each back; a gradient survives save, reload, copy and paste.
+
+Journey 1 is in `test-play.spec.ts`, 2 in `car-journey.spec.ts` (stage 17), 3 and 4 in `saving.spec.ts`. 5 is in `pen-tool.spec.ts`, 6 in `pencil-tool.spec.ts`, 7 in `path-points.spec.ts`, 8 in `gradient-handles.spec.ts`; they run in Chromium, Firefox and WebKit like the rest. Journey 2 checks every entity and value by exporting the imported level again and comparing its `level.json` with the first export's.
 
 ## Guard tests (`tests/guards/`)
 
@@ -80,7 +86,7 @@ Each check that keeps an architecture rule (the type check, ESLint, dependency-c
 
 ## Speed tests
 
-Described in [performance.md](performance.md#targets-and-their-tests). They run on demand and before a stage closes, not on every commit, with `npm run test:performance`, and in CI only to catch a large slowdown.
+Described in [performance.md](performance.md#targets-and-their-tests), v2's four for a 2,000-point path among them. They run on demand and before a stage closes, not on every commit, with `npm run test:performance`, and in CI only to catch a large slowdown.
 
 ## In CI
 

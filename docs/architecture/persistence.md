@@ -110,7 +110,7 @@ export type ReadRefusal =
   | A PhysicsWorldComponent anywhere but the World, the World missing one of its components, a World shape that isn't a rectangle, or a BodyComponent or SurfaceComponent on the World | `damaged` |
   | An unknown component, or an unknown value inside one | `damaged` |
   | A value its value type refuses, such as an empty name or a scale of 0 | `damaged` |
-  | Over 100,000 entities, deeper than 256, more than 1,000 points in a shape or path | `overLimit` |
+  | Over 100,000 entities, deeper than 256, more than 1,000 points in a shape or 2,000 in a path | `overLimit` |
 
 - **The 256 MB limit is checked where the bytes are** (stage 2, standing yes, 2026-11-14), not by the reader: `read` takes data already parsed from JSON, so it can't count bytes, and measuring the level after each change would be slow. `LevelLimits` holds the number; the import worker counts the unpacked bytes and the save measures the text it already has, both in stage 12.
 - **The same reader** reads imports, the browser's saved level, the clipboard, the play copy in the worker and (v7) `.entity` files. So a damaged saved level and a damaged import fail the same way.

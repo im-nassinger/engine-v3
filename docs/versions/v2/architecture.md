@@ -2,7 +2,19 @@
 
 ## TL;DR
 
-**How v2 is built, approved by the owner on 2026-11-20** (Claude's draft). The tasks are in [tasks.md](tasks.md). v2 adds no new part and no new component. It adds: two tools, **`PenTool`** and **`PencilTool`**, each a class behind v1's tool contract; **`FillFieldType`** in place of `SolidFillFieldType` and **`PathPointFieldType`** for a path's Points; point editing on paths in the Select tool's `PointEditState`, with curve handles; **gradient handles** as a new Select tool state and overlay; and PixiJS's `FillGradient` for drawing. **Saved levels never change**: the path and the fill were stored in their v2 shape since v1. Every choice below is made under the standing yes and listed in [decisions.md](../../decisions.md) unless it names the owner. After v2 is built, its lasting parts move into [architecture/](../../architecture/README.md).
+**How v2 is built, approved by the owner on 2026-11-20** (Claude's draft). The tasks are in [tasks.md](tasks.md). v2 adds no new part and no new component. It adds: two tools, **`PenTool`** and **`PencilTool`**, each a class behind v1's tool contract; **`FillFieldType`** in place of `SolidFillFieldType` and **`PathPointFieldType`** for a path's Points; point editing on paths in the Select tool's `PointEditState`, with curve handles; **gradient handles** as a new Select tool state and overlay; and PixiJS's `FillGradient` for drawing. **Saved levels never change**: the path and the fill were stored in their v2 shape since v1. Every choice below is made under the standing yes and listed in [decisions.md](../../decisions.md) unless it names the owner. **v2 is built, and its lasting parts have moved into [architecture/](../../architecture/README.md)** (task 17, 2026-11-21), which is now where they are kept up to date. This file stays as the record of how v2 was planned and built, and is not updated any more:
+
+| Part of this file | Now in |
+|---|---|
+| The fill field type, the path point field type | [components-and-fields.md](../../architecture/core-model/components-and-fields.md#the-fill-v2) |
+| The pen, the Pencil, point editing on paths | [drawing-and-points.md](../../architecture/editor/drawing-and-points.md#the-pen-v2) |
+| Gradient handles, the tools and Space | [selection-and-tools.md](../../architecture/editor/selection-and-tools.md#gradient-handles-v2) |
+| The Fill's editor, the Points list | [inspector-and-entities.md](../../architecture/editor/inspector-and-entities.md#v2-the-fill-and-a-paths-points) |
+| Drawing a gradient, the gradient overlay | [adapters.md](../../architecture/adapters.md#gradients-v2) |
+| The split point limit | [persistence.md](../../architecture/persistence.md#reading-and-writing) |
+| The speed targets and their numbers | [performance.md](../../architecture/performance.md#targets-and-their-tests) |
+| The tests | [testing.md](../../architecture/testing.md) |
+| Where things live | [parts-and-folders.md](../../architecture/parts-and-folders.md) |
 
 ## What v1 already decided for v2
 
