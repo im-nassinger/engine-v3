@@ -3,6 +3,8 @@ import { VersionCounter } from '../../../core/events/index.ts';
 import type { LevelPointerInput, Tool, ToolContext, ToolKey } from '../Tool.ts';
 
 import { SelectionFrame } from './frame/SelectionFrame.ts';
+import { GradientDragState } from './states/GradientDragState.ts';
+import { GradientHandles } from './gradient/GradientHandles.ts';
 import type { DragReadout } from '../readout/DragReadout.ts';
 import { SelectionPicker } from './SelectionPicker.ts';
 import { IdleState } from './states/IdleState.ts';
@@ -13,8 +15,9 @@ import { PointPressState } from './states/PointPressState.ts';
 import type { SelectState, SelectStateHost } from './states/SelectState.ts';
 
 // Picks entities by click, Shift+click and the selection box, moves them by dragging, resizes one entity by
-// its handles and rotates it just outside a corner, goes into and out of groups by double-click, and edits
-// a polygon's or line's points after a double-click on it. It holds one state at a time.
+// its handles, rotates it just outside a corner and drags its gradient's handles, goes into and out of
+// groups by double-click, and edits a polygon's or line's points after a double-click on it. It holds one
+// state at a time.
 export class SelectTool implements Tool {
     readonly id = 'select';
     readonly preview = new VersionCounter();
@@ -39,6 +42,15 @@ export class SelectTool implements Tool {
         if (!isIdle || this.context === undefined) return undefined;
 
         return SelectionFrame.of(this.context.openLevel);
+    }
+
+    // The one selected entity's gradient handles, for the overlay: shown while nothing is dragged and
+    // during their own drag, hidden during other drags and point editing, as the frame's handles are.
+    get gradientHandles() {
+        const shows = this.state instanceof IdleState || this.state instanceof GradientDragState;
+        if (!shows || this.context === undefined) return undefined;
+
+        return GradientHandles.of(this.context.openLevel);
     }
 
     // The polygon or line whose points are being edited, with its selected points, for the overlay.

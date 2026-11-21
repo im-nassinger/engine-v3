@@ -30,6 +30,9 @@ export const MAX_POSITION = 11;
 // The farthest a radius dot can be from a centre, both kept between the limits above.
 export const MAX_RADIUS = MAX_POSITION - MIN_POSITION;
 
+// The smallest radius the editor sets, 1%, typed or dragged: a radius of 0 has no circle to show.
+export const MIN_EDITED_RADIUS = 0.01;
+
 // v1's default fill colour, which a fill switched on from None starts from.
 export const DEFAULT_FILL_COLOUR = '#4A90D9FF';
 

@@ -21,7 +21,7 @@ The tasks that build v2 (curves and gradients), in the orchestrator's format: ea
 - [x] 5. The gradient bar: add a stop by clicking, move one by dragging
   - Read: versions/v2/architecture.md#the-fills-editor
   - Done when: clicking the bar adds a stop with the colour already there, so the look doesn't change; dragging a stop is a live edit through the widened `FieldSlide`, one step on release, put back by Esc; the chosen stop stays chosen as the stops re-sort; tests pass
-- [ ] 6. Gradient handles on the level view
+- [x] 6. Gradient handles on the level view
   - Read: versions/v2/architecture.md#gradient-handles, design/level-view.md#v2-paths-and-gradient-handles
   - Done when: `GradientHandles.of`, `GradientDragState`, `moveGradientHandle`, `GradientHandleOverlay` with `planGradientHandles`, and `EditorGradientSource` are built; the handles show only in the cases the architecture lists; dragging one is one step, Shift keeps a linear gradient to 15° on screen, Esc puts it back; Node tests and a Playwright test (Solid to Linear, drag the end handle, Ctrl+Z) pass
 - [ ] 7. The path point field type and a path's Points list

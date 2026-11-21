@@ -104,3 +104,6 @@ export { resetComponent } from './entity-inspector/resetComponent.ts';
 export { setBodyMass } from './entity-inspector/setBodyMass.ts';
 export { setFieldValue, setFieldValueEach, setVectorAxis } from './entity-inspector/setFieldValue.ts';
 export type { Axis } from './entity-inspector/setFieldValue.ts';
+export { FillPlacement } from './fill/FillPlacement.ts';
+export { moveGradientHandle } from './fill/moveGradientHandle.ts';
+export type { GradientHandleRole } from './fill/moveGradientHandle.ts';

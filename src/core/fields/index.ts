@@ -12,6 +12,7 @@ export {
     MAX_POSITION,
     MAX_RADIUS,
     MAX_STOPS,
+    MIN_EDITED_RADIUS,
     MIN_POSITION,
     MIN_STOPS,
 } from './fill/Fill.ts';

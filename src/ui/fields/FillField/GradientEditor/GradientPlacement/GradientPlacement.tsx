@@ -1,6 +1,7 @@
 import {
     MAX_POSITION,
     MAX_RADIUS,
+    MIN_EDITED_RADIUS,
     MIN_POSITION,
     NumberFieldType,
     VectorFieldType,
@@ -23,10 +24,13 @@ export type GradientPlacementProps = {
 
 const SHOWN_AS_PERCENT = { unit: '%', displayScale: 100, precision: 1 } as const;
 const POSITION_TYPE = new VectorFieldType({ min: MIN_POSITION, max: MAX_POSITION });
-// The smallest radius kept, 1%: a radius of 0 has no circle to show.
-const MIN_RADIUS = 0.01;
 // A minimum alone, so Radius is typed rather than slid across 1% to 2,100%.
-const RADIUS = { key: 'radius', label: 'Radius', type: new NumberFieldType({ min: MIN_RADIUS }), ...SHOWN_AS_PERCENT };
+const RADIUS = {
+    key: 'radius',
+    label: 'Radius',
+    type: new NumberFieldType({ min: MIN_EDITED_RADIUS }),
+    ...SHOWN_AS_PERCENT,
+};
 
 // Where the gradient lies, in % of the entity's box: a linear one's Start and End, or a radial one's Centre
 // and Radius. Each typed box is one step; a value past its limits is kept at the limit.

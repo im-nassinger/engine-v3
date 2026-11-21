@@ -61,6 +61,7 @@ import { createGameWorker } from './createGameWorker.ts';
 import { createImportWorker } from './createImportWorker.ts';
 import { createTools } from './createTools.ts';
 import { EditorDrawingSource } from './EditorDrawingSource.ts';
+import { EditorGradientSource } from './EditorGradientSource.ts';
 import { EditorJointPreviewSource } from './EditorJointPreviewSource.ts';
 import { EditorSelectionSource } from './EditorSelectionSource.ts';
 import { PlayViewLink } from './PlayViewLink.ts';
@@ -295,6 +296,7 @@ export class EditorComposition {
         this.minimap.follow(this.session);
         this.levelView.showSelection(new EditorSelectionSource(this.session, this.tools));
         this.levelView.showDrawing(new EditorDrawingSource(this.tools));
+        this.levelView.showGradientHandles(new EditorGradientSource(this.session, this.tools));
         this.levelView.showJointPreview(new EditorJointPreviewSource(this.session, this.tools, this.mouse));
         // The editor lives as long as the page, so the keyboard, the pointer, the clipboard events, file drops,
         // the page's saving events, its visibility and test play's view are never disconnected.

@@ -15,3 +15,5 @@ export type { PickEntity, ToolServices } from './ToolController.ts';
 export { TOOL_KEYS } from './toolKeys.ts';
 export { JointTool, NOTHING_HERE } from './joint/JointTool.ts';
 export type { JointPreview } from './joint/JointTool.ts';
+export { GRADIENT_HANDLE_GRAB_PX, GradientHandles } from './select/gradient/GradientHandles.ts';
+export type { GradientHandle, GradientStopDot } from './select/gradient/GradientHandles.ts';

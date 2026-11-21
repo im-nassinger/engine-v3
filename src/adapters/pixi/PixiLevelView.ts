@@ -15,6 +15,7 @@ import {
     BoundsOverlay,
     CameraFrameOverlay,
     DrawingPreviewOverlay,
+    GradientHandleOverlay,
     GridOverlay,
     JointIconOverlay,
     JointPreviewOverlay,
@@ -22,7 +23,13 @@ import {
     PhysicsViewOverlay,
     SelectionOverlay,
 } from './overlays/index.ts';
-import type { DrawingSource, JointPreviewSource, OverlayScene, SelectionSource } from './overlays/index.ts';
+import type {
+    DrawingSource,
+    GradientSource,
+    JointPreviewSource,
+    OverlayScene,
+    SelectionSource,
+} from './overlays/index.ts';
 
 // Culling grows the visible area by this many screen pixels, so the editor's 1 px line around an unstyled
 // shape, which BoundsCache doesn't count, is never cut at the view's edge.
@@ -79,6 +86,8 @@ export class PixiLevelView {
     private readonly selectionOverlay = new SelectionOverlay();
     // In front of the selection, since a new shape is drawn over what is selected; the readout stays on top.
     private readonly drawingPreviewOverlay = new DrawingPreviewOverlay();
+    // Over the selection's frame, since a gradient handle is pressed before a frame handle under it.
+    private readonly gradientHandleOverlay = new GradientHandleOverlay();
     // Over everything, so nothing of the level shows on Fixed size's black bars.
     private readonly letterboxOverlay = new LetterboxOverlay();
     // The view through the camera during play. The editor's ViewState is left as it was, so leaving play
@@ -91,6 +100,8 @@ export class PixiLevelView {
     private stopFollowingDrawing: Unsubscribe | undefined;
     private jointPreview: JointPreviewSource | undefined;
     private stopFollowingJointPreview: Unsubscribe | undefined;
+    private gradient: GradientSource | undefined;
+    private stopFollowingGradient: Unsubscribe | undefined;
     private readonly stopListening: Unsubscribe[] = [];
     private stopListeningToLevel: Unsubscribe | undefined;
     private stopFollowing: Unsubscribe | undefined;
@@ -115,6 +126,7 @@ export class PixiLevelView {
             this.jointIconOverlay.graphics,
             this.drawingPreviewOverlay.graphics,
             this.selectionOverlay.container,
+            this.gradientHandleOverlay.graphics,
             this.letterboxOverlay.graphics,
         );
         this.applyViewMatrix();
@@ -163,6 +175,7 @@ export class PixiLevelView {
             jointPreview: this.jointPreviewOverlay,
             selection: this.selectionOverlay,
             drawingPreview: this.drawingPreviewOverlay,
+            gradientHandles: this.gradientHandleOverlay,
             letterbox: this.letterboxOverlay,
         };
     }
@@ -261,6 +274,14 @@ export class PixiLevelView {
         this.markDirty();
     }
 
+    // Draws the Select tool's gradient handles from now on, and again each time they change. Play shows none.
+    showGradientHandles(source: GradientSource | undefined) {
+        this.stopFollowingGradient?.();
+        this.gradient = source;
+        this.stopFollowingGradient = source?.subscribe(() => this.markDirty());
+        this.markDirty();
+    }
+
     // Shows the level through the camera from now on, as Fixed size does: the camera's box fills the
     // window one way, centred, with black bars the other way. Selection, handles, previews, joint icons
     // and the level bounds' edge and label aren't drawn; the grid, camera frame and physics view follow their switches.
@@ -319,6 +340,9 @@ export class PixiLevelView {
         this.stopFollowingJointPreview?.();
         this.stopFollowingJointPreview = undefined;
         this.jointPreview = undefined;
+        this.stopFollowingGradient?.();
+        this.stopFollowingGradient = undefined;
+        this.gradient = undefined;
 
         this.display?.dispose();
         this.display = undefined;
@@ -414,6 +438,7 @@ export class PixiLevelView {
             this.jointPreviewOverlay.update(scene, undefined);
             this.drawingPreviewOverlay.update(scene, undefined);
             this.selectionOverlay.update(scene, undefined);
+            this.gradientHandleOverlay.update(scene, undefined);
             return;
         }
 
@@ -422,6 +447,7 @@ export class PixiLevelView {
         this.jointPreviewOverlay.update(scene, this.jointPreview);
         this.drawingPreviewOverlay.update(scene, this.drawing);
         this.selectionOverlay.update(scene, this.selection);
+        this.gradientHandleOverlay.update(scene, this.gradient);
     }
 
     private render() {

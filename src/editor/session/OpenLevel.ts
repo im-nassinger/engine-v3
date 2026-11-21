@@ -49,6 +49,8 @@ export class OpenLevel {
     readonly liveEdit: LiveEdit;
     readonly messages: EditorMessages;
     readonly entityInspector: EntityInspectorModel;
+    // The session's, so the gradient handles show only while the StyleComponent's card is unfolded.
+    readonly cardFolds: CardFolds;
     // What is under the mouse, for the tools.
     readonly hitTester: HitTester;
     // Names this opening of the level in what it copies, so a paste can tell whether its links to entities
@@ -58,6 +60,7 @@ export class OpenLevel {
     constructor(level: Level, services: OpenLevelServices) {
         this.level = level;
         this.registry = services.registry;
+        this.cardFolds = services.cardFolds;
         this.caches = new DerivedCaches(level);
         this.selection = new Selection(level);
         this.currentGroup = new CurrentGroup(level);

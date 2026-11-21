@@ -3,6 +3,8 @@ import { READ_ONLY_REASON } from '../../../history/index.ts';
 import type { LevelPointerInput } from '../../Tool.ts';
 
 import { SelectionFrame } from '../frame/SelectionFrame.ts';
+import { GradientDragState } from './GradientDragState.ts';
+import { GradientHandles } from '../gradient/GradientHandles.ts';
 import { EntityResize } from '../resize/EntityResize.ts';
 
 import { doubleClick } from './doubleClick.ts';
@@ -11,7 +13,7 @@ import { ResizeState } from './ResizeState.ts';
 import { RotateState } from './RotateState.ts';
 import type { SelectState, SelectStateHost } from './SelectState.ts';
 
-// Nothing held. A left press on a handle starts a ResizeState, just outside a corner a RotateState,
+// Nothing held. A left press on a gradient handle starts a GradientDragState, on a frame handle a ResizeState, just outside a corner a RotateState,
 // elsewhere a PressState; a double-click is answered at once.
 export class IdleState implements SelectState {
     private readonly host: SelectStateHost;
@@ -28,7 +30,7 @@ export class IdleState implements SelectState {
             return;
         }
 
-        if (this.startsResize(input) || this.startsRotate(input)) return;
+        if (this.startsGradientDrag(input) || this.startsResize(input) || this.startsRotate(input)) return;
 
         const target = this.host.picker.targetAt(input.levelPosition);
         const { selection } = this.host.context.openLevel;
@@ -50,6 +52,20 @@ export class IdleState implements SelectState {
 
     cancel() {
         return false;
+    }
+
+    // A gradient handle is in front of the frame's handles and the entities.
+    private startsGradientDrag(input: LevelPointerInput) {
+        const { openLevel, view } = this.host.context;
+        const gradient = GradientHandles.of(openLevel);
+        const role = gradient?.handleAt(input.levelPosition, view.zoom);
+        if (gradient === undefined || role === undefined || openLevel.liveEdit.isActive) return false;
+
+        if (!openLevel.liveEdit.begin([GradientDragState.fillTarget(gradient)])) return this.refusedAsReadOnly();
+
+        this.host.goTo(new GradientDragState(this.host, gradient, role, input.levelPosition));
+
+        return true;
     }
 
     // A handle is in front of everything, so a press on one resizes at once.

@@ -26,3 +26,8 @@ export type { DrawnJointPreview } from './joint-preview/JointPreviewOverlay.ts';
 export { planJointPreview } from './joint-preview/planJointPreview.ts';
 export type { JointPreviewCaches, JointPreviewPlan } from './joint-preview/planJointPreview.ts';
 export type { JointPreviewSource, ShownJointPreview } from './joint-preview/JointPreviewSource.ts';
+export { GradientHandleOverlay } from './gradient/GradientHandleOverlay.ts';
+export type { DrawnGradientHandles } from './gradient/GradientHandleOverlay.ts';
+export { EDGE_STEPS, planGradientHandles } from './gradient/planGradientHandles.ts';
+export type { GradientHandlesPlan, PlannedDot, ScreenMapping } from './gradient/planGradientHandles.ts';
+export type { GradientSource, ShownGradient, ShownGradientDot, ShownGradientEdge } from './gradient/GradientSource.ts';
