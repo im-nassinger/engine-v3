@@ -6,7 +6,7 @@ import { IconButton } from '../../../../shared/index.ts';
 import { ColourBox } from '../../../ColourBox/index.ts';
 import type { FieldSlideHandlers, FieldSubject } from '../../../FieldProps.ts';
 import { NumberField } from '../../../NumberField/index.ts';
-import { innerFieldOf, innerPropsOf } from '../../inner-fields/innerField.ts';
+import { innerFieldOf, innerPropsOf } from '../../../inner-fields/innerField.ts';
 import { GradientRow } from '../GradientRow/index.ts';
 
 export type StopEditorProps = {

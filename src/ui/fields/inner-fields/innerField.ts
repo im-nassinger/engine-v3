@@ -1,8 +1,8 @@
-import type { AnyFieldDefinition } from '../../../../core/components/index.ts';
-import type { FieldType, Unit } from '../../../../core/fields/index.ts';
-import type { Point } from '../../../../core/geometry/index.ts';
-import type { FieldModel } from '../../../../editor/entity-inspector/index.ts';
-import type { FieldProps, FieldSubject } from '../../FieldProps.ts';
+import type { AnyFieldDefinition } from '../../../core/components/index.ts';
+import type { FieldType, Unit } from '../../../core/fields/index.ts';
+import type { Point } from '../../../core/geometry/index.ts';
+import type { FieldModel } from '../../../editor/entity-inspector/index.ts';
+import type { FieldProps, FieldSubject } from '../FieldProps.ts';
 
 export type InnerFieldOptions = {
     readonly key: string;
@@ -13,8 +13,9 @@ export type InnerFieldOptions = {
     readonly precision?: number;
 };
 
-// A part of the Fill shown with another field's control, such as a stop's Place with the number field's
-// slider: a field of its own, named after the part, greyed when the Fill is.
+// A part of a field shown with another field's control, such as a gradient stop's Place with the number
+// field's slider or a path point's Handle in with the vector's: a field of its own, named after the part,
+// greyed when its field is.
 export function innerFieldOf(field: FieldModel, options: InnerFieldOptions, value: unknown): FieldModel {
     const { key, ...shown } = options;
     const definition: AnyFieldDefinition = {

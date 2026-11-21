@@ -169,18 +169,29 @@ describe('EntityInspectorModel: fields', () => {
         expect(requireField(requireCard(model, 'ShapeComponent'), 'kind').value).toBe(MIXED);
     });
 
-    test("a derived field without a write and the World's Kind are read-only", () => {
-        const { level, selection, model } = buildModel();
+    test("the World's Kind and a Rope's Points are read-only, and a drawn path's Points are writable", () => {
+        const { level, crate, selection, model } = buildModel();
         const rope = level.createEntity(level.world, 0);
         rope.addComponent(new TransformComponent());
         rope.addComponent(new NameComponent({ name: 'Rope' }));
         rope.addComponent(new PathComponent());
+        rope.addComponent(new JointComponent({ ...JointComponent.schema.defaults(), a: crate.id }));
+        const drawn = level.createEntity(level.world, 0);
+        drawn.addComponent(new TransformComponent());
+        drawn.addComponent(new NameComponent({ name: 'Path 1' }));
+        drawn.addComponent(new PathComponent());
 
         selection.replace([level.world.id]);
         expect(requireField(requireCard(model, 'ShapeComponent'), 'kind').isReadOnly).toBe(true);
         expect(requireField(requireCard(model, 'ShapeComponent'), 'width').isReadOnly).toBe(false);
 
         selection.replace([rope.id]);
+        expect(requireField(requireCard(model, 'PathComponent'), 'points').isReadOnly).toBe(true);
+
+        selection.replace([drawn.id]);
+        expect(requireField(requireCard(model, 'PathComponent'), 'points').isReadOnly).toBe(false);
+
+        selection.replace([rope.id, drawn.id]);
         expect(requireField(requireCard(model, 'PathComponent'), 'points').isReadOnly).toBe(true);
     });
 

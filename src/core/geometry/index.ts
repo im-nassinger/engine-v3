@@ -9,6 +9,8 @@ export { MassProperties } from './pieces/MassProperties.ts';
 export { Matrix2D } from './Matrix2D.ts';
 export type { PathCorner, PathGeometry, PathPoint } from './PathGeometry.ts';
 export { pathBox } from './path/pathBox.ts';
+export { oppositeHandle, smoothHandles } from './path/smoothHandles.ts';
+export type { PointHandles } from './path/smoothHandles.ts';
 export type { Point } from './Point.ts';
 export { PolygonLibrary } from './pieces/PolygonLibrary.ts';
 export type { ShapeGeometry, ShapeKind } from './ShapeGeometry.ts';

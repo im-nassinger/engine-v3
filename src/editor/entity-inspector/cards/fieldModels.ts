@@ -13,7 +13,7 @@ import { BodyMass, mergesInto } from '../../../core/physics/index.ts';
 import type { BodyMassCaches } from '../../../core/physics/index.ts';
 
 import type { FieldModel, MassRow } from '../model/CardModel.ts';
-import { isWorldsKind } from '../rules/componentRules.ts';
+import { isFixedOn } from '../rules/componentRules.ts';
 
 import { sameOrMixed, sharedAxes, valuesOf } from './componentValues.ts';
 
@@ -109,7 +109,7 @@ function derivedFieldModel(
     const value = sameOrMixed(readValues, (first, second) => derived.type.equals(first, second));
 
     const hasWrite = derived.write !== undefined;
-    const isFixedOnSomeEntity = held.entities.some((entity) => isWorldsKind(entity, held.schema, derived.key));
+    const isFixedOnSomeEntity = held.entities.some((entity) => isFixedOn(entity, held.schema, derived.key));
     const isReadOnly = !hasWrite || isFixedOnSomeEntity;
 
     return { kind: 'derived', definition: derived, value, isEnabled: true, isReadOnly };

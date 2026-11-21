@@ -1,0 +1,56 @@
+.path-point-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+
+    > .point {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-4);
+        min-width: 0;
+
+        > .number {
+            flex: 0 0 18px;
+            color: var(--faint);
+            line-height: var(--row);
+            text-align: right;
+        }
+
+        > .fold,
+        > .no-fold {
+            display: flex;
+            flex: 0 0 14px;
+            align-items: center;
+            justify-content: center;
+            height: var(--row);
+            padding: 0;
+            border: none;
+            background: none;
+            color: var(--muted);
+        }
+
+        > .fold {
+            cursor: pointer;
+
+            &:hover {
+                color: var(--text);
+            }
+
+            &:focus-visible {
+                outline: 1px solid var(--accent);
+                outline-offset: 1px;
+            }
+        }
+
+        > .position {
+            flex: 1;
+            min-width: 0;
+        }
+
+        > .corner {
+            flex: 0 0 92px;
+            min-width: 0;
+        }
+    }
+}

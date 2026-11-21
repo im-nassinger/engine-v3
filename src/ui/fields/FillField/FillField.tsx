@@ -5,7 +5,7 @@ import { ChoiceField } from '../ChoiceField/index.ts';
 import { ColourBox } from '../ColourBox/index.ts';
 import type { FieldProps } from '../FieldProps.ts';
 import { GradientEditor } from './GradientEditor/index.ts';
-import { innerFieldOf, innerPropsOf } from './inner-fields/innerField.ts';
+import { innerFieldOf, innerPropsOf } from '../inner-fields/innerField.ts';
 import './FillField.css';
 
 const KIND_TYPE = new ChoiceFieldType<FillKind>([

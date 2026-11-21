@@ -28,6 +28,7 @@ export { NumberFieldType } from './field-types/NumberFieldType.ts';
 export type { NumberFieldOptions } from './field-types/NumberFieldType.ts';
 export type { ParseOutcome, ParseProblem } from './ParseOutcome.ts';
 export { mixedColour } from './fill/mixedColour.ts';
+export { PathPointFieldType } from './field-types/PathPointFieldType.ts';
 export { PathGeometryValue } from './values/PathGeometryValue.ts';
 export { isPlainObject } from './rawChecks.ts';
 export { ShapeGeometryValue } from './values/ShapeGeometryValue.ts';

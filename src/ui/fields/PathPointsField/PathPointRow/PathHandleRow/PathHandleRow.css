@@ -1,0 +1,28 @@
+/* Its label sits in the card's label column, indented under the point's row. */
+.path-handle-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-8);
+    min-height: var(--row);
+
+    > .label {
+        box-sizing: border-box;
+        flex: 0 0 var(--label);
+        overflow: hidden;
+        padding-left: var(--space-14);
+        color: var(--muted);
+        line-height: var(--row);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    > .value {
+        flex: 1;
+        min-width: 0;
+
+        > .none {
+            color: var(--muted);
+            line-height: var(--row);
+        }
+    }
+}

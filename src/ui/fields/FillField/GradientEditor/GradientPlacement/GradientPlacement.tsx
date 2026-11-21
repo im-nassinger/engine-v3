@@ -12,7 +12,7 @@ import type { FieldModel } from '../../../../../editor/entity-inspector/index.ts
 import type { FieldSubject } from '../../../FieldProps.ts';
 import { NumberField } from '../../../NumberField/index.ts';
 import { VectorField } from '../../../VectorField/index.ts';
-import { innerFieldOf, innerPropsOf } from '../../inner-fields/innerField.ts';
+import { innerFieldOf, innerPropsOf } from '../../../inner-fields/innerField.ts';
 import { GradientRow } from '../GradientRow/index.ts';
 
 export type GradientPlacementProps = {

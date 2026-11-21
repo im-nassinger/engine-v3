@@ -1,0 +1,22 @@
+.path-points-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    &[data-mixed='true'] {
+        color: var(--muted);
+        font-style: italic;
+        line-height: var(--row);
+    }
+
+    > .count {
+        color: var(--muted);
+        line-height: var(--row);
+    }
+
+    /* The rows reach back under the field's label, so a row has the card's whole width, as the design draws it. */
+    > .rows {
+        width: calc(100% + var(--label) + var(--space-8));
+        margin-left: calc(-1 * (var(--label) + var(--space-8)));
+    }
+}

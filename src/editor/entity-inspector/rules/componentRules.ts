@@ -2,6 +2,7 @@ import {
     BodyComponent,
     CameraComponent,
     JointComponent,
+    PathComponent,
     PhysicsWorldComponent,
     ShapeComponent,
     SurfaceComponent,
@@ -63,9 +64,15 @@ export function resetAvailability(schema: AnyComponentSchema) {
     return AVAILABLE;
 }
 
-// The World's rectangle is the level bounds, so its kind is always rectangle.
-export function isWorldsKind(entity: Entity, schema: AnyComponentSchema, key: string) {
+// A field the Entity inspector shows read-only on this entity though it can be written elsewhere: the World's
+// Kind, since its rectangle is the level bounds, and a Rope's or Spring's Points, since the joint rewrites
+// its path every time an end moves.
+export function isFixedOn(entity: Entity, schema: AnyComponentSchema, key: string) {
     const isKind = isSchemaOf(schema, ShapeComponent) && key === 'kind';
+    if (isKind) return isWorld(entity);
 
-    return isKind && isWorld(entity);
+    const isPathPoints = isSchemaOf(schema, PathComponent) && key === 'points';
+    if (isPathPoints) return entity.hasComponent(JointComponent);
+
+    return false;
 }

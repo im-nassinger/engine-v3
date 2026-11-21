@@ -4,7 +4,8 @@ import type { FieldModel } from '../../../editor/entity-inspector/index.ts';
 
 const MIXED_TEXT = 'Mixed';
 
-// A number rounded like a field shows it, with its unit; a choice by its option's label.
+// A number rounded like a field shows it, with its unit; a choice by its option's label; a list, such as a
+// Rope's Points, by how many items it holds.
 export function readOnlyText(field: FieldModel) {
     const { value, definition } = field;
     if (value === MIXED) return { text: MIXED_TEXT, unit: undefined, isMixed: true };
@@ -15,6 +16,8 @@ export function readOnlyText(field: FieldModel) {
 
         return { text, unit: definition.unit, isMixed: false };
     }
+
+    if (Array.isArray(value)) return { text: String(value.length), unit: undefined, isMixed: false };
 
     const choiceLabel = choiceLabelOf(field, value);
     const text = choiceLabel ?? String(value);
