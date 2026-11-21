@@ -27,7 +27,7 @@ The tasks that build v2 (curves and gradients), in the orchestrator's format: ea
 - [x] 7. The path point field type and a path's Points list
   - Read: versions/v2/architecture.md#the-path-point-field-type-and-the-points-list, design/controls.md#v2-the-pen-the-pencil-and-gradients
   - Done when: `PathPointFieldType` is built; the PathComponent's Points is a writable list of 2 to 2,000 path points, refusing a closed path under 3, and read-only on a Rope's or Spring's path; `PathPointRow` shows as the design draws it; the list is virtual above 100 rows; choosing a corner gives or drops handles through `smoothHandles`; tests pass
-- [ ] 8. The pen draws a new path
+- [x] 8. The pen draws a new path
   - Read: versions/v2/architecture.md#the-pen, requirements/drawing.md#the-bézier-pen--v2
   - Done when: `PenTool` and its states and the `createPath` edit are built: clicks, drags, Alt, Space and Shift during a drag, snapping, closing on the first point, every way of finishing, Ctrl+Z and Backspace, the 2,001st point refused; the new path is one step, named `Path 1`, and selected; Node tests through `toolTestSession` pass
 - [ ] 9. The pen on the page

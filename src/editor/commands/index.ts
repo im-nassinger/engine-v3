@@ -15,6 +15,8 @@ export { CommandRegistry } from './CommandRegistry.ts';
 export { createCommandRegistry } from './createCommandRegistry.ts';
 export { createShape } from './draw/createShape.ts';
 export type { CreateShapeOutcome, ShapeDrawing } from './draw/createShape.ts';
+export { createPath } from './draw/createPath.ts';
+export type { CreatePathOutcome } from './draw/createPath.ts';
 export { DeleteCommand } from './edit/DeleteCommand.ts';
 export {
     DAMAGED_FILE_NAME,

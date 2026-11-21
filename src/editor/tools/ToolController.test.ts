@@ -97,6 +97,20 @@ describe('ToolController', () => {
         expect(session.openLevel.history.undoCount).toBe(0);
     });
 
+    test('while a tool’s button is down it hears Space first, and Space pans when the tool leaves it', () => {
+        const { controller, select, pan } = buildToolTestSession();
+
+        controller.pointerDown(pointerAt({ x: 100, y: 100 }));
+        select.usedKeys.add('Space');
+        expect(controller.keyDown(SPACE)).toBe(true);
+        expect(pan.isSpaceHeld).toBe(false);
+
+        select.usedKeys.clear();
+        controller.keyDown({ ...SPACE, repeat: true });
+        expect(pan.isSpaceHeld).toBe(true);
+        expect(select.heard).toEqual(['activate', 'down left', 'keyDown Space', 'keyDown Space']);
+    });
+
     test('a held Space repeating stays used, so the page never scrolls', () => {
         const { controller } = buildToolTestSession();
 

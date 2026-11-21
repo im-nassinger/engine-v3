@@ -91,9 +91,9 @@ export function toolKey(code: string, key: string): ToolKey {
     return { code, key, ctrl: false, shift: false, alt: false, repeat: false };
 }
 
-// A level with a group holding a square, a session with an 800 x 600 view, and Select and Shape as
-// recording tools.
-export function buildToolTestSession() {
+// A level with a group holding a square, a session with an 800 x 600 view, and the tools given under one
+// controller, with Select active. Screen and level positions are the same.
+export function buildSessionWithTools(tools: readonly Tool[], snapper: Snapper = NO_SNAPPING) {
     const level = Level.createNew();
     const group = level.createEntity(level.world, 0);
     group.addComponent(new TransformComponent());
@@ -107,20 +107,26 @@ export function buildToolTestSession() {
     session.view.setSize(800, 600);
     const commands = createCommandRegistry(session);
 
-    const select = new RecordingTool('select');
-    const shape = new RecordingTool('shape');
     const pan = new PanGesture(session.view);
     const services = {
         get openLevel() {
             return session.openLevel;
         },
         view: session.view,
-        snapper: NO_SNAPPING,
+        snapper,
         commands,
         status: session.status,
         reader: session.reader,
     };
-    const controller = new ToolController([select, shape], services, pan);
+    const controller = new ToolController(tools, services, pan);
 
-    return { level, group, square, session, commands, select, shape, pan, controller };
+    return { level, group, square, session, commands, pan, controller };
+}
+
+// buildSessionWithTools with Select and Shape as recording tools.
+export function buildToolTestSession() {
+    const select = new RecordingTool('select');
+    const shape = new RecordingTool('shape');
+
+    return { ...buildSessionWithTools([select, shape]), select, shape };
 }

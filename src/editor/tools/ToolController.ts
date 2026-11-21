@@ -140,9 +140,12 @@ export class ToolController {
         this.current.pointerUp(input);
     }
 
-    // Space pans; a held Space repeating is still used, so the page never scrolls.
+    // Space pans; a held Space repeating is still used, so the page never scrolls. While a tool's button
+    // is down the tool hears Space first, so the pen can move the point it is placing.
     keyDown(key: ToolKey) {
         if (key.code === SPACE_CODE) {
+            if (this.toolButtons.size > 0 && this.current.keyDown(key)) return true;
+
             this.pan.spaceDown();
             return true;
         }
