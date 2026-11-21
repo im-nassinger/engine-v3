@@ -117,3 +117,50 @@ test('the pen’s button picks it, and a click on the first point closes the pat
     await click(page, offset(middle, 0, 20));
     await expect(entityRow(page, 'Path 1')).toHaveAttribute('aria-selected', 'true');
 });
+
+test('picked with an open path selected, the pen continues it from either end and closes it on the other', async ({
+    page,
+}) => {
+    await openEditor(page);
+    const middle = await levelMiddle(page);
+    const firstEnd = offset(middle, -100, 0);
+    const lastEnd = offset(middle, 100, 0);
+    const pointCount = pathCard(page).locator('.path-points-field .count');
+
+    await page.mouse.move(middle.x, middle.y);
+    await page.keyboard.press('4');
+    await click(page, firstEnd);
+    await click(page, lastEnd);
+    await page.keyboard.press('Enter');
+    await expect(pointCount).toHaveText('2');
+
+    // From the first end: one step, and Ctrl+Z puts the path back as it was.
+    await page.keyboard.press('4');
+    await expect(entityRow(page, 'Path 1')).toHaveAttribute('aria-selected', 'true');
+    await click(page, firstEnd);
+    await click(page, offset(middle, -100, 100));
+    await page.keyboard.press('Enter');
+    await expect(toolButton(page, 'Select')).toHaveAttribute('aria-pressed', 'true');
+    await expect(pointCount).toHaveText('3');
+    await page.keyboard.press('Control+z');
+    await expect(pointCount).toHaveText('2');
+
+    // From the last end, Ctrl+Z while drawing stops at the path's own points; a press on the first end closes it.
+    await page.keyboard.press('4');
+    await click(page, lastEnd);
+    await click(page, offset(middle, 200, 200));
+    await page.keyboard.press('Control+z');
+    await page.keyboard.press('Control+z');
+    await click(page, offset(middle, 0, -100));
+    await click(page, firstEnd);
+    await expect(toolButton(page, 'Select')).toHaveAttribute('aria-pressed', 'true');
+    await expect(entityRow(page, 'Path 1')).toHaveAttribute('aria-selected', 'true');
+    await expect(pointCount).toHaveText('3');
+    await expect(entityRow(page, 'Path 2')).toHaveCount(0);
+
+    // Closed, the path is filled, so a click inside it selects it.
+    await click(page, offset(middle, 200, -120));
+    await expect(entityRow(page, 'Path 1')).toHaveAttribute('aria-selected', 'false');
+    await click(page, offset(middle, 0, -30));
+    await expect(entityRow(page, 'Path 1')).toHaveAttribute('aria-selected', 'true');
+});

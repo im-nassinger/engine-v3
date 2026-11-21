@@ -29,6 +29,8 @@ export class PenIdleState implements PenState {
         if (input.button !== 'left') return;
 
         if (path === undefined) {
+            if (host.continueFrom(input.levelPosition)) return;
+
             this.startAt(input);
             return;
         }

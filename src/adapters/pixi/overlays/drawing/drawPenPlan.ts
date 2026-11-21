@@ -37,6 +37,9 @@ export type DrawnPath = {
     readonly handleDots: readonly Bounds[];
     readonly ring: Bounds | undefined;
     readonly closing: boolean;
+    // The kept open path's end rings, and how many are filled: the one under the mouse.
+    readonly endRings: readonly Bounds[];
+    readonly filledEndRings: number;
 };
 
 type ToScreen = (point: Point) => Point;
@@ -46,7 +49,9 @@ type ToScreen = (point: Point) => Point;
 export function drawPenPlan(graphics: Graphics, plan: PenPlan, toScreen: ToScreen): DrawnPath {
     drawCurves(graphics, plan, toScreen);
     const handleDots = drawHandles(graphics, plan, toScreen);
-    const ring = drawRing(graphics, plan, toScreen);
+    const ring = drawFirstRing(graphics, plan, toScreen);
+    const endRings = plan.endRings.map((end) => drawRing(graphics, toScreen(end.place), end.filled));
+    const filledEndRings = plan.endRings.filter((end) => end.filled).length;
     const points = drawPoints(graphics, plan, toScreen);
 
     return {
@@ -56,6 +61,8 @@ export function drawPenPlan(graphics: Graphics, plan: PenPlan, toScreen: ToScree
         handleDots,
         ring,
         closing: plan.closing,
+        endRings,
+        filledEndRings,
     };
 }
 
@@ -93,13 +100,18 @@ function drawHandles(graphics: Graphics, plan: PenPlan, toScreen: ToScreen) {
     });
 }
 
-function drawRing(graphics: Graphics, plan: PenPlan, toScreen: ToScreen) {
+function drawFirstRing(graphics: Graphics, plan: PenPlan, toScreen: ToScreen) {
     if (plan.ring === undefined) return undefined;
 
     const centre = toScreen(plan.ring);
+
+    return drawRing(graphics, centre, plan.closing);
+}
+
+function drawRing(graphics: Graphics, centre: Point, filled: boolean) {
     // The 12 px is the ring's outside; the stroke is centred on the circle.
     graphics.circle(centre.x, centre.y, (RING_PX - RING_WIDTH_PX) / 2);
-    if (plan.closing) {
+    if (filled) {
         graphics.fill({ color: ACCENT, alpha: RING_CLOSING_ALPHA });
     }
     graphics.stroke(RING);

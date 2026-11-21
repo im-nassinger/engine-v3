@@ -17,6 +17,8 @@ export { createShape } from './draw/createShape.ts';
 export type { CreateShapeOutcome, ShapeDrawing } from './draw/createShape.ts';
 export { createPath } from './draw/createPath.ts';
 export type { CreatePathOutcome } from './draw/createPath.ts';
+export { extendPath, extendRefusal } from './draw/extendPath.ts';
+export type { ExtendPathOutcome, ExtendPathRefusal } from './draw/extendPath.ts';
 export { DeleteCommand } from './edit/DeleteCommand.ts';
 export {
     DAMAGED_FILE_NAME,

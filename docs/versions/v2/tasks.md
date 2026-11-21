@@ -33,7 +33,7 @@ The tasks that build v2 (curves and gradients), in the orchestrator's format: ea
 - [x] 9. The pen on the page
   - Read: versions/v2/architecture.md#the-pen, design/level-view.md#v2-paths-and-gradient-handles, design/controls.md#v2-the-pen-the-pencil-and-gradients
   - Done when: the pen's button and key 4 pick it and it hides the Entity inspector; `planDrawing` draws `penDrawing` as the design's table says; the hint shows; a Playwright test draws an open path by clicks and drags and closes another on its first point
-- [ ] 10. The pen continues an open path
+- [x] 10. The pen continues an open path
   - Read: versions/v2/architecture.md#the-pen
   - Done when: picking the pen with one open path selected keeps it and shows rings on its ends; drawing from either end and closing on the other works, through `extendPath`, one step `Draw on Path 1`; Ctrl+Z stops at the path's own points; a Rope's or Spring's path and a locked group are refused; Node tests and a Playwright test pass
 - [ ] 11. Point editing on paths: points

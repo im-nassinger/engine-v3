@@ -26,17 +26,25 @@ export type PenPlan = {
     readonly ring: Point | undefined;
     // A press now, or the one in progress, closes the path: the ring fills at 25%.
     readonly closing: boolean;
+    // The ends of the open path the pen was picked with, each a 12 px ring, filled at 25% under the mouse.
+    readonly endRings: readonly PenEndRing[];
+};
+
+export type PenEndRing = {
+    readonly place: Point;
+    readonly filled: boolean;
 };
 
 export function planPen(pen: ShownPenPreview): PenPlan {
     const { points, next, placing, closing } = pen;
     const first = points[0];
     const last = points.at(-1);
+    const endRings = pen.ends.map((end) => ({ place: end.place, filled: end.underMouse }));
 
     if (first === undefined || last === undefined) {
         const marks = next === undefined ? [] : [{ place: next, isRound: false, isFilled: false }];
 
-        return { placed: [], making: [], marks, handles: [], ring: undefined, closing: false };
+        return { placed: [], making: [], marks, handles: [], ring: undefined, closing: false, endRings };
     }
 
     // While a point is added, the curve to it is the one being made; else the curve to the mouse, or the
@@ -55,6 +63,7 @@ export function planPen(pen: ShownPenPreview): PenPlan {
         handles: handlesOf(placing === undefined ? undefined : points[placing]),
         ring: placeOf(first),
         closing,
+        endRings,
     };
 }
 

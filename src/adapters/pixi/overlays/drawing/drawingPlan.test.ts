@@ -160,7 +160,7 @@ function smooth(x: number, y: number, handle: Point): PathPoint {
 }
 
 function pen(points: readonly PathPoint[], options: Partial<ShownPenPreview> = {}): ShownPenPreview {
-    return { points, next: undefined, placing: undefined, closing: false, ...options };
+    return { points, next: undefined, placing: undefined, closing: false, ends: [], ...options };
 }
 
 function requirePath(plan: DrawingPlan) {
@@ -170,6 +170,20 @@ function requirePath(plan: DrawingPlan) {
 }
 
 describe('planDrawing for the pen', () => {
+    test('a kept open path rings its two ends, the one under the mouse filled', () => {
+        const ends = [
+            { place: { x: 0, y: 0 }, underMouse: false },
+            { place: { x: 50, y: 0 }, underMouse: true },
+        ];
+        const path = requirePath(planDrawing(undefined, undefined, pen([], { ends })));
+
+        expect(path.endRings).toEqual([
+            { place: { x: 0, y: 0 }, filled: false },
+            { place: { x: 50, y: 0 }, filled: true },
+        ]);
+        expect(path.ring).toBeUndefined();
+    });
+
     test('before the first click, only the next point shows, as a square', () => {
         const path = requirePath(planDrawing(undefined, undefined, pen([], { next: { x: 5, y: 5 } })));
 

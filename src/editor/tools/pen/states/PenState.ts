@@ -29,6 +29,8 @@ export type PenStateHost = {
     isNearFirst(levelPosition: Point): boolean;
     // A read-only level or a locked group takes no new path; the status says why.
     refusesNewPath(): boolean;
+    // A press on an end of the open path the pen was picked with starts drawing from it. True when it did.
+    continueFrom(levelPosition: Point): boolean;
 };
 
 // A left press on the level view.

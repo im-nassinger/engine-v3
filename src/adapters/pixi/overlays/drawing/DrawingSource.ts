@@ -22,12 +22,20 @@ export type ShownPolygonPreview = {
 // ends with the point being placed, if one is. next is where a click adds the next point, or the first
 // point when closing is set. placing is the index of the point whose handles show: the one being placed,
 // or the first during the closing drag. closing is set when a press now, or the press or drag in progress,
-// closes the path.
+// closes the path. ends are the two ends of the open path the pen was picked with, before a press on one
+// continues it.
 export type ShownPenPreview = {
     readonly points: readonly PathPoint[];
     readonly next: Point | undefined;
     readonly placing: number | undefined;
     readonly closing: boolean;
+    readonly ends: readonly ShownPenEnd[];
+};
+
+// An end of a kept open path, ringed; its ring fills while it is under the mouse.
+export type ShownPenEnd = {
+    readonly place: Point;
+    readonly underMouse: boolean;
 };
 
 // What the drawing preview overlay reads: the Shape tool's or the pen's preview, when it is the active

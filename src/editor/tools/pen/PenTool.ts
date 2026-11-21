@@ -1,10 +1,13 @@
 import { VersionCounter } from '../../../core/events/index.ts';
 import type { PathGeometry, PathPoint, Point } from '../../../core/geometry/index.ts';
-import { createPath } from '../../commands/index.ts';
+import type { EntityId } from '../../../core/level/index.ts';
+import { createPath, extendPath } from '../../commands/index.ts';
 import { READ_ONLY_REASON } from '../../history/index.ts';
 import { angleLocked } from '../shape/polygonDrawing.ts';
 import type { LevelPointerInput, Modifiers, Tool, ToolContext, ToolKey } from '../Tool.ts';
 
+import { inStoredOrder, keptIdOf, keptPathOf, reversedPoints } from './penContinuing.ts';
+import type { ContinuedPath, KeptPath } from './penContinuing.ts';
 import { pointToLevel, withOpenEnds } from './penPoints.ts';
 import type { GroupSpace, PathInProgress } from './penPoints.ts';
 import { PenIdleState } from './states/PenIdleState.ts';
@@ -24,27 +27,46 @@ const MODIFIER_CODES = new Set(['ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight'
 // holds the point being placed at its end, or the first point as the closing drag reshapes it. next is
 // where a click adds the next point, or the first point when a press there would close the path; it is
 // undefined during a press or a drag, and before the mouse is over the level. placing is the index of the
-// point whose handles show: the one being placed, or the first during the closing drag.
+// point whose handles show: the one being placed, or the first during the closing drag. ends are the
+// two ends of the open path the pen was picked with, ringed until a press on one continues it.
 export type PenDrawing = {
     readonly points: readonly PathPoint[];
     readonly next: Point | undefined;
     readonly placing: number | undefined;
     readonly closing: boolean;
+    readonly ends: readonly PenEnd[];
+};
+
+// An end of a kept open path; a press on the one under the mouse continues the path from it.
+export type PenEnd = {
+    readonly place: Point;
+    readonly underMouse: boolean;
 };
 
 // What finishing does next: the controller selects the path and returns to Select, or the tool only keeps
 // it, for Esc and for deactivate, which the controller calls while it switches tools.
 type FinishWay = 'return' | 'keep';
 
+// Where a click would add the next point, and whether a press there would close the path.
+type NextPlace = {
+    readonly next: Point | undefined;
+    readonly closing: boolean;
+};
+
 // The Bézier pen: a click places a sharp point, a drag a smooth one with mirrored handles; a press on the
 // first point closes the path. Finishing runs createPath, one step, and the controller selects the path and
 // returns to Select unless the tool is locked. The drawing stays in the tool until then, in the current
-// group's own space.
+// group's own space. Picked with one open path selected, the pen keeps it and rings its ends: a press on
+// either continues it, and finishing runs extendPath, one step.
 export class PenTool implements Tool {
     readonly id = 'pen';
     readonly preview = new VersionCounter();
     private toolContext: ToolContext | undefined;
     private drawing: PathInProgress | undefined;
+    // The open path the pen was picked with, until a press elsewhere starts a new path.
+    private kept: EntityId | undefined;
+    // Set while the drawing continues the kept path.
+    private continued: ContinuedPath | undefined;
     private state: PenState;
     // The last mouse position heard, so Shift, Alt and Ctrl redraw without a move.
     private lastInput: LevelPointerInput | undefined;
@@ -63,7 +85,10 @@ export class PenTool implements Tool {
 
     activate(context: ToolContext) {
         this.toolContext = context;
-        context.openLevel.selection.clear();
+        this.kept = keptIdOf(context.openLevel);
+        if (this.kept === undefined) {
+            context.openLevel.selection.clear();
+        }
         context.status.show(PEN_HINT);
         this.goIdle();
     }
@@ -71,6 +96,7 @@ export class PenTool implements Tool {
     // A drag in progress drops the point being placed; the drawing is finished open and kept.
     deactivate() {
         this.finish('keep');
+        this.kept = undefined;
         this.lastInput = undefined;
         this.show(undefined);
     }
@@ -181,6 +207,7 @@ export class PenTool implements Tool {
             nextPlace: (levelPosition, modifiers, space) => this.nextPlace(levelPosition, modifiers, space),
             isNearFirst: (levelPosition) => this.isNearFirst(levelPosition),
             refusesNewPath: () => this.refusesNewPath(),
+            continueFrom: (levelPosition) => this.continueFrom(levelPosition),
         };
     }
 
@@ -200,25 +227,32 @@ export class PenTool implements Tool {
         const drawing = this.drawing;
         if (drawing === undefined) return;
 
+        const continued = this.continued;
         this.drawing = undefined;
+        this.continued = undefined;
         this.goIdle();
-        this.make({ closed: true, points: [first, ...drawing.points.slice(1)] }, 'return');
+        this.make({ closed: true, points: [first, ...drawing.points.slice(1)] }, 'return', continued);
     }
 
     // An open path needs 2 points; with fewer, nothing is made.
     private finish(way: FinishWay) {
         const drawing = this.drawing;
+        const continued = this.continued;
         this.drawing = undefined;
+        this.continued = undefined;
         this.goIdle();
         if (drawing === undefined || drawing.points.length < 2) return;
 
-        this.make({ closed: false, points: withOpenEnds(drawing.points) }, way);
+        this.make({ closed: false, points: withOpenEnds(drawing.points) }, way, continued);
     }
 
-    // Removing the only point ends the drawing with nothing made.
+    // Removing the only point ends the drawing with nothing made. A continued path's own points stay.
     private removeLastPoint() {
         const drawing = this.drawing;
         if (drawing === undefined) return;
+
+        const ownCount = this.continued?.ownCount ?? 0;
+        if (drawing.points.length <= ownCount) return;
 
         const points = drawing.points.slice(0, -1);
         this.drawing = points.length === 0 ? undefined : { points, space: drawing.space };
@@ -226,7 +260,12 @@ export class PenTool implements Tool {
     }
 
     // createPath selects the new path; 'return' also hands it to the controller.
-    private make(path: PathGeometry, way: FinishWay) {
+    private make(path: PathGeometry, way: FinishWay, continued: ContinuedPath | undefined) {
+        if (continued !== undefined) {
+            this.extend(path, way, continued);
+            return;
+        }
+
         const context = this.requireContext();
         const outcome = createPath(context.openLevel, context.reader, path);
         if (outcome.kind === 'refused') {
@@ -237,6 +276,75 @@ export class PenTool implements Tool {
         if (way === 'return') {
             context.finished([outcome.id]);
         }
+    }
+
+    // The path stays selected. Kept open, after Esc, its ends are ringed again.
+    private extend(path: PathGeometry, way: FinishWay, continued: ContinuedPath) {
+        const context = this.requireContext();
+        const { entity } = continued;
+        const stored = inStoredOrder(path, continued);
+        const outcome = extendPath(context.openLevel, entity, stored);
+        if (outcome.kind === 'refused') {
+            context.status.show(outcome.reason);
+            return;
+        }
+
+        if (way === 'return') {
+            context.finished([entity.id]);
+            return;
+        }
+
+        this.kept = keptIdOf(context.openLevel);
+        this.redraw();
+    }
+
+    // A press within 8 screen px of a kept path's end starts drawing from it, the nearer end when both
+    // are; the press adds no point. A press elsewhere lets the path go and starts a new one.
+    private continueFrom(levelPosition: Point) {
+        const kept = this.keptPath();
+        this.kept = undefined;
+        if (kept === undefined) return false;
+
+        const end = this.endUnder(kept, levelPosition);
+        if (end === undefined) return false;
+
+        const points = kept.path.points;
+        const reversed = end === 'first';
+        let drawnPoints = points;
+        if (reversed) {
+            drawnPoints = reversedPoints(points);
+        }
+        this.drawing = { points: drawnPoints, space: kept.space };
+        this.continued = { entity: kept.entity, ownCount: points.length, reversed };
+        this.redraw();
+
+        return true;
+    }
+
+    private keptPath(): KeptPath | undefined {
+        const kept = this.kept;
+        if (kept === undefined || this.toolContext === undefined) return undefined;
+
+        return keptPathOf(this.toolContext.openLevel, kept);
+    }
+
+    private endUnder(kept: KeptPath, levelPosition: Point) {
+        const first = kept.path.points[0];
+        const last = kept.path.points.at(-1);
+        if (first === undefined || last === undefined) return undefined;
+
+        const toFirst = this.screenDistance(kept.space.toLevel.apply(first), levelPosition);
+        const toLast = this.screenDistance(kept.space.toLevel.apply(last), levelPosition);
+        if (Math.min(toFirst, toLast) > CLOSE_PX) return undefined;
+        if (toLast <= toFirst) return 'last';
+
+        return 'first';
+    }
+
+    private screenDistance(from: Point, to: Point) {
+        const distance = Math.hypot(to.x - from.x, to.y - from.y);
+
+        return distance * this.requireContext().view.zoom;
     }
 
     // Snapped as a point, or with Shift at a multiple of 15° from the last point, unsnapped.
@@ -257,9 +365,8 @@ export class PenTool implements Tool {
         if (drawing === undefined || first === undefined) return false;
 
         const firstInLevel = drawing.space.toLevel.apply(first);
-        const distance = Math.hypot(levelPosition.x - firstInLevel.x, levelPosition.y - firstInLevel.y);
 
-        return distance * this.requireContext().view.zoom <= CLOSE_PX;
+        return this.screenDistance(firstInLevel, levelPosition) <= CLOSE_PX;
     }
 
     private refusesNewPath() {
@@ -312,20 +419,51 @@ export class PenTool implements Tool {
                 next: undefined,
                 placing: placed.length,
                 closing: false,
+                ends: [],
             };
         }
         if (placing?.kind === 'closing') {
-            return { points: toLevel([placing.first, ...placed.slice(1)]), next: undefined, placing: 0, closing: true };
+            const points = toLevel([placing.first, ...placed.slice(1)]);
+
+            return { points, next: undefined, placing: 0, closing: true, ends: [] };
         }
         if (this.state.isPressed) {
-            return { points: toLevel(placed), next: undefined, placing: undefined, closing: true };
+            return { points: toLevel(placed), next: undefined, placing: undefined, closing: true, ends: [] };
         }
 
-        return { points: toLevel(placed), ...this.nextOf(space), placing: undefined };
+        const ends = this.keptEnds();
+        const isOverEnd = ends.some((end) => end.underMouse);
+        let next: NextPlace = { next: undefined, closing: false };
+        if (!isOverEnd) {
+            next = this.nextOf(space);
+        }
+
+        return { points: toLevel(placed), ...next, placing: undefined, ends };
+    }
+
+    // The kept path's two ends in level positions, before a drawing starts.
+    private keptEnds(): readonly PenEnd[] {
+        if (this.drawing !== undefined) return [];
+
+        const kept = this.keptPath();
+        const first = kept?.path.points[0];
+        const last = kept?.path.points.at(-1);
+        if (kept === undefined || first === undefined || last === undefined) return [];
+
+        const mouse = this.lastInput?.levelPosition;
+        let under: 'first' | 'last' | undefined;
+        if (mouse !== undefined) {
+            under = this.endUnder(kept, mouse);
+        }
+
+        return [
+            { place: kept.space.toLevel.apply(first), underMouse: under === 'first' },
+            { place: kept.space.toLevel.apply(last), underMouse: under === 'last' },
+        ];
     }
 
     // Where a click would go now, or the first point when a press there would close the path.
-    private nextOf(space: GroupSpace) {
+    private nextOf(space: GroupSpace): NextPlace {
         const input = this.lastInput;
         const drawing = this.drawing;
         if (input === undefined) return { next: undefined, closing: false };

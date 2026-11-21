@@ -154,7 +154,7 @@ describe('DrawingPreviewOverlay', () => {
             handleOut: { x: 5, y: 0 },
             corner: 'smooth' as const,
         };
-        drawing.showPen({ points: [corner, placing], next: undefined, placing: 1, closing: false });
+        drawing.showPen({ points: [corner, placing], next: undefined, placing: 1, closing: false, ends: [] });
 
         for (const zoom of [0.25, 1, 8]) {
             view.zoomAboutMiddle(zoom);
