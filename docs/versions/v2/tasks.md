@@ -51,7 +51,7 @@ The tasks that build v2 (curves and gradients), in the orchestrator's format: ea
 - [x] 15. The rest of v2's Playwright journeys
   - Read: versions/v2/architecture.md#the-tests
   - Done when: every journey the architecture lists is in `tests/e2e/` and passes in Chromium, Firefox and WebKit, including a gradient kept through save, reload, copy and paste
-- [ ] 16. The speed tests for a 2,000-point path
+- [x] 16. The speed tests for a 2,000-point path
   - Read: versions/v2/architecture.md#the-tests, architecture/performance.md
   - Done when: the four tests are in `tests/performance/` on a level with one 2,000-point path among 10,000 entities; they meet their targets on this machine, or what misses and why is written in performance.md; the numbers are written in performance.md
 - [ ] 17. Close v2's docs
