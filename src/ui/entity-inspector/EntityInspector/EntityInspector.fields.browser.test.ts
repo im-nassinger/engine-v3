@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { BodyComponent, TransformComponent } from '../../../core/components/index.ts';
+import { BodyComponent, SurfaceComponent, TransformComponent } from '../../../core/components/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { Level } from '../../../core/level/index.ts';
 import type { EditorSession } from '../../../editor/session/index.ts';
@@ -369,11 +369,17 @@ describe('Entity inspector fields', () => {
         expect(undoLabel(session)).toBe('Change Linear damping');
     });
 
-    test('Mass is a read-only value with its unit', async () => {
-        await showCrate();
+    test('Mass is typed with its unit, and sets the density that gives it in one step', async () => {
+        const { crate, session } = await showCrate();
+        const mass = boxOf('BodyComponent', 'mass');
+        expect(mass.value).toBe('4');
+        expect(fieldRow('BodyComponent', 'mass').textContent).toContain('kg');
+        const density = crate.requireComponent(SurfaceComponent).get('density');
 
-        const mass = requireElement(fieldRow('BodyComponent', 'mass'), '.read-only-value');
-        expect(mass.textContent).toBe('4kg');
-        expect(fieldRow('BodyComponent', 'mass').querySelector('input')).toBeNull();
+        await typeInto(mass, '8');
+        await userEvent.keyboard('{Enter}');
+
+        await expect.poll(() => crate.requireComponent(SurfaceComponent).get('density')).toBe(density * 2);
+        expect(undoLabel(session)).toBe('Change Mass');
     });
 });
