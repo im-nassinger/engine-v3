@@ -48,7 +48,7 @@ The tasks that build v2 (curves and gradients), in the orchestrator's format: ea
 - [x] 14. The Pencil
   - Read: versions/v2/architecture.md#the-pencil, requirements/drawing.md#the-pencil--v2, design/controls.md#v2-the-pen-the-pencil-and-gradients
   - Done when: `PencilTool`, `PencilOptions` and the stroke's preview are built; key 5 and the button pick it; a release near the start closes the path; Esc drops a stroke; the smoothness is kept for the session; Node tests and a Playwright test (a closed and an open stroke at each smoothness) pass
-- [ ] 15. The rest of v2's Playwright journeys
+- [x] 15. The rest of v2's Playwright journeys
   - Read: versions/v2/architecture.md#the-tests
   - Done when: every journey the architecture lists is in `tests/e2e/` and passes in Chromium, Firefox and WebKit, including a gradient kept through save, reload, copy and paste
 - [ ] 16. The speed tests for a 2,000-point path
