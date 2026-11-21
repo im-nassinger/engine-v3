@@ -3,6 +3,8 @@ import { PlanarGeometry } from '../../../hit-testing/index.ts';
 
 // A point is hit within 6 screen px of its middle: the 8 px handle with a little room.
 export const POINT_HIT_PX = 6;
+// A selected point's handle is hit within 6 screen px of its 6 px dot's middle.
+export const HANDLE_HIT_PX = 6;
 // An edge is hit within 5 screen px, as a line's hit area.
 export const EDGE_HIT_PX = 5;
 

@@ -7,6 +7,7 @@ import { GradientDragState } from './states/GradientDragState.ts';
 import { GradientHandles } from './gradient/GradientHandles.ts';
 import type { DragReadout } from '../readout/DragReadout.ts';
 import { SelectionPicker } from './SelectionPicker.ts';
+import { HandleDragState } from './states/HandleDragState.ts';
 import { IdleState } from './states/IdleState.ts';
 import { PointBoxState } from './states/PointBoxState.ts';
 import type { PointEditing } from './states/PointEditing.ts';
@@ -140,10 +141,12 @@ export class SelectTool implements Tool {
     }
 }
 
-// Point editing goes on during a press or a box drag on its points.
+// Point editing goes on during a press or a box drag on its points, and a drag of a handle.
 function pointEditingOf(state: SelectState | undefined): PointEditing | undefined {
     if (state instanceof PointEditState) return state;
-    if (state instanceof PointPressState || state instanceof PointBoxState) return state.editing;
+    const isPointEditingDrag =
+        state instanceof PointPressState || state instanceof PointBoxState || state instanceof HandleDragState;
+    if (isPointEditingDrag) return state.editing;
 
     return undefined;
 }

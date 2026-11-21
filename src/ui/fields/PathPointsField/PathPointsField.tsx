@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { PathPointFieldType } from '../../../core/fields/index.ts';
 import type { PathPoint } from '../../../core/geometry/index.ts';
 import { ListItems, MIXED } from '../../../editor/entity-inspector/index.ts';
+import { useEditedPointIndexes } from '../../tools/index.ts';
 import type { FieldProps } from '../FieldProps.ts';
 import { PathPointRows } from './PathPointRows/index.ts';
 import type { PathPointRowsProps } from './PathPointRows/index.ts';
@@ -16,8 +17,11 @@ const POINT_TYPE = new PathPointFieldType();
 
 // A path's Points: their count, then a PathPointRow per point. Each typed position, handle or corner is
 // one step through the whole list, so the path's limits and its smooth points are kept by its write.
+// The rows of the points selected in the level view show as the blue pill and unfolded, and the list
+// scrolls to the first of them.
 export function PathPointsField({ field, subject, onCommit }: FieldProps) {
     const [unfolded, setUnfolded] = useState<ReadonlySet<number>>(new Set());
+    const selectedIndexes = useEditedPointIndexes(subject.entityIds);
 
     if (field.value === MIXED) {
         return (
@@ -39,7 +43,9 @@ export function PathPointsField({ field, subject, onCommit }: FieldProps) {
         field,
         subject,
         points,
-        unfolded,
+        unfolded: new Set([...unfolded, ...selectedIndexes]),
+        selected: new Set(selectedIndexes),
+        firstSelected: selectedIndexes[0],
         onToggleFold: toggleFold,
         onCommitPoint: commitPoint,
     };

@@ -23,14 +23,18 @@ export type PathPointRowProps = {
     point: PathPoint;
     index: number;
     isUnfolded: boolean;
+    // Selected in the level view: the blue pill.
+    isSelected: boolean;
     onToggleFold: (index: number) => void;
     onCommit: (index: number, point: PathPoint) => void;
 };
 
 // One point of a path: its number, a fold arrow, its position and its corner, and unfolded its Handle in
 // and Handle out. A sharp point has no handles, so no arrow. Choosing Sharp drops the handles, and Smooth
-// or Separate on a sharp point gives it some: the path's write does both.
-export function PathPointRow({ field, subject, point, index, isUnfolded, onToggleFold, onCommit }: PathPointRowProps) {
+// or Separate on a sharp point gives it some: the path's write does both. A point selected in the level
+// view is the blue pill.
+export function PathPointRow(props: PathPointRowProps) {
+    const { field, subject, point, index, isUnfolded, isSelected, onToggleFold, onCommit } = props;
     const number = index + 1;
     const hasHandles = point.corner !== 'sharp';
     const showsHandles = hasHandles && isUnfolded;
@@ -61,7 +65,7 @@ export function PathPointRow({ field, subject, point, index, isUnfolded, onToggl
     const handleRowProps = { field, subject, pointIndex: index };
 
     return (
-        <div className="path-point-row" data-index={index} data-unfolded={showsHandles}>
+        <div className="path-point-row" data-index={index} data-unfolded={showsHandles} data-selected={isSelected}>
             <div className="point">
                 <span className="number">{number}</span>
                 {hasHandles && <FoldButton number={number} isUnfolded={isUnfolded} onToggle={toggleFold} />}

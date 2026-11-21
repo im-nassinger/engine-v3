@@ -86,6 +86,8 @@ export { deletePoints } from './points/deletePoints.ts';
 export { editablePointsOf, isJointPath } from './points/editablePoints.ts';
 export type { EditablePoints, PointsKind } from './points/editablePoints.ts';
 export { nudgePoints } from './points/nudgePoints.ts';
+export { HandleMove } from './points/HandleMove.ts';
+export type { HandleMoveOptions, HandleSide } from './points/HandleMove.ts';
 export { PointsMove } from './points/PointsMove.ts';
 export { setCorner } from './points/setCorner.ts';
 export { RenameCommand } from './rename/RenameCommand.ts';

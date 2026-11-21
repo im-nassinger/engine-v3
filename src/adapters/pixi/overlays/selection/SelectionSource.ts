@@ -16,11 +16,13 @@ export type ShownReadout = {
 };
 
 // The polygon, line or path whose points are being edited: its points in level positions, each one's corner
-// (a polygon's and a line's all sharp), and the indexes of the selected ones.
+// (a polygon's and a line's all sharp), the indexes of the selected ones, and the selected points' curve
+// handles, each from its point to its end.
 export type ShownPoints = {
     readonly points: readonly Point[];
     readonly corners: readonly PathCorner[];
     readonly selected: readonly number[];
+    readonly handles: readonly (readonly [Point, Point])[];
 };
 
 // What the selection overlay reads, besides the level and its caches: the editor's selection and what the

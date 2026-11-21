@@ -7,6 +7,7 @@ export const OVERLAY_FONT = 'JetBrains Mono, monospace';
 export const OVERLAY_TEXT_PX = 12;
 
 const HANDLE_FILL = 0xffffff;
+const CURVE_HANDLE_LINE: StrokeStyle = { color: ACCENT, width: 1 };
 const HANDLE_CORNER_PX = 1.5;
 const HANDLE_EDGE_PX = 1.5;
 const HANDLE_EDGE: StrokeStyle = { color: ACCENT, width: HANDLE_EDGE_PX };
@@ -31,4 +32,27 @@ export function drawRoundPoint(
         .circle(centre.x, centre.y, (ROUND_POINT_PX - HANDLE_EDGE_PX) / 2)
         .fill(inside)
         .stroke(HANDLE_EDGE);
+}
+
+// A curve handle's end is a 6 px dot.
+export const HANDLE_DOT_PX = 6;
+
+type ScreenPoint = { readonly x: number; readonly y: number };
+
+// Curve handles as the level view's v2 table draws them: a 1 px accent line from each point to a 6 px
+// white dot with the handle's edge. In screen pixels.
+export function drawCurveHandles(graphics: Graphics, handles: readonly (readonly [ScreenPoint, ScreenPoint])[]) {
+    if (handles.length === 0) return;
+
+    for (const [from, to] of handles) {
+        graphics.moveTo(from.x, from.y).lineTo(to.x, to.y);
+    }
+    graphics.stroke(CURVE_HANDLE_LINE);
+
+    for (const [, end] of handles) {
+        graphics
+            .circle(end.x, end.y, (HANDLE_DOT_PX - HANDLE_EDGE_PX) / 2)
+            .fill(HANDLE_FILL)
+            .stroke(HANDLE_EDGE);
+    }
 }

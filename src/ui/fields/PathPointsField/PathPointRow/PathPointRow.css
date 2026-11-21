@@ -3,6 +3,16 @@
     flex-direction: column;
     gap: var(--space-4);
     min-width: 0;
+    border-radius: var(--radius);
+
+    /* The blue pill, as the Entities viewer's selected row. */
+    &[data-selected='true'] {
+        background: var(--accent-soft);
+
+        > .point > .number {
+            color: var(--accent-text);
+        }
+    }
 
     > .point {
         display: flex;

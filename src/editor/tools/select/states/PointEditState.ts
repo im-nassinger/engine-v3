@@ -1,12 +1,15 @@
 import type { Entity } from '../../../../core/level/index.ts';
 import type { Unsubscribe } from '../../../../core/events/index.ts';
-import { addPoint, deletePoints, nudgePoints, setCorner } from '../../../commands/index.ts';
+import { addPoint, deletePoints, HandleMove, nudgePoints, setCorner } from '../../../commands/index.ts';
 import type { CommandOutcome } from '../../../commands/index.ts';
+import { READ_ONLY_REASON } from '../../../history/index.ts';
 import type { LevelPointerInput, ToolKey } from '../../Tool.ts';
 import { EditedPoints } from '../points/EditedPoints.ts';
+import type { EditedHandle } from '../points/EditedPoints.ts';
 import type { EdgeHit } from '../points/PointHits.ts';
 import { pointNudgeOffset } from '../points/pointNudgeOffset.ts';
 
+import { HandleDragState } from './HandleDragState.ts';
 import { PointPressState } from './PointPressState.ts';
 import type { SelectState, SelectStateHost } from './SelectState.ts';
 
@@ -52,7 +55,14 @@ export class PointEditState implements SelectState {
 
         if (input.button !== 'left') return;
 
+        // A press hits a selected point's handle first, then a point, then an edge.
         const { zoom } = this.host.context.view;
+        const handle = this.points.handleAt(input.levelPosition, zoom);
+        if (handle !== undefined) {
+            this.dragHandle(handle, input);
+            return;
+        }
+
         const pointIndex = this.points.hits().pointAt(input.levelPosition, zoom);
 
         // An unselected point is selected on the press, so a drag moves it; a selected one narrows on release.
@@ -126,6 +136,22 @@ export class PointEditState implements SelectState {
         return this.host.goIdle();
     }
 
+    private dragHandle(handle: EditedHandle, input: LevelPointerInput) {
+        const { openLevel, status } = this.host.context;
+        const move = HandleMove.of(openLevel, this.points.entity, handle.index, handle.side);
+        if (!(move instanceof HandleMove)) {
+            status.show(move.reason);
+            return;
+        }
+
+        if (!openLevel.liveEdit.begin(move.targets)) {
+            status.show(READ_ONLY_REASON);
+            return;
+        }
+
+        this.host.goTo(new HandleDragState(this.host, this, move, input.levelPosition));
+    }
+
     private addPointOn(edge: EdgeHit) {
         const { openLevel, status } = this.host.context;
         const outcome = addPoint(openLevel, this.points.entity, edge.startIndex, edge.position);
@@ -173,11 +199,12 @@ export class PointEditState implements SelectState {
         this.host.context.status.show(outcome.reason);
     }
 
-    // Another entity under the mouse and not one of the edited shape's points: the press is the Select tool's.
+    // Another entity under the mouse and not one of the edited shape's points or handles: the press is the Select tool's.
     private pressesAnotherEntity(input: LevelPointerInput) {
         const { zoom } = this.host.context.view;
+        const isOnHandle = this.points.handleAt(input.levelPosition, zoom) !== undefined;
         const isOnPoint = this.points.hits().pointAt(input.levelPosition, zoom) !== undefined;
-        if (isOnPoint) return false;
+        if (isOnHandle || isOnPoint) return false;
 
         const { selectable } = this.host.picker.targetAt(input.levelPosition);
 

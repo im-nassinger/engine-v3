@@ -285,6 +285,7 @@ describe('SelectionOverlay', () => {
             ],
             corners: ['sharp', 'sharp', 'sharp'],
             selected: [1],
+            handles: [],
         };
         selection.select([shape], undefined);
 
@@ -313,6 +314,7 @@ describe('SelectionOverlay', () => {
             ],
             corners: ['sharp', 'smooth', 'separate'],
             selected: [1],
+            handles: [],
         };
         selection.select([shape], undefined);
         view.zoomAboutMiddle(2);
@@ -324,6 +326,32 @@ describe('SelectionOverlay', () => {
         expect(separate?.width).toBe(9);
         expect(drawn().roundPoints).toBe(2);
         expect(drawn().selectedPoints).toBe(1);
+    });
+
+    test("the selected points' curve handles end in 6 px dots at any zoom", async () => {
+        const { level, view, frames, selection, drawn } = await showLevel();
+        const shape = addShape(level, level.world, 0, 0);
+        const point = { x: 10, y: -10 };
+        selection.editedPoints = {
+            points: [{ x: -10, y: -10 }, point, { x: 10, y: 10 }],
+            corners: ['sharp', 'smooth', 'sharp'],
+            selected: [1],
+            handles: [
+                [point, { x: 0, y: -10 }],
+                [point, { x: 20, y: -10 }],
+            ],
+        };
+        selection.select([shape], undefined);
+
+        for (const zoom of [0.5, 4]) {
+            view.zoomAboutMiddle(zoom);
+            frames.runFrame();
+
+            const [handleIn, handleOut] = drawn().handleDots;
+            expect(drawn().handleDots).toHaveLength(2);
+            expect(handleIn?.width).toBe(6);
+            expect((handleOut?.centre.x ?? 0) - (handleIn?.centre.x ?? 0)).toBeCloseTo(20 * zoom);
+        }
     });
 
     test('no point handles when no points are edited', async () => {

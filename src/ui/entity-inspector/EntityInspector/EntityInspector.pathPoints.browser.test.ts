@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { JointComponent, NameComponent, PathComponent, TransformComponent } from '../../../core/components/index.ts';
-import type { PathPoint } from '../../../core/geometry/index.ts';
+import type { PathPoint, Point } from '../../../core/geometry/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { Level } from '../../../core/level/index.ts';
+import type { EditorSession } from '../../../editor/session/index.ts';
+import type { ToolController } from '../../../editor/tools/index.ts';
 import {
     addCrate,
     closeEntityInspectorPage,
@@ -42,11 +44,31 @@ function addPath(level: Level, closed: boolean, points: PathPoint[]) {
 async function showPath(closed: boolean, points: PathPoint[]) {
     const level = Level.createNew();
     const path = addPath(level, closed, points);
-    const { session } = showEntityInspector(level);
+    const { session, tools } = showEntityInspector(level);
     select(session, [path]);
     await expect.poll(() => entityInspectorContainer().querySelector('.path-points-field')).not.toBeNull();
 
-    return { level, path, session };
+    return { level, path, session, controller: tools.controller };
+}
+
+// A click with the Select tool at a level position; a second one in a row is a double-click.
+function clickInLevel(session: EditorSession, controller: ToolController, at: Point, clickCount = 1) {
+    const input = {
+        levelPosition: at,
+        screenPosition: session.view.levelToScreen(at),
+        button: 'left',
+        modifiers: { shift: false, alt: false, ctrl: false },
+        clickCount,
+    } as const;
+    controller.pointerDown(input);
+    controller.pointerUp(input);
+}
+
+// Point editing on the path, entered on its first point, and the point at `at` selected.
+function selectPointInLevel(session: EditorSession, controller: ToolController, first: Point, at: Point) {
+    clickInLevel(session, controller, first);
+    clickInLevel(session, controller, first, 2);
+    clickInLevel(session, controller, at);
 }
 
 function pointsRow() {
@@ -136,6 +158,40 @@ describe('Entity inspector: a path’s Points', () => {
 
         await expect.poll(() => pointsOf(path)[1]).toEqual(sharp(30, 0));
         await expect.poll(() => rowAt(1).querySelector('.fold')).toBeNull();
+    });
+
+    test('the row of a point selected in the level view is the blue pill, unfolded', async () => {
+        const curved: PathPoint = {
+            x: 30,
+            y: 0,
+            handleIn: { x: -10, y: 0 },
+            handleOut: { x: 10, y: 0 },
+            corner: 'smooth',
+        };
+        const { session, controller } = await showPath(false, [sharp(0, 0), curved, sharp(90, 0)]);
+
+        selectPointInLevel(session, controller, { x: 0, y: 0 }, { x: 30, y: 0 });
+
+        await expect.poll(() => rowAt(1).dataset.selected).toBe('true');
+        expect(rowAt(0).dataset.selected).toBe('false');
+        expect(rowAt(1).dataset.unfolded).toBe('true');
+        expect(rowAt(1).querySelectorAll('.path-handle-row')).toHaveLength(2);
+        expect(getComputedStyle(rowAt(1)).backgroundColor).not.toBe(getComputedStyle(rowAt(0)).backgroundColor);
+
+        clickInLevel(session, controller, { x: 90, y: 0 });
+        await expect.poll(() => rowAt(1).dataset.selected).toBe('false');
+        expect(rowAt(1).dataset.unfolded).toBe('false');
+        expect(rowAt(2).dataset.selected).toBe('true');
+    });
+
+    test('the list scrolls to the first selected point', async () => {
+        const many = Array.from({ length: 500 }, (_item, index) => sharp(index * 10, 0));
+        const { session, controller } = await showPath(false, many);
+
+        selectPointInLevel(session, controller, { x: 0, y: 0 }, { x: 4000, y: 0 });
+
+        await expect.poll(() => pointsRow().querySelector('.path-point-row[data-index="400"]')).not.toBeNull();
+        expect(rowAt(400).dataset.selected).toBe('true');
     });
 
     test('over 100 points, only the rows in view are built', async () => {

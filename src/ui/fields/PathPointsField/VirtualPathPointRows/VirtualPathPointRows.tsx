@@ -1,5 +1,5 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type { PathPointRowsProps } from '../PathPointRows/index.ts';
 import { PathPointRow } from '../PathPointRow/index.ts';
 import './VirtualPathPointRows.css';
@@ -19,7 +19,7 @@ export function VirtualPathPointRows(props: PathPointRowsProps) {
     // answer of which rows are on screen.
     'use no memo';
 
-    const { field, subject, points, unfolded, onToggleFold, onCommitPoint } = props;
+    const { field, subject, points, unfolded, selected, firstSelected, onToggleFold, onCommitPoint } = props;
     const scrollElement = useRef<HTMLDivElement>(null);
     const estimateSize = (index: number) => {
         const rowCount = unfolded.has(index) ? UNFOLDED_ROWS : 1;
@@ -33,6 +33,12 @@ export function VirtualPathPointRows(props: PathPointRowsProps) {
         estimateSize,
         overscan: OVERSCAN,
     });
+
+    useEffect(() => {
+        if (firstSelected === undefined) return;
+
+        virtualizer.scrollToIndex(firstSelected, { align: 'auto' });
+    }, [firstSelected, virtualizer]);
 
     const contentHeight = { height: `${virtualizer.getTotalSize()}px` };
 
@@ -53,6 +59,7 @@ export function VirtualPathPointRows(props: PathPointRowsProps) {
                             point={points[item.index] as (typeof points)[number]}
                             index={item.index}
                             isUnfolded={unfolded.has(item.index)}
+                            isSelected={selected.has(item.index)}
                             onToggleFold={onToggleFold}
                             onCommit={onCommitPoint}
                         />

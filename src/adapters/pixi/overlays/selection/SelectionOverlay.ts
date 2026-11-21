@@ -8,7 +8,16 @@ import { HANDLE_SIZE_PX } from '../../../../editor/tools/index.ts';
 import { JOINT_ICON_RADIUS_PX } from '../../../../editor/view/index.ts';
 import type { OverlayCaches, OverlayScene } from '../OverlayScene.ts';
 import { dashedLine } from '../dashes.ts';
-import { ACCENT, OVERLAY_FONT, OVERLAY_TEXT_PX, ROUND_POINT_PX, drawHandle, drawRoundPoint } from '../overlayLook.ts';
+import {
+    ACCENT,
+    HANDLE_DOT_PX,
+    OVERLAY_FONT,
+    OVERLAY_TEXT_PX,
+    ROUND_POINT_PX,
+    drawCurveHandles,
+    drawHandle,
+    drawRoundPoint,
+} from '../overlayLook.ts';
 import { screenRectangleOf, squareAround } from '../screenPixels.ts';
 
 import { planSelection } from './selectionPlan.ts';
@@ -52,6 +61,8 @@ export type DrawnSelection = {
     readonly points: readonly Bounds[];
     readonly roundPoints: number;
     readonly selectedPoints: number;
+    // The selected points' curve handles' end dots.
+    readonly handleDots: readonly Bounds[];
     readonly sharedBox: Bounds | undefined;
     readonly hiddenBox: Bounds | undefined;
     readonly selectionBox: Bounds | undefined;
@@ -69,6 +80,7 @@ const NOTHING_DRAWN: DrawnSelection = {
     points: [],
     roundPoints: 0,
     selectedPoints: 0,
+    handleDots: [],
     sharedBox: undefined,
     hiddenBox: undefined,
     selectionBox: undefined,
@@ -117,6 +129,7 @@ export class SelectionOverlay {
 
         const plan = planSelection(source, level, caches);
         const handles = source.frame === undefined ? [] : this.drawFrame(source.frame, scene);
+        const handleDots = source.editedPoints === undefined ? [] : this.drawCurveHandles(source.editedPoints, scene);
         const points = source.editedPoints === undefined ? [] : this.drawPoints(source.editedPoints, scene);
 
         this.shown = {
@@ -129,6 +142,7 @@ export class SelectionOverlay {
             points,
             roundPoints: source.editedPoints?.corners.filter((corner) => corner !== 'sharp').length ?? 0,
             selectedPoints: source.editedPoints?.selected.length ?? 0,
+            handleDots,
             sharedBox: this.drawSharedBox(plan, scene),
             hiddenBox: this.drawHiddenBox(plan, scene),
             selectionBox: this.drawSelectionBox(source.selectionBox, scene),
@@ -185,6 +199,16 @@ export class SelectionOverlay {
         }
 
         return squares;
+    }
+
+    // Under the points, so a handle pulled back onto its point never hides it.
+    private drawCurveHandles(edited: ShownPoints, scene: OverlayScene) {
+        const ends = edited.handles.map(
+            ([from, to]) => [scene.view.levelToScreen(from), scene.view.levelToScreen(to)] as const,
+        );
+        drawCurveHandles(this.handleSquares, ends);
+
+        return ends.map(([, end]) => squareAround(end, HANDLE_DOT_PX));
     }
 
     // Each point the same size at any zoom: a sharp one an 8 px square, a smooth or separate one a 9 px circle,

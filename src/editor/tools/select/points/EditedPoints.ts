@@ -3,10 +3,20 @@ import type { Bounds, Matrix2D, PathCorner, PathGeometry, Point } from '../../..
 import type { Entity } from '../../../../core/level/index.ts';
 import type { OpenLevel } from '../../../session/index.ts';
 import { editablePointsOf, geometryBox } from '../../../commands/index.ts';
-import type { EditablePoints } from '../../../commands/index.ts';
+import type { EditablePoints, HandleSide } from '../../../commands/index.ts';
 import { CURVE_STEP_COUNT } from '../../../hit-testing/index.ts';
 
-import { PointHits } from './PointHits.ts';
+import { HANDLE_HIT_PX, PointHits } from './PointHits.ts';
+
+// A handle of a selected path point, in level positions: from its point to its end.
+export type EditedHandle = {
+    readonly index: number;
+    readonly side: HandleSide;
+    readonly from: Point;
+    readonly to: Point;
+};
+
+const SIDES: readonly HandleSide[] = ['handleIn', 'handleOut'];
 
 // The polygon, line or path whose points are being edited, and which of its points are selected, as indexes
 // into its points. Calls changed() each time the selected points change, so the overlay draws again.
@@ -65,6 +75,47 @@ export class EditedPoints {
         if (editable.kind !== 'path') return editable.points.map(() => 'sharp');
 
         return editable.points.map((point) => point.corner);
+    }
+
+    // The handles of the selected points, in order: a sharp point and an open path's outer ends have none.
+    selectedHandles(): EditedHandle[] {
+        const editable = this.editable();
+        if (editable?.kind !== 'path') return [];
+
+        const matrix = this.levelMatrix();
+        const handles: EditedHandle[] = [];
+        for (const index of this.selected) {
+            const point = editable.points[index];
+            if (point === undefined) continue;
+
+            const from = matrix.apply(point);
+            for (const side of SIDES) {
+                const handle = point[side];
+                if (handle === null) continue;
+
+                const to = matrix.apply({ x: point.x + handle.x, y: point.y + handle.y });
+                handles.push({ index, side, from, to });
+            }
+        }
+
+        return handles;
+    }
+
+    // The selected point's handle whose end is nearest, within 6 screen px; the later one on a tie.
+    handleAt(position: Point, zoom: number) {
+        const reach = HANDLE_HIT_PX / zoom;
+        let nearest: EditedHandle | undefined;
+        let nearestDistance = Infinity;
+
+        for (const handle of this.selectedHandles()) {
+            const distance = Math.hypot(handle.to.x - position.x, handle.to.y - position.y);
+            if (distance > reach || distance > nearestDistance) continue;
+
+            nearest = handle;
+            nearestDistance = distance;
+        }
+
+        return nearest;
     }
 
     hits() {

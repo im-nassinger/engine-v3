@@ -4,7 +4,7 @@ import type { Bounds, Point } from '../../../../core/geometry/index.ts';
 import { HANDLE_SIZE_PX } from '../../../../editor/tools/index.ts';
 import { toPixiColour } from '../../PixiColour.ts';
 import { dashedPolyline } from '../dashes.ts';
-import { ACCENT, ROUND_POINT_PX, drawHandle, drawRoundPoint } from '../overlayLook.ts';
+import { ACCENT, HANDLE_DOT_PX, ROUND_POINT_PX, drawCurveHandles, drawHandle, drawRoundPoint } from '../overlayLook.ts';
 import { squareAround } from '../screenPixels.ts';
 
 import type { PenPlan } from './penPlan.ts';
@@ -13,12 +13,7 @@ const OUTLINE_COLOUR = toPixiColour(DEFAULT_OUTLINE_COLOUR).color;
 // The design: the placed segments in the default outline, 2 px, the one being made dashed at 60%.
 const PLACED: StrokeStyle = { color: OUTLINE_COLOUR, width: 2, join: 'round', cap: 'round' };
 const MAKING: StrokeStyle = { color: OUTLINE_COLOUR, alpha: 0.6, width: 2, cap: 'butt' };
-const EDGE_PX = 1.5;
-const EDGE: StrokeStyle = { color: ACCENT, width: EDGE_PX };
-const HANDLE_LINE: StrokeStyle = { color: ACCENT, width: 1 };
 const WHITE = 0xffffff;
-// A handle's end is a 6 px dot.
-export const HANDLE_DOT_PX = 6;
 // The first point's ring: 12 px, as a polygon's, filling at 25% when a press there closes the path.
 const RING_PX = 12;
 const RING_WIDTH_PX = 2;
@@ -82,21 +77,9 @@ function drawCurves(graphics: Graphics, plan: PenPlan, toScreen: ToScreen) {
 
 function drawHandles(graphics: Graphics, plan: PenPlan, toScreen: ToScreen) {
     const ends = plan.handles.map(([from, to]) => [toScreen(from), toScreen(to)] as const);
-    if (ends.length === 0) return [];
+    drawCurveHandles(graphics, ends);
 
-    for (const [from, to] of ends) {
-        graphics.moveTo(from.x, from.y).lineTo(to.x, to.y);
-    }
-    graphics.stroke(HANDLE_LINE);
-
-    return ends.map(([, end]) => {
-        graphics
-            .circle(end.x, end.y, (HANDLE_DOT_PX - EDGE_PX) / 2)
-            .fill(WHITE)
-            .stroke(EDGE);
-
-        return squareAround(end, HANDLE_DOT_PX);
-    });
+    return ends.map(([, end]) => squareAround(end, HANDLE_DOT_PX));
 }
 
 function drawFirstRing(graphics: Graphics, plan: PenPlan, toScreen: ToScreen) {

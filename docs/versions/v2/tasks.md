@@ -39,7 +39,7 @@ The tasks that build v2 (curves and gradients), in the orchestrator's format: ea
 - [x] 11. Point editing on paths: points
   - Read: versions/v2/architecture.md#point-editing-on-paths, requirements/drawing.md#point-editing--v1
   - Done when: a double-click on a path enters point editing (a Rope's or Spring's only selects); points move, nudge and delete with the path's limits; a double-click on a curve adds a point through `splitCurve` without changing the look; a double-click on a point switches sharp and smooth; sharp points draw as squares and smooth ones as circles; Node tests pass
-- [ ] 12. Point editing on paths: curve handles
+- [x] 12. Point editing on paths: curve handles
   - Read: versions/v2/architecture.md#point-editing-on-paths, design/level-view.md#v2-paths-and-gradient-handles
   - Done when: the selected points' handles show and `HandleDragState` drags them, one step each, smooth points keeping theirs opposite, Alt making a point separate, Shift, snapping and Esc as the architecture says; the selected points' rows in the Points list show as the blue pill, unfolded; Node tests and a Playwright test (drag a handle, switch a point, add a point on a curve) pass
 - [ ] 13. Fit a drag into curves
