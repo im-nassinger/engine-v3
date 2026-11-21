@@ -27,7 +27,7 @@ function labelStartsInBounds(level: Level, scene: OverlayScene, frameTopLeft: Po
 
 // The frame of what players will see, 1.5 screen px at any zoom, dark on a light World's fill and light on a
 // dark one, with "Camera 1920 × 1080" above its top left corner, coloured for what it starts on. Hidden by its
-// View menu switch and with the camera's eye.
+// View menu switch and with the camera's eye, and never drawn in play.
 export class CameraFrameOverlay {
     readonly container = new Container();
     private readonly frame = new Graphics();
@@ -72,6 +72,12 @@ export class CameraFrameOverlay {
         const topLeft = { x: onScreen.left, y: onScreen.top };
         const labelLook = labelStartsInBounds(level, scene, topLeft) ? look : ON_DARK;
         this.label.show(size, topLeft, labelLook.color);
+    }
+
+    // Draws no frame, whatever the switch says: play shows none.
+    clear() {
+        this.frame.clear();
+        this.container.visible = false;
     }
 
     destroy() {

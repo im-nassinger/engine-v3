@@ -1,6 +1,8 @@
 import { VersionCounter } from '../../core/events/index.ts';
 import type { EntityId } from '../../core/level/index.ts';
 
+import { DEFAULT_CURSOR } from './LevelCursor.ts';
+import type { LevelCursor } from './LevelCursor.ts';
 import type { PanGesture } from './pan/PanGesture.ts';
 import type { LevelPointerInput, PointerButton, Tool, ToolContext, ToolId, ToolKey } from './Tool.ts';
 
@@ -61,6 +63,13 @@ export class ToolController {
     // In the order given, for the tool column.
     get tools() {
         return [...this.toolsById.values()];
+    }
+
+    // The active tool's, except while panning or waiting for a pick, which use the default.
+    get cursor(): LevelCursor {
+        if (this.pan.isPanning || this.pickWaiting !== undefined) return DEFAULT_CURSOR;
+
+        return this.current.cursor ?? DEFAULT_CURSOR;
     }
 
     // A tool button is held, or Space or the middle button is panning.

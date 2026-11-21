@@ -183,18 +183,22 @@ describe('PixiLevelView through the camera', () => {
         expect(levelView.overlays.letterbox.bars).toEqual([]);
     });
 
-    test('neither the level bounds nor the grid are drawn, whatever its switch, and the grid comes back after Stop', async () => {
+    test('neither the level bounds, the grid nor the camera frame are drawn, whatever their switches, and they come back after Stop', async () => {
         const { levelView, settings, frames } = await showRedLevel(320, 240);
         settings.set('grid', true);
+        settings.set('cameraFrame', true);
 
         levelView.showThroughCamera({ x: 0, y: 0 }, CAMERA_BOX);
         frames.runFrame();
         expect(levelView.overlays.bounds.isShowing).toBe(false);
         expect(levelView.overlays.grid.plan).toBeUndefined();
+        expect(levelView.overlays.cameraFrame.isShowing).toBe(false);
 
         levelView.stopShowingThroughCamera();
         frames.runFrame();
+        expect(levelView.overlays.bounds.isShowing).toBe(true);
         expect(levelView.overlays.grid.plan).toBeDefined();
+        expect(levelView.overlays.cameraFrame.isShowing).toBe(true);
     });
 
     test('no joint icon is drawn in play, whatever its switch, and they come back after Stop', async () => {

@@ -18,6 +18,8 @@ export type { LevelPointerInput, Modifiers, PointerButton, Tool, ToolContext, To
 export { PICK_TEXT, ToolController } from './ToolController.ts';
 export type { PickEntity, ToolServices } from './ToolController.ts';
 export { TOOL_KEYS } from './toolKeys.ts';
+export { DEFAULT_CURSOR, ROTATE_CURSOR } from './LevelCursor.ts';
+export type { LevelCursor } from './LevelCursor.ts';
 export { JointTool, NOTHING_HERE } from './joint/JointTool.ts';
 export type { JointPreview } from './joint/JointTool.ts';
 export { GRADIENT_HANDLE_GRAB_PX, GradientHandles } from './select/gradient/GradientHandles.ts';

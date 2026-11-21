@@ -8,6 +8,8 @@ import type { Snapper } from '../snapping/index.ts';
 import type { StatusText } from '../status/index.ts';
 import type { ViewState } from '../view/index.ts';
 
+import type { LevelCursor } from './LevelCursor.ts';
+
 // The seven tools of the requirement. v1 builds select, shape and joint.
 export type ToolId = 'select' | 'pencil' | 'pen' | 'shape' | 'text' | 'joint' | 'trigger';
 
@@ -61,6 +63,8 @@ export type Tool = {
     readonly id: ToolId;
     // Moves when what the tool draws over the level changes.
     readonly preview: VersionCounter;
+    // The cursor for where the mouse was last, read after every pointer event. Missing: the default.
+    readonly cursor?: LevelCursor;
     activate(context: ToolContext): void;
     // Finishes and keeps an unfinished drawing.
     deactivate(): void;

@@ -12,10 +12,11 @@ import { ZOOM_STEP } from '../../../editor/view/index.ts';
 import type { ViewState } from '../../../editor/view/index.ts';
 
 import { ClickCounter } from './ClickCounter.ts';
+import { cssCursor } from './cssCursor.ts';
 import { NOTCH_PX, wheelPixels } from './wheelPixels.ts';
 
 export type PointerInputParts = {
-    readonly tools: Pick<ToolController, 'pointerDown' | 'pointerMove' | 'pointerUp'>;
+    readonly tools: Pick<ToolController, 'pointerDown' | 'pointerMove' | 'pointerUp' | 'cursor'>;
     readonly escape: Pick<EscapeChain, 'dragLost' | 'focusLost'>;
     // The debug box's mouse position.
     readonly mouse: Pick<MousePosition, 'moveTo' | 'leave'>;
@@ -105,11 +106,15 @@ export class PointerInput {
         const input = this.inputOf(event, button, screenPosition);
         this.parts.mouse.moveTo(input.levelPosition, screenPosition);
         this.parts.tools.pointerDown(input);
+        this.showCursor();
     }
 
     // A second button going down or up while one is held comes as a move, not a press or release.
     private handleMove(event: PointerEvent) {
-        if (this.isRunGoing) return;
+        if (this.isRunGoing) {
+            this.element.style.cursor = '';
+            return;
+        }
 
         const button = buttonOf(event.button);
         if (event.button !== NO_BUTTON_CHANGE && button !== undefined) {
@@ -122,6 +127,7 @@ export class PointerInput {
         const input = this.inputOf(event, heldButton, screenPosition);
         this.parts.mouse.moveTo(input.levelPosition, screenPosition);
         this.parts.tools.pointerMove(input);
+        this.showCursor();
     }
 
     private handleChord(event: PointerEvent, button: PointerButton) {
@@ -139,6 +145,7 @@ export class PointerInput {
 
         const screenPosition = this.screenPositionOf(event);
         this.parts.tools.pointerUp(this.inputOf(event, button, screenPosition));
+        this.showCursor();
     }
 
     // The wheel zooms at the mouse, a notch a ZOOM_STEP, so a trackpad's small steps add up; a pinch
@@ -163,6 +170,14 @@ export class PointerInput {
 
         const zoom = view.zoom * ZOOM_STEP ** -notches;
         view.zoomAt(this.screenPositionOf(event), zoom);
+    }
+
+    // The tool's cursor for where the mouse is now, after the tool heard it.
+    private showCursor() {
+        const css = cssCursor(this.parts.tools.cursor);
+        if (this.element.style.cursor === css) return;
+
+        this.element.style.cursor = css;
     }
 
     // An element losing focus reaches the window's listeners too; only the window's own blur counts.

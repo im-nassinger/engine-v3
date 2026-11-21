@@ -92,6 +92,7 @@ Source: round 6: LY2; old: SG-39 to SG-42
 ### Handles and arrow keys · v1
 
 - One Select tool moves, resizes and rotates, with no separate modes. Eight handles resize: four corners, four sides. Dragging just outside a corner rotates. There are no skew handles.
+- **The cursor shows what a press would do** (owner: 2026-11-21): a turning arrow just outside a corner, and a two-way arrow along the handle on a resize handle, kept through the drag. *Why: the owner found rotating worked with no sign the mouse was in the right place.*
 - Arrow keys move the selection 1 px. Shift+arrow moves 10 px. **Ctrl+Shift+arrow moves one grid step.** Moves follow the level's axes whatever the rotation.
 - **Z and X rotate the selection** (owner: 2026-11-17): Z counter-clockwise and X clockwise on screen, 1° a press, Shift+Z and Shift+X 10°. Each entity turns around the centre of its own box, as the rotate drag does, until Later turns several entities around the selection box's centre. A run of presses within 1 s is one undo step, `Rotate <name>`. The World and the camera are skipped with the skip rule's text; locked entities are left out. Ctrl+Z and Ctrl+X stay Undo and Cut.
 - **W, A, S and D resize the selection's shapes** (owner: 2026-11-17): D wider, A narrower, W taller, S shorter, 1 px a press, **Shift one grid step** (owner: 2026-11-19, replacing 10 px). Unlike the handles they **change the shape's values**, so an outline keeps its width: a rectangle's Width or Height, a circle's Radius by half a step on either axis, a polygon's or line's points spread from or pulled towards its bounds' centre. Each shape keeps its own centre and grows along its own axes, so a rotated rectangle gets longer along its own width. A size stops at its smallest, 1 px, and W and S do nothing on a flat line. A run of presses within 1 s is one undo step, `Resize <name>`. The World and the camera are skipped with the skip rule's text; locked entities and entities with no ShapeComponent are left out.
@@ -112,7 +113,7 @@ Source: round 6: LY2; old: SG-39 to SG-42
 
 - **Ctrl+Shift resizes from the centre**, as Alt does, and neither keeps proportions nor turns snapping off (owner: 2026-11-16; the rest under the standing yes, 2026-11-17). *Why: on Linux with GNOME, Alt+drag moves the window, so Alt can't reach the page there.* Alt stays a second way, and Alt+Shift resizes from the centre keeping proportions.
 
-Source: scope SE2; round 1: D21; round 4: 02 2.7; round 5: 03 2.4; old: SG-43 to SG-48, SG-52, SG-53, SG-55, SG-56; owner: 2026-11-16, 2026-11-19
+Source: scope SE2; round 1: D21; round 4: 02 2.7; round 5: 03 2.4; old: SG-43 to SG-48, SG-52, SG-53, SG-55, SG-56; owner: 2026-11-16, 2026-11-19, 2026-11-21
 
 ### Several entities together · Later
 

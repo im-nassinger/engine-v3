@@ -76,6 +76,15 @@ export class SelectionFrame {
         return this.box.corners().map((corner) => this.matrix.apply(corner));
     }
 
+    // The angle on screen, in degrees with y down, from the frame's centre out through the handle.
+    handleDirectionDegrees(handle: FrameHandle) {
+        const centre = this.matrix.apply(this.box.centre);
+        const position = this.handlePosition(handle);
+        const radians = Math.atan2(position.y - centre.y, position.x - centre.x);
+
+        return (radians * 180) / Math.PI;
+    }
+
     // The handle nearest the point within its square and grab margin, on screen, or undefined.
     handleAt(point: Point, zoom: number): FrameHandle | undefined {
         const reach = HANDLE_SIZE_PX / 2 + HANDLE_GRAB_PX;

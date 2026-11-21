@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import type { Point } from '../../../core/geometry/index.ts';
-import type { LevelPointerInput } from '../../../editor/tools/index.ts';
+import type { LevelCursor, LevelPointerInput } from '../../../editor/tools/index.ts';
 import { ViewState } from '../../../editor/view/index.ts';
 import { PointerInput } from './PointerInput.ts';
 
@@ -12,6 +12,7 @@ const VIEW_TOP = 40;
 
 class RecordingTools {
     readonly heard: string[] = [];
+    cursor: LevelCursor = { kind: 'default' };
     readonly inputs: LevelPointerInput[] = [];
 
     pointerDown(input: LevelPointerInput) {
@@ -167,6 +168,20 @@ describe('PointerInput', () => {
             });
         }
     }
+
+    test("the level view shows the tools' cursor after each pointer event, and none during play", () => {
+        tools.cursor = { kind: 'resize', directionDegrees: 90 };
+        pointer('pointermove', { x: 10, y: 10 });
+        expect(element.style.cursor).toBe('ns-resize');
+
+        tools.cursor = { kind: 'rotate' };
+        pointer('pointermove', { x: 12, y: 10 });
+        expect(element.style.cursor).toContain('svg');
+
+        play.isRunGoing = true;
+        pointer('pointermove', { x: 14, y: 10 });
+        expect(element.style.cursor).toBe('');
+    });
 
     test('a second press soon after, at the same place, is a double-click', () => {
         click({ x: 10, y: 10 });

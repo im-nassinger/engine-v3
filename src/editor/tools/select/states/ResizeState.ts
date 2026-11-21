@@ -1,4 +1,5 @@
 import type { Point } from '../../../../core/geometry/index.ts';
+import type { LevelCursor } from '../../LevelCursor.ts';
 import type { LevelPointerInput } from '../../Tool.ts';
 import type { FrameHandle } from '../frame/FrameHandle.ts';
 import type { SelectionFrame } from '../frame/SelectionFrame.ts';
@@ -28,6 +29,13 @@ export class ResizeState implements SelectState {
         this.handle = handle;
         const handlePosition = frame.handlePosition(handle);
         this.grabOffset = { x: handlePosition.x - press.x, y: handlePosition.y - press.y };
+    }
+
+    // The handle's arrow, kept for the whole drag.
+    get cursor(): LevelCursor {
+        const directionDegrees = this.frame.handleDirectionDegrees(this.handle);
+
+        return { kind: 'resize', directionDegrees };
     }
 
     pointerDown() {}
