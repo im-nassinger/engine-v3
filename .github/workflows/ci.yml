@@ -1,13 +1,12 @@
 name: CI
 
-# Runs only in the public copy, im-nassinger/engine-v3-ci: a private repo's free minutes ran out.
+# Runs in this repo, public since 2026-11-20 so its Actions minutes are unlimited.
 # See docs/architecture/tooling.md, "CI".
 on:
     push:
 
 jobs:
     check:
-        if: ${{ !github.event.repository.private }}
         strategy:
             fail-fast: false
             matrix:
@@ -22,10 +21,9 @@ jobs:
                   node-version-file: .node-version
                   cache: npm
             - run: npm ci
-            - run: npm run check:code
+            - run: npm run check
 
     browser:
-        if: ${{ !github.event.repository.private }}
         runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v7
@@ -52,7 +50,7 @@ jobs:
             - run: npm run build
 
     journeys:
-        if: ${{ !github.event.repository.private && github.ref == 'refs/heads/master' }}
+        if: ${{ github.ref == 'refs/heads/master' }}
         runs-on: ubuntu-24.04
         strategy:
             fail-fast: false
@@ -88,7 +86,7 @@ jobs:
 
     # Joins the three machines' results into one HTML report. A problem here never turns CI red.
     journeys-report:
-        if: ${{ !cancelled() && !github.event.repository.private && github.ref == 'refs/heads/master' }}
+        if: ${{ !cancelled() && github.ref == 'refs/heads/master' }}
         needs: journeys
         continue-on-error: true
         runs-on: ubuntu-24.04
@@ -115,7 +113,6 @@ jobs:
 
     # The phone checks on ARM: the determinism page in Chromium as a Pixel 7, x86's hashes in an ARM browser.
     phone-arm:
-        if: ${{ !github.event.repository.private }}
         runs-on: ubuntu-24.04-arm
         steps:
             - uses: actions/checkout@v7

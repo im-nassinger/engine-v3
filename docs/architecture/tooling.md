@@ -56,10 +56,10 @@ tests/
 | `npm run test:e2e` | Playwright against the built page | Before a stage closes, and in CI on master |
 | `npm run docs:check` | `node tools/check-docs.js` | |
 | `npm run safety` | `node tools/check-safety.js`: the [safety check](#the-safety-check) | |
-| `npm run check:code` | `typecheck`, `lint`, `format:check`, `deps`, `test`, `safety`, in that order: `check` without the docs | In CI, whose copy of the code has no `docs/` |
+| `npm run check:code` | `typecheck`, `lint`, `format:check`, `deps`, `test`, `safety`, in that order: `check` without the docs | |
 | **`npm run check`** | `check:code`, then `docs:check` | **Before every commit** |
 
-`npm run check` holds everything fast enough to run every time. It is the one command a session needs to know. CI runs `check:code`, the same checks but the docs', because its copy of the code has no `docs/` (owner, 2026-11-18). There is no git hook: the rule is in `CLAUDE.md`.
+`npm run check` holds everything fast enough to run every time. It is the one command a session needs to know, and CI runs it too. There is no git hook: the rule is in `CLAUDE.md`.
 
 ### The safety check
 
@@ -213,11 +213,11 @@ One per test runner, so each pipeline is proven before stage 1 needs it:
 
 ## CI
 
-One workflow, `.github/workflows/ci.yml`. **It runs only in the public copy of the code, `im-nassinger/engine-v3-ci`**, which the runner pushes after each step: the private repo's free Actions minutes ran out on 2026-11-18, and a public repo's are unlimited. Every job has `if: ${{ !github.event.repository.private }}`, so in this repo they are skipped and use no minutes. The copy has no `docs/`, `CLAUDE.md`, `.claude/`, runner or history (owner, 2026-11-18). The runner built and pushed that copy (its `PublicCopy.ts`); it moved to `~/projects/orchestrator/old-runner/` on 2026-11-20, so **nothing publishes the copy now, and no push gets CI** until the new tool does.
+One workflow, `.github/workflows/ci.yml`, **in this repo, public since 2026-11-20** (owner), so its Actions minutes are unlimited. From 2026-11-18 it ran instead in a public copy, `im-nassinger/engine-v3-ci`, which the runner published after each step, because the private repo's free minutes had run out; with the repo public, the copy was deleted (owner, 2026-11-20). The [safety check](#the-safety-check) keeps private details out of it.
 
 | Job | Runs on | Does | When |
 |---|---|---|---|
-| check | `ubuntu-24.04` and `ubuntu-24.04-arm` | `npm ci`, `npm run check:code` | Every push |
+| check | `ubuntu-24.04` and `ubuntu-24.04-arm` | `npm ci`, `npm run check` | Every push |
 | browser | `ubuntu-24.04` | Installs the three browsers, `npm run test:browser`, `npm run test:performance`, `npm run build` | Every push |
 | journeys | `ubuntu-24.04`, three machines | Installs the three browsers, and each machine runs a third of `npm run test:e2e` (the phone checks' two projects among them) and keeps a blob report for a day | Pushes to master |
 | journeys-report | `ubuntu-24.04` | Joins the three blob reports into the HTML report, with its screenshots, kept for 30 days as the `playwright-report` artifact. If it fails, CI stays green | Pushes to master |

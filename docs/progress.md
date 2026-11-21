@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**v1 is built** (stages 0 to 19, done 2026-11-19), with 2,048 tests in Node, 1,269 browser tests and 292 Playwright tests in three browsers. **The versions after v1 are small** (owner, round 12, 2026-11-20): v2 curves and gradients, v3 a first game without code, v4 the rest of the triggers, v5 scripts, v6 text, v7 `.entity` files and the builtin player; see [scope.md](scope.md). **Next is planning v2's architecture**, then its tasks, in [versions/v2/](versions/README.md), for the orchestrator to build. CI doesn't run until the repo is public, the owner's choice.
+**v1 is built** (stages 0 to 19, done 2026-11-19), with 2,048 tests in Node, 1,269 browser tests and 292 Playwright tests in three browsers. **The versions after v1 are small** (owner, round 12, 2026-11-20): v2 curves and gradients, v3 a first game without code, v4 the rest of the triggers, v5 scripts, v6 text, v7 `.entity` files and the builtin player; see [scope.md](scope.md). **Next is planning v2's architecture**, then its tasks, in [versions/v2/](versions/README.md), for the orchestrator to build. The repo is public since 2026-11-20, so CI runs on every push.
 
 ## Where things stand
 
@@ -15,7 +15,7 @@
 | The orchestrator | Built in `~/projects/orchestrator`, waiting for the owner's first try. It builds a version from `docs/versions/<version>/tasks.md`. The old runner that built v1 is in its `old-runner/` |
 | Talking to Claude | Through `~/projects/discord-bridge`, in this project's Discord channel, since 2026-11-20 |
 | `npm run check` | Passes. It includes the [safety check](architecture/tooling.md#the-safety-check) since 2026-11-20 |
-| CI | **Not running.** The repo is private and every job skips itself there; the public copy `im-nassinger/engine-v3-ci` that the old runner published is no longer updated. See [tooling.md](architecture/tooling.md#ci) |
+| CI | Runs in this repo, public since 2026-11-20 (owner). The public copy `im-nassinger/engine-v3-ci` is retired. See [tooling.md](architecture/tooling.md#ci) |
 
 The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js` reads it, so that check only works while it exists.
 
@@ -23,7 +23,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 Each item is removed in the same commit that settles it, wherever that commit is made.
 
-- **Making the repo public, for CI.** The `orchestrator-workflow` skill asks for a public repo, and the orchestrator waits for CI after each push. The files pass the safety check, and a scan of the whole history found only no-reply emails, no home paths and no keys. If yes: the private words go in `~/.config/engine-v3/private-words` first, the `if: !github.event.repository.private` lines leave `ci.yml`, and the public copy is retired. If no: the orchestrator builds without CI, and the browser tests run only by hand.
+Nothing.
 
 ## Next
 
