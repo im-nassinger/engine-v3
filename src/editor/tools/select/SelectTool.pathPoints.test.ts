@@ -91,6 +91,22 @@ function farthestFrom(places: readonly Point[], others: readonly Point[]) {
 }
 
 describe('SelectTool point editing on a path', () => {
+    test('one click on a path frames the box of the curve it draws, with handles', () => {
+        const { path, tool, click } = buildPathTest();
+
+        click(onSegment(path, 0, 0.5));
+
+        // The smooth middle's handles bend the curve below and above the line from 500 to 700, a little less
+        // far than the handles reach.
+        const frame = tool.frame;
+        expect(frame?.kind).toBe('shape');
+        expect(frame?.box.left).toBe(-100);
+        expect(frame?.box.right).toBe(100);
+        expect(frame?.box.top).toBeLessThan(0);
+        expect(frame?.box.top).toBeGreaterThan(-30);
+        expect(frame?.handles).toHaveLength(8);
+    });
+
     test('a double-click on a path enters point editing, with its corners shown', () => {
         const { path, tool, doubleClick } = buildPathTest();
 

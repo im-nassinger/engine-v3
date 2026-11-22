@@ -2,12 +2,13 @@ import { afterEach, describe, expect, test } from 'vitest';
 import {
     BodyComponent,
     JointComponent,
+    PathComponent,
     ShapeComponent,
     SurfaceComponent,
     TransformComponent,
 } from '../../../../core/components/index.ts';
 import { DerivedCaches } from '../../../../core/derived/index.ts';
-import type { ShapeGeometry } from '../../../../core/geometry/index.ts';
+import type { PathGeometry, ShapeGeometry } from '../../../../core/geometry/index.ts';
 import { Level } from '../../../../core/level/index.ts';
 import type { Entity } from '../../../../core/level/index.ts';
 
@@ -15,6 +16,13 @@ import { MAX_OUTLINED_ENTITIES, planSelection } from './selectionPlan.ts';
 import type { SelectionSource } from './SelectionSource.ts';
 
 const SQUARE: ShapeGeometry = { kind: 'rectangle', width: 20, height: 20 };
+const STRAIGHT_PATH: PathGeometry = {
+    closed: false,
+    points: [
+        { x: -10, y: 0, handleIn: null, handleOut: null, corner: 'sharp' },
+        { x: 10, y: 0, handleIn: null, handleOut: null, corner: 'sharp' },
+    ],
+};
 const cleanups: (() => void)[] = [];
 
 afterEach(() => {
@@ -47,13 +55,17 @@ function addShape(level: Level, parent: Entity, x: number, y: number) {
     return entity;
 }
 
-function sourceOf(entities: readonly Entity[], caches: DerivedCaches): SelectionSource {
+function sourceOf(
+    entities: readonly Entity[],
+    caches: DerivedCaches,
+    editedPoints?: SelectionSource['editedPoints'],
+): SelectionSource {
     return {
         entities,
         frame: undefined,
         selectionBox: undefined,
         readout: undefined,
-        editedPoints: undefined,
+        editedPoints,
         isHidden: (entity) => caches.hidden.isHidden(entity),
         isLocked: (entity) => caches.hidden.isLocked(entity),
         subscribe: () => () => {},
@@ -110,6 +122,37 @@ describe('planSelection', () => {
         const { level, caches } = makeLevel();
         const joint = place(level, level.world, 30, 40);
         joint.addComponent(new JointComponent());
+        const result = plan([joint], level, caches);
+
+        expect(result.rings).toEqual([{ x: 30, y: 40 }]);
+        expect(result.outlines).toEqual([]);
+    });
+
+    test('one path is outlined heavier, like a shape', () => {
+        const { level, caches } = makeLevel();
+        const path = place(level, level.world, 0, 0);
+        path.addComponent(new PathComponent({ path: STRAIGHT_PATH }));
+        const result = plan([path], level, caches);
+
+        expect(result.outlines).toEqual([path]);
+        expect(result.heavyOutline).toBe(true);
+    });
+
+    test("a path whose points are edited isn't outlined", () => {
+        const { level, caches } = makeLevel();
+        const path = place(level, level.world, 0, 0);
+        path.addComponent(new PathComponent({ path: STRAIGHT_PATH }));
+        const edited = { points: [], corners: [], selected: [], handles: [] };
+        const result = planSelection(sourceOf([path], caches, edited), level, caches);
+
+        expect(result.outlines).toEqual([]);
+    });
+
+    test("a Rope's or Spring's path is its joint's ring, not an outline", () => {
+        const { level, caches } = makeLevel();
+        const joint = place(level, level.world, 30, 40);
+        joint.addComponent(new JointComponent());
+        joint.addComponent(new PathComponent({ path: STRAIGHT_PATH }));
         const result = plan([joint], level, caches);
 
         expect(result.rings).toEqual([{ x: 30, y: 40 }]);

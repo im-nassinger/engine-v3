@@ -1,6 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import type { FillStyle, StrokeStyle } from 'pixi.js';
-import { ShapeComponent } from '../../../../core/components/index.ts';
+import { PathComponent, ShapeComponent } from '../../../../core/components/index.ts';
 import { Bounds } from '../../../../core/geometry/index.ts';
 import type { Point } from '../../../../core/geometry/index.ts';
 import type { Entity } from '../../../../core/level/index.ts';
@@ -22,7 +22,7 @@ import { screenRectangleOf, squareAround } from '../screenPixels.ts';
 
 import { planSelection } from './selectionPlan.ts';
 import type { SelectionPlan } from './selectionPlan.ts';
-import { shapeOutline } from './shapeOutline.ts';
+import { pathOutline, shapeOutline } from './shapeOutline.ts';
 import type { SelectionSource, ShownFrame, ShownPoints, ShownReadout } from './SelectionSource.ts';
 
 const HEAVY_OUTLINE: StrokeStyle = { color: ACCENT, width: 1.5, join: 'round', cap: 'round' };
@@ -163,8 +163,7 @@ export class SelectionOverlay {
             const bounds = caches.bounds.ownBoundsOf(entity);
             if (bounds !== undefined && !bounds.overlaps(visible)) continue;
 
-            const geometry = entity.requireComponent(ShapeComponent).get('geometry');
-            const outline = shapeOutline(geometry, caches.worldMatrices.matrixOf(entity));
+            const outline = outlineOf(entity, caches, scene.view.zoom);
             const onScreen = outline.points.map((point) => scene.view.levelToScreen(point));
             this.strokePath(onScreen, outline.isClosed, style);
             drawn += 1;
@@ -336,6 +335,15 @@ export class SelectionOverlay {
             label.text = text;
         }
     }
+}
+
+// A shape's edge, or the curve a path draws.
+function outlineOf(entity: Entity, caches: OverlayCaches, zoom: number) {
+    const matrix = caches.worldMatrices.matrixOf(entity);
+    const shape = entity.getComponent(ShapeComponent);
+    if (shape !== undefined) return shapeOutline(shape.get('geometry'), matrix);
+
+    return pathOutline(entity.requireComponent(PathComponent).get('path'), matrix, zoom);
 }
 
 // Grows the rectangle around its centre to at least size on each side.

@@ -1,16 +1,18 @@
-import { ShapeComponent } from '../../../core/components/index.ts';
+import { PathComponent, ShapeComponent } from '../../../core/components/index.ts';
 import { OwnBounds } from '../../../core/derived/index.ts';
-import { Bounds } from '../../../core/geometry/index.ts';
+import { Bounds, pathBox } from '../../../core/geometry/index.ts';
 import type { Matrix2D, ShapeGeometry } from '../../../core/geometry/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import type { OpenLevel } from '../../session/index.ts';
 
 // The box an entity turns and resizes around, in its own space, before its TransformComponent: a shape's
-// own bounds, or what a group's visible descendants draw. undefined for anything else, such as an empty
+// own bounds, the box of the curve a path draws, or what a group's visible descendants draw. undefined for anything else, such as an empty
 // group, a joint or the camera, and under a scale of 0, where no box shows.
 export function ownBox(openLevel: OpenLevel, entity: Entity): Bounds | undefined {
     const shape = entity.getComponent(ShapeComponent);
     if (shape !== undefined) return geometryBox(shape.get('geometry'));
+    const path = entity.getComponent(PathComponent);
+    if (path !== undefined) return pathBox(path.get('path'));
     if (entity.children.length === 0) return undefined;
 
     const inverse = openLevel.caches.worldMatrices.matrixOf(entity).invert();

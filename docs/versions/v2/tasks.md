@@ -57,4 +57,4 @@ The tasks that build v2 (curves and gradients), in the orchestrator's format: ea
 - [x] 17. Close v2's docs
   - Read: versions/README.md#closing-a-version, versions/v2/architecture.md
   - Done when: v2's lasting parts are moved into architecture/ (components-and-fields, drawing-and-points, selection-and-tools, adapters, persistence's point limits, performance, testing) and architecture.md says so; progress.md is trimmed to where things stand and what's next; `node tools/check-sources.js` passes
-- [ ] 18. Try point: try the whole of v2: gradients on shapes and the World, in the Entity inspector and with the handles; paths drawn with the pen, open and closed, and continued; the Pencil; and editing the points and handles of paths
+- [x] 18. Try point: try the whole of v2: gradients on shapes and the World, in the Entity inspector and with the handles; paths drawn with the pen, open and closed, and continued; the Pencil; and editing the points and handles of paths

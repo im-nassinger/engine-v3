@@ -101,8 +101,8 @@ describe('a 2,000-point path among 10,000 entities', () => {
             waitForDrawing(opened);
 
             expect(opened.session.openLevel.selection.entities).toEqual([path]);
-            // The selection overlay outlines shapes and frames shapes and groups, so a path selected draws
-            // nothing there yet (performance.md); the click is timed to the frame that redraws it.
+            // The click is timed to the frame that redraws the selection overlay, with the path's outline
+            // and frame.
         }
 
         const slowest = Math.max(...times);

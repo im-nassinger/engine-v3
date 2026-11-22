@@ -2,6 +2,7 @@ import {
     BodyComponent,
     CameraComponent,
     JointComponent,
+    PathComponent,
     ShapeComponent,
     SurfaceComponent,
 } from '../../../../core/components/index.ts';
@@ -23,7 +24,7 @@ export type SelectionPlanCaches = {
 
 // What the selection table asks to draw, in level positions. The overlay turns it into screen pixels.
 export type SelectionPlan = {
-    // Shapes outlined because they are selected or inside a selected entity.
+    // Shapes and paths outlined because they are selected or inside a selected entity.
     readonly outlines: readonly Entity[];
     // One selected shape gets the heavier outline; several get a thin one each.
     readonly heavyOutline: boolean;
@@ -95,9 +96,9 @@ export function planSelection(source: SelectionSource, level: Level, caches: Sel
 
         const isLocked = source.isLocked(entity);
         // One group is drawn as its box alone, unless it is locked and so has no box.
-        const isLoneGroup = isOne && !entity.hasComponent(ShapeComponent) && !isLocked;
+        const isLoneGroup = isOne && !drawsItself(entity) && !isLocked;
         if (!isLoneGroup) {
-            collectShapes(entity, source, outlines);
+            collectShapes(entity, source, outlines, source.editedPoints === undefined);
         }
 
         const drawn = caches.bounds.subtreeBoundsOf(entity);
@@ -119,15 +120,25 @@ export function planSelection(source: SelectionSource, level: Level, caches: Sel
     };
 }
 
-// The visible shapes of the entity and everything inside it.
-function collectShapes(entity: Entity, source: SelectionSource, into: Entity[]) {
+function drawsItself(entity: Entity) {
+    return entity.hasComponent(ShapeComponent) || entity.hasComponent(PathComponent);
+}
+
+// The visible shapes and paths of the entity and everything inside it. A Rope's or Spring's path is drawn
+// as its joint, so it is left out. While a path's points are edited it is left out too: its own drawing
+// follows the drag and its points show on it, and outlining a 2,000-point path again every frame of the
+// drag would miss the drag's speed target (performance.md).
+function collectShapes(entity: Entity, source: SelectionSource, into: Entity[], withPaths: boolean) {
     if (source.isHidden(entity)) return;
-    if (entity.hasComponent(ShapeComponent)) {
+
+    const isPath = !entity.hasComponent(ShapeComponent) && entity.hasComponent(PathComponent);
+    const isOutlined = isPath ? withPaths && !entity.hasComponent(JointComponent) : drawsItself(entity);
+    if (isOutlined) {
         into.push(entity);
     }
 
     for (const child of entity.children) {
-        collectShapes(child, source, into);
+        collectShapes(child, source, into, withPaths);
     }
 }
 

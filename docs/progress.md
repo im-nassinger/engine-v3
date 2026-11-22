@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**v1 is built** (stages 0 to 19, done 2026-11-19), with 2,048 tests in Node, 1,269 browser tests and 292 Playwright tests in three browsers. **The versions after v1 are small** (owner, round 12, 2026-11-20): v2 curves and gradients, v3 a first game without code, v4 the rest of the triggers, v5 scripts, v6 text, v7 `.entity` files and the builtin player; see [scope.md](scope.md). **v2 is built** (curves and gradients: tasks 1 to 17 of its [tasks.md](versions/v2/tasks.md), done 2026-11-21), and its lasting parts are in [architecture/](architecture/README.md). **Next: the owner tries v2** at task 18, the one try point. The repo is public since 2026-11-20, so CI runs on every push.
+**v1 is built** (stages 0 to 19, done 2026-11-19), with 2,048 tests in Node, 1,269 browser tests and 292 Playwright tests in three browsers. **The versions after v1 are small** (owner, round 12, 2026-11-20): v2 curves and gradients, v3 a first game without code, v4 the rest of the triggers, v5 scripts, v6 text, v7 `.entity` files and the builtin player; see [scope.md](scope.md). **v2 is done** (curves and gradients, 2026-11-21): built, tried by the owner, and the [fixes](versions/v2/fixes.md) asked built; its lasting parts are in [architecture/](architecture/README.md). **Next: plan v3**, a first game without code, in `versions/v3/`. The repo is public since 2026-11-20, so CI runs on every push.
 
 ## Where things stand
 
@@ -10,7 +10,8 @@
 |---|---|
 | Requirements, scope, glossary, principles, the [architecture](architecture/README.md), the [design system](design/README.md) | Done and approved (owner, 2026-11-14), kept up to date |
 | v1 | Built: stages 0 to 19 in [plan.md](plan.md). What each stage showed is in [stages-built.md](stages-built.md), its steps in [steps/](steps/README.md), and what was settled along the way in [settled.md](settled.md) |
-| [v2](versions/README.md) | Built, tasks 1 to 17 (2026-11-21): gradients, the pen, the Pencil, point editing on paths, their journeys and speed tests, all four speed targets met. Its plan stays in [versions/v2/](versions/v2/requirements.md); what it built is now in [architecture/](architecture/README.md). The owner's try (task 18) has begun: the fixes in [fixes.md](versions/v2/fixes.md) asked so far are built |
+| [v2](versions/README.md) | Done (2026-11-21): gradients, the pen, the Pencil, point editing on paths, their journeys and speed tests, all four speed targets met. The owner tried it (task 18) and the 11 [fixes](versions/v2/fixes.md) are built. Its plan stays in [versions/v2/](versions/v2/requirements.md); what it built is now in [architecture/](architecture/README.md) |
+| v3 | Being planned |
 | v3 to v7, Later | One line each in [scope.md](scope.md); their rules are in [requirements/](requirements/README.md) |
 | The orchestrator | Built in `~/projects/orchestrator`, waiting for the owner's first try. It builds a version from `docs/versions/<version>/tasks.md`. The old runner that built v1 is in its `old-runner/` |
 | Talking to Claude | Through `~/projects/discord-bridge`, in this project's Discord channel, since 2026-11-20 |
@@ -23,14 +24,12 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 Each item is removed in the same commit that settles it, wherever that commit is made.
 
-1. **Try v2** (task 18): gradients on shapes and the World, in the Entity inspector and with the handles; paths drawn with the pen, open and closed, and continued; the Pencil; and editing the points and handles of paths. What to change goes into `versions/v2/fixes.md`, each fix a task at the end of [tasks.md](versions/v2/tasks.md).
-2. **A selected path draws no outline and no frame** in the level view (found by task 16, written in [performance.md](architecture/performance.md#targets-and-their-tests)): only the Entity inspector and the Entities viewer show it. It is a look, so it waits for the owner's word, at the try or after.
+1. **v3's plan**, each part as it is written: its requirements, its mockup, its architecture, then its tasks.
 
 ## Next
 
-1. The owner tries v2 (task 18), and any fixes are built.
-2. v3 is planned in `versions/v3/`, a first game without code, as [versions/README.md](versions/README.md#closing-a-version) says.
-3. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
+1. v3 is planned in `versions/v3/`, a first game without code, as [versions/README.md](versions/README.md#closing-a-version) says.
+2. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
 
 ## How to change a requirement
 
