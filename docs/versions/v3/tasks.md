@@ -57,4 +57,4 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 - [x] 17. Close v3's docs
   - Read: versions/README.md#closing-a-version, versions/v2/architecture.md
   - Done when: v3's lasting parts are moved into architecture/ as v2's were, with `versions/v3/architecture.md` left as the record with a table of where each part went; the glossary has every new word; progress.md says v3 is built and waits for the owner's try; `node tools/check-sources.js` passes
-- [ ] 18. Try point: try the whole of v3: the Trigger tool, the trigger card, tags, the World's variables and inputs, triggers firing in test play, Win, Lose and Restart
+- [x] 18. Try point: try the whole of v3: the Trigger tool, the trigger card, tags, the World's variables and inputs, triggers firing in test play, Win, Lose and Restart
