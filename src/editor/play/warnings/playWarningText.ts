@@ -9,5 +9,7 @@ export function playWarningText(warning: PlayWarning) {
             return "A trigger tried to change a value that can't change during play, so it was skipped";
         case 'unknownInput':
             return `A trigger listens for the input "${warning.input}", which the World doesn't have`;
+        case 'restartIgnored':
+            return 'A trigger tried to restart the level in its first second, so it was ignored';
     }
 }

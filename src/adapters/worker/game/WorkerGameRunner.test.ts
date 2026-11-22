@@ -171,4 +171,24 @@ describe('WorkerGameRunner', () => {
         expect(await batch).toEqual({ kind: 'crashed', detail: 'out of memory' });
         expect(workers).toHaveLength(2);
     });
+
+    test('restart asks the same worker for a new run of the kept level, sending no level', async () => {
+        const { runner, workers } = runnerWithWorkers();
+        await runner.start(fallingBoxLevel(), START);
+        await runner.runTicks(BATCH);
+
+        const restarted = await runner.restart();
+        const afterRestart = await runner.runTicks(BATCH);
+
+        expect(restarted).toEqual({ kind: 'started' });
+        expect(afterRestart.kind === 'ticked' && afterRestart.report.lastTick).toBe(4);
+        expect(workers).toHaveLength(1);
+        expect(workers[0]?.requests.map((request) => request.kind)).toEqual([
+            'prepare',
+            'start',
+            'runTicks',
+            'restart',
+            'runTicks',
+        ]);
+    });
 });

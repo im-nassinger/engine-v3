@@ -10,6 +10,8 @@ import type { ValueChangeEffects } from './PlayValueWriter.ts';
 import { targetsOf } from './targetsOf.ts';
 
 const ORIGIN: Point = { x: 0, y: 0 };
+// The ticks of a run's first second, 1 to 60.
+const RESTART_GUARD_TICKS = 60;
 
 // Runs one firing's actions top to bottom, each on each of its targets in Entities viewer order. A target
 // that lacks what the action needs is skipped and the others still run; an action with an unset part does
@@ -63,9 +65,20 @@ export class ActionRunner {
                 this.run.ending.record('lost', this.tick);
                 return;
             case 'restart':
-                this.run.ending.record('restart', this.tick);
+                this.restart();
                 return;
         }
+    }
+
+    // Ignored in the run's first second, with a warning, so a level start trigger that restarts can't
+    // rebuild the level every tick.
+    private restart() {
+        if (this.tick <= RESTART_GUARD_TICKS) {
+            this.run.warnings.warn({ kind: 'restartIgnored' });
+            return;
+        }
+
+        this.run.ending.record('restart', this.tick);
     }
 
     // Marked now and removed with everything inside it at the end of the tick, so the actions after it

@@ -6,7 +6,7 @@ import {
     TransformComponent,
     TriggerComponent,
 } from '../../../core/components/index.ts';
-import type { Action } from '../../../core/fields/index.ts';
+import type { Action, When } from '../../../core/fields/index.ts';
 import type { LevelData } from '../../../core/level-data/index.ts';
 import { LevelWriter } from '../../../core/level-data/index.ts';
 import { Level } from '../../../core/level/index.ts';
@@ -58,6 +58,12 @@ class ControlledRunner implements GameRunner {
         if (this.startAnswer !== undefined) return Promise.resolve(this.startAnswer);
 
         return this.direct.start(levelData, start);
+    }
+
+    restart() {
+        this.asked.push('restart');
+
+        return this.direct.restart();
     }
 
     runTicks(inputsPerTick: readonly TickInputs[]): Promise<TicksOutcome> {
@@ -155,11 +161,15 @@ function crateOf(level: Level) {
 
 // The World's one trigger, which runs the actions when the level starts, on the first tick.
 function onLevelStart(level: Level, actions: readonly Action[]) {
+    return withTrigger(level, { kind: 'levelStart' }, actions);
+}
+
+function withTrigger(level: Level, when: When, actions: readonly Action[]) {
     const trigger = {
         id: 1,
         name: null,
         on: true,
-        when: { kind: 'levelStart' },
+        when,
         checks: [],
         actions,
         repeat: { kind: 'everyTime' },
@@ -692,26 +702,81 @@ describe('PlaySession', () => {
             expect(play.outcome).toEqual({ kind: 'lost', tick: 1 });
         });
 
-        test('Restart starts a new run of the level, and a Restart action does the same', async () => {
+        test("Restart starts a new run from the game's kept level, with the same clock time and a new mirror", async () => {
             const level = onLevelStart(levelWithACrate(), [{ kind: 'win' }]);
-            const { play, runner, nextFrame } = setUp(level);
+            const { play, runner, clock, nextFrame } = setUp(level);
+            const playedAt = clock.nowMs();
             play.play();
             await settle();
             await nextFrame();
+            const firstMirror = play.mirror;
+            expect(play.state).toBe('ended');
+
+            play.restart();
+            expect(play.state).toBe('starting');
+            expect(play.outcome).toBeUndefined();
+            expect(play.mirror).toBe(firstMirror);
+            await settle();
+
+            expect(runner.asked).toEqual(['start', 'restart']);
+            expect(play.state).toBe('playing');
+            expect(play.mirror).not.toBe(firstMirror);
+            expect(play.mirror?.tick).toBe(0);
+            expect(runner.direct.simulation?.start).toEqual({ clockTimeMs: playedAt });
+
+            await nextFrame();
+            expect(play.outcome).toEqual({ kind: 'won', tick: 1 });
+        });
+
+        test('a Restart action after the first second restarts the run, which plays again from its start', async () => {
+            const level = withTrigger(levelWithACrate(), { kind: 'after', seconds: 1.5 }, [{ kind: 'restart' }]);
+            const { play, runner, framesFor } = setUp(level);
+            play.play();
+            await settle();
+
+            await framesFor(1_600);
+
+            expect(runner.asked).toEqual(['start', 'restart']);
+            expect(play.state).toBe('playing');
+            expect(play.mirror?.tick).toBeLessThan(90);
+        });
+
+        test("a Restart action in the run's first second is ignored, with a warning in the message pill", async () => {
+            const { play, runner, session, nextFrame } = setUp(onLevelStart(levelWithACrate(), [{ kind: 'restart' }]));
+            play.play();
+            await settle();
+
+            await nextFrame();
+
+            expect(runner.asked).toEqual(['start']);
+            expect(play.state).toBe('playing');
+            expect(session.status.current).toBe(
+                'A trigger tried to restart the level in its first second, so it was ignored',
+            );
+        });
+
+        test('a paused run restarts paused, and a run that crashed or was stopped is not restarted', async () => {
+            const { play, runner, nextFrame } = setUp();
+            play.play();
+            await settle();
+            play.pause();
 
             play.restart();
             await settle();
+            expect(play.state).toBe('paused');
+            expect(play.mirror?.tick).toBe(0);
 
-            expect(runner.asked).toEqual(['start', 'stop', 'start']);
-            expect(play.state).toBe('playing');
-            expect(play.outcome).toBeUndefined();
+            play.resume();
+            runner.crashNextBatch = true;
+            await nextFrame();
+            expect(play.state).toBe('ended');
+            play.restart();
+            expect(play.state).toBe('ended');
 
-            const restarting = setUp(onLevelStart(levelWithACrate(), [{ kind: 'restart' }]));
-            restarting.play.play();
-            await settle();
-            await restarting.nextFrame();
-
-            expect(restarting.runner.asked).toEqual(['start', 'stop', 'start']);
+            play.stop();
+            play.restart();
+            expect(play.state).toBe('idle');
+            expect(runner.asked).toEqual(['start', 'restart']);
         });
 
         test('a warning shows once in the message pill', async () => {

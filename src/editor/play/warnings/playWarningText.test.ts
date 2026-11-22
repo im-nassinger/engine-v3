@@ -12,5 +12,6 @@ describe('playWarningText', () => {
     test('gives a text for each other warning', () => {
         expect(playWarningText({ kind: 'chainLimit' })).toContain('32');
         expect(playWarningText({ kind: 'valueFixedInPlay' })).toContain("can't change during play");
+        expect(playWarningText({ kind: 'restartIgnored' })).toContain('first second');
     });
 });

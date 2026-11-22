@@ -210,4 +210,39 @@ describe('GameWorkerHost', () => {
         expect(poses[0]).toEqual(directPoses(first, 1)[0]);
         expect(poses.slice(1)).toEqual(directPoses(second, 2));
     });
+
+    test('restart runs the kept level again from its start, in place of the run before it', async () => {
+        const levelData = crateLevel(0);
+        const scope = startedHost();
+
+        scope.send({ kind: 'start', levelData, clockTimeMs: 5_000 });
+        scope.send({ kind: 'runTicks', inputsPerTick: BATCH });
+        scope.send({ kind: 'runTicks', inputsPerTick: BATCH });
+        scope.send({ kind: 'restart' });
+        scope.send({ kind: 'runTicks', inputsPerTick: BATCH });
+
+        await scope.answerCount(5);
+        expect(scope.answers.map((answer) => answer.kind)).toEqual([
+            'started',
+            'ticked',
+            'ticked',
+            'started',
+            'ticked',
+        ]);
+        const poses = reportedPoses(scope.answers);
+        expect(poses[2]).toEqual(poses[0]);
+        const last = scope.answers[4];
+        expect(last?.kind === 'ticked' && last.report.lastTick).toBe(4);
+    });
+
+    test('a restart after stop has no level kept, so it answers crashed', async () => {
+        const scope = startedHost();
+
+        scope.send({ kind: 'start', levelData: crateLevel(0), clockTimeMs: 0 });
+        scope.send({ kind: 'stop' });
+        scope.send({ kind: 'restart' });
+
+        await scope.answerCount(2);
+        expect(scope.answers[1]).toEqual({ kind: 'crashed', detail: 'Restart was asked with no level kept.' });
+    });
 });

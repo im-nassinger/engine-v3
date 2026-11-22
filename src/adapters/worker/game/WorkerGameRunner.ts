@@ -26,13 +26,13 @@ export class WorkerGameRunner implements GameRunner {
     }
 
     start(levelData: LevelData, start: RunStart): Promise<StartOutcome> {
-        const worker = this.workerNow();
-        this.running = false;
+        return this.askToStart({ kind: 'start', levelData, clockTimeMs: start.clockTimeMs });
+    }
 
-        return new Promise<StartOutcome>((answer) => {
-            this.waiters.push({ kind: 'start', answer });
-            send(worker, { kind: 'start', levelData, clockTimeMs: start.clockTimeMs });
-        });
+    restart(): Promise<StartOutcome> {
+        if (this.worker === undefined) throw new Error('Restart was asked with no game.');
+
+        return this.askToStart({ kind: 'restart' });
     }
 
     runTicks(inputsPerTick: readonly TickInputs[]): Promise<TicksOutcome> {
@@ -55,6 +55,16 @@ export class WorkerGameRunner implements GameRunner {
     terminate() {
         this.endWorker();
         this.workerNow();
+    }
+
+    private askToStart(request: GameRequest & { readonly kind: 'start' | 'restart' }) {
+        const worker = this.workerNow();
+        this.running = false;
+
+        return new Promise<StartOutcome>((answer) => {
+            this.waiters.push({ kind: 'start', answer });
+            send(worker, request);
+        });
     }
 
     // The worker, created and told to load the game if there is none.

@@ -45,7 +45,7 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 - [x] 13. The run's end, changed values and warnings on the page
   - Read: versions/v3/architecture.md#the-report-the-mirror-and-the-end, requirements/play-and-save/test-play.md#win-and-lose-the-end-window--v3, design/controls.md#v3-triggers-tags-variables-inputs-and-the-end-window
   - Done when: `TickReport` carries `changes`, `end` and `warnings`; `PlayMirror` applies the changes so they show; Win or Lose puts the run in `ended`, the Play bar reads ENDED and `EndWindow` shows the title, the time as `m:ss.hh`, Leave (Stop) and Restart, as the design draws; warnings show once each in the message pill; tests pass
-- [ ] 14. Restart
+- [x] 14. Restart
   - Read: versions/v3/architecture.md#the-report-the-mirror-and-the-end, requirements/triggers/triggers.md#order-and-limits--v3
   - Done when: the Restart action and the end window's Restart start a new run from the kept `LevelData` in the same worker, with the same clock time, and the mirror starts again; everything the requirement lists is reset; a Restart action in a run's first second is ignored with a warning; tests pass
 - [ ] 15. The determinism levels for triggers

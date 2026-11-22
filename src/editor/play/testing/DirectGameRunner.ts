@@ -18,6 +18,8 @@ export class DirectGameRunner implements GameRunner {
     private readonly engine: PhysicsEngine;
     private queue: Promise<unknown> = Promise.resolve();
     private currentSimulation: Simulation | undefined;
+    // What the last start was given, kept until a stop, as the game worker keeps it.
+    private kept: { readonly levelData: LevelData; readonly start: RunStart } | undefined;
     // Raised by terminate, so nothing asked before it is answered.
     private generation = 0;
     private prepareCount = 0;
@@ -47,16 +49,14 @@ export class DirectGameRunner implements GameRunner {
     }
 
     start(levelData: LevelData, start: RunStart): Promise<StartOutcome> {
-        return this.enqueue(async () => {
-            this.dropRun();
-            await this.engine.load();
-            const started = startSimulation(levelData, this.engine, start);
-            if (!started.ok) return { kind: 'failed', reason: started.refusal };
-
-            this.currentSimulation = started.value;
-
-            return { kind: 'started' };
+        return this.enqueue(() => {
+            this.kept = { levelData, start };
+            return this.startKept();
         });
+    }
+
+    restart(): Promise<StartOutcome> {
+        return this.enqueue(() => this.startKept());
     }
 
     runTicks(inputsPerTick: readonly TickInputs[]): Promise<TicksOutcome> {
@@ -73,7 +73,10 @@ export class DirectGameRunner implements GameRunner {
     }
 
     stop() {
-        void this.enqueue(() => this.dropRun());
+        void this.enqueue(() => {
+            this.kept = undefined;
+            this.dropRun();
+        });
     }
 
     terminate() {
@@ -81,6 +84,21 @@ export class DirectGameRunner implements GameRunner {
         this.terminateCount += 1;
         this.dropRun();
         this.prepare();
+    }
+
+    // A run built from what the last start was given, dropping the one before it.
+    private async startKept(): Promise<StartOutcome> {
+        const kept = this.kept;
+        if (kept === undefined) throw new Error('Restart was asked with no level kept.');
+
+        this.dropRun();
+        await this.engine.load();
+        const started = startSimulation(kept.levelData, this.engine, kept.start);
+        if (!started.ok) return { kind: 'failed', reason: started.refusal };
+
+        this.currentSimulation = started.value;
+
+        return { kind: 'started' };
     }
 
     // Runs the work after everything asked before it. A throw answers crashed and drops the run. Work asked

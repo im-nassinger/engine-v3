@@ -1,7 +1,7 @@
 import type { LevelData } from '../../../core/level-data/index.ts';
 import type { PhysicsEngine } from '../../../core/physics/index.ts';
 import { startSimulation } from '../../../core/simulation/index.ts';
-import type { Simulation, TickInputs } from '../../../core/simulation/index.ts';
+import type { RunStart, Simulation, TickInputs } from '../../../core/simulation/index.ts';
 
 import type { GameAnswer, GameRequest } from './gameProtocol.ts';
 
@@ -18,6 +18,8 @@ export class GameWorkerHost {
     private readonly engine: PhysicsEngine;
     private queue: Promise<void> = Promise.resolve();
     private simulation: Simulation | undefined;
+    // What the last start was given, kept until a stop, so Restart needs nothing from the page.
+    private kept: { readonly levelData: LevelData; readonly start: RunStart } | undefined;
 
     constructor(scope: GameWorkerScope, engine: PhysicsEngine) {
         this.scope = scope;
@@ -35,6 +37,7 @@ export class GameWorkerHost {
         try {
             await this.handleOrThrow(request);
         } catch (error) {
+            this.kept = undefined;
             this.dropRun();
             this.answer({ kind: 'crashed', detail: error instanceof Error ? error.message : String(error) });
         }
@@ -47,21 +50,30 @@ export class GameWorkerHost {
                 this.answer({ kind: 'ready' });
                 return;
             case 'start':
-                await this.start(request.levelData, request.clockTimeMs);
+                this.kept = { levelData: request.levelData, start: { clockTimeMs: request.clockTimeMs } };
+                await this.start(this.kept.levelData, this.kept.start);
                 return;
+            case 'restart': {
+                const kept = this.kept;
+                if (kept === undefined) throw new Error('Restart was asked with no level kept.');
+
+                await this.start(kept.levelData, kept.start);
+                return;
+            }
             case 'runTicks':
                 this.runTicks(request.inputsPerTick);
                 return;
             case 'stop':
+                this.kept = undefined;
                 this.dropRun();
                 return;
         }
     }
 
-    private async start(levelData: LevelData, clockTimeMs: number) {
+    private async start(levelData: LevelData, start: RunStart) {
         this.dropRun();
         await this.engine.load();
-        const started = startSimulation(levelData, this.engine, { clockTimeMs });
+        const started = startSimulation(levelData, this.engine, start);
         if (!started.ok) {
             this.answer({ kind: 'failed', reason: started.refusal });
             return;

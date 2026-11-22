@@ -514,16 +514,44 @@ describe('Win, Lose and Restart', () => {
         expect(coinsIn(simulation)).toBe(2);
     });
 
-    test('Restart is recorded too', () => {
+    test('Restart is recorded too, after the first second', () => {
         const level = levelWithCoins();
         giveTriggers(level.world, [{ actions: [{ kind: 'restart' }, { kind: 'win' }] }]);
         const { simulation } = start(level);
 
+        runTicks(simulation, 60);
         simulation.runTick(PRESS_SPACE);
 
+        expect(simulation.tick).toBe(61);
         expect(simulation.end).toEqual({ kind: 'restart' });
+        expect(simulation.warnings).toEqual([]);
+    });
+
+    test("a Restart in the run's first second is ignored with one warning, and the tick goes on", () => {
+        const level = levelWithCoins();
+        giveTriggers(level.world, [
+            { when: { kind: 'levelStart' }, actions: [{ kind: 'restart' }, addCoins(1)] },
+            { actions: [{ kind: 'restart' }] },
+        ]);
+        const { simulation } = start(level);
+
+        simulation.runTick(NOTHING);
+        expect(simulation.end).toBeNull();
+        expect(coinsIn(simulation)).toBe(1);
+
+        runTicks(simulation, 58);
+        simulation.runTick(PRESS_SPACE);
+        expect(simulation.tick).toBe(60);
+        expect(simulation.end).toBeNull();
+        expect(simulation.warnings).toEqual([{ kind: 'restartIgnored' }]);
     });
 });
+
+function runTicks(simulation: Simulation, count: number) {
+    for (let i = 0; i < count; i++) {
+        simulation.runTick(NOTHING);
+    }
+}
 
 describe('what keeps a trigger or an action from running', () => {
     test('a trigger with an unset part or an unknown variable never runs', () => {

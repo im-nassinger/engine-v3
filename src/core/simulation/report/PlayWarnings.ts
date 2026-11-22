@@ -2,11 +2,13 @@
 // user reads. chainLimit: triggers setting off triggers went past 32 rounds in one tick, and the rest were
 // dropped. valueFixedInPlay: Change value asked for a value physics owns that a running world can't change
 // yet, such as a body's Type, so it was skipped. unknownInput: a trigger listens for an input the World
-// doesn't have, which reads as never held.
+// doesn't have, which reads as never held. restartIgnored: a Restart action ran in the run's first second,
+// which guards against a restart loop.
 export type PlayWarning =
     | { readonly kind: 'chainLimit' }
     | { readonly kind: 'valueFixedInPlay' }
-    | { readonly kind: 'unknownInput'; readonly input: string };
+    | { readonly kind: 'unknownInput'; readonly input: string }
+    | { readonly kind: 'restartIgnored' };
 
 // The run's warnings, each kept once per run, in the order they first came.
 export class PlayWarnings {

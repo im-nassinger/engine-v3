@@ -111,4 +111,29 @@ describe('DirectGameRunner', () => {
         expect((await beforeStop).kind).toBe('ticked');
         expect(await afterStop).toEqual({ kind: 'crashed', detail: 'A batch was sent with no run.' });
     });
+
+    test('restart builds a new run from the kept level with the same clock time', async () => {
+        const runner = new DirectGameRunner(new ScriptedEngine());
+        await runner.start(fallingBoxLevel(), { clockTimeMs: 7_000 });
+        await runner.runTicks(BATCH);
+        const first = runner.simulation;
+
+        const restarted = await runner.restart();
+        const batch = await runner.runTicks(BATCH);
+
+        expect(restarted).toEqual({ kind: 'started' });
+        expect(runner.simulation).not.toBe(first);
+        expect(runner.simulation?.start).toEqual({ clockTimeMs: 7_000 });
+        if (batch.kind !== 'ticked') throw new Error('The batch was not answered.');
+        expect(batch.report.lastTick).toBe(4);
+        expect(yOfFirstPose(batch.report.poses)).toBe(40);
+    });
+
+    test('a restart after stop has no level kept, so it answers crashed', async () => {
+        const runner = new DirectGameRunner(new ScriptedEngine());
+        await runner.start(fallingBoxLevel(), START);
+        runner.stop();
+
+        expect(await runner.restart()).toEqual({ kind: 'crashed', detail: 'Restart was asked with no level kept.' });
+    });
 });

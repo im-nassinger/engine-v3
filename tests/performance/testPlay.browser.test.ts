@@ -51,6 +51,10 @@ class HeldAnswersRunner implements GameRunner {
         return this.inner.start(levelData, start);
     }
 
+    restart(): Promise<StartOutcome> {
+        return this.inner.restart();
+    }
+
     runTicks(inputsPerTick: readonly TickInputs[]): Promise<TicksOutcome> {
         const answered = this.inner.runTicks(inputsPerTick);
 

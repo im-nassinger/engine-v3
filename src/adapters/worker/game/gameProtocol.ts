@@ -7,9 +7,12 @@ export type GameRequest =
     | { readonly kind: 'prepare' }
     // Build a run from the level as the editor wrote it, dropping any run before it.
     | { readonly kind: 'start'; readonly levelData: LevelData; readonly clockTimeMs: number }
+    // Build a new run from the level and clock time the last start kept, dropping the run before it.
+    // Answered like a start.
+    | { readonly kind: 'restart' }
     // Run one tick per entry, with what the player holds during it, and answer with one report.
     | { readonly kind: 'runTicks'; readonly inputsPerTick: readonly TickInputs[] }
-    // Drop the run and keep Box2D loaded for the next start. Nothing answers.
+    // Drop the run and the kept level, and keep Box2D loaded for the next start. Nothing answers.
     | { readonly kind: 'stop' };
 
 // What the game worker answers. failed and crashed end the run; the page doesn't wait for the watchdog.

@@ -66,6 +66,8 @@ export class PlaySession {
     private pauseWhenStarted = false;
     private currentState: PlayState = 'idle';
     private currentMirror: PlayMirror | undefined;
+    // The level the run was started from, which the game keeps too, so Restart can start the mirror again.
+    private currentLevelData: LevelData | undefined;
     // The keys the running level uses, kept from the browser while the game has the keyboard.
     private gameKeys: ReadonlySet<string> = new Set();
     private currentNotice: string | undefined;
@@ -149,6 +151,7 @@ export class PlaySession {
         void this.options.saveNow();
 
         const levelData = this.writer.write(this.options.session.openLevel.level);
+        this.currentLevelData = levelData;
         this.run += 1;
         const run = this.run;
         this.setState('starting');
@@ -161,8 +164,7 @@ export class PlaySession {
     stop() {
         if (!this.isRunGoing) return;
 
-        // A won or lost run is still kept by the game; one that failed, crashed or hung is already gone.
-        const gameHasRun = this.currentState !== 'ended' || this.currentOutcome !== undefined;
+        const gameHasRun = this.gameHasRun();
         this.dropRun();
         if (gameHasRun) {
             this.options.runner.stop();
@@ -171,12 +173,30 @@ export class PlaySession {
         this.setState('idle');
     }
 
-    // A new run of the same level, for the end window's Restart and the Restart action.
+    // A new run of the level the game kept, with the same clock time, for the end window's Restart and the
+    // Restart action. Nothing is reset in place: the game builds a new run and the mirror starts again from
+    // the same data. The last frame stays until the new run has started, and a paused run starts paused.
+    // Ignored while starting, and once a run failed, crashed or hung, since the game has no run to restart.
     restart() {
-        if (!this.isRunGoing) return;
+        const levelData = this.currentLevelData;
+        if (levelData === undefined || !this.gameHasRun()) return;
+        if (this.currentState === 'starting') return;
 
-        this.stop();
-        this.play();
+        const wasPaused = this.currentState === 'paused';
+        this.run += 1;
+        const run = this.run;
+        this.cancelFrame?.();
+        this.cancelFrame = undefined;
+        this.watchdog.reset();
+        this.batchInFlight = false;
+        this.drawnInterpolation = undefined;
+        this.currentNotice = undefined;
+        this.currentOutcome = undefined;
+        this.pauseWhenStarted = wasPaused;
+        this.setState('starting');
+
+        const starting = this.options.runner.restart();
+        void starting.then((outcome) => this.started(run, levelData, outcome));
     }
 
     // Play or Stop, for Shift+T, Ctrl+Enter and the one button.
@@ -249,6 +269,8 @@ export class PlaySession {
             return;
         }
 
+        // A restart kept the last run's mirror on screen until now.
+        this.currentMirror?.destroy();
         this.currentMirror = mirrored.value;
         this.gameKeys = levelKeys(mirrored.value.level);
         this.heldKeys.forgetPresses();
@@ -400,12 +422,20 @@ export class PlaySession {
         this.batchInFlight = false;
         this.currentMirror?.destroy();
         this.currentMirror = undefined;
+        this.currentLevelData = undefined;
         this.gameKeys = new Set();
         this.drawnInterpolation = undefined;
         this.currentNotice = undefined;
         this.currentEndedMessage = undefined;
         this.currentEndedDetail = undefined;
         this.currentOutcome = undefined;
+    }
+
+    // A won or lost run is still kept by the game; one that failed, crashed or hung is already gone.
+    private gameHasRun() {
+        if (this.currentState === 'idle') return false;
+
+        return this.currentState !== 'ended' || this.currentOutcome !== undefined;
     }
 
     private showNotice(shown: boolean) {

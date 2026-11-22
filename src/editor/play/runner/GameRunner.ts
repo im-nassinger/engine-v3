@@ -19,6 +19,9 @@ export type GameRunner = {
     prepare(): void;
     // Builds a run from the level as the editor wrote it. Waits for the game to load if it hasn't yet.
     start(levelData: LevelData, start: RunStart): Promise<StartOutcome>;
+    // Builds a new run from the level and clock time the last start was given, kept by the game, dropping the
+    // run before it. Only after a start that answered started, and before a stop.
+    restart(): Promise<StartOutcome>;
     // Runs one tick per entry, with what the player holds during it, and answers with one report.
     runTicks(inputsPerTick: readonly TickInputs[]): Promise<TicksOutcome>;
     // Drops the run and keeps the game loaded. A batch sent before it is still answered.
