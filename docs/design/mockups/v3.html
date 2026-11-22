@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>v3 Logic Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* The page around the moments. The editor's tokens are the redesign's (tokens.md). */
+  :root {
+    --page: #0b0c0e; --page-2: #17181c; --page-text: #d4d7dd; --page-muted: #80858f;
+    --app: #0d0f13; --panel: rgb(24, 27, 33); --raised: rgba(255,255,255,.04); --field: rgba(255,255,255,.055); --hover: rgba(255,255,255,.065);
+    --text: #e4e8ef; --muted: #8b93a1; --faint: #586070; --accent: #4f8cff; --soft: rgba(79,140,255,.2); --on: #fff; --ink: #8fb5ff;
+    --tooltip: #0b0d10; --r: 8px; --rl: 14px; --rowh: 30px; --inset: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--page); color: var(--page-text); font: 12px/1.4 "JetBrains Mono", ui-monospace, monospace; }
+  .hdr { padding: 16px 16px 6px; max-width: 980px; margin: 0 auto; }
+  .hdr h1 { font-size: 16px; margin: 0 0 6px; font-weight: 600; }
+  .hdr p { margin: 0; color: var(--page-muted); line-height: 1.55; }
+  .moment { max-width: 980px; margin: 18px auto 30px; padding: 0 10px; }
+  .moment h2 { font-size: 14px; font-weight: 600; margin: 0 0 4px; }
+  .moment > p { margin: 0 0 10px; color: var(--page-muted); line-height: 1.55; }
+  .ed { position: relative; width: 960px; height: 600px; overflow: hidden; border-radius: 10px; color: var(--text); background: var(--app); }
+  .ed > svg.view { position: absolute; inset: 0; display: block; }
+  svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+  .shade { box-shadow: 0 2px 5px rgba(0,0,0,.3); }
+  .isl { position: absolute; background: var(--panel); border-radius: var(--rl); }
+
+  /* ☰ and the tool column */
+  .burger { left: 10px; top: 10px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; }
+  .toolcol { left: 10px; top: 68px; width: 48px; padding: 7px 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .tool { width: 34px; height: 34px; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: var(--muted); position: relative; }
+  .tool.on { background: var(--soft); color: var(--ink); }
+  .burger .tool { color: var(--muted); }
+
+  /* A kinds menu standing beside its tool */
+  .menu { position: absolute; background: var(--panel); border-radius: 12px; padding: 6px; min-width: 170px; }
+  .menu.kinds::before { content: ""; position: absolute; left: -6px; top: calc(50% - 7px); border: 7px solid transparent; border-left: 0; border-right-color: var(--panel); }
+  .mt { height: 24px; display: flex; align-items: center; padding: 0 10px; font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .mi { height: 28px; display: flex; align-items: center; gap: 12px; padding: 0 10px; border-radius: var(--r); }
+  .mi svg.i { color: var(--muted); }
+  .mi.on { background: var(--soft); color: var(--ink); }
+  .mi.on svg.i { color: var(--ink); }
+
+  /* The Entity inspector */
+  .insp { left: 68px; top: 10px; width: 300px; padding-bottom: 6px; }
+  .ihead { height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); }
+  .ihead .kind { color: var(--muted); display: flex; }
+  .ihead .nm { flex: 1; height: 28px; display: flex; align-items: center; padding: 0 12px; border-radius: 999px; background: var(--field); font-weight: 500; }
+  .ihead .eye { color: var(--muted); display: flex; }
+  .chead { height: 32px; display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); }
+  .chead .t { flex: 1; font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .chead svg.i { width: 14px; height: 14px; color: var(--faint); }
+  .card { padding-bottom: 8px; }
+  .f { height: var(--rowh); display: flex; align-items: center; gap: 8px; padding: 0 var(--inset); }
+  .f > label { width: 96px; color: var(--muted); flex-shrink: 0; white-space: nowrap; }
+  .f.sub > label { padding-left: 14px; }
+  .vals { flex: 1; display: flex; gap: 6px; min-width: 0; align-items: center; }
+  .inp { flex: 1; min-width: 0; height: 25px; padding: 0 11px; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; border-radius: 999px; background: var(--field); }
+  .inp .ax, .inp .unit { color: var(--muted); }
+  .inp .unit { margin-left: auto; color: var(--faint); }
+  .inp .chev { margin-left: auto; width: 12px; height: 12px; color: var(--muted); }
+  .inp.fill { background: linear-gradient(90deg, var(--soft) 0 var(--p), var(--field) var(--p)); }
+  .inp.short { flex: 0 0 92px; }
+  .swc { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.25); }
+  .idx { width: 18px; color: var(--faint); text-align: right; flex-shrink: 0; }
+  .fold { width: 14px; height: 14px; color: var(--muted); }
+  .prow.sel { background: var(--soft); border-radius: var(--r); margin: 0 6px; padding: 0 8px; }
+  .prow.sel .idx { color: var(--ink); }
+
+  /* The message pill and the debug box */
+  .pill { position: absolute; left: 50%; bottom: 52px; transform: translateX(-50%); background: rgba(13,15,19,.8); color: #e4e8ef; border-radius: 999px; padding: 7px 15px; white-space: nowrap; }
+  .debug { right: 10px; bottom: 10px; height: 28px; display: flex; align-items: center; gap: 10px; padding: 0 12px; font-size: 10px; white-space: pre; }
+  .debug b { font-weight: 400; color: var(--muted); margin-right: 4px; }
+  .readout { position: absolute; background: var(--tooltip); color: #e8ebf0; border-radius: var(--r); padding: 4px 8px; font-size: 12px; }
+
+
+  .insp { max-height: 580px; overflow: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.18) transparent; }
+  .warnc { color: #e5b931; }
+
+  /* v3: tags */
+  .tags { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; min-height: 25px; padding: 3px 4px; border-radius: 13px; background: var(--field); }
+  .tag { height: 19px; display: inline-flex; align-items: center; gap: 4px; padding: 0 4px 0 9px; border-radius: 999px; background: var(--soft); color: var(--ink); }
+  .tag .x { width: 14px; height: 14px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: var(--ink); cursor: pointer; }
+  .tag .x:hover { background: rgba(255,255,255,.12); }
+  .tags input { flex: 1 1 60px; width: 60px; min-width: 0; background: none; border: 0; outline: 0; color: var(--text); font: inherit; padding: 0 6px; }
+  .sugg { margin: 2px var(--inset) 4px calc(var(--inset) + 104px); background: var(--panel); border-radius: 10px; padding: 4px; box-shadow: 0 2px 5px rgba(0,0,0,.3); }
+  .sugg div { height: 24px; display: flex; align-items: center; padding: 0 8px; border-radius: var(--r); cursor: pointer; }
+  .sugg div:hover { background: var(--soft); color: var(--ink); }
+
+  /* v3: a trigger */
+  .trig { margin: 4px 8px 8px; padding: 6px 6px 8px; border-radius: 10px; background: var(--raised); }
+  .trig.off { opacity: .55; }
+  .thead { height: 28px; display: flex; align-items: center; gap: 6px; padding: 0 2px; }
+  .grip { color: var(--faint); cursor: grab; display: flex; }
+  .tname { flex: 1; font-weight: 500; }
+  .sw { width: 28px; height: 16px; border-radius: 999px; background: var(--field); position: relative; cursor: pointer; flex-shrink: 0; }
+  .sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--muted); transition: left .12s; }
+  .sw.on { background: var(--accent); }
+  .sw.on::after { left: 14px; background: #fff; }
+  .tdots { color: var(--muted); display: flex; cursor: pointer; border-radius: 50%; padding: 3px; }
+  .tdots:hover { background: var(--hover); }
+  .line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 5px; padding: 3px 4px 3px 6px; line-height: 22px; border-radius: var(--r); position: relative; }
+  .line:hover { background: rgba(255,255,255,.03); }
+  .kw { width: 34px; flex-shrink: 0; color: var(--muted); font-size: 10px; letter-spacing: .09em; text-transform: uppercase; font-weight: 600; }
+  .ind { width: 34px; flex-shrink: 0; }
+  .chip { height: 22px; display: inline-flex; align-items: center; padding: 0 9px; border-radius: 999px; background: var(--field); color: var(--ink); cursor: pointer; white-space: nowrap; }
+  .chip:hover { background: var(--hover); box-shadow: inset 0 0 0 1px rgba(79,140,255,.5); }
+  .chip.unset { background: rgba(229,185,49,.14); color: #e5b931; font-style: italic; }
+  .chip.grey { color: var(--faint); text-decoration: line-through; }
+  .chip.open { box-shadow: inset 0 0 0 1px var(--accent); }
+  .del { margin-left: auto; color: var(--faint); visibility: hidden; cursor: pointer; display: flex; }
+  .line:hover .del { visibility: visible; }
+  .adds { display: flex; gap: 14px; padding: 4px 6px 0 46px; }
+  .adds span { color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+  .tnote { margin: 6px 4px 0; padding: 7px 10px; border-radius: var(--r); display: flex; gap: 8px; align-items: flex-start; line-height: 1.45; }
+  .tnote.warn { background: rgba(229,185,49,.1); }
+  .tnote.warn svg.i { color: #e5b931; }
+  .tnote.tip { background: rgba(90,169,240,.1); }
+  .tnote.tip svg.i { color: #5aa9f0; }
+  .tnote a { color: var(--ink); cursor: pointer; text-decoration: none; }
+  .addbtn { margin: 4px 8px 6px; height: 28px; border-radius: var(--r); background: var(--raised); display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--text); cursor: pointer; }
+  .addbtn:hover { background: var(--hover); }
+  .pop { position: fixed; z-index: 20; background: var(--panel); border-radius: 12px; padding: 6px; min-width: 150px; max-height: 320px; overflow: auto; box-shadow: 0 2px 5px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.04); color: var(--text); }
+  .pop .mi { cursor: pointer; }
+  .pop .mi:hover { background: var(--soft); color: var(--ink); }
+  .pop .mi.dis { color: var(--faint); cursor: default; }
+  .pop .mi.dis:hover { background: none; color: var(--faint); }
+  .pop .mi .why { margin-left: auto; color: var(--faint); font-size: 10px; }
+  .pop input { width: 120px; height: 25px; border-radius: 999px; background: var(--field); border: 0; color: var(--text); font: inherit; padding: 0 11px; outline: 1px solid var(--accent); }
+
+  /* v3: the end window in test play */
+  .playbar { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); height: 36px; border-radius: 999px; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 14px; background: linear-gradient(rgba(139,147,161,.16), rgba(139,147,161,.16)), var(--panel); }
+  .playbar .lbl { display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--muted); font-size: 11px; letter-spacing: .06em; }
+  .playbar .lbl::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+  .scrim { position: absolute; inset: 0; background: rgba(0,0,0,.5); }
+  .endw { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 320px; padding: 22px 22px 18px; border-radius: var(--rl); background: var(--panel); text-align: center; }
+  .endw h3 { margin: 0 0 4px; font-size: 20px; font-weight: 600; }
+  .endw .time { color: var(--muted); margin-bottom: 18px; }
+  .endw .time b { color: var(--text); font-weight: 500; font-size: 14px; }
+  .btns { display: flex; gap: 8px; justify-content: center; }
+  .btn { height: 30px; padding: 0 16px; border-radius: var(--r); background: var(--raised); display: inline-flex; align-items: center; cursor: pointer; }
+  .btn.pri { background: var(--accent); color: #fff; font-weight: 600; }
+  .seg { display: inline-flex; gap: 4px; margin: 0 0 10px; }
+  .seg span { padding: 5px 12px; border-radius: 999px; background: var(--panel); cursor: pointer; }
+  .seg span.on { background: var(--soft); color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="hdr">
+  <h1>v3: logic without code</h1>
+  <p>Claude's proposal, for the owner to try (2026-11-22), in the redesign's look. Every part here is new in v3; the rest of the editor is as built. <b>The trigger cards work:</b> click any blue part of a sentence to change it, a yellow one to set it, the switch to turn a trigger off, <code>…</code> to duplicate or delete it, and "+ If" or "+ Do" to add a line. The tags field works too. Dragging, undo and the level view don't. The names shown (<code>coins</code>, <code>player</code>) are only an example level.</p>
+</div>
+<div id="out"></div>
+<script>
+const ICON = {
+  menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  select: '<path d="M6 3l12 8-5.5 1.5L10 19z"/>',
+  shape: '<rect x="3" y="3" width="10" height="10" rx="1"/><circle cx="15.5" cy="15.5" r="5.5"/>',
+  joint: '<circle cx="7" cy="17" r="3"/><circle cx="17" cy="7" r="3"/><path d="M9.2 14.8l5.6-5.6"/>',
+  pen: '<path d="M15.7 21.3a1 1 0 0 1-1.4 0l-1.6-1.6a1 1 0 0 1 0-1.4l5.6-5.6a1 1 0 0 1 1.4 0l1.6 1.6a1 1 0 0 1 0 1.4z"/><path d="M18 13l-1.4-6.9a1 1 0 0 0-.7-.8L3.2 2a1 1 0 0 0-1.2 1.2l3.3 12.7a1 1 0 0 0 .8.7L13 18"/><path d="M2.3 2.3l7.3 7.3"/><circle cx="11" cy="11" r="2"/>',
+  pencil: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/>',
+  trigger: '<rect x="3" y="5" width="18" height="14" rx="1.5" stroke-dasharray="3 2.5"/><path d="M13 8l-3 4.5h4L11 17"/>',
+  world: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/>',
+  eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  right: '<path d="M9 6l6 6-6 6"/>',
+  down: '<path d="M6 9l6 6 6-6"/>',
+  dots: '<path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  x: '<path d="M7 7l10 10M17 7L7 17"/>',
+  grip: '<path d="M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01" stroke-width="3"/>',
+  warn: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/>',
+  stop: '<rect x="6" y="6" width="12" height="12" rx="1.5"/>',
+  rect: '<rect x="4" y="6" width="16" height="12" rx="1"/>'
+};
+const ic = (n, cls = 'i') => `<svg class="${cls}" viewBox="0 0 24 24">${ICON[n]}</svg>`;
+const CHEV = ic('down', 'i chev');
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// The level view, as in the v2 mockup.
+const WORLD = '#CDE3F2', FILL = '#4A90D9', LINE = '#1F3552', ACCENT = '#4f8cff';
+function grid(w, h) {
+  let s = '';
+  for (let x = 0; x <= w; x += 10) s += `<path d="M${x} 0V${h}" stroke="#1E3C5F" stroke-opacity="${x % 50 ? 0.07 : 0.13}"/>`;
+  for (let y = 0; y <= h; y += 10) s += `<path d="M0 ${y}H${w}" stroke="#1E3C5F" stroke-opacity="${y % 50 ? 0.07 : 0.13}"/>`;
+  return s;
+}
+const ground = '<path d="M0 520 L180 505 L340 530 L520 500 L700 515 L960 495 V600 H0Z" fill="#5a9a62" stroke="#2f5a35" stroke-width="2"/>';
+const view = (inner, noGrid) => `<svg class="view" width="960" height="600" viewBox="0 0 960 600"><rect width="960" height="600" fill="${WORLD}"/>${noGrid ? '' : grid(960, 600)}${ground}${inner}</svg>`;
+const sq = (x, y) => `<rect x="${x - 4}" y="${y - 4}" width="8" height="8" rx="1.5" fill="#fff" stroke="${ACCENT}" stroke-width="1.5"/>`;
+// A shape with no StyleComponent, drawn by the editor only (proposal): a dashed edge and a small bolt at its top left.
+const zone = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#1D2430" fill-opacity=".04" stroke="#1D2430" stroke-opacity=".55" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <g transform="translate(${x + 6} ${y + 6}) scale(.62)" fill="none" stroke="#1D2430" stroke-opacity=".7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3l-5 9h6l-3 9"/></g>`;
+const handles = (x, y, w, h) => [[x, y], [x + w / 2, y], [x + w, y], [x + w, y + h / 2], [x + w, y + h], [x + w / 2, y + h], [x, y + h], [x, y + h / 2]].map(([a, b]) => sq(a, b)).join('');
+const coin = (x, y) => `<circle cx="${x}" cy="${y}" r="13" fill="#F2C94C" stroke="#9a7a14" stroke-width="2"/>`;
+const scene = `${coin(300, 440)}${coin(360, 420)}${coin(420, 440)}<rect x="150" y="455" width="40" height="40" fill="${FILL}" stroke="${LINE}" stroke-width="2"/>`;
+
+const burger = `<div class="isl shade burger"><div class="tool">${ic('menu')}</div></div>`;
+const tools = (on) => `<div class="isl shade toolcol">${['select', 'shape', 'joint', 'pen', 'pencil', 'trigger'].map((t) => `<div class="tool${t === on ? ' on' : ''}">${ic(t)}</div>`).join('')}</div>`;
+const debug = '<div class="isl shade debug"><span><b>X</b>812</span><span><b>Y</b>-140</span><span><b>GRID</b>50</span><span><b>ZOOM</b>100%</span></div>';
+const card = (title, open, body = '') => open
+  ? `<div class="card"><div class="chead">${ic('down')}<span class="t">${title}</span>${ic('dots')}</div>${body}</div>`
+  : `<div class="chead">${ic('right')}<span class="t">${title}</span>${ic('dots')}</div>`;
+const field = (label, value) => `<div class="f"><label>${label}</label><div class="vals">${value}</div></div>`;
+const inp = (v, unit = '') => `<div class="inp">${v}${unit ? `<span class="unit">${unit}</span>` : ''}</div>`;
+const sw = (on) => `<span class="sw${on ? ' on' : ''}" style="cursor:default"></span>`;
+
+// ---- The trigger model, enough to click through ----
+// A trigger: { name, on, when: {...}, ifs: [...], dos: [...], repeat: {...} }. A part left null is unset.
+const TAGS = { coin: ['coin'] };
+const LEVEL = { names: ['Player', 'Door', 'Coin 1', 'Goal'], tags: ['player', 'coin', 'enemy', 'spike'], vars: ['coins', 'lives', 'time_left'], inputs: ['left', 'right', 'up', 'down', 'jump'] };
+const EVENTS = [
+  ['touched', 'something starts touching this'], ['untouched', 'something stops touching this'],
+  ['input', 'an input'], ['key', 'a key'], ['timer', 'a timer'], ['start', 'the level starts'], ['tagleft', 'no entity with a tag is left']
+];
+const hasOther = (t) => t.when.event === 'touched' || t.when.event === 'untouched';
+const TARGETS = (t, withTags = true) => [
+  { v: 'this' }, { v: 'other', dis: !hasOther(t) && 'no other for this event' },
+  ...LEVEL.names.map((n) => ({ v: n, label: `the entity ${n}` })),
+  ...(withTags ? LEVEL.tags.map((g) => ({ v: '#' + g, label: `every entity tagged ${g}` })) : [])
+];
+const tLabel = (v) => v == null ? null : v.startsWith('#') ? `every ${v.slice(1)}` : v;
+const VALUES = (target) => target && target.startsWith('#') || target === 'other' || target === 'this' || (target && !LEVEL.vars.includes(target))
+  ? ['Transform position x', 'Transform position y', 'Transform rotation', 'Body velocity x', 'Body velocity y', 'Style fill', 'Tags', 'Trigger "Touched" on']
+  : [];
+
+function whenLine(t, i) {
+  const w = t.when, P = [chip(i, 'when.event', EVENTS.find((e) => e[0] === w.event)?.[1], EVENTS.map(([v, l]) => ({ v, label: l })), 'pick an event')];
+  if (w.event === 'input' || w.event === 'key') {
+    P.push(chip(i, 'when.name', w.name, (w.event === 'input' ? LEVEL.inputs : ['Space', 'W', 'A', 'S', 'D', 'Enter', 'Left arrow', 'Right arrow']).map((v) => ({ v })), w.event === 'input' ? 'pick an input' : 'pick a key'));
+    P.push(chip(i, 'when.how', w.how && `is ${w.how}`, ['pressed', 'released', 'held'].map((v) => ({ v, label: `is ${v}` })), 'pressed?'));
+  } else if (w.event === 'timer') {
+    P.push(chip(i, 'when.how', w.how, [{ v: 'after' }, { v: 'every' }], 'after or every'));
+    P.push(chip(i, 'when.secs', w.secs != null && `${w.secs} s`, 'number', 'how long'));
+  } else if (w.event === 'tagleft') {
+    P.push('tagged', chip(i, 'when.tag', w.tag, LEVEL.tags.map((v) => ({ v })), 'pick a tag'));
+  }
+  return line('When', P);
+}
+const COMPARE = ['is', 'is not', 'is more than', 'is less than', 'is at least', 'is at most'];
+function ifLine(t, i, k) {
+  const c = t.ifs[k], p = `ifs.${k}.`;
+  const P = c.kind === 'tag'
+    ? [chip(i, p + 'target', tLabel(c.target), TARGETS(t, false), 'pick who', c.target === 'other' && !hasOther(t)), 'is tagged', chip(i, p + 'tag', c.tag, LEVEL.tags.map((v) => ({ v })), 'pick a tag')]
+    : [chip(i, p + 'var', c.var, LEVEL.vars.map((v) => ({ v })), 'pick a variable'), chip(i, p + 'cmp', c.cmp, COMPARE.map((v) => ({ v })), 'compare'), chip(i, p + 'num', c.num, 'number', 'a number')];
+  return line(k ? 'and' : 'If', P, `ifs.${k}`, i);
+}
+const ACTIONS = [['change', 'change a value'], ['destroy', 'destroy'], ['push', 'push'], ['win', 'win'], ['lose', 'lose'], ['restart', 'restart the level']];
+function doLine(t, i, k) {
+  const a = t.dos[k], p = `dos.${k}.`;
+  const tg = (key = 'target') => chip(i, p + key, tLabel(a[key]), TARGETS(t), 'pick who', a[key] === 'other' && !hasOther(t));
+  let P;
+  if (a.kind === 'change') {
+    const isVar = a.what && LEVEL.vars.includes(a.what);
+    P = [chip(i, p + 'op', a.op, ['set', 'add', 'subtract'].map((v) => ({ v })), 'set, add or subtract'),
+      chip(i, p + 'num', a.num, 'number', 'a value'),
+      a.op === 'set' ? 'as' : a.op === 'subtract' ? 'from' : 'to',
+      chip(i, p + 'what', a.what, [...LEVEL.vars.map((v) => ({ v, label: `the variable ${v}` })), ...VALUES('this').map((v) => ({ v, label: `a value of an entity: ${v}` }))], 'pick a value')];
+    if (a.what && !isVar) P.push('of', tg());
+  } else if (a.kind === 'destroy') P = [chip(i, p + 'kind', 'destroy', ACTIONS.map(([v, label]) => ({ v, label })), ''), tg()];
+  else if (a.kind === 'push') P = [chip(i, p + 'kind', 'push', ACTIONS.map(([v, label]) => ({ v, label })), ''), tg(),
+    chip(i, p + 'how', a.how, [{ v: 'by 0, -600 px/s' }, { v: 'away from this at 400 px/s' }, { v: 'towards this at 400 px/s' }], 'how')];
+  else P = [chip(i, p + 'kind', ACTIONS.find((x) => x[0] === a.kind)[1], ACTIONS.map(([v, label]) => ({ v, label })), '')];
+  return line(k ? '' : 'Do', P, `dos.${k}`, i);
+}
+const REPEATS = [{ v: 'every time' }, { v: 'once per run' }, { v: 'at most once every 1 s' }, { v: 'at most once every 2 s' }];
+
+const CHIPS = [];
+function chip(i, path, label, opts, unset, grey) {
+  CHIPS.push({ i, path, opts });
+  const id = CHIPS.length - 1;
+  return `<span class="chip${label ? '' : ' unset'}${grey ? ' grey' : ''}" data-c="${id}" title="${grey ? 'This event has no other: this part is skipped' : ''}">${esc(label || unset)}</span>`;
+}
+function line(kw, parts, delPath, i) {
+  return `<div class="line"><span class="${kw ? 'kw' : 'ind'}">${kw}</span>${parts.map((p) => typeof p === 'string' ? `<span>${p}</span>` : p).join('')}${delPath ? `<span class="del" data-del="${i}:${delPath}" title="Remove this line">${ic('x')}</span>` : ''}</div>`;
+}
+const isSet = (t) => {
+  const vals = [];
+  const w = t.when; vals.push(w.event);
+  if (w.event === 'input' || w.event === 'key') vals.push(w.name, w.how);
+  if (w.event === 'timer') vals.push(w.how, w.secs);
+  if (w.event === 'tagleft') vals.push(w.tag);
+  t.ifs.forEach((c) => c.kind === 'tag' ? vals.push(c.target, c.tag) : vals.push(c.var, c.cmp, c.num));
+  t.dos.forEach((a) => { if (a.kind === 'change') { vals.push(a.op, a.num, a.what); if (a.what && !LEVEL.vars.includes(a.what)) vals.push(a.target); } if (a.kind === 'destroy') vals.push(a.target); if (a.kind === 'push') vals.push(a.target, a.how); });
+  return vals.every((v) => v != null) && t.dos.length > 0;
+};
+const autoName = (t) => ({ touched: 'Touched', untouched: 'No longer touched', input: `${t.when.name || 'Input'} ${t.when.how || ''}`.trim(), key: `${t.when.name || 'Key'} key ${t.when.how || ''}`.trim(), timer: t.when.how === 'every' ? `Every ${t.when.secs ?? '?'} s` : `After ${t.when.secs ?? '?'} s`, start: 'Level starts', tagleft: `No ${t.when.tag || 'tag'} left` }[t.when.event] || 'New trigger');
+
+function trigHtml(t, i, opts) {
+  const ready = isSet(t);
+  return `<div class="trig${t.on ? '' : ' off'}">
+    <div class="thead"><span class="grip" title="Drag to reorder: it also changes when it runs">${ic('grip')}</span><span class="sw${t.on ? ' on' : ''}" data-sw="${i}" title="On or off"></span><span class="tname">${esc(t.name || autoName(t))}</span><span class="tdots" data-menu="${i}">${ic('dots')}</span></div>
+    ${whenLine(t, i)}${t.ifs.map((_, k) => ifLine(t, i, k)).join('')}${t.dos.map((_, k) => doLine(t, i, k)).join('')}
+    ${t.dos.length ? '' : line('Do', [chip(i, 'dos.new', null, ACTIONS.map(([v, label]) => ({ v, label })), 'pick an action')])}
+    <div class="line"><span class="kw" style="width:auto;margin-right:4px">Repeat</span>${chip(i, 'repeat', t.repeat, REPEATS, '')}</div>
+    <div class="adds"><span data-addif="${i}">${ic('plus')}If</span><span data-adddo="${i}">${ic('plus')}Do</span></div>
+    ${ready ? '' : `<div class="tnote warn">${ic('warn')}<span>Doesn't run until every yellow part is set.</span></div>`}
+    ${opts.noSurface && (t.when.event === 'touched' || t.when.event === 'untouched') ? `<div class="tnote warn">${ic('warn')}<span>Needs a Surface to notice touching. <a data-addsurf="1">Add Surface as sensor</a></span></div>` : ''}
+  </div>`;
+}
+
+// Each interactive card: its triggers and how to draw the rest of its inspector.
+const BOARDS = {};
+function board(id, triggers, frame) { BOARDS[id] = { triggers, frame }; return `<div data-board="${id}"></div>`; }
+function render(id) {
+  const b = BOARDS[id], el = document.querySelector(`[data-board="${id}"]`);
+  CHIPS.length = 0; CHIPS.board = id;
+  el.innerHTML = b.frame(b.triggers.map((t, i) => trigHtml(t, i, b)).join('') + `<div class="addbtn" data-addtrig="1">${ic('plus')}Add trigger</div>`, b);
+  el._chips = CHIPS.slice();
+  el.querySelectorAll('[data-tags]').forEach((t) => renderTags(t.dataset.tags));
+}
+
+// A popup menu under an element.
+let POP = null;
+function closePop() { if (POP) { POP.remove(); POP = null; document.querySelectorAll('.chip.open').forEach((c) => c.classList.remove('open')); } }
+function popUnder(el, html) {
+  closePop();
+  const r = el.getBoundingClientRect();
+  POP = document.createElement('div'); POP.className = 'pop'; POP.innerHTML = html;
+  document.body.appendChild(POP);
+  POP.style.left = Math.min(r.left, innerWidth - POP.offsetWidth - 8) + 'px';
+  POP.style.top = (r.bottom + 4 + POP.offsetHeight > innerHeight ? r.top - POP.offsetHeight - 4 : r.bottom + 4) + 'px';
+  return POP;
+}
+const getAt = (o, path) => path.split('.').reduce((a, k) => a?.[k], o);
+function setAt(o, path, v) { const ks = path.split('.'), last = ks.pop(); ks.reduce((a, k) => a[k], o)[last] = v; }
+
+function choose(boardId, c, v) {
+  const t = BOARDS[boardId].triggers[c.i];
+  if (c.path === 'when.event') t.when = { event: v };
+  else if (c.path === 'dos.new') t.dos.push({ kind: v });
+  else if (/^dos\.\d+\.kind$/.test(c.path)) t.dos[+c.path.split('.')[1]] = { kind: v };
+  else if (c.path.endsWith('.what')) { setAt(t, c.path, v); const a = getAt(t, c.path.replace(/\.what$/, '')); if (!LEVEL.vars.includes(v) && !a.target) a.target = 'this'; }
+  else setAt(t, c.path, v);
+  closePop(); render(boardId);
+}
+
+document.addEventListener('click', (e) => {
+  const boardEl = e.target.closest('[data-board]');
+  if (POP && POP.contains(e.target)) return;
+  if (!boardEl) { closePop(); return; }
+  const id = boardEl.dataset.board, b = BOARDS[id];
+  const chipEl = e.target.closest('.chip');
+  if (chipEl && chipEl.dataset.c != null) {
+    const c = boardEl._chips[+chipEl.dataset.c];
+    chipEl.classList.add('open');
+    if (c.opts === 'number') {
+      const cur = getAt(b.triggers[c.i], c.path);
+      const p = popUnder(chipEl, `<input type="number" value="${cur ?? ''}" placeholder="Type a number">`);
+      const box = p.querySelector('input'); box.focus(); box.select();
+      box.addEventListener('keydown', (k) => { if (k.key === 'Enter' && box.value !== '') choose(id, c, +box.value); if (k.key === 'Escape') closePop(); });
+      chipEl.classList.add('open');
+    } else {
+      const p = popUnder(chipEl, c.opts.map((o, k) => `<div class="mi${o.dis ? ' dis' : ''}" data-k="${k}">${esc(o.label || o.v)}${o.dis ? `<span class="why">${o.dis}</span>` : ''}</div>`).join(''));
+      p.addEventListener('click', (ev) => { const m = ev.target.closest('.mi'); if (m && !m.classList.contains('dis')) choose(id, c, c.opts[+m.dataset.k].v); });
+      chipEl.classList.add('open');
+    }
+    return;
+  }
+  closePop();
+  const d = e.target.closest('[data-sw],[data-menu],[data-addif],[data-adddo],[data-del],[data-addtrig],[data-addsurf]');
+  if (!d) return;
+  const T = b.triggers;
+  if (d.dataset.sw != null) T[+d.dataset.sw].on = !T[+d.dataset.sw].on;
+  else if (d.dataset.addif != null) {
+    const i = +d.dataset.addif;
+    const p = popUnder(d, `<div class="mi" data-k="tag">who is tagged…</div><div class="mi" data-k="var">a variable compared with a number</div>`);
+    p.addEventListener('click', (ev) => { const m = ev.target.closest('.mi'); if (!m) return; T[i].ifs.push(m.dataset.k === 'tag' ? { kind: 'tag', target: hasOther(T[i]) ? 'other' : null } : { kind: 'var' }); closePop(); render(id); });
+    return;
+  } else if (d.dataset.adddo != null) {
+    const i = +d.dataset.adddo;
+    const p = popUnder(d, ACTIONS.map(([v, l]) => `<div class="mi" data-k="${v}">${l}</div>`).join(''));
+    p.addEventListener('click', (ev) => { const m = ev.target.closest('.mi'); if (!m) return; T[i].dos.push({ kind: m.dataset.k }); closePop(); render(id); });
+    return;
+  } else if (d.dataset.del != null) {
+    const [i, path] = d.dataset.del.split(':'), [list, k] = path.split('.');
+    T[+i][list].splice(+k, 1);
+  } else if (d.dataset.menu != null) {
+    const i = +d.dataset.menu;
+    const p = popUnder(d, `<div class="mi" data-k="ren">Rename…</div><div class="mi" data-k="dup">Duplicate</div><div class="mi" data-k="del">Delete</div>`);
+    p.addEventListener('click', (ev) => {
+      const m = ev.target.closest('.mi'); if (!m) return;
+      if (m.dataset.k === 'dup') T.splice(i + 1, 0, JSON.parse(JSON.stringify(T[i])));
+      if (m.dataset.k === 'del') T.splice(i, 1);
+      if (m.dataset.k === 'ren') { const n = prompt('Trigger name', T[i].name || autoName(T[i])); if (n != null) T[i].name = n.trim() || null; }
+      closePop(); render(id);
+    });
+    return;
+  } else if (d.dataset.addtrig != null) T.push({ name: null, on: true, when: { event: null }, ifs: [], dos: [], repeat: 'every time' });
+  else if (d.dataset.addsurf != null) b.noSurface = false;
+  render(id);
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePop(); });
+
+// ---- The moments ----
+const M = [];
+
+// 1. The Trigger tool drawing.
+M.push(['The Trigger tool', 'Key 6, the sixth tool, Lucide\'s dashed square with a bolt (proposal). No menu beside it, and the Entity inspector is hidden as with every drawing tool. It draws a rectangle like the Shape tool, with the same readout. A trigger has no StyleComponent, so the editor draws it as a dashed edge with a small bolt in its corner (proposal), never shown in play.',
+  view(`${scene}${zone(700, 330, 200, 160)}<path d="M900 490l9 14 3-6 6-1z" fill="#111" stroke="#fff" stroke-width="1"/>`) + burger + tools('trigger') +
+  '<span class="readout" style="left:860px;top:512px;white-space:nowrap">200 × 160</span>' + debug]);
+
+// 2. The new trigger, selected: the full card, clickable.
+const frame2 = (trigs) => `<div class="isl shade insp"><div class="ihead"><span class="kind">${ic('trigger')}</span><div class="nm">Trigger 1</div><span class="eye">${ic('eye')}</span></div>
+  ${card('Transform', false)}${card('Shape', false)}${card('Surface', false)}
+  ${card('Triggers', true, trigs)}<div class="addbtn" style="margin-top:2px">Add Component</div></div>`;
+M.push(['A new trigger, as the tool makes it', 'Released, the tool returns to Select with the new entity selected. Its Triggers card is open, holding one trigger that starts "When something starts touching this"; its Do is unset, so it is yellow and the trigger doesn\'t run yet. <b>Try it:</b> set the Do to "win", then add "If other is tagged player". The Surface card is folded: Sensor is ticked.',
+  view(`${scene}${zone(700, 330, 200, 160)}<rect x="700" y="330" width="200" height="160" fill="none" stroke="${ACCENT}" stroke-width="1.5"/>${handles(700, 330, 200, 160)}`) + burger + tools('select') +
+  board('new', [{ name: null, on: true, when: { event: 'touched' }, ifs: [], dos: [], repeat: 'every time' }], frame2) + debug]);
+
+// 3. A coin: tags, and a full trigger.
+const frame3 = (trigs) => `<div class="isl shade insp"><div class="ihead"><span class="kind">${ic('shape')}</span><div class="nm">Coin 1</div><span class="eye">${ic('eye')}</span></div>
+  ${card('Transform', false)}${card('Shape', false)}${card('Style', false)}${card('Surface', false)}
+  ${card('Tags', true, `<div class="f" style="height:auto;padding-top:2px;padding-bottom:2px"><label>Tags</label><div class="vals" data-tags="coin"></div></div><div data-sugg="coin"></div>`)}
+  ${card('Triggers', true, trigs)}<div class="addbtn" style="margin-top:2px">Add Component</div></div>`;
+M.push(['Tags and a full trigger', 'A coin: a circle with a sensor Surface, the tag <code>coin</code>, and one trigger. Every part is set, so it reads as a sentence. <b>Try it:</b> change the When to "a key" and see <code>other</code> crossed out, since a key has no other; type a tag and press Enter; Repeat; the <code>…</code> menu.',
+  view(`${scene}<circle cx="360" cy="420" r="13" fill="none" stroke="${ACCENT}" stroke-width="1.5"/>${handles(347, 407, 26, 26)}`) + burger + tools('select') +
+  board('coin', [{ name: null, on: true, when: { event: 'touched' }, ifs: [{ kind: 'tag', target: 'other', tag: 'player' }], dos: [{ kind: 'change', op: 'add', num: 1, what: 'coins' }, { kind: 'destroy', target: 'this' }], repeat: 'every time' }], frame3) + debug]);
+
+// 4. The World: variables, inputs and a level-wide trigger.
+const vrow = (n, v) => `<div class="f"><label style="color:var(--text)">${n}</label><div class="vals">${inp(v)}<span class="ibtn">${ic('x')}</span></div></div>`;
+const irow = (n, keys) => `<div class="f" style="height:auto;min-height:var(--rowh);padding-top:2px;padding-bottom:2px"><label style="color:var(--text)">${n}</label><div class="vals"><div class="tags" style="cursor:default">${keys.map((k) => `<span class="tag">${k}<span class="x">${ic('x')}</span></span>`).join('')}<span style="color:var(--faint);padding:0 6px">+ key</span></div></div></div>`;
+const frame4 = (trigs, b) => `<div class="isl shade insp"><div class="ihead"><span class="kind">${ic('world')}</span><div class="nm" style="background:none;padding:0">World</div></div>
+  ${card('Shape', false)}${card('Style', false)}${card('PhysicsWorld', false)}
+  ${card('Variables', true, `${vrow('coins', 0)}${vrow('lives', 3)}<div class="f"><label></label><div class="vals"><span class="linkbtn">${ic('plus')}Add variable</span></div></div>`)}
+  ${card('Inputs', true, `${irow('left', ['A', 'Left arrow'])}${irow('right', ['D', 'Right arrow'])}${irow('up', ['W', 'Up arrow'])}${irow('down', ['S', 'Down arrow'])}${irow('jump', ['Space'])}<div class="f"><label></label><div class="vals"><span class="linkbtn">${ic('plus')}Add input</span></div></div>`)}
+  ${card('Triggers', true, trigs)}</div>`;
+M.push(['The World: variables, inputs and the level\'s triggers', 'The World\'s Variables card lists the level\'s variables, each a name and its starting number (every variable is a number in v3). Its Inputs card lists each input\'s keys; a new level starts with these five. Its triggers are level-wide. <b>Try it:</b> the timer trigger, and change "win" to "lose".',
+  view(scene) + burger + tools('select') +
+  board('world', [
+    { name: null, on: true, when: { event: 'tagleft', tag: 'coin' }, ifs: [], dos: [{ kind: 'win' }], repeat: 'every time' },
+    { name: 'Out of time', on: true, when: { event: 'timer', how: 'after', secs: 60 }, ifs: [{ kind: 'var', var: 'coins', cmp: 'is less than', num: 3 }], dos: [{ kind: 'lose' }], repeat: 'once per run' }
+  ], frame4) + debug]);
+
+// 5. A touch trigger with no Surface.
+const frame5 = (trigs, b) => `<div class="isl shade insp"><div class="ihead"><span class="kind">${ic('rect')}</span><div class="nm">Button</div><span class="eye">${ic('eye')}</span></div>
+  ${card('Transform', false)}${card('Shape', false)}${card('Style', false)}${b.noSurface ? '' : card('Surface', true, field('Sensor', sw(true)))}${card('Triggers', true, trigs)}<div class="addbtn" style="margin-top:2px">Add Component</div></div>`;
+M.push(['A touch trigger without a Surface', 'The trigger card says why it can\'t fire, with the fix as a link, as every editor message on a card does. Nothing is added behind your back. <b>Try it:</b> click "Add Surface as sensor".',
+  view(`${scene}<rect x="600" y="470" width="80" height="20" fill="#E0607E" stroke="${LINE}" stroke-width="2"/><rect x="600" y="470" width="80" height="20" fill="none" stroke="${ACCENT}" stroke-width="1.5"/>${handles(600, 470, 80, 20)}`) + burger + tools('select') +
+  board('nosurf', [{ name: null, on: true, when: { event: 'touched' }, ifs: [{ kind: 'tag', target: 'other', tag: 'player' }], dos: [{ kind: 'push', target: 'other', how: 'by 0, -600 px/s' }], repeat: 'at most once every 1 s' }], frame5) + debug]);
+BOARDS.nosurf && (BOARDS.nosurf.noSurface = true);
+
+// 6. The end window.
+const endWin = (won) => `<div class="scrim"></div><div class="playbar shade"><span class="lbl">ENDED</span><span class="ibtn" style="color:var(--text)">${ic('stop')}</span></div>
+  <div class="endw shade"><h3>${won ? 'Level won' : 'Level lost'}</h3><div class="time">Time <b>0:42.18</b></div><div class="btns"><span class="btn">Leave</span><span class="btn pri">Restart</span></div></div>`;
+M.push(['Win and Lose: the end window', 'In test play, after a Win or Lose action. The last frame stays behind a scrim; the Play bar reads ENDED. Won and lost share the window, only the title differs. Leave goes back to the editor, Restart starts the run again. A level can\'t hide or change it. <b>Try it:</b> switch between won and lost.',
+  `<div data-end="1">${view(scene, true)}${endWin(true)}</div>`]);
+
+document.getElementById('out').innerHTML = M.map(([h, p, ed], k) => `<section class="moment"><h2>${k + 1}. ${h}</h2><p>${p}</p>${k === 5 ? '<div class="seg" data-seg="1"><span class="on">Won</span><span>Lost</span></div>' : ''}<div class="ed">${ed}</div></section>`).join('');
+Object.keys(BOARDS).forEach(render);
+
+// The tags field: type and press Enter, click × to remove; tags used in the level are offered.
+function renderTags(id) {
+  const box = document.querySelector(`[data-tags="${id}"]`), sug = document.querySelector(`[data-sugg="${id}"]`);
+  if (!box) return;
+  const keepText = box.querySelector('input')?.value || '';
+  box.innerHTML = `<div class="tags">${TAGS[id].map((g, k) => `<span class="tag">${esc(g)}<span class="x" data-rm="${k}">${ic('x')}</span></span>`).join('')}<input placeholder="Add a tag" value="${esc(keepText)}"></div>`;
+  const input = box.querySelector('input');
+  const showSugg = () => {
+    const q = input.value.toLowerCase().replace(/\s+/g, '_');
+    const s = q ? LEVEL.tags.filter((g) => g.startsWith(q) && !TAGS[id].includes(g)) : [];
+    sug.innerHTML = s.length ? `<div class="sugg">${s.map((g) => `<div data-pick="${g}">${g}</div>`).join('')}</div>` : '';
+  };
+  const add = (raw) => {
+    const g = raw.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+    if (g && !TAGS[id].includes(g)) TAGS[id].push(g);
+    if (g && !LEVEL.tags.includes(g)) LEVEL.tags.push(g);
+    input.value = ''; renderTags(id); document.querySelector(`[data-tags="${id}"] input`).focus();
+  };
+  input.addEventListener('input', showSugg);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') add(input.value); });
+  box.querySelectorAll('[data-rm]').forEach((x) => x.addEventListener('click', () => { TAGS[id].splice(+x.dataset.rm, 1); renderTags(id); }));
+  sug.onclick = (e) => { const p = e.target.closest('[data-pick]'); if (p) add(p.dataset.pick); };
+  showSugg();
+}
+
+document.querySelector('[data-seg]').addEventListener('click', (e) => {
+  const s = e.target.closest('span'); if (!s) return;
+  const won = s.textContent === 'Won';
+  e.currentTarget.querySelectorAll('span').forEach((x) => x.classList.toggle('on', x === s));
+  document.querySelector('[data-end]').innerHTML = view(scene, true) + endWin(won);
+});
+</script>
+</body>
+</html>
