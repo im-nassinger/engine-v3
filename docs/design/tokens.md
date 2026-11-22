@@ -34,6 +34,8 @@ Slate islands and one bright blue accent (owner, 2026-11-17). **There is no line
 | `--check-dark` | `#2a2e36` | The darker squares of the check pattern under the gradient bar, so see-through stops show (v2, from the [v2 mockup](mockups/v2.html)) |
 | `--check-light` | `#3a3f49` | Its lighter squares |
 | `--stop-ring` | `#ffffff` | The white ring around a colour stop's swatch |
+| `--scrollbar` | `rgba(255,255,255,.14)` | A scrollbar's thumb, on no track, in every list that scrolls (owner's fix, 2026-11-21) |
+| `--scrollbar-hover` | `rgba(255,255,255,.24)` | The thumb under the mouse, where the browser allows it (not Firefox) |
 
 The level view's own colours are in [level-view.md](level-view.md).
 
@@ -78,6 +80,7 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--icon-small` | 13 px: in fields, menu entries and the debug box | |
 | `--indent` | 16 px per level of the Entities viewer tree | |
 | `--dialog` | 400 px wide | |
+| `--scrollbar-size` | 8 px: a scrollbar's width in WebKit; Firefox and Chromium draw their own thin one | owner's fix (2026-11-21) |
 
 ## Spacing, corners, the shadow
 

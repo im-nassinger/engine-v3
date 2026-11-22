@@ -29,6 +29,8 @@
     --check-dark: #2a2e36;
     --check-light: #3a3f49;
     --stop-ring: #ffffff;
+    --scrollbar: rgb(255 255 255 / 14%);
+    --scrollbar-hover: rgb(255 255 255 / 24%);
 
     --font: 'JetBrains Mono', ui-monospace, monospace;
     --text-tiny: 10px;
@@ -58,6 +60,7 @@
     --icon-small: 13px;
     --indent: 16px;
     --dialog: 400px;
+    --scrollbar-size: 8px;
 
     --space-4: 4px;
     --space-6: 6px;
@@ -96,4 +99,31 @@ select,
 textarea {
     font: inherit;
     color: inherit;
+}
+
+/* Every scrolling list in the editor (the Entity inspector, the Entities viewer, menus) gets the same thin
+   scrollbar: a round thumb in --scrollbar on no track. Firefox and Chromium read scrollbar-color; WebKit
+   reads the ::-webkit-scrollbar parts, which Chromium ignores once scrollbar-color is set. */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar) transparent;
+}
+
+*::-webkit-scrollbar {
+    width: var(--scrollbar-size);
+    height: var(--scrollbar-size);
+}
+
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--scrollbar);
+    border-radius: var(--scrollbar-size);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-hover);
 }
