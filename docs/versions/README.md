@@ -8,7 +8,7 @@ One folder per version after v1, each planned in four files the way the `orchest
 
 | Version | What it adds | State |
 |---|---|---|
-| [v2/](v2/requirements.md) | Curves and gradients: the Bézier pen, the Pencil, gradients | Done (2026-11-21): built, tried by the owner, and its [fixes](v2/fixes.md) built |
+| [v2/](v2/requirements.md) | Curves and gradients: the Bézier pen, the Pencil, gradients | Done (owner, 2026-11-22): built, tried by the owner, its [fixes](v2/fixes.md) built and tested |
 | v3/ | A first game without code | Being planned |
 
 Only the next version is planned. v3 to v7 stay one line each in [scope.md](../scope.md) until their turn.
