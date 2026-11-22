@@ -23,6 +23,8 @@ export { BodyComponent } from './BodyComponent/BodyComponent.ts';
 export type { BodyType, BodyValues } from './BodyComponent/BodyValues.ts';
 export { CameraComponent } from './CameraComponent/CameraComponent.ts';
 export type { CameraMode, CameraValues } from './CameraComponent/CameraValues.ts';
+export { InputComponent } from './InputComponent/InputComponent.ts';
+export type { InputValues } from './InputComponent/InputValues.ts';
 export { JointComponent } from './JointComponent/JointComponent.ts';
 export type { JointType, JointValues } from './JointComponent/JointValues.ts';
 export { NameComponent } from './NameComponent/NameComponent.ts';

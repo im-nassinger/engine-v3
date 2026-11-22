@@ -1,0 +1,43 @@
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-height: var(--row);
+
+    /* The name stands where a field's label stands, in the text colour, and is a box only while hovered or typed in. */
+    > .name {
+        box-sizing: border-box;
+        /* Its padding reaches back past the card's inset, so its text lines up with the other labels. */
+        flex: 0 0 calc(var(--label) + 6px);
+        width: calc(var(--label) + 6px);
+        min-width: 0;
+        height: var(--input);
+        padding: 0 6px;
+        margin-left: -6px;
+        border: none;
+        border-radius: calc(var(--input) / 2);
+        outline: none;
+        background: none;
+        color: var(--text);
+        font: inherit;
+        text-overflow: ellipsis;
+
+        &:hover {
+            background: var(--field);
+        }
+
+        &:focus {
+            background: var(--field);
+            outline: 1px solid var(--accent);
+            outline-offset: -1px;
+        }
+
+        &:disabled {
+            color: var(--faint);
+        }
+    }
+
+    > .keys-box {
+        flex: 1;
+    }
+}

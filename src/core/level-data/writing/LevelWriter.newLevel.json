@@ -50,6 +50,30 @@
                     "y": 9.8
                 },
                 "walls": false
+            },
+            "InputComponent": {
+                "inputs": [
+                    {
+                        "name": "left",
+                        "keys": ["KeyA", "ArrowLeft"]
+                    },
+                    {
+                        "name": "right",
+                        "keys": ["KeyD", "ArrowRight"]
+                    },
+                    {
+                        "name": "up",
+                        "keys": ["KeyW", "ArrowUp"]
+                    },
+                    {
+                        "name": "down",
+                        "keys": ["KeyS", "ArrowDown"]
+                    },
+                    {
+                        "name": "jump",
+                        "keys": ["Space"]
+                    }
+                ]
             }
         },
         "children": [

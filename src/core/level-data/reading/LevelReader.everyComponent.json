@@ -61,6 +61,18 @@
                         "value": 3
                     }
                 ]
+            },
+            "InputComponent": {
+                "inputs": [
+                    {
+                        "name": "jump",
+                        "keys": ["Space", "KeyW"]
+                    },
+                    {
+                        "name": "fire",
+                        "keys": []
+                    }
+                ]
             }
         },
         "children": [

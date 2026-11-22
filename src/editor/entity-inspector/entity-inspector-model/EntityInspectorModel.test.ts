@@ -98,7 +98,12 @@ describe('EntityInspectorModel: what is shown', () => {
         selection.replace([level.world.id]);
 
         expect(model.shownEntities).toEqual([level.world]);
-        expect(cardTypes(model)).toEqual(['ShapeComponent', 'StyleComponent', 'PhysicsWorldComponent']);
+        expect(cardTypes(model)).toEqual([
+            'ShapeComponent',
+            'StyleComponent',
+            'PhysicsWorldComponent',
+            'InputComponent',
+        ]);
         expect(model.header.title).toBe('World');
         expect(model.header.canRename).toEqual({ enabled: false, reason: "The World can't be renamed" });
     });

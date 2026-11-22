@@ -20,6 +20,8 @@ export type { ColourStop, Fill, FillKind, GradientFill } from './fill/Fill.ts';
 export { FillFieldType } from './field-types/FillFieldType.ts';
 export type { FieldDefinition } from './FieldDefinition.ts';
 export type { FieldKind, FieldType } from './FieldType.ts';
+export { InputFieldType } from './field-types/InputFieldType.ts';
+export type { Input } from './field-types/InputFieldType.ts';
 export type { JsonValue } from './JsonValue.ts';
 export { JointEndsValue } from './values/JointEndsValue.ts';
 export { ListFieldType } from './field-types/ListFieldType.ts';

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { BodyComponent, ShapeComponent, SurfaceComponent } from '../../../core/components/index.ts';
+import { BodyComponent, InputComponent, ShapeComponent, SurfaceComponent } from '../../../core/components/index.ts';
 import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { buildCommandTestSession } from '../testing/commandTestSession.ts';
 
@@ -71,5 +71,32 @@ describe('applyMessageFix', () => {
         frames.runFrame();
 
         expect(surfaceNotes(session)[0]?.entityIds).toEqual(ids);
+    });
+
+    test('the World\'s "No inputs" note adds the five inputs in one step', () => {
+        const { session, frames } = buildCrates();
+        const openLevel = session.openLevel;
+        const world = openLevel.level.world;
+        openLevel.selection.replace([world.id]);
+        removeComponent(openLevel, [world.id], 'InputComponent');
+        frames.runFrame();
+
+        const worldCard = openLevel.entityInspector.cards.find((card) => card.typeName === 'PhysicsWorldComponent');
+        const [note] = worldCard?.notes ?? [];
+        expect(note?.text).toBe('No inputs.');
+        if (note?.fix === undefined) throw new Error('The note has no fix.');
+
+        const stepsBefore = openLevel.history.undoCount;
+        applyMessageFix(openLevel, note.fix, note.entityIds);
+        frames.runFrame();
+
+        expect(
+            world
+                .getComponent(InputComponent)
+                ?.get('inputs')
+                .map((input) => input.name),
+        ).toEqual(['left', 'right', 'up', 'down', 'jump']);
+        expect(openLevel.history.undoCount).toBe(stepsBefore + 1);
+        expect(openLevel.messages.all()).toEqual([]);
     });
 });

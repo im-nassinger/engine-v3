@@ -117,7 +117,10 @@ function leftClickAt(x: number, y: number): LevelPointerInput {
 
 describe('EditorShell', () => {
     test('each island sits 10 px from the window and from its neighbours, in its place', async () => {
-        showShellWithWorld();
+        // The camera, whose two cards leave room below; the World's now fill the window.
+        const level = Level.createNew();
+        const { session } = showShell(level);
+        session.openLevel.selection.replace([level.camera.id]);
         await expect.poll(() => entityInspector()).not.toBeNull();
 
         const mainMenu = boxOf('Main menu');
@@ -137,7 +140,7 @@ describe('EditorShell', () => {
             WINDOW.height - GAP,
             DEBUG_BOX,
         ]);
-        // As tall as the World's cards, which leave room below.
+        // As tall as the camera's cards.
         expect(inspector.bottom).toBeLessThan(WINDOW.height - GAP);
         const minimap = boxOf('Minimap');
         expect([minimap.right, minimap.bottom, minimap.width, minimap.height]).toEqual([

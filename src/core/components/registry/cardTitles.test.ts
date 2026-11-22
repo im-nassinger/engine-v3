@@ -15,6 +15,7 @@ const TITLES = new Map([
     ['PhysicsWorldComponent', 'PhysicsWorld'],
     ['TagsComponent', 'Tags'],
     ['VariablesComponent', 'Variables'],
+    ['InputComponent', 'Input'],
 ]);
 
 const schemas = createV1Registry()

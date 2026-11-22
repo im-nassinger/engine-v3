@@ -1,5 +1,6 @@
 import {
     CameraComponent,
+    InputComponent,
     NameComponent,
     PhysicsWorldComponent,
     ShapeComponent,
@@ -83,6 +84,7 @@ export class Level {
         level.world.addComponent(bounds);
         level.world.addComponent(background);
         level.world.addComponent(new PhysicsWorldComponent());
+        level.world.addComponent(new InputComponent());
 
         level.camera.addComponent(new TransformComponent());
         level.camera.addComponent(new NameComponent({ name: 'Camera' }));

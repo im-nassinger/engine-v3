@@ -17,6 +17,7 @@ export type FieldKind =
     | 'asset'
     | 'variable'
     | 'tags'
+    | 'input'
     | 'list';
 
 export type FieldType<T> = ValueType<T> & {

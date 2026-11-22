@@ -17,6 +17,7 @@ export type { Mixed } from './model/MIXED.ts';
 export type { MixedVector } from './model/MixedVector.ts';
 export { TagEdits } from './tags-field/TagEdits.ts';
 export { ValueInput } from './typing/ValueInput.ts';
+export { InputEdits } from './inputs-field/InputEdits.ts';
 export { VariableEdits } from './variables-field/VariableEdits.ts';
 export type {
     ColourInputResult,

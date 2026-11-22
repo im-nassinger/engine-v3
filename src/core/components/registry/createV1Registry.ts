@@ -1,6 +1,7 @@
 import { BodyComponent } from '../BodyComponent/BodyComponent.ts';
 import { CameraComponent } from '../CameraComponent/CameraComponent.ts';
 import { ComponentRegistry } from './ComponentRegistry.ts';
+import { InputComponent } from '../InputComponent/InputComponent.ts';
 import { JointComponent } from '../JointComponent/JointComponent.ts';
 import { NameComponent } from '../NameComponent/NameComponent.ts';
 import { PathComponent } from '../PathComponent/PathComponent.ts';
@@ -29,6 +30,7 @@ export function createV1Registry() {
     // v3's, in their card order. Card 14 is kept for v5's ScriptComponent.
     registry.register(TagsComponent);
     registry.register(VariablesComponent);
+    registry.register(InputComponent);
 
     return registry;
 }

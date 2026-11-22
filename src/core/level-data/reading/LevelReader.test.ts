@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest';
 import {
     BodyComponent,
     createV1Registry,
+    InputComponent,
     JointComponent,
     NameComponent,
     StyleComponent,
@@ -209,6 +210,28 @@ describe('LevelReader variables', () => {
         levelData.world.components['VariablesComponent'] = { variables: twoCoins };
 
         expectDamaged(levelData);
+    });
+});
+
+describe('LevelReader inputs', () => {
+    test('reads a level saved before v3 without inputs, and adds none', () => {
+        const levelData = newLevelData();
+        delete levelData.world.components['InputComponent'];
+
+        const level = expectRead(levelData);
+
+        expect(level.world.hasComponent(InputComponent)).toBe(false);
+    });
+
+    test('refuses an input on a key a level can not use, and two inputs with one name', () => {
+        const onTab = newLevelData();
+        onTab.world.components['InputComponent'] = { inputs: [{ name: 'menu', keys: ['Tab'] }] };
+        const twoJumps = newLevelData();
+        const jump = { name: 'jump', keys: ['Space'] };
+        twoJumps.world.components['InputComponent'] = { inputs: [jump, jump] };
+
+        expectDamaged(onTab);
+        expectDamaged(twoJumps);
     });
 });
 

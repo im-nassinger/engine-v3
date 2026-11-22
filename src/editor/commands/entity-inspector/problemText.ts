@@ -29,6 +29,8 @@ export function problemText(label: string, problem: ParseProblem) {
             return 'A name needs a letter, a digit or _';
         case 'repeatedName':
             return `${label} already has ${problem.name}`;
+        case 'unbindableKey':
+            return `A level can't use ${problem.key}`;
         case 'flatShape':
             return `Its points are in one line, so ${label} can't spread them`;
     }

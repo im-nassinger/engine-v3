@@ -15,7 +15,7 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 - [x] 3. The VariablesComponent
   - Read: versions/v3/architecture.md#the-components, versions/v3/architecture.md#the-field-types, requirements/triggers/variables-and-inputs.md#variables--v3, design/controls.md#v3-triggers-tags-variables-inputs-and-the-end-window
   - Done when: `VariableFieldType` (a unique name and a number) and `VariablesComponent` (card 12, World only in v3, in the World's Add Component menu, refused on other entities with the reason) are registered; the card shows one row per variable with an × and an Add variable row, as the design draws; each change is one step; tests pass
-- [ ] 4. Keys, the InputComponent and a new level's five inputs
+- [x] 4. Keys, the InputComponent and a new level's five inputs
   - Read: versions/v3/architecture.md#the-components, versions/v3/architecture.md#the-field-types, requirements/triggers/variables-and-inputs.md#raw-keys-and-inputs--v3, design/controls.md#v3-triggers-tags-variables-inputs-and-the-end-window
   - Done when: `KeyCodes` names each `KeyboardEvent.code` (`W`, `Left arrow`) and refuses the keys that can't be bound; `InputFieldType` and `InputComponent` (card 13, World only, not in the Add Component menu) are registered; a new level's World has `left`, `right`, `up`, `down` and `jump` with their keys, in `LevelWriter.newLevel.json`; a World without one shows the note "No inputs. [Add the five inputs]", whose fix is one step; an input's keys are changed by pressing a key; tests pass
 - [ ] 5. The trigger model in core
