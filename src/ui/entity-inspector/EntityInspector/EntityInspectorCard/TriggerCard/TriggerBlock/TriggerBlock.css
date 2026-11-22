@@ -1,0 +1,15 @@
+.trigger-block {
+    display: flex;
+    flex-direction: column;
+    padding: 2px var(--space-8) var(--space-10);
+    border-radius: 10px;
+    background: var(--raised);
+
+    &[data-on='false'] > .trigger-section {
+        opacity: 0.45;
+    }
+
+    > .card-note-box {
+        margin: var(--space-6) var(--space-4) 0;
+    }
+}

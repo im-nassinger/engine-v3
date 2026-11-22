@@ -1,0 +1,38 @@
+.trigger-sentence-row {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 5px;
+    min-height: 28px;
+    padding: var(--space-4) 28px var(--space-4) var(--space-10);
+    border-radius: var(--radius);
+    background: var(--field);
+    line-height: 20px;
+
+    > .remove {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        display: flex;
+        padding: 0;
+        border: none;
+        background: none;
+        color: var(--faint);
+        visibility: hidden;
+        cursor: pointer;
+
+        &:hover {
+            color: var(--text);
+        }
+
+        &:focus-visible {
+            visibility: visible;
+            outline: 1px solid var(--accent);
+        }
+    }
+
+    &:hover > .remove {
+        visibility: visible;
+    }
+}

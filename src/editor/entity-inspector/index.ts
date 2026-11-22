@@ -42,3 +42,5 @@ export type {
     TriggerWordSlot,
     TriggerWordState,
 } from './triggers/TriggerWord.ts';
+export { TriggerTyping } from './triggers/TriggerTyping.ts';
+export type { TriggerTypingResult } from './triggers/TriggerTyping.ts';

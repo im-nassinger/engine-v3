@@ -24,7 +24,7 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 - [x] 6. The trigger card's model
   - Read: versions/v3/architecture.md#the-trigger-card, design/controls.md#v3-triggers-tags-variables-inputs-and-the-end-window, design/mockups/v3.html
   - Done when: `TriggerCardModel`, `TriggerSentence` and `TriggerChoices` are in `editor/entity-inspector/triggers/` and give, for any trigger, the head and the four sections of rows the mockup shows, each word set, unset or greyed with its choices; every edit (pick a word, add or remove a row, switch, rename, duplicate, delete, reorder) is one step with its label; `TouchNeedsSurfaceRule` and `TriggerCantRunRule` give their notes, the first with its one-step fix; Node tests pass
-- [ ] 7. The trigger card on screen
+- [x] 7. The trigger card on screen
   - Read: versions/v3/architecture.md#the-trigger-card, design/controls.md#v3-triggers-tags-variables-inputs-and-the-end-window, design/mockups/v3.html
   - Done when: `TriggerCard` draws the model as the design says: each trigger a block with its head, When, If, Do and Repeat as titled sections of one-sentence rows, underlined words that open a menu or a number field, yellow unset words, struck-through `other`, Add check and Add action rows, × on hover, the notes, and + Add trigger; browser tests in Chromium, Firefox and WebKit click through making a trigger from nothing
 - [ ] 8. The Trigger tool

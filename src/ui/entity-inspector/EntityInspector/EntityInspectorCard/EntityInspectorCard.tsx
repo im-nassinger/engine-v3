@@ -8,6 +8,7 @@ import { Icon } from '../../../shared/index.ts';
 import { CardField } from './CardField/index.ts';
 import { CardMenu } from './CardMenu/index.ts';
 import { CardNoteBox } from './CardNoteBox/index.ts';
+import { TriggerCard } from './TriggerCard/index.ts';
 import './EntityInspectorCard.css';
 
 export type EntityInspectorCardProps = {
@@ -22,7 +23,8 @@ type CardRow =
     | { readonly kind: 'note'; readonly key: string; readonly note: CardNote };
 
 // One component: its title, which folds it, its `…` menu, then its fields, each with the notes about it
-// under it. Notes about the whole card come first.
+// under it. Notes about the whole card come first. The TriggerComponent's card draws its triggers as the
+// trigger card, each note about one trigger under it.
 export function EntityInspectorCard({ openLevel, card, entityIds }: EntityInspectorCardProps) {
     const session = useEditorSession();
 
@@ -31,6 +33,8 @@ export function EntityInspectorCard({ openLevel, card, entityIds }: EntityInspec
     const foldIcon = card.isFolded ? ChevronRight : ChevronDown;
     const rows = cardRows(card);
     const rowProps = { openLevel, typeName: card.typeName, entityIds };
+    const isTriggerCard = card.typeName === 'TriggerComponent';
+    const showsTriggers = isTriggerCard && !card.isFolded;
 
     return (
         <div className="entity-inspector-card" data-type={card.typeName}>
@@ -42,6 +46,7 @@ export function EntityInspectorCard({ openLevel, card, entityIds }: EntityInspec
                 <CardMenu openLevel={openLevel} card={card} entityIds={entityIds} />
             </div>
             {!card.isFolded && rows.map((row) => <CardRowView key={row.key} {...rowProps} row={row} />)}
+            {showsTriggers && <TriggerCard openLevel={openLevel} entityIds={entityIds} notes={card.notes} />}
         </div>
     );
 }
@@ -68,6 +73,9 @@ function cardRows(card: CardModel) {
     for (const note of wholeCardNotes) {
         rows.push(noteRow(note));
     }
+
+    // The trigger card draws the triggers and their notes itself.
+    if (card.typeName === 'TriggerComponent') return rows;
 
     for (const field of card.fields) {
         const key = field.definition.key;

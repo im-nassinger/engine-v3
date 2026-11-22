@@ -1,0 +1,39 @@
+.trigger-slot-word {
+    padding: 0;
+    border: none;
+    border-bottom: 1px dotted color-mix(in srgb, var(--accent-text) 55%, transparent);
+    background: none;
+    color: var(--accent-text);
+    font: inherit;
+    line-height: 17px;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover,
+    &[aria-expanded='true'] {
+        border-bottom: 1px solid var(--accent);
+    }
+
+    &:focus-visible {
+        outline: 1px solid var(--accent);
+        outline-offset: 1px;
+    }
+
+    &[data-state='unset'] {
+        border-bottom-color: color-mix(in srgb, var(--warning) 60%, transparent);
+        color: var(--warning);
+        font-style: italic;
+    }
+
+    &[data-state='greyed'] {
+        border-bottom-color: transparent;
+        color: var(--faint);
+        text-decoration: line-through;
+    }
+
+    &[data-state='missing'] {
+        border-bottom-color: color-mix(in srgb, var(--warning) 60%, transparent);
+        color: var(--warning);
+        text-decoration: line-through;
+    }
+}

@@ -1,0 +1,36 @@
+.trigger-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    padding: 2px var(--space-8) 0;
+
+    &[data-several='true'] {
+        margin: 0;
+        padding: var(--space-4) var(--inset);
+        color: var(--muted);
+        font-style: italic;
+    }
+
+    > .add-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-6);
+        height: 28px;
+        border: none;
+        border-radius: var(--radius);
+        background: var(--raised);
+        color: var(--text);
+        font: inherit;
+        cursor: pointer;
+
+        &:hover {
+            background: var(--hover);
+        }
+
+        &:focus-visible {
+            outline: 1px solid var(--accent);
+            outline-offset: -1px;
+        }
+    }
+}

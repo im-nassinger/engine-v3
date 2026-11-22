@@ -1,0 +1,41 @@
+/* Placed by usePopupPlacement, outside every panel's edges. */
+.trigger-word-field {
+    position: fixed;
+    z-index: var(--stack-popup);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4) var(--space-6);
+    max-width: 220px;
+    padding: var(--space-6);
+    border-radius: var(--radius-menu);
+    background: var(--panel);
+    box-shadow: var(--shade);
+    color: var(--text);
+
+    > input {
+        width: 120px;
+        height: var(--input);
+        padding: 0 11px;
+        border: none;
+        border-radius: 999px;
+        outline: 1px solid var(--accent);
+        background: var(--field);
+        color: var(--text);
+        font: inherit;
+
+        &[aria-invalid='true'] {
+            outline-color: var(--danger);
+        }
+    }
+
+    > .unit {
+        color: var(--muted);
+    }
+
+    > .refusal {
+        flex-basis: 100%;
+        color: var(--danger);
+        font-size: var(--text-tiny);
+    }
+}
