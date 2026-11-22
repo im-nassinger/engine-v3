@@ -103,7 +103,7 @@ Claude's proposal (standing yes, 2026-11-22), drawn in the [v3 mockup](mockups/v
   - **Add check** and **Add action** are rows with no background in `--muted`, a + first, at the end of If and Do. With no action, Add action is `--warning`.
   - **A trigger that can't run** shows a warning note at its end: "Doesn't run until every yellow part is set." A touch trigger without a SurfaceComponent shows "Needs a Surface to notice touching. Add Surface as sensor".
 - **The tags field** is one pill, wrapping onto more lines: each tag a 19 px `--accent-soft` pill in `--accent-text` with an ×, then the text box, "Add a tag". Typing offers the level's matching tags in a small menu under the field.
-- **The Variables card:** one row per variable, its name in `--text` as the label, its starting number as the value, and an × to remove it. **The Inputs card:** one row per input, its name as the label and its keys as one pill ("A, Left arrow"), and an ×. Each card ends with an **Add variable** or **Add input** row, drawn like Add check.
+- **The Variables card:** one row per variable, its name in `--text` as the label, its starting number as the value, and an × to remove it. **The Inputs card:** one row per input, its name as the label, 96 px wide as in the v3 mockup so the default keys fit, its keys as one pill ("A, Left arrow"), and an ×. Each card ends with an **Add variable** or **Add input** row, drawn like Add check.
 - **The end window:** over the `--scrim`, a 320 px `--panel` window with `--radius-island` corners and the `--shade`, centred: the title "Level won" or "Level lost" at 20 px weight 600, "Time" in `--muted` with the time in `--text`, then **Leave** and **Restart**, Restart the primary button. The Play bar reads ENDED.
 
 ## Icons
