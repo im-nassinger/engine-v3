@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**v4 has two new screen parts: the shortcut list, and new rows in cards that already exist.** The owner went to sleep after saying to plan and build v4 (2026-11-22), so these are Claude's proposals under the standing yes, built from v3's approved look with nothing new to learn. Task 1 draws them in a v4 mockup, `design/mockups/v4.html`, and writes the rules into [controls.md](../../design/controls.md); the owner sees them in the morning try, and any change becomes a fix.
+**v4 has two new screen parts: the shortcut list, and new rows in cards that already exist.** The owner went to sleep after saying to plan and build v4 (2026-11-22), so these are Claude's proposals under the standing yes, built from v3's approved look with nothing new to learn. Task 1 drew them in the [v4 mockup](../../design/mockups/v4.html) and wrote the rules into [controls.md, v4](../../design/controls.md#v4-the-shortcut-list-the-new-trigger-rows-and-typed-variables); the owner sees them in the morning try, and any change becomes a fix.
 
 ## The parts
 
@@ -20,6 +20,6 @@
 
 These are Claude's (standing yes, 2026-11-22), for the owner to keep or change:
 
-- **The shortcut list is a sheet, not a dialog**, so it stays open while you work, as the requirement says, and it covers only the level view's right edge, where the Entity inspector is. It hides the Entity inspector while open. *Why: two islands in one corner would overlap.*
+- **The shortcut list is a sheet, not a dialog**, so it stays open while you work, as the requirement says, and it covers only the level view's right edge. It hides the Entities viewer while open. *Why: two islands in one corner would overlap.* **Corrected in task 1 (standing yes, 2026-11-22):** this said the Entity inspector, but the top right holds the Entities viewer; the sheet takes its place and reaches down to 10 px above the minimap. The main menu's entry is **Help › Keyboard shortcuts**, the name [workspace.md](../../requirements/editor/workspace.md) gives it.
 - **Key caps** are drawn as small `--raised` boxes with `--radius` corners, one per key, joined by a `+`.
 - **A Wait's faint line** shows where the delay falls in the Do list, so "wait, then destroy" reads as two moments.

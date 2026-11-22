@@ -18,6 +18,8 @@
   .seg span { color: var(--page-muted); margin-right: 4px; }
   .seg button { font: inherit; color: var(--page-text); background: transparent; border: 1px solid var(--page-line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
   .seg button.on { background: var(--page-on); border-color: var(--page-on); color: #fff; }
+  .seg.later a { color: var(--page-text); border: 1px solid var(--page-line); border-radius: 6px; padding: 4px 10px; text-decoration: none; }
+  .seg.later a:hover { border-color: var(--page-on); }
   .caption { color: var(--page-muted); flex: 1 0 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .stage { position: absolute; top: 84px; left: 0; right: 0; bottom: 0; display: flex; align-items: flex-start; justify-content: center; padding: 12px; overflow: hidden; }
   .frame { width: 1440px; height: 900px; transform-origin: top center; box-shadow: 0 8px 40px rgba(0, 0, 0, .5); flex-shrink: 0; }
@@ -161,6 +163,7 @@
 <div class="controls">
   <b>Editor mockups · v1</b>
   <div class="seg" id="moments"><span>Moment</span></div>
+  <div class="seg later"><span>Later mockups</span><a href="redesign.html">Redesign</a><a href="v2.html">v2</a><a href="v3.html">v3</a><a href="v4.html">v4</a></div>
   <div class="caption" id="caption"></div>
 </div>
 <div class="stage" id="stage"><div class="frame" id="frame"></div></div>

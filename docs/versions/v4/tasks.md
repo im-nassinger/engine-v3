@@ -6,7 +6,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 
 ## Tasks
 
-- [ ] 1. The v4 mockup
+- [x] 1. The v4 mockup
   - Read: versions/v4/design.md, versions/v3/design.md, design/controls.md, design/tokens.md, design/mockups/v3.html
   - Done when: `design/mockups/v4.html` draws, from v3's mockup and tokens, the shortcut sheet (searchable, with a working filter), a trigger card with each new When, the component value check, Fire custom event and Wait with its line, the variable menu's two groups, and the Variables card with its type menu; it is linked from `design/mockups/index.html`; the rules are written into a "v4" section of `design/controls.md`, marked (standing yes, 2026-11-22); `node tools/check-docs.js` passes
 - [ ] 2. Box2D's contact facts
