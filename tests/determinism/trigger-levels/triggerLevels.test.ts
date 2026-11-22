@@ -4,6 +4,7 @@ import { Box2dPhysicsEngine } from '../../../src/adapters/box2d/index.ts';
 import { VariablesComponent } from '../../../src/core/components/index.ts';
 import { runHeadless } from '../../../src/core/simulation/index.ts';
 import type { Simulation } from '../../../src/core/simulation/index.ts';
+import type { VariableValue } from '../../../src/core/fields/index.ts';
 import { recordedInputsOf } from '../../levels/determinism/inputs/recordedInputs.ts';
 
 import { readLevelFile } from '../level-files/determinismFiles.ts';
@@ -12,7 +13,7 @@ import { DETERMINISM_START, DETERMINISM_TICKS } from '../run/determinismRun.ts';
 // What one tick of a trigger level left: the World's variables by name, and how the run ended.
 type TriggerTick = {
     readonly tick: number;
-    readonly variables: Readonly<Record<string, number>>;
+    readonly variables: Readonly<Record<string, VariableValue>>;
     readonly end: string | null;
 };
 
@@ -48,7 +49,7 @@ async function runTriggerLevel(name: string) {
 // The first tick a variable reached each of its values.
 function ticksReaching(ticks: readonly TriggerTick[], name: string) {
     const reached: number[] = [];
-    let last = 0;
+    let last: VariableValue = 0;
     for (const { tick, variables } of ticks) {
         const value = variables[name] ?? 0;
         if (value !== last) {

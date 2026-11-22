@@ -284,17 +284,17 @@ describe('EntityInspectorModel: Add Component, Remove and Reset', () => {
         });
     });
 
-    test('greys the VariablesComponent on any entity but the World, with the reason, and offers it on the World', () => {
+    test('offers the VariablesComponent on any entity, the World and a camera too', () => {
         const { level, crate, selection, model } = buildModel();
 
         selection.replace([crate.id]);
-        expect(addableEntry(model, 'VariablesComponent')?.availability).toEqual({
-            enabled: false,
-            reason: "Only the World has variables. Select the World to add the level's variables.",
-        });
+        expect(addableEntry(model, 'VariablesComponent')?.availability).toEqual({ enabled: true });
         expect(addableEntry(model, 'VariablesComponent')?.section).toBe('Logic');
 
         selection.replace([level.world.id]);
+        expect(addableEntry(model, 'VariablesComponent')?.availability).toEqual({ enabled: true });
+
+        selection.replace([level.camera.id]);
         expect(addableEntry(model, 'VariablesComponent')?.availability).toEqual({ enabled: true });
     });
 

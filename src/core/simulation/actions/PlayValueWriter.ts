@@ -83,6 +83,8 @@ export class PlayValueWriter {
         const component = entity.requireComponent(VariablesComponent);
         const variables = component.get('variables').map((variable) => {
             if (variable.name !== name) return variable;
+            // A string or boolean variable isn't changed by a number's ops.
+            if (typeof variable.value !== 'number') return variable;
 
             return { ...variable, value: changedNumber(op, variable.value, amount) };
         });

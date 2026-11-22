@@ -14,10 +14,12 @@ beforeAll(async () => {
     await engine.load();
 });
 
-function touchesOf(simulation: Simulation) {
+function touchesOf(simulation: Simulation): number {
     const variables = simulation.level.world.requireComponent(VariablesComponent).get('variables');
 
-    return variables.find((variable) => variable.name === TOUCHES_VARIABLE)?.value ?? 0;
+    const touches = variables.find((variable) => variable.name === TOUCHES_VARIABLE)?.value;
+
+    return typeof touches === 'number' ? touches : 0;
 }
 
 describe('buildTouchTriggers', () => {

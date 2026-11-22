@@ -10,7 +10,7 @@ export const variablesSchema = new ComponentSchema<VariablesValues>({
     cardOrder: 12,
     hasCard: true,
     addMenuSection: 'Logic',
-    // By hand on the World only in v3: the Entity inspector's rule refuses it elsewhere, with the reason.
+    // By hand on any entity: the World's are the level's, any other entity's are its own.
     addableByHand: true,
     fields: [
         {
@@ -18,7 +18,8 @@ export const variablesSchema = new ComponentSchema<VariablesValues>({
             label: 'Variables',
             type: new ListFieldType<Variable>({ itemType: new VariableFieldType(), itemName: (item) => item.name }),
             defaultValue: [],
-            description: 'Named numbers the level keeps during play, such as coins. Each starts at its number.',
+            description:
+                'Named values kept during play, such as coins: a number, a string or a boolean, each starting at its value.',
             // Each variable's value changes during play; the list itself doesn't.
             changeableInPlay: true,
         },

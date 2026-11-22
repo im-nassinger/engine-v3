@@ -19,7 +19,9 @@ export function TextField({ field, onCommit }: FieldProps) {
     };
 
     const typing = useFieldTyping({ shownText: text, fullText: text, commit, onRestore: () => {} });
-    const placeholder = isMixed ? 'Mixed' : undefined;
+    const definition = field.definition;
+    const ownPlaceholder = 'placeholder' in definition ? definition.placeholder : undefined;
+    const placeholder = isMixed ? 'Mixed' : ownPlaceholder;
 
     return (
         <input

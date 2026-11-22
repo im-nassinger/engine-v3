@@ -82,7 +82,8 @@ export class Simulation {
         const camera = this.run.camera.position;
 
         const variables = this.run.level.world.getComponent(VariablesComponent)?.get('variables') ?? [];
-        const values = variables.map((variable) => variable.value);
+        // Only the numbers so far: a v3 level's hash stays as recorded.
+        const values = variables.flatMap((variable) => (typeof variable.value === 'number' ? [variable.value] : []));
 
         return stateHash(this.currentTick, this.run.scene, this.run.poses, camera, values);
     }

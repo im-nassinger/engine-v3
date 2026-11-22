@@ -43,4 +43,24 @@ describe('VariableEdits', () => {
         expect(edited).not.toBe(coinsAndLives);
         expect(coinsAndLives[0]).toEqual({ name: 'coins', value: 0 });
     });
+
+    test('withType puts the value back to 0, "" or false, and the same type keeps it', () => {
+        const typed = [
+            { name: 'lives', value: 3 },
+            { name: 'player_name', value: 'Ada' },
+            { name: 'door_open', value: true },
+        ];
+
+        expect(VariableEdits.withType(typed, 0, 'string')[0]).toEqual({ name: 'lives', value: '' });
+        expect(VariableEdits.withType(typed, 0, 'boolean')[0]).toEqual({ name: 'lives', value: false });
+        expect(VariableEdits.withType(typed, 1, 'number')[1]).toEqual({ name: 'player_name', value: 0 });
+        expect(VariableEdits.withType(typed, 2, 'string')[2]).toEqual({ name: 'door_open', value: '' });
+        expect(VariableEdits.withType(typed, 1, 'string')[1]).toEqual({ name: 'player_name', value: 'Ada' });
+        expect(VariableEdits.withType(typed, 0, 'string').slice(1)).toEqual(typed.slice(1));
+    });
+
+    test('withValue takes a string or a boolean too', () => {
+        expect(VariableEdits.withValue(coinsAndLives, 0, 'gold')[0]).toEqual({ name: 'coins', value: 'gold' });
+        expect(VariableEdits.withValue(coinsAndLives, 1, true)[1]).toEqual({ name: 'lives', value: true });
+    });
 });

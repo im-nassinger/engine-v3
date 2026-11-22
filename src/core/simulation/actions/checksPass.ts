@@ -27,7 +27,8 @@ function checkPasses(check: Check, firing: TriggerFiring, run: PlayRun) {
 
     const variables = run.level.world.getComponent(VariablesComponent)?.get('variables') ?? [];
     const held = variables.find((candidate) => candidate.name === variable);
-    if (held === undefined) return false;
+    // A number compare never passes on a string or boolean variable.
+    if (held === undefined || typeof held.value !== 'number') return false;
 
     return compared(held.value, check.compare, value);
 }

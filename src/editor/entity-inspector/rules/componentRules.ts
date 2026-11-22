@@ -9,7 +9,6 @@ import {
     StyleComponent,
     SurfaceComponent,
     TransformComponent,
-    VariablesComponent,
 } from '../../../core/components/index.ts';
 import type { AnyComponent, AnyComponentSchema, ComponentClass } from '../../../core/components/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
@@ -22,9 +21,6 @@ const NOT_BY_HAND_REASONS = new Map([[JointComponent.schema.typeName, 'Use the J
 
 const WORLD_CANT_COLLIDE =
     "The World can't collide. To block the edges of the level, turn on Walls on the PhysicsWorldComponent.";
-
-// The level's variables are the World's. An entity's own variables come with v4.
-const ONLY_WORLD_HAS_VARIABLES = "Only the World has variables. Select the World to add the level's variables.";
 
 // The components a level's World is made with. The ones added to it by hand, such as its variables, can be removed.
 const WORLDS_OWN = [NameComponent, ShapeComponent, StyleComponent, PhysicsWorldComponent];
@@ -51,9 +47,6 @@ export function notByHandReason(schema: AnyComponentSchema) {
 export function addAvailability(entity: Entity, schema: AnyComponentSchema) {
     const isBodyOrSurface = isSchemaOf(schema, BodyComponent) || isSchemaOf(schema, SurfaceComponent);
     if (isWorld(entity) && isBodyOrSurface) return unavailable(WORLD_CANT_COLLIDE);
-
-    const isVariables = isSchemaOf(schema, VariablesComponent);
-    if (isVariables && !isWorld(entity)) return unavailable(ONLY_WORLD_HAS_VARIABLES);
 
     return AVAILABLE;
 }

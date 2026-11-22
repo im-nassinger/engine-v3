@@ -10,6 +10,8 @@ export type FieldDefinition<Values, Key extends keyof Values> = {
     // Shown when hovering the label. A field whose label says enough has none.
     readonly description?: string;
     readonly unit?: Unit;
+    // Shown in an empty text field, such as "Text".
+    readonly placeholder?: string;
     // Opacity is stored 0 to 1 and shown 0 to 100 %.
     readonly displayScale?: number;
     // Decimals shown, 2 when not given.

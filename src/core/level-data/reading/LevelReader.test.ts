@@ -211,6 +211,45 @@ describe('LevelReader variables', () => {
 
         expectDamaged(levelData);
     });
+
+    test('a v3 level, its variables all numbers, writes back byte for byte', () => {
+        const savedText = JSON.stringify(everyComponentLevel);
+        const level = requireLevel(createReader().readJson(savedText));
+
+        expect(JSON.stringify(new LevelWriter().write(level))).toBe(savedText);
+    });
+
+    test("reads a string and a boolean on any entity's VariablesComponent, typed by their JSON values", () => {
+        const levelData = newLevelData();
+        const doorsOwn = [
+            { name: 'door_open', value: false },
+            { name: 'label', value: 'Front door' },
+            { name: 'hits', value: 2 },
+        ];
+        const doorsComponents = {
+            NameComponent: { name: 'Door' },
+            TransformComponent: DEFAULT_TRANSFORM,
+            VariablesComponent: { variables: doorsOwn },
+        };
+        levelData.world.children.push(plainEntity(3, doorsComponents));
+        const savedText = JSON.stringify(levelData);
+
+        const level = requireLevel(createReader().readJson(savedText));
+
+        expect(level.requireEntity(3).requireComponent(VariablesComponent).get('variables')).toEqual(doorsOwn);
+        expect(JSON.stringify(new LevelWriter().write(level))).toBe(savedText);
+    });
+
+    test('cuts a string variable to 1,000 characters', () => {
+        const levelData = newLevelData();
+        const long = [{ name: 'note', value: 'a'.repeat(1_200) }];
+        levelData.world.components['VariablesComponent'] = { variables: long };
+
+        const level = expectRead(levelData);
+        const [note] = level.world.requireComponent(VariablesComponent).get('variables');
+
+        expect(note?.value).toBe('a'.repeat(1_000));
+    });
 });
 
 describe('LevelReader inputs', () => {

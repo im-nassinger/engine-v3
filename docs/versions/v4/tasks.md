@@ -12,7 +12,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 2. Box2D's contact facts
   - Read: versions/v4/architecture.md#triggers-in-play, tech-notes.md, architecture/adapters.md#physics
   - Done when: `box2dFacts.test.ts` checks, on the real Box2D 3.2 build: contact begin and end events between two solid shapes, only on shapes with contact events switched on (one side or both); the end event when a touching shape or body is destroyed; what happens when a touching body falls asleep; two shapes of one body touching a third; what each shows is written in tech-notes.md, and any rule in versions/v4/architecture.md it contradicts is corrected there, with the change listed in decisions.md
-- [ ] 3. Variables of three types, on any entity
+- [x] 3. Variables of three types, on any entity
   - Read: versions/v4/architecture.md#variables, requirements/triggers/variables-and-inputs.md#string-and-boolean-variables-on-any-entity--v4, versions/v4/design.md, design/controls.md
   - Done when: `VariableFieldType` holds a number, a string (at most 1,000 characters) or a boolean, typed by its JSON value, and a v3 level reads and writes back byte for byte; the VariablesComponent is allowed on any entity and in every Add Component menu; the Variables card's rows have the type menu (one step, resetting the value) and a number field, a text field or a checkbox as the design draws; Node and browser tests pass
 - [ ] 4. The trigger model's new kinds
