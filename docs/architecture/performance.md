@@ -48,7 +48,7 @@ The requirements set speed targets for a level of 10,000 entities on a mid-range
 | Selecting a 2,000-point path within 0.05 s (v2, *proposal*: the requirements give no path targets) | Click on the path, measure until the frame it causes | One 2,000-point path among 10,000 entities |
 | Dragging one of its points stays smooth (v2) | Drag its first point in point editing, frame times as above | The same |
 | The Entity inspector shows its Points within 0.2 s (v2) | From selecting the path to its rows laid out | The same |
-| The Pencil's fit of a 10 s stroke within 0.1 s of the release (v2) | 600 moves, one a frame, then the release until the new path is drawn | The same |
+| The Pencil's fit of a 10 s stroke within 0.1 s of the release (v2) | 600 moves, a frame every 10th *(standing yes, 2026-11-22)*, then the release until the new path is drawn | The same |
 | Test play stays smooth at 60 ticks a second (the editor's frame target and test play's tick rate) | Play, timed until the first tick is drawn; then 10 s of play, frame times as above and ticks counted: 600, or on CI what its frames allow, at most 4 each | 1,000 Dynamic crates in stacks |
 
 - **Measured so far:** the Entities viewer paints its first rows 21 to 42 ms after mounting at 10,000 entities (stage 7, 2026-11-15, the owner's laptop, Chromium, Firefox and WebKit). Its test is a browser test, `EntitiesViewer.reveal.browser.test.ts`, which builds the level in the test, because the page can't load a level before Import in stage 12.

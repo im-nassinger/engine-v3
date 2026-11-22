@@ -36,6 +36,9 @@ const DRAG_FRAMES = 120;
 const CLICKS = 5;
 // A 10 s stroke, one pointer move a frame at 60 frames a second, as the browser sends them.
 const STROKE_MOVES = 600;
+// The stroke's frames are not timed and the Pencil doesn't read them; a frame every 10th move still
+// draws its preview, and CI's GPU-less browser takes about 0.3 s a frame, so 600 frames overran the timeout.
+const MOVES_PER_FRAME = 10;
 const SHOWS = 5;
 // performance.md: CI only catches a large slowdown, since its browsers draw without a GPU; the targets
 // are checked on the owner's laptop and written there.
@@ -207,7 +210,9 @@ describe('a 2,000-point path among 10,000 entities', () => {
         opened.tools.pointerDown(pointerAt(opened, strokeAt(0)));
         for (let move = 1; move <= STROKE_MOVES; move += 1) {
             opened.tools.pointerMove(pointerAt(opened, strokeAt(move)));
-            runFrames(opened.frames);
+            if (move % MOVES_PER_FRAME === 0) {
+                runFrames(opened.frames);
+            }
         }
         waitForDrawing(opened);
         const draggedCount = pencil.pencilStroke?.points.length ?? 0;
