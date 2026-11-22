@@ -66,6 +66,31 @@ function addBox(bodyId: b2BodyId, halfWidth: number, halfHeight: number, setUp?:
     return shapeId;
 }
 
+// A box of halfWidth × halfHeight metres centred at centre in its body's space.
+function addBoxAt(
+    bodyId: b2BodyId,
+    halfWidth: number,
+    halfHeight: number,
+    centre: Vector,
+    setUp?: (shape: b2ShapeDef) => void,
+) {
+    const shapeDefinition = box2d.b2DefaultShapeDef();
+    setUp?.(shapeDefinition);
+
+    const box2dCentre = new box2d.b2Vec2(centre.x, centre.y);
+    const rotation = new box2d.b2Rot();
+    rotation.c = 1;
+    rotation.s = 0;
+    const polygon = box2d.b2MakeOffsetBox(halfWidth, halfHeight, box2dCentre, rotation);
+    const shapeId = box2d.b2CreatePolygonShape(bodyId, shapeDefinition, polygon);
+    polygon.delete();
+    rotation.delete();
+    box2dCentre.delete();
+    shapeDefinition.delete();
+
+    return shapeId;
+}
+
 // box2d3-wasm's chain definition has ghost points the C API dropped, and refuses a chain without them.
 function addChain(bodyId: b2BodyId, points: readonly Vector[]) {
     const first = points[0];
@@ -622,6 +647,250 @@ describe('Box2D 3.2: contacts and sensors', () => {
             begins: [{ sensorShapeId: rebuilt, visitorShapeId: visitor }],
             ends: [{ sensorShapeId: sensor, visitorShapeId: visitor }],
         });
+        box2d.b2DestroyWorld(worldId);
+    });
+});
+
+describe('Box2D 3.2: contact events between solid shapes', () => {
+    // Box2D names a contact's two shapes A and B in its own order, so a pair is compared as the two shapes alone.
+    type ShapePair = readonly [string, string];
+
+    function keyOf(shapeId: ShapeId) {
+        return `${shapeId.index1}:${shapeId.generation}`;
+    }
+
+    function pairOf(first: ShapeId, second: ShapeId): ShapePair {
+        const keys = [keyOf(first), keyOf(second)].sort();
+
+        return [keys[0] ?? '', keys[1] ?? ''];
+    }
+
+    function contactEventsOf(worldId: b2WorldId) {
+        const contactEvents = box2d.b2World_GetContactEvents(worldId);
+        const begins: ShapePair[] = [];
+        const ends: ShapePair[] = [];
+        for (let i = 0; i < contactEvents.beginCount; i++) {
+            const event = contactEvents.GetBeginEvent(i);
+            begins.push(pairOf(event.shapeIdA, event.shapeIdB));
+            event.delete();
+        }
+        for (let i = 0; i < contactEvents.endCount; i++) {
+            const event = contactEvents.GetEndEvent(i);
+            ends.push(pairOf(event.shapeIdA, event.shapeIdB));
+        }
+        contactEvents.delete();
+
+        return { begins, ends };
+    }
+
+    // Steps and returns, for each step with a contact event, the step (from 1) and its events.
+    function stepAndRecord(worldId: b2WorldId, steps: number) {
+        const seen: { step: number; begins: ShapePair[]; ends: ShapePair[] }[] = [];
+        for (let i = 1; i <= steps; i++) {
+            step(worldId);
+            const events = contactEventsOf(worldId);
+            if (events.begins.length > 0 || events.ends.length > 0) {
+                seen.push({ step: i, ...events });
+            }
+        }
+
+        return seen;
+    }
+
+    function moveTo(bodyId: b2BodyId, position: Vector) {
+        const box2dPosition = new box2d.b2Vec2(position.x, position.y);
+        const rotation = new box2d.b2Rot();
+        rotation.c = 1;
+        rotation.s = 0;
+        box2d.b2Body_SetTransform(bodyId, box2dPosition, rotation);
+        rotation.delete();
+        box2dPosition.delete();
+    }
+
+    function withContactEvents(on: boolean) {
+        return (shape: b2ShapeDef) => {
+            shape.enableContactEvents = on;
+        };
+    }
+
+    // A 0.6 m box 0.7 m above a wide Static ground whose top is at y = 1.5 m: it lands in step 24.
+    const LANDING_STEP = 24;
+
+    function boxAboveGround(groundEvents = true, boxEvents = true) {
+        const worldId = createWorld(DOWN_ON_SCREEN);
+        const groundBody = createBody(worldId, 'static', { x: 0, y: 2 });
+        const ground = addBox(groundBody, 5, 0.5, withContactEvents(groundEvents));
+        const boxBody = createBody(worldId, 'dynamic', { x: 0, y: 0.5 });
+        const box = addBox(boxBody, 0.3, 0.3, withContactEvents(boxEvents));
+
+        return { worldId, groundBody, ground, boxBody, box, pair: pairOf(ground, box) };
+    }
+
+    function boxOnGround() {
+        const scene = boxAboveGround();
+        step(scene.worldId, 30);
+
+        return scene;
+    }
+
+    test('a box landing sends one begin in the step it touches, and one end in the step it is moved away', () => {
+        const { worldId, boxBody, pair } = boxAboveGround();
+
+        const landing = stepAndRecord(worldId, 30);
+        moveTo(boxBody, { x: 20, y: 0 });
+        const parting = stepAndRecord(worldId, 1);
+
+        expect(landing).toEqual([{ step: LANDING_STEP, begins: [pair], ends: [] }]);
+        expect(parting).toEqual([{ step: 1, begins: [], ends: [pair] }]);
+        box2d.b2DestroyWorld(worldId);
+    });
+
+    test('contact events come when either shape has them switched on, and never when neither does', () => {
+        const cases = [
+            { groundEvents: true, boxEvents: true, events: 2 },
+            { groundEvents: true, boxEvents: false, events: 2 },
+            { groundEvents: false, boxEvents: true, events: 2 },
+            { groundEvents: false, boxEvents: false, events: 0 },
+        ];
+
+        for (const { groundEvents, boxEvents, events } of cases) {
+            const { worldId, boxBody } = boxAboveGround(groundEvents, boxEvents);
+            const landing = stepAndRecord(worldId, 30);
+            moveTo(boxBody, { x: 20, y: 0 });
+            const parting = stepAndRecord(worldId, 1);
+            const seen = [...landing, ...parting];
+            const count = seen.reduce((sum, entry) => sum + entry.begins.length + entry.ends.length, 0);
+
+            expect(count, `ground ${groundEvents}, box ${boxEvents}`).toBe(events);
+            box2d.b2DestroyWorld(worldId);
+        }
+    });
+
+    test('a contact keeps the switch it began with: off while touching still sends its end, on sends no begin', () => {
+        const switchedOff = boxOnGround();
+        box2d.b2Shape_EnableContactEvents(switchedOff.ground, false);
+        box2d.b2Shape_EnableContactEvents(switchedOff.box, false);
+        const whileOff = stepAndRecord(switchedOff.worldId, 1);
+        moveTo(switchedOff.boxBody, { x: 20, y: 0 });
+        const partedOff = stepAndRecord(switchedOff.worldId, 1);
+
+        const switchedOn = boxAboveGround(false, false);
+        step(switchedOn.worldId, 30);
+        box2d.b2Shape_EnableContactEvents(switchedOn.box, true);
+        const whileOn = stepAndRecord(switchedOn.worldId, 1);
+        moveTo(switchedOn.boxBody, { x: 20, y: 0 });
+        const partedOn = stepAndRecord(switchedOn.worldId, 1);
+
+        expect(whileOff).toEqual([]);
+        expect(partedOff).toEqual([{ step: 1, begins: [], ends: [switchedOff.pair] }]);
+        expect(whileOn).toEqual([]);
+        expect(partedOn).toEqual([]);
+        box2d.b2DestroyWorld(switchedOff.worldId);
+        box2d.b2DestroyWorld(switchedOn.worldId);
+    });
+
+    test("destroying a touching shape or its body sends the end with the next step's events, naming a shape that is gone", () => {
+        const destroyers = [
+            {
+                name: 'the box',
+                destroy: (scene: ReturnType<typeof boxOnGround>) => box2d.b2DestroyShape(scene.box, true),
+            },
+            {
+                name: "the box's body",
+                destroy: (scene: ReturnType<typeof boxOnGround>) => box2d.b2DestroyBody(scene.boxBody),
+            },
+            {
+                name: 'the ground',
+                destroy: (scene: ReturnType<typeof boxOnGround>) => box2d.b2DestroyShape(scene.ground, true),
+            },
+            {
+                name: "the ground's body",
+                destroy: (scene: ReturnType<typeof boxOnGround>) => box2d.b2DestroyBody(scene.groundBody),
+            },
+        ];
+
+        for (const { name, destroy } of destroyers) {
+            const scene = boxOnGround();
+
+            destroy(scene);
+            const rightAway = contactEventsOf(scene.worldId);
+            const next = stepAndRecord(scene.worldId, 2);
+
+            expect(rightAway, name).toEqual({ begins: [], ends: [] });
+            expect(next, name).toEqual([{ step: 1, begins: [], ends: [scene.pair] }]);
+            expect(box2d.b2Shape_IsValid(scene.box) && box2d.b2Shape_IsValid(scene.ground), name).toBe(false);
+            box2d.b2DestroyWorld(scene.worldId);
+        }
+    });
+
+    test('a touching body falling asleep sends no end, keeps its contact, and sends no begin when woken', () => {
+        const { worldId, boxBody, pair } = boxAboveGround();
+
+        const seen = stepAndRecord(worldId, 3 * ONE_SECOND);
+        const asleep = !box2d.b2Body_IsAwake(boxBody);
+        const contactsAsleep = touchingContactCount(boxBody);
+        box2d.b2Body_SetAwake(boxBody, true);
+        const afterWaking = stepAndRecord(worldId, 1);
+        box2d.b2Body_SetAwake(boxBody, false);
+        const afterPutToSleep = stepAndRecord(worldId, 1);
+
+        expect(asleep).toBe(true);
+        expect(seen).toEqual([{ step: LANDING_STEP, begins: [pair], ends: [] }]);
+        expect(contactsAsleep).toBe(1);
+        expect(afterWaking).toEqual([]);
+        expect(afterPutToSleep).toEqual([]);
+        box2d.b2DestroyWorld(worldId);
+    });
+
+    test('a sleeping body moved away sends its end only once it is woken', () => {
+        const { worldId, boxBody, pair } = boxAboveGround();
+        step(worldId, 3 * ONE_SECOND);
+
+        moveTo(boxBody, { x: 20, y: 0 });
+        const stillAsleep = !box2d.b2Body_IsAwake(boxBody);
+        const whileAsleep = stepAndRecord(worldId, 3);
+        box2d.b2Body_SetAwake(boxBody, true);
+        const afterWaking = stepAndRecord(worldId, 1);
+
+        expect(stillAsleep).toBe(true);
+        expect(whileAsleep).toEqual([]);
+        expect(afterWaking).toEqual([{ step: 1, begins: [], ends: [pair] }]);
+        box2d.b2DestroyWorld(worldId);
+    });
+
+    test('destroying the ground under a sleeping body wakes it and sends the end', () => {
+        const { worldId, boxBody, ground, pair } = boxAboveGround();
+        step(worldId, 3 * ONE_SECOND);
+        const asleepBefore = !box2d.b2Body_IsAwake(boxBody);
+
+        box2d.b2DestroyShape(ground, true);
+        const next = stepAndRecord(worldId, 1);
+
+        expect(asleepBefore).toBe(true);
+        expect(next).toEqual([{ step: 1, begins: [], ends: [pair] }]);
+        expect(box2d.b2Body_IsAwake(boxBody)).toBe(true);
+        box2d.b2DestroyWorld(worldId);
+    });
+
+    test('two shapes of one body landing on a third send a begin and an end for each shape', () => {
+        const worldId = createWorld(DOWN_ON_SCREEN);
+        const ground = addBox(createBody(worldId, 'static', { x: 0, y: 2 }), 5, 0.5, withContactEvents(true));
+        const boxBody = createBody(worldId, 'dynamic', { x: 0, y: 0.5 });
+        const left = addBoxAt(boxBody, 0.3, 0.3, { x: -1, y: 0 }, withContactEvents(true));
+        const right = addBoxAt(boxBody, 0.3, 0.3, { x: 1, y: 0 }, withContactEvents(true));
+        const pairs = [pairOf(ground, left), pairOf(ground, right)];
+
+        const landing = stepAndRecord(worldId, 30);
+        moveTo(boxBody, { x: 20, y: 0 });
+        const parting = stepAndRecord(worldId, 1);
+
+        expect(landing).toHaveLength(1);
+        expect(landing[0]?.step).toBe(LANDING_STEP);
+        expect(landing[0]?.begins).toEqual(expect.arrayContaining(pairs));
+        expect(landing[0]?.begins).toHaveLength(2);
+        expect(parting).toHaveLength(1);
+        expect(parting[0]?.ends).toEqual(expect.arrayContaining(pairs));
+        expect(parting[0]?.ends).toHaveLength(2);
         box2d.b2DestroyWorld(worldId);
     });
 });

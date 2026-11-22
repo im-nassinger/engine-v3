@@ -9,7 +9,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 1. The v4 mockup
   - Read: versions/v4/design.md, versions/v3/design.md, design/controls.md, design/tokens.md, design/mockups/v3.html
   - Done when: `design/mockups/v4.html` draws, from v3's mockup and tokens, the shortcut sheet (searchable, with a working filter), a trigger card with each new When, the component value check, Fire custom event and Wait with its line, the variable menu's two groups, and the Variables card with its type menu; it is linked from `design/mockups/index.html`; the rules are written into a "v4" section of `design/controls.md`, marked (standing yes, 2026-11-22); `node tools/check-docs.js` passes
-- [ ] 2. Box2D's contact facts
+- [x] 2. Box2D's contact facts
   - Read: versions/v4/architecture.md#triggers-in-play, tech-notes.md, architecture/adapters.md#physics
   - Done when: `box2dFacts.test.ts` checks, on the real Box2D 3.2 build: contact begin and end events between two solid shapes, only on shapes with contact events switched on (one side or both); the end event when a touching shape or body is destroyed; what happens when a touching body falls asleep; two shapes of one body touching a third; what each shows is written in tech-notes.md, and any rule in versions/v4/architecture.md it contradicts is corrected there, with the change listed in decisions.md
 - [ ] 3. Variables of three types, on any entity
