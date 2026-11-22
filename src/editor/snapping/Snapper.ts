@@ -14,7 +14,7 @@ export type SnapOptions = {
     readonly ctrlHeld: boolean;
 };
 
-// Where a drag's edges and centre, or a single point, jump to. v1 has the grid; v3 adds entities.
+// Where a drag's edges, or a single point, jump to. v1 has the grid; v3 adds entities.
 export type Snapper = {
     snapMove(movingBounds: Bounds, offset: Point, view: ViewState, options: SnapOptions): SnapResult;
     snapPoint(point: Point, view: ViewState, options: SnapOptions): SnapResult;

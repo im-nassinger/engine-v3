@@ -56,17 +56,29 @@ describe('GridSnapper.snapPoint', () => {
 });
 
 describe('GridSnapper.snapMove', () => {
-    test('the edge or centre nearest a line wins on each axis', () => {
+    test('the edge nearest a line wins on each axis, never the centre', () => {
         const { snapper } = buildSnapper();
         const view = viewAt(1);
 
-        // Moved by 32: left 132 (18 off), centre 147 (3 off), right 162 (12 off). The centre wins.
-        const byCentre = snapper.snapMove(BOX, { x: 32, y: 0 }, view, FREE);
-        // Moved by 18: left 118, centre 133, right 148 (2 off). The right edge wins.
-        const byRight = snapper.snapMove(BOX, { x: 18, y: 0 }, view, FREE);
+        // Moved by 32: left 132 (18 off), centre 147 (3 off), right 162 (12 off). The right edge wins.
+        const byRight = snapper.snapMove(BOX, { x: 32, y: 0 }, view, FREE);
+        // Moved by 8: left 108 (8 off), right 138 (12 off). The left edge wins.
+        const byLeft = snapper.snapMove(BOX, { x: 8, y: 0 }, view, FREE);
 
-        expect(byCentre.point.x).toBeCloseTo(35);
         expect(byRight.point.x).toBeCloseTo(20);
+        expect(byLeft.point.x).toBeCloseTo(0);
+    });
+
+    test('a shape three lines wide keeps its edges on lines', () => {
+        const { snapper } = buildSnapper();
+        const wide = new Bounds(-75, 0, 75, 100);
+
+        const result = snapper.snapMove(wide, { x: 0, y: 0 }, viewAt(1), FREE);
+
+        const left = wide.left + result.point.x;
+        const right = wide.right + result.point.x;
+        expect(left % 50).toBeCloseTo(0);
+        expect(right % 50).toBeCloseTo(0);
     });
 
     test('always lands on a line, however far the drag is from one', () => {

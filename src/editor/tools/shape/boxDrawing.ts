@@ -31,6 +31,30 @@ export function placedDrawing(kind: BoxKind, size: BoxSize, centre: Point, rotat
     return { geometry: geometryOf(kind, size), position: centre, rotation };
 }
 
+// The corners of what a click places, in the current group's own space, for snapping its edges. A circle
+// looks the same at any turn, so its box never turns.
+export function placedCorners(kind: BoxKind, size: BoxSize, centre: Point, rotation: number): Point[] {
+    const halfWidth = size.width / 2;
+    const halfHeight = size.height / 2;
+    const offsets = [
+        { x: -halfWidth, y: -halfHeight },
+        { x: halfWidth, y: -halfHeight },
+        { x: halfWidth, y: halfHeight },
+        { x: -halfWidth, y: halfHeight },
+    ];
+
+    let turn = rotation;
+    if (kind === 'circle') {
+        turn = 0;
+    }
+    const turning = rotationBy(turn);
+
+    return offsets.map((offset) => {
+        const turned = turning.apply(offset);
+        return { x: centre.x + turned.x, y: centre.y + turned.y };
+    });
+}
+
 // The box a drag sets: Shift keeps a square, Alt draws from the press as the centre, and a circle is always
 // square, the circle that fits the box. A turned box is measured along its own sides, from the press to the
 // mouse. Sides may be 0 until the release.

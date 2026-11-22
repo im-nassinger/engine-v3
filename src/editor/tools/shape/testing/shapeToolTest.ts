@@ -4,6 +4,7 @@ import { Level } from '../../../../core/level/index.ts';
 import type { Entity } from '../../../../core/level/index.ts';
 import { createCommandRegistry } from '../../../commands/index.ts';
 import { EditorSession } from '../../../session/index.ts';
+import { GridSnapper } from '../../../snapping/index.ts';
 import type { SnapResult, Snapper } from '../../../snapping/index.ts';
 import { ManualFrames, ManualTimer } from '../../../time/testing/index.ts';
 import { PanGesture } from '../../pan/PanGesture.ts';
@@ -35,8 +36,18 @@ export function buildShapeTest(snapper: Snapper = NO_SNAPPING) {
     return buildDrawingToolTest(new ShapeTool(), snapper);
 }
 
+// The same, snapping to the level's real grid, 50 px, at zoom 1.
+export function buildShapeTestWithGrid() {
+    return buildDrawingToolTest(new ShapeTool(), (session) => {
+        const editorData = session.openLevel.level.editorData;
+        return new GridSnapper(editorData, session.viewSettings);
+    });
+}
+
+type SnapperOf = (session: EditorSession) => Snapper;
+
 // The same, with another drawing tool in the Shape tool's place, such as the Trigger tool.
-export function buildDrawingToolTest<T extends Tool>(tool: T, snapper: Snapper = NO_SNAPPING) {
+export function buildDrawingToolTest<T extends Tool>(tool: T, snapperOrMaker: Snapper | SnapperOf = NO_SNAPPING) {
     const level = Level.createNew();
     const square = level.createEntity(level.world, 0);
     square.addComponent(new TransformComponent());
@@ -51,6 +62,14 @@ export function buildDrawingToolTest<T extends Tool>(tool: T, snapper: Snapper =
     const session = new EditorSession({ level, clock: timer.clock, timer, frames: new ManualFrames() });
     session.view.setSize(800, 600);
     session.openLevel.selection.replace([square.id]);
+
+    let snapper: Snapper;
+    if (typeof snapperOrMaker === 'function') {
+        snapper = snapperOrMaker(session);
+    } else {
+        snapper = snapperOrMaker;
+    }
+
     const services = {
         get openLevel() {
             return session.openLevel;

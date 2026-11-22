@@ -128,6 +128,7 @@ What we decided against, and why. **Check here before proposing something**: an 
 | Ctrl+S exporting the project file | Ctrl+S saves in the browser now; Export… is its own item | Pressing Ctrl+S out of habit now does what people expect | owner: 2026-11-18 |
 | Inter or Geist for the editor, and sizes between 10 and 16 px | JetBrains Mono at 10, 12, 14 or 16 px | One font, four sizes | owner: 2026-11-17 |
 | Grid snapping only within 6 screen px of a line, lining up the outline | Always to the nearest grid line drawn, lining up the shape's edges | Most drags didn't snap, and shapes sat 1 px off | owner: 2026-11-22 |
+| Snapping a moved or placed shape's centre to the grid | Only its edges snap | A shape 150 px wide with its centre on a line had both edges between lines | owner: 2026-11-22 |
 | Fainter grid lines every fifth of the grid size, and snapping to them | Only the grid size's lines, drawn and snapped to | Snapping every 10 px made the grid size you set feel ignored | owner: 2026-11-22 |
 | A 240 px minimap, and a zoom or snapping button by it | 180 px, the map only | The owner reverted the widening | owner: 2026-11-17 |
 | A square new level, 20000×20000 | 20000×10000 | The redesign's square was its example level only | owner: 2026-11-18 |

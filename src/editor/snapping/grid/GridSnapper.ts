@@ -22,15 +22,15 @@ export class GridSnapper implements Snapper {
         this.settings = settings;
     }
 
-    // The moved bounds' left, centre and right (and top, centre and bottom) each try their nearest line;
-    // the one that needs the smallest correction wins on each axis.
+    // The moved bounds' left and right (and top and bottom) edges each try their nearest line; the one that
+    // needs the smallest correction wins on each axis. The centre is left out: a shape 150 px wide with its
+    // centre on a 50 px line would have both edges between lines.
     snapMove(movingBounds: Bounds, offset: Point, view: ViewState, options: SnapOptions): SnapResult {
         if (!this.isOn(options)) return { point: offset, snappedX: false, snappedY: false };
 
         const step = this.stepAt(view);
-        const centre = movingBounds.centre;
-        const movedXs = [movingBounds.left + offset.x, centre.x + offset.x, movingBounds.right + offset.x];
-        const movedYs = [movingBounds.top + offset.y, centre.y + offset.y, movingBounds.bottom + offset.y];
+        const movedXs = [movingBounds.left + offset.x, movingBounds.right + offset.x];
+        const movedYs = [movingBounds.top + offset.y, movingBounds.bottom + offset.y];
 
         const snapX = nearestSnap(movedXs, step);
         const snapY = nearestSnap(movedYs, step);

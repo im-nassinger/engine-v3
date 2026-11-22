@@ -1,4 +1,5 @@
 import { VersionCounter } from '../../../core/events/index.ts';
+import { Bounds } from '../../../core/geometry/index.ts';
 import type { Matrix2D, Point } from '../../../core/geometry/index.ts';
 import { V1_LEVEL_LIMITS } from '../../../core/level-data/index.ts';
 import type { LevelReader } from '../../../core/level-data/index.ts';
@@ -11,7 +12,7 @@ import { diameterReadout, sizeReadout } from '../readout/readoutText.ts';
 import { sizingModifiers } from '../sizing/sizingModifiers.ts';
 import type { LevelPointerInput, Modifiers, Tool, ToolContext, ToolKey } from '../Tool.ts';
 
-import { atLeastOnePixel, draggedBox, placedDrawing } from './boxDrawing.ts';
+import { atLeastOnePixel, draggedBox, placedCorners, placedDrawing } from './boxDrawing.ts';
 import type { BoxKind, BoxSize } from './boxDrawing.ts';
 import { angleLocked, pointsDrawing, samePoint, turnedPoints } from './polygonDrawing.ts';
 import { previewStepOf, steppedBoxSize, steppedPoints } from './previewSize.ts';
@@ -64,8 +65,10 @@ type GroupSpace = {
 type Press = {
     readonly kind: BoxKind;
     readonly screenPosition: Point;
-    // Snapped, in the current group's own space.
+    // Snapped, in the current group's own space: where a drag starts.
     readonly start: Point;
+    // Where a click places the shape's centre, in the same space, with its edges snapped.
+    readonly placedCentre: Point;
     readonly space: GroupSpace;
     dragging: boolean;
 };
@@ -178,11 +181,13 @@ export class ShapeTool implements Tool {
         const space = this.groupSpace();
         if (space === undefined) return;
 
-        const start = space.toGroup.apply(this.snapped(input.levelPosition, sizingModifiers(input.modifiers)));
-        this.press = { kind, screenPosition: input.screenPosition, start, space, dragging: false };
+        const modifiers = sizingModifiers(input.modifiers);
+        const start = space.toGroup.apply(this.snapped(input.levelPosition, modifiers));
+        const placedCentre = this.placedCentre(kind, input.levelPosition, space, modifiers);
+        this.press = { kind, screenPosition: input.screenPosition, start, placedCentre, space, dragging: false };
         this.lastInput = input;
         this.show({
-            shape: { drawing: placedDrawing(kind, this.sizes[kind], start, this.turn), toLevel: space.toLevel },
+            shape: { drawing: placedDrawing(kind, this.sizes[kind], placedCentre, this.turn), toLevel: space.toLevel },
         });
     }
 
@@ -217,7 +222,7 @@ export class ShapeTool implements Tool {
         this.lastInput = input;
         const drawing = press.dragging
             ? this.release(press, input)
-            : placedDrawing(press.kind, this.sizes[press.kind], press.start, this.turn);
+            : placedDrawing(press.kind, this.sizes[press.kind], press.placedCentre, this.turn);
         this.clearPreview();
         this.make(drawing, 'return');
     }
@@ -474,7 +479,7 @@ export class ShapeTool implements Tool {
             return;
         }
 
-        const drawing = placedDrawing(press.kind, this.sizes[press.kind], press.start, this.turn);
+        const drawing = placedDrawing(press.kind, this.sizes[press.kind], press.placedCentre, this.turn);
         this.show({ shape: { drawing, toLevel: press.space.toLevel } });
     }
 
@@ -532,7 +537,7 @@ export class ShapeTool implements Tool {
             return;
         }
 
-        const centre = space.toGroup.apply(this.snapped(input.levelPosition, sizingModifiers(held)));
+        const centre = this.placedCentre(kind, input.levelPosition, space, sizingModifiers(held));
         this.show({
             shape: { drawing: placedDrawing(kind, this.sizes[kind], centre, this.turn), toLevel: space.toLevel },
         });
@@ -559,6 +564,25 @@ export class ShapeTool implements Tool {
         const next = closing ? polygon.points[0] : this.nextPoint(polygon, levelPosition, modifiers);
 
         return { points: polygon.points, next, closing, toLevel };
+    }
+
+    // The centre, in the group's own space, of a shape a click places at the mouse, moved so its edges
+    // snap as a dragged shape's do.
+    private placedCentre(kind: BoxKind, levelPosition: Point, space: GroupSpace, modifiers: Modifiers) {
+        const centre = space.toGroup.apply(levelPosition);
+        const context = this.context;
+        if (context === undefined) return centre;
+
+        const corners = placedCorners(kind, this.sizes[kind], centre, this.turn);
+        const levelCorners = corners.map((corner) => space.toLevel.apply(corner));
+        const bounds = Bounds.around(levelCorners);
+        if (bounds === undefined) return centre;
+
+        const options = { ctrlHeld: modifiers.ctrl };
+        const offset = context.snapper.snapMove(bounds, { x: 0, y: 0 }, context.view, options).point;
+        const snappedCentre = { x: levelPosition.x + offset.x, y: levelPosition.y + offset.y };
+
+        return space.toGroup.apply(snappedCentre);
     }
 
     private snapped(levelPosition: Point, modifiers: Modifiers) {

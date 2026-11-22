@@ -4,6 +4,7 @@ import { labelName } from '../../../core/level/index.ts';
 
 import {
     buildShapeTest,
+    buildShapeTestWithGrid,
     click,
     drag,
     geometryOf,
@@ -32,6 +33,20 @@ describe('the Shape tool', () => {
         expect(positionOf(shape)).toEqual({ x: 30, y: 40 });
         expect(setup.controller.active.id).toBe('select');
         expect(setup.session.openLevel.history.undoLabel).toBe('Draw Rectangle 1');
+    });
+
+    test("with grid snapping, a click lines up the shape's edges with the grid, not its centre", () => {
+        const setup = buildShapeTestWithGrid();
+        drag(setup, { x: 0, y: 0 }, { x: 150, y: 100 });
+        setup.controller.pick('shape');
+
+        // A 150 by 100 rectangle at the mouse covers 55 to 205 across and 90 to 190 down. Its edges are
+        // nearest the lines at 50 and 100, so it moves 5 px left and 10 px down, and its centre is off the
+        // lines.
+        click(setup, { x: 130, y: 140 });
+
+        expect(geometryOf(made(setup))).toEqual({ kind: 'rectangle', width: 150, height: 100 });
+        expect(positionOf(made(setup))).toEqual({ x: 125, y: 150 });
     });
 
     test('a click places a circle 50 px in radius', () => {
