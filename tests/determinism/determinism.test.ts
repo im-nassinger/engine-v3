@@ -19,13 +19,13 @@ beforeAll(async () => {
 
 describe('the determinism test', () => {
     test('every level file has its recorded hashes', () => {
-        expect(names).toHaveLength(11);
+        expect(names).toHaveLength(14);
     });
 
     test.each(names)('%s matches its recorded hashes', async (name) => {
         const levelData = await readLevelFile(name);
         const recorded = readHashFile(await readFile(hashFile(name), 'utf8'));
-        const difference = firstDifference(runLevel(levelData, engine), recorded);
+        const difference = firstDifference(runLevel(name, levelData, engine), recorded);
 
         expect(recorded).toHaveLength(DETERMINISM_TICKS);
         expect(describeDifference(levelData, difference)).toBeUndefined();
@@ -33,7 +33,7 @@ describe('the determinism test', () => {
 
     test.each(names)('%s run twice in one process gives the same run', async (name) => {
         const levelData = await readLevelFile(name);
-        const difference = firstDifference(runLevel(levelData, engine), runLevel(levelData, engine));
+        const difference = firstDifference(runLevel(name, levelData, engine), runLevel(name, levelData, engine));
 
         expect(describeDifference(levelData, difference)).toBeUndefined();
     });

@@ -48,7 +48,7 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 - [x] 14. Restart
   - Read: versions/v3/architecture.md#the-report-the-mirror-and-the-end, requirements/triggers/triggers.md#order-and-limits--v3
   - Done when: the Restart action and the end window's Restart start a new run from the kept `LevelData` in the same worker, with the same clock time, and the mirror starts again; everything the requirement lists is reset; a Restart action in a run's first second is ignored with a warning; tests pass
-- [ ] 15. The determinism levels for triggers
+- [x] 15. The determinism levels for triggers
   - Read: versions/v3/architecture.md#determinism, architecture/testing.md
   - Done when: `trigger-coins`, `trigger-timers` and `trigger-touch-groups` are built with recorded inputs, the variables are part of `stateHash`, their hashes are recorded, and the older levels' hashes are unchanged or their change is explained in decisions.md
 - [ ] 16. v3's journeys and speed test

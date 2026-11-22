@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { ShapeComponent } from '../../components/index.ts';
+import { ShapeComponent, VariablesComponent } from '../../components/index.ts';
+import type { Variable } from '../../fields/index.ts';
 import { LevelWriter } from '../../level-data/index.ts';
 import { Level } from '../../level/index.ts';
 
@@ -51,6 +52,25 @@ describe('runHeadless', () => {
         expect(bodies.map((body) => body.entityId)).toEqual([first.id, second.id]);
         expect(bodies[0]?.hash).toMatch(/^[0-9a-f]{8}$/);
         expect(bodies[0]?.hash).not.toBe(bodies[1]?.hash);
+    });
+
+    test("the World's variables are part of the stateHash, and no variables add nothing", () => {
+        const hashWith = (variables: readonly Variable[] | undefined) => {
+            const level = Level.createNew();
+            placeBody(level, level.world, transform(0, 0));
+            if (variables !== undefined) {
+                level.world.addComponent(new VariablesComponent({ variables }));
+            }
+            const outcome = runHeadless(new LevelWriter().write(level), new ScriptedEngine(), {
+                ticks: 1,
+                start: START,
+            });
+
+            return recordedOrThrow(outcome)[0]?.hash;
+        };
+
+        expect(hashWith([{ name: 'coins', value: 1 }])).not.toBe(hashWith([{ name: 'coins', value: 2 }]));
+        expect(hashWith([])).toBe(hashWith(undefined));
     });
 
     test("asks for each tick's inputs by its number", () => {

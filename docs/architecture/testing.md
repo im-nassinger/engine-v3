@@ -42,7 +42,7 @@ for (const testLevel of determinismLevels) {
 ```
 
 - **`runHeadless`** builds a `Simulation` exactly as the game worker does (`LevelReader`, `PhysicsSceneBuilder`, `Box2dPhysicsWorld`, the v1 phases), with no page and no worker, and records `stateHash()` after every tick.
-- **Test levels** (`tests/levels/determinism/`): a pyramid of crates, a car with merged shapes and hinged wheels, a rope bridge, springs, a self-crossing polygon falling on a line, bodies leaving through an open edge, a camera following a body. v2 adds levels with triggers, scripts, random numbers and inputs.
+- **Test levels** (`tests/levels/determinism/`): a pyramid of crates, a car with merged shapes and hinged wheels, a rope bridge, springs, a self-crossing polygon falling on a line, bodies leaving through an open edge, a camera following a body. v2 adds levels with triggers, scripts, random numbers and inputs. *As built:* v3 adds `trigger-coins`, `trigger-timers` and `trigger-touch-groups`, run with the recorded inputs in `tests/levels/determinism/inputs/`; the World's variables are part of `stateHash` (see [v3's architecture](../versions/v3/architecture.md#determinism)).
 - **Recorded hashes** live in the repo, one file per level. They are written only by `npm run determinism:record`, on purpose, never by a failing test. Recording again because the Box2D build changed also means raising the physics version.
 - **Where it runs:**
 

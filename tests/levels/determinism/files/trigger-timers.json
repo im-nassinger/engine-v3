@@ -1,0 +1,382 @@
+{
+    "format": "engine-v3-level",
+    "formatVersion": 1,
+    "physicsVersion": 1,
+    "name": "trigger-timers",
+    "editor": {
+        "gridSize": 50,
+        "foldedRows": []
+    },
+    "world": {
+        "id": 1,
+        "hidden": false,
+        "locked": false,
+        "components": {
+            "NameComponent": {
+                "name": "World"
+            },
+            "TransformComponent": {
+                "position": {
+                    "x": 0,
+                    "y": 0
+                },
+                "rotation": 0,
+                "scale": {
+                    "x": 1,
+                    "y": 1
+                },
+                "skew": 0
+            },
+            "ShapeComponent": {
+                "geometry": {
+                    "kind": "rectangle",
+                    "width": 20000,
+                    "height": 10000
+                }
+            },
+            "StyleComponent": {
+                "fill": {
+                    "kind": "solid",
+                    "colour": "#BFE3F5FF"
+                },
+                "outline_colour": "#1F3552FF",
+                "outline_width": 0,
+                "scale_outline": false,
+                "opacity": 1
+            },
+            "PhysicsWorldComponent": {
+                "gravity": {
+                    "x": 0,
+                    "y": 9.8
+                },
+                "walls": false
+            },
+            "VariablesComponent": {
+                "variables": [
+                    {
+                        "name": "beats",
+                        "value": 0
+                    },
+                    {
+                        "name": "late",
+                        "value": 0
+                    },
+                    {
+                        "name": "held",
+                        "value": 0
+                    }
+                ]
+            },
+            "InputComponent": {
+                "inputs": [
+                    {
+                        "name": "left",
+                        "keys": [
+                            "KeyA",
+                            "ArrowLeft"
+                        ]
+                    },
+                    {
+                        "name": "right",
+                        "keys": [
+                            "KeyD",
+                            "ArrowRight"
+                        ]
+                    },
+                    {
+                        "name": "up",
+                        "keys": [
+                            "KeyW",
+                            "ArrowUp"
+                        ]
+                    },
+                    {
+                        "name": "down",
+                        "keys": [
+                            "KeyS",
+                            "ArrowDown"
+                        ]
+                    },
+                    {
+                        "name": "jump",
+                        "keys": [
+                            "Space"
+                        ]
+                    }
+                ]
+            },
+            "TriggerComponent": {
+                "triggers": [
+                    {
+                        "id": 1,
+                        "name": null,
+                        "on": true,
+                        "when": {
+                            "kind": "every",
+                            "seconds": 0.5
+                        },
+                        "checks": [],
+                        "actions": [
+                            {
+                                "kind": "change",
+                                "target": {
+                                    "kind": "entity",
+                                    "entity": 1
+                                },
+                                "value": {
+                                    "kind": "variable",
+                                    "name": "beats"
+                                },
+                                "op": "add",
+                                "amount": 1
+                            },
+                            {
+                                "kind": "push",
+                                "target": {
+                                    "kind": "entity",
+                                    "entity": 4
+                                },
+                                "push": {
+                                    "kind": "by",
+                                    "x": 0,
+                                    "y": -150
+                                }
+                            }
+                        ],
+                        "repeat": {
+                            "kind": "everyTime"
+                        }
+                    },
+                    {
+                        "id": 2,
+                        "name": null,
+                        "on": true,
+                        "when": {
+                            "kind": "after",
+                            "seconds": 2
+                        },
+                        "checks": [],
+                        "actions": [
+                            {
+                                "kind": "change",
+                                "target": {
+                                    "kind": "entity",
+                                    "entity": 1
+                                },
+                                "value": {
+                                    "kind": "variable",
+                                    "name": "late"
+                                },
+                                "op": "set",
+                                "amount": 1
+                            }
+                        ],
+                        "repeat": {
+                            "kind": "everyTime"
+                        }
+                    },
+                    {
+                        "id": 3,
+                        "name": null,
+                        "on": true,
+                        "when": {
+                            "kind": "after",
+                            "seconds": 4
+                        },
+                        "checks": [],
+                        "actions": [
+                            {
+                                "kind": "change",
+                                "target": {
+                                    "kind": "entity",
+                                    "entity": 1
+                                },
+                                "value": {
+                                    "kind": "triggerOn",
+                                    "trigger": 1
+                                },
+                                "op": "set",
+                                "amount": false
+                            }
+                        ],
+                        "repeat": {
+                            "kind": "everyTime"
+                        }
+                    },
+                    {
+                        "id": 4,
+                        "name": null,
+                        "on": true,
+                        "when": {
+                            "kind": "input",
+                            "input": "jump",
+                            "how": "held"
+                        },
+                        "checks": [],
+                        "actions": [
+                            {
+                                "kind": "change",
+                                "target": {
+                                    "kind": "entity",
+                                    "entity": 1
+                                },
+                                "value": {
+                                    "kind": "variable",
+                                    "name": "held"
+                                },
+                                "op": "add",
+                                "amount": 1
+                            }
+                        ],
+                        "repeat": {
+                            "kind": "atMostEvery",
+                            "seconds": 1
+                        }
+                    },
+                    {
+                        "id": 5,
+                        "name": null,
+                        "on": true,
+                        "when": {
+                            "kind": "input",
+                            "input": "up",
+                            "how": "pressed"
+                        },
+                        "checks": [],
+                        "actions": [
+                            {
+                                "kind": "change",
+                                "target": {
+                                    "kind": "entity",
+                                    "entity": 1
+                                },
+                                "value": {
+                                    "kind": "triggerOn",
+                                    "trigger": 1
+                                },
+                                "op": "set",
+                                "amount": true
+                            }
+                        ],
+                        "repeat": {
+                            "kind": "everyTime"
+                        }
+                    }
+                ],
+                "next_trigger_id": 6
+            }
+        },
+        "children": [
+            {
+                "id": 2,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Camera"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "CameraComponent": {
+                        "width": 1920,
+                        "height": 1080,
+                        "follow": null,
+                        "smoothing": 0.3,
+                        "mode": "fixedSize"
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 3,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Floor"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 300
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 800,
+                            "height": 20
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 4,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Ball"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 200
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "circle",
+                            "radius": 20
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0.2,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            }
+        ]
+    }
+}

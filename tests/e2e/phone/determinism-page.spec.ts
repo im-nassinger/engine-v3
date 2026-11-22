@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 // The determinism page's own server, started by playwright.config.ts.
 const DETERMINISM_PAGE = 'http://localhost:4174/';
-const LEVEL_COUNT = 11;
+const LEVEL_COUNT = 14;
 // Eleven levels of 600 ticks; a slow CI runner without a GPU can take a while.
 const RUN_TIMEOUT_MS = 120_000;
 

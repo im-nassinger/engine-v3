@@ -1,3 +1,5 @@
+import { VariablesComponent } from '../../components/index.ts';
+
 import { bodyHashes } from '../hash/bodyHashes.ts';
 import { stateHash } from '../hash/stateHash.ts';
 import type { TickReport } from '../report/TickReport.ts';
@@ -79,7 +81,10 @@ export class Simulation {
     stateHash() {
         const camera = this.run.camera.position;
 
-        return stateHash(this.currentTick, this.run.scene, this.run.poses, camera);
+        const variables = this.run.level.world.getComponent(VariablesComponent)?.get('variables') ?? [];
+        const values = variables.map((variable) => variable.value);
+
+        return stateHash(this.currentTick, this.run.scene, this.run.poses, camera, values);
     }
 
     // One hash per body still in the run, in Entities panel order, to name the first body that differs.

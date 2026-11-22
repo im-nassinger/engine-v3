@@ -20,14 +20,14 @@ beforeAll(async () => {
 
 describe('the determinism test in the browser', () => {
     test('every level file has its recorded hashes', () => {
-        expect(bundledLevelNames).toHaveLength(11);
-        expect(bundledHashFileCount).toBe(11);
+        expect(bundledLevelNames).toHaveLength(14);
+        expect(bundledHashFileCount).toBe(14);
     });
 
     test.each(bundledLevelNames)('%s matches its recorded hashes', (name) => {
         const levelData = bundledLevelFile(name);
         const recorded = bundledRecordedHashes(name);
-        const difference = firstDifference(runLevel(levelData, engine), recorded);
+        const difference = firstDifference(runLevel(name, levelData, engine), recorded);
 
         expect(recorded).toHaveLength(DETERMINISM_TICKS);
         expect(describeDifference(levelData, difference)).toBeUndefined();

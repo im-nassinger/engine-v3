@@ -1,0 +1,64 @@
+import { TagsComponent, TriggerComponent, VariablesComponent } from '../../../../src/core/components/index.ts';
+import type { Action, Check, Trigger, When } from '../../../../src/core/fields/index.ts';
+import type { Entity, Level } from '../../../../src/core/level/index.ts';
+
+// A trigger as the trigger card makes one, without its id or name, which giveTriggers adds.
+export type TriggerParts = {
+    readonly when: When;
+    readonly checks?: readonly Check[];
+    readonly actions: readonly Action[];
+    readonly repeat?: Trigger['repeat'];
+};
+
+// The entity's triggers, with ids from 1 in list order, each named from its When.
+export function giveTriggers(entity: Entity, parts: readonly TriggerParts[]) {
+    const triggers: Trigger[] = parts.map((part, i) => ({
+        id: i + 1,
+        name: null,
+        on: true,
+        when: part.when,
+        checks: part.checks ?? [],
+        actions: part.actions,
+        repeat: part.repeat ?? { kind: 'everyTime' },
+    }));
+    entity.addComponent(new TriggerComponent({ triggers, nextTriggerId: triggers.length + 1 }));
+
+    return entity;
+}
+
+export function giveTags(entity: Entity, tags: readonly string[]) {
+    entity.addComponent(new TagsComponent({ tags }));
+
+    return entity;
+}
+
+// The World's variables, each starting at 0.
+export function giveVariables(level: Level, names: readonly string[]) {
+    level.world.addComponent(new VariablesComponent({ variables: names.map((name) => ({ name, value: 0 })) }));
+}
+
+export function entityTarget(entity: Entity) {
+    return { kind: 'entity', entity: entity.id } as const;
+}
+
+export function changeVariable(level: Level, name: string, op: 'set' | 'add' | 'subtract', amount: number): Action {
+    return { kind: 'change', target: entityTarget(level.world), value: { kind: 'variable', name }, op, amount };
+}
+
+export function switchTrigger(owner: Entity, trigger: number, on: boolean): Action {
+    return {
+        kind: 'change',
+        target: entityTarget(owner),
+        value: { kind: 'triggerOn', trigger },
+        op: 'set',
+        amount: on,
+    };
+}
+
+export function pushBy(entity: Entity, x: number, y: number): Action {
+    return { kind: 'push', target: entityTarget(entity), push: { kind: 'by', x, y } };
+}
+
+export function inputHeld(input: string): When {
+    return { kind: 'input', input, how: 'held' };
+}

@@ -20,7 +20,7 @@ function element<T extends HTMLElement>(id: string) {
 function checkLevel(engine: Box2dPhysicsEngine, name: string): LevelResult {
     const levelData = bundledLevelFile(name);
     const recorded = bundledRecordedHashes(name);
-    const ticks = runLevel(levelData, engine);
+    const ticks = runLevel(name, levelData, engine);
     const lastHash = ticks.at(-1)?.hash ?? '';
     const difference = describeDifference(levelData, firstDifference(ticks, recorded));
     if (difference === undefined) return { ticks: ticks.length, lastHash, result: 'matches', note: 'matches' };

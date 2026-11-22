@@ -1,0 +1,443 @@
+{
+    "format": "engine-v3-level",
+    "formatVersion": 1,
+    "physicsVersion": 1,
+    "name": "trigger-touch-groups",
+    "editor": {
+        "gridSize": 50,
+        "foldedRows": []
+    },
+    "world": {
+        "id": 1,
+        "hidden": false,
+        "locked": false,
+        "components": {
+            "NameComponent": {
+                "name": "World"
+            },
+            "TransformComponent": {
+                "position": {
+                    "x": 0,
+                    "y": 0
+                },
+                "rotation": 0,
+                "scale": {
+                    "x": 1,
+                    "y": 1
+                },
+                "skew": 0
+            },
+            "ShapeComponent": {
+                "geometry": {
+                    "kind": "rectangle",
+                    "width": 20000,
+                    "height": 10000
+                }
+            },
+            "StyleComponent": {
+                "fill": {
+                    "kind": "solid",
+                    "colour": "#BFE3F5FF"
+                },
+                "outline_colour": "#1F3552FF",
+                "outline_width": 0,
+                "scale_outline": false,
+                "opacity": 1
+            },
+            "PhysicsWorldComponent": {
+                "gravity": {
+                    "x": 0,
+                    "y": 9.8
+                },
+                "walls": false
+            },
+            "VariablesComponent": {
+                "variables": [
+                    {
+                        "name": "touches",
+                        "value": 0
+                    },
+                    {
+                        "name": "leaves",
+                        "value": 0
+                    }
+                ]
+            },
+            "InputComponent": {
+                "inputs": [
+                    {
+                        "name": "left",
+                        "keys": [
+                            "KeyA",
+                            "ArrowLeft"
+                        ]
+                    },
+                    {
+                        "name": "right",
+                        "keys": [
+                            "KeyD",
+                            "ArrowRight"
+                        ]
+                    },
+                    {
+                        "name": "up",
+                        "keys": [
+                            "KeyW",
+                            "ArrowUp"
+                        ]
+                    },
+                    {
+                        "name": "down",
+                        "keys": [
+                            "KeyS",
+                            "ArrowDown"
+                        ]
+                    },
+                    {
+                        "name": "jump",
+                        "keys": [
+                            "Space"
+                        ]
+                    }
+                ]
+            },
+            "TriggerComponent": {
+                "triggers": [
+                    {
+                        "id": 1,
+                        "name": null,
+                        "on": true,
+                        "when": {
+                            "kind": "input",
+                            "input": "right",
+                            "how": "held"
+                        },
+                        "checks": [],
+                        "actions": [
+                            {
+                                "kind": "push",
+                                "target": {
+                                    "kind": "entity",
+                                    "entity": 5
+                                },
+                                "push": {
+                                    "kind": "by",
+                                    "x": 12,
+                                    "y": 0
+                                }
+                            }
+                        ],
+                        "repeat": {
+                            "kind": "everyTime"
+                        }
+                    }
+                ],
+                "next_trigger_id": 2
+            }
+        },
+        "children": [
+            {
+                "id": 2,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Camera"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "CameraComponent": {
+                        "width": 1920,
+                        "height": 1080,
+                        "follow": null,
+                        "smoothing": 0.3,
+                        "mode": "fixedSize"
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 3,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Floor"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 300
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 1600,
+                            "height": 20
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 4,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Pad"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 250
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 300,
+                            "height": 80
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": true
+                    },
+                    "TriggerComponent": {
+                        "triggers": [
+                            {
+                                "id": 1,
+                                "name": null,
+                                "on": true,
+                                "when": {
+                                    "kind": "touched"
+                                },
+                                "checks": [],
+                                "actions": [
+                                    {
+                                        "kind": "change",
+                                        "target": {
+                                            "kind": "entity",
+                                            "entity": 1
+                                        },
+                                        "value": {
+                                            "kind": "variable",
+                                            "name": "touches"
+                                        },
+                                        "op": "add",
+                                        "amount": 1
+                                    }
+                                ],
+                                "repeat": {
+                                    "kind": "everyTime"
+                                }
+                            },
+                            {
+                                "id": 2,
+                                "name": null,
+                                "on": true,
+                                "when": {
+                                    "kind": "untouched"
+                                },
+                                "checks": [],
+                                "actions": [
+                                    {
+                                        "kind": "change",
+                                        "target": {
+                                            "kind": "entity",
+                                            "entity": 1
+                                        },
+                                        "value": {
+                                            "kind": "variable",
+                                            "name": "leaves"
+                                        },
+                                        "op": "add",
+                                        "amount": 1
+                                    }
+                                ],
+                                "repeat": {
+                                    "kind": "everyTime"
+                                }
+                            }
+                        ],
+                        "next_trigger_id": 3
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 5,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Cart"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 100
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    }
+                },
+                "children": [
+                    {
+                        "id": 6,
+                        "hidden": false,
+                        "locked": false,
+                        "components": {
+                            "NameComponent": {
+                                "name": "Crate 1"
+                            },
+                            "TransformComponent": {
+                                "position": {
+                                    "x": -50,
+                                    "y": 0
+                                },
+                                "rotation": 0,
+                                "scale": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "skew": 0
+                            },
+                            "ShapeComponent": {
+                                "geometry": {
+                                    "kind": "rectangle",
+                                    "width": 40,
+                                    "height": 30
+                                }
+                            },
+                            "SurfaceComponent": {
+                                "density": 1,
+                                "friction": 0.4,
+                                "restitution": 0,
+                                "sensor": false
+                            }
+                        },
+                        "children": []
+                    },
+                    {
+                        "id": 7,
+                        "hidden": false,
+                        "locked": false,
+                        "components": {
+                            "NameComponent": {
+                                "name": "Crate 2"
+                            },
+                            "TransformComponent": {
+                                "position": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "rotation": 0,
+                                "scale": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "skew": 0
+                            },
+                            "ShapeComponent": {
+                                "geometry": {
+                                    "kind": "rectangle",
+                                    "width": 40,
+                                    "height": 30
+                                }
+                            },
+                            "SurfaceComponent": {
+                                "density": 1,
+                                "friction": 0.4,
+                                "restitution": 0,
+                                "sensor": false
+                            }
+                        },
+                        "children": []
+                    },
+                    {
+                        "id": 8,
+                        "hidden": false,
+                        "locked": false,
+                        "components": {
+                            "NameComponent": {
+                                "name": "Crate 3"
+                            },
+                            "TransformComponent": {
+                                "position": {
+                                    "x": 50,
+                                    "y": 0
+                                },
+                                "rotation": 0,
+                                "scale": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "skew": 0
+                            },
+                            "ShapeComponent": {
+                                "geometry": {
+                                    "kind": "rectangle",
+                                    "width": 40,
+                                    "height": 30
+                                }
+                            },
+                            "SurfaceComponent": {
+                                "density": 1,
+                                "friction": 0.4,
+                                "restitution": 0,
+                                "sensor": false
+                            }
+                        },
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    }
+}

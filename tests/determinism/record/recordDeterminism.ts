@@ -6,12 +6,11 @@ import { mkdir, writeFile } from 'node:fs/promises';
 
 import { Box2dPhysicsEngine } from '../../../src/adapters/box2d/index.ts';
 import { LevelWriter } from '../../../src/core/level-data/index.ts';
-import { runHeadless } from '../../../src/core/simulation/index.ts';
 import { DETERMINISM_LEVELS } from '../../levels/determinism/build/determinismLevels.ts';
 
 import { writeHashFile } from '../hash-files/hashFile.ts';
 import { hashFile, LEVEL_FILES, levelFile, RECORDED_HASHES } from '../level-files/determinismFiles.ts';
-import { DETERMINISM_START, DETERMINISM_TICKS } from '../run/determinismRun.ts';
+import { runLevel } from '../run/determinismRun.ts';
 
 const engine = new Box2dPhysicsEngine();
 await engine.load();
@@ -22,10 +21,9 @@ for (const testLevel of DETERMINISM_LEVELS) {
     const level = testLevel.build();
     level.rename(testLevel.name);
     const levelData = new LevelWriter().write(level);
-    const recorded = runHeadless(levelData, engine, { ticks: DETERMINISM_TICKS, start: DETERMINISM_START });
-    if (!recorded.ok) throw new Error(`${testLevel.name} was refused: ${JSON.stringify(recorded.refusal)}`);
+    const recorded = runLevel(testLevel.name, levelData, engine);
 
     await writeFile(levelFile(testLevel.name), `${JSON.stringify(levelData, undefined, 4)}\n`);
-    await writeFile(hashFile(testLevel.name), writeHashFile(testLevel.name, recorded.value));
-    console.log(`${testLevel.name}: ${recorded.value.length} ticks recorded.`);
+    await writeFile(hashFile(testLevel.name), writeHashFile(testLevel.name, recorded));
+    console.log(`${testLevel.name}: ${recorded.length} ticks recorded.`);
 }
