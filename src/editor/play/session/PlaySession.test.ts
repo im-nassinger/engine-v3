@@ -239,8 +239,58 @@ describe('PlaySession', () => {
 
         const ticksAsked = runner.batches.reduce((sum, batch) => sum + batch.length, 0);
         expect(ticksAsked).toBe(60);
-        expect(runner.batches[0]).toEqual([{ heldKeys: ['ArrowRight'] }]);
+        expect(runner.batches[0]).toEqual([{ heldKeys: ['ArrowRight'], pressedKeys: ['ArrowRight'] }]);
+        expect(runner.batches[1]).toEqual([{ heldKeys: ['ArrowRight'], pressedKeys: [] }]);
         expect(play.mirror?.tick).toBe(60);
+    });
+
+    test("only a batch's first tick carries the keys pressed since the batch before", async () => {
+        const { play, runner, heldKeys, nextFrame } = setUp();
+        play.play();
+        await settle();
+
+        heldKeys.press('Space');
+        heldKeys.release('Space');
+        await nextFrame(FRAME_MS * 3);
+
+        expect(runner.batches.at(-1)).toEqual([
+            { heldKeys: [], pressedKeys: ['Space'] },
+            { heldKeys: [], pressedKeys: [] },
+            { heldKeys: [], pressedKeys: [] },
+        ]);
+    });
+
+    test('a key pressed before the run started is never sent as pressed', async () => {
+        const { play, runner, heldKeys, nextFrame } = setUp();
+        heldKeys.press('Enter');
+        heldKeys.press('KeyW');
+        heldKeys.release('Enter');
+
+        play.play();
+        await settle();
+        await nextFrame();
+
+        expect(runner.batches[0]).toEqual([{ heldKeys: ['KeyW'], pressedKeys: [] }]);
+    });
+
+    test("uses the running level's keys only while it plays or is paused", async () => {
+        const { play, nextFrame } = setUp();
+        expect(play.usesKey('Space')).toBe(false);
+
+        play.play();
+        expect(play.usesKey('Space')).toBe(false);
+        await settle();
+        await nextFrame();
+
+        expect(play.usesKey('Space')).toBe(true);
+        expect(play.usesKey('ArrowLeft')).toBe(true);
+        expect(play.usesKey('KeyQ')).toBe(false);
+
+        play.pause();
+        expect(play.usesKey('Space')).toBe(true);
+
+        play.stop();
+        expect(play.usesKey('Space')).toBe(false);
     });
 
     test('Stop during starting cancels the start', async () => {
@@ -524,7 +574,7 @@ describe('PlaySession', () => {
 
         play.resume();
         await nextFrame();
-        expect(runner.batches.at(-1)).toEqual([{ heldKeys: [] }]);
+        expect(runner.batches.at(-1)).toEqual([{ heldKeys: [], pressedKeys: [] }]);
     });
 
     test('a tab hidden while the game loads starts the run paused', async () => {

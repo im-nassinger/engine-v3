@@ -3,10 +3,10 @@ import type { PhysicsEngine } from '../../physics/index.ts';
 
 import type { BodyHash } from '../hash/bodyHashes.ts';
 import type { RunStart } from '../run/RunStart.ts';
-import type { TickInputs } from '../run/TickInputs.ts';
+import type { TickInputs } from '../inputs/TickInputs.ts';
 import { startSimulation } from '../start/startSimulation.ts';
 
-const NOTHING_HELD: TickInputs = { heldKeys: [] };
+const NOTHING_HELD: TickInputs = { heldKeys: [], pressedKeys: [] };
 
 export type HeadlessOptions = {
     readonly ticks: number;

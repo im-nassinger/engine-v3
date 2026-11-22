@@ -6,22 +6,32 @@ import { focusPlaceOf } from './focusPlaceOf.ts';
 
 type KeyHandler = Pick<ShortcutDispatcher, 'handleKeyDown' | 'handleKeyUp'>;
 
+// The keys the running game uses, by KeyboardEvent.code: PlaySession's.
+export type GameKeys = {
+    usesKey(code: string): boolean;
+};
+
+const NO_GAME_KEYS: GameKeys = { usesKey: () => false };
+
 const LEVEL_VIEW_SELECTOR = '[data-focus-place="level"]';
 
 // The page's keyboard: every key press goes to the ShortcutDispatcher with where the keyboard and the
-// mouse are, and the browser's default is stopped only when the editor used the key. Listens on the
+// mouse are, and the browser's default is stopped only when the editor used the key or the running game
+// uses it, so Space and the arrows don't scroll during play and the browser keeps every other key. Listens on the
 // window in the capture phase, so a focused element can't swallow a key first.
 export class KeyboardInput {
     private readonly handler: KeyHandler;
     private readonly page: Window;
     private readonly held: HeldKeys;
+    private readonly gameKeys: GameKeys;
     private pointerOverLevelView = false;
 
     // held is shared with test play, which sends the keys held with every batch.
-    constructor(handler: KeyHandler, page: Window, held = new HeldKeys()) {
+    constructor(handler: KeyHandler, page: Window, held = new HeldKeys(), gameKeys = NO_GAME_KEYS) {
         this.handler = handler;
         this.page = page;
         this.held = held;
+        this.gameKeys = gameKeys;
     }
 
     // The physical keys held down now. Emptied when the window loses focus, because the key up
@@ -65,7 +75,7 @@ export class KeyboardInput {
         const focus = focusPlaceOf(this.page.document.activeElement);
         const used = this.handler.handleKeyDown(input, focus, this.pointerOverLevelView);
 
-        if (used) {
+        if (used || this.gameKeys.usesKey(event.code)) {
             event.preventDefault();
         }
     }

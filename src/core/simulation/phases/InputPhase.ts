@@ -1,17 +1,8 @@
 import type { TickContext, TickPhase } from '../run/TickPhase.ts';
-import type { TickInputs } from '../run/TickInputs.ts';
 
-const NOTHING_HELD: TickInputs = { heldKeys: [] };
-
-// Records the tick's inputs. Nothing reads them in v1; v2's EventPhase turns them into key events.
+// Builds the tick's InputState from the keys held and pressed, for the events the tick lists.
 export class InputPhase implements TickPhase {
-    private latest = NOTHING_HELD;
-
-    get latestInputs() {
-        return this.latest;
-    }
-
     run(tick: TickContext) {
-        this.latest = tick.inputs;
+        tick.run.inputs.advance(tick.inputs);
     }
 }

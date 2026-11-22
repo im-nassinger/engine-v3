@@ -36,4 +36,39 @@ describe('HeldKeys', () => {
 
         expect(sent).toEqual(['KeyA']);
     });
+
+    test('keeps the keys pressed since the last batch, even those already up, each once', () => {
+        const keys = new HeldKeys();
+        keys.press('KeyA');
+        keys.release('KeyA');
+        keys.press('Space');
+        keys.press('Space');
+        keys.press('KeyA');
+
+        expect(keys.takePresses()).toEqual(['KeyA', 'Space']);
+        expect(keys.takePresses()).toEqual([]);
+    });
+
+    test("a held key's repeat is no new press", () => {
+        const keys = new HeldKeys();
+        keys.press('Space');
+        keys.takePresses();
+
+        keys.press('Space');
+
+        expect(keys.takePresses()).toEqual([]);
+    });
+
+    test('forgetPresses drops the presses and keeps the keys held; releaseAll drops both', () => {
+        const keys = new HeldKeys();
+        keys.press('KeyW');
+
+        keys.forgetPresses();
+        expect(keys.takePresses()).toEqual([]);
+        expect(keys.codes()).toEqual(['KeyW']);
+
+        keys.press('KeyD');
+        keys.releaseAll();
+        expect(keys.takePresses()).toEqual([]);
+    });
 });

@@ -4,6 +4,7 @@ import type { EntityId } from '../../../core/fields/index.ts';
 import { LevelWriter } from '../../../core/level-data/index.ts';
 import type { LevelData } from '../../../core/level-data/index.ts';
 import { labelName } from '../../../core/level/index.ts';
+import { levelKeys } from '../../../core/simulation/index.ts';
 import type { TickInputs, TickReport } from '../../../core/simulation/index.ts';
 import type { EditorSession } from '../../session/index.ts';
 import { StatusText } from '../../status/index.ts';
@@ -61,6 +62,8 @@ export class PlaySession {
     private pauseWhenStarted = false;
     private currentState: PlayState = 'idle';
     private currentMirror: PlayMirror | undefined;
+    // The keys the running level uses, kept from the browser while the game has the keyboard.
+    private gameKeys: ReadonlySet<string> = new Set();
     private currentNotice: string | undefined;
     private currentEndedMessage: string | undefined;
     private currentEndedDetail: string | undefined;
@@ -112,6 +115,14 @@ export class PlaySession {
     // The crash's own words, for developers and tests, never shown as they are.
     get endedDetail() {
         return this.currentEndedDetail;
+    }
+
+    // True for a key the running level uses while it is playing or paused, so the page stops the browser's
+    // default for it, such as Space or an arrow scrolling. Every other key is left to the browser.
+    usesKey(code: string) {
+        const isRunning = this.currentState === 'playing' || this.currentState === 'paused';
+
+        return isRunning && this.gameKeys.has(code);
     }
 
     get canStep() {
@@ -220,6 +231,8 @@ export class PlaySession {
         }
 
         this.currentMirror = mirrored.value;
+        this.gameKeys = levelKeys(mirrored.value.level);
+        this.heldKeys.forgetPresses();
         this.pacer.start();
         this.watchdog.reset();
         if (this.pauseWhenStarted) {
@@ -266,9 +279,11 @@ export class PlaySession {
         const count = this.pacer.ticksDue();
         if (count === 0) return;
 
+        // Only the batch's first tick gets the presses, so each counts once.
         const heldKeys = this.heldKeys.codes();
-        const inputs: TickInputs = { heldKeys };
-        const inputsPerTick = Array.from({ length: count }, () => inputs);
+        const first: TickInputs = { heldKeys, pressedKeys: this.heldKeys.takePresses() };
+        const rest: TickInputs = { heldKeys, pressedKeys: [] };
+        const inputsPerTick = Array.from({ length: count }, (_, index) => (index === 0 ? first : rest));
         const run = this.run;
 
         this.batchInFlight = true;
@@ -341,6 +356,7 @@ export class PlaySession {
         this.batchInFlight = false;
         this.currentMirror?.destroy();
         this.currentMirror = undefined;
+        this.gameKeys = new Set();
         this.drawnInterpolation = undefined;
         this.currentNotice = undefined;
         this.currentEndedMessage = undefined;

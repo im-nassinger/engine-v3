@@ -5,7 +5,7 @@ import type { Entity, Level } from '../../level/index.ts';
 
 import type { Simulation } from '../run/Simulation.ts';
 
-const NOTHING_HELD = { heldKeys: [] };
+const NOTHING_HELD = { heldKeys: [], pressedKeys: [] };
 
 export function transform(x: number, y: number, rotation = 0, scaleX = 1): TransformValues {
     return { position: { x, y }, rotation, scale: { x: scaleX, y: 1 }, skew: 0 };

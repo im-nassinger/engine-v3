@@ -9,7 +9,7 @@ import { placeBody, transform } from '../../../core/simulation/testing/scriptedL
 
 import { DirectGameRunner } from './DirectGameRunner.ts';
 
-const NOTHING_HELD = { heldKeys: [] };
+const NOTHING_HELD = { heldKeys: [], pressedKeys: [] };
 const BATCH = [NOTHING_HELD, NOTHING_HELD, NOTHING_HELD, NOTHING_HELD];
 const START = { clockTimeMs: 0 };
 

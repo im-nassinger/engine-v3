@@ -58,7 +58,7 @@ describe('runHeadless', () => {
         const asked: number[] = [];
         const inputsAt = (tick: number) => {
             asked.push(tick);
-            return { heldKeys: [] };
+            return { heldKeys: [], pressedKeys: [] };
         };
 
         runHeadless(levelData, new ScriptedEngine(), { ticks: 3, start: START, inputsAt });

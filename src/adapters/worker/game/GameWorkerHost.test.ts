@@ -13,7 +13,7 @@ import { GameWorkerHost } from './GameWorkerHost.ts';
 import type { GameWorkerScope } from './GameWorkerHost.ts';
 import type { GameAnswer, GameRequest } from './gameProtocol.ts';
 
-const NOTHING_HELD = { heldKeys: [] };
+const NOTHING_HELD = { heldKeys: [], pressedKeys: [] };
 const BATCH = [NOTHING_HELD, NOTHING_HELD, NOTHING_HELD, NOTHING_HELD];
 const START = { clockTimeMs: 0 };
 

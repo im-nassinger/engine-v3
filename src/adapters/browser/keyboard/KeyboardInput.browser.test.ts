@@ -200,4 +200,15 @@ describe('KeyboardInput', () => {
         expect(event.defaultPrevented).toBe(false);
         expect(dispatcher.calls).toEqual([]);
     });
+
+    test("stops the default of a key the running game uses and leaves every other key's", () => {
+        disconnect();
+        const gameKeys = { usesKey: (code: string) => code === 'Space' || code === 'ArrowDown' };
+        disconnect = new KeyboardInput(dispatcher, window, undefined, gameKeys).connect();
+
+        expect(pressOn(element('level'), 'Space', ' ').defaultPrevented).toBe(true);
+        expect(pressOn(element('level'), 'ArrowDown', 'ArrowDown').defaultPrevented).toBe(true);
+        expect(pressOn(element('level'), 'ArrowUp', 'ArrowUp').defaultPrevented).toBe(false);
+        expect(pressOn(element('level'), 'KeyG', 'g').defaultPrevented).toBe(true);
+    });
 });

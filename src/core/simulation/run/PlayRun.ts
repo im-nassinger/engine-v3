@@ -4,12 +4,13 @@ import type { BodyPoses, PhysicsScene } from '../../physics/index.ts';
 
 import type { BodyMatrices } from '../bodies/BodyMatrices.ts';
 import type { CameraState } from '../camera/CameraState.ts';
+import type { PlayInputs } from '../inputs/PlayInputs.ts';
 import type { PlayJoints } from '../joints/PlayJoints.ts';
 import type { RemovalMarks } from '../removal/RemovalMarks.ts';
 import type { ReportCollector } from '../report/ReportCollector.ts';
 
 // Everything one run's tick phases share: the play copy, its caches, the physics built from it, the
-// bodies' poses, the joints still in the run, the entities marked for removal, the camera and the report being gathered.
+// bodies' poses, the joints still in the run, the entities marked for removal, the camera, the keys and inputs, and the report being gathered.
 export type PlayRun = {
     readonly level: Level;
     readonly caches: DerivedCaches;
@@ -19,5 +20,6 @@ export type PlayRun = {
     readonly joints: PlayJoints;
     readonly removals: RemovalMarks;
     readonly camera: CameraState;
+    readonly inputs: PlayInputs;
     readonly report: ReportCollector;
 };

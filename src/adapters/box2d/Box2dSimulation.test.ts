@@ -14,7 +14,7 @@ import { startSimulation } from '../../core/simulation/index.ts';
 
 import { Box2dPhysicsEngine } from './Box2dPhysicsEngine.ts';
 
-const NOTHING_HELD = { heldKeys: [] };
+const NOTHING_HELD = { heldKeys: [], pressedKeys: [] };
 const START = { clockTimeMs: 0 };
 const ORIGIN = { x: 0, y: 0 };
 

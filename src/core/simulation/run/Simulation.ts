@@ -4,7 +4,7 @@ import type { TickReport } from '../report/TickReport.ts';
 
 import type { PlayRun } from './PlayRun.ts';
 import type { RunStart } from './RunStart.ts';
-import type { TickInputs } from './TickInputs.ts';
+import type { TickInputs } from '../inputs/TickInputs.ts';
 import type { TickPhase } from './TickPhase.ts';
 
 // One run: the play copy, its physics and the tick phases, run in order every tick. startSimulation
@@ -33,6 +33,11 @@ export class Simulation {
 
     get caches() {
         return this.run.caches;
+    }
+
+    // The last tick's keys and inputs, built by InputPhase.
+    get inputs() {
+        return this.run.inputs.state;
     }
 
     runTick(inputs: TickInputs) {

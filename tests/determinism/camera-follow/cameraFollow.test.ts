@@ -38,7 +38,7 @@ function recordTicks(simulation: Simulation) {
 
     try {
         for (let tick = 1; tick <= DETERMINISM_TICKS; tick += 1) {
-            simulation.runTick({ heldKeys: [] });
+            simulation.runTick({ heldKeys: [], pressedKeys: [] });
             recorded.push({ camera: simulation.takeReport().camera, target: targetOrigin(simulation) });
         }
     } finally {

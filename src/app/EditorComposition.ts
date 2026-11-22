@@ -248,7 +248,7 @@ export class EditorComposition {
         const openWindows = new OpenWindowCount();
         const escape = new EscapeChain(session, tools, openWindows);
         const dispatcher = new ShortcutDispatcher(commands, runner, platform, { tools, escape });
-        const keyboard = new KeyboardInput(dispatcher, window, heldKeys);
+        const keyboard = new KeyboardInput(dispatcher, window, heldKeys, play);
         const pointerParts = { tools, escape, mouse, view: session.view, platform, play };
         const pointer = new PointerInput(pointerParts, levelView.canvas, window);
         const clipboardBridge = new ClipboardBridge(new ClipboardEvents(commands, runner), window);

@@ -12,7 +12,7 @@ import { DirectGameRunner } from '../editor/play/testing/index.ts';
 
 import { createGameWorker } from './createGameWorker.ts';
 
-const NOTHING_HELD = { heldKeys: [] };
+const NOTHING_HELD = { heldKeys: [], pressedKeys: [] };
 const START = { clockTimeMs: 0 };
 // Ten ticks, in batches no larger than the pacer sends.
 const BATCHES = [4, 4, 2].map((count) => Array.from({ length: count }, () => NOTHING_HELD));
