@@ -112,11 +112,12 @@ Source: round 1: D24; round 5: 03 2.6; old: DR-46 to DR-48; owner: 2026-11-13
 - **Double-click an edge to add a point.** On a curve the shape doesn't change.
 - Delete removes the selected points. A path or line keeps at least 2 points, a polygon or closed path 3.
 - Path points are sharp, smooth, or smooth with handles that move separately. Double-clicking a point switches between sharp and smooth.
+- **Holding Alt while dragging a handle back onto its point removes that handle** (owner: 2026-11-21). The point keeps its other handle, now moving separately, or turns sharp when it has none left. Moving away again before letting go brings the handle back. *Why: the owner asked for it while trying v2, as a quick way to straighten one side of a curve.*
 - Polygons and lines have straight edges only, so they have no handles.
 - Each drag, add or delete is one undo step.
 - A rectangle or circle has no points to edit.
 
-Source: scope DR2; round 5: TK2, 03 2.7; old: DR-49 to DR-63
+Source: scope DR2; round 5: TK2, 03 2.7; old: DR-49 to DR-63; owner: 2026-11-21
 
 ### Polygons may cross themselves · v1
 

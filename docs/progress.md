@@ -10,7 +10,7 @@
 |---|---|
 | Requirements, scope, glossary, principles, the [architecture](architecture/README.md), the [design system](design/README.md) | Done and approved (owner, 2026-11-14), kept up to date |
 | v1 | Built: stages 0 to 19 in [plan.md](plan.md). What each stage showed is in [stages-built.md](stages-built.md), its steps in [steps/](steps/README.md), and what was settled along the way in [settled.md](settled.md) |
-| [v2](versions/README.md) | Built, tasks 1 to 17 (2026-11-21): gradients, the pen, the Pencil, point editing on paths, their journeys and speed tests, all four speed targets met. Its plan stays in [versions/v2/](versions/v2/requirements.md); what it built is now in [architecture/](architecture/README.md). The owner's try (task 18) has begun: the six fixes in [fixes.md](versions/v2/fixes.md) asked so far are built |
+| [v2](versions/README.md) | Built, tasks 1 to 17 (2026-11-21): gradients, the pen, the Pencil, point editing on paths, their journeys and speed tests, all four speed targets met. Its plan stays in [versions/v2/](versions/v2/requirements.md); what it built is now in [architecture/](architecture/README.md). The owner's try (task 18) has begun: the fixes in [fixes.md](versions/v2/fixes.md) asked so far are built, except fix 8, which waits for the owner |
 | v3 to v7, Later | One line each in [scope.md](scope.md); their rules are in [requirements/](requirements/README.md) |
 | The orchestrator | Built in `~/projects/orchestrator`, waiting for the owner's first try. It builds a version from `docs/versions/<version>/tasks.md`. The old runner that built v1 is in its `old-runner/` |
 | Talking to Claude | Through `~/projects/discord-bridge`, in this project's Discord channel, since 2026-11-20 |
@@ -24,7 +24,8 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 Each item is removed in the same commit that settles it, wherever that commit is made.
 
 1. **Try v2** (task 18): gradients on shapes and the World, in the Entity inspector and with the handles; paths drawn with the pen, open and closed, and continued; the Pencil; and editing the points and handles of paths. What to change goes into `versions/v2/fixes.md`, each fix a task at the end of [tasks.md](versions/v2/tasks.md).
-2. **A selected path draws no outline and no frame** in the level view (found by task 16, written in [performance.md](architecture/performance.md#targets-and-their-tests)): only the Entity inspector and the Entities viewer show it. It is a look, so it waits for the owner's word, at the try or after.
+2. **How a Rope's or Spring's path follows a moved joint** (fix 8 in [fixes.md](versions/v2/fixes.md)). Today moving the joint alone carries both ends, so the path leaves the bodies it joins. Claude's pick: the ends stay on their bodies and the joint stays centred between them, so dragging a Rope or Spring alone changes nothing; to move it, move its bodies. The other way: the ends follow the joint but are kept on their bodies' outlines.
+3. **A selected path draws no outline and no frame** in the level view (found by task 16, written in [performance.md](architecture/performance.md#targets-and-their-tests)): only the Entity inspector and the Entities viewer show it. It is a look, so it waits for the owner's word, at the try or after.
 
 ## Next
 

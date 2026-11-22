@@ -12,9 +12,11 @@ export type HandleSide = 'handleIn' | 'handleOut';
 
 // How a handle's drag places it: Shift keeps it to a multiple of 15° in the path's own space, and
 // separate says Alt was held during the drag, so a smooth point turns separate and the handle moves alone.
+// remove drops the handle instead, as Alt with its end brought back onto the point does.
 export type HandleMoveOptions = {
     readonly lockAngle: boolean;
     readonly separate: boolean;
+    readonly remove?: boolean;
 };
 
 const ANGLE_STEP_RADIANS = (15 * Math.PI) / 180;
@@ -76,6 +78,11 @@ export class HandleMove {
         return this.points.toLevel({ x: this.start.x + handle.x, y: this.start.y + handle.y });
     }
 
+    // Where the handle's point is in the level.
+    get levelPoint() {
+        return this.points.toLevel({ x: this.start.x, y: this.start.y });
+    }
+
     // The handle's end to this level position.
     moveTo(levelEnd: Point, options: HandleMoveOptions) {
         const point = this.movedPoint(levelEnd, options);
@@ -86,6 +93,8 @@ export class HandleMove {
 
     private movedPoint(levelEnd: Point, options: HandleMoveOptions): PathPoint {
         const { start, side } = this;
+        if (options.remove === true) return this.withoutHandle();
+
         const ownEnd = this.points.toOwn(levelEnd);
         const pulled = { x: ownEnd.x - start.x, y: ownEnd.y - start.y };
         const handle = options.lockAngle ? angleLocked(pulled) : pulled;
@@ -97,5 +106,15 @@ export class HandleMove {
         const corner = isSeparate ? 'separate' : start.corner;
 
         return { ...start, [side]: handle, [otherSide(side)]: otherHandle, corner };
+    }
+
+    // The point without the dragged handle: sharp once it has none left, else separate, so the one left
+    // stays where it is.
+    private withoutHandle(): PathPoint {
+        const { start, side } = this;
+        const other = start[otherSide(side)];
+        const corner = other === null ? 'sharp' : 'separate';
+
+        return { ...start, [side]: null, corner };
     }
 }

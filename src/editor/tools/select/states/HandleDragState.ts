@@ -1,13 +1,16 @@
 import type { Point } from '../../../../core/geometry/index.ts';
 import type { HandleMove } from '../../../commands/index.ts';
 import type { LevelPointerInput } from '../../Tool.ts';
+import { POINT_HIT_PX } from '../points/PointHits.ts';
 
 import type { PointEditing } from './PointEditing.ts';
 import type { SelectState, SelectStateHost } from './SelectState.ts';
 
 // A drag on a selected path point's handle: the handle follows the mouse, live, and the release makes one
 // step, `Move a handle of Path 1`. A smooth point turns its other handle to stay opposite; Alt during the
-// drag makes it separate for the rest of the drag, so the handle moves alone. Shift keeps the handle to 15°;
+// drag makes it separate for the rest of the drag, so the handle moves alone, and while Alt is held an end
+// brought within a point's reach of its point removes the handle (the point turns sharp when none is
+// left); moving away again brings it back, until the release. Shift keeps the handle to 15°;
 // otherwise its end snaps as a point, and Ctrl turns that off. Esc puts it back.
 export class HandleDragState implements SelectState {
     readonly editing: PointEditing;
@@ -66,8 +69,18 @@ export class HandleDragState implements SelectState {
 
         const end = { x: levelPosition.x + this.grabOffset.x, y: levelPosition.y + this.grabOffset.y };
         const placed = modifiers.shift ? end : this.snapped(end, modifiers.ctrl);
-        this.move.moveTo(placed, { lockAngle: modifiers.shift, separate: this.separate });
+        const remove = modifiers.alt && this.isOnPoint(end);
+        this.move.moveTo(placed, { lockAngle: modifiers.shift, separate: this.separate, remove });
         this.host.redraw();
+    }
+
+    // Whether the handle's end, as the mouse puts it before any snapping, is within a point's reach of the
+    // handle's point.
+    private isOnPoint(end: Point) {
+        const point = this.move.levelPoint;
+        const reach = POINT_HIT_PX / this.host.context.view.zoom;
+
+        return Math.hypot(end.x - point.x, end.y - point.y) <= reach;
     }
 
     private snapped(end: Point, ctrlHeld: boolean) {

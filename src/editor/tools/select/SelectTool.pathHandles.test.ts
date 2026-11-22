@@ -121,6 +121,35 @@ describe('SelectTool point editing: curve handles', () => {
         expect(middleOf(path)).toEqual({ ...SMOOTH_MIDDLE, handleOut: { x: 60, y: 0 }, corner: 'separate' });
     });
 
+    test('Alt with the end brought onto its point removes the handle, keeping the other', () => {
+        const { path, drag } = buildHandleTest();
+
+        drag(HANDLE_OUT_END, { x: 603, y: 502 }, { alt: true });
+
+        expect(middleOf(path)).toEqual({ ...SMOOTH_MIDDLE, handleOut: null, corner: 'separate' });
+    });
+
+    test('removing the last handle makes the point sharp', () => {
+        const { path, drag } = buildHandleTest({ ...SMOOTH_MIDDLE, handleIn: null, corner: 'separate' });
+
+        drag(HANDLE_OUT_END, MIDDLE_POINT, { alt: true });
+
+        expect(middleOf(path)).toEqual({ ...SMOOTH_MIDDLE, handleIn: null, handleOut: null, corner: 'sharp' });
+    });
+
+    test('without Alt, or moved away again, the handle near its point stays', () => {
+        const { path, tool, pointerAt, drag } = buildHandleTest();
+
+        tool.pointerDown(pointerAt(HANDLE_OUT_END));
+        tool.pointerMove(pointerAt({ x: 602, y: 502 }, { alt: true }));
+        tool.pointerMove(pointerAt({ x: 660, y: 500 }, { alt: true }));
+        tool.pointerUp(pointerAt({ x: 660, y: 500 }, { alt: true }));
+        expect(middleOf(path)).toEqual({ ...SMOOTH_MIDDLE, handleOut: { x: 60, y: 0 }, corner: 'separate' });
+
+        drag({ x: 660, y: 500 }, { x: 602, y: 501 });
+        expectHandleNear(middleOf(path)?.handleOut, { x: 2, y: 1 });
+    });
+
     test("a separate point's handle moves alone", () => {
         const { path, drag } = buildHandleTest({ ...SMOOTH_MIDDLE, corner: 'separate' });
 
