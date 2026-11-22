@@ -7,6 +7,7 @@ import {
     NameComponent,
     StyleComponent,
     TagsComponent,
+    VariablesComponent,
 } from '../../components/index.ts';
 import type { Level } from '../../level/index.ts';
 
@@ -183,6 +184,29 @@ describe('LevelReader tags', () => {
     test('refuses tags that are not a list of texts', () => {
         const levelData = newLevelData();
         levelData.world.children.push(plainEntity(3, { TagsComponent: { tags: 'coin' } }));
+
+        expectDamaged(levelData);
+    });
+});
+
+describe('LevelReader variables', () => {
+    test("reads the World's variables as saved, their names made words", () => {
+        const levelData = newLevelData();
+        levelData.world.components['VariablesComponent'] = { variables: [{ name: 'Coins', value: 2 }] };
+
+        const level = expectRead(levelData);
+        const variables = level.world.requireComponent(VariablesComponent);
+
+        expect(variables.get('variables')).toEqual([{ name: 'coins', value: 2 }]);
+    });
+
+    test('refuses two variables with one name', () => {
+        const levelData = newLevelData();
+        const twoCoins = [
+            { name: 'coins', value: 0 },
+            { name: 'coins', value: 1 },
+        ];
+        levelData.world.components['VariablesComponent'] = { variables: twoCoins };
 
         expectDamaged(levelData);
     });

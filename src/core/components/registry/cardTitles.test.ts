@@ -14,6 +14,7 @@ const TITLES = new Map([
     ['CameraComponent', 'Camera'],
     ['PhysicsWorldComponent', 'PhysicsWorld'],
     ['TagsComponent', 'Tags'],
+    ['VariablesComponent', 'Variables'],
 ]);
 
 const schemas = createV1Registry()

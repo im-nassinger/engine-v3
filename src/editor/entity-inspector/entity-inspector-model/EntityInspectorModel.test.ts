@@ -9,6 +9,7 @@ import {
     ShapeComponent,
     SurfaceComponent,
     TransformComponent,
+    VariablesComponent,
 } from '../../../core/components/index.ts';
 import { DerivedCaches } from '../../../core/derived/index.ts';
 import { Level } from '../../../core/level/index.ts';
@@ -261,7 +262,7 @@ describe('EntityInspectorModel: Add Component, Remove and Reset', () => {
         selection.replace([crate.id]);
         const typeNames = model.addableComponents.map((entry) => entry.typeName);
 
-        expect(typeNames).toEqual(['StyleComponent', 'JointComponent', 'TagsComponent']);
+        expect(typeNames).toEqual(['StyleComponent', 'JointComponent', 'TagsComponent', 'VariablesComponent']);
         expect(addableEntry(model, 'StyleComponent')?.availability).toEqual({ enabled: true });
         expect(addableEntry(model, 'StyleComponent')?.section).toBe('Drawing');
         expect(addableEntry(model, 'TagsComponent')?.availability).toEqual({ enabled: true });
@@ -270,6 +271,20 @@ describe('EntityInspectorModel: Add Component, Remove and Reset', () => {
             enabled: false,
             reason: 'Use the Joint tool to place a joint.',
         });
+    });
+
+    test('greys the VariablesComponent on any entity but the World, with the reason, and offers it on the World', () => {
+        const { level, crate, selection, model } = buildModel();
+
+        selection.replace([crate.id]);
+        expect(addableEntry(model, 'VariablesComponent')?.availability).toEqual({
+            enabled: false,
+            reason: "Only the World has variables. Select the World to add the level's variables.",
+        });
+        expect(addableEntry(model, 'VariablesComponent')?.section).toBe('Logic');
+
+        selection.replace([level.world.id]);
+        expect(addableEntry(model, 'VariablesComponent')?.availability).toEqual({ enabled: true });
     });
 
     test("greys the BodyComponent and the SurfaceComponent on the World, with Walls' hint", () => {
@@ -289,6 +304,15 @@ describe('EntityInspectorModel: Add Component, Remove and Reset', () => {
         selection.replace([crate.id, other.id]);
 
         expect(addableEntry(model, 'BodyComponent')?.availability).toEqual({ enabled: true });
+    });
+
+    test("the World's variables, added by hand, can be removed", () => {
+        const { level, selection, model } = buildModel();
+        level.world.addComponent(new VariablesComponent());
+
+        selection.replace([level.world.id]);
+
+        expect(requireCard(model, 'VariablesComponent').canRemove).toEqual({ enabled: true });
     });
 
     test('Remove gives its reason on the TransformComponent, a joint, the camera and the World', () => {

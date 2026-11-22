@@ -41,5 +41,7 @@ export type { TextFieldOptions } from './field-types/TextFieldType.ts';
 export { MAX_WORD_NAME_LENGTH, wordName } from './names/wordName.ts';
 export type { Unit } from './Unit.ts';
 export type { ValueType } from './ValueType.ts';
+export { VariableFieldType } from './field-types/VariableFieldType.ts';
+export type { Variable } from './field-types/VariableFieldType.ts';
 export { VectorFieldType } from './field-types/VectorFieldType.ts';
 export type { VectorFieldOptions } from './field-types/VectorFieldType.ts';

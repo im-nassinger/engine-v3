@@ -1,0 +1,30 @@
+.add-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    width: 100%;
+    min-height: 28px;
+    padding: 0 var(--space-8);
+    border: none;
+    border-radius: var(--radius);
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+        background: var(--field);
+        color: var(--text);
+    }
+
+    &:focus-visible {
+        outline: 1px solid var(--accent);
+        outline-offset: -1px;
+    }
+
+    &:disabled {
+        color: var(--faint);
+        cursor: default;
+    }
+}

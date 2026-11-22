@@ -1,0 +1,17 @@
+.variables-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+    padding: var(--space-4) 0;
+
+    &[data-mixed='true'] {
+        color: var(--muted);
+        font-style: italic;
+        line-height: var(--row);
+    }
+
+    > .add-row {
+        margin-top: 2px;
+    }
+}

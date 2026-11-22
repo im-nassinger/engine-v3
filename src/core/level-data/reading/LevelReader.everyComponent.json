@@ -49,6 +49,18 @@
                     "y": 3
                 },
                 "walls": true
+            },
+            "VariablesComponent": {
+                "variables": [
+                    {
+                        "name": "coins",
+                        "value": 0
+                    },
+                    {
+                        "name": "lives",
+                        "value": 3
+                    }
+                ]
             }
         },
         "children": [

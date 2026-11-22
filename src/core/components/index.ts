@@ -42,3 +42,5 @@ export type { SurfaceValues } from './SurfaceComponent/SurfaceValues.ts';
 export { TagsComponent } from './TagsComponent/TagsComponent.ts';
 export type { TagsValues } from './TagsComponent/TagsValues.ts';
 export { TransformComponent } from './TransformComponent/TransformComponent.ts';
+export { VariablesComponent } from './VariablesComponent/VariablesComponent.ts';
+export type { VariablesValues } from './VariablesComponent/VariablesValues.ts';

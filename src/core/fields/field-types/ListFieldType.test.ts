@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import { ListFieldType } from './ListFieldType.ts';
 import { NumberFieldType } from './NumberFieldType.ts';
+import { VariableFieldType } from './VariableFieldType.ts';
 import { VectorFieldType } from './VectorFieldType.ts';
 
 const points = [
@@ -89,5 +90,22 @@ describe('ListFieldType', () => {
         expect(fieldType.equals(points, reversed)).toBe(false);
         expect(fieldType.equals(points, shorter)).toBe(false);
         expect(fieldType.equals(points, moved)).toBe(false);
+    });
+
+    test('a list of named items refuses a second item with the same name, once normalized', () => {
+        const fieldType = new ListFieldType({ itemType: new VariableFieldType(), itemName: (item) => item.name });
+
+        expect(
+            fieldType.parse([
+                { name: 'coins', value: 0 },
+                { name: 'lives', value: 3 },
+            ]).ok,
+        ).toBe(true);
+        expect(
+            fieldType.parse([
+                { name: 'coins', value: 0 },
+                { name: 'Coins', value: 3 },
+            ]),
+        ).toEqual({ ok: false, problem: { reason: 'repeatedName', name: 'coins' } });
     });
 });

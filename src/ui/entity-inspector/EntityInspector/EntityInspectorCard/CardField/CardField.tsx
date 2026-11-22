@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import type { ReactNode } from 'react';
 import type { ComponentTypeName } from '../../../../../core/components/index.ts';
 import type { EntityId } from '../../../../../core/level/index.ts';
 import type { EditOutcome } from '../../../../../editor/history/index.ts';
@@ -13,7 +14,7 @@ import type { Axis } from '../../../../../editor/commands/index.ts';
 import type { FieldModel } from '../../../../../editor/entity-inspector/index.ts';
 import type { OpenLevel } from '../../../../../editor/session/index.ts';
 import { useEditorSession } from '../../../../EditorContext.tsx';
-import { FieldControl } from '../../../../fields/index.ts';
+import { drawsOwnLabels, FieldControl } from '../../../../fields/index.ts';
 import type { FieldSlideHandlers } from '../../../../fields/index.ts';
 import { Tooltip } from '../../../../shared/index.ts';
 import './CardField.css';
@@ -27,7 +28,8 @@ export type CardFieldProps = {
 
 // One field's row: its label, whose hover shows the description if it has one, and the field type's control. A
 // committed value is one step on every shown entity, Mass through the densities; a refused one gives its reason as status text. A
-// slider or a gradient's stop changes the level while dragged and makes its one step when let go.
+// slider or a gradient's stop changes the level while dragged and makes its one step when let go. A list
+// whose rows carry their own labels, such as the World's variables, has the card's whole width.
 export function CardField({ openLevel, typeName, entityIds, field }: CardFieldProps) {
     const session = useEditorSession();
     const { key, label, description } = field.definition;
@@ -85,16 +87,20 @@ export function CardField({ openLevel, typeName, entityIds, field }: CardFieldPr
 
     const subject = { openLevel, typeName, entityIds };
     const labelText = <span className="label">{label}</span>;
+    let labelPart: ReactNode = labelText;
+    if (drawsOwnLabels(field)) {
+        labelPart = null;
+    } else if (description !== undefined) {
+        labelPart = (
+            <Tooltip label={description} isLong>
+                {labelText}
+            </Tooltip>
+        );
+    }
 
     return (
         <div className="card-field" data-key={key} data-enabled={field.isEnabled}>
-            {description === undefined ? (
-                labelText
-            ) : (
-                <Tooltip label={description} isLong>
-                    {labelText}
-                </Tooltip>
-            )}
+            {labelPart}
             <span className="control">
                 <FieldControl
                     field={field}

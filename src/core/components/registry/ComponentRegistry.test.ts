@@ -46,7 +46,7 @@ describe('the registry', () => {
         const registry = createV1Registry();
         const cardOrder = registry.inCardOrder();
 
-        expect(registry.all()).toHaveLength(11);
+        expect(registry.all()).toHaveLength(12);
         expect(cardOrder[0]).toBe(NameComponent);
         expect(registry.find('BodyComponent')).toBe(BodyComponent);
     });
@@ -67,6 +67,7 @@ describe('the registry', () => {
             'CameraComponent',
             'PhysicsWorldComponent',
             'TagsComponent',
+            'VariablesComponent',
         ]);
     });
 });

@@ -25,6 +25,10 @@ export function problemText(label: string, problem: ParseProblem) {
             return `${label} needs at least ${problem.minCount}`;
         case 'tooManyItems':
             return `${label} holds at most ${problem.maxCount}`;
+        case 'noName':
+            return 'A name needs a letter, a digit or _';
+        case 'repeatedName':
+            return `${label} already has ${problem.name}`;
         case 'flatShape':
             return `Its points are in one line, so ${label} can't spread them`;
     }

@@ -12,7 +12,7 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 - [x] 2. The TagsComponent and the tags field
   - Read: versions/v3/architecture.md#the-components, versions/v3/architecture.md#the-field-types, requirements/triggers/triggers.md#the-tagscomponent--v3, design/controls.md#v3-triggers-tags-variables-inputs-and-the-end-window, design/mockups/v3.html
   - Done when: `TagsFieldType` (parse, normalize to lowercase words of letters, digits and `_`, 1 to 32 characters, no repeats) and `TagsComponent` (card 11) are registered; `LevelTags` lists every tag in the level; `TagsField` adds a tag with Enter, removes one with its ×, and offers the level's matching tags as the design draws; each change is one step; Node and browser tests pass; a level with tags saves and reads back
-- [ ] 3. The VariablesComponent
+- [x] 3. The VariablesComponent
   - Read: versions/v3/architecture.md#the-components, versions/v3/architecture.md#the-field-types, requirements/triggers/variables-and-inputs.md#variables--v3, design/controls.md#v3-triggers-tags-variables-inputs-and-the-end-window
   - Done when: `VariableFieldType` (a unique name and a number) and `VariablesComponent` (card 12, World only in v3, in the World's Add Component menu, refused on other entities with the reason) are registered; the card shows one row per variable with an × and an Add variable row, as the design draws; each change is one step; tests pass
 - [ ] 4. Keys, the InputComponent and a new level's five inputs

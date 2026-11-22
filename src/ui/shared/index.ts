@@ -1,3 +1,4 @@
+export * from './AddRow/index.ts';
 export * from './Button/index.ts';
 export * from './Icon/index.ts';
 export * from './IconButton/index.ts';
