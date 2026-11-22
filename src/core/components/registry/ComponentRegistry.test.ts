@@ -41,12 +41,12 @@ describe('ComponentRegistry', () => {
     });
 });
 
-describe('the v1 registry', () => {
-    test('holds the ten v1 components, NameComponent first in card order because it has no card', () => {
+describe('the registry', () => {
+    test("holds the ten v1 components and v3's, NameComponent first in card order because it has no card", () => {
         const registry = createV1Registry();
         const cardOrder = registry.inCardOrder();
 
-        expect(registry.all()).toHaveLength(10);
+        expect(registry.all()).toHaveLength(11);
         expect(cardOrder[0]).toBe(NameComponent);
         expect(registry.find('BodyComponent')).toBe(BodyComponent);
     });
@@ -66,6 +66,7 @@ describe('the v1 registry', () => {
             'JointComponent',
             'CameraComponent',
             'PhysicsWorldComponent',
+            'TagsComponent',
         ]);
     });
 });

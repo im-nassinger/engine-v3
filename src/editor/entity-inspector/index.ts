@@ -15,6 +15,7 @@ export type { EntityInspectorHeader } from './model/EntityInspectorHeader.ts';
 export { MIXED } from './model/MIXED.ts';
 export type { Mixed } from './model/MIXED.ts';
 export type { MixedVector } from './model/MixedVector.ts';
+export { TagEdits } from './tags-field/TagEdits.ts';
 export { ValueInput } from './typing/ValueInput.ts';
 export type {
     ColourInputResult,

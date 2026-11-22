@@ -13,6 +13,7 @@ const TITLES = new Map([
     ['JointComponent', 'Joint'],
     ['CameraComponent', 'Camera'],
     ['PhysicsWorldComponent', 'PhysicsWorld'],
+    ['TagsComponent', 'Tags'],
 ]);
 
 const schemas = createV1Registry()

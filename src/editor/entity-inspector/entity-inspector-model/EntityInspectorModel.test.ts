@@ -261,9 +261,11 @@ describe('EntityInspectorModel: Add Component, Remove and Reset', () => {
         selection.replace([crate.id]);
         const typeNames = model.addableComponents.map((entry) => entry.typeName);
 
-        expect(typeNames).toEqual(['StyleComponent', 'JointComponent']);
+        expect(typeNames).toEqual(['StyleComponent', 'JointComponent', 'TagsComponent']);
         expect(addableEntry(model, 'StyleComponent')?.availability).toEqual({ enabled: true });
         expect(addableEntry(model, 'StyleComponent')?.section).toBe('Drawing');
+        expect(addableEntry(model, 'TagsComponent')?.availability).toEqual({ enabled: true });
+        expect(addableEntry(model, 'TagsComponent')?.section).toBe('Logic');
         expect(addableEntry(model, 'JointComponent')?.availability).toEqual({
             enabled: false,
             reason: 'Use the Joint tool to place a joint.',

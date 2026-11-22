@@ -1,0 +1,37 @@
+.tag-pill {
+    display: inline-flex;
+    gap: var(--space-4);
+    align-items: center;
+    height: 19px;
+    padding: 0 4px 0 9px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+
+    .remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 14px;
+        height: 14px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: none;
+        color: inherit;
+        cursor: pointer;
+
+        &:hover:enabled {
+            background: var(--hover);
+        }
+
+        &:disabled {
+            cursor: default;
+        }
+
+        .icon {
+            width: var(--icon-small);
+            height: var(--icon-small);
+        }
+    }
+}

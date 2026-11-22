@@ -6,6 +6,7 @@ import {
     JointComponent,
     NameComponent,
     StyleComponent,
+    TagsComponent,
 } from '../../components/index.ts';
 import type { Level } from '../../level/index.ts';
 
@@ -165,6 +166,25 @@ describe('LevelReader round trips', () => {
 
         expect(outcome.ok).toBe(true);
         expect(reader.readJson('{ not json')).toEqual({ ok: false, refusal: { reason: 'notALevel' } });
+    });
+});
+
+describe('LevelReader tags', () => {
+    test('reads tags as saved, made lowercase words and each kept once', () => {
+        const levelData = newLevelData();
+        levelData.world.children.push(plainEntity(3, { TagsComponent: { tags: ['Coin', 'big coin', 'coin'] } }));
+
+        const level = expectRead(levelData);
+        const tags = level.requireEntity(3).requireComponent(TagsComponent);
+
+        expect(tags.get('tags')).toEqual(['coin', 'big_coin']);
+    });
+
+    test('refuses tags that are not a list of texts', () => {
+        const levelData = newLevelData();
+        levelData.world.children.push(plainEntity(3, { TagsComponent: { tags: 'coin' } }));
+
+        expectDamaged(levelData);
     });
 });
 

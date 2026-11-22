@@ -7,6 +7,7 @@ import { EntityField } from './EntityField/index.ts';
 import type { FieldProps } from './FieldProps.ts';
 import { FillField } from './FillField/index.ts';
 import { NumberField } from './NumberField/index.ts';
+import { TagsField } from './TagsField/index.ts';
 import { TextField } from './TextField/index.ts';
 import { VectorField } from './VectorField/index.ts';
 
@@ -22,4 +23,5 @@ export const ITEM_FIELD_COMPONENTS: Partial<Record<FieldKind, ComponentType<Fiel
     colour: ColourField,
     fill: FillField,
     entity: EntityField,
+    tags: TagsField,
 };

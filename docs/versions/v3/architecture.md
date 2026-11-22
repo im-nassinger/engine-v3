@@ -9,7 +9,8 @@
 | Code | Folder | Part |
 |---|---|---|
 | `TagsComponent`, `VariablesComponent`, `InputComponent`, `TriggerComponent` | `core/components/<Name>/` | core |
-| `TagsFieldType`, `VariableFieldType`, `InputFieldType`, `TriggerFieldType` | `core/fields/tags/`, `variable/`, `input/`, `trigger/` | core |
+| `TagsFieldType`, `VariableFieldType`, `InputFieldType`, `TriggerFieldType` | `core/fields/field-types/`, beside v1's (as built, standing yes, 2026-11-22) | core |
+| `wordName` (the rule for a tag, a variable's name and an input's name) | `core/fields/names/` | core |
 | The trigger's types, `triggerName`, `triggerProblems`, `changeableValues` | `core/triggers/model/` | core |
 | `KeyCodes` (the keys a level may use, and the ones it can't) | `core/triggers/keys/` | core |
 | `EventPhase`, `TriggerPhase`, `TouchLedger`, `InputState`, `TriggerTimers`, `ActionRunner`, `PlayValueWriter` | `core/simulation/triggers/`, `core/simulation/phases/` | core |

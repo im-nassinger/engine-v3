@@ -1,0 +1,20 @@
+.tag-suggestions {
+    padding: var(--space-4);
+    border-radius: var(--radius-menu);
+    background: var(--panel);
+    box-shadow: var(--shade);
+
+    .choice {
+        display: flex;
+        align-items: center;
+        height: 24px;
+        padding: 0 var(--space-8);
+        border-radius: var(--radius);
+        cursor: pointer;
+
+        &:hover {
+            background: var(--accent-soft);
+            color: var(--accent-text);
+        }
+    }
+}

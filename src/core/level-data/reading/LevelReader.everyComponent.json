@@ -115,6 +115,9 @@
                         "friction": 0.9,
                         "restitution": 0.6,
                         "sensor": true
+                    },
+                    "TagsComponent": {
+                        "tags": ["coin", "pickup"]
                     }
                 },
                 "children": [

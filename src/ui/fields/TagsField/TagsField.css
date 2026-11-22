@@ -1,0 +1,43 @@
+.tags-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+    padding: 3px 0;
+
+    > .pill {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        align-items: center;
+        min-height: var(--input);
+        padding: 3px 4px;
+        border-radius: calc(var(--input) / 2);
+        background: var(--field);
+
+        &:focus-within {
+            outline: 1px solid var(--accent);
+            outline-offset: -1px;
+        }
+    }
+
+    input {
+        flex: 1 1 60px;
+        width: 60px;
+        min-width: 0;
+        padding: 0 6px;
+        border: 0;
+        outline: 0;
+        background: none;
+        color: var(--text);
+        font: inherit;
+
+        &::placeholder {
+            color: var(--muted);
+        }
+
+        &:disabled {
+            color: var(--faint);
+        }
+    }
+}

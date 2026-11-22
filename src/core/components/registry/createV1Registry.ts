@@ -8,6 +8,7 @@ import { PhysicsWorldComponent } from '../PhysicsWorldComponent/PhysicsWorldComp
 import { ShapeComponent } from '../ShapeComponent/ShapeComponent.ts';
 import { StyleComponent } from '../StyleComponent/StyleComponent.ts';
 import { SurfaceComponent } from '../SurfaceComponent/SurfaceComponent.ts';
+import { TagsComponent } from '../TagsComponent/TagsComponent.ts';
 import { TransformComponent } from '../TransformComponent/TransformComponent.ts';
 
 // The order here fixes each component's index for Lua: new components are only ever added at the end.
@@ -24,6 +25,8 @@ export function createV1Registry() {
     registry.register(JointComponent);
     registry.register(CameraComponent);
     registry.register(PhysicsWorldComponent);
+    // v3's, in their card order. Card 14 is kept for v5's ScriptComponent.
+    registry.register(TagsComponent);
 
     return registry;
 }

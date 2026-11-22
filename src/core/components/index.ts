@@ -39,4 +39,6 @@ export { DEFAULT_FILL_COLOUR, DEFAULT_OUTLINE_COLOUR } from './StyleComponent/st
 export type { StyleValues } from './StyleComponent/StyleValues.ts';
 export { SurfaceComponent } from './SurfaceComponent/SurfaceComponent.ts';
 export type { SurfaceValues } from './SurfaceComponent/SurfaceValues.ts';
+export { TagsComponent } from './TagsComponent/TagsComponent.ts';
+export type { TagsValues } from './TagsComponent/TagsValues.ts';
 export { TransformComponent } from './TransformComponent/TransformComponent.ts';
