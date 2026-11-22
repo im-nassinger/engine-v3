@@ -36,7 +36,7 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 - [x] 10. Inputs reach the game
   - Read: versions/v3/architecture.md#the-tick-from-v3, versions/v3/architecture.md#keys-during-play, requirements/triggers/variables-and-inputs.md#raw-keys-and-inputs--v3
   - Done when: `HeldKeys` also keeps the keys pressed since the last batch; each tick's inputs carry the keys held and pressed; `InputPhase` builds `InputState` (each key and input pressed, released or held, a press shorter than a tick counted once, two keys on one input held until both are up); `KeyboardInput` stops the browser's default only for the keys the level uses; tests pass, the determinism test included
-- [ ] 11. Events
+- [x] 11. Events
   - Read: versions/v3/architecture.md#the-tick-from-v3, versions/v3/architecture.md#performance, requirements/triggers/triggers.md#events--v3, requirements/triggers/triggers.md#order-and-limits--v3, requirements/physics/bodies.md#sensors-and-touching--v3
   - Done when: `EventPhase`, `TouchLedger`, `TriggerTimers` and `TriggerIndex` list each tick's events in the architecture's order: level start, keys and inputs, timers, touched and no longer touched (once per touching entity, groups hearing their parts, two sensors filtered), and "no entity with this tag is left"; Repeat drops firings that come too soon; Node tests with `runHeadless` cover each event
 - [ ] 12. Checks and actions

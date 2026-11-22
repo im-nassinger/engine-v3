@@ -7,12 +7,15 @@ import { startingCameraPosition } from '../camera/startingCameraPosition.ts';
 import { PlayInputs } from '../inputs/PlayInputs.ts';
 import { CameraPhase } from '../phases/CameraPhase.ts';
 import { EndOfTickPhase } from '../phases/EndOfTickPhase.ts';
+import { EventPhase } from '../phases/EventPhase.ts';
 import { InputPhase } from '../phases/InputPhase.ts';
 import { JointPathPhase } from '../phases/JointPathPhase.ts';
 import { LevelBoundsPhase } from '../phases/LevelBoundsPhase.ts';
 import { PhysicsPhase } from '../phases/PhysicsPhase.ts';
+import { TriggerPhase } from '../phases/TriggerPhase.ts';
 import { RemovalMarks } from '../removal/RemovalMarks.ts';
 import { ReportCollector } from '../report/ReportCollector.ts';
+import { PlayTriggers } from '../triggers/PlayTriggers.ts';
 
 import type { RunStart } from '../run/RunStart.ts';
 import { Simulation } from '../run/Simulation.ts';
@@ -31,12 +34,15 @@ export function startSimulation(levelData: LevelData, engine: PhysicsEngine, sta
     const cameraStart = startingCameraPosition(cameraSettings, playCopy.level);
     const camera = new CameraState(cameraStart);
     const inputs = new PlayInputs(playCopy.level);
+    const triggers = new PlayTriggers(playCopy.level);
     const report = new ReportCollector();
-    const run = { ...playCopy, removals, camera, inputs, report };
+    const run = { ...playCopy, removals, camera, inputs, triggers, report };
     const phases = [
         new InputPhase(),
         new PhysicsPhase(),
         new JointPathPhase(),
+        new EventPhase(),
+        new TriggerPhase(),
         new LevelBoundsPhase(),
         new CameraPhase(),
         new EndOfTickPhase(),

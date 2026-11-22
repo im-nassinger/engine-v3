@@ -189,6 +189,8 @@ Words for how the game is built, used in [architecture/](architecture/README.md)
 | Browser event | Something the browser reports to the page, such as a key press or a paste. Never a game event. |
 | Body pose | A body's position and angle during play, as the physics engine reports it. |
 | Sensor event | What the physics world reports after a step when a surface starts (begin) or stops (end) overlapping a sensor. It names the sensor's entity, the visitor (the other surface's entity, Box2D's word) and the visitor's body. Not a game event: `TouchLedger` turns sensor events into "touched" and "no longer touched". |
+| Firing | One trigger hearing one event in one tick (`TriggerFiring`): its entity, the trigger, and the entity that caused the event (`other`), if any. Two entities touching at once are two firings. `EventPhase` lists a tick's firings, `TriggerPhase` runs them. |
+| Trigger owner | The entity holding a trigger (`this`). For touches, the sensor's entity and every group above it with a touch trigger. |
 | Render chunk | A run of the World's children, next to each other in the draw order, that PixiJS draws as its own render group. Moving an entity uploads again only the shapes of its render chunk, not the whole level's. |
 | Runner | The script that built v1, stages 0 to 19, without the owner: one fresh Claude session per step, with reports to Discord. Moved out of this project on 2026-11-20, to `~/projects/orchestrator/old-runner/`, to become a tool for any project. |
 

@@ -40,6 +40,11 @@ export class Simulation {
         return this.run.inputs.state;
     }
 
+    // The last tick's trigger firings that ran, in the order they ran.
+    get firings() {
+        return this.run.triggers.fired;
+    }
+
     runTick(inputs: TickInputs) {
         this.currentTick += 1;
         const context = { tick: this.currentTick, inputs, run: this.run };

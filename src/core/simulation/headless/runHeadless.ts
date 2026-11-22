@@ -4,6 +4,7 @@ import type { PhysicsEngine } from '../../physics/index.ts';
 import type { BodyHash } from '../hash/bodyHashes.ts';
 import type { RunStart } from '../run/RunStart.ts';
 import type { TickInputs } from '../inputs/TickInputs.ts';
+import type { Simulation } from '../run/Simulation.ts';
 import { startSimulation } from '../start/startSimulation.ts';
 
 const NOTHING_HELD: TickInputs = { heldKeys: [], pressedKeys: [] };
@@ -13,6 +14,8 @@ export type HeadlessOptions = {
     readonly start: RunStart;
     // What the player holds on each tick, by its number from 1; nothing when it isn't given.
     readonly inputsAt?: (tick: number) => TickInputs;
+    // Called after each tick, for a test to read the run.
+    readonly afterTick?: (simulation: Simulation) => void;
 };
 
 // The state after one tick: the run's stateHash, and one hash per body to name the first that differs.
@@ -38,6 +41,7 @@ export function runHeadless(
     try {
         for (let tick = 1; tick <= options.ticks; tick += 1) {
             simulation.runTick(options.inputsAt?.(tick) ?? NOTHING_HELD);
+            options.afterTick?.(simulation);
             recorded.push({ tick, hash: simulation.stateHash(), bodies: simulation.bodyHashes() });
         }
     } finally {
