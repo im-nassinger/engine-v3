@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Where a level lives and how it leaves the browser. **v1:** one level at a time, saved in the browser after every change, exported and imported as a project file (`.editable`); a warning when saving fails; the game asks the browser to keep its data; a second tab is read-only; every file records its file format version and its physics version; a level holds at most 100,000 entities and 256 MB. **Later:** the play file (`.playable`) with a way to run it without the editor, and the warning after 10,000 entities. Core rules: the level lives in one browser that may delete it, so the game is honest about that and only an exported file is a real backup; there is no list of levels, no level id and no version history in v1.
+Where a level lives and how it leaves the browser. **v1:** one level at a time, saved in the browser after every change, exported and imported as a project file (`.editable`); a warning when saving fails; the game asks the browser to keep its data; the newest tab edits and an older one turns read-only; every file records its file format version and its physics version; a level holds at most 100,000 entities and 256 MB. **Later:** the play file (`.playable`) with a way to run it without the editor, and the warning after 10,000 entities. Core rules: the level lives in one browser that may delete it, so the game is honest about that and only an exported file is a real backup; there is no list of levels, no level id and no version history in v1.
 
 A main menu with a list of levels, thumbnails, accounts and publishing are in [later.md](../later.md).
 
@@ -49,10 +49,12 @@ Source: scope SA3; round 12: SV2; old: SV-28, SV-29, SV-46; owner: 2026-11-18
 
 Source: scope SA2; round 11: 12 A6; round 12: ST1; old: SV-38
 
-### A second tab is read-only · v1
+### The newest tab edits the level · v1
 
-- If the level is already open in another tab, the second tab says so and stays read-only.
-- *Why: with one saved level, two tabs editing it would both save, and the last one would silently overwrite the other.*
+- Opening the level in a new tab makes the new tab the one that edits it (owner: 2026-11-22, replacing v1's rule that the second tab stayed read-only).
+- The older tab saves its changes first, so the new tab opens them. Then it turns read-only and says so: "The level is open in a newer tab, so this tab is read-only now. Your changes were saved first. Reload this tab to edit here instead." If that last save failed, it says so and that Export still works.
+- Reloading the older tab makes it the newest, so it takes the level back the same way.
+- *Why: with one saved level, two tabs editing it would both save, and the last one would silently overwrite the other. The owner wanted the tab just opened to be the one that works.*
 
 Source: scope SA1; round 11: 12 A7; round 12: TB1; old: SV-47
 
@@ -140,7 +142,6 @@ Small features from the old draft and review that the scope review never asked a
 | A note after a crash | Reopening after a crash loads the last save and says: "Recovered from your last save at 14:32. The last few seconds may be missing." | v1 |
 | A saved level that won't open | It is checked like an import. If it fails, the game offers to export the raw data and never deletes it | v1 |
 | Site data cleared while the level is open | The open level is still in memory, so the game saves it again and says so | v1 |
-| Edit here instead | A button in the read-only tab that takes over editing. The other tab saves and turns read-only | Later |
 | An Export dialog | The file name, counts of entities and files, the size and one button | Later |
 | A note about scripts on import | "Contains 4 scripts. They can't reach your files or other levels." Never a blocking question | Later |
 | Update available | When a new version of the game is out, an open tab offers Reload and never reloads by itself | Later |

@@ -262,7 +262,7 @@ Rules: [requirements/play-and-save](requirements/play-and-save/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
-| SA1 | A second tab on the same level says so and stays read-only. | v1 | With one saved level, two tabs would silently overwrite each other's work. |
+| SA1 | A new tab on the same level edits it; the older tab saves, then says so and turns read-only (owner: 2026-11-22). | v1 | With one saved level, two tabs would silently overwrite each other's work. |
 | SA2 | Ask the browser to keep the saved level. | v1 | One call. Without it, Safari may delete the level after 7 days without a visit. |
 | SA3 | A warning when saving in the browser fails. | v1 | Otherwise you'd find out you lost work only after a reload. |
 | SA4 | The play file (.playable), and a way to open one and run the level without the editor. | Later | Before publishing, nobody else plays your levels. The project file already keeps and moves them. |

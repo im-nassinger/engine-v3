@@ -6,8 +6,7 @@ export type PageSavingParts = {
     readonly saving: SavesNow;
     // Settings written on the next frame, which a hidden tab never runs.
     readonly settings: { flush(): void };
-    // Only the tab with the lock keeps it: a read-only tab closing would hide the other tab's crash.
-    readonly sessionOpen: SessionOpenRecord | undefined;
+    readonly sessionOpen: SessionOpenRecord;
 };
 
 // The page's events that saving answers: the tab hidden saves at once, since a hidden tab may be closed
@@ -18,6 +17,8 @@ export class PageSavingEvents {
     private readonly parts: PageSavingParts;
     private readonly page: Window;
     private isPromptArmed = false;
+    // Only the tab editing the level keeps sessionOpen: an older, read-only tab closing would hide its crash.
+    private keepsSessionOpen = true;
     private readonly handleBeforeUnload = (event: BeforeUnloadEvent) => event.preventDefault();
 
     constructor(parts: PageSavingParts, page: Window) {
@@ -45,6 +46,11 @@ export class PageSavingEvents {
         };
     }
 
+    // A newer tab took the level, and with it sessionOpen.
+    stopKeepingSessionOpen() {
+        this.keepsSessionOpen = false;
+    }
+
     private handleVisibility() {
         if (this.page.document.visibilityState !== 'hidden') return;
 
@@ -53,14 +59,17 @@ export class PageSavingEvents {
 
     private handlePageHide() {
         this.saveAtOnce();
-        this.parts.sessionOpen?.setOpen(false);
+        if (this.keepsSessionOpen) {
+            this.parts.sessionOpen.setOpen(false);
+        }
     }
 
     // Back from the back-forward cache: the session is open again, so a crash from here on is noticed.
     private handlePageShow(event: PageTransitionEvent) {
         if (!event.persisted) return;
+        if (!this.keepsSessionOpen) return;
 
-        this.parts.sessionOpen?.setOpen(true);
+        this.parts.sessionOpen.setOpen(true);
     }
 
     private saveAtOnce() {

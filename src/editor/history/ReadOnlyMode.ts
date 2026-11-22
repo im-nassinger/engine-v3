@@ -4,7 +4,7 @@ import { VersionCounter } from '../../core/events/index.ts';
 export const READ_ONLY_REASON = 'The level is open in another tab';
 
 // Whether this tab may change the level. Shared by the session with every level it opens, so New and
-// Import stay read-only. Only ever turned on: a tab that lost the lock never gets it back in v1.
+// Import stay read-only. Only ever turned on: a tab whose level a newer tab took edits again only once reloaded.
 export class ReadOnlyMode {
     readonly changed = new VersionCounter();
     private on = false;

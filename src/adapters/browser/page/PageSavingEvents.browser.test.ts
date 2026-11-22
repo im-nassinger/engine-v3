@@ -19,7 +19,7 @@ function buildEvents(mode: SaveMode = 'autosave') {
     const events = new PageSavingEvents(parts, window);
     const disconnect = events.connect();
 
-    return { state, counts, sessionOpen, disconnect };
+    return { state, counts, sessionOpen, events, disconnect };
 }
 
 // Whether leaving the page now would ask first.
@@ -101,5 +101,17 @@ describe('PageSavingEvents', () => {
         expect(sessionOpen.isOpen).toBe(false);
         window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
         expect(sessionOpen.isOpen).toBe(true);
+    });
+
+    test('after a newer tab took the level, leaving and coming back leave sessionOpen to it', () => {
+        const { sessionOpen, events } = connected(buildEvents());
+        events.stopKeepingSessionOpen();
+
+        window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true }));
+        expect(sessionOpen.isOpen).toBe(true);
+
+        sessionOpen.setOpen(false);
+        window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+        expect(sessionOpen.isOpen).toBe(false);
     });
 });

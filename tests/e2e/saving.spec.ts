@@ -10,6 +10,8 @@ const BOMB_UNPACKED_BYTES = 300 * MB;
 const BOMB_DECLARED_BYTES = 1000;
 const TOO_BIG_TEXT = 'This file is too big: a level holds at most 256 MB';
 const READ_ONLY_TEXT = 'The level is open in another tab';
+const HANDED_OVER_TEXT =
+    'The level is open in a newer tab, so this tab is read-only now. Your changes were saved first.';
 const SAVE_FAILED_START = 'Saving in this browser failed';
 const SAVED_TITLE = 'Untitled level - engine-v3';
 const UNSAVED_TITLE = '*Untitled level - engine-v3';
@@ -160,37 +162,43 @@ test("File's Save saves now, and the level's name and save state are not on scre
     await expect(page.getByRole('textbox', { name: 'Level name' })).toHaveCount(0);
 });
 
-test('a second tab is read-only and refuses edits', async ({ page, context }) => {
+test('a newer tab takes the level; the older one saves first, then is read-only and says so', async ({
+    page,
+    context,
+}) => {
     await openEditor(page);
+    // Not waited for: the older tab saves it as it hands the level over.
     await drawRectangle(page);
-    await expectSaved(page);
 
-    const second = await context.newPage();
-    await openEditor(second);
+    const newer = await context.newPage();
+    await openEditor(newer);
+    await expect(entityRow(newer, 'Rectangle 1')).toBeVisible();
+    await expect(newer.getByRole('dialog')).toHaveCount(0);
 
-    await expect(statusText(second)).toHaveText(READ_ONLY_TEXT);
-    await expect(entityRow(second, 'Rectangle 1')).toBeVisible();
+    await page.bringToFront();
+    const notice = page.getByRole('dialog');
+    await expect(notice).toContainText(HANDED_OVER_TEXT);
+    await notice.getByRole('button', { name: 'OK' }).click();
 
     // Selecting still works; deleting is refused and changes nothing.
-    await entityRow(second, 'Rectangle 1').click();
-    await expect(entityRow(second, 'Rectangle 1')).toHaveAttribute('aria-selected', 'true');
-    await second.keyboard.press('Delete');
-    await expect(statusText(second)).toHaveText(READ_ONLY_TEXT);
-    await expect(entityRow(second, 'Rectangle 1')).toBeVisible();
+    await entityRow(page, 'Rectangle 1').click();
+    await expect(entityRow(page, 'Rectangle 1')).toHaveAttribute('aria-selected', 'true');
+    await page.keyboard.press('Delete');
+    await expect(statusText(page)).toHaveText(READ_ONLY_TEXT);
+    await expect(entityRow(page, 'Rectangle 1')).toBeVisible();
 
-    // Saving and renaming are refused too, and leaving it would lose nothing, so its title has no `*`.
-    await second.keyboard.press('Control+s');
-    await expect(statusText(second)).toHaveText(READ_ONLY_TEXT);
-    await second.getByRole('button', { name: 'Main menu' }).click();
-    await second.getByRole('menuitem', { name: 'File', exact: true }).hover();
-    await expect(second.getByRole('menuitem', { name: /^Save/ })).toHaveAttribute('aria-disabled', 'true');
-    await expect(second.getByRole('menuitem', { name: /^Rename level/ })).toHaveAttribute('aria-disabled', 'true');
-    await expect(second).toHaveTitle(SAVED_TITLE);
+    // Saving and renaming are refused too, Export isn't, and leaving it would lose nothing, so its title has no `*`.
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('menuitem', { name: 'File', exact: true }).hover();
+    await expect(page.getByRole('menuitem', { name: /^Save/ })).toHaveAttribute('aria-disabled', 'true');
+    await expect(page.getByRole('menuitem', { name: /^Rename level/ })).toHaveAttribute('aria-disabled', 'true');
+    await expect(page.getByRole('menuitem', { name: /^Export/ })).not.toHaveAttribute('aria-disabled', 'true');
+    await expect(page).toHaveTitle(SAVED_TITLE);
 
-    // The first tab still saves.
-    await page.bringToFront();
-    await page.keyboard.press('Control+s');
-    await expect(statusText(page)).toHaveText('Saved in this browser');
+    // The newer tab edits and saves.
+    await newer.bringToFront();
+    await newer.keyboard.press('Control+s');
+    await expect(statusText(newer)).toHaveText('Saved in this browser');
 });
 
 test('an exported level, dropped on the page, imports back', async ({ page }) => {

@@ -520,5 +520,32 @@ describe('Autosave', () => {
 
             expect(store.saveCount).toBe(0);
         });
+
+        test('saveLastTime writes what is unsaved, then never saves again', async () => {
+            const { timer, session, store, autosave, change } = buildAutosave();
+            change();
+            session.makeReadOnly();
+
+            const isSaved = await autosave.saveLastTime();
+            change();
+            await advance(timer, 30_000);
+
+            expect(isSaved).toBe(true);
+            expect(store.saveCount).toBe(1);
+        });
+
+        test('saveLastTime says so when the last save fails, and tries no more', async () => {
+            const { timer, session, store, autosave, change } = buildAutosave();
+            store.refusesSaves = true;
+            change();
+            session.makeReadOnly();
+
+            const isSaved = await autosave.saveLastTime();
+            store.refusesSaves = false;
+            await advance(timer, 30_000);
+
+            expect(isSaved).toBe(false);
+            expect(store.saveCount).toBe(0);
+        });
     });
 });

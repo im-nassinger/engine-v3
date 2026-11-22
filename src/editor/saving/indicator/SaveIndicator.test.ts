@@ -6,16 +6,11 @@ import { EditorSession } from '../../session/index.ts';
 import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 
 import { Autosave, SAVE_FAILED_TEXT } from '../autosave/Autosave.ts';
-import type { Opening } from '../opening/LevelOpener.ts';
 import { EditorSettings } from '../settings/EditorSettings.ts';
 import { FakePersistence } from '../testing/FakePersistence.ts';
 import { InMemoryLevelStore } from '../testing/InMemoryLevelStore.ts';
 import { InMemorySettingsStore } from '../testing/InMemorySettingsStore.ts';
 import { NOTHING_SAVED_WARNING, SaveIndicator } from './SaveIndicator.ts';
-
-function openingOf(parts: Pick<Opening, 'readOnly' | 'canSave'>): Opening {
-    return { ...parts, level: Level.createNew(), isNew: true, damaged: undefined, statusText: undefined };
-}
 
 function buildAutosave() {
     const timer = new ManualTimer();
@@ -35,7 +30,7 @@ function buildAutosave() {
         persistence: new FakePersistence(),
         persistAsked: new EditorSettings(new InMemorySettingsStore(), new ManualFrames()).persistAsked,
     });
-    const indicator = SaveIndicator.forOpening(openingOf({ readOnly: false, canSave: true }), autosave);
+    const indicator = SaveIndicator.forOpening(autosave);
 
     return { session, store, autosave, indicator };
 }
@@ -71,16 +66,24 @@ describe('SaveIndicator', () => {
         autosave.dispose();
     });
 
-    test('a read-only tab has no failed save and never counts as unsaved', () => {
-        const indicator = SaveIndicator.forOpening(openingOf({ readOnly: true, canSave: false }), undefined);
+    test('a tab made read-only has no failed save, never counts as unsaved, and says it changed', async () => {
+        const { session, store, autosave, indicator } = buildAutosave();
+        store.refusesSaves = true;
+        session.replaceOpenLevel(Level.createNew());
+        await autosave.saveNow();
+        const versionBefore = indicator.version.version;
+
+        indicator.becomeReadOnly();
 
         expect(indicator.mode).toBe('readOnly');
         expect(indicator.failedSaveText).toBeUndefined();
         expect(indicator.hasUnsavedChanges).toBe(false);
+        expect(indicator.version.version).toBeGreaterThan(versionBefore);
+        autosave.dispose();
     });
 
     test('storage that never saves is failed for good, and always unsaved', () => {
-        const indicator = SaveIndicator.forOpening(openingOf({ readOnly: false, canSave: false }), undefined);
+        const indicator = SaveIndicator.forOpening(undefined);
 
         expect(indicator.mode).toBe('nothingSaved');
         expect(indicator.state.status).toBe('failed');

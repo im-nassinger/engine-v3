@@ -27,10 +27,8 @@ export type DamagedOpening = {
 // What the page builds the editor from.
 export type Opening = {
     readonly level: Level;
-    // Another tab holds the lock: the session is made read-only and nothing is saved.
-    readonly readOnly: boolean;
-    // False when read-only, when storage can't open, or when a damaged record couldn't be kept apart, so
-    // a save would delete it. Autosave isn't started then.
+    // False when storage can't open, or when a damaged record couldn't be kept apart, so a save would
+    // delete it. Autosave isn't started then.
     readonly canSave: boolean;
     // A new level, so the view fits its camera frame instead of the saved view.
     readonly isNew: boolean;
@@ -41,7 +39,8 @@ export type Opening = {
 
 type Loaded = { readonly ok: true; readonly saved: SavedLevel | undefined } | { readonly ok: false };
 
-// Opens the editor on the level saved in this browser: the tab's lock first, then the saved record, read like
+// Opens the editor on the level saved in this browser: the level taken from any other tab first, which saves it
+// before handing it over, then the saved record, read like
 // an import. With no record it gives a new level; with storage that can't open, a new level that is never
 // saved. A record that won't open is kept in the store's damaged record before the new level is saved over
 // it, so it is never deleted. A session found still open, with a saved level, means the last one crashed.
@@ -53,26 +52,23 @@ export class LevelOpener {
     }
 
     async open(): Promise<Opening> {
-        const hasLock = await this.options.tabGuard.acquire();
-        const readOnly = !hasLock;
-        // Only the tab with the lock keeps sessionOpen, or a read-only tab closing would hide the other's crash.
-        const crashed = !readOnly && this.options.sessionOpen.isOpen;
-        if (!readOnly) {
-            this.options.sessionOpen.setOpen(true);
-        }
+        const acquired = await this.options.tabGuard.acquire();
+        // A level taken from a tab still open set sessionOpen there, so that is no crash.
+        const crashed = acquired === 'free' && this.options.sessionOpen.isOpen;
+        this.options.sessionOpen.setOpen(true);
 
         const loaded = await this.load();
-        if (!loaded.ok) return newLevelOpening({ readOnly, canSave: false, statusText: NOTHING_SAVED_TEXT });
+        if (!loaded.ok) return newLevelOpening({ canSave: false, statusText: NOTHING_SAVED_TEXT });
 
         const saved = loaded.saved;
-        if (saved === undefined) return newLevelOpening({ readOnly, canSave: !readOnly, statusText: undefined });
+        if (saved === undefined) return newLevelOpening({ canSave: true, statusText: undefined });
 
         const outcome = this.options.reader.readJson(saved.levelJson);
-        if (!outcome.ok) return this.openDamaged(saved, outcome.refusal, readOnly);
+        if (!outcome.ok) return this.openDamaged(saved, outcome.refusal);
 
         const statusText = crashed ? crashNoteText(saved.savedAtMs, this.options.timeOfDay) : undefined;
 
-        return { level: outcome.value, readOnly, canSave: !readOnly, isNew: false, damaged: undefined, statusText };
+        return { level: outcome.value, canSave: true, isNew: false, damaged: undefined, statusText };
     }
 
     private async load(): Promise<Loaded> {
@@ -85,17 +81,15 @@ export class LevelOpener {
         }
     }
 
-    // A read-only tab writes nothing: the tab with the lock keeps the record.
-    private async openDamaged(saved: SavedLevel, refusal: ReadRefusal, readOnly: boolean): Promise<Opening> {
+    private async openDamaged(saved: SavedLevel, refusal: ReadRefusal): Promise<Opening> {
         const damaged = { levelJson: saved.levelJson, refusal, noticeText: damagedNoticeText(refusal) };
-        if (readOnly) return { ...newLevelOpening({ readOnly, canSave: false, statusText: undefined }), damaged };
 
         const kept = await this.keepDamaged({ ...saved, refusal });
         if (!kept) {
-            return { ...newLevelOpening({ readOnly, canSave: false, statusText: NOTHING_SAVED_TEXT }), damaged };
+            return { ...newLevelOpening({ canSave: false, statusText: NOTHING_SAVED_TEXT }), damaged };
         }
 
-        const opening = { ...newLevelOpening({ readOnly, canSave: true, statusText: undefined }), damaged };
+        const opening = { ...newLevelOpening({ canSave: true, statusText: undefined }), damaged };
         await this.saveNewLevel(opening.level);
 
         return opening;
@@ -123,7 +117,7 @@ export class LevelOpener {
     }
 }
 
-type NewLevelParts = Pick<Opening, 'readOnly' | 'canSave' | 'statusText'>;
+type NewLevelParts = Pick<Opening, 'canSave' | 'statusText'>;
 
 function newLevelOpening(parts: NewLevelParts): Opening {
     return { ...parts, level: Level.createNew(), isNew: true, damaged: undefined };

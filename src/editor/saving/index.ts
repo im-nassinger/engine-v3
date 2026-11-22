@@ -18,7 +18,7 @@ export type { SettingsStore } from './contracts/SettingsStore.ts';
 export type { StoragePersistence } from './contracts/StoragePersistence.ts';
 export { EditorSettings } from './settings/EditorSettings.ts';
 export type { SavedView } from './settings/settingsValues.ts';
-export type { TabGuard } from './contracts/TabGuard.ts';
+export type { Acquired, HandOver, TabGuard } from './contracts/TabGuard.ts';
 export type { ExportedFile, FileExporter } from './contracts/FileExporter.ts';
 export type { ZipCodec, ZipEntry } from './contracts/ZipCodec.ts';
 export { LevelExport } from './project-file/LevelExport.ts';

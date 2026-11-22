@@ -136,7 +136,7 @@ Made under the standing yes (2026-11-14), before building, and the "as built" en
 |---|---|---|
 | `IndexedDbLevelStore` | `idb` on IndexedDB database `engine-v3`, store `level` | One record, written in one transaction with `durability: 'strict'`. All or nothing |
 | `LocalStorageSettings` | `localStorage`, key `engine-v3/settings` | Small editor settings, read before the first draw. Every read and write is wrapped, and a failure falls back to defaults |
-| `WebLockTabGuard` | `navigator.locks.request('engine-v3/level', { ifAvailable: true })` | Held for the page's life. No lock means another tab has the level: this one is read-only |
+| `WebLockTabGuard` | `navigator.locks.request('engine-v3/level', ...)` and a `BroadcastChannel` of the same name | Held for the page's life. A tab finding it held asks on the channel; the holder hands over (saves, turns read-only) and lets go. Not let go within 3 s, it is stolen (`steal: true`) |
 | `BrowserPersistence` | `navigator.storage.persist()` | Asked once, after the first successful save |
 
 Details of what is saved and when are in [persistence.md](persistence.md). Storage errors become `SaveState` failures, never silent, see [errors.md](errors.md).

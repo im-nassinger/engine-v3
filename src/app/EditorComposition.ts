@@ -29,7 +29,6 @@ import { levelBoundsOf } from '../core/derived/index.ts';
 import { createV1Registry } from '../core/components/index.ts';
 import { FormatUpgrader, LevelReader, LevelWriter, V1_LEVEL_LIMITS } from '../core/level-data/index.ts';
 import { EditorClipboard } from '../editor/clipboard/index.ts';
-import { READ_ONLY_REASON } from '../editor/history/index.ts';
 import { HeldKeys, PlaySession } from '../editor/play/index.ts';
 import type { GameRunner } from '../editor/play/index.ts';
 import {
@@ -38,6 +37,7 @@ import {
     createCommandRegistry,
     damagedLevelQuestion,
     FileDropEvents,
+    handedOverNotice,
     OpenDialog,
 } from '../editor/commands/index.ts';
 import type { CommandRegistry } from '../editor/commands/index.ts';
@@ -50,7 +50,7 @@ import {
     ProjectFile,
     SaveIndicator,
 } from '../editor/saving/index.ts';
-import type { FileExporter, Opening, SavesNow } from '../editor/saving/index.ts';
+import type { FileExporter, Opening, SavesNow, TabGuard } from '../editor/saving/index.ts';
 import { EditorSession } from '../editor/session/index.ts';
 import { ShortcutDispatcher } from '../editor/shortcuts/index.ts';
 import type { KeyboardPlatform } from '../editor/shortcuts/index.ts';
@@ -84,6 +84,8 @@ type EditorParts = {
     readonly mouse: MousePosition;
     readonly openWindows: OpenWindowCount;
     readonly opening: Opening;
+    readonly tabGuard: TabGuard;
+    readonly autosave: Autosave | undefined;
     readonly saveIndicator: SaveIndicator;
     readonly pageSaving: PageSavingEvents;
     readonly tabTitle: TabTitle;
@@ -95,7 +97,8 @@ type EditorParts = {
 };
 
 // The composition root: the only code that knows both the editor's rules and the browser's details.
-// It opens the level saved in this browser, and saves it with Autosave when this tab holds the lock.
+// It takes the level from any older tab, opens the one saved in this browser and saves it with Autosave,
+// until a newer tab takes the level in turn.
 export class EditorComposition {
     readonly session: EditorSession;
     readonly settings: EditorSettings;
@@ -113,6 +116,8 @@ export class EditorComposition {
     // Test play: Play, Stop, Pause and Step, and what the Play bar shows.
     readonly play: PlaySession;
     private readonly opening: Opening;
+    private readonly tabGuard: TabGuard;
+    private readonly autosave: Autosave | undefined;
     private readonly pageSaving: PageSavingEvents;
     private readonly tabTitle: TabTitle;
     private readonly exporter: FileExporter;
@@ -140,6 +145,8 @@ export class EditorComposition {
         this.mouse = parts.mouse;
         this.openWindows = parts.openWindows;
         this.opening = parts.opening;
+        this.tabGuard = parts.tabGuard;
+        this.autosave = parts.autosave;
         this.saveIndicator = parts.saveIndicator;
         this.pageSaving = parts.pageSaving;
         this.tabTitle = parts.tabTitle;
@@ -160,8 +167,9 @@ export class EditorComposition {
         // One registry and reader for the opening and the session, so the saved level is read as an import is.
         const registry = createV1Registry();
         const reader = new LevelReader(registry, V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+        const tabGuard = new WebLockTabGuard();
         const opening = await new LevelOpener({
-            tabGuard: new WebLockTabGuard(),
+            tabGuard,
             store,
             reader,
             writer,
@@ -182,10 +190,7 @@ export class EditorComposition {
         });
         const mouse = new MousePosition(frames);
         const clipboard = new EditorClipboard(systemClipboard());
-        if (opening.readOnly) {
-            session.makeReadOnly();
-        }
-        // Started only when the opening can save, so a read-only tab or a kept damaged record is never written over.
+        // Started only when the opening can save, so a kept damaged record is never written over.
         const autosave = opening.canSave
             ? new Autosave({
                   session,
@@ -198,7 +203,7 @@ export class EditorComposition {
               })
             : undefined;
         const saving: SavesNow = autosave ?? { saveNow: () => Promise.resolve() };
-        const saveIndicator = SaveIndicator.forOpening(opening, autosave);
+        const saveIndicator = SaveIndicator.forOpening(autosave);
         const exporter = new FileDownload(window);
         const levelExport = new LevelExport({
             session,
@@ -253,7 +258,7 @@ export class EditorComposition {
         const pointer = new PointerInput(pointerParts, levelView.canvas, window);
         const clipboardBridge = new ClipboardBridge(new ClipboardEvents(commands, runner), window);
         const fileDrop = new FileDropTarget(new FileDropEvents(commands, runner), window);
-        const sessionOpen = opening.readOnly ? undefined : settings.sessionOpen;
+        const sessionOpen = settings.sessionOpen;
         const pageSaving = new PageSavingEvents({ indicator: saveIndicator, saving, settings, sessionOpen }, window);
         const tabTitle = new TabTitle(session, saveIndicator, document, play);
         const pageVisibility = new PageVisibility(window);
@@ -275,6 +280,8 @@ export class EditorComposition {
             mouse,
             openWindows,
             opening,
+            tabGuard,
+            autosave,
             saveIndicator,
             pageSaving,
             tabTitle,
@@ -315,13 +322,14 @@ export class EditorComposition {
             this.fitCameraFrameOnceSized();
         }
         this.showOpeningNotes();
+        this.tabGuard.whenTakenOver(() => this.handOverLevel());
         // Loading Box2D now, while the editor is used, makes the first Play fast.
         this.gameRunner.prepare();
     }
 
-    // The crash note, the storage notices or the read-only reason as status text, and the damaged level's notice.
+    // The crash note or the storage notices as status text, and the damaged level's notice.
     private showOpeningNotes() {
-        const statusText = this.opening.statusText ?? (this.opening.readOnly ? READ_ONLY_REASON : undefined);
+        const statusText = this.opening.statusText;
         if (statusText !== undefined) {
             this.session.status.show(statusText);
         }
@@ -330,6 +338,23 @@ export class EditorComposition {
         if (damaged !== undefined) {
             this.runner.showOutcome(damagedLevelQuestion(damaged, this.exporter));
         }
+    }
+
+    // A newer tab is taking the level: the typing in a focused field is kept, every edit is refused from here
+    // on, and what is unsaved is saved before the lock is let go, so the newer tab opens it.
+    private async handOverLevel() {
+        commitFocusedField(document);
+        this.session.makeReadOnly();
+        this.pageSaving.stopKeepingSessionOpen();
+
+        let isSaved = false;
+        if (this.autosave !== undefined) {
+            isSaved = await this.autosave.saveLastTime();
+        }
+
+        this.saveIndicator.becomeReadOnly();
+        const notice = handedOverNotice(isSaved);
+        this.runner.showOutcome(notice);
     }
 
     // The pan limit is set when a level opens; following a change to the World's rectangle comes

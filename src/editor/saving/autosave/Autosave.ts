@@ -42,8 +42,8 @@ type Followed = {
 // Saves the open level to the browser on its own: 2 s after the last change, and at most 20 s after the first
 // unsaved one. A save due during a drag waits for the drag's end, and one save runs at a time. It follows the
 // session, so New and Import need no new Autosave. A failed save shows a level-wide editor message and is
-// tried again every 10 s until one works. A read-only tab never saves, so it can't overwrite the level
-// another tab is editing.
+// tried again every 10 s until one works. A read-only tab never saves on its own, so it can't overwrite the level
+// a newer tab is editing; saveLastTime is its one save, as it hands the level over.
 export class Autosave {
     static readonly quietDelayMs = 2_000;
     static readonly longestWaitMs = 20_000;
@@ -96,6 +96,22 @@ export class Autosave {
         if (!this.hasUnsavedChanges()) return;
 
         await this.save();
+    }
+
+    // A newer tab is taking the level, and this tab is already read-only: saves what is unsaved, even during
+    // a drag, then stops for good. Resolves true when the store holds the level as it is.
+    async saveLastTime() {
+        while (this.running !== undefined) {
+            await this.running;
+        }
+        if (this.hasUnsavedChanges()) {
+            await this.save();
+        }
+
+        const isSaved = !this.hasUnsavedChanges();
+        this.dispose();
+
+        return isSaved;
     }
 
     // Why the last save failed, while it stands: the level-wide message's text.

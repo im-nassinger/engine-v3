@@ -64,7 +64,7 @@ describe('LevelOpener', () => {
         const opening = await openEditor({ store }).opening;
 
         expect(entityNames(opening.level)).toContain('Square');
-        expect(opening).toMatchObject({ readOnly: false, canSave: true, isNew: false, damaged: undefined });
+        expect(opening).toMatchObject({ canSave: true, isNew: false, damaged: undefined });
         expect(opening.statusText).toBeUndefined();
         expect(store.saveCount).toBe(0);
     });
@@ -75,7 +75,7 @@ describe('LevelOpener', () => {
         const opening = await openEditor({ store }).opening;
 
         expect(entityNames(opening.level)).not.toContain('Square');
-        expect(opening).toMatchObject({ readOnly: false, canSave: true, isNew: true, damaged: undefined });
+        expect(opening).toMatchObject({ canSave: true, isNew: true, damaged: undefined });
         expect(opening.statusText).toBeUndefined();
     });
 
@@ -175,27 +175,16 @@ describe('LevelOpener', () => {
         expect(opening.statusText).toBe('Recovered from your last save at 23:52. The last few seconds may be missing.');
     });
 
-    test('a second tab is read-only, opens the saved level and writes nothing', async () => {
+    test('a tab that takes the level from another opens the saved level, with no crash note', async () => {
         const store = new InMemoryLevelStore({ levelJson: savedLevelJson(), savedAtMs: SAVED_AT_MS });
-        // The first tab is open, so sessionOpen is set: that is no crash for the second.
+        // The other tab is still open, so sessionOpen is set: that is no crash.
         const settings = new InMemorySettingsStore(JSON.stringify({ sessionOpen: true }));
 
-        const second = openEditor({ store, settings, heldElsewhere: true });
-        const opening = await second.opening;
+        const newer = openEditor({ store, settings, heldElsewhere: true });
+        const opening = await newer.opening;
 
         expect(entityNames(opening.level)).toContain('Square');
-        expect(opening).toMatchObject({ readOnly: true, canSave: false, isNew: false, statusText: undefined });
-        expect(settings.text).toBe(JSON.stringify({ sessionOpen: true }));
-    });
-
-    test('a second tab never keeps or saves over a damaged record', async () => {
-        const store = new InMemoryLevelStore({ levelJson: 'not json', savedAtMs: SAVED_AT_MS });
-
-        const opening = await openEditor({ store, heldElsewhere: true }).opening;
-
-        expect(opening).toMatchObject({ readOnly: true, canSave: false, isNew: true });
-        expect(opening.damaged?.levelJson).toBe('not json');
-        expect(store.damaged).toBeUndefined();
-        expect(store.saveCount).toBe(0);
+        expect(opening).toMatchObject({ canSave: true, isNew: false, statusText: undefined });
+        expect(newer.settings.sessionOpen.isOpen).toBe(true);
     });
 });
