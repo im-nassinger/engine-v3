@@ -212,6 +212,63 @@ describe('TickPacer', () => {
         expect(pacer.interpolation).toBe(1);
     });
 
+    test('sending a batch never moves the drawing back before its report comes', () => {
+        const clock = new ManualClock();
+        const pacer = new TickPacer(clock);
+        pacer.start();
+
+        clock.advance(1_000 / 60 + 1_000 / 600);
+        const due = pacer.ticksDue();
+        pacer.batchSent(due);
+
+        expect(due).toBe(1);
+        expect(pacer.interpolation).toBe(1);
+
+        pacer.reportReceived();
+        expect(pacer.interpolation).toBeCloseTo(0.1);
+    });
+
+    test('the drawing moves forward every frame at 144 Hz, even when a report comes a frame late', () => {
+        const clock = new ManualClock();
+        const pacer = new TickPacer(clock);
+        // Ticks reported so far plus the drawn part between the last two reports, in ticks.
+        let reportedTicks = 0;
+        let lastBatch = 1;
+        let lastDrawn = -Infinity;
+        let waiting: number | undefined;
+        pacer.start();
+
+        for (let frame = 0; frame < 288; frame += 1) {
+            clock.advance(1_000 / 144);
+            if (waiting !== undefined && frame % 7 !== 0) {
+                pacer.reportReceived();
+                reportedTicks += waiting;
+                lastBatch = waiting;
+                waiting = undefined;
+            }
+            const due = pacer.ticksDue();
+            if (due > 0) {
+                pacer.batchSent(due);
+                waiting = due;
+            }
+            const drawn = reportedTicks - lastBatch + pacer.interpolation * lastBatch;
+
+            expect(drawn).toBeGreaterThanOrEqual(lastDrawn - 1e-9);
+            lastDrawn = drawn;
+        }
+    });
+
+    test('a report of several ticks is drawn a tick behind its last one', () => {
+        const clock = new ManualClock();
+        const pacer = new TickPacer(clock);
+        pacer.start();
+
+        clock.advance((1_000 / 60) * 2.5);
+        runFrame(pacer);
+
+        expect(pacer.interpolation).toBeCloseTo(0.75);
+    });
+
     test('interpolation stays where it was while paused', () => {
         const clock = new ManualClock();
         const pacer = new TickPacer(clock);
