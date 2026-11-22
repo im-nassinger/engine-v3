@@ -315,7 +315,7 @@ describe('PixiLevelView overlays', () => {
         const { settings, frames, overlays } = await showNewLevel();
 
         expect(overlays.grid.graphics.visible).toBe(true);
-        expect(overlays.grid.plan?.spacing).toEqual({ step: 50, fineStep: 10 });
+        expect(overlays.grid.plan?.step).toBe(50);
 
         settings.toggle('grid');
         expect(frames.pendingCount).toBe(1);
@@ -332,16 +332,16 @@ describe('PixiLevelView overlays', () => {
         expect(frames.pendingCount).toBe(1);
         frames.runFrame();
 
-        expect(overlays.grid.plan?.spacing).toEqual({ step: 100, fineStep: 20 });
+        expect(overlays.grid.plan?.step).toBe(100);
     });
 
-    test('zoomed out, the fainter lines are left out', async () => {
+    test('zoomed far out, every fifth line is kept', async () => {
         const { view, frames, overlays } = await showNewLevel();
 
-        view.zoomAboutMiddle(0.5);
+        view.zoomAboutMiddle(0.1);
         frames.runFrame();
 
-        expect(overlays.grid.plan?.spacing).toEqual({ step: 50, fineStep: undefined });
+        expect(overlays.grid.plan?.step).toBe(250);
     });
 
     function alphaAt(levelView: PixiLevelView, x: number, y: number) {

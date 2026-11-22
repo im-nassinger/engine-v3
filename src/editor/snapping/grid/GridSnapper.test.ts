@@ -30,20 +30,12 @@ function viewAt(zoom: number) {
 const BOX = new Bounds(100, 100, 130, 130);
 
 describe('GridSnapper.snapPoint', () => {
-    test('at 100% a point lands on the nearest 10 px line, however far it is from one', () => {
+    test('a point lands on the nearest grid line, however far it is from one', () => {
         const { snapper } = buildSnapper();
 
-        const result = snapper.snapPoint({ x: 24.9, y: -36 }, viewAt(1), FREE);
+        const result = snapper.snapPoint({ x: 24, y: -26 }, viewAt(1), FREE);
 
-        expect(result).toEqual({ point: { x: 20, y: -40 }, snappedX: true, snappedY: true });
-    });
-
-    test('once the fainter lines fade, a point lands on the grid lines', () => {
-        const { snapper } = buildSnapper();
-
-        const result = snapper.snapPoint({ x: 74, y: 76 }, viewAt(0.5), FREE);
-
-        expect(result.point).toEqual({ x: 50, y: 100 });
+        expect(result).toEqual({ point: { x: 0, y: -50 }, snappedX: true, snappedY: true });
     });
 
     test('zoomed far out, a point lands on the lines still drawn', () => {
@@ -57,16 +49,16 @@ describe('GridSnapper.snapPoint', () => {
     test('follows the grid size', () => {
         const { snapper } = buildSnapper(100);
 
-        const result = snapper.snapPoint({ x: 29, y: 31 }, viewAt(1), FREE);
+        const result = snapper.snapPoint({ x: 149, y: 151 }, viewAt(1), FREE);
 
-        expect(result.point).toEqual({ x: 20, y: 40 });
+        expect(result.point).toEqual({ x: 100, y: 200 });
     });
 });
 
 describe('GridSnapper.snapMove', () => {
     test('the edge or centre nearest a line wins on each axis', () => {
         const { snapper } = buildSnapper();
-        const view = viewAt(0.5);
+        const view = viewAt(1);
 
         // Moved by 32: left 132 (18 off), centre 147 (3 off), right 162 (12 off). The centre wins.
         const byCentre = snapper.snapMove(BOX, { x: 32, y: 0 }, view, FREE);
@@ -81,7 +73,7 @@ describe('GridSnapper.snapMove', () => {
         const { snapper } = buildSnapper();
         const box = new Bounds(0, 0, 100, 100);
 
-        const result = snapper.snapMove(box, { x: 24, y: -26 }, viewAt(0.5), FREE);
+        const result = snapper.snapMove(box, { x: 24, y: -26 }, viewAt(1), FREE);
 
         expect(result).toEqual({ point: { x: 0, y: -50 }, snappedX: true, snappedY: true });
     });

@@ -1,6 +1,6 @@
 import type { Bounds, Point } from '../../../core/geometry/index.ts';
 import type { LevelEditorData } from '../../../core/level/index.ts';
-import { gridSnapStepAt } from '../../view/index.ts';
+import { gridStepAt } from '../../view/index.ts';
 import type { ViewSettings, ViewState } from '../../view/index.ts';
 import type { SnapOptions, SnapResult, Snapper } from '../Snapper.ts';
 
@@ -11,7 +11,7 @@ type AxisSnap = {
 
 const NO_SNAP: AxisSnap = { correction: 0, snapped: false };
 
-// Snaps to the finest grid lines drawn at the view's zoom, counted from the level's origin. While snapping
+// Snaps to the grid lines drawn at the view's zoom, counted from the level's origin. While snapping
 // is on, what you move always lands on a line, however far from one it is.
 export class GridSnapper implements Snapper {
     private readonly editorData: LevelEditorData;
@@ -56,7 +56,7 @@ export class GridSnapper implements Snapper {
     }
 
     private stepAt(view: ViewState) {
-        return gridSnapStepAt(this.editorData.gridSize, view.zoom);
+        return gridStepAt(this.editorData.gridSize, view.zoom);
     }
 }
 

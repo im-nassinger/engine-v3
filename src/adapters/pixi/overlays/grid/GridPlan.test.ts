@@ -21,31 +21,17 @@ describe('gridAreaOf', () => {
 });
 
 describe('planGrid', () => {
-    test('lines cover the visible rectangle, with the origin, the steps and the fainter lines apart', () => {
-        const plan = planGrid({ visible: new Bounds(-20, -5, 60, 5), zoom: 1, gridSize: 50 });
+    test('lines cover the visible rectangle every grid size, with the origin apart', () => {
+        const plan = planGrid({ visible: new Bounds(-60, -5, 110, 5), zoom: 1, gridSize: 50 });
 
         const vertical = plan.vertical.map((line) => [line.position, line.strength]);
         expect(vertical).toEqual([
-            [-20, 'fine'],
-            [-10, 'fine'],
+            [-50, 'step'],
             [0, 'origin'],
-            [10, 'fine'],
-            [20, 'fine'],
-            [30, 'fine'],
-            [40, 'fine'],
             [50, 'step'],
-            [60, 'fine'],
+            [100, 'step'],
         ]);
         expect(plan.horizontal).toEqual([{ position: 0, strength: 'origin' }]);
-    });
-
-    test('without the fainter lines every line is a step', () => {
-        const plan = planGrid({ visible: new Bounds(1, 0, 101, 0), zoom: 0.5, gridSize: 50 });
-
-        expect(plan.vertical).toEqual([
-            { position: 50, strength: 'step' },
-            { position: 100, strength: 'step' },
-        ]);
     });
 
     test('the number of lines stays bounded by the view at any zoom', () => {

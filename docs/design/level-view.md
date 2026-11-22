@@ -9,9 +9,9 @@ What the editor draws over the level: the grid, the dark outside, the bounds' an
 | Part | Look |
 |---|---|
 | Background | The World's fill. In the mockups the soft light blue is `#CDE3F2` (*proposal*: the requirements say "a soft light blue" without a value) |
-| Grid lines, every 50 px | 1 px, `#1E3C5F` at 13% on a light fill; white at 5% on a dark fill (redesign, standing yes, 2026-11-17) |
+| Grid lines, every grid size (50 px by default) | 1 px, `#1E3C5F` at 13% on a light fill; white at 5% on a dark fill (redesign, standing yes, 2026-11-17) |
 | The lines through the origin | 1 px, `#1E3C5F` at 32% on a light fill; white at 14% on a dark fill |
-| Fainter lines every 10 px | Same colour at 7% on a light fill, 3% on a dark one (*proposal*; 3% standing yes, 2026-11-18), shown only when they are at least 8 screen px apart. For another grid size, every fifth of it |
+| Fainter lines | **None** (owner, 2026-11-22): only the grid size's lines are drawn, so the grid you see is the one things snap to. Before, a line every fifth of the grid size was drawn at 7% (3% on a dark fill) |
 | Zoomed far out | When the grid's lines would be under 8 screen px apart, only every fifth is drawn, then every 25th, and so on (*proposal*) |
 | Outside the level bounds | **The app's `#0d0f13`**: the World's fill paints only the inside of the bounds (owner, 2026-11-17). A 1 px edge on the bounds, `#ECF0F6` at 35% |
 | The bounds' label | Above their top left corner in 12 px: **World** in weight 600, a 10 px gap, then the size, such as **World** 20000 × 10000, in `#ECF0F6` (the name at 92%, the size at 60%) |

@@ -9,14 +9,14 @@ import { worldFillOf } from '../levelBackground.ts';
 import type { OverlayScene } from '../OverlayScene.ts';
 import { onPixel, screenRectangleOf } from '../screenPixels.ts';
 
-const STRENGTHS: readonly GridLineStrength[] = ['fine', 'step', 'origin'];
+const STRENGTHS: readonly GridLineStrength[] = ['step', 'origin'];
 
 function withStrength(lines: readonly GridLine[], strength: GridLineStrength) {
     return lines.filter((line) => line.strength === strength);
 }
 
-// The grid over the level, only inside the level bounds: 1 screen px lines every grid step, fainter ones in
-// between when there is room, and stronger ones through the origin.
+// The grid over the level, only inside the level bounds: 1 screen px lines every grid step, and stronger
+// ones through the origin.
 export class GridOverlay {
     readonly graphics = new Graphics();
     private lastPlan: GridPlan | undefined;
