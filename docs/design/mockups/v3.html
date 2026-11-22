@@ -91,11 +91,11 @@
   .sugg div { height: 24px; display: flex; align-items: center; padding: 0 8px; border-radius: var(--r); cursor: pointer; }
   .sugg div:hover { background: var(--soft); color: var(--ink); }
 
-  /* v3: a trigger */
-  .trig { margin: 4px 8px 8px; padding: 6px 6px 8px; border-radius: 10px; background: var(--raised); }
-  .trig.off { opacity: .55; }
-  .thead { height: 28px; display: flex; align-items: center; gap: 6px; padding: 0 2px; }
-  .grip { color: var(--faint); cursor: grab; display: flex; }
+  /* v3: a trigger. Four sections, each a small title over full-width rows; every row is one sentence. */
+  .trig { margin: 2px 8px 8px; padding: 2px 8px 10px; border-radius: 10px; background: var(--raised); }
+  .trig.off .sec { opacity: .45; }
+  .thead { height: 34px; display: flex; align-items: center; gap: 8px; padding: 0 0 0 4px; }
+  .tname { cursor: grab; }
   .tname { flex: 1; font-weight: 500; }
   .sw { width: 28px; height: 16px; border-radius: 999px; background: var(--field); position: relative; cursor: pointer; flex-shrink: 0; }
   .sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--muted); transition: left .12s; }
@@ -103,19 +103,19 @@
   .sw.on::after { left: 14px; background: #fff; }
   .tdots { color: var(--muted); display: flex; cursor: pointer; border-radius: 50%; padding: 3px; }
   .tdots:hover { background: var(--hover); }
-  .line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 5px; padding: 3px 4px 3px 6px; line-height: 22px; border-radius: var(--r); position: relative; }
-  .line:hover { background: rgba(255,255,255,.03); }
-  .kw { width: 34px; flex-shrink: 0; color: var(--muted); font-size: 10px; letter-spacing: .09em; text-transform: uppercase; font-weight: 600; }
-  .ind { width: 34px; flex-shrink: 0; }
-  .chip { height: 22px; display: inline-flex; align-items: center; padding: 0 9px; border-radius: 999px; background: var(--field); color: var(--ink); cursor: pointer; white-space: nowrap; }
-  .chip:hover { background: var(--hover); box-shadow: inset 0 0 0 1px rgba(79,140,255,.5); }
-  .chip.unset { background: rgba(229,185,49,.14); color: #e5b931; font-style: italic; }
-  .chip.grey { color: var(--faint); text-decoration: line-through; }
-  .chip.open { box-shadow: inset 0 0 0 1px var(--accent); }
-  .del { margin-left: auto; color: var(--faint); visibility: hidden; cursor: pointer; display: flex; }
-  .line:hover .del { visibility: visible; }
-  .adds { display: flex; gap: 14px; padding: 4px 6px 0 46px; }
-  .adds span { color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+  .sech { height: 26px; display: flex; align-items: flex-end; padding: 0 4px 5px; font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .sech .opt { margin-left: auto; text-transform: none; letter-spacing: 0; color: var(--faint); font-weight: 400; }
+  .row { min-height: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 0 5px; padding: 4px 28px 4px 10px; border-radius: var(--r); background: var(--field); position: relative; line-height: 20px; }
+  .row + .row { margin-top: 4px; }
+  .row .del { position: absolute; right: 6px; top: 6px; color: var(--faint); visibility: hidden; cursor: pointer; display: flex; }
+  .row:hover .del { visibility: visible; }
+  .row.add { background: none; color: var(--muted); cursor: pointer; gap: 6px; }
+  .row.add:hover { background: var(--hover); color: var(--text); }
+  .row.add.need { color: #e5b931; }
+  .chip { color: var(--ink); cursor: pointer; border-bottom: 1px dotted rgba(143,181,255,.55); line-height: 17px; white-space: nowrap; }
+  .chip:hover, .chip.open { border-bottom: 1px solid var(--accent); }
+  .chip.unset { color: #e5b931; font-style: italic; border-bottom-color: rgba(229,185,49,.6); }
+  .chip.grey { color: var(--faint); text-decoration: line-through; border-bottom-color: transparent; }
   .tnote { margin: 6px 4px 0; padding: 7px 10px; border-radius: var(--r); display: flex; gap: 8px; align-items: flex-start; line-height: 1.45; }
   .tnote.warn { background: rgba(229,185,49,.1); }
   .tnote.warn svg.i { color: #e5b931; }
@@ -152,7 +152,7 @@
 <body>
 <div class="hdr">
   <h1>v3: logic without code</h1>
-  <p>Claude's proposal, for the owner to try (2026-11-22), in the redesign's look. Every part here is new in v3; the rest of the editor is as built. <b>The trigger cards work:</b> click any blue part of a sentence to change it, a yellow one to set it, the switch to turn a trigger off, <code>…</code> to duplicate or delete it, and "+ If" or "+ Do" to add a line. The tags field works too. Dragging, undo and the level view don't. The names shown (<code>coins</code>, <code>player</code>) are only an example level.</p>
+  <p>Claude's proposal, for the owner to try (2026-11-22), in the redesign's look. Every part here is new in v3; the rest of the editor is as built. <b>The trigger cards work:</b> each trigger has four sections, When, If, Do and Repeat, each a list of one-sentence rows. Click an underlined word to change it (yellow ones aren't set yet), "Add check" or "Add action" to add a row, × on a row to remove it, the switch to turn a trigger off, and <code>…</code> to rename, duplicate or delete it. The tags field works too. Dragging, undo and the level view don't. The names shown (<code>coins</code>, <code>player</code>) are only an example level.</p>
 </div>
 <div id="out"></div>
 <script>
@@ -214,8 +214,14 @@ const sw = (on) => `<span class="sw${on ? ' on' : ''}" style="cursor:default"></
 const TAGS = { coin: ['coin'] };
 const LEVEL = { names: ['Player', 'Door', 'Coin 1', 'Goal'], tags: ['player', 'coin', 'enemy', 'spike'], vars: ['coins', 'lives', 'time_left'], inputs: ['left', 'right', 'up', 'down', 'jump'] };
 const EVENTS = [
-  ['touched', 'something starts touching this'], ['untouched', 'something stops touching this'],
-  ['input', 'an input'], ['key', 'a key'], ['timer', 'a timer'], ['start', 'the level starts'], ['tagleft', 'no entity with a tag is left']
+  ['touched', 'something starts touching this', 'something starts touching this'],
+  ['untouched', 'something stops touching this', 'something stops touching this'],
+  ['input', 'the input', 'an input is pressed, released or held'],
+  ['key', 'the key', 'a key is pressed, released or held'],
+  ['after', 'after', 'after some time'],
+  ['every', 'every', 'every few seconds'],
+  ['start', 'the level starts', 'the level starts'],
+  ['tagleft', 'no entity tagged', 'no entity with a tag is left']
 ];
 const hasOther = (t) => t.when.event === 'touched' || t.when.event === 'untouched';
 const TARGETS = (t, withTags = true) => [
@@ -229,17 +235,16 @@ const VALUES = (target) => target && target.startsWith('#') || target === 'other
   : [];
 
 function whenLine(t, i) {
-  const w = t.when, P = [chip(i, 'when.event', EVENTS.find((e) => e[0] === w.event)?.[1], EVENTS.map(([v, l]) => ({ v, label: l })), 'pick an event')];
+  const w = t.when, P = [chip(i, 'when.event', EVENTS.find((e) => e[0] === w.event)?.[1], EVENTS.map(([v, , label]) => ({ v, label })), 'pick an event')];
   if (w.event === 'input' || w.event === 'key') {
     P.push(chip(i, 'when.name', w.name, (w.event === 'input' ? LEVEL.inputs : ['Space', 'W', 'A', 'S', 'D', 'Enter', 'Left arrow', 'Right arrow']).map((v) => ({ v })), w.event === 'input' ? 'pick an input' : 'pick a key'));
-    P.push(chip(i, 'when.how', w.how && `is ${w.how}`, ['pressed', 'released', 'held'].map((v) => ({ v, label: `is ${v}` })), 'pressed?'));
-  } else if (w.event === 'timer') {
-    P.push(chip(i, 'when.how', w.how, [{ v: 'after' }, { v: 'every' }], 'after or every'));
-    P.push(chip(i, 'when.secs', w.secs != null && `${w.secs} s`, 'number', 'how long'));
+    P.push('is', chip(i, 'when.how', w.how, ['pressed', 'released', 'held'].map((v) => ({ v })), ''));
+  } else if (w.event === 'after' || w.event === 'every') {
+    P.push(chip(i, 'when.secs', w.secs != null && `${w.secs} seconds`, 'number', 'how many seconds'));
   } else if (w.event === 'tagleft') {
-    P.push('tagged', chip(i, 'when.tag', w.tag, LEVEL.tags.map((v) => ({ v })), 'pick a tag'));
+    P.push(chip(i, 'when.tag', w.tag, LEVEL.tags.map((v) => ({ v })), 'pick a tag'), 'is left');
   }
-  return line('When', P);
+  return row(P);
 }
 const COMPARE = ['is', 'is not', 'is more than', 'is less than', 'is at least', 'is at most'];
 function ifLine(t, i, k) {
@@ -247,7 +252,7 @@ function ifLine(t, i, k) {
   const P = c.kind === 'tag'
     ? [chip(i, p + 'target', tLabel(c.target), TARGETS(t, false), 'pick who', c.target === 'other' && !hasOther(t)), 'is tagged', chip(i, p + 'tag', c.tag, LEVEL.tags.map((v) => ({ v })), 'pick a tag')]
     : [chip(i, p + 'var', c.var, LEVEL.vars.map((v) => ({ v })), 'pick a variable'), chip(i, p + 'cmp', c.cmp, COMPARE.map((v) => ({ v })), 'compare'), chip(i, p + 'num', c.num, 'number', 'a number')];
-  return line(k ? 'and' : 'If', P, `ifs.${k}`, i);
+  return row(P, `ifs.${k}`, i);
 }
 const ACTIONS = [['change', 'change a value'], ['destroy', 'destroy'], ['push', 'push'], ['win', 'win'], ['lose', 'lose'], ['restart', 'restart the level']];
 function doLine(t, i, k) {
@@ -265,7 +270,7 @@ function doLine(t, i, k) {
   else if (a.kind === 'push') P = [chip(i, p + 'kind', 'push', ACTIONS.map(([v, label]) => ({ v, label })), ''), tg(),
     chip(i, p + 'how', a.how, [{ v: 'by 0, -600 px/s' }, { v: 'away from this at 400 px/s' }, { v: 'towards this at 400 px/s' }], 'how')];
   else P = [chip(i, p + 'kind', ACTIONS.find((x) => x[0] === a.kind)[1], ACTIONS.map(([v, label]) => ({ v, label })), '')];
-  return line(k ? '' : 'Do', P, `dos.${k}`, i);
+  return row(P, `dos.${k}`, i);
 }
 const REPEATS = [{ v: 'every time' }, { v: 'once per run' }, { v: 'at most once every 1 s' }, { v: 'at most once every 2 s' }];
 
@@ -275,29 +280,31 @@ function chip(i, path, label, opts, unset, grey) {
   const id = CHIPS.length - 1;
   return `<span class="chip${label ? '' : ' unset'}${grey ? ' grey' : ''}" data-c="${id}" title="${grey ? 'This event has no other: this part is skipped' : ''}">${esc(label || unset)}</span>`;
 }
-function line(kw, parts, delPath, i) {
-  return `<div class="line"><span class="${kw ? 'kw' : 'ind'}">${kw}</span>${parts.map((p) => typeof p === 'string' ? `<span>${p}</span>` : p).join('')}${delPath ? `<span class="del" data-del="${i}:${delPath}" title="Remove this line">${ic('x')}</span>` : ''}</div>`;
+function row(parts, delPath, i) {
+  return `<div class="row">${parts.map((p) => typeof p === 'string' ? `<span>${p}</span>` : p).join('')}${delPath ? `<span class="del" data-del="${i}:${delPath}" title="Remove">${ic('x')}</span>` : ''}</div>`;
 }
+const sec = (title, hint, body) => `<div class="sec"><div class="sech">${title}${hint ? `<span class="opt">${hint}</span>` : ''}</div>${body}</div>`;
+const addRow = (label, attr, need) => `<div class="row add${need ? ' need' : ''}" ${attr}>${ic('plus')}${label}</div>`;
 const isSet = (t) => {
   const vals = [];
   const w = t.when; vals.push(w.event);
   if (w.event === 'input' || w.event === 'key') vals.push(w.name, w.how);
-  if (w.event === 'timer') vals.push(w.how, w.secs);
+  if (w.event === 'after' || w.event === 'every') vals.push(w.secs);
   if (w.event === 'tagleft') vals.push(w.tag);
   t.ifs.forEach((c) => c.kind === 'tag' ? vals.push(c.target, c.tag) : vals.push(c.var, c.cmp, c.num));
   t.dos.forEach((a) => { if (a.kind === 'change') { vals.push(a.op, a.num, a.what); if (a.what && !LEVEL.vars.includes(a.what)) vals.push(a.target); } if (a.kind === 'destroy') vals.push(a.target); if (a.kind === 'push') vals.push(a.target, a.how); });
   return vals.every((v) => v != null) && t.dos.length > 0;
 };
-const autoName = (t) => ({ touched: 'Touched', untouched: 'No longer touched', input: `${t.when.name || 'Input'} ${t.when.how || ''}`.trim(), key: `${t.when.name || 'Key'} key ${t.when.how || ''}`.trim(), timer: t.when.how === 'every' ? `Every ${t.when.secs ?? '?'} s` : `After ${t.when.secs ?? '?'} s`, start: 'Level starts', tagleft: `No ${t.when.tag || 'tag'} left` }[t.when.event] || 'New trigger');
+const autoName = (t) => ({ touched: 'Touched', untouched: 'No longer touched', input: t.when.name ? `${t.when.name} ${t.when.how}` : 'Input', key: t.when.name ? `${t.when.name} ${t.when.how}` : 'Key', after: `After ${t.when.secs ?? '?'} s`, every: `Every ${t.when.secs ?? '?'} s`, start: 'Level starts', tagleft: `No ${t.when.tag || 'tag'} left` }[t.when.event] || 'New trigger');
 
 function trigHtml(t, i, opts) {
   const ready = isSet(t);
   return `<div class="trig${t.on ? '' : ' off'}">
-    <div class="thead"><span class="grip" title="Drag to reorder: it also changes when it runs">${ic('grip')}</span><span class="sw${t.on ? ' on' : ''}" data-sw="${i}" title="On or off"></span><span class="tname">${esc(t.name || autoName(t))}</span><span class="tdots" data-menu="${i}">${ic('dots')}</span></div>
-    ${whenLine(t, i)}${t.ifs.map((_, k) => ifLine(t, i, k)).join('')}${t.dos.map((_, k) => doLine(t, i, k)).join('')}
-    ${t.dos.length ? '' : line('Do', [chip(i, 'dos.new', null, ACTIONS.map(([v, label]) => ({ v, label })), 'pick an action')])}
-    <div class="line"><span class="kw" style="width:auto;margin-right:4px">Repeat</span>${chip(i, 'repeat', t.repeat, REPEATS, '')}</div>
-    <div class="adds"><span data-addif="${i}">${ic('plus')}If</span><span data-adddo="${i}">${ic('plus')}Do</span></div>
+    <div class="thead"><span class="tname" title="Drag to reorder: it also changes when it runs">${esc(t.name || autoName(t))}</span><span class="sw${t.on ? ' on' : ''}" data-sw="${i}" title="${t.on ? 'On: click to switch off' : 'Off: click to switch on'}"></span><span class="tdots" data-menu="${i}">${ic('dots')}</span></div>
+    ${sec('When', '', whenLine(t, i))}
+    ${sec('If', t.ifs.length ? 'all must be true' : 'optional', t.ifs.map((_, k) => ifLine(t, i, k)).join('') + addRow('Add check', `data-addif="${i}"`))}
+    ${sec('Do', t.dos.length > 1 ? 'top to bottom' : '', t.dos.map((_, k) => doLine(t, i, k)).join('') + addRow('Add action', `data-adddo="${i}"`, !t.dos.length))}
+    ${sec('Repeat', '', row([chip(i, 'repeat', t.repeat, REPEATS, '')]))}
     ${ready ? '' : `<div class="tnote warn">${ic('warn')}<span>Doesn't run until every yellow part is set.</span></div>`}
     ${opts.noSurface && (t.when.event === 'touched' || t.when.event === 'untouched') ? `<div class="tnote warn">${ic('warn')}<span>Needs a Surface to notice touching. <a data-addsurf="1">Add Surface as sensor</a></span></div>` : ''}
   </div>`;
@@ -331,7 +338,7 @@ function setAt(o, path, v) { const ks = path.split('.'), last = ks.pop(); ks.red
 
 function choose(boardId, c, v) {
   const t = BOARDS[boardId].triggers[c.i];
-  if (c.path === 'when.event') t.when = { event: v };
+  if (c.path === 'when.event') t.when = { event: v, how: v === 'input' || v === 'key' ? 'pressed' : undefined };
   else if (c.path === 'dos.new') t.dos.push({ kind: v });
   else if (/^dos\.\d+\.kind$/.test(c.path)) t.dos[+c.path.split('.')[1]] = { kind: v };
   else if (c.path.endsWith('.what')) { setAt(t, c.path, v); const a = getAt(t, c.path.replace(/\.what$/, '')); if (!LEVEL.vars.includes(v) && !a.target) a.target = 'this'; }
@@ -408,7 +415,7 @@ M.push(['The Trigger tool', 'Key 6, the sixth tool, Lucide\'s dashed square with
 const frame2 = (trigs) => `<div class="isl shade insp"><div class="ihead"><span class="kind">${ic('trigger')}</span><div class="nm">Trigger 1</div><span class="eye">${ic('eye')}</span></div>
   ${card('Transform', false)}${card('Shape', false)}${card('Surface', false)}
   ${card('Triggers', true, trigs)}<div class="addbtn" style="margin-top:2px">Add Component</div></div>`;
-M.push(['A new trigger, as the tool makes it', 'Released, the tool returns to Select with the new entity selected. Its Triggers card is open, holding one trigger that starts "When something starts touching this"; its Do is unset, so it is yellow and the trigger doesn\'t run yet. <b>Try it:</b> set the Do to "win", then add "If other is tagged player". The Surface card is folded: Sensor is ticked.',
+M.push(['A new trigger, as the tool makes it', 'Released, the tool returns to Select with the new entity selected. Its Triggers card is open, holding one trigger that starts "When something starts touching this"; it has no action yet, so "Add action" is yellow and the trigger doesn\'t run. <b>Try it:</b> Add action → win, then Add check → "who is tagged" → player. The Surface card is folded: Sensor is ticked.',
   view(`${scene}${zone(700, 330, 200, 160)}<rect x="700" y="330" width="200" height="160" fill="none" stroke="${ACCENT}" stroke-width="1.5"/>${handles(700, 330, 200, 160)}`) + burger + tools('select') +
   board('new', [{ name: null, on: true, when: { event: 'touched' }, ifs: [], dos: [], repeat: 'every time' }], frame2) + debug]);
 
@@ -423,17 +430,17 @@ M.push(['Tags and a full trigger', 'A coin: a circle with a sensor Surface, the 
 
 // 4. The World: variables, inputs and a level-wide trigger.
 const vrow = (n, v) => `<div class="f"><label style="color:var(--text)">${n}</label><div class="vals">${inp(v)}<span class="ibtn">${ic('x')}</span></div></div>`;
-const irow = (n, keys) => `<div class="f" style="height:auto;min-height:var(--rowh);padding-top:2px;padding-bottom:2px"><label style="color:var(--text)">${n}</label><div class="vals"><div class="tags" style="cursor:default">${keys.map((k) => `<span class="tag">${k}<span class="x">${ic('x')}</span></span>`).join('')}<span style="color:var(--faint);padding:0 6px">+ key</span></div></div></div>`;
+const irow = (n, keys) => `<div class="f"><label style="color:var(--text)">${n}</label><div class="vals">${inp(keys.join(', '))}<span class="ibtn">${ic('x')}</span></div></div>`;
 const frame4 = (trigs, b) => `<div class="isl shade insp"><div class="ihead"><span class="kind">${ic('world')}</span><div class="nm" style="background:none;padding:0">World</div></div>
   ${card('Shape', false)}${card('Style', false)}${card('PhysicsWorld', false)}
-  ${card('Variables', true, `${vrow('coins', 0)}${vrow('lives', 3)}<div class="f"><label></label><div class="vals"><span class="linkbtn">${ic('plus')}Add variable</span></div></div>`)}
-  ${card('Inputs', true, `${irow('left', ['A', 'Left arrow'])}${irow('right', ['D', 'Right arrow'])}${irow('up', ['W', 'Up arrow'])}${irow('down', ['S', 'Down arrow'])}${irow('jump', ['Space'])}<div class="f"><label></label><div class="vals"><span class="linkbtn">${ic('plus')}Add input</span></div></div>`)}
+  ${card('Variables', true, `${vrow('coins', 0)}${vrow('lives', 3)}<div style="padding:2px 8px 0">${addRow('Add variable', '')}</div>`)}
+  ${card('Inputs', true, `${irow('left', ['A', 'Left arrow'])}${irow('right', ['D', 'Right arrow'])}${irow('up', ['W', 'Up arrow'])}${irow('down', ['S', 'Down arrow'])}${irow('jump', ['Space'])}<div style="padding:2px 8px 0">${addRow('Add input', '')}</div>`)}
   ${card('Triggers', true, trigs)}</div>`;
-M.push(['The World: variables, inputs and the level\'s triggers', 'The World\'s Variables card lists the level\'s variables, each a name and its starting number (every variable is a number in v3). Its Inputs card lists each input\'s keys; a new level starts with these five. Its triggers are level-wide. <b>Try it:</b> the timer trigger, and change "win" to "lose".',
+M.push(['The World: variables, inputs and the level\'s triggers', 'The World\'s Variables card lists the level\'s variables, each a name and its starting number (every variable is a number in v3). Its Inputs card lists each input with its keys, clicked to change; a new level starts with these five. Its triggers are level-wide. <b>Try it:</b> the timer trigger, and change "win" to "lose".',
   view(scene) + burger + tools('select') +
   board('world', [
     { name: null, on: true, when: { event: 'tagleft', tag: 'coin' }, ifs: [], dos: [{ kind: 'win' }], repeat: 'every time' },
-    { name: 'Out of time', on: true, when: { event: 'timer', how: 'after', secs: 60 }, ifs: [{ kind: 'var', var: 'coins', cmp: 'is less than', num: 3 }], dos: [{ kind: 'lose' }], repeat: 'once per run' }
+    { name: 'Out of time', on: true, when: { event: 'after', secs: 60 }, ifs: [{ kind: 'var', var: 'coins', cmp: 'is less than', num: 3 }], dos: [{ kind: 'lose' }], repeat: 'once per run' }
   ], frame4) + debug]);
 
 // 5. A touch trigger with no Surface.
