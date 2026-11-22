@@ -30,7 +30,7 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 - [x] 8. The Trigger tool
   - Read: versions/v3/architecture.md#the-trigger-tool, requirements/triggers/triggers.md#the-trigger-tool--v3, design/controls.md#v3-triggers-tags-variables-inputs-and-the-end-window, design/level-view.md#v3-shapes-with-no-style
   - Done when: `TriggerTool` is key 6 with its button, icon and tooltip; it draws a rectangle like the Shape tool, and `createTrigger` makes the entity the architecture lists in one step, then returns to Select with it selected; `UnstyledShapeOverlay` draws any shape with no StyleComponent as a dashed edge with a bolt, in the editor only; tests pass
-- [ ] 9. The physics world for triggers
+- [x] 9. The physics world for triggers
   - Read: versions/v3/architecture.md#actions, versions/v3/architecture.md#the-tick-from-v3, architecture/adapters.md, tech-notes.md
   - Done when: the `PhysicsWorld` contract and `Box2dPhysicsWorld` give the sensor begin and end events after `step()` with the two entities, and `setPose`, `addVelocity`, `setSurfaceSettings` and `setMotor`; `NoPhysicsEngine` and the test fakes follow; tests on the real build pass
 - [ ] 10. Inputs reach the game

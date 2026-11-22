@@ -5,28 +5,36 @@ import type {
     b2JointDef,
     b2JointId,
     b2ShapeDef,
+    b2ShapeId,
     b2Transform,
     b2WorldId,
 } from 'box2d3-wasm/compat';
 
 import type { BodyType } from '../../core/components/index.ts';
 import type { Point } from '../../core/geometry/index.ts';
+import type { EntityId } from '../../core/fields/index.ts';
 import { DeterministicMath, Units } from '../../core/math/index.ts';
 import type {
     BodyDefinition,
     BodyHandle,
+    BodyPose,
     BodyPoses,
     BodyVelocity,
     HingeDefinition,
+    HingeMotor,
     JointDefinition,
     JointHandle,
     PhysicsWorld,
     RopeDefinition,
+    SensorEvent,
     SpringDefinition,
     SurfaceDefinition,
     SurfacePiece,
+    SurfaceSettings,
     WorldSettings,
 } from '../../core/physics/index.ts';
+
+import { SensorShapeTable } from './SensorShapeTable.ts';
 
 const STEP_SECONDS = 1 / 60;
 // Box2D's recommended number of sub-steps for one step.
@@ -40,6 +48,19 @@ const MAX_SPEED_PIXELS_PER_SECOND = 6000;
 type CreatedBody = {
     readonly bodyId: b2BodyId;
     readonly type: BodyType;
+    readonly entity: EntityId;
+    readonly surfaces: CreatedSurface[];
+};
+
+// One addSurface call: what it was given, so a change of Sensor can build it again, and the shapes made.
+type CreatedSurface = {
+    definition: SurfaceDefinition;
+    shapes: b2ShapeId[];
+};
+
+type CreatedJoint = {
+    readonly jointId: b2JointId;
+    readonly type: JointDefinition['type'];
 };
 
 // One Box2D world. The only code that turns pixels into metres and degrees into radians. Box2D's angles
@@ -53,7 +74,11 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
     // Indexed by handle, in creation order; undefined once destroyed.
     private readonly bodies: (CreatedBody | undefined)[] = [];
     // Indexed by handle, in creation order; undefined once destroyed by destroyJoint.
-    private readonly joints: (b2JointId | undefined)[] = [];
+    private readonly joints: (CreatedJoint | undefined)[] = [];
+    // Every surface an entity gave, in the order given. The World gives one per wall.
+    private readonly surfacesByEntity = new Map<EntityId, { body: CreatedBody; surface: CreatedSurface }[]>();
+    private readonly sensorShapes = new SensorShapeTable();
+    private readonly sensorEvents: SensorEvent[] = [];
     private destroyed = false;
 
     constructor(box2d: Box2DModule, settings: WorldSettings) {
@@ -100,7 +125,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
             this.giveMassWithoutSurfaces(bodyId);
         }
 
-        this.bodies.push({ bodyId, type: definition.type });
+        this.bodies.push({ bodyId, type: definition.type, entity: definition.entity, surfaces: [] });
 
         return this.bodies.length - 1;
     }
@@ -109,23 +134,36 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         this.checkAlive();
         const createdBody = this.bodyAt(body);
 
-        const shapeDefinition = this.box2d.b2DefaultShapeDef();
-        // A sensor weighs nothing, so it never changes how its body moves.
-        shapeDefinition.density = surface.sensor ? 0 : surface.density;
-        shapeDefinition.material.friction = surface.friction;
-        shapeDefinition.material.restitution = surface.restitution;
-        shapeDefinition.isSensor = surface.sensor;
-        shapeDefinition.userData = surface.entity;
+        const createdSurface = { definition: surface, shapes: this.createShapes(createdBody, surface) };
+        createdBody.surfaces.push(createdSurface);
 
-        for (const piece of surface.pieces) {
-            this.addPiece(createdBody.bodyId, shapeDefinition, piece);
+        const entitySurfaces = this.surfacesByEntity.get(surface.entity);
+        const entry = { body: createdBody, surface: createdSurface };
+        if (entitySurfaces === undefined) {
+            this.surfacesByEntity.set(surface.entity, [entry]);
+        } else {
+            entitySurfaces.push(entry);
         }
+    }
 
-        shapeDefinition.delete();
+    setSurfaceSettings(entity: EntityId, settings: SurfaceSettings) {
+        this.checkAlive();
 
-        // Surfaces that weigh nothing leave a Dynamic body with no mass, and it would never move.
-        if (createdBody.type === 'dynamic' && this.box2d.b2Body_GetMass(createdBody.bodyId) === 0) {
-            this.giveMassWithoutSurfaces(createdBody.bodyId);
+        for (const { body, surface } of this.surfacesByEntity.get(entity) ?? []) {
+            const definition = { ...surface.definition, ...settings };
+            const sensorChanged = settings.sensor !== surface.definition.sensor;
+            surface.definition = definition;
+
+            if (sensorChanged) {
+                this.destroyShapes(surface.shapes);
+                surface.shapes = this.createShapes(body, definition);
+                continue;
+            }
+
+            for (const shapeId of surface.shapes) {
+                this.box2d.b2Shape_SetFriction(shapeId, settings.friction);
+                this.box2d.b2Shape_SetRestitution(shapeId, settings.restitution);
+            }
         }
     }
 
@@ -137,7 +175,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         }
 
         const jointId = definition.type === 'hinge' ? this.createHinge(definition) : this.createDistance(definition);
-        this.joints.push(jointId);
+        this.joints.push({ jointId, type: definition.type });
 
         return this.joints.length - 1;
     }
@@ -145,16 +183,32 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
     destroyJoint(joint: JointHandle) {
         this.checkAlive();
 
-        const jointId = this.joints[joint];
-        if (jointId === undefined) {
-            throw new Error(`Joint ${joint} doesn't exist in this world.`);
-        }
+        const { jointId } = this.jointAt(joint);
 
         // Box2D destroys a body's joints with it, and the id then reads as no longer valid.
         if (this.box2d.b2Joint_IsValid(jointId)) {
             this.box2d.b2DestroyJoint(jointId);
         }
         this.joints[joint] = undefined;
+    }
+
+    setMotor(joint: JointHandle, motor: HingeMotor) {
+        this.checkAlive();
+        const box2d = this.box2d;
+
+        const createdJoint = this.jointAt(joint);
+        if (createdJoint.type !== 'hinge') {
+            throw new Error(`Joint ${joint} is a ${createdJoint.type}, which has no motor.`);
+        }
+
+        const { jointId } = createdJoint;
+        if (!box2d.b2Joint_IsValid(jointId)) return;
+
+        const settings = this.motorSettings(motor);
+        box2d.b2RevoluteJoint_EnableMotor(jointId, settings.enabled);
+        box2d.b2RevoluteJoint_SetTargetMotorSpeed(jointId, settings.speed);
+        box2d.b2RevoluteJoint_SetMaxMotorTorque(jointId, settings.torque);
+        box2d.b2Joint_WakeBodies(jointId);
     }
 
     setGravity(gravity: Point) {
@@ -173,9 +227,20 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         }
     }
 
+    // Reads the step's sensor events at once, so the table counts every one even if no one asks for them.
     step() {
         this.checkAlive();
         this.box2d.b2World_Step(this.worldId, STEP_SECONDS, SUB_STEPS);
+
+        this.sensorEvents.length = 0;
+        const sensorEvents = this.box2d.b2World_GetSensorEvents(this.worldId);
+        this.sensorShapes.read(sensorEvents, this.sensorEvents);
+        sensorEvents.delete();
+    }
+
+    readSensorEvents(into: SensorEvent[]) {
+        this.checkAlive();
+        into.push(...this.sensorEvents);
     }
 
     readMovedBodies(into: BodyPoses) {
@@ -215,6 +280,40 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         return { linear, spin };
     }
 
+    setPose(body: BodyHandle, pose: BodyPose) {
+        this.checkAlive();
+        const box2d = this.box2d;
+        const createdBody = this.bodyAt(body);
+
+        const position = this.toBox2dPoint(pose);
+        const rotation = new box2d.b2Rot();
+        const sineAndCosine = DeterministicMath.sinCos(pose.angle);
+        rotation.c = sineAndCosine.cos;
+        rotation.s = sineAndCosine.sin;
+        box2d.b2Body_SetTransform(createdBody.bodyId, position, rotation);
+        rotation.delete();
+        position.delete();
+
+        if (createdBody.type !== 'static') {
+            box2d.b2Body_SetAwake(createdBody.bodyId, true);
+        }
+    }
+
+    addVelocity(body: BodyHandle, velocity: Point) {
+        this.checkAlive();
+        const box2d = this.box2d;
+        const createdBody = this.bodyAt(body);
+        if (createdBody.type === 'static') return;
+
+        const bodyId = createdBody.bodyId;
+        const current = box2d.b2Body_GetLinearVelocity(bodyId);
+        const sum = new box2d.b2Vec2(current.x + Units.toMetres(velocity.x), current.y + Units.toMetres(velocity.y));
+        current.delete();
+        box2d.b2Body_SetLinearVelocity(bodyId, sum);
+        sum.delete();
+        box2d.b2Body_SetAwake(bodyId, true);
+    }
+
     // Not part of PhysicsWorld: the tests use it to throw and spin bodies, until scripts (v2) need it.
     setVelocity(body: BodyHandle, velocity: BodyVelocity) {
         this.checkAlive();
@@ -233,6 +332,13 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         const createdBody = this.bodyAt(body);
         this.box2d.b2DestroyBody(createdBody.bodyId);
         this.bodies[body] = undefined;
+
+        for (const surface of createdBody.surfaces) {
+            for (const shapeId of surface.shapes) {
+                this.sensorShapes.markDestroyed(shapeId);
+            }
+            surface.shapes = [];
+        }
     }
 
     destroy() {
@@ -241,6 +347,9 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         this.box2d.b2DestroyWorld(this.worldId);
         this.bodies.length = 0;
         this.joints.length = 0;
+        this.surfacesByEntity.clear();
+        this.sensorShapes.clear();
+        this.sensorEvents.length = 0;
         this.destroyed = true;
     }
 
@@ -259,8 +368,65 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         return createdBody;
     }
 
+    private jointAt(joint: JointHandle) {
+        const createdJoint = this.joints[joint];
+        if (createdJoint === undefined) {
+            throw new Error(`Joint ${joint} doesn't exist in this world.`);
+        }
+
+        return createdJoint;
+    }
+
+    // Every shape gets sensor events, the sensor to send them and the visitor to be seen (tech-notes.md).
+    private createShapes(body: CreatedBody, surface: SurfaceDefinition) {
+        const shapeDefinition = this.box2d.b2DefaultShapeDef();
+        // A sensor weighs nothing, so it never changes how its body moves.
+        shapeDefinition.density = surface.sensor ? 0 : surface.density;
+        shapeDefinition.material.friction = surface.friction;
+        shapeDefinition.material.restitution = surface.restitution;
+        shapeDefinition.isSensor = surface.sensor;
+        shapeDefinition.enableSensorEvents = true;
+        shapeDefinition.userData = surface.entity;
+
+        const shapes: b2ShapeId[] = [];
+        for (const piece of surface.pieces) {
+            shapes.push(...this.addPiece(body.bodyId, shapeDefinition, piece));
+        }
+        shapeDefinition.delete();
+
+        for (const shapeId of shapes) {
+            this.sensorShapes.add(shapeId, surface.entity, body.entity, surface.sensor);
+        }
+
+        this.keepMass(body);
+
+        return shapes;
+    }
+
+    private destroyShapes(shapes: readonly b2ShapeId[]) {
+        for (const shapeId of shapes) {
+            this.box2d.b2DestroyShape(shapeId, true);
+            this.sensorShapes.markDestroyed(shapeId);
+        }
+    }
+
+    // Surfaces that weigh nothing leave a Dynamic body with no mass, and it would never move.
+    private keepMass(body: CreatedBody) {
+        if (body.type === 'dynamic' && this.box2d.b2Body_GetMass(body.bodyId) === 0) {
+            this.giveMassWithoutSurfaces(body.bodyId);
+        }
+    }
+
     // A Hinge is Box2D's revolute joint. Resistance is a motor at speed 0, which brakes the turning
     // without holding any angle.
+    private motorSettings(motor: HingeMotor) {
+        if (motor.motor) {
+            return { enabled: true, speed: Units.toRadians(motor.motorSpeed), torque: motor.motorStrength };
+        }
+
+        return { enabled: motor.resistance > 0, speed: 0, torque: motor.resistance };
+    }
+
     private createHinge(definition: HingeDefinition) {
         const box2d = this.box2d;
         const hingeDefinition = box2d.b2DefaultRevoluteJointDef();
@@ -270,15 +436,10 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         hingeDefinition.lowerAngle = Units.toRadians(definition.minAngle);
         hingeDefinition.upperAngle = Units.toRadians(definition.maxAngle);
 
-        if (definition.motor) {
-            hingeDefinition.enableMotor = true;
-            hingeDefinition.motorSpeed = Units.toRadians(definition.motorSpeed);
-            hingeDefinition.maxMotorTorque = definition.motorStrength;
-        } else if (definition.resistance > 0) {
-            hingeDefinition.enableMotor = true;
-            hingeDefinition.motorSpeed = 0;
-            hingeDefinition.maxMotorTorque = definition.resistance;
-        }
+        const motor = this.motorSettings(definition);
+        hingeDefinition.enableMotor = motor.enabled;
+        hingeDefinition.motorSpeed = motor.speed;
+        hingeDefinition.maxMotorTorque = motor.torque;
 
         const jointId = box2d.b2CreateRevoluteJoint(this.worldId, hingeDefinition);
         hingeDefinition.delete();
@@ -361,17 +522,15 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         return frame;
     }
 
-    private addPiece(bodyId: b2BodyId, shapeDefinition: b2ShapeDef, piece: SurfacePiece) {
+    // Returns the shapes made: one per circle or polygon, none for a skipped polygon, one per line edge.
+    private addPiece(bodyId: b2BodyId, shapeDefinition: b2ShapeDef, piece: SurfacePiece): b2ShapeId[] {
         switch (piece.kind) {
             case 'circle':
-                this.addCircle(bodyId, shapeDefinition, piece.center, piece.radius);
-                return;
+                return [this.addCircle(bodyId, shapeDefinition, piece.center, piece.radius)];
             case 'polygon':
-                this.addPolygon(bodyId, shapeDefinition, piece.points);
-                return;
+                return this.addPolygon(bodyId, shapeDefinition, piece.points);
             case 'line':
-                this.addLine(bodyId, shapeDefinition, piece.points);
-                return;
+                return this.addLine(bodyId, shapeDefinition, piece.points);
         }
     }
 
@@ -384,8 +543,10 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         box2dCenter.delete();
         circle.radius = Units.toMetres(radius);
 
-        box2d.b2CreateCircleShape(bodyId, shapeDefinition, circle);
+        const shapeId = box2d.b2CreateCircleShape(bodyId, shapeDefinition, circle);
         circle.delete();
+
+        return shapeId;
     }
 
     // Box2D builds a polygon from its hull, which also puts the points in its own order. A hull of
@@ -395,20 +556,24 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
 
         const pointsInMetres = points.map((point) => ({ x: Units.toMetres(point.x), y: Units.toMetres(point.y) }));
         const hull = box2d.b2ComputeHull(pointsInMetres);
+        const shapes: b2ShapeId[] = [];
 
         if (hull.count >= 3) {
             const polygon = box2d.b2MakePolygon(hull, 0);
-            box2d.b2CreatePolygonShape(bodyId, shapeDefinition, polygon);
+            shapes.push(box2d.b2CreatePolygonShape(bodyId, shapeDefinition, polygon));
             polygon.delete();
         }
 
         hull.delete();
+
+        return shapes;
     }
 
     // A line is one two-sided segment per edge, not a chain: chains collide from one side only, and
     // Box2D never makes segments collide with segments, so lines never hit each other.
     private addLine(bodyId: b2BodyId, shapeDefinition: b2ShapeDef, points: readonly Point[]) {
         const box2d = this.box2d;
+        const shapes: b2ShapeId[] = [];
 
         for (let i = 0; i + 1 < points.length; i++) {
             const start = points[i];
@@ -423,9 +588,11 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
             box2dStart.delete();
             box2dEnd.delete();
 
-            box2d.b2CreateSegmentShape(bodyId, shapeDefinition, segment);
+            shapes.push(box2d.b2CreateSegmentShape(bodyId, shapeDefinition, segment));
             segment.delete();
         }
+
+        return shapes;
     }
 
     private toBox2dPoint(point: Point) {

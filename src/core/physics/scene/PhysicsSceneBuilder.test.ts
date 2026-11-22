@@ -72,9 +72,14 @@ class RecordingWorld implements PhysicsWorld {
     setGravity() {}
     step() {}
     readMovedBodies() {}
+    readSensorEvents() {}
     velocityOf() {
         return { linear: { x: 0, y: 0 }, spin: 0 };
     }
+    setPose() {}
+    addVelocity() {}
+    setSurfaceSettings() {}
+    setMotor() {}
     destroyBody() {}
     destroy() {}
 }

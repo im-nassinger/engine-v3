@@ -14,8 +14,11 @@ export type {
     RopeDefinition,
     SpringDefinition,
 } from './contracts/JointDefinition.ts';
+export type { HingeMotor } from './contracts/HingeMotor.ts';
 export type { PhysicsWorld } from './contracts/PhysicsWorld.ts';
+export type { SensorEvent } from './contracts/SensorEvent.ts';
 export type { SurfaceDefinition, SurfacePiece } from './contracts/SurfaceDefinition.ts';
+export type { SurfaceSettings } from './contracts/SurfaceSettings.ts';
 export { drawnLength } from './joint-paths/drawnLength.ts';
 export { jointPathPoints } from './joint-paths/jointPathPoints.ts';
 export { countBodyChanges } from './merging/bodyChanges.ts';

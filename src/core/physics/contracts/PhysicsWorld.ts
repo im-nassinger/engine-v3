@@ -1,11 +1,16 @@
+import type { EntityId } from '../../fields/index.ts';
 import type { Point } from '../../geometry/index.ts';
 
 import type { BodyDefinition } from './BodyDefinition.ts';
+import type { BodyPose } from './BodyPose.ts';
 import type { BodyPoses } from './BodyPoses.ts';
 import type { BodyVelocity } from './BodyVelocity.ts';
 import type { BodyHandle, JointHandle } from './Handles.ts';
+import type { HingeMotor } from './HingeMotor.ts';
 import type { JointDefinition } from './JointDefinition.ts';
+import type { SensorEvent } from './SensorEvent.ts';
 import type { SurfaceDefinition } from './SurfaceDefinition.ts';
+import type { SurfaceSettings } from './SurfaceSettings.ts';
 
 // One run's physics. Everything going in and out is in pixels and degrees, except gravity, which is in
 // m/s² like the World's Gravity field.
@@ -24,7 +29,19 @@ export type PhysicsWorld = {
     step(): void;
     // Records the pose of each body that moved in the last step.
     readMovedBodies(into: BodyPoses): void;
+    // Adds the sensor events of the last step, begins first, in Box2D's own order.
+    readSensorEvents(into: SensorEvent[]): void;
     velocityOf(body: BodyHandle): BodyVelocity;
+    // Teleports a body and wakes it; its speed is kept.
+    setPose(body: BodyHandle, pose: BodyPose): void;
+    // Adds to a body's speed in px/s, whatever its mass, and wakes it. A Static body doesn't move.
+    addVelocity(body: BodyHandle, velocity: Point): void;
+    // Changes every surface the entity gave this world; one play left out has nothing to change. Friction
+    // and Restitution change in place. A change of Sensor rebuilds the surface, so its overlaps end and
+    // begin again in the next step.
+    setSurfaceSettings(entity: EntityId, settings: SurfaceSettings): void;
+    // Changes a Hinge's motor and wakes its bodies. Does nothing if its body took it.
+    setMotor(joint: JointHandle, motor: HingeMotor): void;
     destroyBody(body: BodyHandle): void;
     destroy(): void;
 };
