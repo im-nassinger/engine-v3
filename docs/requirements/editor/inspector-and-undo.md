@@ -35,7 +35,7 @@ Source: round 1: C1, C10; round 3: R15; round 4: H2, SEL1; decisions: D14, D15; 
 
 ### One fixed list of field types · v1
 
-- Every Entity inspector field is one of: **number, text, checkbox, choice, colour, vector, angle, entity, asset, variable, tags, path point**, or a **list** of any of these.
+- Every Entity inspector field is one of: **number, text, checkbox, choice, colour, vector, angle, entity, asset, variable, tags, path point, input, trigger**, or a **list** of any of these. *Input and trigger joined the list when v3 was planned: an input is a name with its keys, and a trigger is the When, If, Do value its card draws (standing yes, 2026-11-22).*
 - **A list is one field**, such as "Points", folded by default with its item count beside its name. Unfolded, it shows one row per item, each the field of its type. A + at the end adds an item and each row can be removed, unless that breaks the list's minimum or maximum, which is refused with a status text. Each change is one undo step.
 - A **path point** is one point of a path: its position, its two curve handles and its corner (sharp, smooth, or smooth with handles that move separately).
 - *Why the points are one list field: a shape's points are one value, so they read as one entry, not as a row per point (owner, 2026-11-15).*
