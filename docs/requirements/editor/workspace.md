@@ -91,10 +91,10 @@ Source: owner: 2026-11-18
 | 4 (v2) | Bézier pen | A path with curves | [drawing](../drawing.md) |
 | 5 (v2) | Pencil | A freehand path | [drawing](../drawing.md) |
 | v6 | Text | A text entity | [drawing](../drawing.md) |
-| v3 | Trigger | A rectangle that notices touching, with a trigger | [triggers](../triggers/triggers.md) |
+| 6 (v3) | Trigger | A rectangle that notices touching, with a trigger | [triggers](../triggers/triggers.md) |
 
 - *Why seven: the owner wanted fewer tools. Point editing moved into Select (double-click) as in Inkscape and Figma, and panning is Space, so neither needs a tool.*
-- **v1 has three of them: Select (1), Shape (2) and Joint (3)** (owner: 2026-11-19, replacing 1, 4 and 6). **v2 adds the Bézier pen (4) and the Pencil (5)** (owner: 2026-11-20). Trigger comes in v3 and Text in v6, and their keys are decided then. *Why: in the smaller v1 a path is decoration only, text was for a score, and there are no triggers; the owner wants v1's tools on the first three keys for now.*
+- **v1 has three of them: Select (1), Shape (2) and Joint (3)** (owner: 2026-11-19, replacing 1, 4 and 6). **v2 adds the Bézier pen (4) and the Pencil (5)** (owner: 2026-11-20). **v3 adds Trigger (6)** (standing yes, 2026-11-22). Text comes in v6, and its key is decided then. *Why: in the smaller v1 a path is decoration only, text was for a score, and there are no triggers; the owner wants v1's tools on the first three keys for now.*
 - The tools are 34 px buttons in the tool column. Exactly one tool is active, drawn in the soft accent.
 - **After making something, every tool returns to Select** with the new entity selected, the Joint tool included. To make many in a row, use tool lock. *Why: one rule for every tool, and tool lock already covers placing many joints (owner: 2026-11-13).*
 - **Tool lock:** double-clicking a tool button, or pressing its number key twice, keeps the tool active until another tool is picked or Esc is pressed.

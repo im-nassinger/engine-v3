@@ -177,6 +177,17 @@ Source: scope TR8; round 5: T7; old: TR-55 to TR-57; owner: 2026-11-13
 
 Source: scope TR2, TR7; round 3: M1; round 9: MSG2; round 10: EV1; owner: 2026-11-13
 
+## Tags
+
+### The TagsComponent · v3
+
+- **The TagsComponent lists an entity's tags**, such as `player` or `coin`. Any entity can have one. Its card holds one tags field: type a tag and press Enter to add it, click a tag's × to remove it. Tags already used in the level are offered as you type.
+- **A tag is one word of lowercase letters, digits and `_`.** What is typed is made lowercase and its spaces become `_`. An entity has each tag once. *Why: so `Coin` and `coin` are never two tags that look alike (standing yes, 2026-11-22).*
+- During play, Change value adds or removes a tag.
+- *Why v3: nothing reads tags before triggers (owner: 2026-11-20).*
+
+Source: owner: 2026-11-20
+
 ## When things run
 
 ### Order and limits · v3
@@ -212,9 +223,10 @@ Source: scope LU8; round 10: TL1, TL2
 
 ### The Trigger tool · v3
 
-- **Tool 7 draws a rectangle that notices touching.** The new entity has a TransformComponent, a rectangle ShapeComponent, a SurfaceComponent with Sensor ticked, and a TriggerComponent holding one trigger that starts "When something starts touching this".
+- **The Trigger tool, key 6, draws a rectangle that notices touching.** The new entity has a TransformComponent, a rectangle ShapeComponent, a SurfaceComponent with Sensor ticked, and a TriggerComponent holding one trigger that starts "When something starts touching this".
 - It has no StyleComponent, so it isn't drawn in play, and it is selected by its edge.
 - Example: draw one over the end of a level, then add Win to its trigger.
+- *Why key 6: it is the next free key, so the keys have no gap until Text comes in v6 (standing yes, 2026-11-22).*
 - *Why v3: triggers are v3. "Trigger", not "Trigger zone": the owner's shorter name.*
 
 Source: owner: 2026-11-13

@@ -39,7 +39,7 @@ These versions were decided during the requirements review, or by the owner afte
 | Gradients | v2 | Decoration. Solid colours are enough to test. The owner had changed it from "not in the first version" (owner: 2026-11-13) |
 | The searchable list of shortcuts | v4 | The owner put it in v4 (owner: 2026-11-20). It never went through "smallest thing that can be tested". The main menu lists every command with its shortcut (owner: 2026-11-13) |
 | The rest of debugging: `print()` in the Console (v5), the Panels button with live values (Later) | v5 and Later | They come with scripts; live values are the most work of the set (owner: 2026-11-20). The agreed debugging set, nothing else was discussed |
-| The Trigger tool (tool 7): a rectangle that notices touching, with a trigger | v3 | Triggers come in v3. It was in the tool list with no version (owner: 2026-11-13) |
+| The Trigger tool (key 6, standing yes, 2026-11-22): a rectangle that notices touching, with a trigger | v3 | Triggers come in v3. It was in the tool list with no version (owner: 2026-11-13) |
 | The camera follows a tag | Later | A spawned player can't be picked in the editor, so following its tag finds it without a script (owner: 2026-11-13) |
 | A new level starts with the inputs left, right, up, down and jump | v3 | Inputs come in v3, and most games need these five (owner: 2026-11-13) |
 | Variables are a number, a string, a boolean, an entity, an asset, a colour, a vector, an angle or tags | v3 to v5 | Variables come from v3. The owner wants text too (owner: 2026-11-13), named the first three types (owner: 2026-11-14), and added the rest when variables replaced the values scripts kept (owner: 2026-11-16) |

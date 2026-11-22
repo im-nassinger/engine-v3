@@ -22,6 +22,7 @@ Logic without code. **Nothing here is in v1.** **In v3** an entity's TriggerComp
 | Actions: Change value, Destroy, Push, Win, Lose, Restart | v3 | triggers |
 | Repeat, order and limits | v3 | triggers |
 | The Trigger tool | v3 | triggers |
+| The TagsComponent | v3 | triggers |
 | Number variables on the World | v3 | variables-and-inputs |
 | Raw keys and inputs | v3 | variables-and-inputs |
 | Events: collision, custom event, destroyed, a variable changes | v4 | triggers |
