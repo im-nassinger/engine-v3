@@ -78,7 +78,11 @@ The tech notes ask for keyboard layout tests (US, Brazilian ABNT2, and one AltGr
 7. (v2) A path's handle is dragged, a point is switched sharp and smooth, and a point is added on a curve.
 8. (v2) A rectangle's fill goes Solid to Linear, gets a stop, has its end handle dragged, and Ctrl+Z puts each back; a gradient survives save, reload, copy and paste.
 
-Journey 1 is in `test-play.spec.ts`, 2 in `car-journey.spec.ts` (stage 17), 3 and 4 in `saving.spec.ts`. 5 is in `pen-tool.spec.ts`, 6 in `pencil-tool.spec.ts`, 7 in `path-points.spec.ts`, 8 in `gradient-handles.spec.ts`; they run in Chromium, Firefox and WebKit like the rest. Journey 2 checks every entity and value by exporting the imported level again and comparing its `level.json` with the first export's.
+9. (v3) A trigger drawn with the Trigger tool is made to Win when touched by `player`; in play a ball tagged `player` falls into it, the end window shows, Restart plays again to a second Win, and Leave goes back to the editor.
+10. (v3) A key trigger on a box pushes it: Space pressed during play kicks it up.
+11. (v3) The World's variables and inputs are edited (a variable added, named and given a start, an input renamed, another given new keys), saved and read back after a reload.
+
+Journey 1 is in `test-play.spec.ts`, 2 in `car-journey.spec.ts` (stage 17), 3 and 4 in `saving.spec.ts`. 5 is in `pen-tool.spec.ts`, 6 in `pencil-tool.spec.ts`, 7 in `path-points.spec.ts`, 8 in `gradient-handles.spec.ts`, 9 to 11 in `triggers.spec.ts`; they run in Chromium, Firefox and WebKit like the rest. Journey 2 checks every entity and value by exporting the imported level again and comparing its `level.json` with the first export's.
 
 ## Guard tests (`tests/guards/`)
 

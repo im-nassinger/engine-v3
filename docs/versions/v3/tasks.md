@@ -51,7 +51,7 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 - [x] 15. The determinism levels for triggers
   - Read: versions/v3/architecture.md#determinism, architecture/testing.md
   - Done when: `trigger-coins`, `trigger-timers` and `trigger-touch-groups` are built with recorded inputs, the variables are part of `stateHash`, their hashes are recorded, and the older levels' hashes are unchanged or their change is explained in decisions.md
-- [ ] 16. v3's journeys and speed test
+- [x] 16. v3's journeys and speed test
   - Read: versions/v3/architecture.md#tests, versions/v3/architecture.md#performance, architecture/testing.md, architecture/performance.md
   - Done when: Playwright journeys in three browsers pass: draw a trigger with the Trigger tool, make it Win when touched by `player`, play, roll a tagged ball into it, see the end window, Restart, Leave; a key trigger pushing a body; the World's variables and inputs edited, saved and read back; the speed test of 1,000 touch triggers meets the targets, its numbers written in performance.md
 - [ ] 17. Close v3's docs

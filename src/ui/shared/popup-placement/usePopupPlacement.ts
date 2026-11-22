@@ -5,7 +5,9 @@ import type { PopupPlacement, PopupRect } from './placePopup.ts';
 
 // Places a popup with `position: fixed` next to its anchor before the browser paints, and again when
 // anything scrolls or the window resizes, so no panel's edge cuts it and it stays inside the window. The
-// most height that fits is written as `--popup-room`, for the part of the popup that scrolls.
+// most height that fits is written as `--popup-room`, for the part of the popup that scrolls. A scroll
+// inside the popup itself moves no anchor and is left alone: measuring it at full height would set its
+// scroll back to the top.
 export function usePopupPlacement(
     popupRef: RefObject<HTMLElement | null>,
     readAnchor: () => PopupRect | undefined,
@@ -31,12 +33,19 @@ export function usePopupPlacement(
             element.style.setProperty('--popup-room', `${placed.room}px`);
         };
 
+        const placeAfterScroll = (event: Event) => {
+            const scrolled = event.target;
+            if (scrolled instanceof Node && popupRef.current?.contains(scrolled) === true) return;
+
+            place();
+        };
+
         place();
-        window.addEventListener('scroll', place, { capture: true, passive: true });
+        window.addEventListener('scroll', placeAfterScroll, { capture: true, passive: true });
         window.addEventListener('resize', place);
 
         return () => {
-            window.removeEventListener('scroll', place, { capture: true });
+            window.removeEventListener('scroll', placeAfterScroll, { capture: true });
             window.removeEventListener('resize', place);
         };
     });
