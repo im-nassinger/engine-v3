@@ -79,8 +79,8 @@ Source: scope PH3; round 1: C7; round 6: 05 2.5; round 7: SF1, SN1; round 8: CT1
 - *Why: Box2D detects touching, so we don't write a second collision system that would disagree at the edges and threaten determinism.*
 - A sensor is drawn like any other shape, so its StyleComponent decides whether players see it. With no StyleComponent it is invisible, and only the physics view shows it.
 - Sensors add no weight.
-- Sensors check once per tick and are not protected against fast entities: something moving 600 px/s travels 10 px each tick and can skip a thin sensor.
-- The body type rule applies: a Static sensor can't notice a Kinematic body.
+- Sensors check once per tick. A Dynamic body is noticed even when it passes a sensor between two ticks, but a Kinematic one is not: at 600 px/s it travels 10 px each tick and can skip a sensor thinner than that. *Why: this is how Box2D 3.2 behaves (standing yes, 2026-11-22; written for older Box2D as "any fast entity can skip a thin sensor").*
+- A sensor notices bodies of every type, Static and Kinematic included, whatever its own body's type. *Why: Box2D 3.2 sensors do, so a Static coin notices a Kinematic platform's rider and the platform too (standing yes, 2026-11-22; written for older Box2D as "a Static sensor can't notice a Kinematic body").*
 - *Why v3: noticing a touch is only for triggers and scripts, and triggers come in v3. The Sensor setting itself is in v1, because it is one Box2D setting.*
 
 Source: scope PH3; round 6: 05 2.11; round 7: SN1; old: PH-58 to PH-63; owner: 2026-11-13

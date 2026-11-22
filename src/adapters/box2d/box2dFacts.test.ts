@@ -120,6 +120,65 @@ function sensorEventCounts(worldId: b2WorldId) {
     return counts;
 }
 
+type ShapeId = { index1: number; world0: number; generation: number };
+type SensorEvent = { sensorShapeId: ShapeId; visitorShapeId: ShapeId };
+
+function sensorEventsOf(worldId: b2WorldId) {
+    const sensorEvents = box2d.b2World_GetSensorEvents(worldId);
+    const begins: SensorEvent[] = [];
+    const ends: SensorEvent[] = [];
+    for (let i = 0; i < sensorEvents.beginCount; i++) {
+        begins.push(sensorEvents.GetBeginEvent(i));
+    }
+    for (let i = 0; i < sensorEvents.endCount; i++) {
+        ends.push(sensorEvents.GetEndEvent(i));
+    }
+    sensorEvents.delete();
+
+    return { begins, ends };
+}
+
+function setUpSensor(shape: b2ShapeDef) {
+    shape.isSensor = true;
+    shape.enableSensorEvents = true;
+}
+
+function setUpVisitor(shape: b2ShapeDef) {
+    shape.enableSensorEvents = true;
+}
+
+function setVelocity(bodyId: b2BodyId, velocity: Vector) {
+    const box2dVelocity = new box2d.b2Vec2(velocity.x, velocity.y);
+    box2d.b2Body_SetLinearVelocity(bodyId, box2dVelocity);
+    box2dVelocity.delete();
+}
+
+// A Static sensor 2 × sensorHalfWidth m wide at the origin, and a 0.6 m visitor starting 3 m to its left, moving
+// right at speed m/s. Returns, for each step with a sensor event, the step and the visitor's x after it.
+function passThroughSensor(visitorKind: BodyKind, speed: number, steps: number, sensorHalfWidth = 1) {
+    const worldId = createWorld(NO_GRAVITY);
+    const sensor = addBox(createBody(worldId, 'static', { x: 0, y: 0 }), sensorHalfWidth, 1, setUpSensor);
+    const visitorBody = createBody(worldId, visitorKind, { x: -3, y: 0 });
+    const visitor = addBox(visitorBody, 0.3, 0.3, setUpVisitor);
+    setVelocity(visitorBody, { x: speed, y: 0 });
+
+    const seen: { step: number; kind: 'begin' | 'end'; x: number; event: SensorEvent }[] = [];
+    for (let i = 0; i < steps; i++) {
+        step(worldId);
+        const events = sensorEventsOf(worldId);
+        const x = positionOf(visitorBody).x;
+        for (const event of events.begins) {
+            seen.push({ step: i, kind: 'begin', x, event });
+        }
+        for (const event of events.ends) {
+            seen.push({ step: i, kind: 'end', x, event });
+        }
+    }
+    box2d.b2DestroyWorld(worldId);
+
+    return { sensor, visitor, seen };
+}
+
 function contactEventCounts(worldId: b2WorldId) {
     const contactEvents = box2d.b2World_GetContactEvents(worldId);
     const counts = { begins: contactEvents.beginCount, ends: contactEvents.endCount };
@@ -393,18 +452,17 @@ describe('Box2D 3.2: contacts and sensors', () => {
         }
     });
 
-    test('two sensors see each other', () => {
+    test('two overlapping sensors each see the other: two begins, each naming the other as the visitor', () => {
         const worldId = createWorld(NO_GRAVITY);
-        const setUpSensor = (shape: b2ShapeDef) => {
-            shape.isSensor = true;
-            shape.enableSensorEvents = true;
-        };
-        addBox(createBody(worldId, 'static', { x: 0, y: 0 }), 1, 1, setUpSensor);
-        addBox(createBody(worldId, 'dynamic', { x: 0, y: 0 }), 0.3, 0.3, setUpSensor);
+        const still = addBox(createBody(worldId, 'static', { x: 0, y: 0 }), 1, 1, setUpSensor);
+        const moving = addBox(createBody(worldId, 'dynamic', { x: 0, y: 0 }), 0.3, 0.3, setUpSensor);
 
         step(worldId);
+        const { begins } = sensorEventsOf(worldId);
 
-        expect(sensorEventCounts(worldId).begins).toBe(2);
+        expect(begins).toHaveLength(2);
+        expect(begins).toContainEqual({ sensorShapeId: still, visitorShapeId: moving });
+        expect(begins).toContainEqual({ sensorShapeId: moving, visitorShapeId: still });
         box2d.b2DestroyWorld(worldId);
     });
 
@@ -461,25 +519,109 @@ describe('Box2D 3.2: contacts and sensors', () => {
         box2d.b2DestroyWorld(worldId);
     });
 
-    test("destroying a body inside a sensor sends the sensor's end with the next step's events", () => {
+    test('a Kinematic or Dynamic visitor passing a Static sensor sends one begin and one end, naming both surfaces', () => {
+        for (const visitorKind of ['kinematic', 'dynamic'] as const) {
+            // 0.1 m a step: the visitor's right edge meets the sensor's left edge (x = -1) after step 17.
+            const { sensor, visitor, seen } = passThroughSensor(visitorKind, 6, 60);
+            const pair = { sensorShapeId: sensor, visitorShapeId: visitor };
+
+            expect(seen.map((event) => event.kind)).toEqual(['begin', 'end']);
+            expect(seen[0]?.event).toEqual(pair);
+            expect(seen[1]?.event).toEqual(pair);
+            // The begin comes in the step that makes them overlap (edges just meeting count),
+            // the end in the step that parts them: no step late.
+            expect(seen[0]?.x).toBeCloseTo(-1.3, 4);
+            expect(seen[1]?.x).toBeCloseTo(1.4, 4);
+        }
+    });
+
+    test('a Kinematic body that skips a sensor between steps sends nothing; a Dynamic one still sends begin, then end', () => {
+        // 6,000 px/s, the game's speed cap, is 2 m a step: the visitor is at x = -1 m, then 1 m, never over the
+        // 1 px sensor at the end of a step.
+        const kinematic = passThroughSensor('kinematic', 120, 4, 0.01);
+        const dynamic = passThroughSensor('dynamic', 120, 4, 0.01);
+
+        expect(kinematic.seen).toEqual([]);
+        expect(dynamic.seen.map((event) => [event.step, event.kind])).toEqual([
+            [1, 'begin'],
+            [2, 'end'],
+        ]);
+    });
+
+    test("destroying a body inside a sensor sends the sensor's end with the next step's events, naming a shape that is gone", () => {
         const worldId = createWorld(NO_GRAVITY);
-        addBox(createBody(worldId, 'static', { x: 0, y: 0 }), 1, 1, (shape) => {
-            shape.isSensor = true;
-            shape.enableSensorEvents = true;
-        });
-        const visitor = createBody(worldId, 'dynamic', { x: 0, y: 0 });
-        addBox(visitor, 0.3, 0.3, (shape) => {
-            shape.enableSensorEvents = true;
-        });
+        const sensor = addBox(createBody(worldId, 'static', { x: 0, y: 0 }), 1, 1, setUpSensor);
+        const visitorBody = createBody(worldId, 'dynamic', { x: 0, y: 0 });
+        const visitor = addBox(visitorBody, 0.3, 0.3, setUpVisitor);
         step(worldId);
 
-        box2d.b2DestroyBody(visitor);
+        box2d.b2DestroyBody(visitorBody);
         const endsRightAway = sensorEventCounts(worldId).ends;
         step(worldId);
-        const endsAfterStep = sensorEventCounts(worldId).ends;
+        const { ends } = sensorEventsOf(worldId);
+        // The next shape made takes the freed slot, with a new generation.
+        const next = addBox(createBody(worldId, 'dynamic', { x: 10, y: 0 }), 0.3, 0.3, setUpVisitor);
 
         expect(endsRightAway).toBe(0);
-        expect(endsAfterStep).toBe(1);
+        expect(ends).toEqual([{ sensorShapeId: sensor, visitorShapeId: visitor }]);
+        expect(box2d.b2Shape_IsValid(visitor)).toBe(false);
+        expect(next.index1).toBe(visitor.index1);
+        expect(next.generation).not.toBe(visitor.generation);
+        box2d.b2DestroyWorld(worldId);
+    });
+
+    test("destroying a sensor's body sends its end with the next step's events", () => {
+        const worldId = createWorld(NO_GRAVITY);
+        const sensorBody = createBody(worldId, 'static', { x: 0, y: 0 });
+        const sensor = addBox(sensorBody, 1, 1, setUpSensor);
+        const visitor = addBox(createBody(worldId, 'dynamic', { x: 0, y: 0 }), 0.3, 0.3, setUpVisitor);
+        step(worldId);
+
+        box2d.b2DestroyBody(sensorBody);
+        const endsRightAway = sensorEventCounts(worldId).ends;
+        step(worldId);
+
+        expect(endsRightAway).toBe(0);
+        expect(sensorEventsOf(worldId).ends).toEqual([{ sensorShapeId: sensor, visitorShapeId: visitor }]);
+        box2d.b2DestroyWorld(worldId);
+    });
+
+    test("turning a sensor's events off sends its ends, and on again sends its begins", () => {
+        const worldId = createWorld(NO_GRAVITY);
+        const sensor = addBox(createBody(worldId, 'static', { x: 0, y: 0 }), 1, 1, setUpSensor);
+        const visitor = addBox(createBody(worldId, 'dynamic', { x: 0, y: 0 }), 0.3, 0.3, setUpVisitor);
+        const pair = { sensorShapeId: sensor, visitorShapeId: visitor };
+        step(worldId);
+
+        box2d.b2Shape_EnableSensorEvents(sensor, false);
+        step(worldId);
+        const whenOff = sensorEventsOf(worldId);
+        box2d.b2Shape_EnableSensorEvents(sensor, true);
+        step(worldId);
+        const whenOn = sensorEventsOf(worldId);
+
+        expect(whenOff).toEqual({ begins: [], ends: [pair] });
+        expect(whenOn).toEqual({ begins: [pair], ends: [] });
+        box2d.b2DestroyWorld(worldId);
+    });
+
+    test('a surface has no switch between sensor and solid; destroying it sends its ends and a new one its begins', () => {
+        const worldId = createWorld(NO_GRAVITY);
+        const sensorBody = createBody(worldId, 'static', { x: 0, y: 0 });
+        const sensor = addBox(sensorBody, 1, 1, setUpSensor);
+        const visitor = addBox(createBody(worldId, 'dynamic', { x: 0, y: 0 }), 0.3, 0.3, setUpVisitor);
+        step(worldId);
+
+        box2d.b2DestroyShape(sensor, true);
+        const rebuilt = addBox(sensorBody, 1, 1, setUpSensor);
+        step(worldId);
+
+        expect('b2Shape_SetSensor' in box2d).toBe(false);
+        expect(box2d.b2Shape_IsSensor(rebuilt)).toBe(true);
+        expect(sensorEventsOf(worldId)).toEqual({
+            begins: [{ sensorShapeId: rebuilt, visitorShapeId: visitor }],
+            ends: [{ sensorShapeId: sensor, visitorShapeId: visitor }],
+        });
         box2d.b2DestroyWorld(worldId);
     });
 });

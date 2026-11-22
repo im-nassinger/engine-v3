@@ -6,7 +6,7 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 
 ## Tasks
 
-- [ ] 1. Box2D's sensor facts
+- [x] 1. Box2D's sensor facts
   - Read: versions/v3/architecture.md#tests, tech-notes.md, architecture/adapters.md
   - Done when: `box2dFacts.test.ts` checks, on the real Box2D 3.2 build, sensor begin and end events, a sensor on a Static body with a Kinematic visitor, a sensor on a Static body with a Dynamic visitor, the end event when the visiting body is destroyed, and two overlapping sensors; what each shows is written in tech-notes.md, and any rule in versions/v3/architecture.md it contradicts is corrected there, with the change listed in decisions.md
 - [ ] 2. The TagsComponent and the tags field
