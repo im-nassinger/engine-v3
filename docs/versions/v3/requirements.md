@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**v3 is a first game without code** (owner, round 12, 2026-11-20): sensors that notice touching, tags, triggers, number variables on the World, inputs, and Win and Lose. Enough for "collect every coin, avoid the spikes, reach the goal". The rules are written once, in [requirements/](../../requirements/README.md), each feature marked `· v3`; this file lists them and what in v1 and v2 they touch. Warnings that later go to the Console go to the message pill, since the Console is v5.
+**v3 gives the engine logic without code** (owner, round 12, 2026-11-20): shapes that notice touching, tags, triggers (When, If, Do), number variables on the World, inputs mapped to keys, and a run that can end as won or lost. **The owner approved this list (2026-11-22).** Coins, spikes and goals in the rules are only examples of what a creator builds with these parts; the engine adds none of them. The rules are written once, in [requirements/](../../requirements/README.md), each feature marked `· v3`; this file lists them and what in v1 and v2 they touch. Warnings that later go to the Console go to the message pill, since the Console is v5.
 
 ## The new features
 
