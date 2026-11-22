@@ -1,9 +1,14 @@
-import { EntityRotate } from '../../../commands/index.ts';
+import type { Point } from '../../../../core/geometry/index.ts';
+import type { Entity } from '../../../../core/level/index.ts';
+import { EntityRotate, JointEndMove } from '../../../commands/index.ts';
+import type { JointEndSide } from '../../../commands/index.ts';
 import { READ_ONLY_REASON } from '../../../history/index.ts';
+import { jointIconCentres, jointIconRadiusPx } from '../../../view/index.ts';
 import type { LevelPointerInput } from '../../Tool.ts';
 
 import { SelectionFrame } from '../frame/SelectionFrame.ts';
 import { GradientDragState } from './GradientDragState.ts';
+import { JointEndDragState } from './JointEndDragState.ts';
 import { GradientHandles } from '../gradient/GradientHandles.ts';
 import { EntityResize } from '../resize/EntityResize.ts';
 
@@ -35,6 +40,7 @@ export class IdleState implements SelectState {
         const target = this.host.picker.targetAt(input.levelPosition);
         const { selection } = this.host.context.openLevel;
         const selectable = target.selectable;
+        if (!input.modifiers.shift && this.startsJointEndDrag(input, selectable)) return;
 
         // An unselected entity is selected on the press, so a drag moves it; a selected one narrows on release.
         const selectsNow = !input.modifiers.shift && selectable !== undefined && !selection.has(selectable.id);
@@ -100,6 +106,43 @@ export class IdleState implements SelectState {
         this.host.goTo(new RotateState(this.host, frame, rotate, input.levelPosition));
 
         return true;
+    }
+
+    // A press on an end's icon of a Rope or Spring drags that end, unless the joint is part of a larger
+    // selection, which a drag moves as a whole.
+    private startsJointEndDrag(input: LevelPointerInput, joint: Entity | undefined) {
+        const { openLevel } = this.host.context;
+        const { selection } = openLevel;
+        if (joint === undefined) return false;
+
+        const isInLargerSelection = selection.has(joint.id) && selection.ids.length > 1;
+        const side = isInLargerSelection ? undefined : this.jointEndAt(joint, input.levelPosition);
+        if (side === undefined) return false;
+
+        const move = JointEndMove.of(openLevel, joint, side);
+        if (!(move instanceof JointEndMove)) return false;
+
+        selection.replace([joint.id]);
+        if (!openLevel.liveEdit.begin(move.targets)) return this.refusedAsReadOnly();
+
+        this.host.goTo(new JointEndDragState(this.host, move, input.levelPosition));
+
+        return true;
+    }
+
+    // The end of a Rope or Spring whose icon is under this point, the nearer one when both are.
+    private jointEndAt(joint: Entity, point: Point): JointEndSide | undefined {
+        const { openLevel, view } = this.host.context;
+        const centres = jointIconCentres(joint, openLevel.caches.worldMatrices.matrixOf(joint));
+        const [centreA, centreB] = centres;
+        if (centres.length !== 2 || centreA === undefined || centreB === undefined) return undefined;
+
+        const reach = jointIconRadiusPx(view.zoom) / view.zoom;
+        const distanceA = Math.hypot(point.x - centreA.x, point.y - centreA.y);
+        const distanceB = Math.hypot(point.x - centreB.x, point.y - centreB.y);
+        if (Math.min(distanceA, distanceB) > reach) return undefined;
+
+        return distanceA <= distanceB ? 'a' : 'b';
     }
 
     // The press is used up: a handle in a read-only level starts nothing.

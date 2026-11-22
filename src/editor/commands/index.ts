@@ -78,6 +78,8 @@ export { EntityRotate } from './move/EntityRotate.ts';
 export { geometryBox, ownBox } from './move/ownBox.ts';
 export { SelectionMove } from './move/SelectionMove.ts';
 export { nudgeSelection } from './move/nudgeSelection.ts';
+export { JointEndMove } from './joints/JointEndMove.ts';
+export type { JointEndSide } from './joints/JointEndMove.ts';
 export { placeJoint } from './joints/placeJoint.ts';
 export type { JointPlacement, PlaceJointOutcome } from './joints/placeJoint.ts';
 export { addPoint } from './points/addPoint.ts';

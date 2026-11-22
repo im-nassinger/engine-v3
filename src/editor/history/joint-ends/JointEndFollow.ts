@@ -3,7 +3,7 @@ import type { AnyComponentSchema, JointType } from '../../../core/components/ind
 import { Matrix2D } from '../../../core/geometry/index.ts';
 import type { JointEnds, PathGeometry, Point } from '../../../core/geometry/index.ts';
 import type { Entity, EntityId, Level } from '../../../core/level/index.ts';
-import { jointPathPoints } from '../../../core/physics/index.ts';
+import { drawnLength, jointPathPoints } from '../../../core/physics/index.ts';
 
 import { SetValueChange } from '../changes/index.ts';
 
@@ -18,6 +18,10 @@ type WatchedJoint = {
     readonly startPosition: Point;
     readonly startEnds: JointEnds;
     readonly startPath: PathGeometry;
+    readonly startLength: number;
+    readonly startRestLength: number;
+    // Match drawn distance: the lengths follow the gap between the ends.
+    readonly matchesDrawn: boolean;
     // The joint's own space to level positions when the edit began.
     readonly startJointMatrix: Matrix2D;
     // The joint, the joined entities and all their parents: moving any of them moves an end.
@@ -37,12 +41,14 @@ type FollowedValues = {
     readonly position: Point;
     readonly ends: JointEnds;
     readonly path: PathGeometry;
+    readonly length: number;
+    readonly restLength: number;
 };
 
 // Keeps each Rope's and Spring's ends on the entities it joins, and the joint at its end A (owner,
 // 2026-11-21): when an edit moves, turns or resizes one of them, or a group holding one, the end attached
-// to it moves with it. Moving the joint itself moves its end A only; end B stays where it is. Either way the
-// joint is put back on end A and its path is drawn again from A to B. Taken when an edit begins; the edit
+// to it moves with it. Moving the joint itself carries both ends. Either way the joint is put back on end A
+// and its path is drawn again from A to B; dragging one end alone is JointEndMove's. Taken when an edit begins; the edit
 // then adds the changes it gives, so they undo with it.
 export class JointEndFollow {
     private readonly watched: readonly WatchedJoint[];
@@ -185,6 +191,9 @@ function watchedJointOf(level: Level, entity: Entity): WatchedJoint | undefined 
         startPosition: transform.get('position'),
         startEnds: ends,
         startPath: path.get('path'),
+        startLength: joint.get('length'),
+        startRestLength: joint.get('restLength'),
+        matchesDrawn: joint.get('matchDrawnDistance'),
         startJointMatrix: jointMatrix,
         moverIds,
     };
@@ -265,8 +274,8 @@ function endPositionNow(level: Level, end: WatchedEnd, unmoved: () => Point) {
     return now.apply(onBody);
 }
 
-// Undefined when neither a joined entity nor the joint moved, or a matrix can't be inverted. End A, when
-// its entity didn't move, goes where the joint at its own position puts it; end B stays where it was.
+// Undefined when neither a joined entity nor the joint moved, or a matrix can't be inverted. An end whose
+// entity didn't move goes where the joint, at its own position, puts it.
 function followedValuesOf(
     level: Level,
     joint: Entity,
@@ -287,7 +296,7 @@ function followedValuesOf(
     if (parentInverse === undefined) return undefined;
 
     const endA = endPositionNow(level, watched.endA, () => jointMatrix.apply(watched.startEnds.a));
-    const endB = endPositionNow(level, watched.endB, () => watched.endB.startPosition);
+    const endB = endPositionNow(level, watched.endB, () => jointMatrix.apply(watched.startEnds.b));
 
     const position = parentInverse.apply(endA);
     const placedInverse = jointMatrixAt(transform, parentMatrix, position).invert();
@@ -296,8 +305,10 @@ function followedValuesOf(
     // The joint's origin is end A by where it was just put.
     const ends = { a: { x: 0, y: 0 }, b: placedInverse.apply(endB) };
     const path = jointPathPoints(watched.type, ends.a, ends.b);
+    const length = watched.matchesDrawn ? drawnLength(ends) : watched.startLength;
+    const restLength = watched.matchesDrawn ? drawnLength(ends) : watched.startRestLength;
 
-    return { position, ends, path };
+    return { position, ends, path, length, restLength };
 }
 
 function jointMatrixAt(transform: TransformComponent, parentMatrix: Matrix2D, position: Point) {
@@ -313,7 +324,9 @@ function jointMatrixAt(transform: TransformComponent, parentMatrix: Matrix2D, po
 
 // The ends and path as they began, at this position.
 function startValuesOf(watched: WatchedJoint, position: Point): FollowedValues {
-    return { position, ends: watched.startEnds, path: watched.startPath };
+    const { startEnds: ends, startPath: path, startLength: length, startRestLength: restLength } = watched;
+
+    return { position, ends, path, length, restLength };
 }
 
 function changesTo(joint: Entity, values: FollowedValues) {
@@ -321,6 +334,8 @@ function changesTo(joint: Entity, values: FollowedValues) {
         valueChange(joint, TransformComponent.schema, 'position', values.position),
         valueChange(joint, JointComponent.schema, 'ends', values.ends),
         valueChange(joint, PathComponent.schema, 'path', values.path),
+        valueChange(joint, JointComponent.schema, 'length', values.length),
+        valueChange(joint, JointComponent.schema, 'restLength', values.restLength),
     ];
 
     return changes.filter((change) => change !== undefined);
@@ -331,6 +346,8 @@ function changesFrom(joint: Entity, watched: WatchedJoint) {
         valueChangeSince(joint, TransformComponent.schema, 'position', watched.startPosition),
         valueChangeSince(joint, JointComponent.schema, 'ends', watched.startEnds),
         valueChangeSince(joint, PathComponent.schema, 'path', watched.startPath),
+        valueChangeSince(joint, JointComponent.schema, 'length', watched.startLength),
+        valueChangeSince(joint, JointComponent.schema, 'restLength', watched.startRestLength),
     ];
 
     return changes.filter((change) => change !== undefined);

@@ -154,6 +154,7 @@ The Select tool holds one **drag state** at a time (the State pattern):
 | `BoxSelectState` | Pressing empty space and moving | Selects everything the box touches |
 | `PointEditState` | Double-clicking a polygon, line or path (not a Rope's or Spring's) | Esc. Each point drag, add or delete is one step, see [drawing-and-points.md](drawing-and-points.md#point-editing) |
 | `HandleDragState` (v2) | Pressing a selected path point's curve handle | One step: `Move a handle of Path 1`, see [drawing-and-points.md](drawing-and-points.md#point-editing-on-paths-v2) |
+| `JointEndDragState` | Pressing an end's icon of a Rope or Spring, unless it is part of a larger selection | One step: `Move an end of Rope 1`, through `JointEndMove` in `commands/joints/`. The other end stays; the joint is put on end A, its path drawn again, and with Match drawn distance its lengths follow the gap. The end snaps as a point, Ctrl turns that off, Esc puts it back (owner, 2026-11-21) |
 | `GradientDragState` (v2) | Pressing a gradient handle, before anything else | One step: `Change the fill of Rectangle 1`, see [gradient handles](#gradient-handles-v2) |
 
 - **`IdleState`, `PressState` and `BoxSelectState` as built** (standing yes, 2026-11-15):

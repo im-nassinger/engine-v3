@@ -4,7 +4,7 @@ import { JointComponent } from '../../../core/components/index.ts';
 import type { JointType } from '../../../core/components/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
-import { JOINT_ICON_RADIUS, jointIconRadiusPx } from '../../../editor/view/index.ts';
+import { JOINT_ICON_RADIUS, jointIconCentres, jointIconRadiusPx } from '../../../editor/view/index.ts';
 import type { OverlayScene } from './OverlayScene.ts';
 
 // The design's joint icon: a white circle with a 1.5 px edge. Every size here is the one at 100%; the
@@ -51,7 +51,7 @@ function isOffScreen(position: Point, radiusPx: number, scene: OverlayScene) {
     );
 }
 
-// One icon per joint at its position, growing and shrinking with the zoom as the level does: Hinge has a dot in the middle, Rope a short
+// One icon per Hinge at its position and one on each end of a Rope or Spring, growing and shrinking with the zoom as the level does: Hinge has a dot in the middle, Rope a short
 // upright line, Spring a small zigzag. Editor only, never drawn in play; hidden by its View menu switch and
 // with the joint's eye.
 export class JointIconOverlay {
@@ -81,12 +81,14 @@ export class JointIconOverlay {
             if (joint === undefined || isHiddenWithParents(entity)) continue;
 
             const matrix = caches.worldMatrices.matrixOf(entity);
-            const screenPosition = scene.view.levelToScreen({ x: matrix.tx, y: matrix.ty });
-            if (isOffScreen(screenPosition, radiusPx, scene)) continue;
-
             const type = joint.get('type');
-            this.drawIcon(type, screenPosition, scale);
-            shown.push({ joint: entity, type, screenPosition });
+            for (const centre of jointIconCentres(entity, matrix)) {
+                const screenPosition = scene.view.levelToScreen(centre);
+                if (isOffScreen(screenPosition, radiusPx, scene)) continue;
+
+                this.drawIcon(type, screenPosition, scale);
+                shown.push({ joint: entity, type, screenPosition });
+            }
         }
 
         this.shown = shown;

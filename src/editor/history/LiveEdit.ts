@@ -1,3 +1,4 @@
+import { JointComponent, TransformComponent } from '../../core/components/index.ts';
 import type { AnyComponentSchema, AnyValueEntry } from '../../core/components/index.ts';
 import { VersionCounter } from '../../core/events/index.ts';
 import type { ParseOutcome } from '../../core/fields/index.ts';
@@ -125,9 +126,15 @@ export class LiveEdit {
         return changes;
     }
 
+    // Only a TransformComponent's change moves an entity, so only one moves an end. A joint whose ends
+    // the drag writes itself, dragging one of them, is left as written.
     private followJointEnds(target: ValueTarget) {
         const jointEnds = this.jointEnds;
         if (jointEnds === undefined || !jointEnds.moves(target.entityId)) return;
+        if (target.schema !== TransformComponent.schema) return;
+
+        const endsTarget = { entityId: target.entityId, schema: JointComponent.schema, key: 'ends' };
+        if (this.started.has(targetKey(endsTarget))) return;
 
         for (const change of jointEnds.changesFollowing(this.level, target.entityId)) {
             change.apply(this.level);

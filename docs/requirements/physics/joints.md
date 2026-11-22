@@ -14,7 +14,7 @@ All lengths are pixels and all angles are degrees. Positive angles and speeds ar
 - It can hold children, triggers and scripts, like any entity. *Why: one rule for every entity. Treating joints as special was left over from an earlier design.*
 - The JointComponent names its two entities in fields **A** and **B**. Clicking a field selects that entity. An empty B pins A to the background.
 - Joints connect bodies. A sensor or a line can be an end.
-- Joints show an editor-only icon so they can be selected, one shape per type. **The icon grows and shrinks with the zoom**, like the level, but never gets too small to see or click. "Joint icons" in the View menu hides them. *Why: the owner found an icon of one fixed size on screen looked wrong beside the zoomed level (owner: 2026-11-21, replacing "always the same size on screen").*
+- Joints show an editor-only icon so they can be selected, one shape per type: a Hinge one at its point, a Rope or Spring one on each end. **The icon grows and shrinks with the zoom**, like the level, but never gets too small to see or click. "Joint icons" in the View menu hides them. *Why: the owner found an icon of one fixed size on screen looked wrong beside the zoomed level (owner: 2026-11-21, replacing "always the same size on screen").*
 - Hovering or selecting a joint shows thin lines to its two entities.
 - **Joints have no special drawing in play.** An unstyled joint is invisible, like any entity.
 - A hidden joint still works.
@@ -151,7 +151,7 @@ Source: scope JO2; round 7: 06 2.6; old: JT-42 to JT-46
 
 ### Re-attach an end, change the type · Later
 
-- After placing a joint you can drag an end to attach it elsewhere, change its two entities in fields A and B, or change its type.
+- After placing a joint you can drag an end to attach it to another entity (moving an end on the same entity is v1, see [Only what is selected moves or copies](#only-what-is-selected-moves-or-copies--v1)), change its two entities in fields A and B, or change its type.
 - Settings both types share are kept. Settings that don't apply to the new type stay stored and come back when you switch back.
 - In v1 you delete the joint and place it again.
 
@@ -171,7 +171,7 @@ Source: scope JO3; round 6: JB1; round 7: 06 2.5; decisions: D47; old: JT-39, JT
 
 - **A joint moves like any entity: only when it is selected.** Moving a Hinge's connected entity alone leaves the Hinge where it is, so it attaches at a different spot. To move both, select both.
 - **A Rope's or Spring's ends stay on the entities they join** (owner: 2026-11-21, replacing "moving a connected entity alone leaves the joint where it is" for these two). Moving, turning or resizing one of them, or a group holding one, carries the end on it along, and its path is drawn again between its ends, all in the same undo step. *Why: the owner found a Rope's path left behind when a body moved, which the game would never show, and agreed the ends should follow their bodies.*
-- **A Rope or Spring sits at its end A** (owner: 2026-11-21): its position and its icon are where its path starts. Moving the joint moves end A only, so it attaches at a different spot; end B stays where it is, and the path is drawn again from A to B. *Why: the owner found the path carried off the bodies when the joint moved, and wanted the icon where the joint starts.*
+- **A Rope or Spring shows an icon on each of its two ends, and either can be dragged** (owner: 2026-11-21). Dragging an end's icon moves that end alone to a new spot, still on the same entity, and the path is drawn again between the ends, as one undo step. The joint's position is its end A. Moving the whole joint, by arrow keys, by typing its position or by dragging it with other selected entities, carries both ends. *Why: the owner found a Rope or Spring couldn't be changed after placing it, and its path carried off the bodies when it moved.*
 - During play the physics engine moves the joint.
 - A joint inside a group moves with the group.
 - **Copying copies a joint only when it is selected.** A copied joint connects the copies of its entities if they were copied too. Otherwise it connects the originals in the same level, or shows them as missing in another level. `.entity` files follow the same rule.

@@ -10,7 +10,7 @@ import type { DerivedCaches } from '../../../core/derived/index.ts';
 import type { Matrix2D, Point } from '../../../core/geometry/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import type { ViewSettings } from '../../view/index.ts';
-import { jointIconRadiusPx } from '../../view/index.ts';
+import { jointIconCentres, jointIconRadiusPx } from '../../view/index.ts';
 import type { HitArea } from './HitArea.ts';
 import { JointIconHitArea } from './JointIconHitArea.ts';
 import { LocalOutlines } from './LocalOutlines.ts';
@@ -63,12 +63,12 @@ function jointArea(entity: Entity, context: HitAreaContext) {
     if (!context.settings.isOn('jointIcons')) return undefined;
 
     const matrix = context.caches.worldMatrices.matrixOf(entity);
-    const centre = { x: matrix.tx, y: matrix.ty };
+    const centres = jointIconCentres(entity, matrix);
     const zoom = 1 / context.levelPerScreenPx;
     const radiusPx = Math.max(context.tolerancePx, jointIconRadiusPx(zoom));
     const radius = radiusPx * context.levelPerScreenPx;
 
-    return new JointIconHitArea(centre, radius);
+    return new JointIconHitArea(centres, radius);
 }
 
 // The camera never turns, so its frame is its bounds. Only the frame's edge is hit, never the inside.
@@ -108,7 +108,7 @@ function shapeArea(entity: Entity, shape: ShapeComponent, context: HitAreaContex
 }
 
 // The requirement's hit area table, picked in the order an entity picks what it draws. A joint is hit
-// only by its icon, even a Rope with its path. undefined when nothing of it can be hit, like a group.
+// only by its icons, even a Rope with its path. undefined when nothing of it can be hit, like a group.
 export class HitAreas {
     static of(entity: Entity, context: HitAreaContext): HitArea | undefined {
         if (entity.hasComponent(JointComponent)) return jointArea(entity, context);

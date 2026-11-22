@@ -2,27 +2,27 @@ import type { Bounds, Point } from '../../../core/geometry/index.ts';
 import type { HitArea } from './HitArea.ts';
 import { PlanarGeometry } from './PlanarGeometry.ts';
 
-// A joint's round icon, the same size on screen at any zoom, so its radius here is in level pixels.
+// A joint's round icons, one for a Hinge and one on each end of a Rope or Spring, the same size on screen
+// at any zoom, so their radius here is in level pixels.
 export class JointIconHitArea implements HitArea {
-    private readonly centre: Point;
+    private readonly centres: readonly Point[];
     private readonly radius: number;
 
-    constructor(centre: Point, radius: number) {
-        this.centre = centre;
+    constructor(centres: readonly Point[], radius: number) {
+        this.centres = centres;
         this.radius = radius;
     }
 
     touchesPoint(point: Point) {
-        const offsetX = point.x - this.centre.x;
-        const offsetY = point.y - this.centre.y;
-        const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+        return this.centres.some((centre) => {
+            const offsetX = point.x - centre.x;
+            const offsetY = point.y - centre.y;
 
-        return distance <= this.radius;
+            return Math.sqrt(offsetX * offsetX + offsetY * offsetY) <= this.radius;
+        });
     }
 
     touchesBox(box: Bounds) {
-        const distance = PlanarGeometry.distanceToBox(this.centre, box);
-
-        return distance <= this.radius;
+        return this.centres.some((centre) => PlanarGeometry.distanceToBox(centre, box) <= this.radius);
     }
 }

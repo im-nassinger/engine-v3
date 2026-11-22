@@ -5,7 +5,7 @@ import { Level } from '../../../core/level/index.ts';
 import type { EntityId } from '../../../core/level/index.ts';
 import { LevelWriter } from '../../../core/level-data/index.ts';
 import type { LevelReader } from '../../../core/level-data/index.ts';
-import { jointPathPoints } from '../../../core/physics/index.ts';
+import { drawnLength, jointPathPoints } from '../../../core/physics/index.ts';
 import { AddEntitiesChange } from '../../history/index.ts';
 import type { OpenLevel } from '../../session/index.ts';
 import { EntityNamer } from '../shared/EntityNamer.ts';
@@ -19,10 +19,6 @@ const TYPE_WORDS: Readonly<Record<JointType, string>> = {
     rope: 'Rope',
     spring: 'Spring',
 };
-
-// Length and Rest length's own range in the JointComponent.
-const SHORTEST_LENGTH = 1;
-const LONGEST_LENGTH = 100_000;
 
 const ORIGIN: Point = { x: 0, y: 0 };
 
@@ -104,14 +100,4 @@ function jointComponents(placement: JointPlacement, name: string, toGroup: (poin
 
 function transformAt(position: Point) {
     return new TransformComponent({ position, rotation: 0, scale: { x: 1, y: 1 }, skew: 0 });
-}
-
-// The gap between the ends, kept inside the field's range so a typed value starts from it when Match drawn
-// distance is turned off. Not Math.hypot, which IEEE 754 doesn't define exactly.
-function drawnLength(ends: JointEnds) {
-    const x = ends.b.x - ends.a.x;
-    const y = ends.b.y - ends.a.y;
-    const gap = Math.sqrt(x * x + y * y);
-
-    return Math.min(LONGEST_LENGTH, Math.max(SHORTEST_LENGTH, gap));
 }

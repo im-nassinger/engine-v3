@@ -458,15 +458,18 @@ describe('PixiLevelView overlays', () => {
         return entity;
     }
 
-    test('a joint icon sits at its position at any zoom, one per type', async () => {
+    test('a Hinge has one icon at its position at any zoom, a Rope and a Spring one on each end', async () => {
         const { level, view, frames, overlays } = await showNewLevel();
         addJoint(level, 10, 20, 'hinge');
-        addJoint(level, -40, 0, 'rope');
+        const rope = addJoint(level, -40, 0, 'rope');
+        rope.requireComponent(JointComponent).set('ends', { a: { x: 0, y: 0 }, b: { x: 30, y: 0 } });
         addJoint(level, 0, -30, 'spring');
         frames.runFrame();
 
         const types = overlays.jointIcons.shownIcons.map((icon) => icon.type);
-        expect(types.sort()).toEqual(['hinge', 'rope', 'spring']);
+        expect(types.sort()).toEqual(['hinge', 'rope', 'rope', 'spring', 'spring']);
+        const ropeIcons = overlays.jointIcons.shownIcons.filter((icon) => icon.type === 'rope');
+        expect(ropeIcons[1]!.screenPosition.x - ropeIcons[0]!.screenPosition.x).toBeCloseTo(30);
         const hinge = overlays.jointIcons.shownIcons.find((icon) => icon.type === 'hinge');
         expect(hinge?.screenPosition).toEqual({ x: 160, y: 120 });
         view.zoomAboutMiddle(4);

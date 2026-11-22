@@ -244,7 +244,7 @@ describe('placeJoint', () => {
         expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 0 }, b: { x: 400, y: 0 } });
     });
 
-    test('moving the Rope alone moves its end A, keeps end B and redraws its path', () => {
+    test('moving the Rope alone carries both its ends, keeping it on end A', () => {
         const built = buildSession();
         const { session } = built;
         const rope = place(built, ropeBetween(built, { x: 200, y: 0 }, { x: 400, y: 0 }));
@@ -253,31 +253,7 @@ describe('placeJoint', () => {
         nudgeSelection(session.openLevel, { x: 0, y: 30 });
 
         expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 200, y: 30 });
-        expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 30 }, b: { x: 400, y: 0 } });
-        const path = rope.requireComponent(PathComponent).get('path');
-        expect(path).toEqual(jointPathPoints('rope', { x: 0, y: 0 }, { x: 200, y: -30 }));
-
-        session.openLevel.editor.undo();
-        expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 0 }, b: { x: 400, y: 0 } });
-    });
-
-    test('dragging the Rope moves end A as it goes, and Esc puts it back', () => {
-        const built = buildSession();
-        const { session } = built;
-        const rope = place(built, ropeBetween(built, { x: 200, y: 0 }, { x: 400, y: 0 }));
-        session.openLevel.selection.replace([rope.id]);
-        const move = SelectionMove.ofSelection(session.openLevel);
-        if (!(move instanceof SelectionMove)) throw new Error('Nothing to move.');
-        session.openLevel.liveEdit.begin(move.targets);
-
-        move.moveBy({ x: 50, y: 40 });
-        expect(levelEnds(built, rope)).toEqual({ a: { x: 250, y: 40 }, b: { x: 400, y: 0 } });
-        move.moveBy({ x: -20, y: 10 });
-        expect(levelEnds(built, rope)).toEqual({ a: { x: 180, y: 10 }, b: { x: 400, y: 0 } });
-
-        session.openLevel.liveEdit.cancel();
-        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 200, y: 0 });
-        expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 0 }, b: { x: 400, y: 0 } });
+        expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 30 }, b: { x: 400, y: 30 } });
     });
 });
 

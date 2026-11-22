@@ -25,7 +25,7 @@ What the editor draws over the level: the grid, the dark outside, the bounds' an
 | Part | Look |
 |---|---|
 | Camera frame | 1.5 px, `#141C28` at 70% on a light fill, `#ECF0F6` at 55% on a dark one, with its label written like the bounds': **Camera** 1920 × 1080. The label is coloured for what it starts on, so above the level bounds it is the light one (standing yes, 2026-11-18) |
-| Joint icon | A 14 px white circle with a 1.5 px `#1D2430` edge and a dot in its middle at 100%, all of it scaled with the zoom, never under 8 px across (standing yes, 2026-11-21) |
+| Joint icon | A 14 px white circle with a 1.5 px `#1D2430` edge and a dot in its middle at 100%, all of it scaled with the zoom, never under 8 px across (standing yes, 2026-11-21). A Rope or Spring has one on each end (owner, 2026-11-21) |
 | Drag readout | A small `--tooltip` box near the mouse, such as "175 × 85" |
 
 All of them are hidden during test play unless a View menu switch shows them.
