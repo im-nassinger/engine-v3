@@ -10,6 +10,7 @@ One folder per version after v1, each planned in four files the way the `orchest
 |---|---|---|
 | [v2/](v2/requirements.md) | Curves and gradients: the Bézier pen, the Pencil, gradients | Done (owner, 2026-11-22): built, tried by the owner, its [fixes](v2/fixes.md) built and tested |
 | [v3/](v3/requirements.md) | A first game without code | Done (owner, 2026-11-22): built from its [tasks](v3/tasks.md), tried by the owner, two [fixes](v3/fixes.md) built |
+| [v4/](v4/requirements.md) | The rest of the triggers, string and boolean variables on any entity, the shortcut list | Planned (2026-11-22) and being built by the orchestrator from its [tasks](v4/tasks.md) |
 
 Only the next version is planned. v4 to v7 stay one line each in [scope.md](../scope.md) until their turn.
 

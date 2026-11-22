@@ -54,6 +54,10 @@ Source: scope TR2; round 1: D63; round 4: T2; round 8: 09 2.2, 09 2.6; round 9: 
 
 - **Two solid things hitting counts as "collision"**, while a sensor being touched counts as "touched". Collision needs what touching needs.
 - **A variable changes** has an optional condition, such as "becomes 10 or more". *Why: it replaces a builtin script that watched a variable. It is one more event, not a new concept.*
+- **Collision fires once for each entity this hits**, like touched: an entity built from several shapes hitting with two of them fires once, and it fires again only after the two have stopped touching. A trigger on a group hears hits on any part inside it, and parts of the group hitting each other fire nothing. *Why: the same counting as touching, so "hits" and "touches" never disagree on what one hit is (standing yes, 2026-11-22).*
+- **Destroyed** fires when a Destroy action takes the entity, or a group above it. Its triggers run in the same tick, before the entity disappears at the end of it, so they can still read and change it. Every entity in a destroyed group hears its own Destroyed. Restart and Stop never fire it, and nor does falling out of the level bounds until "left the level" comes (Later). *Why: Destroyed is the moment to give points or open a door; Restart is not a loss of the entity (standing yes, 2026-11-22).*
+- **A variable changes** names one variable: one of the level's (on the World), or one of this entity's own. **The level's variables are heard by triggers on any entity**: a door's trigger can say "When coins becomes 10 or more". **An entity's own variable is heard only by that entity's triggers.** *Why: the level's variables are shared by the whole level, so anyone may watch them; an enemy's `health` is its own business, which keeps triggers local and easy to follow (standing yes, 2026-11-22: Claude's pick, asked of the owner, who went ahead without answering).*
+- **"Becomes" fires only when the condition turns true**, not on every change while it stays true: coins going 9, 10, 11 fires "becomes 10 or more" once, at 10. Without a condition, it fires on every change of value. Setting a variable to the value it already has is no change. *Why: "becomes" is a moment, so a door opens once (standing yes, 2026-11-22).*
 - **Custom event:** an event you name yourself, see below.
 - *Why this set: with v3's, enough for coins, doors, buttons, timers and hazards. Why v4: none of them is needed to win or lose a first game (owner: 2026-11-20).*
 
@@ -99,6 +103,8 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27; owner: 2026-11-13
 ### Checking a component value · v4
 
 - **A component value compared with a number:** "If this BodyComponent speed is more than 200".
+- It offers every number value of the target's components, and each part of a vector by itself (position x, position y), plus what a body is doing right now: its **speed** and its **velocity** x and y, in px/s. *Why: speed is not a value anyone types, but "fast enough to break" is the example that asked for this check (standing yes, 2026-11-22).*
+- With a tag as the target, the check is true when any tagged entity passes it, as the tag check is. A target without the value makes the check false.
 - *Why v4: v3's game needs only tags and its count (owner: 2026-11-20).*
 
 Source: scope TR6; owner: 2026-11-20
@@ -133,6 +139,9 @@ Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b, 09 2.9; round 8:
 | Wait | Delays the actions after it |
 
 - **Wait** is one action in the list. A trigger that fires again during a wait gets its own run, so two enemies in a "wait, then destroy other" trigger both die. Destroying the entity, or switching the trigger off, cancels what is still waiting. *Why a list with Wait: without a list, "add a coin, play a sound, destroy this" needs three triggers with the same When.*
+- **A wait is counted in whole ticks**, like timers, so it slows and stops with the game speed. Wait 0 continues in the next tick.
+- **A waiting run keeps its `this` and `other`.** If `other` is destroyed during the wait, the actions on it are skipped and the rest still run.
+- **Fire custom event** picks a target like any action, a name, and an optional number. Each target hears it in the same tick, with `other` set to the entity whose trigger fired it, so it counts towards the 32 steps. A trigger reads the number nowhere in v4; scripts (v5) read it. *Why: carrying it now means a level saved in v4 doesn't change when scripts come (standing yes, 2026-11-22).*
 - *Why v4: they come with custom events and timed doors (owner: 2026-11-20).*
 
 Source: scope TR7; round 10: WT1; round 11: WT2; owner: 2026-11-20
@@ -171,6 +180,7 @@ Source: scope TR8; round 5: T7; old: TR-55 to TR-57; owner: 2026-11-13
 - A **custom event** is an event you name yourself, such as `open`. A trigger or script fires it on an entity, and that entity's triggers and scripts react. It can carry one number.
 - *The problem it solves: making something happen on another entity without knowing how that entity works. A button fires `open` on a door, and the door decides what opening means. Swap the door for a drawbridge and the button doesn't change.*
 - *Why "custom event" and not "message": "event" is a word already in use, so there is no second concept.*
+- **A custom event's name follows the rule for tags**: one word of lowercase letters, digits and `_`. The When offers the names already used in the level, as tags are offered.
 - A custom event can't reuse the name of a builtin event.
 - A custom event nobody listens to is ignored without an error.
 - A trigger calls a script by firing a custom event that the script listens for.

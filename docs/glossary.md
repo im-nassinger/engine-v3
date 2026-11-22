@@ -35,6 +35,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Card | One component as the Entity inspector shows it: a title and its fields. The title drops "Component": the TransformComponent's card reads `Transform` (owner: 2026-11-17). |
 | ☰ | The square island at the top left that opens the main menu: Play, then File, Edit, Arrange, View and Help. Every command is reached through it. |
 | Tool column | The island under ☰ holding the tools, one button each. |
+| Shortcut list | The sheet `?` opens: every shortcut by area, searchable, staying open while you work. |
 | Kinds menu | The menu that stands open beside the Shape tool while it is active, to pick Rectangle, Circle or Polygon; the Joint tool's types (Hinge, Rope, Spring) have the same menu. |
 | Minimap | The island at the bottom right showing the whole level bounds small, with a rectangle for what the level view shows. Show-only in v1. |
 | Debug box | The island under the minimap showing the mouse position, the grid size and the zoom: `X: … Y: … GRID: … ZOOM: …`. |
@@ -132,12 +133,19 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Trigger | No-code logic on an entity, in three parts: When (one event), If (optional checks), Do (actions in order). An entity's TriggerComponent holds a list of them. |
 | Event | Something the game reports to triggers and scripts, such as touching, a key, a timer or level start. Triggers and scripts share one list of event names. |
 | Custom event | An event you name yourself, such as `open`. A trigger or script fires it on an entity, and that entity's triggers and scripts react. It can carry one number. |
+| Fire custom event | The action that fires a custom event on its target, with an optional number. |
 | Action | One step in a trigger's Do list, such as Change value or Spawn. Only ever used for triggers. |
 | When, If, Do | The three parts of a trigger, each a section of its card: **When** names its one event, **If** its checks, **Do** its actions, run top to bottom. |
 | Check | One condition in a trigger's If, such as "`other` has the tag `coin`" or "`coins` is at least 10". The actions run only when every check holds. |
 | Repeat | A trigger's setting for how often it may fire: every time (the default), once per run, or at most once every N seconds. |
 | Touched, no longer touched | The events for something starting or stopping touching an entity's sensor or surface, once per touching entity however many shapes it has. `other` is the entity that touched or left. |
+| Collision (event) | The event for this entity starting to hit a solid thing, once per entity hit however many shapes it has: "When this hits something". `other` is the entity hit. Not the same as the collision grid, which decides what hits what. |
+| Destroyed | The event for a Destroy action taking this entity or a group above it. Its triggers run before the entity disappears at the end of the tick. |
+| A variable changes | The event for a variable getting a new value, with an optional condition: "When coins becomes 10 or more" fires once, when the condition turns true. |
 | Change value | The action that sets, adds to or subtracts from a value on its target: a variable, a component value allowed to change during play, a tag, or a trigger's on or off. Teleporting is Change value on the position. |
+| Flip | Change value on a boolean variable that turns true into false and false into true. |
+| Wait | The action that delays the actions after it in a Do list, in whole ticks. |
+| Waiting run | What is left of a trigger's Do list while a Wait counts down. Each firing is its own; a trigger holds at most 32. |
 | Push | The action that gives a body a kick, ignoring its mass: a fixed vector in px/s, or a strength away from or towards `this`. |
 | Unset part | A part of a trigger not chosen yet, shown in yellow on its card. A trigger with an unset part doesn't run. |
 | Chain limit | Triggers setting off triggers stop after 32 rounds in one tick, with a play warning. The game keeps running. |

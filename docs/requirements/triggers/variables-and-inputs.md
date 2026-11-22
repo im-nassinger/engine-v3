@@ -22,7 +22,9 @@ Source: scope VA1; round 2: O2; round 5: T5; owner: 2026-11-13; owner: 2026-11-2
 - **string:** Change value only sets it. An If only checks "is" or "is not".
 - **boolean:** Change value sets it or **flips** it: true becomes false, false becomes true. An If only checks "is" or "is not", such as "If lamp_on is true". Example: a light switch is one trigger, "When something starts touching this, Flip lamp_on". *Why: with only Set, a switch needs two triggers that both fire on the same touch and undo each other (owner: 2026-11-14).*
 - *Why: adding 1 to a string or asking whether a boolean is "10 or more" means nothing.*
-- A trigger can react to a variable with the event "a variable changes" (v4).
+- **Any entity's VariablesComponent is added from its Add Component menu.** Each variable row has a type, Number, String or Boolean, picked from a small menu; changing it puts the value back to `0`, `""` or `false`.
+- **A trigger always offers the level's variables, beside the target's own.** "If coins is 10 or more" needs no target picked: `coins` is offered under "the level's" in the variable menu, wherever the trigger is. An entity's own variables are offered under its target, such as "this health". *Why: coins and score are the usual case, so they take one click (standing yes, 2026-11-22: Claude's pick, asked of the owner, who went ahead without answering).*
+- A trigger can react to a variable with the event "a variable changes", see [triggers](triggers.md#more-events--v4).
 - Restarting the level puts every entity's variables back to their starting values. A spawned entity's variables start from its `.entity` file.
 - *Why v4: switches and an enemy's own hits need them (owner: 2026-11-20).*
 
