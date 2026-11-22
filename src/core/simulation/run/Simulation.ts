@@ -40,9 +40,19 @@ export class Simulation {
         return this.run.inputs.state;
     }
 
-    // The last tick's trigger firings that ran, in the order they ran.
+    // The last tick's trigger firings whose actions ran, in the order they ran.
     get firings() {
         return this.run.triggers.fired;
+    }
+
+    // How the run ended, by the first Win, Lose or Restart action; null while it goes on.
+    get end() {
+        return this.run.ending.end;
+    }
+
+    // The run's warnings so far, each once.
+    get warnings() {
+        return this.run.warnings.all;
     }
 
     runTick(inputs: TickInputs) {

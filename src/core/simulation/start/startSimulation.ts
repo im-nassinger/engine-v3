@@ -14,9 +14,11 @@ import { LevelBoundsPhase } from '../phases/LevelBoundsPhase.ts';
 import { PhysicsPhase } from '../phases/PhysicsPhase.ts';
 import { TriggerPhase } from '../phases/TriggerPhase.ts';
 import { RemovalMarks } from '../removal/RemovalMarks.ts';
+import { PlayWarnings } from '../report/PlayWarnings.ts';
 import { ReportCollector } from '../report/ReportCollector.ts';
 import { PlayTriggers } from '../triggers/PlayTriggers.ts';
 
+import { RunEnding } from '../run/RunEnd.ts';
 import type { RunStart } from '../run/RunStart.ts';
 import { Simulation } from '../run/Simulation.ts';
 
@@ -34,9 +36,11 @@ export function startSimulation(levelData: LevelData, engine: PhysicsEngine, sta
     const cameraStart = startingCameraPosition(cameraSettings, playCopy.level);
     const camera = new CameraState(cameraStart);
     const inputs = new PlayInputs(playCopy.level);
-    const triggers = new PlayTriggers(playCopy.level);
+    const triggers = new PlayTriggers(playCopy.level, playCopy.registry);
+    const ending = new RunEnding();
+    const warnings = new PlayWarnings();
     const report = new ReportCollector();
-    const run = { ...playCopy, removals, camera, inputs, triggers, report };
+    const run = { ...playCopy, removals, camera, inputs, triggers, ending, warnings, report };
     const phases = [
         new InputPhase(),
         new PhysicsPhase(),

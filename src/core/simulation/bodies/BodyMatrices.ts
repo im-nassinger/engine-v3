@@ -66,6 +66,11 @@ export class BodyMatrices implements BodyMatrixSource {
         return body;
     }
 
+    // The body built for the entity itself, or undefined when it isn't one in this run.
+    bodyOf(entity: Entity) {
+        return this.bodiesByEntity.get(entity);
+    }
+
     entityOf(id: EntityId) {
         return this.entitiesById.get(id);
     }

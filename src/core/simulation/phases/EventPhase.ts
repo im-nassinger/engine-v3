@@ -1,7 +1,6 @@
 import type { TickContext, TickPhase } from '../run/TickPhase.ts';
 import type { TouchChange } from '../triggers/TouchLedger.ts';
 import type { TriggerFiring } from '../triggers/TriggerFiring.ts';
-import { triggerOf } from '../triggers/TriggerIndex.ts';
 import type { IndexedTrigger } from '../triggers/TriggerIndex.ts';
 import type { PlayTriggers } from '../triggers/PlayTriggers.ts';
 
@@ -79,12 +78,9 @@ class FiringList {
     }
 
     add(indexed: IndexedTrigger, other: TriggerFiring['other']) {
-        const trigger = triggerOf(indexed);
-        if (trigger === undefined || !trigger.on) return;
+        const firing = this.triggers.hear(indexed, other, this.tick);
+        if (firing === undefined) return;
 
-        const allowed = this.triggers.repeats.allows(indexed.owner, indexed.triggerId, trigger.repeat, this.tick);
-        if (!allowed) return;
-
-        this.firings.push({ owner: indexed.owner, triggerId: indexed.triggerId, when: indexed.when, other });
+        this.firings.push(firing);
     }
 }

@@ -1,8 +1,8 @@
 import type { Entity } from '../../level/index.ts';
 
-// Why an entity leaves the run: fully outside an open edge of the level bounds, or a body past the hard
-// limit, 100,000 px from the origin on either axis.
-export type RemovalCause = 'openEdge' | 'pastHardLimit';
+// Why an entity leaves the run: fully outside an open edge of the level bounds, a body past the hard
+// limit, 100,000 px from the origin on either axis, or a Destroy action.
+export type RemovalCause = 'openEdge' | 'pastHardLimit' | 'destroyed';
 
 // The entities a tick's phases marked for removal, in the order they were marked, which EndOfTickPhase
 // removes. An entity marked twice keeps its first cause.

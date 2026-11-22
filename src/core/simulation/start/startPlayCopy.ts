@@ -4,6 +4,7 @@ import { FormatUpgrader, LevelReader, V1_LEVEL_LIMITS } from '../../level-data/i
 import type { LevelData, ReadOutcome } from '../../level-data/index.ts';
 import type { Level } from '../../level/index.ts';
 import { BodyPoses, PhysicsSceneBuilder } from '../../physics/index.ts';
+import type { ComponentRegistry } from '../../components/index.ts';
 import type { PhysicsEngine, PhysicsScene } from '../../physics/index.ts';
 
 import { BodyMatrices } from '../bodies/BodyMatrices.ts';
@@ -12,6 +13,8 @@ import { PlayJoints } from '../joints/PlayJoints.ts';
 // A level read for play, with each body split into its pose and rest, and each joint following its A's body.
 export type PlayCopy = {
     readonly level: Level;
+    // The components the level was read with, which Change value reads the schemas of.
+    readonly registry: ComponentRegistry;
     readonly caches: DerivedCaches;
     readonly scene: PhysicsScene;
     readonly poses: BodyPoses;
@@ -22,7 +25,8 @@ export type PlayCopy = {
 // Reads the level data and builds its physics scene. The worker's play copy and the page's PlayMirror both
 // come from here, so the mirror's matrices are the play copy's. The engine must be loaded already.
 export function startPlayCopy(levelData: LevelData, engine: PhysicsEngine): ReadOutcome<PlayCopy> {
-    const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+    const registry = createV1Registry();
+    const reader = new LevelReader(registry, V1_LEVEL_LIMITS, FormatUpgrader.createV1());
     const read = reader.read(levelData);
     if (!read.ok) return read;
 
@@ -51,7 +55,7 @@ export function startPlayCopy(levelData: LevelData, engine: PhysicsEngine): Read
         caches.bodyMoved(joint.entity);
     }
 
-    const playCopy = { level, caches, scene, poses, bodyMatrices, joints };
+    const playCopy = { level, registry, caches, scene, poses, bodyMatrices, joints };
 
     return { ok: true, value: playCopy };
 }

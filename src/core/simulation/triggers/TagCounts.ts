@@ -34,6 +34,17 @@ export class TagCounts {
         }
     }
 
+    // A tag Change value took away, whose running out is heard in the same tick rather than the next:
+    // true when that was its last entity.
+    tagTakenAway(tag: string) {
+        const count = this.count(tag);
+        if (count === 0) return false;
+
+        this.counts.set(tag, count - 1);
+
+        return count === 1;
+    }
+
     // The removed entities' tags leave with them.
     forget(removed: Iterable<Entity>) {
         for (const entity of removed) {

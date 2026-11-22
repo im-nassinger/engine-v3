@@ -39,7 +39,7 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 - [x] 11. Events
   - Read: versions/v3/architecture.md#the-tick-from-v3, versions/v3/architecture.md#performance, requirements/triggers/triggers.md#events--v3, requirements/triggers/triggers.md#order-and-limits--v3, requirements/physics/bodies.md#sensors-and-touching--v3
   - Done when: `EventPhase`, `TouchLedger`, `TriggerTimers` and `TriggerIndex` list each tick's events in the architecture's order: level start, keys and inputs, timers, touched and no longer touched (once per touching entity, groups hearing their parts, two sensors filtered), and "no entity with this tag is left"; Repeat drops firings that come too soon; Node tests with `runHeadless` cover each event
-- [ ] 12. Checks and actions
+- [x] 12. Checks and actions
   - Read: versions/v3/architecture.md#actions, requirements/triggers/triggers.md#if-checks--v3, requirements/triggers/triggers.md#actions--v3, requirements/triggers/triggers.md#order-and-limits--v3
   - Done when: `TriggerPhase`, `ActionRunner` and `PlayValueWriter` run checks and actions on their targets in Entities viewer order: Change value (variables, any value `changeableValues` offers, tags, a trigger's on/off, physics told when it owns the value), Destroy at the end of the tick, Push ignoring mass, Win, Lose and Restart recorded with the first one winning; triggers with problems don't run, a missing target is skipped; the chain limit of 32 with one warning; Node tests pass
 - [ ] 13. The run's end, changed values and warnings on the page

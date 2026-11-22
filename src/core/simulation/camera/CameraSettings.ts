@@ -1,6 +1,5 @@
 import { CameraComponent } from '../../components/index.ts';
 import type { DerivedCaches } from '../../derived/index.ts';
-import type { EntityId } from '../../fields/index.ts';
 import type { Point } from '../../geometry/index.ts';
 import type { Level } from '../../level/index.ts';
 
@@ -12,10 +11,8 @@ const ORIGIN = { x: 0, y: 0 };
 // they are read again each tick.
 export class CameraSettings {
     readonly box: CameraBox;
-    readonly smoothingSeconds: number;
     private readonly level: Level;
     private readonly caches: DerivedCaches;
-    private readonly followId: EntityId | null;
 
     constructor(level: Level, caches: DerivedCaches) {
         const camera = level.camera.requireComponent(CameraComponent);
@@ -23,8 +20,14 @@ export class CameraSettings {
         this.level = level;
         this.caches = caches;
         this.box = { width: camera.get('width'), height: camera.get('height') };
-        this.smoothingSeconds = camera.get('smoothing');
-        this.followId = camera.get('follow');
+    }
+
+    get smoothingSeconds() {
+        return this.camera.get('smoothing');
+    }
+
+    private get camera() {
+        return this.level.camera.requireComponent(CameraComponent);
     }
 
     // Where the camera entity was placed in the level.
@@ -37,9 +40,10 @@ export class CameraSettings {
     // The follow target's level origin, or undefined when there is no target or it is gone from the run.
     // A hidden target is still followed.
     targetOrigin(): Point | undefined {
-        if (this.followId === null) return undefined;
+        const followId = this.camera.get('follow');
+        if (followId === null) return undefined;
 
-        const target = this.level.findEntity(this.followId);
+        const target = this.level.findEntity(followId);
         if (target === undefined) return undefined;
 
         const matrix = this.caches.worldMatrices.matrixOf(target);

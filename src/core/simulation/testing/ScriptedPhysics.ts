@@ -28,7 +28,8 @@ export type ScriptedChange =
     | { readonly call: 'setPose'; readonly entity: EntityId; readonly pose: BodyPose }
     | { readonly call: 'addVelocity'; readonly entity: EntityId; readonly velocity: Point }
     | { readonly call: 'setSurfaceSettings'; readonly entity: EntityId; readonly settings: SurfaceSettings }
-    | { readonly call: 'setMotor'; readonly joint: JointHandle; readonly motor: HingeMotor };
+    | { readonly call: 'setMotor'; readonly joint: JointHandle; readonly motor: HingeMotor }
+    | { readonly call: 'setGravity'; readonly gravity: Point };
 
 // A PhysicsWorld where every Dynamic body falls 10 px a step and nothing else moves, unless a test sets a
 // body's next pose itself. A destroyed body stops moving and is listed, and so is a destroyed joint. The
@@ -73,7 +74,9 @@ export class ScriptedWorld implements PhysicsWorld {
         this.destroyedJoints.push(joint);
     }
 
-    setGravity() {}
+    setGravity(gravity: Point) {
+        this.changes.push({ call: 'setGravity', gravity });
+    }
 
     step() {
         this.movedLastStep.length = 0;
