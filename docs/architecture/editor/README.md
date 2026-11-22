@@ -10,8 +10,8 @@
 |---|---|
 | [history.md](history.md) | Changes, edit transactions, history steps, joining, drags, what is and isn't a step |
 | [selection-and-tools.md](selection-and-tools.md) | The selection, the current group, hit testing, the tool contract, the Select and Joint tools, gradient handles (v2), snapping, Esc |
-| [drawing-and-points.md](drawing-and-points.md) | The Shape tool, point editing, and stage 10's choices; the pen, the Pencil and point editing on paths (v2) |
-| [inspector-and-entities.md](inspector-and-entities.md) | What the Entity inspector shows and how a typed value becomes a change, editor messages, the Entities viewer's rows and drops, the Fill's editor and a path's Points (v2) |
+| [drawing-and-points.md](drawing-and-points.md) | The Shape tool, point editing, and stage 10's choices; the pen, the Pencil and point editing on paths (v2); the Trigger tool (v3) |
+| [inspector-and-entities.md](inspector-and-entities.md) | What the Entity inspector shows and how a typed value becomes a change, editor messages, the Entities viewer's rows and drops, the Fill's editor and a path's Points (v2); the tags, variables and inputs fields and the trigger card (v3) |
 | [clipboard-and-shortcuts.md](clipboard-and-shortcuts.md) | Copy, cut, paste and duplicate, commands and the main menu, shortcuts and keys, and stage 11's choices |
 
 ## The objects

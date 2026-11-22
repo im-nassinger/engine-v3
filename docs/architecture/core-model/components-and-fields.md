@@ -27,10 +27,11 @@ export type ValueType<T> = {
 export type FieldKind =
     | 'number' | 'text' | 'checkbox' | 'choice' | 'colour' | 'vector' | 'angle' | 'entity' | 'fill' | 'list'
     | 'pathPoint'                                       // v2
-    | 'asset' | 'variable' | 'tags';                  // tags in v3, variable and asset in v5
+    | 'asset' | 'variable' | 'tags' | 'input' | 'trigger';  // v3 (triggers.md); asset in v5
 
 export type FieldType<T> = ValueType<T> & {
     readonly kind: FieldKind;
+    mapEntities?(raw: unknown, linkTo: EntityLinkMapper): unknown;  // v3: where a saved value links to entities
 };
 ```
 
@@ -284,7 +285,7 @@ export function createV1Registry(): ComponentRegistry;
 
 | Later need | Where it plugs in | Changes to v1 code |
 |---|---|---|
-| TriggerComponent, ScriptComponent, VariablesComponent, InputComponent, TextComponent, TagsComponent (v3 to v6) | New component folders, registered in the registry | None |
+| TagsComponent, VariablesComponent, InputComponent, TriggerComponent (v3, built: [triggers.md](triggers.md)), ScriptComponent (v5), TextComponent (v6) | New component folders, registered in the registry | None; copying gained `mapEntities` for links inside a value |
 | Variables of nine types on any entity (v4 and v5) | Each variable on a VariablesComponent is drawn with its type's field type, limits included. A script's `variables` table is only read to offer [Add variables] | None |
 | `get_attribute`, `set_attribute`, Change value (v3) | `schema.findFieldByAttribute`, `writeValue`, guarded by `changeableInPlay` | None |
 | Images as fills (Later) | One more kind of `Fill` in `FillFieldType`, as v2 added the gradients by replacing `SolidFillFieldType` | None outside `core/fields/fill` and the fill's drawing and editor |

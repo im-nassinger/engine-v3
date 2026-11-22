@@ -2,7 +2,21 @@
 
 ## TL;DR
 
-**How v3 is built**, Claude's draft (2026-11-22); the owner said to go ahead and build it the same day. v3 adds **four components** (TagsComponent, VariablesComponent, InputComponent, TriggerComponent), **three field types** for them, **the Trigger tool**, **a trigger model in core** that both the Entity inspector and the game read, and **three tick phases** in the game worker (`EventPhase`, `TriggerPhase`, and the run's end in `EndOfTickPhase`). The page learns to show **changed values**, **the end window** and **Restart**. Everything plugs into seams v1 left for it (see [components-and-fields.md](../../architecture/core-model/components-and-fields.md#seams-for-later-versions) and [simulation.md](../../architecture/simulation.md#the-simulation)); no part boundary is crossed that v1 didn't already cross. **Saved levels never change:** a level without the new components reads as before. Every choice here is made under the standing yes and listed in [decisions.md](../../decisions.md) unless it names the owner.
+**How v3 is built**, Claude's draft (2026-11-22); the owner said to go ahead and build it the same day. v3 adds **four components** (TagsComponent, VariablesComponent, InputComponent, TriggerComponent), **three field types** for them, **the Trigger tool**, **a trigger model in core** that both the Entity inspector and the game read, and **three tick phases** in the game worker (`EventPhase`, `TriggerPhase`, and the run's end in `EndOfTickPhase`). The page learns to show **changed values**, **the end window** and **Restart**. Everything plugs into seams v1 left for it (see [components-and-fields.md](../../architecture/core-model/components-and-fields.md#seams-for-later-versions) and [simulation.md](../../architecture/simulation.md#the-simulation)); no part boundary is crossed that v1 didn't already cross. **Saved levels never change:** a level without the new components reads as before. Every choice here is made under the standing yes and listed in [decisions.md](../../decisions.md) unless it names the owner. **v3 is built, and its lasting parts have moved into [architecture/](../../architecture/README.md)** (task 17, 2026-11-22), which is now where they are kept up to date. This file stays as the record of how v3 was planned and built, and is not updated any more:
+
+| Part of this file | Now in |
+|---|---|
+| The components, the field types, the trigger | [core-model/triggers.md](../../architecture/core-model/triggers.md) |
+| The trigger card, the tags, variables and inputs fields, the two message rules | [inspector-and-entities.md](../../architecture/editor/inspector-and-entities.md#v3-the-trigger-card-tags-variables-and-inputs) |
+| The Trigger tool | [drawing-and-points.md](../../architecture/editor/drawing-and-points.md#the-trigger-tool-v3) |
+| The dashed edge and bolt (`UnstyledShapeOverlay`) | [adapters.md](../../architecture/adapters.md#the-unstyled-shape-overlay-v3) |
+| Test play: the tick, actions, the report, the mirror and the end, Restart, keys during play | [triggers-in-play.md](../../architecture/triggers-in-play.md) |
+| Sensor events and the physics world's new calls | [adapters.md](../../architecture/adapters.md#physics) |
+| Determinism | [triggers-in-play.md](../../architecture/triggers-in-play.md#determinism), [testing.md](../../architecture/testing.md#the-determinism-test) |
+| Tests | [testing.md](../../architecture/testing.md) |
+| Performance | [triggers-in-play.md](../../architecture/triggers-in-play.md#the-tick-from-v3) (`TriggerIndex`), [performance.md](../../architecture/performance.md#targets-and-their-tests) |
+| Where things live | [parts-and-folders.md](../../architecture/parts-and-folders.md#the-folder-tree) |
+| A play warning as a kind of problem | [errors.md](../../architecture/errors.md#kinds-of-problem) |
 
 ## Where things live
 

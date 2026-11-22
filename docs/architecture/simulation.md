@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Test play runs in a game worker from v1** (owner, 2026-11-13), because the requirement "the game runs separately from the editor" is v1. **Play makes its play copy the way saving does:** the editor writes the level as `LevelData`, the worker reads it into its own `Level` and builds a `Simulation`. **The page sets the pace:** a `TickPacer` on the editor page decides how many ticks are due (60 per second), sends them with the keys held for each tick, and waits for the worker's tick report before asking again, so a slow computer slows the game instead of skipping, and a hidden tab pauses it. The page keeps its own copy of the running level, the `PlayMirror`, updated from tick reports and drawn between ticks. A `Watchdog` ends a run whose worker stops answering. The simulation is one class with an ordered list of tick phases, which v5 extends with events, triggers and scripts.
+**Test play runs in a game worker from v1** (owner, 2026-11-13), because the requirement "the game runs separately from the editor" is v1. **Play makes its play copy the way saving does:** the editor writes the level as `LevelData`, the worker reads it into its own `Level` and builds a `Simulation`. **The page sets the pace:** a `TickPacer` on the editor page decides how many ticks are due (60 per second), sends them with the keys held for each tick, and waits for the worker's tick report before asking again, so a slow computer slows the game instead of skipping, and a hidden tab pauses it. The page keeps its own copy of the running level, the `PlayMirror`, updated from tick reports and drawn between ticks. A `Watchdog` ends a run whose worker stops answering. The simulation is one class with an ordered list of tick phases. **v3 added events, triggers, the run's end and Restart** as phases and report fields, described in [triggers-in-play.md](triggers-in-play.md); v5 adds scripts the same way.
 
 ## The pieces
 
@@ -81,7 +81,10 @@ export type TickReport = {
     readonly removed: readonly EntityId[];    // past an open edge of the level bounds, or the hard limit
     readonly removedPastHardLimit: readonly EntityId[];  // those of removed past the hard limit
     readonly camera: { x: number; y: number };
-    // later: the run's end (v3), changed values, Console lines (v5), spawned entities (v7)
+    readonly changes: readonly ValueChanges[]; // v3: values Change value wrote, { entity, component, values }
+    readonly end: RunEnd | null;              // v3: { kind: 'won' | 'lost', tick } or { kind: 'restart' }
+    readonly warnings: readonly PlayWarning[]; // v3: play warnings first given in this batch
+    // later: Console lines (v5), spawned entities (v7)
 };
 ```
 
@@ -117,9 +120,9 @@ v1 phases, in order:
 | `CameraPhase` | Follows the target with smoothing, stops at the bounds |
 | `EndOfTickPhase` | Removes marked entities, writes the report |
 
-- **v3 and v5 add phases, not code paths:** `EventPhase` (keys, timers, level start, touches from the physics step), `TriggerPhase` and `ScriptPhase` (in Entities viewer order), a `CustomEventQueue` shared by triggers and scripts with the chain limit of 32, `SpawnPhase` and the run's end in `EndOfTickPhase`. The order follows the requirements: touches are delivered after the physics step, destroys and spawns at the end of the tick.
+- **Later versions add phases, not code paths.** v3 added `EventPhase` (keys, timers, level start, touches from the physics step) and `TriggerPhase` after `JointPathPhase`, with the chain limit of 32 counted in `TriggerPhase`'s rounds, and the run's end in `EndOfTickPhase` ([triggers-in-play.md](triggers-in-play.md#the-tick-from-v3)). v4's custom events join those rounds, which v5's `ScriptPhase` (in Entities viewer order) shares; v7 adds `SpawnPhase`. The order follows the requirements: touches are delivered after the physics step, destroys and spawns at the end of the tick.
 - **The Lua host** is a contract in core, `ScriptEngine`, fulfilled in v5 by `adapters/lua/WasmoonScriptEngine`. The Lua API functions call a `GameApi` class in core, which uses the same schemas (`findFieldByAttribute`, `changeableInPlay`) as the Entity inspector.
-- **Restart** (v3) builds a new `Simulation` from the same `LevelData` with a fresh physics world, Lua state, id counter and seed, as the tech notes advise. Nothing is reset in place.
+- **Restart** (v3) builds a new `Simulation` from the `LevelData` the game worker kept, with a fresh physics world, id counter and seed (and Lua state from v5), as the tech notes advise. Nothing is reset in place. See [triggers-in-play.md](triggers-in-play.md#restart).
 
 ## Bodies and their entities
 
@@ -215,7 +218,7 @@ Made under the standing yes (2026-11-16), before building. The [plan](../steps/s
 
 - **The protocol lives in `adapters/worker/game/`**, beside `import/`, not in a shared `protocol/` folder. *Why: the import worker's protocol already sits with its two ends, and the folder rule wants one area per folder.*
 - **Two answers end a run without waiting:** `failed { reason }` when the level data can't be read (the reader's reason, which should never happen, since the editor wrote it), and `crashed { detail }` when the worker throws during a tick. Both end the run with a message on the Play bar, like a hang, and a crash replaces the worker. *Why: the requirement says a crash ends the run with a message; waiting 5 seconds for the watchdog would hide what happened.*
-- **One worker, prepared when the editor opens and kept between runs.** `stop` drops the run and keeps Box2D loaded. After the watchdog or a crash terminates it, a fresh one is created and prepared at once. The tech notes' spare worker is for Restart, which is v3. *Why: v1 has no Restart, and one loaded worker already makes the first Play fast.*
+- **One worker, prepared when the editor opens and kept between runs.** `stop` drops the run and keeps Box2D loaded. After the watchdog or a crash terminates it, a fresh one is created and prepared at once. The tech notes' spare worker was meant for Restart; v3 built Restart in the same worker instead, since the level is already read. *Why: one loaded worker already makes the first Play fast.*
 - **Play before the worker is ready waits for `ready`**, in the `starting` state; Stop cancels it. *Why: the requirement says Play starts as fast as possible and Stop during loading cancels the start.*
 - **Each batch sends the keys held when it is sent, once for every tick in it.** The inputs list is still per tick in the protocol, so v3 can stamp a key change on its own tick. *Why: nothing reads keys in v1, and a batch is at most 4 ticks; Step sends the keys held at that moment, so "hold right, press Step" works.*
 - **`TickPacer` reads the `Clock` on each frame**, as the [architecture](#pacing-and-time) says, and adds `stepOnce()` for Step. *Why: Step asks for exactly one tick while paused, with no backlog.*

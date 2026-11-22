@@ -10,7 +10,7 @@
 |---|---|---|
 | core: model, field types, schemas, geometry, deterministic maths, level data, simulation phases | Unit tests, `*.test.ts` beside the file | Node |
 | editor: history, selection, tools, commands, Entity inspector and Entities viewer models, clipboard codec, shortcuts, autosave, pacer, watchdog | Unit tests with fakes (`FakeClock`, `FakeTimer`, `InMemoryLevelStore`, `DirectGameRunner`) | Node |
-| adapters/box2d | Unit tests with the real `box2d3-wasm/compat` | Node |
+| adapters/box2d | Unit tests with the real `box2d3-wasm/compat`; `box2dFacts.test.ts` checks what the rules lean on in Box2D, such as sensor events (v3), with the results in [tech-notes.md](../tech-notes.md#triggers) | Node |
 | adapters/pixi, storage, browser, worker | `*.browser.test.ts` beside the file | Vitest browser mode: Chromium, Firefox, WebKit |
 | ui components | Covered by the models' unit tests and the journeys below. A component holds no rules worth testing alone | |
 | The whole game | `tests/determinism/`, `tests/performance/`, `tests/e2e/` | Node and the browsers |
@@ -18,6 +18,7 @@
 **Why tools and commands are unit tests:** tools take `LevelPointerInput` in level positions and commands take ids, so a test can say "press at (100, 100), move to (150, 100), release" and check the level, the history and the selection, with no canvas.
 
 ## Tests every module has
+
 
 - **Round trips:** every component and field type survives `write` then `read` unchanged, and a whole test level survives save, load, export, import, copy and paste.
 - **Schemas:** each key is the camelCase of its label, attributes are unique per component, defaults are in range, and every field type's `parse` refuses wrong data (a test feeds it strings, `NaN`, `Infinity`, huge numbers, wrong shapes).
@@ -42,7 +43,7 @@ for (const testLevel of determinismLevels) {
 ```
 
 - **`runHeadless`** builds a `Simulation` exactly as the game worker does (`LevelReader`, `PhysicsSceneBuilder`, `Box2dPhysicsWorld`, the v1 phases), with no page and no worker, and records `stateHash()` after every tick.
-- **Test levels** (`tests/levels/determinism/`): a pyramid of crates, a car with merged shapes and hinged wheels, a rope bridge, springs, a self-crossing polygon falling on a line, bodies leaving through an open edge, a camera following a body. v2 adds levels with triggers, scripts, random numbers and inputs. *As built:* v3 adds `trigger-coins`, `trigger-timers` and `trigger-touch-groups`, run with the recorded inputs in `tests/levels/determinism/inputs/`; the World's variables are part of `stateHash` (see [v3's architecture](../versions/v3/architecture.md#determinism)).
+- **Test levels** (`tests/levels/determinism/`): a pyramid of crates, a car with merged shapes and hinged wheels, a rope bridge, springs, a self-crossing polygon falling on a line, bodies leaving through an open edge, a camera following a body. Later versions add levels with scripts and random numbers. *As built:* v3 adds `trigger-coins`, `trigger-timers` and `trigger-touch-groups`, run with the recorded inputs in `tests/levels/determinism/inputs/`; the World's variables are part of `stateHash` ([triggers-in-play.md](triggers-in-play.md#determinism)). **The recorded inputs are code**, `tests/levels/determinism/inputs/recordedInputs.ts`: per level, the keys held from one tick to another, a key pressed on its first tick, one tick per batch. `runLevel(name, levelData, engine)` reads them, so the Node test, the browser test, the phone page and `npm run determinism:record` run the same inputs. `tests/determinism/trigger-levels/triggerLevels.test.ts` checks each trigger level does what it is built to show: the coins counted on the ticks they are reached and the Win on the tick after the last, every and after on their ticks with the beat switched off and on again, at most once a second while `jump` is held, and the three-shape cart counted once going in and once leaving.
 - **Recorded hashes** live in the repo, one file per level. They are written only by `npm run determinism:record`, on purpose, never by a failing test. Recording again because the Box2D build changed also means raising the physics version.
 - **Where it runs:**
 
@@ -62,6 +63,7 @@ for (const testLevel of determinismLevels) {
 - **Storage:** a save and a load round trip in IndexedDB; a failed write (quota) becomes `SaveState` `failed`; a second tab gets no lock.
 - **Workers:** a Play, ten ticks and a Stop through the real `WorkerGameRunner`; a worker that never answers is ended by the watchdog.
 - **Keys and clipboard:** reserved keys are left to the browser; AltGr never fires a Ctrl+Alt shortcut; copy and paste events carry the tagged text.
+- **Triggers (v3):** the tags field, the trigger card's menus (`TriggerCard` browser tests in three browsers click through making a trigger from nothing) and the dashed overlay for a shape with no StyleComponent.
 - **Gradients (v2):** `GradientDrawing.browser.test.ts` reads the pixels of a linear and a radial gradient on a rectangle, a turned one, a see-through stop over the background and a closed path; `GradientTextures` shares equal gradients and lets go of unused ones; the Points list turns virtual above 100 rows (`EntityInspector.pathPoints.browser.test.ts`).
 
 The tech notes ask for keyboard layout tests (US, Brazilian ABNT2, and one AltGr-heavy layout). Browsers can't switch layout in a test, so `KeyChord` is unit-tested with recorded key data from each layout, and the layouts are checked by hand once per release.

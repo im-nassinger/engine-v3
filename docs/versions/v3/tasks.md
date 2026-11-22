@@ -54,7 +54,7 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 - [x] 16. v3's journeys and speed test
   - Read: versions/v3/architecture.md#tests, versions/v3/architecture.md#performance, architecture/testing.md, architecture/performance.md
   - Done when: Playwright journeys in three browsers pass: draw a trigger with the Trigger tool, make it Win when touched by `player`, play, roll a tagged ball into it, see the end window, Restart, Leave; a key trigger pushing a body; the World's variables and inputs edited, saved and read back; the speed test of 1,000 touch triggers meets the targets, its numbers written in performance.md
-- [ ] 17. Close v3's docs
+- [x] 17. Close v3's docs
   - Read: versions/README.md#closing-a-version, versions/v2/architecture.md
   - Done when: v3's lasting parts are moved into architecture/ as v2's were, with `versions/v3/architecture.md` left as the record with a table of where each part went; the glossary has every new word; progress.md says v3 is built and waits for the owner's try; `node tools/check-sources.js` passes
 - [ ] 18. Try point: try the whole of v3: the Trigger tool, the trigger card, tags, the World's variables and inputs, triggers firing in test play, Win, Lose and Restart

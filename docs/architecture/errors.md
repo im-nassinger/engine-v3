@@ -18,6 +18,7 @@
 | Over a limit | A paste past 100,000 entities | `{ reason: 'overLimit', limit, max }` | The message names the limit: "A level holds at most 100,000 entities" |
 | A detail fails | IndexedDB full; no storage in a private window | `SaveState` `failed` | The message pill until a save works, and a level-wide warning |
 | A run fails | The worker stops answering or throws | `PlaySession` state `ended` with a reason | A message on the Play bar, one click from the editor |
+| Something goes wrong in play without stopping the run (v3) | The chain limit, an unknown input, a Restart in the first second, a value fixed in play | A `PlayWarning` in the tick report, once per run | The message pill, until the Console comes in v5 ([triggers-in-play.md](triggers-in-play.md#the-report-the-mirror-and-the-end)) |
 | A bug | An exception nobody expected | An exception | Below |
 
 ## Where the sentences come from
@@ -37,6 +38,7 @@
 | A failed save is never silent, and Export still works | `Autosave` sets `failed`; export doesn't use storage |
 | Nothing is deleted when saving fails | Autosave only ever writes the whole record in one transaction |
 | A game that stops responding ends the run with a message | `Watchdog`, see [simulation.md](simulation.md) |
+| A trigger with unset parts doesn't run, and a missing target only skips its part (v3) | `triggerProblems`, read by the Entity inspector and the game alike ([core-model/triggers.md](core-model/triggers.md#the-trigger)) |
 | A missing file doesn't stop a run (v5) | The simulation skips the use and adds a Console line |
 | Script errors stay in the Console (v5), never as editor messages | `ScriptEngine` errors go to the run's Console lines |
 | A disabled button still says why | `Availability` carries a reason, shown in the tooltip |

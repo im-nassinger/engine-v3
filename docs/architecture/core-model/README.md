@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The classes in `src/core` that describe a level: **`Level`** owns the tree of entities and hands out ids, **`Entity`** owns its components and its eye and lock switches, and each **component** is a class whose values are declared once in a **schema**. A schema lists fields, each with a field type from the one fixed list, and that list drives the Entity inspector, undo, saving, copy and paste, and later Lua and Change value. The World and the camera are ordinary entities that the level creates and protects. Geometry (matrices, bounds, collision pieces, mass) and deterministic maths sit beside the model, shared by the editor, the renderer and the simulation.
+The classes in `src/core` that describe a level: **`Level`** owns the tree of entities and hands out ids, **`Entity`** owns its components and its eye and lock switches, and each **component** is a class whose values are declared once in a **schema**. A schema lists fields, each with a field type from the one fixed list, and that list drives the Entity inspector, undo, saving, copy and paste, and Change value (v3), and later Lua. The World and the camera are ordinary entities that the level creates and protects. Geometry (matrices, bounds, collision pieces, mass) and deterministic maths sit beside the model, shared by the editor, the renderer and the simulation.
 
 ## Files
 
@@ -11,6 +11,7 @@ The classes in `src/core` that describe a level: **`Level`** owns the tree of en
 | [entities-and-level.md](entities-and-level.md) | `Entity`, `Level`, ids, the tree and its order, the World and the camera, change signals, derived caches |
 | [components-and-fields.md](components-and-fields.md) | `Component`, value types, the field types, `FieldDefinition`, `ComponentSchema`, the registry, every v1 component and its fields |
 | [geometry.md](geometry.md) | `Matrix2D`, the TransformComponent's maths, the collision pieces, bounds, mass, `DeterministicMath`, units |
+| [triggers.md](triggers.md) | The four v3 components (tags, variables, inputs, triggers), their field types, `KeyCodes`, and the `Trigger` model that the Entity inspector and the game share |
 
 ## The model in one picture
 

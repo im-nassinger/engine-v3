@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**`Selection`** holds the selected ids and keeps the requirement's invariants (never an entity with one of its parents, the World only alone). **`CurrentGroup`** is the group you are inside. **`HitTester`** answers "what is under this point" and "what does this box touch" with the requirement's hit areas, using cached bounds. A **tool** is a class behind one small contract that receives pointer and key input in level positions, already converted from the browser, so every tool is tested without a browser. **`ToolController`** picks the active tool, keeps tool lock, handles panning before any tool, and returns to Select after a tool makes something. The Select tool uses the State pattern for its drags; from v2 it also drags a path's curve handles and a gradient's handles. v2 adds the pen and the Pencil as two more tool classes. Snapping is a contract with one v1 implementation, the grid.
+**`Selection`** holds the selected ids and keeps the requirement's invariants (never an entity with one of its parents, the World only alone). **`CurrentGroup`** is the group you are inside. **`HitTester`** answers "what is under this point" and "what does this box touch" with the requirement's hit areas, using cached bounds. A **tool** is a class behind one small contract that receives pointer and key input in level positions, already converted from the browser, so every tool is tested without a browser. **`ToolController`** picks the active tool, keeps tool lock, handles panning before any tool, and returns to Select after a tool makes something. The Select tool uses the State pattern for its drags; from v2 it also drags a path's curve handles and a gradient's handles. v2 adds the pen and the Pencil as two more tool classes, and v3 the Trigger tool. Snapping is a contract with one v1 implementation, the grid.
 
 ## Selection and the current group
 
@@ -127,7 +127,7 @@ export class ToolController {
 
 - **Panning comes before any tool:** middle drag pans at any time, and holding Space pans with any tool and returns to it on release. **Except while one of the active tool's buttons is down** (v2, standing yes, 2026-11-21): then Space goes to the tool first, so the pen can move the point being placed, and a tool that doesn't take it leaves it to panning. `PanGesture` changes `ViewState` only, so it never makes a step.
 - **After making something the tool returns to Select** with the new entity selected, unless tool lock is on (open question 4 stays as written).
-- v1 registered three tools; v2 added the Bézier pen and the Pencil (`PenTool`, `PencilTool`, in [drawing-and-points.md](drawing-and-points.md#the-pen-v2)) to `createTools` in `app`, with nothing else in the controller changed but Space above. Trigger (v3) and Text (v6) come the same way.
+- v1 registered three tools; v2 added the Bézier pen and the Pencil (`PenTool`, `PencilTool`, in [drawing-and-points.md](drawing-and-points.md#the-pen-v2)) to `createTools` in `app`, with nothing else in the controller changed but Space above. v3 added the Trigger tool (`TriggerTool`, in [drawing-and-points.md](drawing-and-points.md#the-trigger-tool-v3)) the same way, and Text (v6) will too.
 - **The tool contract and `ToolController` as built** (standing yes, 2026-11-15):
   - A tool's `keyDown` and `keyUp` take a `ToolKey` (code, key, Ctrl, Shift, Alt, repeat) instead of a `KeyChord`, which is a written shortcut, not a press. `editor/shortcuts`' `KeyPress` has that shape, so `editor/tools` never imports the shortcuts and the dispatcher can import the tools. *Why: a tool reads the key pressed, and the other way round the two modules would import each other.*
   - The constructor takes `ToolServices`, the context without `finished`, which the controller adds. The context reads the services when used, so a replaced open level reaches every tool. The tools' number keys are `TOOL_KEYS`: Select 1, Shape 2, Joint 3 (owner, 2026-11-19), the pen 4 and the Pencil 5 (v2, as the requirement gives them), the Trigger tool 6 (v3, standing yes, 2026-11-22), and Text 7 only as a placeholder until v6 decides.
@@ -193,7 +193,7 @@ The Select tool holds one **drag state** at a time (the State pattern):
 - **Shift keeps a linear gradient's direction to 15° steps on screen**, around the end not dragged. *Why on screen: in a box that isn't square, 15° in shares looks like another angle.* Esc puts the drag back. The stops' dots only show where they are; stops move in the Entity inspector.
 - **The overlay** is `GradientHandleOverlay` with `planGradientHandles`, in [adapters.md](../adapters.md#gradients-v2); `EditorGradientSource` in `app` builds its source from the selection, the caches and `CardFolds`.
 
-## The Shape tool, the pen and the Pencil
+## The Shape tool, the pen, the Pencil and the Trigger tool
 
 They are in [drawing-and-points.md](drawing-and-points.md), with point editing.
 

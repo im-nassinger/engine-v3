@@ -41,11 +41,16 @@ src/
       field-types/       one file per field type: NumberFieldType, ColourFieldType, ...
       values/            the value types that aren't fields: shape and path geometry, joint ends
       fill/              the Fill value and its rules: Fill, switchFillKind, mixedColour (v2)
+      names/             wordName: the rule for a tag, a variable's name and an input's name (v3)
+      trigger/           the Trigger types, parseTrigger, normalizeTrigger, copyTrigger, mapTriggerEntities (v3)
     components/        Component, AnyComponent, ComponentValues, then one folder per component
       schema/            ComponentSchema, the stored and derived field definitions, PartnerRule
       registry/          ComponentRegistry, createV1Registry
       TransformComponent/ NameComponent/ ShapeComponent/ PathComponent/ StyleComponent/
       BodyComponent/ SurfaceComponent/ JointComponent/ CameraComponent/ PhysicsWorldComponent/
+      TagsComponent/ VariablesComponent/ InputComponent/ TriggerComponent/ (v3)
+    keys/              KeyCodes: the keys a level may use, and their labels (v3)
+    triggers/          model/: triggerName, triggerProblems, changeableValues, newTriggerId (v3)
     geometry/          Matrix2D, Point, Bounds, ShapeGeometry, PathGeometry, JointEnds
       pieces/            the polygon pipeline from a shape to collision pieces, line chains, mass
       path/              pathBox, splitCurve, nearestOnCurve, smoothHandles: a path's curves (v2)
@@ -53,6 +58,7 @@ src/
     math/              DeterministicMath, units (px and metres, degrees and radians)
     derived/           DerivedCaches, levelBoundsOf
       caches/            WorldMatrixCache, BoundsCache, HiddenCache, PiecesCache
+      tags/              LevelTags: every tag in the level (v3)
     level-data/        LevelData types, limits
       reading/           LevelReader and what it returns
       writing/           LevelWriter, LevelText
@@ -60,28 +66,28 @@ src/
     physics/           PhysicsWorld contract, PhysicsSceneBuilder (merging), BodyMass, JointEnds
       merging/           mergesInto: which body a shape merges into
       mass/              BodyMass: a body's mass from its surfaces
-    simulation/        run/ (Simulation, PlayRun), phases/ (the tick phases), bodies/ (BodyMatrices), removal/ (RemovalMarks), report/ (TickReport), hash/, start/ (startPlayCopy, startSimulation), testing/ (a scripted PhysicsWorld, test levels); CameraFollow
+    simulation/        run/ (Simulation, PlayRun), phases/ (the tick phases), bodies/ (BodyMatrices), removal/ (RemovalMarks), report/ (TickReport), hash/, start/ (startPlayCopy, startSimulation), testing/ (a scripted PhysicsWorld, test levels); CameraFollow; from v3 inputs/ (InputState, PlayInputs), triggers/ (TouchLedger, TriggerIndex, TriggerTimers, RunnableTriggers), actions/ (ActionRunner, PlayValueWriter), end/ (RunEnd)
   editor/
     session/           EditorSession (the editor's root object), OpenLevel, CurrentGroup
     history/           History, HistoryStep, EditTransaction, changes/
     selection/         Selection
-    commands/          EditorCommand, CommandRegistry, createCommandRegistry, then file/ edit/ arrange/ view/ play/, rename/ (renameEntity, renameLevel), hide/ (toggleEntityHidden, a row's eye), shared/ (skip rule, step labels, EntityNamer, attached joints, keeping in place), testing/
-    tools/             Tool, ToolController (with the entity field's picker), escape/ (EscapeChain), pan/, mouse/ (MousePosition), select/ shape/ joint/, pen/ pencil/ (v2)
+    commands/          EditorCommand, CommandRegistry, createCommandRegistry, then file/ edit/ arrange/ view/ play/, triggers/ (editTriggers, v3), draw/ (createShape, createPath, createTrigger), rename/ (renameEntity, renameLevel), hide/ (toggleEntityHidden, a row's eye), shared/ (skip rule, step labels, EntityNamer, attached joints, keeping in place), testing/
+    tools/             Tool, ToolController (with the entity field's picker), escape/ (EscapeChain), pan/, mouse/ (MousePosition), select/ shape/ joint/, pen/ pencil/ (v2), trigger/ (v3)
     hit-testing/       HitTester, HitProbe; areas/ (each entity's hit area), spatial-index/ (SpatialIndex, LinearSpatialIndex)
     snapping/          Snapper, GridSnapper
     view/              ViewState (pan and zoom), ViewSettings, the overlay sizes the drawing and hitting share
     entities-viewer/   rows/ (EntitiesRows, the visible rows, and rowKind, a row's icon), clicks/ (RowClicks), drop/ (EntitiesDrop, where a drag lands)
-    entity-inspector/  EntityInspectorModel, CardModel, FieldModel, CardFolds, ValueInput (typed text)
-    messages/          EditorMessages, EditorMessageRule, rules/
+    entity-inspector/  EntityInspectorModel, CardModel, FieldModel, CardFolds, ValueInput (typed text); tags-field/ variables-field/ inputs-field/ triggers/ (TriggerCardModel, TriggerSentence, TriggerChoices, TriggerEdits) (v3)
+    messages/          EditorMessages, EditorMessageRule, rules/ (with TouchNeedsSurfaceRule, TriggerCantRunRule, MissingInputsRule from v3)
     clipboard/         ClipboardCodec, PastePlacement, IdRemapping
     shortcuts/         KeyChord, KeyPress, ShortcutMap, ShortcutDispatcher
     saving/            Autosave, SaveState, ProjectFile, ImportLevel, ExportLevel, contracts
-    play/              session/ (PlaySession), pacing/ (TickPacer), watchdog/ (Watchdog), mirror/ (PlayMirror, NoPhysicsEngine), runner/ (the GameRunner contract), inputs/ (HeldKeys, the PageLifecycle contract), fixed-size/ (fixedSizeView), testing/ (DirectGameRunner, FakePageLifecycle)
+    play/              session/ (PlaySession), pacing/ (TickPacer), watchdog/ (Watchdog), mirror/ (PlayMirror, NoPhysicsEngine), runner/ (the GameRunner contract), inputs/ (HeldKeys, the PageLifecycle contract), fixed-size/ (fixedSizeView), end/ (runTimeText) and warnings/ (playWarningText) (v3), testing/ (DirectGameRunner, FakePageLifecycle)
     status/            StatusText (what the message pill shows), outcomeText, mouseCoordinateText (the debug box's X and Y)
     time/              Clock, Timer, FrameScheduler, TimeOfDay contracts
   adapters/
-    pixi/              PixiLevelView, EntityNode, EntityDrawing, overlays/, minimap/ (MinimapView)
-    box2d/             Box2dPhysicsEngine, Box2dPhysicsWorld, Box2dShapes, Box2dJoints
+    pixi/              PixiLevelView, EntityNode, EntityDrawing, overlays/ (with unstyled/, UnstyledShapeOverlay, v3), minimap/ (MinimapView)
+    box2d/             Box2dPhysicsEngine, Box2dPhysicsWorld, Box2dShapes, Box2dJoints, SensorShapeTable (v3)
     storage/           IndexedDbLevelStore, LocalStorageSettings, WebLockTabGuard, BrowserPersistence
     browser/           keyboard/ (KeyboardInput, commitFocusedField), pointer/ (PointerInput, ClickCounter, wheelPixels),
                        time/ (SystemClock, LocalTimeOfDay, BrowserTimer, AnimationFrames),
@@ -106,10 +112,11 @@ src/
     tools/             ToolsContext: ToolController and MousePosition for the tool column, debug box and picker; testing/
     play/              PlayContext: the PlaySession for the shell, the Play button and the Play bar
     play-bar/          PlayBar/ (with PlayBarButton/)
+    end-window/        EndWindow/: Win or Lose, the time, Leave and Restart (v3)
     testing/           editorPage: a component shown with the session, commands and tools, for browser tests
     main-menu/ level-view-host/ minimap/ entities-viewer/ entity-inspector/
     save-state/        SaveIndicatorContext
-    fields/            one component per field type: NumberField/, ColourField/, ...
+    fields/            one component per field type: NumberField/, ColourField/, ..., TagsField/, VariablesField/, InputsField/ (v3)
     shared/            Button/, IconButton/, Menu/, MenuButton/, Tooltip/, Icon/
 tests/
   guards/              tests that prove each check still refuses what it should
@@ -119,7 +126,7 @@ tests/
   levels/              test levels (.editable files) shared by the three above
 ```
 
-Each component folder is named exactly like its class, as the owner's React rules do for components, and holds the class, its values type and its schema (for example `BodyComponent/BodyComponent.ts`, `BodyValues.ts`, `bodySchema.ts`). v5 adds `TriggerComponent/`, `ScriptComponent/`, `VariablesComponent/`, `InputComponent/`, `TextComponent/` and `TagsComponent/` beside them, and nothing else in `core` changes shape. ui's folders follow the owner's component rules: one component per folder, its child components as subfolders.
+Each component folder is named exactly like its class, as the owner's React rules do for components, and holds the class, its values type and its schema (for example `BodyComponent/BodyComponent.ts`, `BodyValues.ts`, `bodySchema.ts`). v3 added `TagsComponent/`, `VariablesComponent/`, `InputComponent/` and `TriggerComponent/` beside them; `ScriptComponent/` (v5) and `TextComponent/` (v6) come the same way, and nothing else in `core` changes shape. ui's folders follow the owner's component rules: one component per folder, its child components as subfolders.
 
 ## Rules for what goes where
 

@@ -45,6 +45,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Console | The panel at the bottom showing errors, `print()` messages and trigger lines from test play. |
 | View menu | The main menu's View submenu, holding the editor's view settings: Grid, Grid snapping, Joint icons, Camera frame, Physics view, and the zooms. There is no View button of its own. |
 | Tool | What the mouse does in the level view: Select, Pencil, Bézier pen, Shape, Text, Joint, Trigger. |
+| Trigger tool | The tool on key 6 that draws a rectangle sensor holding one touch trigger, ready for its actions. A shape with no StyleComponent, as it makes, shows in the editor as a dashed edge with a bolt and isn't drawn in play. |
 | Selection | The entities currently selected. There is one selection, shown in the level view, the Entities viewer and the Entity inspector. |
 | Draw order | Which entity is painted on top when entities overlap. It is the Entities viewer order. |
 | Hidden | An entity whose eye icon is off. It is not drawn, in the editor or in play. It still collides and runs its triggers and scripts. |
@@ -132,6 +133,14 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Event | Something the game reports to triggers and scripts, such as touching, a key, a timer or level start. Triggers and scripts share one list of event names. |
 | Custom event | An event you name yourself, such as `open`. A trigger or script fires it on an entity, and that entity's triggers and scripts react. It can carry one number. |
 | Action | One step in a trigger's Do list, such as Change value or Spawn. Only ever used for triggers. |
+| When, If, Do | The three parts of a trigger, each a section of its card: **When** names its one event, **If** its checks, **Do** its actions, run top to bottom. |
+| Check | One condition in a trigger's If, such as "`other` has the tag `coin`" or "`coins` is at least 10". The actions run only when every check holds. |
+| Repeat | A trigger's setting for how often it may fire: every time (the default), once per run, or at most once every N seconds. |
+| Touched, no longer touched | The events for something starting or stopping touching an entity's sensor or surface, once per touching entity however many shapes it has. `other` is the entity that touched or left. |
+| Change value | The action that sets, adds to or subtracts from a value on its target: a variable, a component value allowed to change during play, a tag, or a trigger's on or off. Teleporting is Change value on the position. |
+| Push | The action that gives a body a kick, ignoring its mass: a fixed vector in px/s, or a strength away from or towards `this`. |
+| Unset part | A part of a trigger not chosen yet, shown in yellow on its card. A trigger with an unset part doesn't run. |
+| Chain limit | Triggers setting off triggers stop after 32 rounds in one tick, with a play warning. The game keeps running. |
 | `this` and `other` | In a trigger: `this` is the entity holding the trigger, `other` is the entity that caused the event, when there is one. In a script: `this` is the id of the entity the script is on, and `other` is what a handler receives. |
 | Variable | A named value during play, such as `coins = 5`, listed on a VariablesComponent. The World's variables are the level's; any other entity's are its own, such as an enemy's `health`. Its type is **number**, **string** (text, such as `"Ada"`), **boolean** (`true` or `false`), **entity**, **asset**, **colour**, **vector**, **angle** or **tags**. A script lists the variables it needs in a `variables` table at its top. |
 | Keep between runs | A variable setting: its value is saved in the browser and the next run starts from it. |
@@ -154,6 +163,8 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Panels button | The Play bar button that brings the Entity inspector, the Entities viewer and the Console back during play, read-only. |
 | Pause menu | The menu Tab opens during play: Resume, Restart (R), and later Controls, Settings and Quit. |
 | End window | The window shown when a run is won or lost: a title, the time, Restart and Leave. |
+| Win, Lose | The actions that end a run as won or lost: the tick finishes, the Play bar reads ENDED and the end window shows. |
+| Restart | Starting the run again from the level as it was at Play, everything reset: from the end window, the Restart action, or the Pause menu once it comes. A Restart action in a run's first second is ignored, so a level can't restart forever. |
 | Fixed size | A camera mode: players see exactly the camera's box, with black bars if their window is a different shape. |
 | Fill window | A camera mode: the same height as the camera's box, and wider windows see more of the level sideways. |
 | Publishing | A later feature: uploading a level so other people can play it online. |
@@ -180,7 +191,7 @@ Words for how the game is built, used in [architecture/](architecture/README.md)
 | Open level | The level open in the editor, together with its history, selection, current group and caches. New and Import replace it. |
 | Game worker | The worker that runs the play copy during test play. |
 | Play mirror | The editor page's own copy of the running level, updated from tick reports and drawn by the level view. |
-| Tick report | What the game worker sends back after running ticks: the bodies that moved, entities removed, the camera's position. |
+| Tick report | What the game worker sends back after running ticks: the bodies that moved, entities removed, the camera's position, and from v3 the changed values, the run's end and play warnings. |
 | Collision piece | One convex part of a shape, at most 8 points, as handed to the physics engine and drawn by the physics view. |
 | Value type | A class that knows how to check, store, copy and compare one kind of value. Every field type is a value type the Entity inspector can show. |
 | Change signal | The notice a class sends when its state changed, so caches, the level view and panels can update. Not a game event. |
@@ -192,6 +203,8 @@ Words for how the game is built, used in [architecture/](architecture/README.md)
 | Firing | One trigger hearing one event in one tick (`TriggerFiring`): its entity, the trigger, and the entity that caused the event (`other`), if any. Two entities touching at once are two firings. `EventPhase` lists a tick's firings, `TriggerPhase` runs them. |
 | Round | One pass of `TriggerPhase` over a list of firings in one tick: the first is the firings `EventPhase` listed, each next one the firings the last round's actions set off. A tick stops after 32 (the chain limit). |
 | Play warning | Something that went wrong during play without stopping the run, such as the chain limit, given once per run (`PlayWarnings`). Shown in the message pill until the Console comes in v5. Not an editor message. |
+| Changed value | A value Change value wrote during play, sent in the tick report so the play mirror and the Entity inspector show it. |
+| Recorded inputs | The keys a determinism test level holds and presses on each tick, written as code beside the levels, so every run of the test plays the same inputs. |
 | Trigger owner | The entity holding a trigger (`this`). For touches, the sensor's entity and every group above it with a touch trigger. |
 | Render chunk | A run of the World's children, next to each other in the draw order, that PixiJS draws as its own render group. Moving an entity uploads again only the shapes of its render chunk, not the whole level's. |
 | Runner | The script that built v1, stages 0 to 19, without the owner: one fresh Claude session per step, with reports to Discord. Moved out of this project on 2026-11-20, to `~/projects/orchestrator/old-runner/`, to become a tool for any project. |
