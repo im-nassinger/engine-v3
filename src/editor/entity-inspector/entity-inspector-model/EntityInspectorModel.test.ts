@@ -267,7 +267,13 @@ describe('EntityInspectorModel: Add Component, Remove and Reset', () => {
         selection.replace([crate.id]);
         const typeNames = model.addableComponents.map((entry) => entry.typeName);
 
-        expect(typeNames).toEqual(['StyleComponent', 'JointComponent', 'TagsComponent', 'VariablesComponent']);
+        expect(typeNames).toEqual([
+            'StyleComponent',
+            'JointComponent',
+            'TagsComponent',
+            'VariablesComponent',
+            'TriggerComponent',
+        ]);
         expect(addableEntry(model, 'StyleComponent')?.availability).toEqual({ enabled: true });
         expect(addableEntry(model, 'StyleComponent')?.section).toBe('Drawing');
         expect(addableEntry(model, 'TagsComponent')?.availability).toEqual({ enabled: true });

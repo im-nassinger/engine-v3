@@ -6,12 +6,14 @@ import {
     NameComponent,
     ShapeComponent,
     TransformComponent,
+    TriggerComponent,
     createV1Registry,
 } from '../../../core/components/index.ts';
 import { DerivedCaches } from '../../../core/derived/index.ts';
 import { Bounds } from '../../../core/geometry/index.ts';
 import { Level } from '../../../core/level/index.ts';
-import type { Entity } from '../../../core/level/index.ts';
+import type { Entity, EntityId } from '../../../core/level/index.ts';
+import type { Trigger } from '../../../core/fields/index.ts';
 import { FormatUpgrader, LevelReader, LevelWriter, V1_LEVEL_LIMITS } from '../../../core/level-data/index.ts';
 
 import { ClipboardCodec } from '../codec/ClipboardCodec.ts';
@@ -210,5 +212,78 @@ describe('IdRemapping', () => {
         expect(data[1]).toEqual(damaged[1]);
         expect(data[2]).toEqual({ ...unknownComponent, id: expect.any(Number) as unknown });
         expect(reader.checkSubtree(level, data, level.world).ok).toBe(false);
+    });
+});
+
+// A button whose trigger, when touched, checks the door's tag and destroys the door.
+function buildButtonAndDoor() {
+    const level = Level.createNew();
+    const door = addBox(level, 'Door');
+    const button = addBox(level, 'Button');
+    const opens: Trigger = {
+        id: 1,
+        name: null,
+        on: true,
+        when: { kind: 'touched' },
+        checks: [{ kind: 'hasTag', target: { kind: 'entity', entity: door.id }, tag: 'door' }],
+        actions: [{ kind: 'destroy', target: { kind: 'entity', entity: door.id } }, { kind: 'win' }],
+        repeat: { kind: 'everyTime' },
+    };
+    button.addComponent(new TriggerComponent({ triggers: [opens], nextTriggerId: 2 }));
+
+    return { level, door, button };
+}
+
+// The entities the button's trigger names: its check's target, then its first action's.
+function linksOf(entity: Entity | undefined): readonly (EntityId | null)[] {
+    const [trigger] = entity?.getComponent(TriggerComponent)?.get('triggers') ?? [];
+    if (trigger === undefined) throw new Error('The entity has no trigger.');
+
+    return [...trigger.checks, ...trigger.actions].flatMap((part) =>
+        'target' in part && part.target.kind === 'entity' ? [part.target.entity] : [],
+    );
+}
+
+describe('IdRemapping: triggers', () => {
+    test("a copied button and door paste with the new button's trigger naming the new door", () => {
+        const { level, door, button } = buildButtonAndDoor();
+        const fragment = copy(level, [door, button], 'opening-1');
+
+        const [newDoor, newButton] = paste(fragment, { level, sourceToken: 'opening-1' });
+
+        expect(newDoor?.id).not.toBe(door.id);
+        expect(linksOf(newButton)).toEqual([newDoor?.id, newDoor?.id]);
+        expect(linksOf(button)).toEqual([door.id, door.id]);
+    });
+
+    test('pasted into another level, the button and door still name each other', () => {
+        const { level, door, button } = buildButtonAndDoor();
+        const fragment = copy(level, [door, button], 'opening-1');
+
+        const [newDoor, newButton] = paste(fragment, { level: Level.createNew(), sourceToken: 'opening-2' });
+
+        expect(linksOf(newButton)).toEqual([newDoor?.id, newDoor?.id]);
+    });
+
+    test('a button copied alone keeps naming the original door in the same level', () => {
+        const { level, door, button } = buildButtonAndDoor();
+        const fragment = copy(level, [button], 'opening-1');
+
+        const [newButton] = paste(fragment, { level, sourceToken: 'opening-1' });
+
+        expect(linksOf(newButton)).toEqual([door.id, door.id]);
+    });
+
+    test('a button copied alone into another level names a missing entity', () => {
+        const { level, button } = buildButtonAndDoor();
+        const fragment = copy(level, [button], 'opening-1');
+        const other = Level.createNew();
+
+        const [newButton] = paste(fragment, { level: other, sourceToken: 'opening-2' });
+        const [checked, destroyed] = linksOf(newButton);
+
+        expect(checked).toBe(destroyed);
+        expect(other.findEntity(checked ?? 0)).toBeUndefined();
+        expect(checked).not.toBeNull();
     });
 });

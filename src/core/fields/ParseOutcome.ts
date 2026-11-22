@@ -15,6 +15,8 @@ export type ParseProblem =
     | { readonly reason: 'noName' }
     // A second item of a list with the same name, such as two variables named `coins`.
     | { readonly reason: 'repeatedName'; readonly name: string }
+    // A second item of a list with the same id, such as two triggers numbered 3 in one TriggerComponent.
+    | { readonly reason: 'repeatedId'; readonly id: number }
     // A key a level can't use, such as `Tab` or `F5`, or a code that names no key.
     | { readonly reason: 'unbindableKey'; readonly key: string }
     // A size typed for a line whose points are all on one row, or one column: they can't be spread.

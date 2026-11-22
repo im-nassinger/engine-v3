@@ -1,5 +1,5 @@
 import type { Input } from '../../../core/fields/index.ts';
-import type { KeyCode } from '../../../core/triggers/index.ts';
+import type { KeyCode } from '../../../core/keys/index.ts';
 import { InputEdits, MIXED } from '../../../editor/entity-inspector/index.ts';
 import { AddRow } from '../../shared/index.ts';
 import type { FieldProps } from '../FieldProps.ts';

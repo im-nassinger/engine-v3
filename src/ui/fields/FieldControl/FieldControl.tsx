@@ -19,6 +19,8 @@ export function FieldControl(props: FieldProps) {
     if (isPathPointList(field)) return <PathPointsField {...props} />;
     if (isListOf(field, 'input')) return <InputsField {...props} />;
     if (isListOf(field, 'variable')) return <VariablesField {...props} />;
+    // A TriggerComponent's triggers are drawn by the trigger card, not as a list field.
+    if (isListOf(field, 'trigger')) return null;
     if (kind === 'list') return <ListField {...props} />;
 
     const Field = ITEM_FIELD_COMPONENTS[kind];

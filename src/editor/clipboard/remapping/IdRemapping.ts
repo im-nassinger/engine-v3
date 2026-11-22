@@ -20,17 +20,8 @@ function isEntityId(raw: unknown): raw is EntityId {
     return typeof raw === 'number' && Number.isSafeInteger(raw) && raw >= 1;
 }
 
-// The entity a raw entity field points at: { "entity": 12 }. Undefined for null or anything damaged.
-function linkedId(raw: unknown): EntityId | undefined {
-    if (!isPlainObject(raw)) return undefined;
-
-    const id = raw['entity'];
-    const hasOnlyEntity = Object.keys(raw).length === 1;
-
-    return hasOnlyEntity && isEntityId(id) ? id : undefined;
-}
-
-// Gives every pasted entity a new id from the level and rewires the entity fields. A field pointing inside
+// Gives every pasted entity a new id from the level and rewires every field that links to entities (a field
+// type with mapEntities: an entity field, a trigger, a list of either). A field pointing inside
 // the pasted set points at the new copy. One pointing outside it keeps its id when the paste comes from the
 // same opening of the level, even when that entity was deleted, since ids are never reused in a session;
 // from another opening it gets a fresh id no entity has, so it reads as a missing entity.
@@ -130,13 +121,13 @@ export class IdRemapping {
         const copy: Record<string, unknown> = { ...values };
 
         for (const field of schema.fields) {
-            if (field.type.kind !== 'entity') continue;
+            const { type } = field;
+            if (type.mapEntities === undefined) continue;
 
             const fileKey = schema.fileKeyOf(field);
-            const id = linkedId(values[fileKey]);
-            if (id === undefined) continue;
+            if (!Object.hasOwn(values, fileKey)) continue;
 
-            copy[fileKey] = { entity: linkTo(id) };
+            copy[fileKey] = type.mapEntities(values[fileKey], linkTo);
         }
 
         return copy;

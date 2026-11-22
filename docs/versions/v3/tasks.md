@@ -18,7 +18,7 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 - [x] 4. Keys, the InputComponent and a new level's five inputs
   - Read: versions/v3/architecture.md#the-components, versions/v3/architecture.md#the-field-types, requirements/triggers/variables-and-inputs.md#raw-keys-and-inputs--v3, design/controls.md#v3-triggers-tags-variables-inputs-and-the-end-window
   - Done when: `KeyCodes` names each `KeyboardEvent.code` (`W`, `Left arrow`) and refuses the keys that can't be bound; `InputFieldType` and `InputComponent` (card 13, World only, not in the Add Component menu) are registered; a new level's World has `left`, `right`, `up`, `down` and `jump` with their keys, in `LevelWriter.newLevel.json`; a World without one shows the note "No inputs. [Add the five inputs]", whose fix is one step; an input's keys are changed by pressing a key; tests pass
-- [ ] 5. The trigger model in core
+- [x] 5. The trigger model in core
   - Read: versions/v3/architecture.md#the-trigger, versions/v3/architecture.md#the-field-types, requirements/triggers/triggers.md
   - Done when: the `Trigger` types, `TriggerFieldType` (unset parts as null, ids unique and never reused in a component), `triggerName`, `triggerProblems` and `changeableValues` are in `core/triggers/model/` with Node tests for every When, Check, Action and Repeat kind; `TriggerComponent` (card 15, any entity) is registered; field types may give `mapEntities`, which `TriggerFieldType` and `ListFieldType` implement and `IdRemapping` and the missing-entity rule use, with tests that copying and pasting triggers keeps their links as the requirement says
 - [ ] 6. The trigger card's model

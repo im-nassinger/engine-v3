@@ -19,7 +19,7 @@ export {
 export type { ColourStop, Fill, FillKind, GradientFill } from './fill/Fill.ts';
 export { FillFieldType } from './field-types/FillFieldType.ts';
 export type { FieldDefinition } from './FieldDefinition.ts';
-export type { FieldKind, FieldType } from './FieldType.ts';
+export type { EntityLinkMapper, FieldKind, FieldType } from './FieldType.ts';
 export { InputFieldType } from './field-types/InputFieldType.ts';
 export type { Input } from './field-types/InputFieldType.ts';
 export type { JsonValue } from './JsonValue.ts';
@@ -38,6 +38,25 @@ export { colourAt, withoutStop, withStopAdded, withStopAt, withStopChanged } fro
 export type { EditedStops } from './fill/gradientStops.ts';
 export { switchFillKind } from './fill/switchFillKind.ts';
 export { TagsFieldType } from './field-types/TagsFieldType.ts';
+export { TriggerFieldType } from './field-types/TriggerFieldType.ts';
+export { MAX_TRIGGER_NAME_LENGTH, MAX_TRIGGER_SECONDS } from './trigger/normalizeTrigger.ts';
+export type {
+    Action,
+    ActionKind,
+    ChangeOp,
+    Check,
+    CheckKind,
+    Compare,
+    Press,
+    Push,
+    Repeat,
+    RepeatKind,
+    Target,
+    Trigger,
+    ValueRef,
+    When,
+    WhenKind,
+} from './trigger/Trigger.ts';
 export { TextFieldType } from './field-types/TextFieldType.ts';
 export type { TextFieldOptions } from './field-types/TextFieldType.ts';
 export { MAX_WORD_NAME_LENGTH, wordName } from './names/wordName.ts';

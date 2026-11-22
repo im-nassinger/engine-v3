@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import type { KeyCode } from '../../../core/triggers/index.ts';
+import type { KeyCode } from '../../../core/keys/index.ts';
 
 import { InputEdits } from './InputEdits.ts';
 

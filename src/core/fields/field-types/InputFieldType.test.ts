@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import type { KeyCode } from '../../triggers/index.ts';
+import type { KeyCode } from '../../keys/index.ts';
 
 import { InputFieldType } from './InputFieldType.ts';
 

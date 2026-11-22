@@ -16,6 +16,7 @@ const TITLES = new Map([
     ['TagsComponent', 'Tags'],
     ['VariablesComponent', 'Variables'],
     ['InputComponent', 'Input'],
+    ['TriggerComponent', 'Trigger'],
 ]);
 
 const schemas = createV1Registry()

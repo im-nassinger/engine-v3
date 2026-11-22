@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
+import { EntityFieldType } from './EntityFieldType.ts';
 import { ListFieldType } from './ListFieldType.ts';
 import { NumberFieldType } from './NumberFieldType.ts';
 import { VariableFieldType } from './VariableFieldType.ts';
@@ -107,5 +108,22 @@ describe('ListFieldType', () => {
                 { name: 'Coins', value: 3 },
             ]),
         ).toEqual({ ok: false, problem: { reason: 'repeatedName', name: 'coins' } });
+    });
+
+    test('a list of items with ids refuses a second item with the same id', () => {
+        const fieldType = new ListFieldType({ itemType: new NumberFieldType(), itemId: (item) => item });
+
+        expect(fieldType.parse([1, 2, 3]).ok).toBe(true);
+        expect(fieldType.parse([1, 2, 1])).toEqual({ ok: false, problem: { reason: 'repeatedId', id: 1 } });
+    });
+
+    test('mapEntities maps the links of each item, and only when its items can link', () => {
+        const entities = new ListFieldType({ itemType: new EntityFieldType() });
+        const numbers = new ListFieldType({ itemType: new NumberFieldType() });
+        const raw = [{ entity: 2 }, null, { entity: 5 }];
+
+        expect(entities.mapEntities(raw, (id) => id * 10)).toEqual([{ entity: 20 }, null, { entity: 50 }]);
+        expect(entities.mapEntities('damaged', (id) => id * 10)).toBe('damaged');
+        expect(numbers.mapEntities([2, 5], (id) => id * 10)).toEqual([2, 5]);
     });
 });

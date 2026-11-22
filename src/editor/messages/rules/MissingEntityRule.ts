@@ -10,8 +10,9 @@ type EntityReference = {
     readonly id: EntityId;
 };
 
-// `missing entity` on an entity field whose entity is gone: a joint's B, or the camera's Follow, after its
-// entity was deleted. Undo brings the entity back, and the message goes with it.
+// `missing entity` on a field that links to an entity that is gone: a joint's B, the camera's Follow, or a
+// trigger's target, after its entity was deleted. One message per link, so a field naming two gone entities
+// has two. Undo brings the entity back, and the message goes with it.
 export class MissingEntityRule implements EditorMessageRule {
     check(entity: Entity, level: Level): readonly EditorMessage[] {
         const messages: EditorMessage[] = [];
@@ -43,12 +44,15 @@ function entityReferences(entity: Entity) {
 
     for (const component of entity.components) {
         for (const field of component.schema.fields) {
-            if (field.type.kind !== 'entity') continue;
+            const { type } = field;
+            if (type.mapEntities === undefined) continue;
 
-            const id = component.readValue(field.key) as EntityId | null;
-            if (id === null) continue;
-
-            references.push({ component, key: field.key, id });
+            // The field type finds its own links in the saved value; each one is kept as it is.
+            const saved = type.serialize(component.readValue(field.key));
+            type.mapEntities(saved, (id) => {
+                references.push({ component, key: field.key, id });
+                return id;
+            });
         }
     }
 

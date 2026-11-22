@@ -1,4 +1,4 @@
-import type { FieldType } from '../FieldType.ts';
+import type { EntityLinkMapper, FieldType } from '../FieldType.ts';
 import type { ParseOutcome } from '../ParseOutcome.ts';
 import { accept, refuse } from '../rawChecks.ts';
 
@@ -9,6 +9,8 @@ export type ListFieldOptions<T> = {
     // For a list of named items, such as variables: parse refuses a second item with the same name, once
     // each item is normalized, so `Coins` and `coins` are the same name.
     readonly itemName?: (item: T) => string;
+    // For a list of items with ids, such as triggers: parse refuses a second item with the same id.
+    readonly itemId?: (item: T) => number;
 };
 
 // A list of values of one field type, such as a polygon's Points. Refused whole when one item is wrong.
@@ -18,12 +20,14 @@ export class ListFieldType<T> implements FieldType<T[]> {
     readonly minItems: number;
     readonly maxItems: number;
     readonly itemName: ((item: T) => string) | undefined;
+    readonly itemId: ((item: T) => number) | undefined;
 
     constructor(options: ListFieldOptions<T>) {
         this.itemType = options.itemType;
         this.minItems = options.minItems ?? 0;
         this.maxItems = options.maxItems ?? Infinity;
         this.itemName = options.itemName;
+        this.itemId = options.itemId;
     }
 
     parse(raw: unknown): ParseOutcome<T[]> {
@@ -42,6 +46,9 @@ export class ListFieldType<T> implements FieldType<T[]> {
         const repeated = this.repeatedName(items);
         if (repeated !== undefined) return refuse({ reason: 'repeatedName', name: repeated });
 
+        const repeatedId = this.repeatedId(items);
+        if (repeatedId !== undefined) return refuse({ reason: 'repeatedId', id: repeatedId });
+
         return accept(items);
     }
 
@@ -59,6 +66,29 @@ export class ListFieldType<T> implements FieldType<T[]> {
         }
 
         return undefined;
+    }
+
+    private repeatedId(items: readonly T[]) {
+        const { itemId } = this;
+        if (itemId === undefined) return undefined;
+
+        const ids = new Set<number>();
+        for (const item of items) {
+            const id = itemId(item);
+            if (ids.has(id)) return id;
+
+            ids.add(id);
+        }
+
+        return undefined;
+    }
+
+    // Each item's links, when its type has any. A list that isn't one is copied as it is.
+    mapEntities(raw: unknown, linkTo: EntityLinkMapper): unknown {
+        const { itemType } = this;
+        if (itemType.mapEntities === undefined || !Array.isArray(raw)) return raw;
+
+        return raw.map((rawItem: unknown) => itemType.mapEntities?.(rawItem, linkTo));
     }
 
     serialize(value: T[]) {

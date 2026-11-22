@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
 import type { Input } from '../../../../core/fields/index.ts';
-import type { KeyCode } from '../../../../core/triggers/index.ts';
+import type { KeyCode } from '../../../../core/keys/index.ts';
 import { IconButton } from '../../../shared/index.ts';
 import { useFieldTyping } from '../../typing/useFieldTyping.ts';
 import { KeysBox } from './KeysBox/index.ts';

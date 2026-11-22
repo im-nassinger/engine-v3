@@ -10,6 +10,7 @@ import { ShapeComponent } from '../ShapeComponent/ShapeComponent.ts';
 import { StyleComponent } from '../StyleComponent/StyleComponent.ts';
 import { SurfaceComponent } from '../SurfaceComponent/SurfaceComponent.ts';
 import { TagsComponent } from '../TagsComponent/TagsComponent.ts';
+import { TriggerComponent } from '../TriggerComponent/TriggerComponent.ts';
 import { TransformComponent } from '../TransformComponent/TransformComponent.ts';
 import { VariablesComponent } from '../VariablesComponent/VariablesComponent.ts';
 
@@ -31,6 +32,7 @@ export function createV1Registry() {
     registry.register(TagsComponent);
     registry.register(VariablesComponent);
     registry.register(InputComponent);
+    registry.register(TriggerComponent);
 
     return registry;
 }

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
-import { KeyCodes } from '../../../../../core/triggers/index.ts';
-import type { KeyCode } from '../../../../../core/triggers/index.ts';
+import { KeyCodes } from '../../../../../core/keys/index.ts';
+import type { KeyCode } from '../../../../../core/keys/index.ts';
 import './KeysBox.css';
 
 export type KeysBoxProps = {

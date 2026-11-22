@@ -1,5 +1,5 @@
 import type { EntityId } from '../EntityId.ts';
-import type { FieldType } from '../FieldType.ts';
+import type { EntityLinkMapper, FieldType } from '../FieldType.ts';
 import type { ParseOutcome } from '../ParseOutcome.ts';
 import { accept, hasExactlyKeys, isPlainObject, refuse } from '../rawChecks.ts';
 
@@ -24,6 +24,13 @@ export class EntityFieldType implements FieldType<EntityId | null> {
         if (value === null) return null;
 
         return { entity: value };
+    }
+
+    mapEntities(raw: unknown, linkTo: EntityLinkMapper) {
+        const parsed = this.parse(raw);
+        if (!parsed.ok || parsed.value === null) return raw;
+
+        return { entity: linkTo(parsed.value) };
     }
 
     normalize(value: EntityId | null) {

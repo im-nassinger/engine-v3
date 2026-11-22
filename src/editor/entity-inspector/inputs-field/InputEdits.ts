@@ -1,5 +1,5 @@
 import type { Input } from '../../../core/fields/index.ts';
-import type { KeyCode } from '../../../core/triggers/index.ts';
+import type { KeyCode } from '../../../core/keys/index.ts';
 
 // The name Add input gives, numbered from 1 past the ones taken: `input_1`, then `input_2`.
 const NEW_NAME = 'input';

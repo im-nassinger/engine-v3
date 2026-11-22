@@ -1,5 +1,5 @@
-import { KeyCodes } from '../../triggers/index.ts';
-import type { KeyCode } from '../../triggers/index.ts';
+import { KeyCodes } from '../../keys/index.ts';
+import type { KeyCode } from '../../keys/index.ts';
 
 import type { FieldType } from '../FieldType.ts';
 import { wordName } from '../names/wordName.ts';

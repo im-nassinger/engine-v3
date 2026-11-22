@@ -1,6 +1,6 @@
 import { InputFieldType, ListFieldType } from '../../fields/index.ts';
 import type { Input } from '../../fields/index.ts';
-import type { KeyCode } from '../../triggers/index.ts';
+import type { KeyCode } from '../../keys/index.ts';
 
 import { ComponentSchema } from '../schema/ComponentSchema.ts';
 

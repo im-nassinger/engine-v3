@@ -11,8 +11,9 @@
 | `TagsComponent`, `VariablesComponent`, `InputComponent`, `TriggerComponent` | `core/components/<Name>/` | core |
 | `TagsFieldType`, `VariableFieldType`, `InputFieldType`, `TriggerFieldType` | `core/fields/field-types/`, beside v1's (as built, standing yes, 2026-11-22) | core |
 | `wordName` (the rule for a tag, a variable's name and an input's name) | `core/fields/names/` | core |
-| The trigger's types, `triggerName`, `triggerProblems`, `changeableValues` | `core/triggers/model/` | core |
-| `KeyCodes` (the keys a level may use, and the ones it can't) | `core/triggers/keys/` | core |
+| The trigger's types and how a saved trigger is read (`parseTrigger`, `normalizeTrigger`, `copyTrigger`, `mapTriggerEntities`) | `core/fields/trigger/` (as built, standing yes, 2026-11-22) | core |
+| `triggerName`, `triggerProblems`, `changeableValues`, `newTriggerId` | `core/triggers/model/` | core |
+| `KeyCodes` (the keys a level may use, and the ones it can't) | `core/keys/` (as built, standing yes, 2026-11-22) | core |
 | `EventPhase`, `TriggerPhase`, `TouchLedger`, `InputState`, `TriggerTimers`, `ActionRunner`, `PlayValueWriter` | `core/simulation/triggers/`, `core/simulation/phases/` | core |
 | `TriggerTool` | `editor/tools/trigger/` | editor |
 | `createTrigger` (the tool's one step), the trigger edits | `editor/commands/triggers/` | editor |
@@ -107,6 +108,7 @@ export type Repeat = { kind: 'everyTime' } | { kind: 'oncePerRun' } | { kind: 'a
 - **`triggerProblems(trigger, level)`** (core) lists what stops a trigger running: an unset part, a missing entity, an unknown variable, input or value. **The Entity inspector and the game both call it**, so "yellow in the editor" and "doesn't run in play" can't disagree. A missing entity shows `missing` and only that action is skipped in play, as the requirement says; an unset part stops the whole trigger.
 - **`changeableValues(entity, registry)`** lists what Change value may offer for a target: every field whose schema marks it `changeableInPlay`, the TagsComponent's tag, each trigger's on/off, and the World's variables. It reads the schemas only, so a component added later is offered with no trigger code, as v1's seam promised. A vector is offered whole for Set, and by axis for Add and Subtract.
 - **`triggerName(trigger)`** gives "Touched", "jump pressed", "After 60 s", "No coin left". A trigger with a name of its own keeps it.
+- **Ids are never reused** (as built, standing yes, 2026-11-22): the TriggerComponent stores `nextTriggerId` beside its list, and `newTriggerId(component)` gives the next one, above every id the list holds. The list refuses two triggers with one id (`ListFieldType`'s `itemId`, the problem `repeatedId`).
 
 ## The trigger card
 
