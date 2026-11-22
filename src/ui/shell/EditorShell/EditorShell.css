@@ -63,8 +63,9 @@
         height: var(--debug-box);
     }
 
-    /* Hidden, not removed, so the panels keep their scroll and folds and nothing in them is clicked or read. */
-    &[data-playing='true'] > :is(.panel-place, .free-area, .message-pill) {
+    /* Hidden, not removed, so the panels keep their scroll and folds and nothing in them is clicked or read.
+       The message pill stays, for the play warnings. */
+    &[data-playing='true'] > :is(.panel-place, .free-area) {
         visibility: hidden;
     }
 }

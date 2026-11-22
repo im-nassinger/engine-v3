@@ -22,7 +22,7 @@
 | `LevelTags` (every tag in the level, for suggestions and pickers) | `core/derived/tags/` | core |
 | Sensor events, teleports, kicks and live settings in the Box2D adapter | `adapters/box2d/` | adapters |
 | `UnstyledShapeOverlay` (the dashed edge and bolt) | `adapters/pixi/overlays/unstyled/` | adapters |
-| `TriggerCard`, `TagsField`, `VariableRow`, `InputRow`, `EndWindow` | `ui/entity-inspector/triggers/`, `ui/fields/`, `ui/play/end-window/` | ui |
+| `TriggerCard`, `TagsField`, `VariableRow`, `InputRow`, `EndWindow` | `ui/entity-inspector/triggers/`, `ui/fields/`, `ui/end-window/` | ui |
 | The new tool in `createTools`, the new components in the registry | `app/` | app |
 
 ## The components
@@ -164,6 +164,7 @@ export type Repeat = { kind: 'everyTime' } | { kind: 'oncePerRun' } | { kind: 'a
 - **Win or Lose** puts `PlaySession` in `ended`; the Play bar reads ENDED and **`EndWindow`** (ui) shows the title and the time, the run's tick count as `m:ss.hh`. Leave is Stop. Restart is below.
 - **Restart** (the action or the button) starts a new `Simulation` from the `LevelData` the worker kept, with the run's same clock time, as v1 planned: nothing is reset in place. The page's `PlayMirror` starts again from the same data. One worker does it; the tech notes' spare worker is not needed, since the level is already read. **The guard against a restart loop:** a Restart action in the first second of a run is ignored with a warning. *Why: a level-start trigger that restarts would otherwise rebuild the level every tick, which is the "restart loop that could freeze the computer" the requirement names.*
 - **Warnings during play** (the chain limit, an unknown input, an ignored Restart) go to the message pill until the Console comes in v5, through the report's new `warnings`, each sent once per run.
+- **As built (standing yes, 2026-11-22):** `TickReport` also carries `warnings`, the `PlayWarning`s first given in the batch (`PlayWarnings.takeNew`); a `PlayWarning` is a kind with its details, and `EndOfTickPhase` turns `PlayInputs.unknownInputs` into `unknownInput` warnings. `changes` hold only the keys `PlayValueWriter` wrote, at their latest, in `ReportCollector`; a teleport also sets the pose's snap flag. `Simulation.runTick` does nothing once `end` is set. On the page, `PlaySession.outcome` is the Win or Lose, `playWarningText` (`editor/play/warnings/`) writes each warning for the message pill, which now stays on the page during play, and `runTimeText` (`editor/play/end/`) the time. `EndWindow` is in `ui/end-window/`, beside `ui/play-bar/`, not in `ui/play/`, which holds the context both read (a component there made a module cycle); it is in the Play bar's floating layer, under it. `RunEnd` and `RunEnding` moved to `core/simulation/end/`, since both the run and the report read them. Until task 14, `PlaySession.restart` is Stop then Play.
 
 ### Keys during play
 

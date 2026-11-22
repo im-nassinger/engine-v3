@@ -42,7 +42,7 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 - [x] 12. Checks and actions
   - Read: versions/v3/architecture.md#actions, requirements/triggers/triggers.md#if-checks--v3, requirements/triggers/triggers.md#actions--v3, requirements/triggers/triggers.md#order-and-limits--v3
   - Done when: `TriggerPhase`, `ActionRunner` and `PlayValueWriter` run checks and actions on their targets in Entities viewer order: Change value (variables, any value `changeableValues` offers, tags, a trigger's on/off, physics told when it owns the value), Destroy at the end of the tick, Push ignoring mass, Win, Lose and Restart recorded with the first one winning; triggers with problems don't run, a missing target is skipped; the chain limit of 32 with one warning; Node tests pass
-- [ ] 13. The run's end, changed values and warnings on the page
+- [x] 13. The run's end, changed values and warnings on the page
   - Read: versions/v3/architecture.md#the-report-the-mirror-and-the-end, requirements/play-and-save/test-play.md#win-and-lose-the-end-window--v3, design/controls.md#v3-triggers-tags-variables-inputs-and-the-end-window
   - Done when: `TickReport` carries `changes`, `end` and `warnings`; `PlayMirror` applies the changes so they show; Win or Lose puts the run in `ended`, the Play bar reads ENDED and `EndWindow` shows the title, the time as `m:ss.hh`, Leave (Stop) and Restart, as the design draws; warnings show once each in the message pill; tests pass
 - [ ] 14. Restart

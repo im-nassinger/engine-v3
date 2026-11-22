@@ -12,7 +12,7 @@ import type { PlayWarnings } from '../report/PlayWarnings.ts';
 import type { ReportCollector } from '../report/ReportCollector.ts';
 import type { PlayTriggers } from '../triggers/PlayTriggers.ts';
 
-import type { RunEnding } from './RunEnd.ts';
+import type { RunEnding } from '../end/RunEnd.ts';
 
 // Everything one run's tick phases share: the play copy, the components it was read with, its caches, the
 // physics built from it, the bodies' poses, the joints still in the run, the entities marked for removal,

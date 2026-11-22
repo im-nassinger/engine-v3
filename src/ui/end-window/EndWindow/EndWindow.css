@@ -1,0 +1,41 @@
+.end-window {
+    position: absolute;
+    inset: 0;
+    /* With the Play bar, which comes after it in the page and so stays over its scrim, as the design draws. */
+    z-index: var(--stack-floating);
+    display: grid;
+    place-items: center;
+    background: var(--scrim);
+
+    > .box {
+        box-sizing: border-box;
+        width: var(--end-window);
+        padding: var(--space-14) var(--space-14) var(--space-10);
+        border-radius: var(--radius-island);
+        background: var(--panel);
+        box-shadow: var(--shade);
+        text-align: center;
+
+        > h2 {
+            margin: 0 0 var(--space-4);
+            font-size: var(--text-end-title);
+            font-weight: var(--weight-heading);
+        }
+
+        > .time {
+            margin: 0 0 var(--space-14);
+            color: var(--muted);
+
+            > b {
+                color: var(--text);
+                font-weight: var(--weight-name);
+            }
+        }
+
+        > .buttons {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-8);
+        }
+    }
+}

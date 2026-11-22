@@ -1,6 +1,10 @@
 import type { EntityId } from '../../fields/index.ts';
 import type { PathGeometry, Point } from '../../geometry/index.ts';
 
+import type { RunEnd } from '../end/RunEnd.ts';
+
+import type { PlayWarning } from './PlayWarnings.ts';
+
 // Numbers per moved body in TickReport.poses: entity id, x, y, angle and the snap flag.
 export const POSE_STRIDE = 5;
 
@@ -11,6 +15,13 @@ export type JointPath = {
 };
 
 // What the worker sends the page after a batch of ticks. Everything in it is plain data.
+// The values a trigger changed in one component, by their keys in its schema, each at its latest.
+export type ValueChanges = {
+    readonly entity: EntityId;
+    readonly component: string;
+    readonly values: Readonly<Record<string, unknown>>;
+};
+
 export type TickReport = {
     readonly lastTick: number;
     // Per body that moved during the batch, its latest pose in pixels and degrees, then 1 when the page
@@ -25,4 +36,11 @@ export type TickReport = {
     // changed. A path follows from its bodies' poses, so it is sent only to be drawn.
     readonly paths: readonly JointPath[];
     readonly camera: Point;
+    // Every value Change value wrote during the batch, per entity and component in the order they first
+    // changed. An entity removed in the batch has none.
+    readonly changes: readonly ValueChanges[];
+    // How the run ended, by the first Win, Lose or Restart; null while it goes on. No tick runs after it.
+    readonly end: RunEnd | null;
+    // The warnings first given during the batch: each is sent once per run.
+    readonly warnings: readonly PlayWarning[];
 };

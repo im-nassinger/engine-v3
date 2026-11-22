@@ -15,4 +15,5 @@ export {
     PlaySession,
     STOP_TO_EDIT_TEXT,
 } from './session/PlaySession.ts';
-export type { PlaySessionOptions, PlayState } from './session/PlaySession.ts';
+export type { PlaySessionOptions, PlayState, RunOutcome } from './session/PlaySession.ts';
+export { runTimeText } from './end/runTimeText.ts';

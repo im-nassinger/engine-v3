@@ -55,7 +55,10 @@ export class Simulation {
         return this.run.warnings.all;
     }
 
+    // Once the run has ended, its tick finished and no more run.
     runTick(inputs: TickInputs) {
+        if (this.end !== null) return;
+
         this.currentTick += 1;
         const context = { tick: this.currentTick, inputs, run: this.run };
 
@@ -68,7 +71,9 @@ export class Simulation {
     takeReport(): TickReport {
         const camera = this.run.camera.position;
 
-        return this.run.report.take(this.currentTick, camera);
+        const warnings = this.run.warnings.takeNew();
+
+        return this.run.report.take(this.currentTick, camera, this.end, warnings);
     }
 
     stateHash() {

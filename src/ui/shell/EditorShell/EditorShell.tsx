@@ -1,5 +1,6 @@
 import { DebugBox } from '../../debug-box/index.ts';
 import { Dialogs } from '../../dialogs/index.ts';
+import { EndWindow } from '../../end-window/index.ts';
 import { EntitiesViewer } from '../../entities-viewer/index.ts';
 import { EntityInspector } from '../../entity-inspector/index.ts';
 import { LevelViewHost } from '../../level-view-host/index.ts';
@@ -27,7 +28,7 @@ const HIDES_ENTITY_INSPECTOR: ReadonlySet<string> = new Set(['shape', 'joint', '
 // the Trigger tool is active the Entity inspector's island is gone and the free area reaches the tool column. With nothing
 // selected the island is gone too, but the free area stays, so selecting doesn't move what fitting frames (owner, 2026-11-19). During test play
 // every panel and bar is hidden but kept, so Stop shows them as they were, scrolled and folded, and the Play bar floats
-// over the game.
+// over the game, with the end window under it, over the last frame, once a Win or Lose ends the run.
 export function EditorShell() {
     // The session gives a new open level after New or Import while the session object stays the same, so the
     // React Compiler must not keep the old level's selection.
@@ -48,6 +49,11 @@ export function EditorShell() {
     return (
         <div className="editor-shell" data-entity-inspector-hidden={isEntityInspectorHidden} data-playing={isPlaying}>
             <LevelViewHost />
+            {isPlaying && (
+                <PanelErrorBoundary>
+                    <EndWindow />
+                </PanelErrorBoundary>
+            )}
             {isPlaying && (
                 <PanelErrorBoundary>
                     <PlayBar />

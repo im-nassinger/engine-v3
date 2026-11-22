@@ -12,7 +12,7 @@ import {
     startingCameraPosition,
     startPlayCopy,
 } from '../../../core/simulation/index.ts';
-import type { CameraBox, PlayCopy, TickReport } from '../../../core/simulation/index.ts';
+import type { CameraBox, PlayCopy, TickReport, ValueChanges } from '../../../core/simulation/index.ts';
 
 import { NoPhysicsEngine } from './NoPhysicsEngine.ts';
 
@@ -89,6 +89,7 @@ export class PlayMirror {
         this.lastTick = report.lastTick;
         this.removeAll(report.removed);
         this.setPaths(report);
+        this.writeChanges(report.changes);
 
         const before = this.moves;
         this.moves = this.movesIn(report.poses);
@@ -162,6 +163,20 @@ export class PlayMirror {
     private setPaths(report: TickReport) {
         for (const { entity, path } of report.paths) {
             this.level.findEntity(entity)?.getComponent(PathComponent)?.set('path', path);
+        }
+    }
+
+    // Written through each value's field type, as the worker wrote it. A body's pose still comes from the
+    // poses, so a teleported body's Position and Rotation only reach the Entity inspector.
+    private writeChanges(changes: readonly ValueChanges[]) {
+        for (const change of changes) {
+            const entity = this.level.findEntity(change.entity);
+            const component = entity?.components.find((held) => held.schema.typeName === change.component);
+            if (component === undefined) continue;
+
+            for (const [key, value] of Object.entries(change.values)) {
+                component.writeValue(key, value);
+            }
         }
     }
 

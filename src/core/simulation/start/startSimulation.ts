@@ -18,7 +18,7 @@ import { PlayWarnings } from '../report/PlayWarnings.ts';
 import { ReportCollector } from '../report/ReportCollector.ts';
 import { PlayTriggers } from '../triggers/PlayTriggers.ts';
 
-import { RunEnding } from '../run/RunEnd.ts';
+import { RunEnding } from '../end/RunEnd.ts';
 import type { RunStart } from '../run/RunStart.ts';
 import { Simulation } from '../run/Simulation.ts';
 

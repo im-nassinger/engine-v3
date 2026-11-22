@@ -5,6 +5,9 @@ import {
     PathComponent,
     PhysicsWorldComponent,
     ShapeComponent,
+    StyleComponent,
+    TriggerComponent,
+    VariablesComponent,
 } from '../../../core/components/index.ts';
 import type { JointValues } from '../../../core/components/index.ts';
 import type { EntityId } from '../../../core/fields/index.ts';
@@ -97,6 +100,10 @@ function reportOf(lastTick: number, poses: readonly (readonly number[])[], camer
         removedPastHardLimit: [],
         paths: [],
         camera,
+
+        changes: [],
+        end: null,
+        warnings: [],
     };
 }
 
@@ -252,6 +259,53 @@ describe('PlayMirror', () => {
         const path = mirror.level.requireEntity(rope.id).requireComponent(PathComponent).get('path');
         const levelPoints = path.points.map((point) => levelPositionOf(mirror, rope.id, point));
         expect(levelPoints).toEqual([closeTo({ x: 0, y: 105 }), closeTo({ x: 0, y: 0 })]);
+    });
+
+    test("writes a report's changed values, so they show", async () => {
+        const level = Level.createNew();
+        level.world.addComponent(new VariablesComponent({ variables: [{ name: 'coins', value: 0 }] }));
+        const crate = placeBody(level, level.world, transform(0, 0));
+        crate.addComponent(new StyleComponent(StyleComponent.schema.defaults()));
+        const opacity = { kind: 'field', component: 'StyleComponent', field: 'opacity' } as const;
+        const coins = { kind: 'variable', name: 'coins' } as const;
+        const triggers = [
+            {
+                id: 1,
+                name: null,
+                on: true,
+                when: { kind: 'levelStart' },
+                checks: [],
+                actions: [
+                    {
+                        kind: 'change',
+                        target: { kind: 'entity', entity: crate.id },
+                        value: opacity,
+                        op: 'set',
+                        amount: 0.4,
+                    },
+                    { kind: 'change', target: { kind: 'this' }, value: coins, op: 'add', amount: 3 },
+                ],
+                repeat: { kind: 'everyTime' },
+            },
+        ] as const;
+        level.world.addComponent(new TriggerComponent({ triggers: [...triggers], nextTriggerId: 2 }));
+        const { runner, mirror } = await startBoth(level);
+
+        const report = await runBatch(runner, mirror);
+
+        expect(report.changes).toHaveLength(2);
+        const mirrorCrate = mirror.level.requireEntity(crate.id);
+        expect(mirrorCrate.requireComponent(StyleComponent).get('opacity')).toBe(0.4);
+        const variables = mirror.level.world.requireComponent(VariablesComponent).get('variables');
+        expect(variables).toEqual([{ name: 'coins', value: 3 }]);
+    });
+
+    test('a change for an entity the mirror no longer has is skipped', () => {
+        const level = Level.createNew();
+        const mirror = startMirror(level);
+        const change = { entity: 999, component: 'TagsComponent', values: { tags: ['x'] } };
+
+        expect(() => mirror.apply({ ...reportOf(1, []), changes: [change] })).not.toThrow();
     });
 
     test('a level the reader refuses is refused', () => {

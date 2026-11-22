@@ -401,7 +401,7 @@ describe('Change value tells physics when it owns the value', () => {
         ]);
         expect(simulation.level.world.requireComponent(PhysicsWorldComponent).get('gravity')).toEqual({ x: 0, y: 0 });
         expect(inRun(simulation, wheel)?.requireComponent(BodyComponent).get('gravityScale')).toBe(1);
-        expect(simulation.warnings).toEqual(['valueFixedInPlay']);
+        expect(simulation.warnings).toEqual([{ kind: 'valueFixedInPlay' }]);
     });
 
     test('the Position of a surface with no body of its own is skipped, a plain entity moves', () => {
@@ -591,7 +591,7 @@ describe('the chain limit', () => {
 
         simulation.runTick(PRESS_SPACE);
         expect(coinsIn(simulation)).toBe(31);
-        expect(simulation.warnings).toEqual(['chainLimit']);
+        expect(simulation.warnings).toEqual([{ kind: 'chainLimit' }]);
 
         // The dropped round is not heard on the next tick.
         simulation.runTick(NOTHING);

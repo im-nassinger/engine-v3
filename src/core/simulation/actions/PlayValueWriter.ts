@@ -87,6 +87,7 @@ export class PlayValueWriter {
             return { ...variable, value: changedNumber(op, variable.value, amount) };
         });
         component.set('variables', variables);
+        this.reportChange(entity, component, 'variables');
 
         return true;
     }
@@ -105,6 +106,7 @@ export class PlayValueWriter {
             if (has) return true;
 
             component.set('tags', [...tags, tag]);
+            this.reportChange(entity, component, 'tags');
             counts.tagAdded(tag);
 
             return true;
@@ -116,6 +118,7 @@ export class PlayValueWriter {
             'tags',
             tags.filter((held) => held !== tag),
         );
+        this.reportChange(entity, component, 'tags');
         if (counts.tagTakenAway(tag)) {
             this.effects.tagRanOut(tag);
         }
@@ -135,6 +138,7 @@ export class PlayValueWriter {
             'triggers',
             triggers.map((candidate) => (candidate.id === triggerId ? { ...candidate, on } : candidate)),
         );
+        this.reportChange(entity, component, 'triggers');
 
         const { timers } = this.run.triggers;
         if (!on) {
@@ -154,7 +158,7 @@ export class PlayValueWriter {
 
         const role = physicsRoleOf(ref);
         if (role === 'fixed') {
-            this.run.warnings.warn('valueFixedInPlay');
+            this.run.warnings.warn({ kind: 'valueFixedInPlay' });
             return false;
         }
 
@@ -167,6 +171,7 @@ export class PlayValueWriter {
         const written = component.writeValue(ref.field, next);
         if (!written.ok) return false;
 
+        this.reportChange(entity, component, ref.field);
         this.tellPhysics(entity, component, role);
 
         return true;
@@ -231,18 +236,29 @@ export class PlayValueWriter {
         const rotationWritten = transform.writeValue('rotation', nextRotation);
         if (!positionWritten.ok || !rotationWritten.ok) return false;
 
+        this.reportChange(entity, transform, 'position');
+        this.reportChange(entity, transform, 'rotation');
+
         const newLevel = parentMatrix.multiply(Matrix2D.fromTransform(transformValuesOf(transform)));
         const placed = newLevel.decompose();
         const pose = { x: placed.position.x, y: placed.position.y, angle: placed.rotation };
 
         scene.world.setPose(body.handle, pose);
         poses.recordMove(entity.id, pose);
+        this.run.report.bodyTeleported(entity.id);
         caches.bodyMoved(entity);
         for (const follower of bodyMatrices.followersOf(entity)) {
             caches.bodyMoved(follower);
         }
 
         return true;
+    }
+
+    // The page's mirror writes the same value, so the level view and the Entity inspector show it.
+    private reportChange(entity: Entity, component: AnyComponent, key: string) {
+        const value = component.readValue(key);
+
+        this.run.report.valueChanged(entity.id, component.schema.typeName, key, value);
     }
 
     private get counts() {

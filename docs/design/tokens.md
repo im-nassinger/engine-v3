@@ -53,6 +53,7 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--text-size` | 12 px | The default: rows, fields, menus, numbers, tooltips, the message pill |
 | `--text-title` | 14 px | A panel's title, a dialog's title |
 | `--text-large` | 16 px | Kept for the rare large text; v1 uses none |
+| `--text-end-title` | 20 px | The end window's title, "Level won" or "Level lost" (v3) |
 | `--weight-text` | 400 | Text |
 | `--weight-name` | 500 | The entity's name field |
 | `--weight-heading` | 600 | Panel titles, card heads, the Play bar's label and primary buttons |
@@ -80,6 +81,7 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--icon-small` | 13 px: in fields, menu entries and the debug box | |
 | `--indent` | 16 px per level of the Entities viewer tree | |
 | `--dialog` | 400 px wide | |
+| `--end-window` | 320 px wide: the end window in test play | the v3 design |
 | `--scrollbar-size` | 8 px: a scrollbar's width in WebKit; Firefox and Chromium draw their own thin one | owner's fix (2026-11-21) |
 
 ## Spacing, corners, the shadow

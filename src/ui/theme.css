@@ -37,6 +37,7 @@
     --text-size: 12px;
     --text-title: 14px;
     --text-large: 16px;
+    --text-end-title: 20px;
     --weight-text: 400;
     --weight-name: 500;
     --weight-heading: 600;
@@ -60,6 +61,7 @@
     --icon-small: 13px;
     --indent: 16px;
     --dialog: 400px;
+    --end-window: 320px;
     --scrollbar-size: 8px;
 
     --space-4: 4px;

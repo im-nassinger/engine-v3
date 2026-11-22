@@ -25,7 +25,7 @@ export class TriggerPhase implements TickPhase {
 
         for (let count = 1; round.length > 0; count++) {
             if (count > CHAIN_LIMIT) {
-                run.warnings.warn('chainLimit');
+                run.warnings.warn({ kind: 'chainLimit' });
                 return;
             }
 

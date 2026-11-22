@@ -5,7 +5,7 @@ import { LevelWriter } from '../../../core/level-data/index.ts';
 import type { LevelData } from '../../../core/level-data/index.ts';
 import { labelName } from '../../../core/level/index.ts';
 import { levelKeys } from '../../../core/simulation/index.ts';
-import type { TickInputs, TickReport } from '../../../core/simulation/index.ts';
+import type { PlayWarning, RunEnd, TickInputs, TickReport } from '../../../core/simulation/index.ts';
 import type { EditorSession } from '../../session/index.ts';
 import { StatusText } from '../../status/index.ts';
 import type { Cancel, Clock, FrameScheduler, Timer } from '../../time/index.ts';
@@ -16,9 +16,13 @@ import { PlayMirror } from '../mirror/PlayMirror.ts';
 import { TickPacer } from '../pacing/TickPacer.ts';
 import type { GameRunner, StartOutcome, TicksOutcome } from '../runner/GameRunner.ts';
 import { Watchdog } from '../watchdog/Watchdog.ts';
+import { playWarningText } from '../warnings/playWarningText.ts';
+
+// A run ended by a Win or Lose action, on its last tick.
+export type RunOutcome = RunEnd & { readonly kind: 'won' | 'lost' };
 
 // idle: the editor. starting: Play was pressed and the game is loading the level. playing and paused: a run
-// is going. ended: the run is over with a message, and its last frame stays until Stop.
+// is going. ended: the run is over, won, lost or with a message, and its last frame stays until Stop.
 export type PlayState = 'idle' | 'starting' | 'playing' | 'paused' | 'ended';
 
 export const NOT_RESPONDING_TEXT = "The game isn't responding";
@@ -67,6 +71,7 @@ export class PlaySession {
     private currentNotice: string | undefined;
     private currentEndedMessage: string | undefined;
     private currentEndedDetail: string | undefined;
+    private currentOutcome: RunOutcome | undefined;
     // Raised by every Play and Stop, so an answer to an earlier run is dropped.
     private run = 0;
     private batchInFlight = false;
@@ -112,6 +117,11 @@ export class PlaySession {
         return this.currentEndedMessage;
     }
 
+    // Won or lost on which tick, for the end window, until Stop. Undefined when the run ended any other way.
+    get outcome() {
+        return this.currentOutcome;
+    }
+
     // The crash's own words, for developers and tests, never shown as they are.
     get endedDetail() {
         return this.currentEndedDetail;
@@ -151,13 +161,22 @@ export class PlaySession {
     stop() {
         if (!this.isRunGoing) return;
 
-        const runWasEnded = this.currentState === 'ended';
+        // A won or lost run is still kept by the game; one that failed, crashed or hung is already gone.
+        const gameHasRun = this.currentState !== 'ended' || this.currentOutcome !== undefined;
         this.dropRun();
-        if (!runWasEnded) {
+        if (gameHasRun) {
             this.options.runner.stop();
         }
 
         this.setState('idle');
+    }
+
+    // A new run of the same level, for the end window's Restart and the Restart action.
+    restart() {
+        if (!this.isRunGoing) return;
+
+        this.stop();
+        this.play();
     }
 
     // Play or Stop, for Shift+T, Ctrl+Enter and the one button.
@@ -322,10 +341,35 @@ export class PlaySession {
         if (warning !== undefined) {
             this.hint.show(warning);
         }
+        this.showWarnings(report.warnings);
+        this.reachEnd(report.end);
+    }
+
+    // Each comes once per run from the game. Two in one report share the message pill.
+    private showWarnings(warnings: readonly PlayWarning[]) {
+        if (warnings.length === 0) return;
+
+        const texts = warnings.map(playWarningText);
+        const text = texts.join('. ');
+        this.options.session.status.show(text);
+    }
+
+    private reachEnd(end: RunEnd | null) {
+        if (end === null) return;
+
+        if (end.kind === 'restart') {
+            this.restart();
+            return;
+        }
+
+        this.currentOutcome = end;
+        this.end(undefined, undefined);
+        // The game ran no tick past the end, so its last frame is drawn where the report put it.
+        this.drawn.increment();
     }
 
     // The last frame stays, nothing more is asked of the game, and the message stays until Stop.
-    private end(message: string, detail: string | undefined) {
+    private end(message: string | undefined, detail: string | undefined) {
         this.cancelFrame?.();
         this.cancelFrame = undefined;
         this.watchdog.reset();
@@ -361,6 +405,7 @@ export class PlaySession {
         this.currentNotice = undefined;
         this.currentEndedMessage = undefined;
         this.currentEndedDetail = undefined;
+        this.currentOutcome = undefined;
     }
 
     private showNotice(shown: boolean) {

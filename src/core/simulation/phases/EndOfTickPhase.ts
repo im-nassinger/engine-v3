@@ -6,8 +6,8 @@ import type { PlayRun } from '../run/PlayRun.ts';
 import type { TickContext, TickPhase } from '../run/TickPhase.ts';
 
 // The tick's last phase: removes the marked entities with everything inside them, their bodies and the
-// joints with an end on those bodies, keeps the tags that ran out for the next tick's events, then adds the
-// bodies that moved to the report.
+// joints with an end on those bodies, keeps the tags that ran out for the next tick's events, warns of the
+// unknown inputs read, then adds the bodies that moved to the report.
 export class EndOfTickPhase implements TickPhase {
     run(tick: TickContext) {
         const { run } = tick;
@@ -19,6 +19,10 @@ export class EndOfTickPhase implements TickPhase {
             removeMarked(run, entity, cause);
         }
         run.triggers.endTick();
+
+        for (const input of run.inputs.unknownInputs) {
+            run.warnings.warn({ kind: 'unknownInput', input });
+        }
 
         for (const id of run.poses.moved) {
             const pose = run.poses.poseOf(id);

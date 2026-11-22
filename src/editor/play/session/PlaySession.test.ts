@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'vitest';
 
-import { NameComponent, PhysicsWorldComponent, TransformComponent } from '../../../core/components/index.ts';
+import {
+    NameComponent,
+    PhysicsWorldComponent,
+    TransformComponent,
+    TriggerComponent,
+} from '../../../core/components/index.ts';
+import type { Action } from '../../../core/fields/index.ts';
 import type { LevelData } from '../../../core/level-data/index.ts';
 import { LevelWriter } from '../../../core/level-data/index.ts';
 import { Level } from '../../../core/level/index.ts';
@@ -147,6 +153,22 @@ function crateOf(level: Level) {
     return crate;
 }
 
+// The World's one trigger, which runs the actions when the level starts, on the first tick.
+function onLevelStart(level: Level, actions: readonly Action[]) {
+    const trigger = {
+        id: 1,
+        name: null,
+        on: true,
+        when: { kind: 'levelStart' },
+        checks: [],
+        actions,
+        repeat: { kind: 'everyTime' },
+    } as const;
+    level.world.addComponent(new TriggerComponent({ triggers: [trigger], nextTriggerId: 2 }));
+
+    return level;
+}
+
 function emptyReport(lastTick: number): TickReport {
     return {
         lastTick,
@@ -155,6 +177,10 @@ function emptyReport(lastTick: number): TickReport {
         removedPastHardLimit: [],
         paths: [],
         camera: { x: 0, y: 0 },
+
+        changes: [],
+        end: null,
+        warnings: [],
     };
 }
 
@@ -629,5 +655,89 @@ describe('PlaySession', () => {
         disconnect();
 
         expect(page.listenerCount).toBe(0);
+    });
+
+    describe("the run's end and warnings", () => {
+        test("a Win ends the run with its tick, asks for no more ticks, and Stop drops the game's run", async () => {
+            const level = onLevelStart(levelWithACrate(), [{ kind: 'win' }]);
+            const { play, runner, nextFrame } = setUp(level);
+            play.play();
+            await settle();
+
+            await nextFrame();
+
+            expect(play.state).toBe('ended');
+            expect(play.outcome).toEqual({ kind: 'won', tick: 1 });
+            expect(play.endedMessage).toBeUndefined();
+            expect(play.mirror).toBeDefined();
+            const batchesAtEnd = runner.batches.length;
+
+            await nextFrame();
+            expect(runner.batches.length).toBe(batchesAtEnd);
+
+            play.stop();
+            expect(play.state).toBe('idle');
+            expect(play.outcome).toBeUndefined();
+            expect(runner.asked).toEqual(['start', 'stop']);
+        });
+
+        test('a Lose ends the run lost', async () => {
+            const level = onLevelStart(levelWithACrate(), [{ kind: 'lose' }]);
+            const { play, nextFrame } = setUp(level);
+            play.play();
+            await settle();
+
+            await nextFrame();
+
+            expect(play.outcome).toEqual({ kind: 'lost', tick: 1 });
+        });
+
+        test('Restart starts a new run of the level, and a Restart action does the same', async () => {
+            const level = onLevelStart(levelWithACrate(), [{ kind: 'win' }]);
+            const { play, runner, nextFrame } = setUp(level);
+            play.play();
+            await settle();
+            await nextFrame();
+
+            play.restart();
+            await settle();
+
+            expect(runner.asked).toEqual(['start', 'stop', 'start']);
+            expect(play.state).toBe('playing');
+            expect(play.outcome).toBeUndefined();
+
+            const restarting = setUp(onLevelStart(levelWithACrate(), [{ kind: 'restart' }]));
+            restarting.play.play();
+            await settle();
+            await restarting.nextFrame();
+
+            expect(restarting.runner.asked).toEqual(['start', 'stop', 'start']);
+        });
+
+        test('a warning shows once in the message pill', async () => {
+            const level = levelWithACrate();
+            const crateId = crateOf(level).id;
+            const gravityScale = { kind: 'field', component: 'BodyComponent', field: 'gravityScale' } as const;
+            const fixed: Action = {
+                kind: 'change',
+                target: { kind: 'entity', entity: crateId },
+                value: gravityScale,
+                op: 'set',
+                amount: 0,
+            };
+            onLevelStart(level, [fixed]);
+            const { play, session, timer, nextFrame } = setUp(level);
+            play.play();
+            await settle();
+
+            await nextFrame();
+
+            expect(session.status.current).toBe(
+                "A trigger tried to change a value that can't change during play, so it was skipped",
+            );
+            timer.advance(4_000);
+            await nextFrame();
+            expect(session.status.current).toBeUndefined();
+        });
     });
 });
