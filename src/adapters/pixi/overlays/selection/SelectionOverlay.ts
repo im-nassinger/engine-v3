@@ -53,6 +53,7 @@ export type DrawnSelection = {
     readonly outlines: number;
     readonly bodyOutlines: number;
     readonly rings: number;
+    readonly jointBoxes: readonly Bounds[];
     readonly cameraFrames: number;
     readonly padlocks: number;
     readonly handles: readonly Bounds[];
@@ -74,6 +75,7 @@ const NOTHING_DRAWN: DrawnSelection = {
     outlines: 0,
     bodyOutlines: 0,
     rings: 0,
+    jointBoxes: [],
     cameraFrames: 0,
     padlocks: 0,
     handles: [],
@@ -136,6 +138,7 @@ export class SelectionOverlay {
             outlines: this.drawOutlines(plan.outlines, plan.heavyOutline ? HEAVY_OUTLINE : THIN_OUTLINE, scene, caches),
             bodyOutlines: this.drawOutlines(plan.bodyOutlines, BODY_OUTLINE, scene, caches),
             rings: this.drawRings(plan.rings, scene),
+            jointBoxes: this.drawJointBoxes(plan.jointBoxes, scene),
             cameraFrames: this.drawCameraFrames(plan, scene),
             padlocks: this.drawPadlocks(plan, scene),
             handles,
@@ -239,6 +242,18 @@ export class SelectionOverlay {
         }
 
         return rings.length;
+    }
+
+    // Around both ends' rings, so the box takes in the whole joint.
+    private drawJointBoxes(boxes: readonly Bounds[], scene: OverlayScene) {
+        const margin = jointIconRadiusPx(scene.view.zoom) + RING_GAP_PX;
+
+        return boxes.map((box) => {
+            const onScreen = screenRectangleOf(box, scene.view).expandedBy(margin);
+            this.lines.rect(onScreen.left, onScreen.top, onScreen.width, onScreen.height).stroke(BOX);
+
+            return onScreen;
+        });
     }
 
     private drawCameraFrames(plan: SelectionPlan, scene: OverlayScene) {

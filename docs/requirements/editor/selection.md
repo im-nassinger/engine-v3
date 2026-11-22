@@ -75,7 +75,7 @@ Source: scope SE7; round 4: 02 2.6
 | One shape, path or text | An outline of the real shape, plus a box with handles |
 | One group | A box only |
 | Several entities | A thin outline each, and one shared box |
-| A joint | A ring around its icon |
+| A joint | A ring around each of its icons. A Rope or Spring also outlines its path and has one box around the whole joint, with no handles, since its ends stay on the entities they join (owner: 2026-11-22) |
 | The camera | A heavier frame |
 | A locked entity, selected from the Entities viewer | A plain outline with a padlock, no handles |
 | Only hidden entities, selected from the Entities viewer | A dashed box where they are, no handles |

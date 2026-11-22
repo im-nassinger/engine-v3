@@ -11,6 +11,7 @@ import { Bounds } from '../../../../core/geometry/index.ts';
 import type { Point } from '../../../../core/geometry/index.ts';
 import type { Entity, Level } from '../../../../core/level/index.ts';
 import { mergesInto } from '../../../../core/physics/index.ts';
+import { jointIconCentres } from '../../../../editor/view/index.ts';
 
 import type { SelectionSource } from './SelectionSource.ts';
 
@@ -30,8 +31,11 @@ export type SelectionPlan = {
     readonly heavyOutline: boolean;
     // The other shapes of the bodies the selected entities belong to.
     readonly bodyOutlines: readonly Entity[];
-    // The selected joints' positions, each drawn as a ring around its icon.
+    // The selected joints' icons, each drawn as a ring around it: a Hinge's one, a Rope's or Spring's two.
     readonly rings: readonly Point[];
+    // A selected Rope's or Spring's two ends, in a box together so the whole joint shows as selected. The
+    // overlay grows it to take in the rings. No handles: its ends stay on the entities they join.
+    readonly jointBoxes: readonly Bounds[];
     // The selected camera's frame, drawn heavier.
     readonly cameraFrames: readonly Bounds[];
     // Where each selected locked entity draws, with a padlock at its top right.
@@ -49,6 +53,7 @@ const EMPTY_PLAN: SelectionPlan = {
     heavyOutline: false,
     bodyOutlines: [],
     rings: [],
+    jointBoxes: [],
     cameraFrames: [],
     padlocks: [],
     hiddenBox: undefined,
@@ -74,6 +79,7 @@ export function planSelection(source: SelectionSource, level: Level, caches: Sel
     const isOne = selected.length === 1;
     const outlines: Entity[] = [];
     const rings: Point[] = [];
+    const jointBoxes: Bounds[] = [];
     const cameraFrames: Bounds[] = [];
     const padlocks: Bounds[] = [];
 
@@ -81,8 +87,15 @@ export function planSelection(source: SelectionSource, level: Level, caches: Sel
         if (entity === level.world) continue;
 
         if (entity.hasComponent(JointComponent)) {
-            const matrix = caches.worldMatrices.matrixOf(entity);
-            rings.push({ x: matrix.tx, y: matrix.ty });
+            const centres = jointIconCentres(entity, caches.worldMatrices.matrixOf(entity));
+            rings.push(...centres);
+            const box = centres.length > 1 ? Bounds.around(centres) : undefined;
+            if (box !== undefined) {
+                jointBoxes.push(box);
+            }
+            if (entity.hasComponent(PathComponent)) {
+                outlines.push(entity);
+            }
             continue;
         }
 
@@ -112,6 +125,7 @@ export function planSelection(source: SelectionSource, level: Level, caches: Sel
         heavyOutline: isOne,
         bodyOutlines: bodyOutlinesOf(shown, source, outlines),
         rings,
+        jointBoxes,
         cameraFrames,
         padlocks,
         hiddenBox: undefined,

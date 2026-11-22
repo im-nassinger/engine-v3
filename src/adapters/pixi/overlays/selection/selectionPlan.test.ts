@@ -126,6 +126,7 @@ describe('planSelection', () => {
 
         expect(result.rings).toEqual([{ x: 30, y: 40 }]);
         expect(result.outlines).toEqual([]);
+        expect(result.jointBoxes).toEqual([]);
     });
 
     test('one path is outlined heavier, like a shape', () => {
@@ -148,15 +149,22 @@ describe('planSelection', () => {
         expect(result.outlines).toEqual([]);
     });
 
-    test("a Rope's or Spring's path is its joint's ring, not an outline", () => {
+    test('a Rope or Spring is a ring on each end, its path outlined, and one box around both ends', () => {
         const { level, caches } = makeLevel();
         const joint = place(level, level.world, 30, 40);
-        joint.addComponent(new JointComponent());
+        const rope = new JointComponent();
+        rope.set('type', 'rope');
+        rope.set('ends', { a: { x: 0, y: 0 }, b: { x: 100, y: 50 } });
+        joint.addComponent(rope);
         joint.addComponent(new PathComponent({ path: STRAIGHT_PATH }));
         const result = plan([joint], level, caches);
 
-        expect(result.rings).toEqual([{ x: 30, y: 40 }]);
-        expect(result.outlines).toEqual([]);
+        expect(result.rings).toEqual([
+            { x: 30, y: 40 },
+            { x: 130, y: 90 },
+        ]);
+        expect(result.outlines).toEqual([joint]);
+        expect(result.jointBoxes).toEqual([expect.objectContaining({ left: 30, top: 40, right: 130, bottom: 90 })]);
     });
 
     test('the camera is a heavier frame of its size', () => {
