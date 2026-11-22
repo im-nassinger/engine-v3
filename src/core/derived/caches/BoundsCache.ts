@@ -77,6 +77,26 @@ export class BoundsCache {
         return bounds;
     }
 
+    // The subtree's bounds without outlines, the edges grid snapping lines up. Not cached: only the start
+    // of a drag asks.
+    subtreeEdgesOf(entity: Entity): Bounds | undefined {
+        const matrix = this.worldMatrices.matrixOf(entity);
+        let bounds = OwnBounds.edgesOf(entity, matrix);
+
+        for (const child of entity.children) {
+            const childBounds = this.subtreeEdgesOf(child);
+            if (childBounds === undefined) continue;
+
+            if (bounds === undefined) {
+                bounds = childBounds;
+            } else {
+                bounds = bounds.union(childBounds);
+            }
+        }
+
+        return bounds;
+    }
+
     // A body's pose changed during play, which moves it and its descendants like a new TransformComponent.
     markBodyMoved(entity: Entity) {
         this.markMoved(entity);

@@ -23,7 +23,7 @@ export type NoMove = { readonly kind: 'refused'; readonly reason: string };
 // child still moves with its parent. Each position goes through LiveEdit, which the caller begins first.
 export class SelectionMove {
     readonly label: string;
-    // The moved entities' bounds at the start, for snapping their edges and centre.
+    // The moved entities' bounds at the start, outlines left out, for snapping their edges and centre.
     readonly startBounds: Bounds;
     private readonly openLevel: OpenLevel;
     private readonly moved: readonly MovedEntity[];
@@ -47,9 +47,9 @@ export class SelectionMove {
         if (moved.length === 0) return { kind: 'refused', reason: refusalReason(openLevel) };
 
         const entities = moved.map((each) => each.entity);
-        const drawnBounds = entities.map((entity) => caches.bounds.subtreeBoundsOf(entity));
+        const edgeBounds = entities.map((entity) => caches.bounds.subtreeEdgesOf(entity));
         const origins = moved.map((each) => each.startOrigin);
-        const startBounds = unionOf(drawnBounds) ?? Bounds.around(origins);
+        const startBounds = unionOf(edgeBounds) ?? Bounds.around(origins);
         if (startBounds === undefined) throw new Error('A move with entities has their origins.');
 
         return new SelectionMove(openLevel, moved, startBounds);

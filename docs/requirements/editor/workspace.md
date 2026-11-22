@@ -153,15 +153,16 @@ Source: scope ED1; round 3: 01 2.6; round 5: 02 2.5; old: WS-46 to WS-52, WS-56,
 - The grid can be shown or hidden, its size can be set by typing it in the debug box (owner: 2026-11-19), and entities can snap to it.
 - Default size: **50 px**, which is 1 metre, with fainter lines every 10 px. Lines fade out when they get too close together on screen. The lines through the level's origin are slightly stronger.
 - Grid lines adapt to the background colour so they stay visible.
-- With grid snapping on, the edges and centre of what you move, resize or draw jump to the nearest grid line. Pasted entities snap too.
-- Snap distance is 6 screen pixels at every zoom.
+- With grid snapping on, the edges and centre of what you move, resize or draw always land on the nearest grid line, however far from one they are. On each axis, whichever of the two edges and the centre is nearest a line lands on it. Pasted entities snap too. *Why: snapping only within 6 screen px of a line, as before, left most drags unsnapped, and the owner found snapping didn't seem to work (owner: 2026-11-22).*
+- **What snaps is the shape's own edge, not its outline.** *Why: lining up the outline left a shape with the default 2 px outline 1 px off the line (owner: 2026-11-22).*
+- **Snapping goes to the finest lines drawn**: the fainter lines while they show (every 10 px for the default grid), the grid lines once they fade, and every fifth grid line or further when zoomed far out, as the lines drawn thin out. Fainter lines that are not whole pixels apart (a 7 px grid's would be 1.4 px apart) are left out, so snapped positions stay whole. *Why: what you move should land on a line you can see (owner: 2026-11-22).*
 - Holding Ctrl during a drag turns snapping off until released.
 - Typed values and arrow-key moves are never snapped. Ctrl+Shift+arrow moves one grid step.
 - **The grid size is a whole number of pixels from 5 to 1,000.** *Why: whole numbers keep snapped positions whole, and the range covers fine tiles and coarse layout (standing yes, 2026-11-14).*
 - The grid size is saved in the project file. **Changing it is not an undo step** (owner: 2026-11-19, replacing 2026-11-13's undo step): Ctrl+Z never changes the grid size. Whether the grid is shown is saved in the browser.
 - **The grid is never drawn during play**, whatever its switch; it comes back at Stop. *Why: the owner wants it only in the editor, before testing the level (owner: 2026-11-21).*
 
-Source: scope ED4; round 3: 01 2.6; round 5: FMT1; round 7: BND2; old: WS-53, WS-54, WS-58 to WS-62; owner: 2026-11-13, 2026-11-14, 2026-11-19, 2026-11-21
+Source: scope ED4; round 3: 01 2.6; round 5: FMT1; round 7: BND2; old: WS-53, WS-54, WS-58 to WS-62; owner: 2026-11-13, 2026-11-14, 2026-11-19, 2026-11-21, 2026-11-22
 
 ### Snapping to other entities · Later
 

@@ -2,11 +2,13 @@ import type { DerivedCaches } from '../../../core/derived/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import type { ViewState } from '../../view/index.ts';
-import { SNAP_DISTANCE_PX } from '../grid/GridSnapper.ts';
 import type { SnapOptions, SnapResult, Snapper } from '../Snapper.ts';
 
 // The caches PointSnapper reads: each entity's own bounds, pieces and matrix.
 export type PointSnapCaches = Pick<DerivedCaches, 'bounds' | 'pieces' | 'worldMatrices'>;
+
+// How near a centre or corner a joint's end must come to snap to it, the same on screen at every zoom.
+export const SNAP_DISTANCE_PX = 6;
 
 const ORIGIN: Point = { x: 0, y: 0 };
 

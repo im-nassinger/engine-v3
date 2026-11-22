@@ -127,6 +127,7 @@ What we decided against, and why. **Check here before proposing something**: an 
 | The Shape tool's options strip | The kinds menu beside the tool, the Joint tool's too | It belongs to the tool it changes | owner: 2026-11-17, 2026-11-18 |
 | Ctrl+S exporting the project file | Ctrl+S saves in the browser now; Export… is its own item | Pressing Ctrl+S out of habit now does what people expect | owner: 2026-11-18 |
 | Inter or Geist for the editor, and sizes between 10 and 16 px | JetBrains Mono at 10, 12, 14 or 16 px | One font, four sizes | owner: 2026-11-17 |
+| Grid snapping only within 6 screen px of a line, to the grid size's lines only, lining up the outline | Always to the nearest of the finest lines drawn, lining up the shape's edges | Most drags didn't snap, the fainter lines you see were ignored, and shapes sat 1 px off | owner: 2026-11-22 |
 | A 240 px minimap, and a zoom or snapping button by it | 180 px, the map only | The owner reverted the widening | owner: 2026-11-17 |
 | A square new level, 20000×20000 | 20000×10000 | The redesign's square was its example level only | owner: 2026-11-18 |
 

@@ -100,12 +100,24 @@ function withOutline(edgeBounds: Bounds, entity: Entity, matrix: Matrix2D) {
 export class OwnBounds {
     static of(entity: Entity, matrix: Matrix2D) {
         const drawnBounds = OwnBounds.drawnBoundsOf(entity, matrix);
-        if (!entity.hasComponent(JointComponent)) return drawnBounds;
+
+        return OwnBounds.withJointPosition(drawnBounds, entity, matrix);
+    }
+
+    // The same without the outline: the shape's own edges, which grid snapping lines up.
+    static edgesOf(entity: Entity, matrix: Matrix2D) {
+        const edgeBounds = OwnBounds.edgeBoundsOf(entity, matrix);
+
+        return OwnBounds.withJointPosition(edgeBounds, entity, matrix);
+    }
+
+    private static withJointPosition(bounds: Bounds | undefined, entity: Entity, matrix: Matrix2D) {
+        if (!entity.hasComponent(JointComponent)) return bounds;
 
         const position = new Bounds(matrix.tx, matrix.ty, matrix.tx, matrix.ty);
-        if (drawnBounds === undefined) return position;
+        if (bounds === undefined) return position;
 
-        return drawnBounds.union(position);
+        return bounds.union(position);
     }
 
     private static drawnBoundsOf(entity: Entity, matrix: Matrix2D) {

@@ -1,9 +1,6 @@
 import { Bounds } from '../../../../core/geometry/index.ts';
-
-// Lines closer than this on screen are left out, so the grid never turns into a grey wash.
-export const MIN_LINE_SPACING_PX = 8;
-// The fainter lines split each grid step in five: every 10 px for the default 50 px grid.
-export const FINE_LINES_PER_STEP = 5;
+import { FINE_LINES_PER_STEP, gridSpacingAt } from '../../../../editor/view/index.ts';
+import type { GridSpacing } from '../../../../editor/view/index.ts';
 
 export type GridLineStrength = 'fine' | 'step' | 'origin';
 
@@ -11,13 +8,6 @@ export type GridLine = {
     // A level x for a vertical line, a level y for a horizontal one.
     readonly position: number;
     readonly strength: GridLineStrength;
-};
-
-export type GridSpacing = {
-    // The level distance between the stronger lines.
-    readonly step: number;
-    // The distance between the fainter lines, undefined when they would be too close on screen.
-    readonly fineStep: number | undefined;
 };
 
 export type GridPlan = {
@@ -31,20 +21,6 @@ export type GridPlanInput = {
     readonly zoom: number;
     readonly gridSize: number;
 };
-
-// The step is the grid size, times five as often as needed to keep the lines 8 screen px apart, so zooming
-// far out shows every fifth line, then every 25th, and never thousands of them.
-export function gridSpacingAt(gridSize: number, zoom: number): GridSpacing {
-    let step = gridSize;
-    while (step * zoom < MIN_LINE_SPACING_PX) {
-        step *= FINE_LINES_PER_STEP;
-    }
-
-    const fineStep = step / FINE_LINES_PER_STEP;
-    const fineIsShown = fineStep * zoom >= MIN_LINE_SPACING_PX;
-
-    return { step, fineStep: fineIsShown ? fineStep : undefined };
-}
 
 function strengthOf(index: number, linesPerStep: number): GridLineStrength {
     if (index === 0) return 'origin';

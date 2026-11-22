@@ -24,7 +24,8 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 Each item is removed in the same commit that settles it, wherever that commit is made.
 
-1. **Try v3** (task 18, its try point): the Trigger tool, the trigger card, tags, the World's variables and inputs, triggers firing in test play, Win, Lose and Restart.
+1. **Try the new grid snapping** (2026-11-22): a dragged, resized or drawn shape now always lands on the nearest line you can see, Ctrl turning it off.
+2. **Try v3** (task 18, its try point): the Trigger tool, the trigger card, tags, the World's variables and inputs, triggers firing in test play, Win, Lose and Restart.
 
 ## Next
 

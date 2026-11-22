@@ -142,17 +142,18 @@ describe('SelectTool moving', () => {
         expect(positionOf(square)).toEqual({ x: 130, y: 160 });
     });
 
-    test('the edges and centre snap to the grid, and Ctrl turns snapping off', () => {
+    test('the shape edges, not the outline, land on the nearest line, and Ctrl turns snapping off', () => {
         const { square, tool, session } = buildMoveTest();
 
-        // The drawn box, its outline included, is 49 to 151 across. Moved 47 px, its left edge is 4 px from
-        // the line at 100, its centre 3 px from 150 and its right edge 2 px from 200: the nearest wins.
-        drag(tool, { x: 100, y: 100 }, { x: 147, y: 100 });
-        expect(positionOf(square)).toEqual({ x: 149, y: 100 });
+        // The square's edges are 50 to 150 across; its 2 px outline reaches 1 px further. Moved 33 px, its
+        // edges are 3 px past the 10 px lines at 80 and 180, so it lands 3 px back. Lining up the outline
+        // instead would leave it at 131.
+        drag(tool, { x: 100, y: 100 }, { x: 133, y: 100 });
+        expect(positionOf(square)).toEqual({ x: 130, y: 100 });
 
         session.openLevel.editor.undo();
-        drag(tool, { x: 100, y: 100 }, { x: 147, y: 100 }, { ctrl: true });
-        expect(positionOf(square)).toEqual({ x: 147, y: 100 });
+        drag(tool, { x: 100, y: 100 }, { x: 133, y: 100 }, { ctrl: true });
+        expect(positionOf(square)).toEqual({ x: 133, y: 100 });
     });
 
     test('Esc puts the selection back and makes no step', () => {

@@ -210,6 +210,15 @@ describe('BoundsCache subtree bounds', () => {
         expect(sidesOf(cache.subtreeBoundsOf(group))).toEqual([45, -5, 155, 5]);
     });
 
+    test('their edges leave every outline out', () => {
+        const { group, left, right, cache } = buildGroupOfTwo();
+        left.addComponent(new StyleComponent());
+        right.addComponent(new StyleComponent());
+
+        expect(sidesOf(cache.subtreeBoundsOf(group))).toEqual([44, -6, 156, 6]);
+        expect(sidesOf(cache.subtreeEdgesOf(group))).toEqual([45, -5, 155, 5]);
+    });
+
     test("moving a child moves its parent's subtree bounds", () => {
         const { level, group, right, cache } = buildGroupOfTwo();
         cache.subtreeBoundsOf(level.world);
