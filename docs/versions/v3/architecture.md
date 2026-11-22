@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**How v3 is built**, Claude's draft (2026-11-22), waiting for the owner's yes. v3 adds **four components** (TagsComponent, VariablesComponent, InputComponent, TriggerComponent), **three field types** for them, **the Trigger tool**, **a trigger model in core** that both the Entity inspector and the game read, and **three tick phases** in the game worker (`EventPhase`, `TriggerPhase`, and the run's end in `EndOfTickPhase`). The page learns to show **changed values**, **the end window** and **Restart**. Everything plugs into seams v1 left for it (see [components-and-fields.md](../../architecture/core-model/components-and-fields.md#seams-for-later-versions) and [simulation.md](../../architecture/simulation.md#the-simulation)); no part boundary is crossed that v1 didn't already cross. **Saved levels never change:** a level without the new components reads as before. Every choice here is made under the standing yes and listed in [decisions.md](../../decisions.md) unless it names the owner.
+**How v3 is built**, Claude's draft (2026-11-22); the owner said to go ahead and build it the same day. v3 adds **four components** (TagsComponent, VariablesComponent, InputComponent, TriggerComponent), **three field types** for them, **the Trigger tool**, **a trigger model in core** that both the Entity inspector and the game read, and **three tick phases** in the game worker (`EventPhase`, `TriggerPhase`, and the run's end in `EndOfTickPhase`). The page learns to show **changed values**, **the end window** and **Restart**. Everything plugs into seams v1 left for it (see [components-and-fields.md](../../architecture/core-model/components-and-fields.md#seams-for-later-versions) and [simulation.md](../../architecture/simulation.md#the-simulation)); no part boundary is crossed that v1 didn't already cross. **Saved levels never change:** a level without the new components reads as before. Every choice here is made under the standing yes and listed in [decisions.md](../../decisions.md) unless it names the owner.
 
 ## Where things live
 
@@ -105,7 +105,7 @@ export type Repeat = { kind: 'everyTime' } | { kind: 'oncePerRun' } | { kind: 'a
 - **`changeableValues(entity, registry)`** lists what Change value may offer for a target: every field whose schema marks it `changeableInPlay`, the TagsComponent's tag, each trigger's on/off, and the World's variables. It reads the schemas only, so a component added later is offered with no trigger code, as v1's seam promised. A vector is offered whole for Set, and by axis for Add and Subtract.
 - **`triggerName(trigger)`** gives "Touched", "jump pressed", "After 60 s", "No coin left". A trigger with a name of its own keeps it.
 
-## The Entity inspector
+## The trigger card
 
 - **`TriggerCardModel`** (editor) turns one `Trigger` into the card the mockup draws: the head (name, on, menu) and four sections of rows. **A row is a `TriggerSentence`**: a list of words, each plain text or a slot with its label, its state (set, unset, greyed) and the `TriggerChoices` it offers. React draws the rows and never knows what a trigger is. *Why: the sentence rules are the hard part, and in editor they are tested without a browser, as v1 keeps every Entity inspector rule.*
 - **`TriggerChoices`** builds each menu from the level: the events; the targets (`this`, `other` greyed with its reason under an event with none, every named entity, every tag from `LevelTags`); the variables and inputs from the World; `changeableValues` for the target picked.
