@@ -24,6 +24,7 @@ export class HighDetailRule implements EditorMessageRule {
                 entityId: entity.id,
                 componentType: ShapeComponent.schema.typeName,
                 fieldKey: 'points',
+                itemId: undefined,
                 text: 'High detail may slow physics',
                 fix: undefined,
             },

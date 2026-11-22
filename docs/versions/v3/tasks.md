@@ -21,7 +21,7 @@ The tasks that build v3 (logic without code), in the orchestrator's format: each
 - [x] 5. The trigger model in core
   - Read: versions/v3/architecture.md#the-trigger, versions/v3/architecture.md#the-field-types, requirements/triggers/triggers.md
   - Done when: the `Trigger` types, `TriggerFieldType` (unset parts as null, ids unique and never reused in a component), `triggerName`, `triggerProblems` and `changeableValues` are in `core/triggers/model/` with Node tests for every When, Check, Action and Repeat kind; `TriggerComponent` (card 15, any entity) is registered; field types may give `mapEntities`, which `TriggerFieldType` and `ListFieldType` implement and `IdRemapping` and the missing-entity rule use, with tests that copying and pasting triggers keeps their links as the requirement says
-- [ ] 6. The trigger card's model
+- [x] 6. The trigger card's model
   - Read: versions/v3/architecture.md#the-trigger-card, design/controls.md#v3-triggers-tags-variables-inputs-and-the-end-window, design/mockups/v3.html
   - Done when: `TriggerCardModel`, `TriggerSentence` and `TriggerChoices` are in `editor/entity-inspector/triggers/` and give, for any trigger, the head and the four sections of rows the mockup shows, each word set, unset or greyed with its choices; every edit (pick a word, add or remove a row, switch, rename, duplicate, delete, reorder) is one step with its label; `TouchNeedsSurfaceRule` and `TriggerCantRunRule` give their notes, the first with its one-step fix; Node tests pass
 - [ ] 7. The trigger card on screen

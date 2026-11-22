@@ -8,6 +8,8 @@ export type CardNote = {
     readonly text: string;
     // The field it sits under; undefined when it is about the whole card.
     readonly fieldKey: string | undefined;
+    // The list item it sits under, such as one trigger, by its id; undefined for the field or card.
+    readonly itemId: number | undefined;
     readonly fix: MessageFix | undefined;
     readonly entityIds: readonly EntityId[];
 };

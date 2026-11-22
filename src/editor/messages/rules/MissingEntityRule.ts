@@ -26,6 +26,7 @@ export class MissingEntityRule implements EditorMessageRule {
                 entityId: entity.id,
                 componentType: reference.component.schema.typeName,
                 fieldKey: reference.key,
+                itemId: undefined,
                 text: 'missing entity',
                 fix: undefined,
             });

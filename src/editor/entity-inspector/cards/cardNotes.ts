@@ -17,7 +17,7 @@ export function cardNotes(entities: readonly Entity[], typeName: ComponentTypeNa
         for (const message of messages.forEntity(entity.id)) {
             if (message.componentType !== typeName) continue;
 
-            const key = `${message.fieldKey ?? ''}\n${message.text}`;
+            const key = `${message.fieldKey ?? ''}\n${message.itemId ?? ''}\n${message.text}`;
             const gathering = gathered.get(key) ?? { message, entityIds: [] };
             gathering.entityIds.push(entity.id);
             gathered.set(key, gathering);
@@ -28,5 +28,12 @@ export function cardNotes(entities: readonly Entity[], typeName: ComponentTypeNa
 }
 
 function toNote({ message, entityIds }: Gathering): CardNote {
-    return { kind: message.kind, text: message.text, fieldKey: message.fieldKey, fix: message.fix, entityIds };
+    return {
+        kind: message.kind,
+        text: message.text,
+        fieldKey: message.fieldKey,
+        itemId: message.itemId,
+        fix: message.fix,
+        entityIds,
+    };
 }

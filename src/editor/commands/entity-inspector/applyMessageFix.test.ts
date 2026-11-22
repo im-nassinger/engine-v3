@@ -1,6 +1,13 @@
 import { describe, expect, test } from 'vitest';
 
-import { BodyComponent, InputComponent, ShapeComponent, SurfaceComponent } from '../../../core/components/index.ts';
+import {
+    BodyComponent,
+    InputComponent,
+    ShapeComponent,
+    SurfaceComponent,
+    TriggerComponent,
+    VariablesComponent,
+} from '../../../core/components/index.ts';
 import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { buildCommandTestSession } from '../testing/commandTestSession.ts';
 
@@ -98,5 +105,69 @@ describe('applyMessageFix', () => {
         ).toEqual(['left', 'right', 'up', 'down', 'jump']);
         expect(openLevel.history.undoCount).toBe(stepsBefore + 1);
         expect(openLevel.messages.all()).toEqual([]);
+    });
+
+    test('a touch trigger\'s "Add Surface as sensor" adds a Surface with Sensor ticked in one step', () => {
+        const { session, frames } = buildCrates();
+        const openLevel = session.openLevel;
+        const pad = openLevel.level.createEntity(openLevel.level.world, 0);
+        pad.addComponent(new ShapeComponent());
+        const touchTrigger = {
+            id: 1,
+            name: null,
+            on: true,
+            when: { kind: 'touched' },
+            checks: [],
+            actions: [{ kind: 'win' }],
+            repeat: { kind: 'everyTime' },
+        } as const;
+        pad.addComponent(new TriggerComponent({ triggers: [touchTrigger], nextTriggerId: 2 }));
+        openLevel.selection.replace([pad.id]);
+        frames.runFrame();
+
+        const triggerCard = openLevel.entityInspector.cards.find((card) => card.typeName === 'TriggerComponent');
+        const [note] = triggerCard?.notes ?? [];
+        expect(note).toMatchObject({ text: 'Needs a Surface to notice touching.', itemId: 1 });
+        if (note?.fix === undefined) throw new Error('The note has no fix.');
+
+        const stepsBefore = openLevel.history.undoCount;
+        applyMessageFix(openLevel, note.fix, note.entityIds);
+        frames.runFrame();
+
+        expect(pad.getComponent(SurfaceComponent)?.get('sensor')).toBe(true);
+        expect(openLevel.history.undoCount).toBe(stepsBefore + 1);
+        expect(openLevel.messages.forEntity(pad.id)).toEqual([]);
+    });
+
+    test("a trigger's note comes and goes with the World's variables it names", () => {
+        const { session, frames } = buildCrates();
+        const openLevel = session.openLevel;
+        const world = openLevel.level.world;
+        world.addComponent(new VariablesComponent({ variables: [{ name: 'coins', value: 0 }] }));
+        const timer = openLevel.level.createEntity(world, 0);
+        const countingTrigger = {
+            id: 1,
+            name: null,
+            on: true,
+            when: { kind: 'levelStart' },
+            checks: [{ kind: 'compare', variable: 'coins', compare: 'is', value: 0 }],
+            actions: [{ kind: 'win' }],
+            repeat: { kind: 'everyTime' },
+        } as const;
+        timer.addComponent(new TriggerComponent({ triggers: [countingTrigger], nextTriggerId: 2 }));
+        frames.runFrame();
+        expect(openLevel.messages.forEntity(timer.id)).toEqual([]);
+
+        removeComponent(openLevel, [world.id], 'VariablesComponent');
+        frames.runFrame();
+
+        expect(openLevel.messages.forEntity(timer.id).map((message) => message.text)).toEqual([
+            "Doesn't run until every yellow part is set.",
+        ]);
+
+        openLevel.editor.undo();
+        frames.runFrame();
+
+        expect(openLevel.messages.forEntity(timer.id)).toEqual([]);
     });
 });

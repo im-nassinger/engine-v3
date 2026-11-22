@@ -18,11 +18,13 @@ export class MissingInputsRule implements EditorMessageRule {
                 entityId: entity.id,
                 componentType: PhysicsWorldComponent.schema.typeName,
                 fieldKey: undefined,
+                itemId: undefined,
                 text: 'No inputs.',
                 fix: {
                     kind: 'addComponent',
                     label: 'Add the five inputs',
                     componentType: InputComponent.schema.typeName,
+                    savedValues: undefined,
                 },
             },
         ];

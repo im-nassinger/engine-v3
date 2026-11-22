@@ -275,6 +275,7 @@ function levelWideWarning(text: string): EditorMessage {
         entityId: undefined,
         componentType: undefined,
         fieldKey: undefined,
+        itemId: undefined,
         text,
         fix: undefined,
     };

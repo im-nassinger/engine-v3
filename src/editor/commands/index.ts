@@ -43,6 +43,7 @@ export {
 } from './file/index.ts';
 export type { FileParts, LateOutcomes } from './file/index.ts';
 export { AboutCommand, GAME_NAME } from './help/AboutCommand.ts';
+export { editTriggers } from './triggers/editTriggers.ts';
 export { toggleEntityHidden } from './hide/toggleEntityHidden.ts';
 export { HideOrShowCommand } from './edit/HideOrShowCommand.ts';
 export { RedoCommand } from './edit/RedoCommand.ts';

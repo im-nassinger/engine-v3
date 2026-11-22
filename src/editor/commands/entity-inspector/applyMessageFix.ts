@@ -15,7 +15,7 @@ export function applyMessageFix(openLevel: OpenLevel, fix: MessageFix, entityIds
                 throw new Error(`${fix.componentType} is not registered.`);
             }
 
-            return addComponent(openLevel, entityIds, componentClass);
+            return addComponent(openLevel, entityIds, componentClass, fix.savedValues);
         }
     }
 }

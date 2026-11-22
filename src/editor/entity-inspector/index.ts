@@ -26,3 +26,19 @@ export type {
     NumberInputType,
     ValueInputResult,
 } from './typing/ValueInput.ts';
+export { TriggerCardModel } from './triggers/TriggerCardModel.ts';
+export type { TriggerAddRow, TriggerBlock, TriggerRow, TriggerSection } from './triggers/TriggerCardModel.ts';
+export { TriggerChoices } from './triggers/TriggerChoices.ts';
+export { TriggerEdits } from './triggers/TriggerEdits.ts';
+export type { TriggerEdit } from './triggers/TriggerEdits.ts';
+export { TriggerSentence } from './triggers/TriggerSentence.ts';
+export type {
+    TriggerChoice,
+    TriggerPartValue,
+    TriggerRowPart,
+    TriggerWord,
+    TriggerWordAddress,
+    TriggerWordEntry,
+    TriggerWordSlot,
+    TriggerWordState,
+} from './triggers/TriggerWord.ts';

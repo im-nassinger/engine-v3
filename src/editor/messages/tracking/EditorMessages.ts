@@ -84,10 +84,13 @@ export class EditorMessages {
                 this.markReadersToCheck(update.entity.id);
                 return;
             case 'entityMoved':
+                this.markToCheck(update.entity.id);
+                return;
             case 'componentAdded':
             case 'componentRemoved':
             case 'valueChanged':
                 this.markToCheck(update.entity.id);
+                this.markReadersToCheck(update.entity.id);
                 return;
             case 'switchChanged':
             case 'levelRenamed':
@@ -148,7 +151,7 @@ export class EditorMessages {
     }
 
     private readsOfEntity(entity: Entity) {
-        return this.rules.flatMap((rule) => rule.readsEntities?.(entity) ?? NONE_READ);
+        return this.rules.flatMap((rule) => rule.readsEntities?.(entity, this.level) ?? NONE_READ);
     }
 
     private recordReads(id: EntityId, reads: readonly EntityId[]) {

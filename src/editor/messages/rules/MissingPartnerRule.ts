@@ -40,7 +40,13 @@ function partnerNote(entity: Entity, component: AnyComponent, partner: PartnerRu
         entityId: entity.id,
         componentType: component.schema.typeName,
         fieldKey: undefined,
+        itemId: undefined,
         text: partner.noteText,
-        fix: { kind: 'addComponent', label: `Add ${partnerTitle}`, componentType: partner.partner },
+        fix: {
+            kind: 'addComponent',
+            label: `Add ${partnerTitle}`,
+            componentType: partner.partner,
+            savedValues: undefined,
+        },
     };
 }

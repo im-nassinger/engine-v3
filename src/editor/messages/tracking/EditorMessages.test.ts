@@ -8,6 +8,7 @@ import {
     StyleComponent,
     SurfaceComponent,
     TransformComponent,
+    createV1Registry,
 } from '../../../core/components/index.ts';
 import { Level } from '../../../core/level/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
@@ -50,7 +51,7 @@ class CountingRule implements EditorMessageRule {
     }
 }
 
-function build(rules: readonly EditorMessageRule[] = createV1Rules()) {
+function build(rules: readonly EditorMessageRule[] = createV1Rules(createV1Registry())) {
     const level = Level.createNew();
     const crate = addCrate(level);
     const frames = new ManualFrames();
@@ -71,7 +72,7 @@ describe('EditorMessages', () => {
         const crate = addCrate(level);
         crate.removeComponent(ShapeComponent);
 
-        const messages = new EditorMessages(level, createV1Rules(), new ManualFrames());
+        const messages = new EditorMessages(level, createV1Rules(createV1Registry()), new ManualFrames());
 
         expect(texts(messages.forEntity(crate.id))).toEqual([
             'StyleComponent: Needs a Shape to draw anything.',
@@ -119,7 +120,7 @@ describe('EditorMessages', () => {
         group.addComponent(new NameComponent({ name: 'Group' }));
         group.addComponent(new BodyComponent());
 
-        const messages = new EditorMessages(level, createV1Rules(), new ManualFrames());
+        const messages = new EditorMessages(level, createV1Rules(createV1Registry()), new ManualFrames());
 
         expect(messages.forEntity(group.id)).toEqual([]);
     });
@@ -187,7 +188,7 @@ describe('EditorMessages', () => {
         const level = Level.createNew();
         const crates = Array.from({ length: 10_000 }, () => addCrate(level));
         const frames = new ManualFrames();
-        new EditorMessages(level, [...createV1Rules(), counter], frames);
+        new EditorMessages(level, [...createV1Rules(createV1Registry()), counter], frames);
         counter.checked = [];
 
         const crate = crates[5_000] as Entity;
@@ -223,6 +224,7 @@ describe('EditorMessages', () => {
             entityId: undefined,
             componentType: undefined,
             fieldKey: undefined,
+            itemId: undefined,
             text: 'Saving in the browser failed.',
             fix: undefined,
         };
