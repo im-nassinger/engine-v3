@@ -21,6 +21,6 @@ These are Claude's, for the owner to keep or change:
 
 - **A trigger is a block** in `--raised` inside the Triggers card, so several triggers read apart. **Its four sections share one shape**, a small-caps title (with a hint at the right, such as "all must be true") over rows; a row is a `--field` sentence with `--radius` corners and an × on hover. *Why: the owner found the first try's mix of labels beside and above values, and floating "+ If" and "+ Do", unclear (2026-11-22).*
 - **A word that can change is `--accent-text` with a dotted underline**; an unset one is `--warning` in italics, saying what it needs.
-- **A shape with no StyleComponent** is drawn in the editor as a dashed edge with a small bolt, so a trigger can be seen and selected by its edge.
+- **A shape with no StyleComponent** is drawn in the editor as a dashed edge with a small bolt, so a trigger can be seen and selected by its edge. *Changed after the owner's try (2026-11-22): the bolt is in its middle and scales with the shape and the zoom, and a trigger is selected by clicking anywhere on it; see [fixes](fixes.md).*
 - **The tool's icon** is a dashed rectangle with a bolt.
 - **The end window** is a small centred window, not a full dialog, with Restart as the primary button.

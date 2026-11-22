@@ -35,7 +35,8 @@ What counts as hit:
 | Entity | Hit area |
 |---|---|
 | A shape or closed path with a fill | Inside and edge |
-| A shape with no fill, or with no StyleComponent | Edge only, so a big invisible sensor doesn't steal clicks |
+| A shape with no StyleComponent, such as a trigger | Inside and edge, as the editor draws it with a faint fill. *Why: the owner couldn't click a trigger except on its edge (2026-11-22).* |
+| A shape with a StyleComponent and no fill | Edge only, so a big invisible sensor doesn't steal clicks |
 | An open path, a line | The line itself, with at least 5 px of tolerance at any zoom |
 | A shape with an image fill | The whole shape, transparent parts included |
 | Text | Its box |
@@ -45,7 +46,7 @@ What counts as hit:
 
 Clicks pass through hidden entities and locked entities.
 
-Source: scope SE1; round 1: D19; round 4: SEL1, 02 2.3, 02 2.4; round 5: 02 2.2, 04 2.7; old: SG-01 to SG-14, SG-21 to SG-33; owner: 2026-11-19
+Source: scope SE1; round 1: D19; round 4: SEL1, 02 2.3, 02 2.4; round 5: 02 2.2, 04 2.7; old: SG-01 to SG-14, SG-21 to SG-33; owner: 2026-11-19, 2026-11-22
 
 ### Invert selection · Later
 

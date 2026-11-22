@@ -71,7 +71,7 @@ Claude's proposal (standing yes, 2026-11-22), drawn in the [v3 mockup](mockups/v
 
 | Part | Look |
 |---|---|
-| A shape with no StyleComponent, such as a trigger | In the editor only: its outline dashed, 1.5 px `#1D2430` at 55% with 6 px dashes, a 4% `#1D2430` fill, and a small bolt in its top left corner. Hidden in test play like the other editor-only drawing |
+| A shape with no StyleComponent, such as a trigger | In the editor only: its outline dashed, 1.5 px `#1D2430` at 55% with 6 px dashes, a 4% `#1D2430` fill, and a filled bolt in `#1D2430` at 14% in its middle, sized from the shape on screen so it grows and shrinks with the shape and the zoom, and left out when under 10 px or on a line (owner asked for it to scale with the zoom, 2026-11-22; size and look standing yes, 2026-11-22). Hidden in test play like the other editor-only drawing |
 
 ## The physics view
 

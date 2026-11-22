@@ -11,7 +11,7 @@ import type { ShapeGeometry } from '../../../../core/geometry/index.ts';
 import { Level } from '../../../../core/level/index.ts';
 import type { Entity } from '../../../../core/level/index.ts';
 import { ViewState } from '../../../../editor/view/index.ts';
-import { BOLT_INSET_PX, planUnstyledShapes } from './planUnstyledShapes.ts';
+import { BOLT_SHARE_OF_INRADIUS, planUnstyledShapes } from './planUnstyledShapes.ts';
 
 const cleanups: (() => void)[] = [];
 
@@ -45,7 +45,7 @@ function addShape(level: Level, geometry: ShapeGeometry, position = { x: 0, y: 0
 const RECTANGLE: ShapeGeometry = { kind: 'rectangle', width: 200, height: 100 };
 
 describe('planUnstyledShapes', () => {
-    test('plans a shape with no StyleComponent, its edge on screen and the bolt inset from its top left', () => {
+    test('plans a shape with no StyleComponent, its edge on screen and the bolt in its middle', () => {
         const scene = buildScene();
         const trigger = addShape(scene.level, RECTANGLE);
         const corner = scene.view.levelToScreen({ x: -100, y: -50 });
@@ -58,7 +58,24 @@ describe('planUnstyledShapes', () => {
         expect(plan?.isClosed).toBe(true);
         expect(plan?.points).toHaveLength(4);
         expect(plan?.points).toContainEqual(corner);
-        expect(plan?.bolt).toEqual({ x: corner.x + BOLT_INSET_PX, y: corner.y + BOLT_INSET_PX });
+        const middle = scene.view.levelToScreen({ x: 0, y: 0 });
+        expect(plan?.bolt?.centre.x).toBeCloseTo(middle.x);
+        expect(plan?.bolt?.centre.y).toBeCloseTo(middle.y);
+        // A 200 by 100 rectangle's inradius, twice its area over its perimeter, is 200 / 3.
+        expect(plan?.bolt?.heightPx).toBeCloseTo((200 / 3) * BOLT_SHARE_OF_INRADIUS);
+    });
+
+    test('the bolt grows with the zoom and is left out when the shape is small on screen or a line', () => {
+        const scene = buildScene();
+        addShape(scene.level, RECTANGLE);
+        const heightAt = (zoom: number) => {
+            scene.view.zoomAboutMiddle(zoom);
+            return planUnstyledShapes(scene)[0]?.bolt?.heightPx;
+        };
+
+        const atOne = heightAt(1) ?? 0;
+        expect(heightAt(2)).toBeCloseTo(atOne * 2);
+        expect(heightAt(0.1)).toBeUndefined();
     });
 
     test('leaves out styled shapes, paths, and shapes hidden by their eye or a parent’s', () => {
@@ -104,5 +121,6 @@ describe('planUnstyledShapes', () => {
         const plans = planUnstyledShapes(scene);
 
         expect(plans.map((plan) => plan.isClosed)).toEqual([false]);
+        expect(plans[0]?.bolt).toBeUndefined();
     });
 });

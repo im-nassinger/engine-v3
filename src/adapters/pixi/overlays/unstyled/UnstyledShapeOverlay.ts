@@ -7,24 +7,28 @@ import type { OverlayScene } from '../OverlayScene.ts';
 import { planUnstyledShapes } from './planUnstyledShapes.ts';
 import type { UnstyledShapePlan } from './planUnstyledShapes.ts';
 
-// The design's look for a shape with no StyleComponent: a 1.5 px dashed edge in #1D2430 at 55% with 6 px
-// dashes, a 4% fill, and a small bolt, as in the v3 mockup.
+// The look for a shape with no StyleComponent: a 1.5 px dashed edge in #1D2430 at 55% with 6 px dashes, a
+// 4% fill, and a faint filled bolt in its middle that scales with the shape and the zoom (owner, 2026-11-22).
 const INK = 0x1d2430;
 const EDGE: StrokeStyle = { color: INK, alpha: 0.55, width: 1.5 };
 const EDGE_DASHES: DashPattern = { dashPx: 6, gapPx: 4 };
 const FILL_ALPHA = 0.04;
-// Lucide's bolt on its 24 px grid, drawn at 62%, so about 15 px tall.
-const BOLT_SCALE = 0.62;
+const BOLT_ALPHA = 0.14;
+// A bolt on a 24 px grid, its middle at 12, 12 and 20 tall.
+const BOLT_GRID_CENTRE = 12;
+const BOLT_GRID_HEIGHT = 20;
 const BOLT_POINTS: readonly Point[] = [
-    { x: 13, y: 3 },
-    { x: 8, y: 12 },
-    { x: 14, y: 12 },
-    { x: 11, y: 21 },
+    { x: 14, y: 2 },
+    { x: 4, y: 14 },
+    { x: 11, y: 14 },
+    { x: 10, y: 22 },
+    { x: 20, y: 10 },
+    { x: 13, y: 10 },
 ];
-const BOLT: StrokeStyle = { color: INK, alpha: 0.7, width: 2.2 * BOLT_SCALE, cap: 'round', join: 'round' };
 
 // Draws every shape with no StyleComponent, such as a trigger, so it can be seen and picked in the editor:
-// its edge dashed over a faint fill, and a bolt in its top left corner. Sizes are screen pixels at any zoom.
+// its edge dashed over a faint fill, and a faint bolt in its middle. The edge's sizes are screen pixels at
+// any zoom; the bolt is sized from the shape on screen.
 // Editor only: play draws none of it. Hidden with the shape's eye or a parent's.
 export class UnstyledShapeOverlay {
     readonly graphics = new Graphics();
@@ -69,19 +73,14 @@ export class UnstyledShapeOverlay {
         dashedPolyline(graphics, plan.points, plan.isClosed, EDGE_DASHES);
         graphics.stroke(EDGE);
 
-        const [first, ...rest] = BOLT_POINTS;
-        if (first === undefined) return;
+        if (plan.bolt === undefined) return;
 
-        const place = (point: Point) => ({
-            x: plan.bolt.x + point.x * BOLT_SCALE,
-            y: plan.bolt.y + point.y * BOLT_SCALE,
-        });
-        const start = place(first);
-        graphics.moveTo(start.x, start.y);
-        for (const point of rest) {
-            const next = place(point);
-            graphics.lineTo(next.x, next.y);
-        }
-        graphics.stroke(BOLT);
+        const { centre, heightPx } = plan.bolt;
+        const scale = heightPx / BOLT_GRID_HEIGHT;
+        const boltPoints = BOLT_POINTS.flatMap((point) => [
+            centre.x + (point.x - BOLT_GRID_CENTRE) * scale,
+            centre.y + (point.y - BOLT_GRID_CENTRE) * scale,
+        ]);
+        graphics.poly(boltPoints, true).fill({ color: INK, alpha: BOLT_ALPHA });
     }
 }

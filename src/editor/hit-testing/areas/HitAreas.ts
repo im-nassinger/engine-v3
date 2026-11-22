@@ -101,7 +101,10 @@ function shapeArea(entity: Entity, shape: ShapeComponent, context: HitAreaContex
     const style = entity.getComponent(StyleComponent);
     const matrix = context.caches.worldMatrices.matrixOf(entity);
     const geometry = shape.get('geometry');
-    const outlines = LocalOutlines.shape(geometry, pieces, hasFill(style));
+    // A shape with no StyleComponent, such as a trigger, is hit inside too: the editor draws it with a faint
+    // fill (owner, 2026-11-22).
+    const isFilled = style === undefined || hasFill(style);
+    const outlines = LocalOutlines.shape(geometry, pieces, isFilled);
     const edgeReach = edgeReachOf(entity, matrix, context);
 
     return outlineArea(outlines, matrix, edgeReach);

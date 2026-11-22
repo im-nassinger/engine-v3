@@ -38,5 +38,5 @@ export { EDGE_STEPS, planGradientHandles } from './gradient/planGradientHandles.
 export type { GradientHandlesPlan, PlannedDot, ScreenMapping } from './gradient/planGradientHandles.ts';
 export type { GradientSource, ShownGradient, ShownGradientDot, ShownGradientEdge } from './gradient/GradientSource.ts';
 export { UnstyledShapeOverlay } from './unstyled/UnstyledShapeOverlay.ts';
-export { BOLT_INSET_PX, planUnstyledShapes } from './unstyled/planUnstyledShapes.ts';
+export { BOLT_MIN_PX, BOLT_SHARE_OF_INRADIUS, planUnstyledShapes } from './unstyled/planUnstyledShapes.ts';
 export type { UnstyledShapePlan } from './unstyled/planUnstyledShapes.ts';

@@ -91,12 +91,12 @@ describe('HitTester hit areas', () => {
         expect(tester.topmostAt({ x: 46, y: 100 }, probe)).toBe(sensor);
     });
 
-    test('a shape with no StyleComponent is hit only on its edge', () => {
+    test('a shape with no StyleComponent, such as a trigger, is hit inside and on its edge', () => {
         const { level, tester } = buildTester();
         const shape = addShape(level, level.world, { x: 100, y: 100 }, SQUARE);
         const probe = probeAt(level);
 
-        expect(tester.topmostAt({ x: 100, y: 100 }, probe)).toBeUndefined();
+        expect(tester.topmostAt({ x: 100, y: 100 }, probe)).toBe(shape);
         expect(tester.topmostAt({ x: 100, y: 53 }, probe)).toBe(shape);
     });
 
@@ -304,7 +304,10 @@ describe('HitTester selection box', () => {
     test('a box wholly inside a filled shape touches it, and inside an unfilled one does not', () => {
         const { level, tester } = buildTester();
         const filled = addFilledSquare(level, level.world, { x: 100, y: 100 });
-        addShape(level, level.world, { x: 300, y: 100 }, SQUARE);
+        const unfilled = addShape(level, level.world, { x: 300, y: 100 }, SQUARE);
+        const style = new StyleComponent();
+        style.set('fill', { kind: 'none' });
+        unfilled.addComponent(style);
         const probe = probeAt(level);
 
         expect(tester.allTouching(new Bounds(90, 90, 110, 110), probe)).toEqual([filled]);
