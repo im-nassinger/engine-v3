@@ -65,6 +65,14 @@ Claude's proposal (standing yes, 2026-11-20), drawn in the [v2 mockup](mockups/v
 | Linear gradient handles | A 1.5 px white line from start to end over a 3.5 px `#1D2430` line at 60%, so it shows on any colour. Each end a 14 px dot in its stop's colour with a 2 px white edge and a thin dark ring; each stop between them a 7 px dot on the line |
 | Radial gradient handles | The centre dot in the first stop's colour, the radius dot in the last, joined by the same line, and the radius as a dashed white circle |
 
+## v3: shapes with no style
+
+Claude's proposal (standing yes, 2026-11-22), drawn in the [v3 mockup](mockups/v3.html), **approved by the owner** the same day.
+
+| Part | Look |
+|---|---|
+| A shape with no StyleComponent, such as a trigger | In the editor only: its outline dashed, 1.5 px `#1D2430` at 55% with 6 px dashes, a 4% `#1D2430` fill, and a small bolt in its top left corner. Hidden in test play like the other editor-only drawing |
+
 ## The physics view
 
 - Every collision piece is drawn in **orange `#FF8A3D`**, a 1.5 px outline over a 15% fill, on top of the level (*proposal*). Orange stays visible next to the blue selection and the default blue shapes.

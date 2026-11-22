@@ -90,6 +90,22 @@ Claude's proposal (standing yes, 2026-11-20), drawn in the [v2 mockup](mockups/v
   - **Start and End** (linear) or **Centre and Radius** (radial), in % of the entity's box.
 - **The minimap paints a gradient as one colour**: its stops mixed, each weighted by how much of the bar it covers.
 
+## v3: triggers, tags, variables, inputs and the end window
+
+Claude's proposal (standing yes, 2026-11-22), drawn in the [v3 mockup](mockups/v3.html), redrawn once after the owner's notes and **approved by the owner** the same day.
+
+- **The Trigger tool (6)** is a tool button under the Pencil, a dashed rectangle with a bolt. Tooltip: `Trigger 6`. It hides the Entity inspector like the other drawing tools and has no menu beside it.
+- **The Triggers card** holds one block per trigger, in `--raised` with 10 px corners and 8 px inside, 8 px apart, then **+ Add trigger** as a `--raised` button across the card.
+  - **The block's head:** the trigger's name (weight 500, the handle that drags it), the on/off switch, and a `…` menu with Rename, Duplicate and Delete. An off trigger's sections fade to 45%.
+  - **Four sections in one shape: When, If, Do, Repeat.** Each is a small-caps title in `--muted` (the card head's style) with a hint at the right in `--faint` ("optional" or "all must be true" on If, "top to bottom" on Do with two or more actions), over full-width rows. *Why one shape: the owner found a first try that mixed labels beside and above values, with floating "+ If" and "+ Do", unclear (owner, 2026-11-22).*
+  - **A row is one sentence**, at least 28 px high, `--field` with `--radius` corners, 4 px apart; it wraps when it must. If and Do rows show an × at the right on hover, which removes the row.
+  - **A word that can change** is `--accent-text` with a dotted underline, solid on hover and while its menu is open. Clicking it opens a menu under it; a number opens a small number field. **An unset word** is `--warning` in italics and says what it needs, such as "pick a tag". **A word naming `other` under an event with none** is `--faint` and struck through.
+  - **Add check** and **Add action** are rows with no background in `--muted`, a + first, at the end of If and Do. With no action, Add action is `--warning`.
+  - **A trigger that can't run** shows a warning note at its end: "Doesn't run until every yellow part is set." A touch trigger without a SurfaceComponent shows "Needs a Surface to notice touching. Add Surface as sensor".
+- **The tags field** is one pill, wrapping onto more lines: each tag a 19 px `--accent-soft` pill in `--accent-text` with an ×, then the text box, "Add a tag". Typing offers the level's matching tags in a small menu under the field.
+- **The Variables card:** one row per variable, its name in `--text` as the label, its starting number as the value, and an × to remove it. **The Inputs card:** one row per input, its name as the label and its keys as one pill ("A, Left arrow"), and an ×. Each card ends with an **Add variable** or **Add input** row, drawn like Add check.
+- **The end window:** over the `--scrim`, a 320 px `--panel` window with `--radius-island` corners and the `--shade`, centred: the title "Level won" or "Level lost" at 20 px weight 600, "Time" in `--muted` with the time in `--text`, then **Leave** and **Restart**, Restart the primary button. The Play bar reads ENDED.
+
 ## Icons
 
 - **Outline icons** (owner, 2026-11-14): 24 px drawings shown at 16 px, a 1.6 px stroke with round ends and corners, no fill. One open set for every icon: `lucide-react`, picked in stage 6 (standing yes, 2026-11-15, see [ui.md](../architecture/ui.md#stage-6s-choices)).

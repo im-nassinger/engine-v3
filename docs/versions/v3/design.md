@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**v3's screen parts are drawn in the [v3 mockup](../../design/mockups/v3.html)**, Claude's proposal waiting for the owner's try (2026-11-22). Its trigger cards and tags field work, so the owner can click through a trigger before anything is built. Once approved, its rules are written into [controls.md](../../design/controls.md) and [level-view.md](../../design/level-view.md), as v2's were, and this file only points at them.
+**v3's screen parts are drawn in the [v3 mockup](../../design/mockups/v3.html)**, **approved by the owner (2026-11-22)** after one redraw of the trigger card. Its trigger cards and tags field work. Its rules are written into [controls.md, v3](../../design/controls.md#v3-triggers-tags-variables-inputs-and-the-end-window) and [level-view.md, v3](../../design/level-view.md#v3-shapes-with-no-style).
 
 ## What the mockup shows
 
