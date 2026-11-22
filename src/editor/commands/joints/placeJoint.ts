@@ -83,11 +83,8 @@ function jointComponents(placement: JointPlacement, name: string, toGroup: (poin
 
     const endA = toGroup(placement.endA);
     const endB = toGroup(placement.endB);
-    const middle = { x: (endA.x + endB.x) / 2, y: (endA.y + endB.y) / 2 };
-    const ends: JointEnds = {
-        a: { x: endA.x - middle.x, y: endA.y - middle.y },
-        b: { x: endB.x - middle.x, y: endB.y - middle.y },
-    };
+    // A Rope or Spring sits at its end A, so its icon is where it starts (owner, 2026-11-21).
+    const ends: JointEnds = { a: ORIGIN, b: { x: endB.x - endA.x, y: endB.y - endA.y } };
     const gap = drawnLength(ends);
     const joint = new JointComponent({
         ...defaults,
@@ -102,7 +99,7 @@ function jointComponents(placement: JointPlacement, name: string, toGroup: (poin
     });
     const path = new PathComponent({ path: jointPathPoints(placement.type, ends.a, ends.b) });
 
-    return [transformAt(middle), new NameComponent({ name }), joint, path];
+    return [transformAt(endA), new NameComponent({ name }), joint, path];
 }
 
 function transformAt(position: Point) {

@@ -94,21 +94,21 @@ describe('placeJoint', () => {
         expect(session.openLevel.history.undoLabel).toBe('Place Hinge 1');
     });
 
-    test('places a Rope halfway between its ends, with the drawn gap, a straight path and no style', () => {
+    test('places a Rope at its end A, with the drawn gap, a straight path and no style', () => {
         const built = buildSession();
 
         const rope = place(built, ropeBetween(built, { x: 200, y: 0 }, { x: 260, y: 80 }));
 
         expect(labelName(rope)).toBe('Rope 1');
-        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 230, y: 40 });
+        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 200, y: 0 });
         const joint = rope.requireComponent(JointComponent);
-        expect(joint.get('ends')).toEqual({ a: { x: -30, y: -40 }, b: { x: 30, y: 40 } });
+        expect(joint.get('ends')).toEqual({ a: { x: 0, y: 0 }, b: { x: 60, y: 80 } });
         expect(joint.get('letConnectedObjectsCollide')).toBe(true);
         expect(joint.get('matchDrawnDistance')).toBe(true);
         expect(joint.get('length')).toBe(100);
         expect(joint.get('restLength')).toBe(100);
         const path = rope.requireComponent(PathComponent).get('path');
-        expect(path).toEqual(jointPathPoints('rope', { x: -30, y: -40 }, { x: 30, y: 40 }));
+        expect(path).toEqual(jointPathPoints('rope', { x: 0, y: 0 }, { x: 60, y: 80 }));
         expect(rope.getComponent(StyleComponent)).toBeUndefined();
     });
 
@@ -129,7 +129,7 @@ describe('placeJoint', () => {
         expect(joint.get('b')).toBeNull();
         expect(joint.get('restLength')).toBe(50);
         const path = spring.requireComponent(PathComponent).get('path');
-        expect(path).toEqual(jointPathPoints('spring', { x: 0, y: -25 }, { x: 0, y: 25 }));
+        expect(path).toEqual(jointPathPoints('spring', { x: 0, y: 0 }, { x: 0, y: 50 }));
     });
 
     test('keeps a drawn gap inside Length’s range', () => {
@@ -222,7 +222,7 @@ describe('placeJoint', () => {
         expect(joint.get('b')).toBe(carCopy.id);
     });
 
-    test("moving one body alone carries the Rope's end on it, centres the Rope again and redraws its path", () => {
+    test("moving one body alone carries the Rope's end on it, keeps the Rope at end A and redraws its path", () => {
         const built = buildSession();
         const { session, wheel } = built;
         const rope = place(built, ropeBetween(built, { x: 200, y: 0 }, { x: 400, y: 0 }));
@@ -231,20 +231,20 @@ describe('placeJoint', () => {
         nudgeSelection(session.openLevel, { x: 0, y: 30 });
 
         expect(wheel.requireComponent(TransformComponent).get('position')).toEqual({ x: 200, y: 30 });
-        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 300, y: 15 });
+        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 200, y: 30 });
         expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 30 }, b: { x: 400, y: 0 } });
         const pathPoints = rope.requireComponent(PathComponent).get('path').points;
         expect(pathPoints.map((point) => ({ x: point.x, y: point.y }))).toEqual([
-            { x: -100, y: 15 },
-            { x: 100, y: -15 },
+            { x: 0, y: 0 },
+            { x: 200, y: -30 },
         ]);
 
         session.openLevel.editor.undo();
-        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 300, y: 0 });
+        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 200, y: 0 });
         expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 0 }, b: { x: 400, y: 0 } });
     });
 
-    test('moving the Rope alone carries both its ends, as before', () => {
+    test('moving the Rope alone moves its end A, keeps end B and redraws its path', () => {
         const built = buildSession();
         const { session } = built;
         const rope = place(built, ropeBetween(built, { x: 200, y: 0 }, { x: 400, y: 0 }));
@@ -252,7 +252,32 @@ describe('placeJoint', () => {
 
         nudgeSelection(session.openLevel, { x: 0, y: 30 });
 
-        expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 30 }, b: { x: 400, y: 30 } });
+        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 200, y: 30 });
+        expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 30 }, b: { x: 400, y: 0 } });
+        const path = rope.requireComponent(PathComponent).get('path');
+        expect(path).toEqual(jointPathPoints('rope', { x: 0, y: 0 }, { x: 200, y: -30 }));
+
+        session.openLevel.editor.undo();
+        expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 0 }, b: { x: 400, y: 0 } });
+    });
+
+    test('dragging the Rope moves end A as it goes, and Esc puts it back', () => {
+        const built = buildSession();
+        const { session } = built;
+        const rope = place(built, ropeBetween(built, { x: 200, y: 0 }, { x: 400, y: 0 }));
+        session.openLevel.selection.replace([rope.id]);
+        const move = SelectionMove.ofSelection(session.openLevel);
+        if (!(move instanceof SelectionMove)) throw new Error('Nothing to move.');
+        session.openLevel.liveEdit.begin(move.targets);
+
+        move.moveBy({ x: 50, y: 40 });
+        expect(levelEnds(built, rope)).toEqual({ a: { x: 250, y: 40 }, b: { x: 400, y: 0 } });
+        move.moveBy({ x: -20, y: 10 });
+        expect(levelEnds(built, rope)).toEqual({ a: { x: 180, y: 10 }, b: { x: 400, y: 0 } });
+
+        session.openLevel.liveEdit.cancel();
+        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 200, y: 0 });
+        expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 0 }, b: { x: 400, y: 0 } });
     });
 });
 
@@ -294,11 +319,11 @@ describe('Rope and Spring ends follow the entities they join', () => {
 
         move.moveBy({ x: 0, y: 0 });
         expect(levelEnds(built, rope).a).toEqual({ x: 200, y: 0 });
-        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 300, y: 0 });
+        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 200, y: 0 });
 
         move.moveBy({ x: -50, y: 0 });
         session.openLevel.liveEdit.cancel();
-        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 300, y: 0 });
+        expect(rope.requireComponent(TransformComponent).get('position')).toEqual({ x: 200, y: 0 });
         expect(levelEnds(built, rope)).toEqual({ a: { x: 200, y: 0 }, b: { x: 400, y: 0 } });
     });
 

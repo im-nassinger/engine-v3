@@ -8,7 +8,8 @@ What we decided against, and why. **Check here before proposing something**: an 
 
 | Idea | What we do instead | Why | Source |
 |---|---|---|---|
-| A Rope's or Spring's ends stay where they are when an entity it joins moves alone | Its ends follow the entities they join; moving the joint alone still carries both ends | The owner found the path left behind, which the game would never show | owner: 2026-11-21 |
+| A Rope or Spring sits halfway between its ends, and moving it alone carries both ends | It sits at its end A, and moving it moves end A only | The owner found the path carried off the bodies, and wanted the icon where the joint starts | owner: 2026-11-21 |
+| A Rope's or Spring's ends stay where they are when an entity it joins moves alone | Its ends follow the entities they join | The owner found the path left behind, which the game would never show | owner: 2026-11-21 |
 | Mass read-only: you set density, never mass | Typing a mass sets the density that gives it; mass is still never stored | The owner wanted to set how heavy a body is directly | owner: 2026-11-19 |
 | Prefabs | `.entity` files | If something is just a file, it stays a file | round 1: C14 |
 | Behaviours | Builtin `.lua` scripts | Same reason | round 1: C13 |
