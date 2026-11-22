@@ -12,11 +12,12 @@ import { PixiFill } from './PixiFill.ts';
 import { tracePath } from './tracePath.ts';
 
 export type EntityDrawingOptions = {
-    // The editor shows a shape or path with no StyleComponent as a thin line; play shows nothing.
+    // The editor shows a path with no StyleComponent as a thin line; play shows nothing. A shape with none is
+    // drawn by UnstyledShapeOverlay instead, in the editor only.
     readonly showUnstyled: boolean;
 };
 
-// The thin line for a shape or path with no StyleComponent: 1 screen pixel at any zoom.
+// The thin line for a path with no StyleComponent: 1 screen pixel at any zoom.
 const UNSTYLED_LINE: StrokeStyle = { color: 0x1d2430, alpha: 0.6, width: 1, pixelLine: true };
 const IDENTITY = new Matrix();
 
@@ -238,6 +239,9 @@ export class EntityDrawing {
         if (pathComponent === undefined && shape === undefined) return;
 
         const style = entity.getComponent(StyleComponent);
+        // A shape with no style draws nothing here: UnstyledShapeOverlay shows it over the level.
+        if (style === undefined && pathComponent === undefined) return;
+
         const look = lookOf(style, parts.options);
         if (look === undefined) return;
 

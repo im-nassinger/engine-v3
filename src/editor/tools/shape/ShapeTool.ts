@@ -1,9 +1,11 @@
 import { VersionCounter } from '../../../core/events/index.ts';
 import type { Matrix2D, Point } from '../../../core/geometry/index.ts';
 import { V1_LEVEL_LIMITS } from '../../../core/level-data/index.ts';
+import type { LevelReader } from '../../../core/level-data/index.ts';
 import { createShape } from '../../commands/index.ts';
-import type { ShapeDrawing } from '../../commands/index.ts';
+import type { CreateShapeOutcome, ShapeDrawing } from '../../commands/index.ts';
 import { READ_ONLY_REASON } from '../../history/index.ts';
+import type { OpenLevel } from '../../session/index.ts';
 import type { DragReadout } from '../readout/DragReadout.ts';
 import { diameterReadout, sizeReadout } from '../readout/readoutText.ts';
 import { sizingModifiers } from '../sizing/sizingModifiers.ts';
@@ -74,14 +76,18 @@ type PolygonInProgress = {
     readonly space: GroupSpace;
 };
 
+// Makes the entity for a finished drawing, in one step, and selects it: createShape, or createTrigger for
+// the Trigger tool.
+export type MakeDrawnShape = (openLevel: OpenLevel, reader: LevelReader, drawing: ShapeDrawing) => CreateShapeOutcome;
+
 // What finishing does next: the controller selects the shape and returns to Select, or the tool only
 // keeps the shape, for Esc and for deactivate, which the controller calls while it switches tools.
 type FinishWay = 'return' | 'keep';
 
 // Draws the four kinds a ShapeComponent holds. A rectangle or a circle: a click places the remembered size
 // centred on the mouse, a drag sets a new size. A polygon: each click a point, closed by clicking the first
-// point, finished open as a line by Enter, a double-click, Esc or another tool. Finishing runs createShape,
-// one step, and the controller selects the shape and returns to Select unless the tool is locked.
+// point, finished open as a line by Enter, a double-click, Esc or another tool. Finishing runs createShape (or
+// the maker it is given), one step, and the controller selects the shape and returns to Select unless the tool is locked.
 export class ShapeTool implements Tool {
     readonly id = 'shape';
     readonly preview = new VersionCounter();
@@ -103,6 +109,11 @@ export class ShapeTool implements Tool {
     // A left press for a polygon's point, until it is released.
     private polygonPress: LevelPointerInput | undefined;
     private shownPolygon: PolygonPreview | undefined;
+    private readonly makeShape: MakeDrawnShape;
+
+    constructor(makeShape: MakeDrawnShape = createShape) {
+        this.makeShape = makeShape;
+    }
 
     get kind() {
         return this.chosenKind;
@@ -467,12 +478,12 @@ export class ShapeTool implements Tool {
         this.show({ shape: { drawing, toLevel: press.space.toLevel } });
     }
 
-    // createShape selects the new shape; 'return' also hands it to the controller.
+    // The maker selects the new shape; 'return' also hands it to the controller.
     private make(drawing: ShapeDrawing, way: FinishWay) {
         const context = this.context;
         if (context === undefined) return;
 
-        const outcome = createShape(context.openLevel, context.reader, drawing);
+        const outcome = this.makeShape(context.openLevel, context.reader, drawing);
         if (outcome.kind === 'refused') {
             context.status.show(outcome.reason);
             return;

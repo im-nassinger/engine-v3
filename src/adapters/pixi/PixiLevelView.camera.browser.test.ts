@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { JointComponent, StyleComponent, TransformComponent } from '../../core/components/index.ts';
+import { JointComponent, ShapeComponent, StyleComponent, TransformComponent } from '../../core/components/index.ts';
 import { BoundsCache, PiecesCache, WorldMatrixCache } from '../../core/derived/index.ts';
 import { Level } from '../../core/level/index.ts';
 import { Signal } from '../../core/events/index.ts';
@@ -219,6 +219,23 @@ describe('PixiLevelView through the camera', () => {
         levelView.stopShowingThroughCamera();
         frames.runFrame();
         expect(levelView.overlays.jointIcons.shownIcons).toHaveLength(1);
+    });
+
+    test('a shape with no style is drawn in the editor only, and comes back after Stop', async () => {
+        const { levelView, frames, level } = await showRedLevel(320, 180);
+        const trigger = level.createEntity(level.world, 0);
+        trigger.addComponent(new TransformComponent());
+        trigger.addComponent(new ShapeComponent({ geometry: { kind: 'rectangle', width: 40, height: 30 } }));
+        frames.runFrame();
+        expect(levelView.overlays.unstyledShapes.shownShapes.map((shown) => shown.entity)).toEqual([trigger]);
+
+        levelView.showThroughCamera({ x: 0, y: 0 }, CAMERA_BOX);
+        frames.runFrame();
+        expect(levelView.overlays.unstyledShapes.shownShapes).toEqual([]);
+
+        levelView.stopShowingThroughCamera();
+        frames.runFrame();
+        expect(levelView.overlays.unstyledShapes.shownShapes).toHaveLength(1);
     });
 
     test('the editor view is left as it was, and stopping goes back to it without bars', async () => {

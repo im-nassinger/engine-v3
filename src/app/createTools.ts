@@ -9,9 +9,10 @@ import {
     SelectTool,
     ShapeTool,
     ToolController,
+    TriggerTool,
 } from '../editor/tools/index.ts';
 
-// The tools in the tool column's order: Select, Shape, Joint, the pen and the Pencil. The snapper is made again for each
+// The tools in the tool column's order: Select, Shape, Joint, the pen, the Pencil and the Trigger tool. The snapper is made again for each
 // level that opens, since it reads that level's grid.
 export function createTools(session: EditorSession, commands: CommandRegistry) {
     let snapperLevel = session.openLevel.level;
@@ -37,7 +38,7 @@ export function createTools(session: EditorSession, commands: CommandRegistry) {
     const pan = new PanGesture(session.view);
 
     return new ToolController(
-        [new SelectTool(), new ShapeTool(), new JointTool(), new PenTool(), new PencilTool()],
+        [new SelectTool(), new ShapeTool(), new JointTool(), new PenTool(), new PencilTool(), new TriggerTool()],
         services,
         pan,
     );

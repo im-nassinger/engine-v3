@@ -83,13 +83,40 @@ describe('ToolColumn', () => {
 
         await expect.poll(() => selectButton().getAttribute('aria-pressed')).toBe('true');
         const buttons = editorPageContainer().querySelectorAll('.tool-button');
-        expect(buttons.length).toBe(5);
+        expect(buttons.length).toBe(6);
         expect(selectButton().getAttribute('aria-label')).toBe('Select');
         expect(toolButton('shape').getAttribute('aria-label')).toBe('Shape');
         expect(toolButton('shape').getAttribute('aria-pressed')).toBe('false');
         expect(toolButton('joint').getAttribute('aria-label')).toBe('Joint');
         expect(toolButton('pen').getAttribute('aria-label')).toBe('Bézier pen');
         expect(toolButton('pencil').getAttribute('aria-label')).toBe('Pencil');
+        expect(toolButton('trigger').getAttribute('aria-label')).toBe('Trigger');
+    });
+
+    test('key 6 picks the Trigger tool, its button shows it on, and it has no kinds menu', async () => {
+        const { session, commands, tools } = showWithEditor(Level.createNew(), createElement(ToolColumn));
+        const escape = new EscapeChain(session, tools.controller, new OpenWindowCount());
+        const toolKeys = { tools: tools.controller, escape };
+        const dispatcher = new ShortcutDispatcher(commands.registry, commands.runner, 'other', toolKeys);
+        await expect.poll(() => selectButton().getAttribute('aria-pressed')).toBe('true');
+
+        const used = dispatcher.handleKeyDown(digitPress('6'), 'level', true);
+
+        expect(used).toBe(true);
+        expect(tools.controller.active.id).toBe('trigger');
+        await expect.poll(() => toolButton('trigger').getAttribute('aria-pressed')).toBe('true');
+        expect(kindsMenu()).toBeNull();
+    });
+
+    test('the Trigger tool’s tooltip is "Trigger 6", and its icon is a dashed rectangle with a bolt', async () => {
+        showWithEditor(Level.createNew(), createElement(ToolColumn));
+        await expect.poll(() => selectButton().getAttribute('aria-pressed')).toBe('true');
+
+        expect(toolButton('trigger').querySelector('svg rect')?.getAttribute('stroke-dasharray')).toBe('3 2.5');
+        await userEvent.hover(toolButton('trigger'));
+
+        await expect.poll(() => document.querySelector('[role="tooltip"]')?.textContent).toBe('Trigger6');
+        expect(document.querySelector('[role="tooltip"] .shortcut')?.textContent).toBe('6');
     });
 
     test('key 4 picks the pen, its button shows it on, and it has no kinds menu', async () => {

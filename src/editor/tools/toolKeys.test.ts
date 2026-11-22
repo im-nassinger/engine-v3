@@ -10,8 +10,8 @@ describe('TOOL_KEYS', () => {
             joint: '3',
             pen: '4',
             pencil: '5',
-            text: '6',
-            trigger: '7',
+            trigger: '6',
+            text: '7',
         });
     });
 });

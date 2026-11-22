@@ -304,24 +304,40 @@ describe('LevelDisplay', () => {
         expect(node?.container.visible).toBe(false);
     });
 
-    test('a shape with no StyleComponent draws a thin line in the editor and nothing in play', () => {
-        const editorLevel = Level.createNew();
-        const editorShape = addShape(editorLevel, editorLevel.world, SQUARE);
-        editorShape.removeComponent(StyleComponent);
-        const editor = makeDisplay(editorLevel, true);
-        editor.display.prepare();
+    test('a path with no StyleComponent draws a thin line in the editor and nothing in play', () => {
+        const drawUnstyledPath = (showUnstyled: boolean) => {
+            const level = Level.createNew();
+            const path = level.createEntity(level.world, 0);
+            path.addComponent(new TransformComponent());
+            path.addComponent(
+                new PathComponent({
+                    path: {
+                        closed: false,
+                        points: [
+                            { x: 0, y: 0, corner: 'sharp', handleIn: null, handleOut: null },
+                            { x: 100, y: 0, corner: 'sharp', handleIn: null, handleOut: null },
+                        ],
+                    },
+                }),
+            );
+            const { display } = makeDisplay(level, showUnstyled);
+            display.prepare();
 
-        const playLevel = Level.createNew();
-        const playShape = addShape(playLevel, playLevel.world, SQUARE);
-        playShape.removeComponent(StyleComponent);
-        const play = makeDisplay(playLevel, false);
-        play.display.prepare();
+            return display.nodeOf(path)?.graphics.getLocalBounds();
+        };
 
-        const editorBounds = editor.display.nodeOf(editorShape)?.graphics.getLocalBounds();
-        const playBounds = play.display.nodeOf(playShape)?.graphics.getLocalBounds();
+        expect(drawUnstyledPath(true)?.width).toBeGreaterThan(99);
+        expect(drawUnstyledPath(false)?.width).toBe(0);
+    });
 
-        expect(editorBounds?.width).toBeGreaterThan(99);
-        expect(playBounds?.width).toBe(0);
+    test('a shape with no StyleComponent draws nothing in the level: UnstyledShapeOverlay shows it', () => {
+        const level = Level.createNew();
+        const shape = addShape(level, level.world, SQUARE);
+        shape.removeComponent(StyleComponent);
+        const { display } = makeDisplay(level, true);
+        display.prepare();
+
+        expect(display.nodeOf(shape)?.graphics.getLocalBounds().width).toBe(0);
     });
 
     test('a line, a self-crossing polygon, a circle and a path all draw', () => {

@@ -22,6 +22,7 @@ import {
     LetterboxOverlay,
     PhysicsViewOverlay,
     SelectionOverlay,
+    UnstyledShapeOverlay,
 } from './overlays/index.ts';
 import type {
     DrawingSource,
@@ -31,8 +32,8 @@ import type {
     SelectionSource,
 } from './overlays/index.ts';
 
-// Culling grows the visible area by this many screen pixels, so the editor's 1 px line around an unstyled
-// shape, which BoundsCache doesn't count, is never cut at the view's edge.
+// Culling grows the visible area by this many screen pixels, so the editor's 1 px line along an unstyled
+// path, which BoundsCache doesn't count, is never cut at the view's edge.
 const CULLING_MARGIN_SCREEN_PX = 2;
 
 // Where the renderer's resolution comes from. DevicePixelRatio in adapters/browser fulfils it.
@@ -75,6 +76,8 @@ export class PixiLevelView {
     // The grid is over the level, since the World's fill, drawn first in the level, is the background. Outside
     // the level bounds nothing is drawn behind the entities, so the app's colour shows through the clear canvas.
     private readonly gridOverlay = new GridOverlay();
+    // Over the grid, so a trigger's faint fill and dashed edge show on it.
+    private readonly unstyledShapeOverlay = new UnstyledShapeOverlay();
     private readonly boundsOverlay = new BoundsOverlay();
     private readonly cameraFrameOverlay = new CameraFrameOverlay();
     // On top of everything, since it shows what collides whatever the drawing hides.
@@ -119,6 +122,7 @@ export class PixiLevelView {
         this.stage.addChild(this.levelLayer);
         this.stage.addChild(
             this.gridOverlay.graphics,
+            this.unstyledShapeOverlay.graphics,
             this.boundsOverlay.container,
             this.cameraFrameOverlay.container,
             this.physicsViewOverlay.graphics,
@@ -168,6 +172,7 @@ export class PixiLevelView {
     get overlays() {
         return {
             grid: this.gridOverlay,
+            unstyledShapes: this.unstyledShapeOverlay,
             bounds: this.boundsOverlay,
             cameraFrame: this.cameraFrameOverlay,
             physicsView: this.physicsViewOverlay,
@@ -284,7 +289,7 @@ export class PixiLevelView {
 
     // Shows the level through the camera from now on, as Fixed size does: the camera's box fills the
     // window one way, centred, with black bars the other way. Selection, handles, previews, joint icons,
-    // the grid, the camera frame and the level bounds' edge and label aren't drawn; the physics view
+    // shapes with no style, the grid, the camera frame and the level bounds' edge and label aren't drawn; the physics view
     // follows its switch.
     showThroughCamera(position: Point, box: CameraBox) {
         this.camera = { position, box };
@@ -433,6 +438,7 @@ export class PixiLevelView {
             // Editor-only drawing: play shows none of it, whatever the editor holds behind the view.
             // A joint has no drawing of its own in play, so an unstyled one is invisible, as any entity.
             this.gridOverlay.clear();
+            this.unstyledShapeOverlay.clear();
             this.cameraFrameOverlay.clear();
             this.jointIconOverlay.clear();
             this.boundsOverlay.clear();
@@ -444,6 +450,7 @@ export class PixiLevelView {
         }
 
         this.gridOverlay.update(scene);
+        this.unstyledShapeOverlay.update(scene);
         this.cameraFrameOverlay.update(scene);
         this.jointIconOverlay.update(scene);
         this.boundsOverlay.update(scene);

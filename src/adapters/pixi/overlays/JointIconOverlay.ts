@@ -5,6 +5,7 @@ import type { JointType } from '../../../core/components/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
 import { JOINT_ICON_RADIUS, jointIconCentres, jointIconRadiusPx } from '../../../editor/view/index.ts';
+import { isHiddenWithParents } from './hiddenWithParents.ts';
 import type { OverlayScene } from './OverlayScene.ts';
 
 // The design's joint icon: a white circle with a 1.5 px edge. Every size here is the one at 100%; the
@@ -27,18 +28,6 @@ export type ShownJointIcon = {
     readonly screenPosition: Point;
 };
 
-// Hidden when the joint or any of its parents is. The physics view, unlike this, ignores the eye.
-function isHiddenWithParents(entity: Entity) {
-    let current: Entity | undefined = entity;
-
-    while (current !== undefined) {
-        if (current.isHidden) return true;
-        current = current.parent;
-    }
-
-    return false;
-}
-
 function isOffScreen(position: Point, radiusPx: number, scene: OverlayScene) {
     const size = scene.view.size;
     const margin = radiusPx + 1;
@@ -53,7 +42,7 @@ function isOffScreen(position: Point, radiusPx: number, scene: OverlayScene) {
 
 // One icon per Hinge at its position and one on each end of a Rope or Spring, growing and shrinking with the zoom as the level does: Hinge has a dot in the middle, Rope a short
 // upright line, Spring a small zigzag. Editor only, never drawn in play; hidden by its View menu switch and
-// with the joint's eye.
+// with the joint's eye or a parent's. The physics view, unlike this, ignores the eye.
 export class JointIconOverlay {
     readonly graphics = new Graphics();
     private shown: readonly ShownJointIcon[] = [];

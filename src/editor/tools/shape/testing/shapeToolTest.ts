@@ -8,7 +8,7 @@ import type { SnapResult, Snapper } from '../../../snapping/index.ts';
 import { ManualFrames, ManualTimer } from '../../../time/testing/index.ts';
 import { PanGesture } from '../../pan/PanGesture.ts';
 import { SelectTool } from '../../select/SelectTool.ts';
-import type { LevelPointerInput, Modifiers, ToolKey } from '../../Tool.ts';
+import type { LevelPointerInput, Modifiers, Tool, ToolKey } from '../../Tool.ts';
 import { ToolController } from '../../ToolController.ts';
 import { ShapeTool } from '../ShapeTool.ts';
 
@@ -32,6 +32,11 @@ const NO_SNAPPING: Snapper = {
 // A level with a square selected and a group at 400, 300 turned 90°, the Select and Shape tools under
 // one controller, and the Shape tool picked. Screen and level positions are the same.
 export function buildShapeTest(snapper: Snapper = NO_SNAPPING) {
+    return buildDrawingToolTest(new ShapeTool(), snapper);
+}
+
+// The same, with another drawing tool in the Shape tool's place, such as the Trigger tool.
+export function buildDrawingToolTest<T extends Tool>(tool: T, snapper: Snapper = NO_SNAPPING) {
     const level = Level.createNew();
     const square = level.createEntity(level.world, 0);
     square.addComponent(new TransformComponent());
@@ -56,14 +61,16 @@ export function buildShapeTest(snapper: Snapper = NO_SNAPPING) {
         status: session.status,
         reader: session.reader,
     };
-    const tool = new ShapeTool();
     const controller = new ToolController([new SelectTool(), tool], services, new PanGesture(session.view));
-    controller.pick('shape');
+    controller.pick(tool.id);
 
     return { level, square, group, session, tool, controller };
 }
 
 export type Setup = ReturnType<typeof buildShapeTest>;
+
+// What the pointer helpers below need, whichever tool is picked.
+type AnySetup = Pick<Setup, 'controller' | 'session' | 'level'>;
 
 export function pointer(position: Point, modifiers: Partial<Modifiers> = {}): LevelPointerInput {
     return {
@@ -75,20 +82,20 @@ export function pointer(position: Point, modifiers: Partial<Modifiers> = {}): Le
     };
 }
 
-export function click(setup: Setup, at: Point, modifiers: Partial<Modifiers> = {}) {
+export function click(setup: AnySetup, at: Point, modifiers: Partial<Modifiers> = {}) {
     setup.controller.pointerMove(pointer(at, modifiers));
     setup.controller.pointerDown(pointer(at, modifiers));
     setup.controller.pointerUp(pointer(at, modifiers));
 }
 
-export function drag(setup: Setup, from: Point, to: Point, modifiers: Partial<Modifiers> = {}) {
+export function drag(setup: AnySetup, from: Point, to: Point, modifiers: Partial<Modifiers> = {}) {
     setup.controller.pointerDown(pointer(from, modifiers));
     setup.controller.pointerMove(pointer(to, modifiers));
     setup.controller.pointerUp(pointer(to, modifiers));
 }
 
 // The shape just made: the one selected.
-export function made(setup: Setup): Entity {
+export function made(setup: AnySetup): Entity {
     const ids = setup.session.openLevel.selection.ids;
     if (ids.length !== 1) throw new Error(`${String(ids.length)} entities are selected.`);
 
