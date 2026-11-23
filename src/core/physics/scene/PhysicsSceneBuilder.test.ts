@@ -85,6 +85,7 @@ class RecordingWorld implements PhysicsWorld {
     setSurfaceSettings() {}
     setMotor() {}
     destroyBody() {}
+    removeSurfaces() {}
     destroy() {}
 }
 

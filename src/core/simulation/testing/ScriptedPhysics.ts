@@ -43,6 +43,8 @@ export type ScriptedChange =
 export class ScriptedWorld implements PhysicsWorld {
     static readonly FALL_PER_STEP = FALL_PER_STEP;
     readonly destroyedEntities: EntityId[] = [];
+    // The entities whose surfaces were taken out, in order, whether or not they had any.
+    readonly removedSurfaces: EntityId[] = [];
     readonly destroyedJoints: JointHandle[] = [];
     readonly changes: ScriptedChange[] = [];
     falling = true;
@@ -163,6 +165,10 @@ export class ScriptedWorld implements PhysicsWorld {
 
     setMotor(joint: JointHandle, motor: HingeMotor) {
         this.changes.push({ call: 'setMotor', joint, motor });
+    }
+
+    removeSurfaces(entity: EntityId) {
+        this.removedSurfaces.push(entity);
     }
 
     destroyBody(handle: BodyHandle) {

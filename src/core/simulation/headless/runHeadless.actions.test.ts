@@ -462,6 +462,8 @@ describe('Destroy', () => {
         expect(inRun(simulation, ball)).toBeUndefined();
         expect(inRun(simulation, child)).toBeUndefined();
         expect(world.destroyedEntities).toEqual([ball.id]);
+        // A surface merged into a body that stays goes on its own; the ball and its child are asked too.
+        expect(world.removedSurfaces).toEqual([ball.id, child.id]);
         // The World is never destroyed.
         expect(simulation.level.findEntity(level.world.id)).toBe(simulation.level.world);
         expect(simulation.takeReport().removed).toEqual([ball.id]);

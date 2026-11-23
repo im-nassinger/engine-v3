@@ -19,7 +19,7 @@ beforeAll(async () => {
 
 describe('the determinism test', () => {
     test('every level file has its recorded hashes', () => {
-        expect(names).toHaveLength(14);
+        expect(names).toHaveLength(16);
     });
 
     test.each(names)('%s matches its recorded hashes', async (name) => {

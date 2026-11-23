@@ -16,6 +16,16 @@ export const RECORDED_INPUTS: Readonly<Record<string, readonly KeyHold[]>> = {
         { key: 'ArrowUp', from: 420, to: 423 },
     ],
     'trigger-touch-groups': [{ key: 'ArrowRight', from: 240, to: 300 }],
+    'trigger-doors': [
+        { key: 'ArrowRight', from: 30, to: 200 },
+        { key: 'Space', from: 100, to: 102 },
+        { key: 'Space', from: 300, to: 300 },
+        { key: 'Space', from: 450, to: 455 },
+    ],
+    'trigger-hits': [
+        { key: 'ArrowLeft', from: 10, to: 60 },
+        { key: 'ArrowRight', from: 120, to: 420 },
+    ],
 };
 
 // The level's recorded inputs, tick by tick from 1.

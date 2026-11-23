@@ -1,5 +1,13 @@
 import { TagsComponent, TriggerComponent, VariablesComponent } from '../../../../src/core/components/index.ts';
-import type { Action, Check, Trigger, When } from '../../../../src/core/fields/index.ts';
+import type {
+    Action,
+    ChangeOp,
+    Check,
+    JsonValue,
+    Trigger,
+    VariableValue,
+    When,
+} from '../../../../src/core/fields/index.ts';
 import type { Entity, Level } from '../../../../src/core/level/index.ts';
 
 // A trigger as the trigger card makes one, without its id or name, which giveTriggers adds.
@@ -41,7 +49,7 @@ export function entityTarget(entity: Entity) {
     return { kind: 'entity', entity: entity.id } as const;
 }
 
-export function changeVariable(level: Level, name: string, op: 'set' | 'add' | 'subtract', amount: number): Action {
+export function changeVariable(level: Level, name: string, op: ChangeOp, amount: JsonValue | null): Action {
     return { kind: 'change', target: entityTarget(level.world), value: { kind: 'variable', name }, op, amount };
 }
 
@@ -61,4 +69,38 @@ export function pushBy(entity: Entity, x: number, y: number): Action {
 
 export function inputHeld(input: string): When {
     return { kind: 'input', input, how: 'held' };
+}
+
+// An entity's own variables, each with its starting value.
+export function giveOwnVariables(entity: Entity, values: Readonly<Record<string, VariableValue>>) {
+    const variables = Object.entries(values).map(([name, value]) => ({ name, value }));
+    entity.addComponent(new VariablesComponent({ variables }));
+
+    return entity;
+}
+
+export function changeOwnVariable(name: string, op: ChangeOp, amount: JsonValue | null): Action {
+    return { kind: 'change', target: { kind: 'this' }, value: { kind: 'variable', name, own: true }, op, amount };
+}
+
+export function setOwnSensor(sensor: boolean): Action {
+    return {
+        kind: 'change',
+        target: { kind: 'this' },
+        value: { kind: 'field', component: 'SurfaceComponent', field: 'sensor' },
+        op: 'set',
+        amount: sensor,
+    };
+}
+
+export function fireAtTagged(tag: string, name: string): Action {
+    return { kind: 'fire', target: { kind: 'tagged', tag }, name, amount: null };
+}
+
+export function wait(seconds: number): Action {
+    return { kind: 'wait', seconds };
+}
+
+export function otherHasTag(tag: string): Check {
+    return { kind: 'hasTag', target: { kind: 'other' }, tag };
 }

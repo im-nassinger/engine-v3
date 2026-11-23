@@ -1,0 +1,726 @@
+{
+    "format": "engine-v3-level",
+    "formatVersion": 1,
+    "physicsVersion": 1,
+    "name": "trigger-doors",
+    "editor": {
+        "gridSize": 50,
+        "foldedRows": []
+    },
+    "world": {
+        "id": 1,
+        "hidden": false,
+        "locked": false,
+        "components": {
+            "NameComponent": {
+                "name": "World"
+            },
+            "TransformComponent": {
+                "position": {
+                    "x": 0,
+                    "y": 0
+                },
+                "rotation": 0,
+                "scale": {
+                    "x": 1,
+                    "y": 1
+                },
+                "skew": 0
+            },
+            "ShapeComponent": {
+                "geometry": {
+                    "kind": "rectangle",
+                    "width": 20000,
+                    "height": 10000
+                }
+            },
+            "StyleComponent": {
+                "fill": {
+                    "kind": "solid",
+                    "colour": "#BFE3F5FF"
+                },
+                "outline_colour": "#1F3552FF",
+                "outline_width": 0,
+                "scale_outline": false,
+                "opacity": 1
+            },
+            "PhysicsWorldComponent": {
+                "gravity": {
+                    "x": 0,
+                    "y": 9.8
+                },
+                "walls": false
+            },
+            "VariablesComponent": {
+                "variables": [
+                    {
+                        "name": "opened",
+                        "value": 0
+                    },
+                    {
+                        "name": "lights",
+                        "value": false
+                    },
+                    {
+                        "name": "lit",
+                        "value": 0
+                    }
+                ]
+            },
+            "InputComponent": {
+                "inputs": [
+                    {
+                        "name": "left",
+                        "keys": [
+                            "KeyA",
+                            "ArrowLeft"
+                        ]
+                    },
+                    {
+                        "name": "right",
+                        "keys": [
+                            "KeyD",
+                            "ArrowRight"
+                        ]
+                    },
+                    {
+                        "name": "up",
+                        "keys": [
+                            "KeyW",
+                            "ArrowUp"
+                        ]
+                    },
+                    {
+                        "name": "down",
+                        "keys": [
+                            "KeyS",
+                            "ArrowDown"
+                        ]
+                    },
+                    {
+                        "name": "jump",
+                        "keys": [
+                            "Space"
+                        ]
+                    }
+                ]
+            },
+            "TriggerComponent": {
+                "triggers": [
+                    {
+                        "id": 1,
+                        "name": null,
+                        "on": true,
+                        "when": {
+                            "kind": "input",
+                            "input": "right",
+                            "how": "held"
+                        },
+                        "checks": [],
+                        "actions": [
+                            {
+                                "kind": "push",
+                                "target": {
+                                    "kind": "entity",
+                                    "entity": 5
+                                },
+                                "push": {
+                                    "kind": "by",
+                                    "x": 4,
+                                    "y": 0
+                                }
+                            }
+                        ],
+                        "repeat": {
+                            "kind": "everyTime"
+                        }
+                    },
+                    {
+                        "id": 2,
+                        "name": null,
+                        "on": true,
+                        "when": {
+                            "kind": "input",
+                            "input": "jump",
+                            "how": "pressed"
+                        },
+                        "checks": [],
+                        "actions": [
+                            {
+                                "kind": "change",
+                                "target": {
+                                    "kind": "entity",
+                                    "entity": 1
+                                },
+                                "value": {
+                                    "kind": "variable",
+                                    "name": "lights"
+                                },
+                                "op": "flip",
+                                "amount": null
+                            }
+                        ],
+                        "repeat": {
+                            "kind": "everyTime"
+                        }
+                    },
+                    {
+                        "id": 3,
+                        "name": null,
+                        "on": true,
+                        "when": {
+                            "kind": "variableChanged",
+                            "variable": "lights",
+                            "becomes": {
+                                "compare": "is",
+                                "value": true
+                            }
+                        },
+                        "checks": [],
+                        "actions": [
+                            {
+                                "kind": "change",
+                                "target": {
+                                    "kind": "entity",
+                                    "entity": 1
+                                },
+                                "value": {
+                                    "kind": "variable",
+                                    "name": "lit"
+                                },
+                                "op": "add",
+                                "amount": 1
+                            }
+                        ],
+                        "repeat": {
+                            "kind": "everyTime"
+                        }
+                    }
+                ],
+                "next_trigger_id": 4
+            }
+        },
+        "children": [
+            {
+                "id": 2,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Camera"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "CameraComponent": {
+                        "width": 1920,
+                        "height": 1080,
+                        "follow": null,
+                        "smoothing": 0.3,
+                        "mode": "fixedSize"
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 3,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Floor"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 300
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 1600,
+                            "height": 20
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 4,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Wall"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 700,
+                            "y": 200
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 20,
+                            "height": 200
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 5,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Ball"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -600,
+                            "y": 270
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "circle",
+                            "radius": 20
+                        }
+                    },
+                    "BodyComponent": {
+                        "type": "dynamic",
+                        "gravity_scale": 1,
+                        "linear_damping": 0,
+                        "angular_damping": 0,
+                        "fixed_rotation": false,
+                        "bullet": false,
+                        "merge": true
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.6,
+                        "restitution": 0,
+                        "sensor": false
+                    },
+                    "TagsComponent": {
+                        "tags": [
+                            "player"
+                        ]
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 6,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Button"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -200,
+                            "y": 285
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 60,
+                            "height": 10
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": true
+                    },
+                    "VariablesComponent": {
+                        "variables": [
+                            {
+                                "name": "presses",
+                                "value": 0
+                            }
+                        ]
+                    },
+                    "TriggerComponent": {
+                        "triggers": [
+                            {
+                                "id": 1,
+                                "name": null,
+                                "on": true,
+                                "when": {
+                                    "kind": "touched"
+                                },
+                                "checks": [
+                                    {
+                                        "kind": "hasTag",
+                                        "target": {
+                                            "kind": "other"
+                                        },
+                                        "tag": "player"
+                                    }
+                                ],
+                                "actions": [
+                                    {
+                                        "kind": "change",
+                                        "target": {
+                                            "kind": "this"
+                                        },
+                                        "value": {
+                                            "kind": "variable",
+                                            "name": "presses",
+                                            "own": true
+                                        },
+                                        "op": "add",
+                                        "amount": 1
+                                    },
+                                    {
+                                        "kind": "fire",
+                                        "target": {
+                                            "kind": "tagged",
+                                            "tag": "door"
+                                        },
+                                        "name": "open",
+                                        "amount": null
+                                    }
+                                ],
+                                "repeat": {
+                                    "kind": "everyTime"
+                                }
+                            }
+                        ],
+                        "next_trigger_id": 2
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 7,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Door 1"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0,
+                            "y": 230
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 20,
+                            "height": 120
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    },
+                    "TagsComponent": {
+                        "tags": [
+                            "door"
+                        ]
+                    },
+                    "VariablesComponent": {
+                        "variables": [
+                            {
+                                "name": "door_open",
+                                "value": false
+                            }
+                        ]
+                    },
+                    "TriggerComponent": {
+                        "triggers": [
+                            {
+                                "id": 1,
+                                "name": null,
+                                "on": true,
+                                "when": {
+                                    "kind": "custom",
+                                    "name": "open"
+                                },
+                                "checks": [],
+                                "actions": [
+                                    {
+                                        "kind": "change",
+                                        "target": {
+                                            "kind": "this"
+                                        },
+                                        "value": {
+                                            "kind": "variable",
+                                            "name": "door_open",
+                                            "own": true
+                                        },
+                                        "op": "set",
+                                        "amount": true
+                                    },
+                                    {
+                                        "kind": "change",
+                                        "target": {
+                                            "kind": "entity",
+                                            "entity": 1
+                                        },
+                                        "value": {
+                                            "kind": "variable",
+                                            "name": "opened"
+                                        },
+                                        "op": "add",
+                                        "amount": 1
+                                    },
+                                    {
+                                        "kind": "change",
+                                        "target": {
+                                            "kind": "this"
+                                        },
+                                        "value": {
+                                            "kind": "field",
+                                            "component": "SurfaceComponent",
+                                            "field": "sensor"
+                                        },
+                                        "op": "set",
+                                        "amount": true
+                                    },
+                                    {
+                                        "kind": "wait",
+                                        "seconds": 1
+                                    },
+                                    {
+                                        "kind": "change",
+                                        "target": {
+                                            "kind": "this"
+                                        },
+                                        "value": {
+                                            "kind": "field",
+                                            "component": "SurfaceComponent",
+                                            "field": "sensor"
+                                        },
+                                        "op": "set",
+                                        "amount": false
+                                    },
+                                    {
+                                        "kind": "change",
+                                        "target": {
+                                            "kind": "this"
+                                        },
+                                        "value": {
+                                            "kind": "variable",
+                                            "name": "door_open",
+                                            "own": true
+                                        },
+                                        "op": "set",
+                                        "amount": false
+                                    }
+                                ],
+                                "repeat": {
+                                    "kind": "everyTime"
+                                }
+                            }
+                        ],
+                        "next_trigger_id": 2
+                    }
+                },
+                "children": []
+            },
+            {
+                "id": 8,
+                "hidden": false,
+                "locked": false,
+                "components": {
+                    "NameComponent": {
+                        "name": "Door 2"
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 400,
+                            "y": 230
+                        },
+                        "rotation": 0,
+                        "scale": {
+                            "x": 1,
+                            "y": 1
+                        },
+                        "skew": 0
+                    },
+                    "ShapeComponent": {
+                        "geometry": {
+                            "kind": "rectangle",
+                            "width": 20,
+                            "height": 120
+                        }
+                    },
+                    "SurfaceComponent": {
+                        "density": 1,
+                        "friction": 0.3,
+                        "restitution": 0,
+                        "sensor": false
+                    },
+                    "TagsComponent": {
+                        "tags": [
+                            "door"
+                        ]
+                    },
+                    "VariablesComponent": {
+                        "variables": [
+                            {
+                                "name": "door_open",
+                                "value": false
+                            }
+                        ]
+                    },
+                    "TriggerComponent": {
+                        "triggers": [
+                            {
+                                "id": 1,
+                                "name": null,
+                                "on": true,
+                                "when": {
+                                    "kind": "custom",
+                                    "name": "open"
+                                },
+                                "checks": [],
+                                "actions": [
+                                    {
+                                        "kind": "change",
+                                        "target": {
+                                            "kind": "this"
+                                        },
+                                        "value": {
+                                            "kind": "variable",
+                                            "name": "door_open",
+                                            "own": true
+                                        },
+                                        "op": "set",
+                                        "amount": true
+                                    },
+                                    {
+                                        "kind": "change",
+                                        "target": {
+                                            "kind": "entity",
+                                            "entity": 1
+                                        },
+                                        "value": {
+                                            "kind": "variable",
+                                            "name": "opened"
+                                        },
+                                        "op": "add",
+                                        "amount": 1
+                                    },
+                                    {
+                                        "kind": "change",
+                                        "target": {
+                                            "kind": "this"
+                                        },
+                                        "value": {
+                                            "kind": "field",
+                                            "component": "SurfaceComponent",
+                                            "field": "sensor"
+                                        },
+                                        "op": "set",
+                                        "amount": true
+                                    },
+                                    {
+                                        "kind": "wait",
+                                        "seconds": 2
+                                    },
+                                    {
+                                        "kind": "change",
+                                        "target": {
+                                            "kind": "this"
+                                        },
+                                        "value": {
+                                            "kind": "field",
+                                            "component": "SurfaceComponent",
+                                            "field": "sensor"
+                                        },
+                                        "op": "set",
+                                        "amount": false
+                                    },
+                                    {
+                                        "kind": "change",
+                                        "target": {
+                                            "kind": "this"
+                                        },
+                                        "value": {
+                                            "kind": "variable",
+                                            "name": "door_open",
+                                            "own": true
+                                        },
+                                        "op": "set",
+                                        "amount": false
+                                    }
+                                ],
+                                "repeat": {
+                                    "kind": "everyTime"
+                                }
+                            }
+                        ],
+                        "next_trigger_id": 2
+                    }
+                },
+                "children": []
+            }
+        ]
+    }
+}

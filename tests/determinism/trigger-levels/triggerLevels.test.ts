@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, test } from 'vitest';
 
 import { Box2dPhysicsEngine } from '../../../src/adapters/box2d/index.ts';
-import { VariablesComponent } from '../../../src/core/components/index.ts';
+import { NameComponent, VariablesComponent } from '../../../src/core/components/index.ts';
 import { runHeadless } from '../../../src/core/simulation/index.ts';
 import type { Simulation } from '../../../src/core/simulation/index.ts';
 import type { VariableValue } from '../../../src/core/fields/index.ts';
@@ -10,7 +10,8 @@ import { recordedInputsOf } from '../../levels/determinism/inputs/recordedInputs
 import { readLevelFile } from '../level-files/determinismFiles.ts';
 import { DETERMINISM_START, DETERMINISM_TICKS } from '../run/determinismRun.ts';
 
-// What one tick of a trigger level left: the World's variables by name, and how the run ended.
+// What one tick of a trigger level left: every variable by name, the World's as `coins` and an entity's own
+// as `Door 1.door_open`, and how the run ended.
 type TriggerTick = {
     readonly tick: number;
     readonly variables: Readonly<Record<string, VariableValue>>;
@@ -28,10 +29,9 @@ async function runTriggerLevel(name: string) {
     const levelData = await readLevelFile(name);
     const ticks: TriggerTick[] = [];
     const afterTick = (simulation: Simulation) => {
-        const variables = simulation.level.world.requireComponent(VariablesComponent).get('variables');
         ticks.push({
             tick: simulation.tick,
-            variables: Object.fromEntries(variables.map((variable) => [variable.name, variable.value])),
+            variables: variablesIn(simulation),
             end: simulation.end?.kind ?? null,
         });
     };
@@ -46,12 +46,25 @@ async function runTriggerLevel(name: string) {
     return ticks;
 }
 
-// The first tick a variable reached each of its values.
-function ticksReaching(ticks: readonly TriggerTick[], name: string) {
+function variablesIn(simulation: Simulation) {
+    const found: Record<string, VariableValue> = {};
+    for (const entity of simulation.level.entitiesInPanelOrder()) {
+        const prefix =
+            entity === simulation.level.world ? '' : `${entity.requireComponent(NameComponent).get('name')}.`;
+        for (const variable of entity.getComponent(VariablesComponent)?.get('variables') ?? []) {
+            found[`${prefix}${variable.name}`] = variable.value;
+        }
+    }
+
+    return found;
+}
+
+// The first tick a variable reached each of its values, from the value it starts with.
+function ticksReaching(ticks: readonly TriggerTick[], name: string, start: VariableValue = 0) {
     const reached: number[] = [];
-    let last: VariableValue = 0;
+    let last = start;
     for (const { tick, variables } of ticks) {
-        const value = variables[name] ?? 0;
+        const value = variables[name] ?? last;
         if (value !== last) {
             reached.push(tick);
             last = value;
@@ -90,5 +103,32 @@ describe('the determinism levels with triggers do what they are built to show', 
         const ticks = await runTriggerLevel('trigger-touch-groups');
         expect(ticksReaching(ticks, 'touches')).toEqual([38]);
         expect(ticksReaching(ticks, 'leaves')).toEqual([295]);
+    });
+
+    test('trigger-doors: the button fires open, each door waits and closes, and the switch flips', async () => {
+        const ticks = await runTriggerLevel('trigger-doors');
+        // The ball reaches the button once; both doors hear `open` in that tick and close 1 s and 2 s later.
+        expect(ticksReaching(ticks, 'Button.presses')).toEqual([156]);
+        expect(ticksReaching(ticks, 'opened')).toEqual([156]);
+        expect(ticks.find((tick) => tick.tick === 156)?.variables['opened']).toBe(2);
+        expect(ticksReaching(ticks, 'Door 1.door_open', false)).toEqual([156, 216]);
+        expect(ticksReaching(ticks, 'Door 2.door_open', false)).toEqual([156, 276]);
+        // `jump` pressed three times flips `lights`, and `lit` counts the two times it becomes true.
+        expect(ticksReaching(ticks, 'lights', false)).toEqual([100, 300, 450]);
+        expect(ticksReaching(ticks, 'lit')).toEqual([100, 450]);
+    });
+
+    test('trigger-hits: collisions are counted, destroyed bricks score and score becoming 3 wins', async () => {
+        const ticks = await runTriggerLevel('trigger-hits');
+        const won = ticks.find((tick) => tick.end !== null);
+
+        // The ball's own `hits`: the floor it starts on, the wall and the floor, then the three bricks, with a
+        // landing on the floor after the first two.
+        expect(ticksReaching(ticks, 'Ball.hits')).toEqual([1, 111, 120, 255, 283, 370, 391, 512]);
+        // Each brick hit is destroyed and its Destroyed trigger scores in the same tick; the ball rolls on
+        // through the gap it left. `score` becoming 3 wins in that tick.
+        expect(ticksReaching(ticks, 'score')).toEqual([255, 370, 512]);
+        expect(won?.tick).toBe(512);
+        expect(won?.end).toBe('won');
     });
 });

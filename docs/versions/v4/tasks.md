@@ -42,7 +42,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 12. The component value check in play
   - Read: versions/v4/architecture.md#triggers-in-play, requirements/triggers/triggers.md#checking-a-component-value--v4
   - Done when: `checksPass` reads a target's number value, a vector's axis, or a body's live speed or velocity from `velocity(body)`; a tagged target passes when any tagged entity passes; a target without the value is false; `runHeadless` tests cover "If this BodyComponent speed is more than 200" on a falling ball
-- [ ] 13. The determinism levels for v4
+- [x] 13. The determinism levels for v4
   - Read: versions/v4/architecture.md#determinism, architecture/testing.md#the-determinism-test
   - Done when: `stateHash` adds every entity's variables and the waiting runs as the architecture says; `trigger-doors` and `trigger-hits` are built with recorded inputs and their hashes recorded; the older levels' hashes are unchanged, or their change is explained in decisions.md
 - [ ] 14. The shortcut catalog and its search

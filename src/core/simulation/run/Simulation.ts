@@ -1,6 +1,5 @@
-import { VariablesComponent } from '../../components/index.ts';
-
 import { bodyHashes } from '../hash/bodyHashes.ts';
+import { playNumbers } from '../hash/playNumbers.ts';
 import { stateHash } from '../hash/stateHash.ts';
 import type { TickReport } from '../report/TickReport.ts';
 
@@ -81,11 +80,9 @@ export class Simulation {
     stateHash() {
         const camera = this.run.camera.position;
 
-        const variables = this.run.level.world.getComponent(VariablesComponent)?.get('variables') ?? [];
-        // Only the numbers so far: a v3 level's hash stays as recorded.
-        const values = variables.flatMap((variable) => (typeof variable.value === 'number' ? [variable.value] : []));
+        const played = playNumbers(this.run.level, this.run.triggers.waiting.all);
 
-        return stateHash(this.currentTick, this.run.scene, this.run.poses, camera, values);
+        return stateHash(this.currentTick, this.run.scene, this.run.poses, camera, played);
     }
 
     // One hash per body still in the run, in Entities panel order, to name the first body that differs.

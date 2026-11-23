@@ -252,4 +252,40 @@ describe("Box2dPhysicsWorld's surfaces", () => {
         expect(() => world.addSurface(7, surfaceDefinition({ pieces: [boxPiece(40, 40)] }))).toThrow("doesn't exist");
         world.destroy();
     });
+
+    test('removing a surface merged into the ground lets a box fall through where it was', () => {
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const poses = new BodyPoses();
+        const ground = world.createBody(bodyDefinition({ entity: 1, type: 'static', position: { x: 0, y: 100 } }));
+        world.addSurface(ground, surfaceDefinition({ entity: 3, pieces: [boxPiece(2000, 40)] }));
+        const box = world.createBody(bodyDefinition({ entity: 2, position: { x: 0, y: 0 } }));
+        world.addSurface(box, surfaceDefinition({ entity: 2, pieces: [boxPiece(40, 40)] }));
+
+        stepTimes(world, poses, ONE_SECOND);
+        world.removeSurfaces(3);
+        // Asking again, or for an entity with no surfaces, does nothing.
+        world.removeSurfaces(3);
+        world.removeSurfaces(9);
+        stepTimes(world, poses, ONE_SECOND);
+
+        expect(poses.poseOf(2)?.y ?? 0).toBeGreaterThan(GROUND_TOP + 100);
+        world.destroy();
+    });
+
+    test('a body that loses a merged surface keeps the mass of what is left', () => {
+        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const cart = world.createBody(bodyDefinition({ entity: 2 }));
+        world.addSurface(cart, surfaceDefinition({ entity: 2, pieces: [boxPiece(40, 40)] }));
+        world.addSurface(cart, surfaceDefinition({ entity: 3, pieces: [circlePiece(20, { x: 40, y: 0 })] }));
+
+        world.removeSurfaces(3);
+        world.addVelocity(cart, { x: 100, y: 0 });
+        // Taking out the last surface too leaves a Dynamic body its 1 kg, and it keeps moving.
+        world.removeSurfaces(2);
+        const poses = new BodyPoses();
+        stepTimes(world, poses, ONE_SECOND);
+
+        expect(poses.poseOf(2)?.x ?? 0).toBeGreaterThan(90);
+        world.destroy();
+    });
 });

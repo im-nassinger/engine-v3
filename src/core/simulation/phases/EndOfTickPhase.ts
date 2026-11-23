@@ -77,13 +77,15 @@ function removeJoint(run: PlayRun, joint: PlayJoint, removedBodies: Set<Entity>)
     run.report.jointRemoved(joint.entity.id);
 }
 
-// Every body built for the entity or anything inside it leaves the physics world and the run, and every
+// Every surface and body built for the entity or anything inside it leaves the physics world and the run, and every
 // joint entity inside it stops following its body.
 function removeBodiesIn(run: PlayRun, top: Entity, removedBodies: Set<Entity>) {
     const waiting = [top];
 
     for (let entity = waiting.pop(); entity !== undefined; entity = waiting.pop()) {
         waiting.push(...entity.children);
+        // A surface merged into a body that stays, a group's or the ground, goes on its own.
+        run.scene.world.removeSurfaces(entity.id);
 
         const body = run.bodyMatrices.remove(entity);
         if (body === undefined) continue;

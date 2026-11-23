@@ -357,6 +357,21 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         }
     }
 
+    removeSurfaces(entity: EntityId) {
+        this.checkAlive();
+
+        for (const { body, surface } of this.surfacesByEntity.get(entity) ?? []) {
+            const hadShapes = surface.shapes.length > 0;
+            this.destroyShapes(surface.shapes);
+            surface.shapes = [];
+            body.surfaces.splice(body.surfaces.indexOf(surface), 1);
+            if (hadShapes) {
+                this.keepMass(body);
+            }
+        }
+        this.surfacesByEntity.delete(entity);
+    }
+
     destroy() {
         if (this.destroyed) return;
 

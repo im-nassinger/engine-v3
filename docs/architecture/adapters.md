@@ -50,10 +50,12 @@ export type PhysicsWorld = {
     setSurfaceSettings(entity: EntityId, settings: SurfaceSettings): void; // v3: Sensor rebuilds
     setMotor(joint: JointHandle, motor: HingeMotor): void;          // v3: a Hinge's motor values
     destroyBody(body: BodyHandle): void;
+    removeSurfaces(entity: EntityId): void;          // v4: a merged surface destroyed in play
     destroy(): void;
 };
 ```
 
+- **As built in v4 task 13** (standing yes, 2026-11-23): **`removeSurfaces(entity)`** takes every surface the entity gave out of the body it went to, which stays (a shape merged into a group's body, or a surface on the ground); a Dynamic body left with no mass gets its 1 kg back; asking for an entity with no surfaces, or whose body was destroyed, does nothing. `EndOfTickPhase` asks it for every entity a removal takes. *Why: until then only bodies were destroyed, so a destroyed brick on the ground stayed solid in Box2D; v3's only such level destroyed sensor coins, which nothing collides with, so it never showed.*
 - **Everything in the definitions is in pixels and degrees.** `Box2dPhysicsWorld` converts to metres and radians (50 px per metre), and is the only code that does.
 - It imports `box2d3-wasm/compat` only, see [stack.md](stack.md).
 - Handles are the adapter's own numbers, mapped to Box2D ids inside it. Box2D's user data holds the entity id, so contacts (v3) can name entities. **v3:** sensor events name their entities from the adapter's own table instead, because a destroyed shape's end arrives after it can be read (see [triggers-in-play.md](triggers-in-play.md#the-tick-from-v3)).

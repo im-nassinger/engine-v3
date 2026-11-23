@@ -16,6 +16,7 @@ import {
     setGravity,
 } from './levelParts.ts';
 import { triggerCoins, triggerTimers, triggerTouchGroups } from './triggerLevels.ts';
+import { triggerDoors, triggerHits } from './triggerLevelsV4.ts';
 
 export type DeterminismLevel = {
     // The file name, without .json, of the level and of its recorded hashes.
@@ -283,7 +284,7 @@ function point(x: number, y: number): Point {
 }
 
 // The determinism test's levels: stage 13's seven, stage 14's three with joints, stage 15's camera and v3's
-// three with triggers, which read the recorded inputs in tests/levels/determinism/inputs/.
+// three and v4's two with triggers, which read the recorded inputs in tests/levels/determinism/inputs/.
 export const DETERMINISM_LEVELS: readonly DeterminismLevel[] = [
     { name: 'crate-pyramid', build: cratePyramid },
     { name: 'merged-car', build: mergedCar },
@@ -299,4 +300,6 @@ export const DETERMINISM_LEVELS: readonly DeterminismLevel[] = [
     { name: 'trigger-coins', build: triggerCoins },
     { name: 'trigger-timers', build: triggerTimers },
     { name: 'trigger-touch-groups', build: triggerTouchGroups },
+    { name: 'trigger-doors', build: triggerDoors },
+    { name: 'trigger-hits', build: triggerHits },
 ];

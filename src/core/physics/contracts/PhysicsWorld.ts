@@ -48,5 +48,9 @@ export type PhysicsWorld = {
     // Changes a Hinge's motor and wakes its bodies. Does nothing if its body took it.
     setMotor(joint: JointHandle, motor: HingeMotor): void;
     destroyBody(body: BodyHandle): void;
+    // Takes every surface the entity gave this world out of the body it went to, which stays: a shape
+    // merged into a group's body or the ground. A body that loses weight takes its mass from what is left.
+    // A surface whose body was destroyed is already gone.
+    removeSurfaces(entity: EntityId): void;
     destroy(): void;
 };

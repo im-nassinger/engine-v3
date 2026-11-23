@@ -43,6 +43,7 @@ class NoPhysicsWorld implements PhysicsWorld {
     setSurfaceSettings() {}
     setMotor() {}
     destroyBody() {}
+    removeSurfaces() {}
     destroy() {}
 }
 
