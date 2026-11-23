@@ -1,4 +1,4 @@
-import type { Action, Push } from '../../fields/index.ts';
+import type { Action, Push, Target } from '../../fields/index.ts';
 import type { Point } from '../../geometry/index.ts';
 import type { Entity } from '../../level/index.ts';
 
@@ -78,8 +78,8 @@ export class ActionRunner {
                 const { name } = action;
                 if (name === null) return;
 
-                for (const target of targetsOf(action.target, firing, this.run)) {
-                    this.effects.customEventFired(target, name, firing.owner);
+                for (const hearer of this.hearersOf(action.target, firing)) {
+                    this.effects.customEventFired(hearer, name, firing.owner);
                 }
                 return;
             }
@@ -96,6 +96,19 @@ export class ActionRunner {
                 this.restart();
                 return;
         }
+    }
+
+    // A custom event goes down the tree: each target and everything inside it, parents first, top row
+    // first, each entity once however many targets hold it.
+    private hearersOf(target: Target, firing: TriggerFiring) {
+        const hearers = new Set<Entity>();
+        for (const top of targetsOf(target, firing, this.run)) {
+            for (const entity of entitiesIn(top)) {
+                hearers.add(entity);
+            }
+        }
+
+        return hearers;
     }
 
     // The rest goes on in whole ticks from now, at least the next tick, keeping `this` and `other`. A

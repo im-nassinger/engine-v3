@@ -141,7 +141,7 @@ Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b, 09 2.9; round 8:
 - **Wait** is one action in the list. A trigger that fires again during a wait gets its own run, so two enemies in a "wait, then destroy other" trigger both die. Destroying the entity, or switching the trigger off, cancels what is still waiting. *Why a list with Wait: without a list, "add a coin, play a sound, destroy this" needs three triggers with the same When.*
 - **A wait is counted in whole ticks**, like timers, so it slows and stops with the game speed. Wait 0 continues in the next tick.
 - **A waiting run keeps its `this` and `other`.** If `other` is destroyed during the wait, the actions on it are skipped and the rest still run.
-- **Fire custom event** picks a target like any action, a name, and an optional number. Each target hears it in the same tick, with `other` set to the entity whose trigger fired it, so it counts towards the 32 steps. A trigger reads the number nowhere in v4; scripts (v5) read it. *Why: carrying it now means a level saved in v4 doesn't change when scripts come (standing yes, 2026-11-22).*
+- **Fire custom event** picks a target like any action, a name, and an optional number. The event goes down the tree, so each target and everything inside it hears it (see [custom events](#custom-events--v4)). Each hears it in the same tick, with `other` set to the entity whose trigger fired it, so it counts towards the 32 steps. A trigger reads the number nowhere in v4; scripts (v5) read it. *Why: carrying it now means a level saved in v4 doesn't change when scripts come (standing yes, 2026-11-22).*
 - *Why v4: they come with custom events and timed doors (owner: 2026-11-20).*
 
 Source: scope TR7; round 10: WT1; round 11: WT2; owner: 2026-11-20
@@ -178,6 +178,7 @@ Source: scope TR8; round 5: T7; old: TR-55 to TR-57; owner: 2026-11-13
 ### Custom events · v4
 
 - A **custom event** is an event you name yourself, such as `open`. A trigger or script fires it on an entity, and that entity's triggers and scripts react. It can carry one number.
+- **A custom event goes down the tree:** the entity it is fired on hears it, then everything inside it, parents first, top row first, as with Destroyed. Fired on the World, every entity in the level can hear it. An entity hears one Fire once, even when two of its targets hold it, such as a tagged group and a tagged entity inside it. *Why: the owner fired an event on the World and expected a trigger anywhere in the level to hear it (owner: 2026-11-23). The trade-off: an event fired on a group, such as `damage`, also reaches the entities inside it.*
 - *The problem it solves: making something happen on another entity without knowing how that entity works. A button fires `open` on a door, and the door decides what opening means. Swap the door for a drawbridge and the button doesn't change.*
 - *Why "custom event" and not "message": "event" is a word already in use, so there is no second concept.*
 - **A custom event's name follows the rule for tags**: one word of lowercase letters, digits and `_`. The When offers the names already used in the level, as tags are offered.
@@ -185,7 +186,7 @@ Source: scope TR8; round 5: T7; old: TR-55 to TR-57; owner: 2026-11-13
 - A custom event nobody listens to is ignored without an error.
 - A trigger calls a script by firing a custom event that the script listens for.
 
-Source: scope TR2, TR7; round 3: M1; round 9: MSG2; round 10: EV1; owner: 2026-11-13
+Source: scope TR2, TR7; round 3: M1; round 9: MSG2; round 10: EV1; owner: 2026-11-13; owner: 2026-11-23
 
 ## Tags
 

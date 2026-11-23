@@ -203,6 +203,37 @@ describe('custom events', () => {
         expect(after.map((state) => state.coins)).toEqual([0, 2, 2]);
     });
 
+    test('fired on the World, an event goes down the tree: every entity hears it once, parents first, top row first', () => {
+        const level = levelWithCoins();
+        const group = place(level, level.world, transform(0, 0));
+        const top = place(level, group, transform(0, 0));
+        const inner = place(level, top, transform(0, 0));
+        const lower = place(level, group, transform(10, 0));
+        const outside = place(level, level.world, transform(50, 0));
+        for (const entity of [level.world, group, top, inner, lower, outside]) {
+            giveTriggers(entity, [{ when: custom('test'), actions: [addCoin] }]);
+        }
+        giveTags(group, ['loud']);
+        giveTags(inner, ['loud']);
+        const sender = place(level, level.world, transform(90, 0));
+        giveTriggers(sender, [
+            { when: LEVEL_START, actions: [fire(WORLD, 'test'), fire({ kind: 'tagged', tag: 'loud' }, 'test')] },
+        ]);
+
+        const { heard, after } = play(level, { ticks: 1 });
+        const owners = heard.filter((firing) => firing.kind === 'custom').map((firing) => firing.owner);
+
+        // The tagged group holds `inner` too, which hears the second Fire once.
+        expect(owners).toEqual([
+            ...[level.world, group, top, inner, lower, outside].map((entity) => entity.id),
+            ...[group, top, inner, lower].map((entity) => entity.id),
+        ]);
+        expect(heard.filter((firing) => firing.kind === 'custom').every((firing) => firing.other === sender.id)).toBe(
+            true,
+        );
+        expect(after[0]?.coins).toBe(10);
+    });
+
     test('a name nobody hears is ignored without a warning', () => {
         const level = levelWithCoins();
         const door = place(level, level.world, transform(100, 0));

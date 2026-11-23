@@ -29,7 +29,7 @@ Status: **Review** means the review named it. **Owner** means the owner decided 
 | Function | Does | Status |
 |---|---|---|
 | `on(name, handler)` | Calls `handler` when the event happens on this script's entity | Review |
-| `fire_event(id, name, number)` | Fires a custom event on an entity. `number` is optional | Review |
+| `fire_event(id, name, number)` | Fires a custom event on an entity, heard by it and everything inside it. `number` is optional | Review, Owner |
 
 | Event | When | The handler gets | Status |
 |---|---|---|---|
@@ -42,11 +42,11 @@ Status: **Review** means the review named it. **Owner** means the owner decided 
 | `"destroyed"` | This entity is destroyed | | Owner |
 | `"variable_changed"` | A variable changes | the variable's name | Owner |
 | `"no_entity_with_tag_left"` | The last entity with a tag is gone | the tag | Owner |
-| A custom event, such as `"open"` | Something fires it on this entity | the sender, the number | Review, Owner |
+| A custom event, such as `"open"` | Something fires it on this entity or on an entity holding it, such as the World | the sender, the number | Review, Owner |
 
 Script event names are the trigger events in snake_case.
 
-Source: round 9: 10 2.3; round 10: EV1; owner: 2026-11-13
+Source: round 9: 10 2.3; round 10: EV1; owner: 2026-11-13; owner: 2026-11-23
 
 ### Entities · v5
 

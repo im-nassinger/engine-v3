@@ -132,7 +132,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 |---|---|
 | Trigger | No-code logic on an entity, in three parts: When (one event), If (optional checks), Do (actions in order). An entity's TriggerComponent holds a list of them. |
 | Event | Something the game reports to triggers and scripts, such as touching, a key, a timer or level start. Triggers and scripts share one list of event names. |
-| Custom event | An event you name yourself, such as `open`. A trigger or script fires it on an entity, and that entity's triggers and scripts react. It can carry one number. |
+| Custom event | An event you name yourself, such as `open`. A trigger or script fires it on an entity, and the triggers and scripts of that entity and of everything inside it react. Fired on the World, every entity can hear it. It can carry one number. |
 | Fire custom event | The action that fires a custom event on its target, with an optional number. |
 | Action | One step in a trigger's Do list, such as Change value or Spawn. Only ever used for triggers. |
 | When, If, Do | The three parts of a trigger, each a section of its card: **When** names its one event, **If** its checks, **Do** its actions, run top to bottom. |

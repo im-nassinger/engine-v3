@@ -117,7 +117,7 @@ Scripts for movement, enemies, health, pickups, the camera and showing variables
 
 - **Moving platforms** are Kinematic bodies with Move Along Path. Riders move along. A path never collides, and scripts can read its points.
 - **Showing a variable on screen with no code:** a text entity plus Show Variable.
-- Builtin scripts talk to each other through custom events fired on an entity, such as `damage` with an amount. The entity that receives it decides what happens: a crate with no Health script ignores `damage`.
+- Builtin scripts talk to each other through custom events fired on an entity, such as `damage` with an amount. The entity that receives it decides what happens: a crate with no Health script ignores `damage`. Like every custom event, it also reaches the entities inside the one it is fired on.
 - **Builtin scripts share three custom events: `damage`, `heal` and `died`.** `damage` and `heal` carry an amount. The Health script fires `died` on its own entity at zero, so a trigger there can Destroy or Lose. Each builtin script's help lists the events it fires and hears. *Why: these are the ones the builtin scripts need. More come only when a builtin file needs one.*
 - A kinematic platform can push a player into a wall. There is no crush rule.
 

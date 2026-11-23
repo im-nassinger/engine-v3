@@ -8,6 +8,7 @@ What we decided against, and why. **Check here before proposing something**: an 
 
 | Idea | What we do instead | Why | Source |
 |---|---|---|---|
+| A custom event heard only by the entity it is fired on | It goes down the tree: that entity and everything inside it hear it, so one fired on the World reaches the whole level | The owner fired an event on the World and expected a trigger elsewhere to hear it | owner: 2026-11-23 |
 | A shape with no StyleComponent is hit on its edge only, and its bolt is a fixed 15 px in its top left corner | It is hit inside too, and its bolt sits in its middle, sized with the shape and the zoom | The owner couldn't click a trigger except on its edge, and found the fixed-size bolt strange | owner: 2026-11-22 |
 | A Rope or Spring has one icon, halfway between its ends, and its ends can't be moved after placing | An icon on each end, each draggable; the joint sits at end A | The owner found a Rope or Spring couldn't be changed after placing it | owner: 2026-11-21 |
 | A Rope's or Spring's ends stay where they are when an entity it joins moves alone | Its ends follow the entities they join | The owner found the path left behind, which the game would never show | owner: 2026-11-21 |
