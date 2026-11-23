@@ -3,10 +3,11 @@ import type { Point } from '../../geometry/index.ts';
 import type { Entity } from '../../level/index.ts';
 
 import type { PlayRun } from '../run/PlayRun.ts';
+import { entitiesIn } from '../triggers/entitiesIn.ts';
 import type { TriggerFiring } from '../triggers/TriggerFiring.ts';
 
+import type { ActionEffects } from './ActionEffects.ts';
 import { PlayValueWriter } from './PlayValueWriter.ts';
-import type { ValueChangeEffects } from './PlayValueWriter.ts';
 import { targetsOf } from './targetsOf.ts';
 
 const ORIGIN: Point = { x: 0, y: 0 };
@@ -19,10 +20,12 @@ const RESTART_GUARD_TICKS = 60;
 export class ActionRunner {
     private readonly run: PlayRun;
     private readonly tick: number;
+    private readonly effects: ActionEffects;
     private readonly writer: PlayValueWriter;
 
-    constructor(run: PlayRun, effects: ValueChangeEffects, tick: number) {
+    constructor(run: PlayRun, effects: ActionEffects, tick: number) {
         this.run = run;
+        this.effects = effects;
         this.tick = tick;
         this.writer = new PlayValueWriter(run, effects, tick);
     }
@@ -58,6 +61,15 @@ export class ActionRunner {
                 }
                 return;
             }
+            case 'fire': {
+                const { name } = action;
+                if (name === null) return;
+
+                for (const target of targetsOf(action.target, firing, this.run)) {
+                    this.effects.customEventFired(target, name, firing.owner);
+                }
+                return;
+            }
             case 'win':
                 this.run.ending.record('won', this.tick);
                 return;
@@ -82,12 +94,19 @@ export class ActionRunner {
     }
 
     // Marked now and removed with everything inside it at the end of the tick, so the actions after it
-    // still run. The World and the camera are never destroyed.
+    // still run, and each entity in it not marked already hears its own Destroyed, parents first, top row
+    // first. The World and the camera are never destroyed.
     private destroy(target: Entity) {
-        const { level } = this.run;
+        const { level, removals } = this.run;
         if (target === level.world || target === level.camera) return;
+        if (removals.goes(target)) return;
 
-        this.run.removals.mark(target, 'destroyed');
+        const newlyMarked = entitiesIn(target).filter((entity) => !removals.goes(entity));
+        removals.mark(target, 'destroyed');
+
+        for (const entity of newlyMarked) {
+            this.effects.destroyed(entity);
+        }
     }
 
     // A kick to the body the entity belongs to, whatever its mass: a vector, or a strength along the line

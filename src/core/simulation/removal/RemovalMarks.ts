@@ -15,6 +15,15 @@ export class RemovalMarks {
         this.causes.set(entity, cause);
     }
 
+    // Whether the entity, or a group above it, is marked, so it goes at the end of the tick.
+    goes(entity: Entity) {
+        for (let current: Entity | undefined = entity; current !== undefined; current = current.parent) {
+            if (this.causes.has(current)) return true;
+        }
+
+        return false;
+    }
+
     // Hands over the marks and starts again from none.
     take(): [Entity, RemovalCause][] {
         const marked = [...this.causes];

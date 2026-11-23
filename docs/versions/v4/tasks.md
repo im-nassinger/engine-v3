@@ -30,7 +30,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 8. The collision event
   - Read: versions/v4/architecture.md#triggers-in-play, requirements/triggers/triggers.md#more-events--v4, architecture/triggers-in-play.md
   - Done when: `ContactLedger` counts per hit entity and hitting entity and fires collision once per entity hit, groups hearing their parts and parts of one group filtered out; `TriggerIndex` gives the shapes that need contact events at the start of a run; `EventPhase` lists collision after no longer touched; `runHeadless` tests cover a ball hitting a wall, a two-shape body hitting once, a group's trigger, and a hit after the two parted
-- [ ] 9. Destroyed and custom events
+- [x] 9. Destroyed and custom events
   - Read: versions/v4/architecture.md#triggers-in-play, requirements/triggers/triggers.md#more-events--v4, requirements/triggers/triggers.md#custom-events--v4, requirements/triggers/triggers.md#fire-custom-event-and-wait--v4
   - Done when: Destroy adds one Destroyed event per newly marked entity, heard in the same tick while the entity still exists; Fire custom event adds one event per target with `other` the sender, heard in the same tick through `ChainedEvents` within the 32 steps; `TriggerIndex` keeps custom triggers by name; `runHeadless` tests cover a destroyed group, a Destroyed trigger changing a variable, a button firing `open` on a tagged door, a name nobody hears, and a chain stopping at 32
 - [ ] 10. Variable changes and every entity's variables in play

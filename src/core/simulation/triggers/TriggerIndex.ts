@@ -12,7 +12,8 @@ export type IndexedTrigger = {
 
 // The run's triggers by the kind of event they hear, each list in Entities viewer order, built when the run
 // starts and kept as entities are removed, so no tick walks every trigger. A When with an unset part hears
-// nothing and isn't listed. Touch and collision triggers are found from their entity.
+// nothing and isn't listed. Touch, collision and Destroyed triggers are found from their entity, custom event
+// triggers from their name and then their entity.
 export class TriggerIndex {
     private readonly level: Level;
     private levelStartList: IndexedTrigger[] = [];
@@ -25,6 +26,8 @@ export class TriggerIndex {
     private readonly collisionByOwner = new Map<Entity, IndexedTrigger[]>();
     // Each collision owner's place in Entities viewer order, to sort hits.
     private readonly collisionPlace = new Map<Entity, number>();
+    private readonly destroyedByOwner = new Map<Entity, IndexedTrigger[]>();
+    private readonly customByName = new Map<string, Map<Entity, IndexedTrigger[]>>();
 
     constructor(level: Level) {
         this.level = level;
@@ -82,6 +85,17 @@ export class TriggerIndex {
         return this.collisionPlace.get(owner) ?? Number.POSITIVE_INFINITY;
     }
 
+    // The entity's Destroyed triggers, top to bottom in its card.
+    destroyedTriggersOf(owner: Entity): readonly IndexedTrigger[] {
+        return this.destroyedByOwner.get(owner) ?? [];
+    }
+
+    // The entity's triggers hearing the custom event of this name, top to bottom in its card. A name nobody
+    // hears is one lookup.
+    customTriggersOf(owner: Entity, name: string): readonly IndexedTrigger[] {
+        return this.customByName.get(name)?.get(owner) ?? [];
+    }
+
     // The surfaces whose shapes must send contact events: those whose entity, or a group above it, hears
     // collisions. Read when the run starts, before its physics is built; triggers can't be added in play.
     // A sensor is in it too, since Change value can make it solid.
@@ -113,6 +127,11 @@ export class TriggerIndex {
             this.touchPlace.delete(entity);
             this.collisionByOwner.delete(entity);
             this.collisionPlace.delete(entity);
+            this.destroyedByOwner.delete(entity);
+
+            for (const byOwner of this.customByName.values()) {
+                byOwner.delete(entity);
+            }
         }
     }
 
@@ -144,7 +163,24 @@ export class TriggerIndex {
             case 'collision':
                 addByOwner(this.collisionByOwner, this.collisionPlace, indexed);
                 return;
+            case 'destroyed':
+                addTo(this.destroyedByOwner, indexed);
+                return;
+            case 'custom':
+                if (when.name === null) return;
+                addTo(this.customOwnersOf(when.name), indexed);
+                return;
         }
+    }
+
+    private customOwnersOf(name: string) {
+        const found = this.customByName.get(name);
+        if (found !== undefined) return found;
+
+        const byOwner = new Map<Entity, IndexedTrigger[]>();
+        this.customByName.set(name, byOwner);
+
+        return byOwner;
     }
 
     private hearsCollisionAtOrAbove(entity: Entity) {
@@ -156,7 +192,7 @@ export class TriggerIndex {
     }
 }
 
-function addByOwner(byOwner: Map<Entity, IndexedTrigger[]>, places: Map<Entity, number>, indexed: IndexedTrigger) {
+function addTo(byOwner: Map<Entity, IndexedTrigger[]>, indexed: IndexedTrigger) {
     const ownTriggers = byOwner.get(indexed.owner);
     if (ownTriggers !== undefined) {
         ownTriggers.push(indexed);
@@ -164,7 +200,14 @@ function addByOwner(byOwner: Map<Entity, IndexedTrigger[]>, places: Map<Entity, 
     }
 
     byOwner.set(indexed.owner, [indexed]);
-    places.set(indexed.owner, places.size);
+}
+
+function addByOwner(byOwner: Map<Entity, IndexedTrigger[]>, places: Map<Entity, number>, indexed: IndexedTrigger) {
+    if (!places.has(indexed.owner)) {
+        places.set(indexed.owner, places.size);
+    }
+
+    addTo(byOwner, indexed);
 }
 
 // The trigger now, as its component holds it, or undefined once it is gone.
@@ -185,6 +228,8 @@ function isWhenSet(when: When) {
             return when.seconds !== null;
         case 'tagLeft':
             return when.tag !== null;
+        case 'custom':
+            return when.name !== null;
         default:
             return true;
     }

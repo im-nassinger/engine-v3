@@ -2,7 +2,7 @@ import type { Entity } from '../../level/index.ts';
 
 import { ActionRunner } from '../actions/ActionRunner.ts';
 import { checksPass } from '../actions/checksPass.ts';
-import type { ValueChangeEffects } from '../actions/PlayValueWriter.ts';
+import type { ActionEffects } from '../actions/ActionEffects.ts';
 import type { PlayRun } from '../run/PlayRun.ts';
 import type { TickContext, TickPhase } from '../run/TickPhase.ts';
 import type { TriggerFiring } from '../triggers/TriggerFiring.ts';
@@ -15,7 +15,7 @@ const LEVEL_START_TICK = 1;
 
 // Runs the firings EventPhase listed, in their order: each trigger's checks, then its actions. The events
 // those actions cause in the same tick (a tag running out, a level start trigger switched on during the
-// first tick) are heard in a next round, and so on, up to 32 rounds; the rest are dropped with one warning.
+// first tick, an entity destroyed, a custom event fired) are heard in a next round, and so on, up to 32 rounds; the rest are dropped with one warning.
 export class TriggerPhase implements TickPhase {
     run(tick: TickContext) {
         const { run } = tick;
@@ -54,7 +54,7 @@ function runFiring(firing: TriggerFiring, run: PlayRun, runner: ActionRunner, ti
 }
 
 // The firings the current round's actions caused, decided when each event happens, in the order they did.
-class ChainedEvents implements ValueChangeEffects {
+class ChainedEvents implements ActionEffects {
     private readonly run: PlayRun;
     private readonly tick: number;
     private queued: TriggerFiring[] = [];
@@ -82,6 +82,19 @@ class ChainedEvents implements ValueChangeEffects {
         if (indexed === undefined) return;
 
         this.queue(this.run.triggers.hear(indexed, null, this.tick));
+    }
+
+    // The entity is still there for the rest of the tick, so its Destroyed triggers can read and change it.
+    destroyed(entity: Entity) {
+        for (const indexed of this.run.triggers.index.destroyedTriggersOf(entity)) {
+            this.queue(this.run.triggers.hear(indexed, null, this.tick));
+        }
+    }
+
+    customEventFired(target: Entity, name: string, sender: Entity) {
+        for (const indexed of this.run.triggers.index.customTriggersOf(target, name)) {
+            this.queue(this.run.triggers.hear(indexed, sender.id, this.tick));
+        }
     }
 
     takeRound() {
