@@ -9,6 +9,9 @@ const PHONE_TESTS = 'phone/**';
 export default defineConfig({
     testDir: 'tests/e2e',
     forbidOnly: Boolean(process.env.CI),
+    // On CI a test that fails is run once more, and passing then is reported as flaky, not green: CI's
+    // WebKit once hung a whole page so a click never found two still frames (tech-notes.md, 2026-11-22).
+    retries: process.env.CI ? 1 : 0,
     // CI splits these tests across machines. Each keeps a blob report, and the journeys-report job joins
     // them into the HTML report, with the layout checks' screenshots attached.
     reporter: process.env.CI ? [['list'], ['blob']] : 'list',

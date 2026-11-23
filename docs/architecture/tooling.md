@@ -111,7 +111,7 @@ tests/
 | `node` | `src/**/*.test.ts` and `tests/guards/**/*.test.ts`, without the browser ones | Node |
 | `browser` | `**/*.browser.test.ts` | Chromium, Firefox and WebKit, headless |
 
-- **`playwright.config.ts`:** runs `tests/e2e/` against `vite preview` of the built page, in Chromium, Firefox and WebKit, from stage 10 (standing yes, 2026-11-16: stage 10's plan asked for three browsers, and drawing leans on each browser's mouse and keys).
+- **`playwright.config.ts`:** runs `tests/e2e/` against `vite preview` of the built page, in Chromium, Firefox and WebKit, from stage 10 (standing yes, 2026-11-16: stage 10's plan asked for three browsers, and drawing leans on each browser's mouse and keys). On CI a failed test runs once more and passing then counts as flaky (standing yes, 2026-11-22, [tech-notes.md](../tech-notes.md)).
 - **Prettier:** 4 spaces, single quotes, 120 columns, as the stack says. It skips `docs/` (the tables and `review.html` are laid out by hand), `tools/*.js`, `dist/` and `package-lock.json`.
 
 ## Which tool keeps which rule
