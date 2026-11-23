@@ -2,13 +2,14 @@ import type { TickContext, TickPhase } from '../run/TickPhase.ts';
 import type { Hit } from '../triggers/ContactLedger.ts';
 import type { TouchChange } from '../triggers/TouchLedger.ts';
 import type { TriggerFiring } from '../triggers/TriggerFiring.ts';
+import type { WaitingRun } from '../triggers/WaitingRuns.ts';
 import type { IndexedTrigger } from '../triggers/TriggerIndex.ts';
 import type { PlayTriggers } from '../triggers/PlayTriggers.ts';
 
 const LEVEL_START_TICK = 1;
 
 // Lists the tick's firings, in a fixed order: level start (the first tick only), keys and inputs, timers,
-// touched, no longer touched, collision, then "no entity with this tag is left" for the tags that ran out last tick.
+// the waiting runs due this tick (in WaitingRuns' order, never asking Repeat again), touched, no longer touched, collision, then "no entity with this tag is left" for the tags that ran out last tick.
 // Inside each, triggers come in Entities viewer order. A trigger that is off hears nothing, and a firing
 // its Repeat already refuses is dropped here.
 export class EventPhase implements TickPhase {
@@ -34,6 +35,7 @@ export class EventPhase implements TickPhase {
         }
 
         listing.addAll(triggers.timers.due(tick.tick));
+        listing.addResumed(triggers.waiting.takeDue(tick.tick));
         listing.addTouches(triggers.touches.changes.touched, 'touched');
         listing.addTouches(triggers.touches.changes.untouched, 'untouched');
         listing.addHits(triggers.contacts.hits);
@@ -85,6 +87,13 @@ class FiringList {
             for (const indexed of this.triggers.index.collisionTriggersOf(hit.owner)) {
                 this.add(indexed, hit.other);
             }
+        }
+    }
+
+    // A waiting run goes on where it stopped, so Repeat, which let it start, isn't asked again.
+    addResumed(due: readonly WaitingRun[]) {
+        for (const run of due) {
+            this.firings.push({ ...run.firing, resumesAt: run.nextAction });
         }
     }
 

@@ -41,11 +41,17 @@ export class TriggerPhase implements TickPhase {
 
 // Repeat is asked again, since an earlier firing of the same trigger this tick may have used it up, and so
 // is on/off, which an earlier action may have switched. A trigger with problems never runs. A firing whose
-// checks fail doesn't count for Repeat, so a once per run coin waits for the player.
+// checks fail doesn't count for Repeat, so a once per run coin waits for the player. A waiting run resumed
+// goes on from its next action without asking its checks or Repeat again: "wait 2 s, then close" closes.
 function runFiring(firing: TriggerFiring, run: PlayRun, runner: ActionRunner, tick: number) {
     const { triggers } = run;
     const trigger = triggerOf(firing);
     if (trigger === undefined || !trigger.on) return;
+    if (firing.resumesAt !== undefined) {
+        triggers.fired.push(firing);
+        runner.runActions(trigger.actions, firing, firing.resumesAt);
+        return;
+    }
     if (!triggers.repeats.allows(firing.owner, firing.triggerId, trigger.repeat, tick)) return;
     if (!triggers.runnable.canRun(firing.owner, trigger)) return;
     if (!checksPass(trigger.checks, firing, run)) return;

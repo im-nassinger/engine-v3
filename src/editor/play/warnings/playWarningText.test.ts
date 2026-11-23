@@ -13,5 +13,6 @@ describe('playWarningText', () => {
         expect(playWarningText({ kind: 'chainLimit' })).toContain('32');
         expect(playWarningText({ kind: 'valueFixedInPlay' })).toContain("can't change during play");
         expect(playWarningText({ kind: 'restartIgnored' })).toContain('first second');
+        expect(playWarningText({ kind: 'tooManyWaitingRuns' })).toContain('32');
     });
 });

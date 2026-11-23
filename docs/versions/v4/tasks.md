@@ -36,7 +36,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 10. Variable changes and every entity's variables in play
   - Read: versions/v4/architecture.md#triggers-in-play, requirements/triggers/triggers.md#more-events--v4, requirements/triggers/variables-and-inputs.md#string-and-boolean-variables-on-any-entity--v4
   - Done when: `PlayValueWriter` writes own variables of any type and Flip; the compare check reads the level's or the target's own variable and compares strings and booleans with is and is not; `VariableWatch` fires "a variable changes" on change, and "becomes" only when its condition turns true; the level's variables are heard by every entity, own ones only by their entity; the report and `PlayMirror` show changed own variables; `runHeadless` tests cover each rule
-- [ ] 11. Wait and waiting runs
+- [x] 11. Wait and waiting runs
   - Read: versions/v4/architecture.md#triggers-in-play, requirements/triggers/triggers.md#fire-custom-event-and-wait--v4, requirements/triggers/triggers.md#small-features
   - Done when: `ActionRunner` stops at a Wait and `WaitingRuns` resumes the rest when due, in whole ticks, in the architecture's order, after timers in `EventPhase`, without asking checks or Repeat again; two firings during one wait both run; switching the trigger off or removing its entity cancels its runs; the 33rd waiting run is dropped with the play warning `tooManyWaitingRuns`, shown in the message pill; Restart starts empty; `runHeadless` tests cover each rule
 - [ ] 12. The component value check in play

@@ -4,6 +4,7 @@ import type { Entity } from '../../level/index.ts';
 
 import type { PlayRun } from '../run/PlayRun.ts';
 import { entitiesIn } from '../triggers/entitiesIn.ts';
+import { secondsToTicks } from '../triggers/secondsToTicks.ts';
 import type { TriggerFiring } from '../triggers/TriggerFiring.ts';
 
 import type { ActionEffects } from './ActionEffects.ts';
@@ -14,9 +15,10 @@ const ORIGIN: Point = { x: 0, y: 0 };
 // The ticks of a run's first second, 1 to 60.
 const RESTART_GUARD_TICKS = 60;
 
-// Runs one firing's actions top to bottom, each on each of its targets in Entities viewer order. A target
-// that lacks what the action needs is skipped and the others still run; an action with an unset part does
-// nothing, though triggerProblems keeps such a trigger from firing at all.
+// Runs one firing's actions top to bottom, each on each of its targets in Entities viewer order, until a
+// Wait, which hands the rest to WaitingRuns. A target that lacks what the action needs is skipped and the
+// others still run; an action with an unset part does nothing, though triggerProblems keeps such a trigger
+// from firing at all.
 export class ActionRunner {
     private readonly run: PlayRun;
     private readonly tick: number;
@@ -30,8 +32,18 @@ export class ActionRunner {
         this.writer = new PlayValueWriter(run, effects, tick);
     }
 
-    runActions(actions: readonly Action[], firing: TriggerFiring) {
-        for (const action of actions) {
+    // From the action at `from`, 0 for a new firing.
+    runActions(actions: readonly Action[], firing: TriggerFiring, from = 0) {
+        for (let at = from; at < actions.length; at++) {
+            const action = actions[at];
+            if (action === undefined) return;
+
+            if (action.kind === 'wait') {
+                if (action.seconds === null) continue;
+
+                this.wait(firing, at + 1, action.seconds);
+                return;
+            }
             this.runAction(action, firing);
         }
     }
@@ -71,6 +83,9 @@ export class ActionRunner {
                 }
                 return;
             }
+            case 'wait':
+                // runActions stops at a Wait.
+                return;
             case 'win':
                 this.run.ending.record('won', this.tick);
                 return;
@@ -81,6 +96,17 @@ export class ActionRunner {
                 this.restart();
                 return;
         }
+    }
+
+    // The rest goes on in whole ticks from now, at least the next tick, keeping `this` and `other`. A
+    // trigger already holding 32 waiting runs drops this one, with a warning once per run.
+    private wait(firing: TriggerFiring, nextAction: number, seconds: number) {
+        const dueTick = this.tick + Math.max(1, secondsToTicks(seconds));
+        const { owner, triggerId, when, other } = firing;
+        const kept = this.run.triggers.waiting.add({ owner, triggerId, when, other }, nextAction, dueTick);
+        if (kept) return;
+
+        this.run.warnings.warn({ kind: 'tooManyWaitingRuns' });
     }
 
     // Ignored in the run's first second, with a warning, so a level start trigger that restarts can't

@@ -11,5 +11,7 @@ export function playWarningText(warning: PlayWarning) {
             return `A trigger listens for the input "${warning.input}", which the World doesn't have`;
         case 'restartIgnored':
             return 'A trigger tried to restart the level in its first second, so it was ignored';
+        case 'tooManyWaitingRuns':
+            return 'A trigger was already waiting 32 times, so another firing was dropped';
     }
 }
