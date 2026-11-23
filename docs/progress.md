@@ -31,8 +31,9 @@ Each item is removed in the same commit that settles it, wherever that commit is
 
 ## Next
 
-1. The owner tries v4 (task 18), and the fixes asked go into `versions/v4/fixes.md`; then v5 (scripts) is planned.
-2. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
+1. **Build v4 fix 3, simpler triggers** (agreed with the owner 2026-11-23, not built): the plan is in [versions/v4/fix-3-simpler-triggers.md](versions/v4/fix-3-simpler-triggers.md).
+2. The owner tries v4 (task 18), and the fixes asked go into `versions/v4/fixes.md`; then v5 (scripts) is planned.
+3. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
 
 ## How to change a requirement
 

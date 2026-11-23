@@ -23,6 +23,7 @@ Only the next version is planned. v4 to v7 stay one line each in [scope.md](../s
 | `architecture.md` | What the version adds to the code and how it connects. When the version is built, its lasting parts move into [architecture/](../architecture/README.md) |
 | `tasks.md` | The tasks in the orchestrator's format: numbered, each with **Read** and **Done when**, and **Try points** for the owner |
 | `fixes.md` | After the owner tries the version: what to change, in the owner's words. Each fix becomes a task at the end of `tasks.md` |
+| `fix-N-<name>.md` | A fix too big for one row in `fixes.md`: its agreed plan, which the session that builds it reads. Its row in `fixes.md` links to it |
 
 **`tasks.md` is written last**, once the other three have the owner's yes. A version folder without it can't be started by mistake: `orchestrator start` refuses it.
 
