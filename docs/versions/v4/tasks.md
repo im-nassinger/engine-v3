@@ -51,7 +51,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 15. The shortcut sheet and the tooltips
   - Read: versions/v4/architecture.md#the-shortcut-list, versions/v4/design.md, design/controls.md, design/mockups/v4.html
   - Done when: `ShortcutSheet` draws the catalog as the mockup does; `?` (by its character) and Help › Shortcuts in the main menu open and close it, its search takes focus and typing there reaches no editor shortcut, Esc closes it, and it stays open while the level is edited; a browser test checks every icon button has a tooltip with its name, and its shortcut when its command has one; browser tests pass in three browsers
-- [ ] 16. v4's journeys and speed test
+- [x] 16. v4's journeys and speed test
   - Read: versions/v4/architecture.md#tests, architecture/testing.md, architecture/performance.md
   - Done when: Playwright journeys in three browsers pass: a button that fires `open` on a door, which waits 2 s and flips `door_open`; a ball that hits a wall, the wall destroyed and adding 1 to `score`, "When score becomes 3 or more" winning; a boolean and a string variable on an entity edited, saved and read back; the shortcut sheet opened with `?`, searched and closed; the speed test of 1,000 collision triggers meets test play's targets, its numbers written in performance.md
 - [ ] 17. Close v4's docs

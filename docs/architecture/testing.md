@@ -84,7 +84,12 @@ The tech notes ask for keyboard layout tests (US, Brazilian ABNT2, and one AltGr
 10. (v3) A key trigger on a box pushes it: Space pressed during play kicks it up.
 11. (v3) The World's variables and inputs are edited (a variable added, named and given a start, an input renamed, another given new keys), saved and read back after a reload.
 
-Journey 1 is in `test-play.spec.ts`, 2 in `car-journey.spec.ts` (stage 17), 3 and 4 in `saving.spec.ts`. 5 is in `pen-tool.spec.ts`, 6 in `pencil-tool.spec.ts`, 7 in `path-points.spec.ts`, 8 in `gradient-handles.spec.ts`, 9 to 11 in `triggers.spec.ts`; they run in Chromium, Firefox and WebKit like the rest. Journey 2 checks every entity and value by exporting the imported level again and comparing its `level.json` with the first export's.
+12. (v4) A button (the Trigger tool's sensor) fires `open` on a door, whose trigger waits 2 s and flips its own `door_open`; "When door_open of this becomes true" wins, and the end window's time is at least 2 s.
+13. (v4) A ball hits a wall (a surface on the ground) that destroys itself when hit; its Destroyed trigger adds 1 to the level's `score`, which starts at 2, and "When score becomes 3 or more" wins.
+14. (v4) A boolean and a string variable on an entity other than the World are edited (named, typed, switched on and given a text), saved and read back after a reload.
+15. (v4) The shortcut sheet is opened with `?`, searched ("ctrl z" shows Undo and Redo) and closed with Esc.
+
+Journey 1 is in `test-play.spec.ts`, 2 in `car-journey.spec.ts` (stage 17), 3 and 4 in `saving.spec.ts`. 5 is in `pen-tool.spec.ts`, 6 in `pencil-tool.spec.ts`, 7 in `path-points.spec.ts`, 8 in `gradient-handles.spec.ts`, 9 to 11 in `triggers.spec.ts`, 12 to 14 in `triggers-v4.spec.ts`, 15 in `shortcut-sheet.spec.ts`; they run in Chromium, Firefox and WebKit like the rest. Journey 2 checks every entity and value by exporting the imported level again and comparing its `level.json` with the first export's.
 
 ## Guard tests (`tests/guards/`)
 
