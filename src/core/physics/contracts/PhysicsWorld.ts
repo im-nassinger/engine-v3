@@ -5,6 +5,7 @@ import type { BodyDefinition } from './BodyDefinition.ts';
 import type { BodyPose } from './BodyPose.ts';
 import type { BodyPoses } from './BodyPoses.ts';
 import type { BodyVelocity } from './BodyVelocity.ts';
+import type { ContactEvent } from './ContactEvent.ts';
 import type { BodyHandle, JointHandle } from './Handles.ts';
 import type { HingeMotor } from './HingeMotor.ts';
 import type { JointDefinition } from './JointDefinition.ts';
@@ -31,7 +32,11 @@ export type PhysicsWorld = {
     readMovedBodies(into: BodyPoses): void;
     // Adds the sensor events of the last step, begins first, in Box2D's own order.
     readSensorEvents(into: SensorEvent[]): void;
-    velocityOf(body: BodyHandle): BodyVelocity;
+    // The contact events of the last step, begins first, in Box2D's own order. Only the surfaces in
+    // WorldSettings' contactEventSurfaces send them, a surface rebuilt in play too.
+    contactEvents(): readonly ContactEvent[];
+    // The body's live speed and spin.
+    velocity(body: BodyHandle): BodyVelocity;
     // Teleports a body and wakes it; its speed is kept.
     setPose(body: BodyHandle, pose: BodyPose): void;
     // Adds to a body's speed in px/s, whatever its mass, and wakes it. A Static body doesn't move.

@@ -98,7 +98,7 @@ describe('Box2dPhysicsWorld: addVelocity', () => {
         }
 
         for (const body of [light, heavy]) {
-            const { linear } = world.velocityOf(body);
+            const { linear } = world.velocity(body);
             expect(linear.x).toBeCloseTo(600, 3);
             expect(linear.y).toBeCloseTo(-60, 3);
         }
@@ -125,7 +125,7 @@ describe('Box2dPhysicsWorld: addVelocity', () => {
 
         world.addVelocity(floor, { x: 600, y: 0 });
 
-        expect(world.velocityOf(floor).linear).toEqual({ x: 0, y: 0 });
+        expect(world.velocity(floor).linear).toEqual({ x: 0, y: 0 });
         world.destroy();
     });
 });
@@ -251,7 +251,7 @@ describe('Box2dPhysicsWorld: setMotor', () => {
         world.setMotor(joint, { motor: true, motorSpeed: 90, motorStrength: 1000, resistance: 0 });
         stepTimes(world, poses, ONE_SECOND);
 
-        expect(world.velocityOf(wheel).spin).toBeCloseTo(90, 3);
+        expect(world.velocity(wheel).spin).toBeCloseTo(90, 3);
         world.destroy();
     });
 
@@ -264,7 +264,7 @@ describe('Box2dPhysicsWorld: setMotor', () => {
         world.setMotor(joint, { ...MOTOR_OFF, resistance: 1000 });
         stepTimes(world, poses, ONE_SECOND);
 
-        expect(world.velocityOf(wheel).spin).toBeCloseTo(0, 3);
+        expect(world.velocity(wheel).spin).toBeCloseTo(0, 3);
         world.destroy();
     });
 

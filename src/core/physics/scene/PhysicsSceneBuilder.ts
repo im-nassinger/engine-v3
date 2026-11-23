@@ -51,10 +51,16 @@ export class PhysicsSceneBuilder {
         this.world = world;
     }
 
-    // Makes a world with the World's Gravity and builds the level into it.
-    static build(level: Level, caches: SceneCaches, engine: PhysicsEngine): PhysicsScene {
+    // Makes a world with the World's Gravity and builds the level into it. Only the surfaces of
+    // contactEventSurfaces send contact events.
+    static build(
+        level: Level,
+        caches: SceneCaches,
+        engine: PhysicsEngine,
+        contactEventSurfaces: ReadonlySet<EntityId> = new Set(),
+    ): PhysicsScene {
         const gravity = level.world.requireComponent(PhysicsWorldComponent).get('gravity');
-        const world = engine.createWorld({ gravity });
+        const world = engine.createWorld({ gravity, contactEventSurfaces });
         const builder = new PhysicsSceneBuilder(level, caches, world);
 
         return builder.buildAll();

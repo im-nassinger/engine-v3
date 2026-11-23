@@ -30,7 +30,11 @@ class NoPhysicsWorld implements PhysicsWorld {
     readMovedBodies() {}
     readSensorEvents() {}
 
-    velocityOf() {
+    contactEvents() {
+        return [];
+    }
+
+    velocity() {
         return { linear: { x: 0, y: 0 }, spin: 0 };
     }
 

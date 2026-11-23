@@ -20,6 +20,7 @@ import type {
     BodyPose,
     BodyPoses,
     BodyVelocity,
+    ContactEvent,
     HingeDefinition,
     HingeMotor,
     JointDefinition,
@@ -34,7 +35,7 @@ import type {
     WorldSettings,
 } from '../../core/physics/index.ts';
 
-import { SensorShapeTable } from './SensorShapeTable.ts';
+import { ShapeTable } from './ShapeTable.ts';
 
 const STEP_SECONDS = 1 / 60;
 // Box2D's recommended number of sub-steps for one step.
@@ -77,12 +78,15 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
     private readonly joints: (CreatedJoint | undefined)[] = [];
     // Every surface an entity gave, in the order given. The World gives one per wall.
     private readonly surfacesByEntity = new Map<EntityId, { body: CreatedBody; surface: CreatedSurface }[]>();
-    private readonly sensorShapes = new SensorShapeTable();
+    private readonly shapes = new ShapeTable();
     private readonly sensorEvents: SensorEvent[] = [];
+    private readonly contactEventsOfStep: ContactEvent[] = [];
+    private readonly contactEventSurfaces: ReadonlySet<EntityId>;
     private destroyed = false;
 
     constructor(box2d: Box2DModule, settings: WorldSettings) {
         this.box2d = box2d;
+        this.contactEventSurfaces = settings.contactEventSurfaces ?? new Set();
 
         const worldDefinition = box2d.b2DefaultWorldDef();
         const gravity = new box2d.b2Vec2(settings.gravity.x, settings.gravity.y);
@@ -227,15 +231,27 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         }
     }
 
-    // Reads the step's sensor events at once, so the table counts every one even if no one asks for them.
+    // Reads the step's sensor and contact events at once, so the table counts every one even if no one
+    // asks for them.
     step() {
         this.checkAlive();
         this.box2d.b2World_Step(this.worldId, STEP_SECONDS, SUB_STEPS);
 
         this.sensorEvents.length = 0;
         const sensorEvents = this.box2d.b2World_GetSensorEvents(this.worldId);
-        this.sensorShapes.read(sensorEvents, this.sensorEvents);
+        this.shapes.readSensorEvents(sensorEvents, this.sensorEvents);
         sensorEvents.delete();
+
+        this.contactEventsOfStep.length = 0;
+        const contactEvents = this.box2d.b2World_GetContactEvents(this.worldId);
+        this.shapes.readContactEvents(contactEvents, this.contactEventsOfStep);
+        contactEvents.delete();
+    }
+
+    contactEvents(): readonly ContactEvent[] {
+        this.checkAlive();
+
+        return [...this.contactEventsOfStep];
     }
 
     readSensorEvents(into: SensorEvent[]) {
@@ -268,7 +284,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         bodyEvents.delete();
     }
 
-    velocityOf(body: BodyHandle): BodyVelocity {
+    velocity(body: BodyHandle): BodyVelocity {
         this.checkAlive();
         const bodyId = this.bodyAt(body).bodyId;
 
@@ -335,7 +351,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
 
         for (const surface of createdBody.surfaces) {
             for (const shapeId of surface.shapes) {
-                this.sensorShapes.markDestroyed(shapeId);
+                this.shapes.markDestroyed(shapeId);
             }
             surface.shapes = [];
         }
@@ -348,8 +364,9 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         this.bodies.length = 0;
         this.joints.length = 0;
         this.surfacesByEntity.clear();
-        this.sensorShapes.clear();
+        this.shapes.clear();
         this.sensorEvents.length = 0;
+        this.contactEventsOfStep.length = 0;
         this.destroyed = true;
     }
 
@@ -378,6 +395,8 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
     }
 
     // Every shape gets sensor events, the sensor to send them and the visitor to be seen (tech-notes.md).
+    // Contact events only for the surfaces the run asked for: one side switched on is enough, and a
+    // contact keeps the switch it began with, so a rebuilt surface gets it again here.
     private createShapes(body: CreatedBody, surface: SurfaceDefinition) {
         const shapeDefinition = this.box2d.b2DefaultShapeDef();
         // A sensor weighs nothing, so it never changes how its body moves.
@@ -386,6 +405,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         shapeDefinition.material.restitution = surface.restitution;
         shapeDefinition.isSensor = surface.sensor;
         shapeDefinition.enableSensorEvents = true;
+        shapeDefinition.enableContactEvents = this.contactEventSurfaces.has(surface.entity);
         shapeDefinition.userData = surface.entity;
 
         const shapes: b2ShapeId[] = [];
@@ -395,7 +415,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         shapeDefinition.delete();
 
         for (const shapeId of shapes) {
-            this.sensorShapes.add(shapeId, surface.entity, body.entity, surface.sensor);
+            this.shapes.add(shapeId, surface.entity, body.entity, surface.sensor);
         }
 
         this.keepMass(body);
@@ -406,7 +426,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
     private destroyShapes(shapes: readonly b2ShapeId[]) {
         for (const shapeId of shapes) {
             this.box2d.b2DestroyShape(shapeId, true);
-            this.sensorShapes.markDestroyed(shapeId);
+            this.shapes.markDestroyed(shapeId);
         }
     }
 

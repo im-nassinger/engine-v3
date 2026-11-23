@@ -87,7 +87,7 @@ src/
     time/              Clock, Timer, FrameScheduler, TimeOfDay contracts
   adapters/
     pixi/              PixiLevelView, EntityNode, EntityDrawing, overlays/ (with unstyled/, UnstyledShapeOverlay, v3), minimap/ (MinimapView)
-    box2d/             Box2dPhysicsEngine, Box2dPhysicsWorld, Box2dShapes, Box2dJoints, SensorShapeTable (v3)
+    box2d/             Box2dPhysicsEngine, Box2dPhysicsWorld, Box2dShapes, Box2dJoints, ShapeTable (v3, sensor events; v4, contact events)
     storage/           IndexedDbLevelStore, LocalStorageSettings, WebLockTabGuard, BrowserPersistence
     browser/           keyboard/ (KeyboardInput, commitFocusedField), pointer/ (PointerInput, ClickCounter, wheelPixels),
                        time/ (SystemClock, LocalTimeOfDay, BrowserTimer, AnimationFrames),

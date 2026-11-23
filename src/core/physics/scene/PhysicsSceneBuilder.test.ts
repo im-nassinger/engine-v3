@@ -12,6 +12,7 @@ import { DerivedCaches } from '../../derived/index.ts';
 import { Matrix2D, ShapePieces } from '../../geometry/index.ts';
 import type { Point, ShapeGeometry, TransformValues } from '../../geometry/index.ts';
 import type { JointValues } from '../../components/index.ts';
+import type { EntityId } from '../../fields/index.ts';
 import type { Entity } from '../../level/index.ts';
 import { Level } from '../../level/index.ts';
 
@@ -73,7 +74,10 @@ class RecordingWorld implements PhysicsWorld {
     step() {}
     readMovedBodies() {}
     readSensorEvents() {}
-    velocityOf() {
+    contactEvents() {
+        return [];
+    }
+    velocity() {
         return { linear: { x: 0, y: 0 }, spin: 0 };
     }
     setPose() {}
@@ -143,9 +147,9 @@ function onlyJoint(world: RecordingWorld) {
     return call;
 }
 
-function build(level: Level) {
+function build(level: Level, contactEventSurfaces?: ReadonlySet<EntityId>) {
     const engine = new RecordingEngine();
-    const scene = PhysicsSceneBuilder.build(level, new DerivedCaches(level), engine);
+    const scene = PhysicsSceneBuilder.build(level, new DerivedCaches(level), engine, contactEventSurfaces);
     if (engine.world === undefined) throw new Error('The builder made no world.');
 
     return { scene, world: engine.world };
@@ -165,6 +169,14 @@ describe('PhysicsSceneBuilder', () => {
         level.world.requireComponent(PhysicsWorldComponent).set('gravity', { x: 1, y: -3 });
 
         expect(build(level).world.settings.gravity).toEqual({ x: 1, y: -3 });
+    });
+
+    test('the world is told which surfaces send contact events, none unless asked', () => {
+        const level = Level.createNew();
+        const ball = withSurface(withBody(place(level, level.world, transform(0, 0))));
+
+        expect(build(level).world.settings.contactEventSurfaces).toEqual(new Set());
+        expect(build(level, new Set([ball.id])).world.settings.contactEventSurfaces).toEqual(new Set([ball.id]));
     });
 
     test('bodies and surfaces come in Entities panel order', () => {

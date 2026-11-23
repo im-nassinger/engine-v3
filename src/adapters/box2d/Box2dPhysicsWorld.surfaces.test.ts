@@ -95,7 +95,7 @@ describe("Box2dPhysicsWorld's surfaces", () => {
         expect(pose.x).toBeGreaterThan(-150);
         expect(pose.y).toBeLessThan(slopeHeightAt(pose.x));
         // Rolling right along the slope turns it clockwise on screen.
-        expect(world.velocityOf(ball).spin).toBeGreaterThan(0);
+        expect(world.velocity(ball).spin).toBeGreaterThan(0);
         world.destroy();
     });
 
@@ -208,7 +208,7 @@ describe("Box2dPhysicsWorld's surfaces", () => {
         world.setVelocity(body, { linear: { x: 8000, y: 6000 }, spin: 0 });
 
         world.step();
-        const { linear } = world.velocityOf(body);
+        const { linear } = world.velocity(body);
         const speed = Math.hypot(linear.x, linear.y);
 
         expect(speed).toBeCloseTo(6000, 1);
@@ -227,8 +227,8 @@ describe("Box2dPhysicsWorld's surfaces", () => {
 
         world.step();
 
-        expect(world.velocityOf(clockwise).spin).toBeCloseTo(7.5 * 360, 3);
-        expect(world.velocityOf(anticlockwise).spin).toBeCloseTo(-7.5 * 360, 3);
+        expect(world.velocity(clockwise).spin).toBeCloseTo(7.5 * 360, 3);
+        expect(world.velocity(anticlockwise).spin).toBeCloseTo(-7.5 * 360, 3);
         world.destroy();
     });
 
@@ -239,7 +239,7 @@ describe("Box2dPhysicsWorld's surfaces", () => {
         world.setVelocity(body, { linear: { x: 500, y: 0 }, spin: 720 });
 
         world.step();
-        const velocity = world.velocityOf(body);
+        const velocity = world.velocity(body);
 
         expect(velocity.linear.x).toBeCloseTo(500, 3);
         expect(velocity.spin).toBeCloseTo(720, 3);

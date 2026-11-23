@@ -19,7 +19,7 @@ export function bodyNumbers(scene: PhysicsScene, poses: BodyPoses): BodyNumbers[
         const pose = poses.poseOf(id);
         if (pose === undefined) continue;
 
-        const { linear, spin } = scene.world.velocityOf(body.handle);
+        const { linear, spin } = scene.world.velocity(body.handle);
         found.push({ entityId: id, numbers: [id, pose.x, pose.y, pose.angle, linear.x, linear.y, spin] });
     }
 

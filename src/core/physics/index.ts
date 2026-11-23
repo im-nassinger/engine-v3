@@ -5,6 +5,7 @@ export type { DensitiesForMass, SurfaceDensity } from './mass/densitiesForMass.t
 export type { BodyDefinition } from './contracts/BodyDefinition.ts';
 export type { BodyPose } from './contracts/BodyPose.ts';
 export type { BodyVelocity } from './contracts/BodyVelocity.ts';
+export type { ContactEvent } from './contracts/ContactEvent.ts';
 export { BodyPoses } from './contracts/BodyPoses.ts';
 export type { PhysicsEngine, WorldSettings } from './contracts/PhysicsEngine.ts';
 export type { BodyHandle, JointHandle } from './contracts/Handles.ts';

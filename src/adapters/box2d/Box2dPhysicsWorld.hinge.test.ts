@@ -144,7 +144,7 @@ describe("Box2dPhysicsWorld's Hinge", () => {
 
             const angles = doorPoses(world, ONE_SECOND).map((pose) => pose.angle);
 
-            expect(world.velocityOf(wheel).spin).toBeCloseTo(motorSpeed, 3);
+            expect(world.velocity(wheel).spin).toBeCloseTo(motorSpeed, 3);
             expect(Math.sign(angles.at(-1) ?? 0)).toBe(Math.sign(motorSpeed));
             world.destroy();
         }
@@ -155,7 +155,7 @@ describe("Box2dPhysicsWorld's Hinge", () => {
 
         doorPoses(world, ONE_SECOND / 2);
 
-        expect(world.velocityOf(door).spin).toBeGreaterThan(0);
+        expect(world.velocity(door).spin).toBeGreaterThan(0);
         world.destroy();
     });
 
@@ -167,7 +167,7 @@ describe("Box2dPhysicsWorld's Hinge", () => {
             world.createJoint(hinge({ bodyA: wheel, bodyB: ground, ...changes }));
             world.setVelocity(wheel, { linear: { x: 0, y: 0 }, spin: 360 });
             doorPoses(world, ONE_SECOND / 2);
-            const spin = world.velocityOf(wheel).spin;
+            const spin = world.velocity(wheel).spin;
             world.destroy();
 
             return spin;

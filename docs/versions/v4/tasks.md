@@ -24,7 +24,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 6. The trigger card on screen for v4
   - Read: versions/v4/design.md, design/controls.md, design/mockups/v4.html
   - Done when: `TriggerCard` draws everything task 5 gives as the mockup does: the new rows and menus, the variable menu's groups with the type word, a text field or true or false choice for strings and booleans, the line under a Wait; browser tests in Chromium, Firefox and WebKit click through making "When this gets `open`: wait 2 s, flip door_open" from nothing
-- [ ] 7. Contact events and velocity in the physics world
+- [x] 7. Contact events and velocity in the physics world
   - Read: versions/v4/architecture.md#triggers-in-play, architecture/adapters.md#physics, tech-notes.md
   - Done when: the physics contract has `contactEvents()` after `step()` with the two entities (named from the adapter's own shape table, as sensor events are) and `velocity(body)`; contact events are switched on only for the shapes a run asks for; `NoPhysicsEngine` and the test fakes follow; tests on the real build pass
 - [ ] 8. The collision event

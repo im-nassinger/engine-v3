@@ -6,12 +6,14 @@ import type {
     BodyHandle,
     BodyPose,
     BodyPoses,
+    ContactEvent,
     HingeMotor,
     JointHandle,
     PhysicsEngine,
     PhysicsWorld,
     SensorEvent,
     SurfaceSettings,
+    WorldSettings,
 } from '../../physics/index.ts';
 
 const FALL_PER_STEP = 10;
@@ -33,7 +35,7 @@ export type ScriptedChange =
 
 // A PhysicsWorld where every Dynamic body falls 10 px a step and nothing else moves, unless a test sets a
 // body's next pose itself. A destroyed body stops moving and is listed, and so is a destroyed joint. The
-// sensor events a test queues come out of the next step; every change asked of it is listed, and setPose
+// sensor and contact events a test queues come out of the next step; every change asked of it is listed, and setPose
 // moves the body at once.
 export class ScriptedWorld implements PhysicsWorld {
     static readonly FALL_PER_STEP = FALL_PER_STEP;
@@ -47,6 +49,8 @@ export class ScriptedWorld implements PhysicsWorld {
     private jointCount = 0;
     private queuedSensorEvents: SensorEvent[] = [];
     private lastSensorEvents: SensorEvent[] = [];
+    private queuedContactEvents: ContactEvent[] = [];
+    private lastContactEvents: ContactEvent[] = [];
 
     createBody(definition: BodyDefinition): BodyHandle {
         const pose = { x: definition.position.x, y: definition.position.y, angle: definition.angle };
@@ -61,6 +65,10 @@ export class ScriptedWorld implements PhysicsWorld {
 
     queueSensorEvents(events: readonly SensorEvent[]) {
         this.queuedSensorEvents.push(...events);
+    }
+
+    queueContactEvents(events: readonly ContactEvent[]) {
+        this.queuedContactEvents.push(...events);
     }
 
     addSurface() {}
@@ -100,6 +108,8 @@ export class ScriptedWorld implements PhysicsWorld {
 
         this.lastSensorEvents = this.queuedSensorEvents;
         this.queuedSensorEvents = [];
+        this.lastContactEvents = this.queuedContactEvents;
+        this.queuedContactEvents = [];
     }
 
     readMovedBodies(into: BodyPoses) {
@@ -112,7 +122,11 @@ export class ScriptedWorld implements PhysicsWorld {
         into.push(...this.lastSensorEvents);
     }
 
-    velocityOf() {
+    contactEvents(): readonly ContactEvent[] {
+        return this.lastContactEvents;
+    }
+
+    velocity() {
         return { linear: { x: 0, y: 0 }, spin: 0 };
     }
 
@@ -152,12 +166,16 @@ export class ScriptedWorld implements PhysicsWorld {
     }
 }
 
+// Keeps the settings its one world was made with, so a test can see which surfaces send contact events.
 export class ScriptedEngine implements PhysicsEngine {
     readonly world = new ScriptedWorld();
+    settings: WorldSettings | undefined;
 
     async load() {}
 
-    createWorld() {
+    createWorld(settings: WorldSettings) {
+        this.settings = settings;
+
         return this.world;
     }
 }
