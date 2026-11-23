@@ -300,6 +300,47 @@ describe('PlayMirror', () => {
         expect(variables).toEqual([{ name: 'coins', value: 3 }]);
     });
 
+    test("writes an entity's changed own variables of every type", async () => {
+        const level = Level.createNew();
+        const door = place(level, level.world, transform(0, 0));
+        door.addComponent(
+            new VariablesComponent({
+                variables: [
+                    { name: 'open', value: false },
+                    { name: 'label', value: 'shut' },
+                    { name: 'hits', value: 0 },
+                ],
+            }),
+        );
+        const own = (name: string) => ({ kind: 'variable', name, own: true }) as const;
+        const triggers = [
+            {
+                id: 1,
+                name: null,
+                on: true,
+                when: { kind: 'levelStart' },
+                checks: [],
+                actions: [
+                    { kind: 'change', target: { kind: 'this' }, value: own('open'), op: 'flip', amount: null },
+                    { kind: 'change', target: { kind: 'this' }, value: own('label'), op: 'set', amount: 'open' },
+                    { kind: 'change', target: { kind: 'this' }, value: own('hits'), op: 'add', amount: 2 },
+                ],
+                repeat: { kind: 'everyTime' },
+            },
+        ] as const;
+        door.addComponent(new TriggerComponent({ triggers: [...triggers], nextTriggerId: 2 }));
+        const { runner, mirror } = await startBoth(level);
+
+        await runBatch(runner, mirror);
+
+        const variables = mirror.level.requireEntity(door.id).requireComponent(VariablesComponent).get('variables');
+        expect(variables).toEqual([
+            { name: 'open', value: true },
+            { name: 'label', value: 'open' },
+            { name: 'hits', value: 2 },
+        ]);
+    });
+
     test('a change for an entity the mirror no longer has is skipped', () => {
         const level = Level.createNew();
         const mirror = startMirror(level);

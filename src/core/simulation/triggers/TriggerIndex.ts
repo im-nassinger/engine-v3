@@ -13,7 +13,8 @@ export type IndexedTrigger = {
 // The run's triggers by the kind of event they hear, each list in Entities viewer order, built when the run
 // starts and kept as entities are removed, so no tick walks every trigger. A When with an unset part hears
 // nothing and isn't listed. Touch, collision and Destroyed triggers are found from their entity, custom event
-// triggers from their name and then their entity.
+// triggers from their name and then their entity, "a variable changes" triggers from the level's variable's
+// name, or from their entity and then their own variable's name.
 export class TriggerIndex {
     private readonly level: Level;
     private levelStartList: IndexedTrigger[] = [];
@@ -28,6 +29,8 @@ export class TriggerIndex {
     private readonly collisionPlace = new Map<Entity, number>();
     private readonly destroyedByOwner = new Map<Entity, IndexedTrigger[]>();
     private readonly customByName = new Map<string, Map<Entity, IndexedTrigger[]>>();
+    private readonly levelVariableByName = new Map<string, IndexedTrigger[]>();
+    private readonly ownVariableByOwner = new Map<Entity, IndexedTrigger[]>();
 
     constructor(level: Level) {
         this.level = level;
@@ -96,6 +99,18 @@ export class TriggerIndex {
         return this.customByName.get(name)?.get(owner) ?? [];
     }
 
+    // The triggers on any entity hearing the level's variable of this name change, in Entities viewer order.
+    levelVariableTriggersOf(name: string): readonly IndexedTrigger[] {
+        return this.levelVariableByName.get(name) ?? [];
+    }
+
+    // The entity's triggers hearing its own variable of this name change, top to bottom in its card.
+    ownVariableTriggersOf(owner: Entity, name: string): readonly IndexedTrigger[] {
+        const ownTriggers = this.ownVariableByOwner.get(owner) ?? [];
+
+        return ownTriggers.filter((indexed) => variableNameOf(indexed.when) === name);
+    }
+
     // The surfaces whose shapes must send contact events: those whose entity, or a group above it, hears
     // collisions. Read when the run starts, before its physics is built; triggers can't be added in play.
     // A sensor is in it too, since Change value can make it solid.
@@ -129,9 +144,15 @@ export class TriggerIndex {
             this.collisionPlace.delete(entity);
             this.destroyedByOwner.delete(entity);
 
+            this.ownVariableByOwner.delete(entity);
+
             for (const byOwner of this.customByName.values()) {
                 byOwner.delete(entity);
             }
+        }
+
+        for (const [name, listening] of this.levelVariableByName) {
+            this.levelVariableByName.set(name, listening.filter(stays));
         }
     }
 
@@ -170,7 +191,31 @@ export class TriggerIndex {
                 if (when.name === null) return;
                 addTo(this.customOwnersOf(when.name), indexed);
                 return;
+            case 'variableChanged':
+                this.addVariableChanged(indexed, when);
+                return;
         }
+    }
+
+    // The World's own variables are the level's, so a World trigger naming one as its own hears it as the
+    // level's.
+    private addVariableChanged(indexed: IndexedTrigger, when: VariableChangedWhen) {
+        const { variable } = when;
+        if (variable === null) return;
+
+        const isWorld = indexed.owner === this.level.world;
+        if (variable.owner === 'own' && !isWorld) {
+            addTo(this.ownVariableByOwner, indexed);
+            return;
+        }
+
+        const listening = this.levelVariableByName.get(variable.name);
+        if (listening !== undefined) {
+            listening.push(indexed);
+            return;
+        }
+
+        this.levelVariableByName.set(variable.name, [indexed]);
     }
 
     private customOwnersOf(name: string) {
@@ -190,6 +235,12 @@ export class TriggerIndex {
 
         return false;
     }
+}
+
+type VariableChangedWhen = When & { readonly kind: 'variableChanged' };
+
+function variableNameOf(when: When) {
+    return when.kind === 'variableChanged' ? when.variable?.name : undefined;
 }
 
 function addTo(byOwner: Map<Entity, IndexedTrigger[]>, indexed: IndexedTrigger) {
@@ -230,6 +281,8 @@ function isWhenSet(when: When) {
             return when.tag !== null;
         case 'custom':
             return when.name !== null;
+        case 'variableChanged':
+            return when.variable !== null;
         default:
             return true;
     }

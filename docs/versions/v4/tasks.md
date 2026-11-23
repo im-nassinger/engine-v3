@@ -33,7 +33,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 9. Destroyed and custom events
   - Read: versions/v4/architecture.md#triggers-in-play, requirements/triggers/triggers.md#more-events--v4, requirements/triggers/triggers.md#custom-events--v4, requirements/triggers/triggers.md#fire-custom-event-and-wait--v4
   - Done when: Destroy adds one Destroyed event per newly marked entity, heard in the same tick while the entity still exists; Fire custom event adds one event per target with `other` the sender, heard in the same tick through `ChainedEvents` within the 32 steps; `TriggerIndex` keeps custom triggers by name; `runHeadless` tests cover a destroyed group, a Destroyed trigger changing a variable, a button firing `open` on a tagged door, a name nobody hears, and a chain stopping at 32
-- [ ] 10. Variable changes and every entity's variables in play
+- [x] 10. Variable changes and every entity's variables in play
   - Read: versions/v4/architecture.md#triggers-in-play, requirements/triggers/triggers.md#more-events--v4, requirements/triggers/variables-and-inputs.md#string-and-boolean-variables-on-any-entity--v4
   - Done when: `PlayValueWriter` writes own variables of any type and Flip; the compare check reads the level's or the target's own variable and compares strings and booleans with is and is not; `VariableWatch` fires "a variable changes" on change, and "becomes" only when its condition turns true; the level's variables are heard by every entity, own ones only by their entity; the report and `PlayMirror` show changed own variables; `runHeadless` tests cover each rule
 - [ ] 11. Wait and waiting runs

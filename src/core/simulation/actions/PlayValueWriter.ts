@@ -10,7 +10,7 @@ import {
 } from '../../components/index.ts';
 import type { AnyComponent } from '../../components/index.ts';
 import { TagsFieldType } from '../../fields/index.ts';
-import type { ChangeOp, JsonValue, ValueRef } from '../../fields/index.ts';
+import type { ChangeOp, JsonValue, ValueRef, VariableValue } from '../../fields/index.ts';
 import { Matrix2D } from '../../geometry/index.ts';
 import type { Point } from '../../geometry/index.ts';
 import type { Entity } from '../../level/index.ts';
@@ -22,16 +22,20 @@ import { entitiesIn } from '../triggers/entitiesIn.ts';
 type FieldRef = ValueRef & { readonly kind: 'field' };
 
 // One Change value as the writer is given it: which value, how, and the amount as the trigger stores it.
+// Flip needs no amount, so its amount may be null and is never read.
 export type ValueChange = {
     readonly value: ValueRef;
     readonly op: ChangeOp;
-    readonly amount: JsonValue;
+    readonly amount: JsonValue | null;
 };
 
-// What a change sets off in the same tick, which TriggerPhase hears in its next round.
+// What a change sets off in the same tick, which TriggerPhase hears in its next round. Every variable
+// written is told, the World's (the level's) and any other entity's own, with its value before and after,
+// even when the two are the same.
 export type ValueChangeEffects = {
     tagRanOut(tag: string): void;
     triggerSwitchedOn(owner: Entity, triggerId: number): void;
+    variableChanged(holder: Entity, name: string, before: VariableValue, after: VariableValue): void;
 };
 
 // How physics holds a value: the body's pose, the surface's settings, the World's gravity, a Hinge's motor,
@@ -43,6 +47,8 @@ const MOTOR_FIELDS: readonly string[] = ['motor', 'motorSpeed', 'motorStrength',
 const SURFACE_FIELDS: readonly string[] = ['friction', 'restitution', 'sensor'];
 const POSE_FIELDS: readonly string[] = ['position', 'rotation'];
 const TAGS = new TagsFieldType();
+// What a Flip is given in place of an amount, which it never reads.
+const FLIP_AMOUNT = { ok: true, value: true } as const;
 
 // The one road a value takes when it changes in play: it is written into the play copy through its field
 // type, and the physics world is told when it owns the value. A target that doesn't offer the value, or an
@@ -63,13 +69,13 @@ export class PlayValueWriter {
         const offer = offers.find((candidate) => sameValueRef(candidate.ref, change.value));
         if (offer === undefined || !offer.ops.includes(change.op)) return false;
 
-        const amount = offer.amountType.parse(change.amount);
+        const amount = change.op === 'flip' ? FLIP_AMOUNT : offer.amountType.parse(change.amount);
         if (!amount.ok) return false;
 
         const { value } = change;
         switch (value.kind) {
             case 'variable':
-                return this.changeVariable(entity, value.name, change.op, amount.value as number);
+                return this.changeVariable(entity, value.name, change.op, amount.value as VariableValue);
             case 'tag':
                 return this.changeTag(entity, change.op, amount.value as string);
             case 'triggerOn':
@@ -79,17 +85,22 @@ export class PlayValueWriter {
         }
     }
 
-    private changeVariable(entity: Entity, name: string, op: ChangeOp, amount: number) {
+    // The amount was read with the variable's own type (changeableValues), and only the ops its type allows
+    // reach here: Set for any, Add and Subtract for a number, Flip for a boolean.
+    private changeVariable(entity: Entity, name: string, op: ChangeOp, amount: VariableValue) {
         const component = entity.requireComponent(VariablesComponent);
-        const variables = component.get('variables').map((variable) => {
-            if (variable.name !== name) return variable;
-            // A string or boolean variable isn't changed by a number's ops.
-            if (typeof variable.value !== 'number') return variable;
+        const variables = component.get('variables');
+        const held = variables.find((variable) => variable.name === name);
+        if (held === undefined) return false;
 
-            return { ...variable, value: changedNumber(op, variable.value, amount) };
-        });
-        component.set('variables', variables);
+        const before = held.value;
+        const after = changedVariable(op, before, amount);
+        component.set(
+            'variables',
+            variables.map((variable) => (variable === held ? { ...variable, value: after } : variable)),
+        );
         this.reportChange(entity, component, 'variables');
+        this.effects.variableChanged(entity, name, before, after);
 
         return true;
     }
@@ -308,6 +319,14 @@ function parentMatrixOf(entity: Entity, run: PlayRun) {
     if (parent === undefined) return Matrix2D.identity();
 
     return run.caches.worldMatrices.matrixOf(parent);
+}
+
+function changedVariable(op: ChangeOp, current: VariableValue, amount: VariableValue): VariableValue {
+    if (op === 'set') return amount;
+    if (op === 'flip') return typeof current === 'boolean' ? !current : current;
+    if (typeof current !== 'number' || typeof amount !== 'number') return current;
+
+    return changedNumber(op, current, amount);
 }
 
 function changedNumber(op: ChangeOp, current: number, amount: number) {

@@ -1,3 +1,4 @@
+import type { VariableValue } from '../../fields/index.ts';
 import type { Entity } from '../../level/index.ts';
 
 import { ActionRunner } from '../actions/ActionRunner.ts';
@@ -15,7 +16,8 @@ const LEVEL_START_TICK = 1;
 
 // Runs the firings EventPhase listed, in their order: each trigger's checks, then its actions. The events
 // those actions cause in the same tick (a tag running out, a level start trigger switched on during the
-// first tick, an entity destroyed, a custom event fired) are heard in a next round, and so on, up to 32 rounds; the rest are dropped with one warning.
+// first tick, an entity destroyed, a custom event fired, a variable changed) are heard in a next round, and so
+// on, up to 32 rounds; the rest are dropped with one warning.
 export class TriggerPhase implements TickPhase {
     run(tick: TickContext) {
         const { run } = tick;
@@ -94,6 +96,12 @@ class ChainedEvents implements ActionEffects {
     customEventFired(target: Entity, name: string, sender: Entity) {
         for (const indexed of this.run.triggers.index.customTriggersOf(target, name)) {
             this.queue(this.run.triggers.hear(indexed, sender.id, this.tick));
+        }
+    }
+
+    variableChanged(holder: Entity, name: string, before: VariableValue, after: VariableValue) {
+        for (const indexed of this.run.triggers.variables.changed(holder, name, before, after)) {
+            this.queue(this.run.triggers.hear(indexed, null, this.tick));
         }
     }
 

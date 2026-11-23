@@ -40,7 +40,8 @@ export class ActionRunner {
         switch (action.kind) {
             case 'change': {
                 const { value, amount, op } = action;
-                if (value === null || amount === null) return;
+                // Flip is the one op that needs no amount.
+                if (value === null || (amount === null && op !== 'flip')) return;
 
                 for (const target of targetsOf(action.target, firing, this.run)) {
                     this.writer.change(target, { value, op, amount });

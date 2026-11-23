@@ -12,9 +12,11 @@ import { triggerOf } from './TriggerIndex.ts';
 import type { IndexedTrigger, TriggerIndex } from './TriggerIndex.ts';
 import { TriggerRepeats } from './TriggerRepeats.ts';
 import { TriggerTimers } from './TriggerTimers.ts';
+import { VariableWatch } from './VariableWatch.ts';
 
 // What a run keeps about its triggers between the tick phases: the index of who hears what, the touches,
-// the hits, the timers, each trigger's last firing, which triggers can run, the tags held, and this tick's firings.
+// the hits, the timers, each trigger's last firing, which triggers can run, the tags held, who hears which
+// variable change, and this tick's firings.
 export class PlayTriggers {
     readonly index: TriggerIndex;
     readonly touches: TouchLedger;
@@ -23,6 +25,7 @@ export class PlayTriggers {
     readonly repeats: TriggerRepeats;
     readonly runnable: RunnableTriggers;
     readonly tags: TagCounts;
+    readonly variables: VariableWatch;
     // The firings EventPhase listed this tick, in the events' order.
     listed: readonly TriggerFiring[] = [];
     // The firings whose actions TriggerPhase ran this tick, in the order they ran.
@@ -39,6 +42,7 @@ export class PlayTriggers {
         this.repeats = new TriggerRepeats();
         this.runnable = new RunnableTriggers(level, registry);
         this.tags = new TagCounts(level);
+        this.variables = new VariableWatch(this.index);
     }
 
     // The tags that ran out last tick, which this tick's "no entity with this tag is left" hears.
