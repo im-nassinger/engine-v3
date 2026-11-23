@@ -26,6 +26,12 @@
         font-size: var(--text-size);
     }
 
+    > .note {
+        padding-left: var(--space-6);
+        color: var(--faint);
+        font-size: var(--text-tiny);
+    }
+
     &:hover,
     &:focus-visible {
         outline: none;

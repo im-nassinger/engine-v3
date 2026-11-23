@@ -25,6 +25,12 @@
         font-style: italic;
     }
 
+    /* Not set, and nothing is missing: Fire's "no number". */
+    &[data-state='optional'] {
+        border-bottom-color: color-mix(in srgb, var(--muted) 55%, transparent);
+        color: var(--muted);
+    }
+
     &[data-state='greyed'] {
         border-bottom-color: transparent;
         color: var(--faint);

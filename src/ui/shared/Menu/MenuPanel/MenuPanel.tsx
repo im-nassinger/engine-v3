@@ -43,6 +43,7 @@ type MenuPanelEntryProps = {
 
 function MenuPanelEntry({ entry, onChoose, isSubmenuOpen, onShowSubmenu, onHideSubmenu }: MenuPanelEntryProps) {
     if (entry.kind === 'separator') return <div className="separator" role="separator" />;
+    if (entry.kind === 'heading') return <div className="heading">{entry.label}</div>;
 
     if (entry.kind === 'submenu') {
         return <MenuSubmenuRow submenu={entry} isOpen={isSubmenuOpen} onShow={onShowSubmenu} />;

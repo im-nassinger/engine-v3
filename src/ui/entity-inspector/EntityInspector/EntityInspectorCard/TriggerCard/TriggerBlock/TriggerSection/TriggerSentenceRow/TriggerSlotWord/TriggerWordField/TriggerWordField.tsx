@@ -15,8 +15,17 @@ export type TriggerWordFieldProps = {
 
 const GAP_PX = 4;
 
-// The small field a number or a value word opens under itself. Enter types it in, empty text keeps the
-// word as it was, and text that isn't a value turns it red with the reason; Esc and a press outside close it.
+const PLACEHOLDERS: Record<TriggerTypedEntry['kind'], string> = {
+    number: 'Type a number',
+    value: 'Type a value',
+    text: 'Text',
+    word: 'Type a name',
+};
+
+// The small field a number, a value, a text or a name word opens under itself. Enter types it in, empty
+// text keeps the word as it was (a text takes it as a value), and text that isn't a value turns it red with
+// the reason; Esc and a press outside close it. A name's field says what it takes above the box, and an
+// optional number's has an entry that leaves it unset.
 export function TriggerWordField({ entry, anchor, onType, onClose }: TriggerWordFieldProps) {
     const rootRef = useRef<HTMLDivElement>(null);
     const [text, setText] = useState(() => TriggerTyping.shownText(entry));
@@ -50,13 +59,16 @@ export function TriggerWordField({ entry, anchor, onType, onClose }: TriggerWord
     };
 
     const unit = entry.kind === 'number' ? entry.unit : undefined;
+    const clearLabel = entry.kind === 'number' ? entry.clearLabel : undefined;
 
     return (
-        <div className="trigger-word-field" ref={rootRef}>
+        <div className="trigger-word-field" data-kind={entry.kind} ref={rootRef}>
+            {entry.kind === 'word' && <span className="hint">{entry.hint}</span>}
             <input
                 aria-label="Value"
                 aria-invalid={refusal !== undefined}
                 inputMode={entry.kind === 'number' ? 'decimal' : undefined}
+                placeholder={PLACEHOLDERS[entry.kind]}
                 value={text}
                 autoFocus
                 onChange={(event) => changeText(event.target.value)}
@@ -64,6 +76,11 @@ export function TriggerWordField({ entry, anchor, onType, onClose }: TriggerWord
             />
             {unit !== undefined && <span className="unit">{unit}</span>}
             {refusal !== undefined && <span className="refusal">{refusal}</span>}
+            {clearLabel !== undefined && (
+                <button type="button" className="clear" onClick={() => onType(null)}>
+                    {clearLabel}
+                </button>
+            )}
         </div>
     );
 }

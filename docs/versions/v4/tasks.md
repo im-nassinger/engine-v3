@@ -21,7 +21,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 5. The trigger card's model for v4
   - Read: versions/v4/architecture.md#the-trigger-card, versions/v4/design.md, design/controls.md, design/mockups/v4.html
   - Done when: `TriggerChoices`, `TriggerSentence` and `TriggerCardModel` give the new Whens with the "becomes" part, the component value check with its value menu (components, then number values and vector axes, then a body's Speed and Velocity x and y), Fire custom event with its name suggestions and optional number, Wait, Flip and Set-only for strings, and the variable menu's two groups with each item's type; the compare words and the value field follow the variable's type; every edit is one step with its label; Node tests pass
-- [ ] 6. The trigger card on screen for v4
+- [x] 6. The trigger card on screen for v4
   - Read: versions/v4/design.md, design/controls.md, design/mockups/v4.html
   - Done when: `TriggerCard` draws everything task 5 gives as the mockup does: the new rows and menus, the variable menu's groups with the type word, a text field or true or false choice for strings and booleans, the line under a Wait; browser tests in Chromium, Firefox and WebKit click through making "When this gets `open`: wait 2 s, flip door_open" from nothing
 - [ ] 7. Contact events and velocity in the physics world

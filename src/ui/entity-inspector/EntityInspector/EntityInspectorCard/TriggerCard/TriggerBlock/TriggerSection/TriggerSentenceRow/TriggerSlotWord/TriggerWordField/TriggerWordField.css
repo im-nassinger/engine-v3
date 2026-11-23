@@ -29,6 +29,13 @@
         }
     }
 
+    > .hint {
+        flex-basis: 100%;
+        padding: 0 var(--space-4);
+        color: var(--faint);
+        font-size: var(--text-tiny);
+    }
+
     > .unit {
         color: var(--muted);
     }
@@ -37,5 +44,24 @@
         flex-basis: 100%;
         color: var(--danger);
         font-size: var(--text-tiny);
+    }
+
+    > .clear {
+        flex-basis: 100%;
+        height: var(--control);
+        padding: 0 var(--space-8);
+        border: none;
+        border-radius: var(--radius);
+        background: none;
+        color: var(--text);
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+
+        &:hover,
+        &:focus-visible {
+            outline: none;
+            background: var(--accent-soft);
+        }
     }
 }

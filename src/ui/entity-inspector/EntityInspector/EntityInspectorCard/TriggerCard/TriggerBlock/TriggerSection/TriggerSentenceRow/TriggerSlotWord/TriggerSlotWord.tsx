@@ -4,6 +4,7 @@ import type { JsonValue } from '../../../../../../../../../core/fields/index.ts'
 import { TriggerEdits } from '../../../../../../../../../editor/entity-inspector/index.ts';
 import type {
     TriggerChoice,
+    TriggerMenuGroup,
     TriggerTypedEntry,
     TriggerWord,
     TriggerWordEntry,
@@ -99,7 +100,8 @@ function typedEntryOf(entry: TriggerWordEntry): TriggerTypedEntry | undefined {
     return entry;
 }
 
-// The groups follow each other with a line between them, and a component opens its values in a submenu.
+// Each group is under its title, with a line before every group after the first, and a group with no
+// choice says so, disabled. A component opens its values in a submenu.
 function menuEntriesOf(entry: TriggerWordEntry, pick: (choice: TriggerChoice) => void): MenuEntry[] {
     if (entry.kind === 'menu') return actionsOf(entry.choices, pick, 'item');
     if (entry.kind === 'submenus') {
@@ -111,13 +113,20 @@ function menuEntriesOf(entry: TriggerWordEntry, pick: (choice: TriggerChoice) =>
     }
     if (entry.kind !== 'groups') return [];
 
+    return entry.groups.flatMap((group, index) => groupEntries(group, index, pick));
+}
+
+function groupEntries(group: TriggerMenuGroup, index: number, pick: (choice: TriggerChoice) => void) {
     const entries: MenuEntry[] = [];
-    entry.groups.forEach((group, index) => {
-        if (index > 0) {
-            entries.push({ kind: 'separator', id: `separator-${index}` });
-        }
-        entries.push(...actionsOf(group.choices, pick, `group-${index}`));
-    });
+    if (index > 0) {
+        entries.push({ kind: 'separator', id: `separator-${index}` });
+    }
+    entries.push({ kind: 'heading', id: `heading-${index}`, label: group.title });
+    entries.push(...actionsOf(group.choices, pick, `group-${index}`));
+    if (group.choices.length === 0 && group.emptyText !== undefined) {
+        const empty = group.emptyText;
+        entries.push({ kind: 'action', id: `empty-${index}`, label: empty, onChoose: () => {}, disabledReason: empty });
+    }
 
     return entries;
 }
@@ -130,6 +139,7 @@ function actionsOf(choices: readonly TriggerChoice[], pick: (choice: TriggerChoi
             label: choice.label,
             onChoose: () => pick(choice),
             disabledReason: choice.disabledReason,
+            note: choice.note,
         };
 
         return entry;

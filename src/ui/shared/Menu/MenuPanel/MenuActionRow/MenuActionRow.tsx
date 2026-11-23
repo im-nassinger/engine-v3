@@ -33,6 +33,7 @@ export function MenuActionRow({ action, onChoose, onPointerEnter }: MenuActionRo
             <span className="tick">{action.checked && <Icon icon={Check} size="small" />}</span>
             <span className="label">{action.label}</span>
             {action.shortcut && <span className="shortcut">{action.shortcut}</span>}
+            {action.note !== undefined && <span className="note">{action.note}</span>}
         </button>
     );
 

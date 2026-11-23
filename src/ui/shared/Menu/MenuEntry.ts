@@ -8,6 +8,15 @@ export type MenuAction = {
     checked?: boolean;
     // A disabled entry is greyed, and its tooltip says why.
     disabledReason?: string;
+    // A small faint word at the right, such as a variable's type.
+    note?: string;
+};
+
+// The title of the entries under it, in small caps: the variable menu's "The level's".
+export type MenuHeading = {
+    kind: 'heading';
+    id: string;
+    label: string;
 };
 
 export type MenuSeparator = {
@@ -23,6 +32,6 @@ export type MenuSubmenu = {
     entries: MenuItem[];
 };
 
-export type MenuItem = MenuAction | MenuSeparator;
+export type MenuItem = MenuAction | MenuSeparator | MenuHeading;
 
 export type MenuEntry = MenuItem | MenuSubmenu;

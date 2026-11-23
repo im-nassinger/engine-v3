@@ -13,11 +13,23 @@ import {
     closeEntityInspectorPage,
     entityInspectorContainer,
     openEntityInspectorPage,
-    requireCard,
     requireElement,
     select,
     showEntityInspector,
 } from './testing/entityInspectorPage.ts';
+import {
+    addRow,
+    blockName,
+    blocks,
+    menuRowNamed,
+    menuRows,
+    notesOf,
+    requireBlock,
+    section,
+    sentences,
+    triggersCard,
+    word,
+} from './testing/triggerCardPage.ts';
 
 beforeEach(async () => {
     openEntityInspectorPage();
@@ -70,69 +82,11 @@ async function showEntity(level: Level, entity: Entity) {
     return shown;
 }
 
-function triggersCard() {
-    return requireCard('TriggerComponent');
-}
-
-function blocks() {
-    return [...triggersCard().querySelectorAll<HTMLElement>('.trigger-block')];
-}
-
-function requireBlock(index = 0) {
-    const block = blocks()[index];
-    if (block === undefined) throw new Error(`No trigger block ${index}.`);
-
-    return block;
-}
-
-function blockName(index = 0) {
-    return requireElement(requireBlock(index), '.trigger-head .name').textContent;
-}
-
-function section(title: string, blockIndex = 0) {
-    return requireElement<HTMLElement>(requireBlock(blockIndex), `.trigger-section[data-section="${title}"]`);
-}
-
-function sentences(title: string, blockIndex = 0) {
-    const rows = section(title, blockIndex).querySelectorAll<HTMLElement>('.trigger-sentence-row');
-
-    return [...rows].map((row) => {
-        const words = row.querySelectorAll<HTMLElement>('.text, .trigger-slot-word');
-        return [...words].map((word) => word.textContent).join(' ');
-    });
-}
-
-function word(title: string, text: string, blockIndex = 0) {
-    const words = section(title, blockIndex).querySelectorAll<HTMLElement>('.trigger-slot-word');
-    const found = [...words].find((candidate) => candidate.textContent === text);
-    if (found === undefined) throw new Error(`No word ${text} in ${title}.`);
-
-    return found;
-}
-
-function menuRows() {
-    return [...document.querySelectorAll<HTMLElement>('.menu [role="menuitem"]')];
-}
-
-function menuRowNamed(label: string) {
-    return menuRows().find((candidate) => candidate.textContent.trim() === label);
-}
-
 async function pickFromMenu(opener: HTMLElement, label: string) {
     click(opener);
     await expect.poll(() => menuRowNamed(label)).toBeDefined();
     menuRowNamed(label)?.click();
     await expect.poll(() => menuRows().length).toBe(0);
-}
-
-function addRow(label: string, blockIndex = 0) {
-    return buttonNamed(requireBlock(blockIndex), label);
-}
-
-function notesOf(blockIndex = 0) {
-    const notes = requireBlock(blockIndex).querySelectorAll<HTMLElement>('.card-note-box .text');
-
-    return [...notes].map((note) => note.textContent.trim());
 }
 
 function history(session: EditorSession) {

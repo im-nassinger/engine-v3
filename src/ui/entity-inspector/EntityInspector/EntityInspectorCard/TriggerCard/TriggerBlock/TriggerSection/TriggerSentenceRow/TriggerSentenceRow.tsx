@@ -13,9 +13,10 @@ export type TriggerSentenceRowProps = {
 };
 
 // One sentence, wrapping when it must: plain words, and words that open a menu or a small field. A check
-// or an action shows an × at the right on hover, which removes it.
+// or an action shows an × at the right on hover, which removes it. A Wait with actions after it has a faint
+// line under it, so they read as a later moment.
 export function TriggerSentenceRow({ row, triggerIndex, commit }: TriggerSentenceRowProps) {
-    const { part, sentence, canRemove } = row;
+    const { part, sentence, canRemove, hasWaitLine } = row;
 
     const remove = () => {
         if (part.section !== 'check' && part.section !== 'action') return;
@@ -24,7 +25,7 @@ export function TriggerSentenceRow({ row, triggerIndex, commit }: TriggerSentenc
     };
 
     return (
-        <div className="trigger-sentence-row" data-can-remove={canRemove}>
+        <div className="trigger-sentence-row" data-can-remove={canRemove} data-wait-line={hasWaitLine}>
             {sentence.words.map((word, wordIndex) => (
                 <SentenceWord key={wordIndex} word={word} triggerIndex={triggerIndex} commit={commit} />
             ))}

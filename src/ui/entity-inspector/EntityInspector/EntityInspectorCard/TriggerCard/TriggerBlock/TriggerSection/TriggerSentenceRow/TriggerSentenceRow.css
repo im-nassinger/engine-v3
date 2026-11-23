@@ -35,4 +35,21 @@
     &:hover > .remove {
         visibility: visible;
     }
+
+    /* The line is 8 px under the row, and the next row 5 px under the line, past the section's 4 px gap. */
+    &[data-wait-line='true'] {
+        margin-bottom: 9px;
+
+        &::after {
+            content: '';
+            position: absolute;
+            right: var(--space-10);
+            bottom: calc(-1 * var(--space-8));
+            left: var(--space-10);
+            height: 1px;
+            background: var(--faint);
+            opacity: 0.45;
+            pointer-events: none;
+        }
+    }
 }
