@@ -39,7 +39,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 11. Wait and waiting runs
   - Read: versions/v4/architecture.md#triggers-in-play, requirements/triggers/triggers.md#fire-custom-event-and-wait--v4, requirements/triggers/triggers.md#small-features
   - Done when: `ActionRunner` stops at a Wait and `WaitingRuns` resumes the rest when due, in whole ticks, in the architecture's order, after timers in `EventPhase`, without asking checks or Repeat again; two firings during one wait both run; switching the trigger off or removing its entity cancels its runs; the 33rd waiting run is dropped with the play warning `tooManyWaitingRuns`, shown in the message pill; Restart starts empty; `runHeadless` tests cover each rule
-- [ ] 12. The component value check in play
+- [x] 12. The component value check in play
   - Read: versions/v4/architecture.md#triggers-in-play, requirements/triggers/triggers.md#checking-a-component-value--v4
   - Done when: `checksPass` reads a target's number value, a vector's axis, or a body's live speed or velocity from `velocity(body)`; a tagged target passes when any tagged entity passes; a target without the value is false; `runHeadless` tests cover "If this BodyComponent speed is more than 200" on a falling ball
 - [ ] 13. The determinism levels for v4

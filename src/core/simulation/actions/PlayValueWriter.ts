@@ -19,6 +19,8 @@ import { changeableValues, sameValueRef } from '../../triggers/index.ts';
 import type { PlayRun } from '../run/PlayRun.ts';
 import { entitiesIn } from '../triggers/entitiesIn.ts';
 
+import { parentMatrixOf, placementNow } from './placementNow.ts';
+
 type FieldRef = ValueRef & { readonly kind: 'field' };
 
 // One Change value as the writer is given it: which value, how, and the amount as the trigger stores it.
@@ -233,15 +235,11 @@ export class PlayValueWriter {
     private teleport(entity: Entity, ref: FieldRef, op: ChangeOp, amount: unknown) {
         const { bodyMatrices, caches, poses, scene } = this.run;
         const body = bodyMatrices.bodyOf(entity);
-        const levelMatrix = bodyMatrices.matrixOf(entity);
-        if (body === undefined || levelMatrix === undefined) return false;
+        const now = placementNow(entity, this.run);
+        if (body === undefined || now === undefined) return false;
 
         const transform = entity.requireComponent(TransformComponent);
         const parentMatrix = parentMatrixOf(entity, this.run);
-        const fromParent = parentMatrix.invert();
-        if (fromParent === undefined) return false;
-
-        const now = fromParent.multiply(levelMatrix).decompose();
         const current = ref.field === 'position' ? now.position : now.rotation;
         const next = changedValue(op, current, amount, ref.axis);
         const nextPosition = ref.field === 'position' ? next : now.position;
@@ -314,13 +312,6 @@ function transformValuesOf(transform: TransformComponent) {
         scale: transform.get('scale'),
         skew: transform.get('skew'),
     };
-}
-
-function parentMatrixOf(entity: Entity, run: PlayRun) {
-    const parent = entity.parent;
-    if (parent === undefined) return Matrix2D.identity();
-
-    return run.caches.worldMatrices.matrixOf(parent);
 }
 
 function changedVariable(op: ChangeOp, current: VariableValue, amount: VariableValue): VariableValue {

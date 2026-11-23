@@ -17,11 +17,14 @@ import type {
 } from '../../physics/index.ts';
 
 const FALL_PER_STEP = 10;
+const STEPS_PER_SECOND = 60;
 
 type ScriptedBody = {
     readonly entity: EntityId;
     readonly type: BodyType;
     pose: BodyPose;
+    // How far it moved in the last step, which velocity() gives per second.
+    moved: BodyPose;
     destroyed: boolean;
 };
 
@@ -33,7 +36,7 @@ export type ScriptedChange =
     | { readonly call: 'setMotor'; readonly joint: JointHandle; readonly motor: HingeMotor }
     | { readonly call: 'setGravity'; readonly gravity: Point };
 
-// A PhysicsWorld where every Dynamic body falls 10 px a step and nothing else moves, unless a test sets a
+// A PhysicsWorld where every Dynamic body falls 10 px a step (600 px/s) and nothing else moves, unless a test sets a
 // body's next pose itself. A destroyed body stops moving and is listed, and so is a destroyed joint. The
 // sensor and contact events a test queues come out of the next step; every change asked of it is listed, and setPose
 // moves the body at once.
@@ -54,7 +57,8 @@ export class ScriptedWorld implements PhysicsWorld {
 
     createBody(definition: BodyDefinition): BodyHandle {
         const pose = { x: definition.position.x, y: definition.position.y, angle: definition.angle };
-        this.bodies.push({ entity: definition.entity, type: definition.type, pose, destroyed: false });
+        const moved = { x: 0, y: 0, angle: 0 };
+        this.bodies.push({ entity: definition.entity, type: definition.type, pose, moved, destroyed: false });
 
         return this.bodies.length - 1;
     }
@@ -92,6 +96,8 @@ export class ScriptedWorld implements PhysicsWorld {
         for (const body of this.bodies) {
             if (body.destroyed) continue;
 
+            const before = body.pose;
+            body.moved = { x: 0, y: 0, angle: 0 };
             const nextPose = this.nextPoses.get(body.entity);
             const falls = this.falling && body.type === 'dynamic';
 
@@ -102,6 +108,11 @@ export class ScriptedWorld implements PhysicsWorld {
             } else {
                 continue;
             }
+            body.moved = {
+                x: body.pose.x - before.x,
+                y: body.pose.y - before.y,
+                angle: body.pose.angle - before.angle,
+            };
             this.movedLastStep.push(body);
         }
         this.nextPoses.clear();
@@ -126,8 +137,14 @@ export class ScriptedWorld implements PhysicsWorld {
         return this.lastContactEvents;
     }
 
-    velocity() {
-        return { linear: { x: 0, y: 0 }, spin: 0 };
+    // What the body moved in the last step, as if it moved that way all along it: 60 steps a second.
+    velocity(handle: BodyHandle) {
+        const { moved } = this.requireBody(handle);
+
+        return {
+            linear: { x: moved.x * STEPS_PER_SECOND, y: moved.y * STEPS_PER_SECOND },
+            spin: moved.angle * STEPS_PER_SECOND,
+        };
     }
 
     setPose(handle: BodyHandle, pose: BodyPose) {

@@ -6,12 +6,15 @@ import type { PlayRun } from '../run/PlayRun.ts';
 import type { TriggerFiring } from '../triggers/TriggerFiring.ts';
 import { variableMatches } from '../triggers/variableMatches.ts';
 
+import { readableValueOf } from './readableValueOf.ts';
 import { ownTagsOf, targetsOf } from './targetsOf.ts';
 
 // Whether every check of the trigger is true for this firing. A tag check is true when one of its targets
 // has the tag, on itself or on a group above it; with no target left (a missing entity, a tag nobody holds)
 // it is false. A variable compare reads the level's variable, on the World, or the target's own; with a tag
 // as the target, it is true when one tagged entity's passes, and a target without the variable is false.
+// The component value check reads the same way: a number, a vector's axis, or a body's live speed or
+// velocity, compared with its amount, true when one target passes and false for a target without it.
 export function checksPass(checks: readonly Check[], firing: TriggerFiring, run: PlayRun) {
     return checks.every((check) => checkPasses(check, firing, run));
 }
@@ -24,8 +27,16 @@ function checkPasses(check: Check, firing: TriggerFiring, run: PlayRun) {
         return targetsOf(check.target, firing, run).some((entity) => isTaggedWith(entity, tag));
     }
 
-    // The component value check isn't read in play yet: false, as a value that isn't there is.
-    if (check.kind === 'compareValue') return false;
+    if (check.kind === 'compareValue') {
+        const { value, compare, amount } = check;
+        if (value === null || amount === null) return false;
+
+        return targetsOf(check.target, firing, run).some((entity) => {
+            const held = readableValueOf(entity, value, run);
+
+            return held !== undefined && variableMatches(held, compare, amount);
+        });
+    }
 
     const { variable, value, compare } = check;
     if (variable === null || value === null) return false;
