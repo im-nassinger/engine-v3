@@ -8,6 +8,8 @@ export class StepCommand implements EditorCommand {
     readonly id = 'play.step';
     readonly label = 'Step';
     readonly shortcuts = ['F9'];
+    readonly shortcutName = 'Step one tick';
+    readonly shortcutArea = 'Test play';
     readonly shortcutScope = 'everywhere';
     readonly runsDuringPlay = true;
     private readonly play: PlaySession;

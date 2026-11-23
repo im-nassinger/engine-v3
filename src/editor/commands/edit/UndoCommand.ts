@@ -8,6 +8,7 @@ export class UndoCommand implements EditorCommand {
     readonly id = 'edit.undo';
     readonly menu = { menu: 'Edit', section: 1, order: 10 } as const;
     readonly shortcuts = ['Ctrl+Z'];
+    readonly shortcutName = 'Undo';
     private readonly session: EditorSession;
 
     constructor(session: EditorSession) {

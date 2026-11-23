@@ -34,6 +34,7 @@ export class RotateCommand implements EditorCommand {
     readonly id: string;
     readonly label: string;
     readonly shortcuts: readonly string[];
+    readonly shortcutName: string;
     readonly repeatsWhileHeld = true;
     private readonly session: EditorSession;
     private readonly degrees: number;
@@ -44,6 +45,7 @@ export class RotateCommand implements EditorCommand {
         this.id = `edit.rotate${turn.idPart}${step.degrees}`;
         this.label = `Rotate ${turn.word} ${step.degrees}°`;
         this.shortcuts = [`${step.modifiers}${turn.key}`];
+        this.shortcutName = `Rotate ${step.degrees}°`;
     }
 
     // All four.

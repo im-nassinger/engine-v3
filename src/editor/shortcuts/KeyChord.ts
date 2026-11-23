@@ -1,4 +1,5 @@
 import type { KeyboardPlatform } from './KeyboardInputData.ts';
+import { altName, ctrlName } from './modifierNames.ts';
 import type { KeyPress } from './KeyPress.ts';
 
 // How a chord's main key is found in a press, following the tech notes: a letter by what the layout
@@ -103,23 +104,28 @@ export class KeyChord {
 
     // What the menu shows at the right of an entry.
     text(platform: KeyboardPlatform) {
-        const parts: string[] = [];
+        const caps = this.caps(platform);
+
+        return caps.join('+');
+    }
+
+    // The keys one by one, modifiers first, as the shortcut list draws them: ['Cmd', 'Shift', 'Z'] on a Mac.
+    caps(platform: KeyboardPlatform) {
+        const caps: string[] = [];
 
         if (this.ctrl) {
-            const ctrlName = platform === 'mac' ? 'Cmd' : 'Ctrl';
-            parts.push(ctrlName);
+            caps.push(ctrlName(platform));
         }
         if (this.alt) {
-            const altName = platform === 'mac' ? 'Option' : 'Alt';
-            parts.push(altName);
+            caps.push(altName(platform));
         }
         if (this.shift) {
-            parts.push('Shift');
+            caps.push('Shift');
         }
 
-        parts.push(this.keyText);
+        caps.push(this.keyText);
 
-        return parts.join('+');
+        return caps;
     }
 
     private keyMatches(press: KeyPress) {

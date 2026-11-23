@@ -15,6 +15,7 @@ export class FitSelectionCommand implements EditorCommand {
     readonly label = 'Selection';
     readonly menu = { menu: 'View', section: 3, order: 20 } as const;
     readonly shortcuts = ['F'];
+    readonly shortcutName = 'Zoom to the selection';
     private readonly session: EditorSession;
 
     constructor(session: EditorSession) {

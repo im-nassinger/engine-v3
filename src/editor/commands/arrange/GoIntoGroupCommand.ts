@@ -10,6 +10,8 @@ export class GoIntoGroupCommand implements EditorCommand {
     readonly label = 'Go into group';
     readonly menu = { menu: 'Arrange', section: 2, order: 10 } as const;
     readonly shortcuts = ['Enter'];
+    readonly shortcutName = 'Go into the selected group';
+    readonly shortcutArea = 'Selecting';
     private readonly session: EditorSession;
 
     constructor(session: EditorSession) {

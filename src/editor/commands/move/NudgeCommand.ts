@@ -43,6 +43,7 @@ export class NudgeCommand implements EditorCommand {
     readonly id: string;
     readonly label: string;
     readonly shortcuts: readonly string[];
+    readonly shortcutName: string;
     readonly shortcutScope = 'levelView' as const;
     readonly repeatsWhileHeld = true;
     private readonly session: EditorSession;
@@ -57,6 +58,7 @@ export class NudgeCommand implements EditorCommand {
         this.id = `edit.nudge${capitalWord}${distance.idPart}`;
         this.label = `Move ${direction.word} ${distance.name}`;
         this.shortcuts = [`${distance.modifiers}${direction.key}`];
+        this.shortcutName = `Move ${distance.name}`;
     }
 
     // All twelve.

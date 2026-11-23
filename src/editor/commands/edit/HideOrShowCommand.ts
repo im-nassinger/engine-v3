@@ -11,6 +11,7 @@ export class HideOrShowCommand implements EditorCommand {
     readonly id = 'edit.hideOrShow';
     readonly label = 'Hide or show';
     readonly shortcuts = ['Ctrl+Shift+H'];
+    readonly shortcutName = 'Hide or show the selection';
     private readonly session: EditorSession;
 
     constructor(session: EditorSession) {

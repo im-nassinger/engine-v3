@@ -10,6 +10,8 @@ export class RenameCommand implements EditorCommand {
     readonly id = 'edit.rename';
     readonly label = 'Rename';
     readonly shortcuts = ['F2'];
+    readonly shortcutName = 'Rename the selected entity';
+    readonly shortcutArea = 'Selecting';
     private readonly session: EditorSession;
 
     constructor(session: EditorSession) {

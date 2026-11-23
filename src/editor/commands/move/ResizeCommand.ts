@@ -44,6 +44,7 @@ export class ResizeCommand implements EditorCommand {
     readonly id: string;
     readonly label: string;
     readonly shortcuts: readonly string[];
+    readonly shortcutName: string;
     readonly repeatsWhileHeld = true;
     private readonly session: EditorSession;
     private readonly axis: ResizeAxis;
@@ -58,6 +59,7 @@ export class ResizeCommand implements EditorCommand {
         this.id = `edit.resize${side.idPart}${step.idPart}`;
         this.label = `Resize ${side.word} ${step.name}`;
         this.shortcuts = [`${step.modifiers}${side.key}`];
+        this.shortcutName = `Resize ${step.name}`;
     }
 
     // All eight.

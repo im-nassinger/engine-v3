@@ -8,6 +8,7 @@ export class RedoCommand implements EditorCommand {
     readonly id = 'edit.redo';
     readonly menu = { menu: 'Edit', section: 1, order: 20 } as const;
     readonly shortcuts = ['Ctrl+Shift+Z', 'Ctrl+Y'];
+    readonly shortcutName = 'Redo';
     private readonly session: EditorSession;
 
     constructor(session: EditorSession) {

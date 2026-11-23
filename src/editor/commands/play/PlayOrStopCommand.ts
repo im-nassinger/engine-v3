@@ -9,6 +9,7 @@ export class PlayOrStopCommand implements EditorCommand {
     readonly id = 'play.playOrStop';
     readonly menu = { menu: 'Play', section: 1, order: 10 } as const;
     readonly shortcuts = ['Ctrl+Enter', 'Shift+T'];
+    readonly shortcutName = 'Play or stop';
     readonly shortcutScope = 'everywhere';
     readonly shortcutScopes = { 'Shift+T': 'editor' } as const;
     readonly runsDuringPlay = true;

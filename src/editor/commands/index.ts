@@ -12,6 +12,7 @@ export {
 } from './clipboard/index.ts';
 export type { ClipboardParts, MouseOverView, PasteSpot, PasteTools } from './clipboard/index.ts';
 export { CommandRegistry } from './CommandRegistry.ts';
+export { SHORTCUT_AREAS } from './EditorCommand.ts';
 export { createCommandRegistry } from './createCommandRegistry.ts';
 export { createShape } from './draw/createShape.ts';
 export type { CreateShapeOutcome, ShapeDrawing } from './draw/createShape.ts';
@@ -65,6 +66,7 @@ export type {
     MenuPlace,
     Notice,
     Question,
+    ShortcutArea,
     ShortcutScope,
     TextRequest,
 } from './EditorCommand.ts';

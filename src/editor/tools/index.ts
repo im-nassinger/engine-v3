@@ -19,6 +19,7 @@ export type { LevelPointerInput, Modifiers, PointerButton, Tool, ToolContext, To
 export { PICK_TEXT, ToolController } from './ToolController.ts';
 export type { PickEntity, ToolServices } from './ToolController.ts';
 export { TOOL_KEYS } from './toolKeys.ts';
+export { TOOL_NAMES } from './toolNames.ts';
 export { DEFAULT_CURSOR, ROTATE_CURSOR } from './LevelCursor.ts';
 export type { LevelCursor } from './LevelCursor.ts';
 export { JointTool, NOTHING_HERE } from './joint/JointTool.ts';

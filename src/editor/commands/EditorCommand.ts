@@ -54,6 +54,11 @@ export type CommandOutcome =
 // mouse over the level view.
 export type ShortcutScope = 'everywhere' | 'editor' | 'levelView';
 
+// The shortcut list's sections, in the order it shows them.
+export const SHORTCUT_AREAS = ['Tools', 'Selecting', 'Editing', 'View', 'Test play', 'File', 'Mouse'] as const;
+
+export type ShortcutArea = (typeof SHORTCUT_AREAS)[number];
+
 // Every menu entry and shortcut runs one. Shortcuts are written as the requirement writes them
 // ('Ctrl+Shift+Z'); editor/shortcuts' KeyChord reads them.
 export type EditorCommand = {
@@ -66,6 +71,12 @@ export type EditorCommand = {
     readonly shortcuts: readonly string[];
     // 'editor' when missing.
     readonly shortcutScope?: ShortcutScope;
+    // The shortcut list's name for the row, when the label doesn't fit it: a label that names the step
+    // ("Undo: Move 3 entities") or the state ("Pause"). Commands with the same name share one row, so the
+    // four arrows of "Move 1 px" read as one shortcut.
+    readonly shortcutName?: string;
+    // Where the shortcut list shows it, when its menu doesn't say: see ShortcutCatalog.
+    readonly shortcutArea?: ShortcutArea;
     // A shortcut whose scope differs from shortcutScope, by its text. Only Play's Shift+T, a letter that
     // must still type a T in a field while Ctrl+Enter plays from anywhere.
     readonly shortcutScopes?: Readonly<Record<string, ShortcutScope>>;

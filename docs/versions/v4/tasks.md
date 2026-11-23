@@ -45,7 +45,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 13. The determinism levels for v4
   - Read: versions/v4/architecture.md#determinism, architecture/testing.md#the-determinism-test
   - Done when: `stateHash` adds every entity's variables and the waiting runs as the architecture says; `trigger-doors` and `trigger-hits` are built with recorded inputs and their hashes recorded; the older levels' hashes are unchanged, or their change is explained in decisions.md
-- [ ] 14. The shortcut catalog and its search
+- [x] 14. The shortcut catalog and its search
   - Read: versions/v4/architecture.md#the-shortcut-list, requirements/editor/workspace.md#the-searchable-list-of-shortcuts--v4, requirements/editor/shortcuts.md
   - Done when: `ShortcutCatalog` lists every shortcut in `ShortcutMap` and the commands, with its name, area and keys as the platform shows them (Cmd and Option on a Mac), plus the mouse shortcuts as fixed rows; `ShortcutSearch` filters by name words and key text, ignoring case and order; a Node test fails if a shortcut in `ShortcutMap` is missing from the catalog
 - [ ] 15. The shortcut sheet and the tooltips

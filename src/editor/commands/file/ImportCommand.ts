@@ -16,6 +16,7 @@ export class ImportCommand implements EditorCommand {
     readonly label = 'Import…';
     readonly menu = { menu: 'File', section: 1, order: 20 } as const;
     readonly shortcuts = ['Ctrl+O'];
+    readonly shortcutName = 'Import a project file';
     private readonly session: EditorSession;
     private readonly parts: FileParts;
     private readonly replacement: LevelReplacement;

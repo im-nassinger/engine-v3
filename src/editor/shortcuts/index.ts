@@ -7,3 +7,6 @@ export type { Shortcut } from './ShortcutMap.ts';
 export type { FocusPlace } from './FocusPlace.ts';
 export { ShortcutDispatcher } from './ShortcutDispatcher.ts';
 export type { ToolKeys } from './ShortcutDispatcher.ts';
+export { ShortcutCatalog } from './catalog/ShortcutCatalog.ts';
+export type { ShortcutKeys, ShortcutRow, ShortcutSection } from './catalog/ShortcutRow.ts';
+export { ShortcutSearch } from './catalog/ShortcutSearch.ts';

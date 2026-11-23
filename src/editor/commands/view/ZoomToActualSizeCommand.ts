@@ -7,6 +7,7 @@ export class ZoomToActualSizeCommand implements EditorCommand {
     readonly label = '100%';
     readonly menu = { menu: 'View', section: 2, order: 30 } as const;
     readonly shortcuts = ['Shift+0'];
+    readonly shortcutName = 'Zoom to 100%';
     private readonly session: EditorSession;
 
     constructor(session: EditorSession) {

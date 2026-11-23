@@ -7,6 +7,8 @@ import { NOT_PLAYING_REASON } from './playReasons.ts';
 export class PauseOrResumeCommand implements EditorCommand {
     readonly id = 'play.pauseOrResume';
     readonly shortcuts = ['F8'];
+    readonly shortcutName = 'Pause or resume';
+    readonly shortcutArea = 'Test play';
     readonly shortcutScope = 'everywhere';
     readonly runsDuringPlay = true;
     private readonly play: PlaySession;

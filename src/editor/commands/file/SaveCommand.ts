@@ -14,6 +14,7 @@ export class SaveCommand implements EditorCommand {
     readonly label = 'Save';
     readonly menu = { menu: 'File', section: 1, order: 25 } as const;
     readonly shortcuts = ['Ctrl+S'];
+    readonly shortcutName = 'Save in the browser now';
     readonly shortcutScope = 'everywhere';
     private readonly session: EditorSession;
     private readonly parts: FileParts;

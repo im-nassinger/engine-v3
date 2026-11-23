@@ -8,6 +8,7 @@ export class SelectAllCommand implements EditorCommand {
     readonly id = 'edit.selectAll';
     readonly label = 'Select all';
     readonly shortcuts = ['Ctrl+A'];
+    readonly shortcutArea = 'Selecting';
     private readonly session: EditorSession;
 
     constructor(session: EditorSession) {

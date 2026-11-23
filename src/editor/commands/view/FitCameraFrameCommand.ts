@@ -10,6 +10,7 @@ export class FitCameraFrameCommand implements EditorCommand {
     readonly label = 'Camera frame';
     readonly menu = { menu: 'View', section: 3, order: 30 } as const;
     readonly shortcuts = ['Shift+3'];
+    readonly shortcutName = 'Zoom to the camera frame';
     private readonly session: EditorSession;
 
     constructor(session: EditorSession) {

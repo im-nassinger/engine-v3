@@ -1,7 +1,14 @@
 import { READ_ONLY_REASON } from '../history/index.ts';
 import type { EditorSession } from '../session/index.ts';
 
-import type { Availability, CommandOutcome, EditorCommand, MenuPlace, ShortcutScope } from './EditorCommand.ts';
+import type {
+    Availability,
+    CommandOutcome,
+    EditorCommand,
+    MenuPlace,
+    ShortcutArea,
+    ShortcutScope,
+} from './EditorCommand.ts';
 
 // A command that edits the level, wrapped: in a read-only tab it is disabled and refused with the reason
 // before its own rules are read. One wrapper instead of a check in each command, so a new command that
@@ -11,6 +18,8 @@ export class ReadOnlyGuard implements EditorCommand {
     readonly menu: MenuPlace | undefined;
     readonly shortcuts: readonly string[];
     readonly shortcutScope: ShortcutScope | undefined;
+    readonly shortcutName: string | undefined;
+    readonly shortcutArea: ShortcutArea | undefined;
     readonly repeatsWhileHeld: boolean | undefined;
     readonly shortcutsAsBrowserEvents: boolean | undefined;
     private readonly session: EditorSession;
@@ -23,6 +32,8 @@ export class ReadOnlyGuard implements EditorCommand {
         this.menu = command.menu;
         this.shortcuts = command.shortcuts;
         this.shortcutScope = command.shortcutScope;
+        this.shortcutName = command.shortcutName;
+        this.shortcutArea = command.shortcutArea;
         this.repeatsWhileHeld = command.repeatsWhileHeld;
         this.shortcutsAsBrowserEvents = command.shortcutsAsBrowserEvents;
     }
