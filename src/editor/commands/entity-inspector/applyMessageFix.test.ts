@@ -150,7 +150,7 @@ describe('applyMessageFix', () => {
             name: null,
             on: true,
             when: { kind: 'levelStart' },
-            checks: [{ kind: 'compare', variable: 'coins', compare: 'is', value: 0 }],
+            checks: [{ kind: 'compare', variable: { owner: 'level', name: 'coins' }, compare: 'is', value: 0 }],
             actions: [{ kind: 'win' }],
             repeat: { kind: 'everyTime' },
         } as const;

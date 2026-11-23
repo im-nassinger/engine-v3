@@ -81,7 +81,10 @@ describe('TriggerCantRunRule', () => {
             trigger({ id: 1 }),
             trigger({ id: 2, when: null }),
             trigger({ id: 3, actions: [] }),
-            trigger({ id: 4, checks: [{ kind: 'compare', variable: 'lives', compare: 'is', value: 0 }] }),
+            trigger({
+                id: 4,
+                checks: [{ kind: 'compare', variable: { owner: 'level', name: 'lives' }, compare: 'is', value: 0 }],
+            }),
         ]);
 
         const messages = rule.check(entity, level);

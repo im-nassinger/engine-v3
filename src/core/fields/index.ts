@@ -39,7 +39,7 @@ export type { EditedStops } from './fill/gradientStops.ts';
 export { switchFillKind } from './fill/switchFillKind.ts';
 export { TagsFieldType } from './field-types/TagsFieldType.ts';
 export { TriggerFieldType } from './field-types/TriggerFieldType.ts';
-export { MAX_TRIGGER_NAME_LENGTH, MAX_TRIGGER_SECONDS } from './trigger/normalizeTrigger.ts';
+export { MAX_TRIGGER_NAME_LENGTH, MAX_TRIGGER_SECONDS, MAX_WAIT_SECONDS } from './trigger/normalizeTrigger.ts';
 export type {
     Action,
     ActionKind,
@@ -47,13 +47,17 @@ export type {
     Check,
     CheckKind,
     Compare,
+    Condition,
+    LiveValue,
     Press,
     Push,
+    ReadableValue,
     Repeat,
     RepeatKind,
     Target,
     Trigger,
     ValueRef,
+    VariableRef,
     When,
     WhenKind,
 } from './trigger/Trigger.ts';
@@ -63,7 +67,8 @@ export { MAX_WORD_NAME_LENGTH, wordName } from './names/wordName.ts';
 export type { Unit } from './Unit.ts';
 export type { ValueType } from './ValueType.ts';
 export { VariableFieldType } from './field-types/VariableFieldType.ts';
-export { MAX_STRING_VARIABLE_LENGTH, startingValueOf, variableTypeOf } from './field-types/VariableFieldType.ts';
-export type { Variable, VariableType, VariableValue } from './field-types/VariableFieldType.ts';
+export { MAX_STRING_VARIABLE_LENGTH, startingValueOf, variableTypeOf } from './variables/VariableValue.ts';
+export type { Variable } from './field-types/VariableFieldType.ts';
+export type { VariableType, VariableValue } from './variables/VariableValue.ts';
 export { VectorFieldType } from './field-types/VectorFieldType.ts';
 export type { VectorFieldOptions } from './field-types/VectorFieldType.ts';

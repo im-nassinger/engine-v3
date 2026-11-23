@@ -1,6 +1,18 @@
 import type { JsonValue } from '../JsonValue.ts';
 
-import type { Action, Check, Push, Repeat, Target, Trigger, ValueRef, When } from './Trigger.ts';
+import type {
+    Action,
+    Check,
+    Condition,
+    Push,
+    ReadableValue,
+    Repeat,
+    Target,
+    Trigger,
+    ValueRef,
+    VariableRef,
+    When,
+} from './Trigger.ts';
 
 // A copy sharing nothing with the trigger, its keys always in the same order, so two equal triggers save
 // as the same text. The optional axis is left out when it isn't set.
@@ -23,7 +35,17 @@ function copyWhen(when: When | null): When | null {
         case 'touched':
         case 'untouched':
         case 'levelStart':
+        case 'collision':
+        case 'destroyed':
             return { kind: when.kind };
+        case 'custom':
+            return { kind: 'custom', name: when.name };
+        case 'variableChanged':
+            return {
+                kind: 'variableChanged',
+                variable: copyVariableRef(when.variable),
+                becomes: copyCondition(when.becomes),
+            };
         case 'input':
             return { kind: 'input', input: when.input, how: when.how };
         case 'key':
@@ -53,7 +75,40 @@ function copyCheck(check: Check): Check {
         return { kind: 'hasTag', target: copyTarget(check.target), tag: check.tag };
     }
 
-    return { kind: 'compare', variable: check.variable, compare: check.compare, value: check.value };
+    if (check.kind === 'compare') {
+        const variable = copyVariableRef(check.variable);
+
+        return { kind: 'compare', variable, compare: check.compare, value: check.value };
+    }
+
+    return {
+        kind: 'compareValue',
+        target: copyTarget(check.target),
+        value: copyReadableValue(check.value),
+        compare: check.compare,
+        amount: check.amount,
+    };
+}
+
+export function copyVariableRef(variable: VariableRef | null): VariableRef | null {
+    if (variable === null) return null;
+    if (variable.owner === 'level') return { owner: 'level', name: variable.name };
+
+    return { owner: 'own', target: copyTarget(variable.target), name: variable.name };
+}
+
+function copyCondition(condition: Condition | null): Condition | null {
+    if (condition === null) return null;
+
+    return { compare: condition.compare, value: condition.value };
+}
+
+function copyReadableValue(value: ReadableValue | null): ReadableValue | null {
+    if (value === null) return null;
+    if (value.kind === 'live') return { kind: 'live', live: value.live };
+    if (value.axis === undefined) return { kind: 'field', component: value.component, field: value.field };
+
+    return { kind: 'field', component: value.component, field: value.field, axis: value.axis };
 }
 
 function copyAction(action: Action): Action {
@@ -74,6 +129,10 @@ function copyAction(action: Action): Action {
         case 'lose':
         case 'restart':
             return { kind: action.kind };
+        case 'fire':
+            return { kind: 'fire', target: copyTarget(action.target), name: action.name, amount: action.amount };
+        case 'wait':
+            return { kind: 'wait', seconds: action.seconds };
     }
 }
 
@@ -89,7 +148,9 @@ function copyValueRef(value: ValueRef | null): ValueRef | null {
 
     switch (value.kind) {
         case 'variable':
-            return { kind: 'variable', name: value.name };
+            if (value.own === undefined) return { kind: 'variable', name: value.name };
+
+            return { kind: 'variable', name: value.name, own: true };
         case 'field':
             if (value.axis === undefined) {
                 return { kind: 'field', component: value.component, field: value.field };

@@ -33,14 +33,20 @@ export function freshWhen(kind: WhenKind): When {
             return { kind, seconds: null };
         case 'tagLeft':
             return { kind, tag: null };
+        case 'custom':
+            return { kind, name: null };
+        case 'variableChanged':
+            return { kind, variable: null, becomes: null };
         default:
             return { kind };
     }
 }
 
-// Add check's two kinds. The tag check starts on `other` when the event has one, as most do.
+// Add check's kinds. The tag check starts on `other` when the event has one, as most do; the component value
+// check on `this`.
 export function freshCheck(kind: CheckKind, eventHasOther: boolean): Check {
     if (kind === 'compare') return { kind, variable: null, compare: 'atLeast', value: null };
+    if (kind === 'compareValue') return { kind, target: THIS_TARGET, value: null, compare: 'more', amount: null };
 
     let target = UNSET_TARGET;
     if (eventHasOther) {
@@ -62,6 +68,10 @@ export function freshAction(kind: ActionKind, keptTarget: Target | undefined): A
             return { kind, target };
         case 'push':
             return { kind, target, push: null };
+        case 'fire':
+            return { kind, target, name: null, amount: null };
+        case 'wait':
+            return { kind, seconds: null };
         default:
             return { kind };
     }
@@ -80,7 +90,13 @@ export function freshRepeat(kind: RepeatKind): Repeat {
 }
 
 export function targetOf(action: Action) {
-    if (action.kind === 'change' || action.kind === 'destroy' || action.kind === 'push') return action.target;
-
-    return undefined;
+    switch (action.kind) {
+        case 'change':
+        case 'destroy':
+        case 'push':
+        case 'fire':
+            return action.target;
+        default:
+            return undefined;
+    }
 }

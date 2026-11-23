@@ -71,6 +71,7 @@ export type ValueRef = /* v3's */ | { kind: 'variable'; name: string; own?: true
 - **`readableValues(entity, registry)`** (new) lists what the component value check offers: every `number` field and each axis of every `vector` field the entity's components have, and, when the entity is a body, the three live values. It reads the schemas only, like `changeableValues`.
 - **`triggerName`**: "Hits something", "Gets open", "Destroyed", "coins changes", "coins becomes 10 or more".
 - **`mapTriggerEntities`** maps the targets of `fire`, `compareValue` and an own `VariableRef`, so copying keeps their links as v3's do.
+- **As built (standing yes, 2026-11-22):** the trigger holds a `VariableRef` in memory, and `savedTrigger` writes the level's variable back as its name, so `normalizeTrigger` keeps the type; `triggerProblems` gains the slots `compare` (a compare the type lacks) and `name` (a custom event's). See [decisions.md](../../decisions.md).
 - **A custom event's name** uses `wordName`, the tags' rule. `CustomEventNames` (`core/derived/custom-events/`) lists every name used in a When or a Fire in the level, for the card's suggestions.
 
 ## The trigger card

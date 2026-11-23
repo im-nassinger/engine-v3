@@ -62,7 +62,10 @@ const WHEN_CASES: readonly (readonly [When | null, string])[] = [
 const CHECK_CASES: readonly (readonly [Check, string])[] = [
     [{ kind: 'hasTag', target: { kind: 'other' }, tag: 'player' }, 'other is tagged player'],
     [{ kind: 'hasTag', target: { kind: 'entity', entity: null }, tag: null }, 'pick who is tagged pick a tag'],
-    [{ kind: 'compare', variable: 'coins', compare: 'atLeast', value: 10 }, 'coins is at least 10'],
+    [
+        { kind: 'compare', variable: { owner: 'level', name: 'coins' }, compare: 'atLeast', value: 10 },
+        'coins is at least 10',
+    ],
     [{ kind: 'compare', variable: null, compare: 'isNot', value: null }, 'pick a variable is not a number'],
 ];
 

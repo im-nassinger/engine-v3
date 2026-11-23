@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { startingValueOf, VariableFieldType, variableTypeOf } from './VariableFieldType.ts';
+import { startingValueOf, variableTypeOf } from '../variables/VariableValue.ts';
+import { VariableFieldType } from './VariableFieldType.ts';
 
 describe('VariableFieldType', () => {
     test('a variable round-trips through serialize and parse', () => {

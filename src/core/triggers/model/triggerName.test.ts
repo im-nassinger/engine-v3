@@ -22,6 +22,44 @@ const NAMES: readonly (readonly [When | null, string])[] = [
     [{ kind: 'levelStart' }, 'Level start'],
     [{ kind: 'tagLeft', tag: 'coin' }, 'No coin left'],
     [{ kind: 'tagLeft', tag: null }, 'No tag left'],
+    [{ kind: 'collision' }, 'Hits something'],
+    [{ kind: 'destroyed' }, 'Destroyed'],
+    [{ kind: 'custom', name: 'open' }, 'Gets open'],
+    [{ kind: 'custom', name: null }, 'Gets an event'],
+    [{ kind: 'variableChanged', variable: { owner: 'level', name: 'coins' }, becomes: null }, 'coins changes'],
+    [
+        {
+            kind: 'variableChanged',
+            variable: { owner: 'level', name: 'coins' },
+            becomes: { compare: 'atLeast', value: 10 },
+        },
+        'coins becomes 10 or more',
+    ],
+    [
+        {
+            kind: 'variableChanged',
+            variable: { owner: 'own', target: { kind: 'this' }, name: 'health' },
+            becomes: { compare: 'less', value: 1 },
+        },
+        'health becomes less than 1',
+    ],
+    [
+        {
+            kind: 'variableChanged',
+            variable: { owner: 'own', target: { kind: 'this' }, name: 'door_open' },
+            becomes: { compare: 'is', value: true },
+        },
+        'door_open becomes true',
+    ],
+    [
+        {
+            kind: 'variableChanged',
+            variable: { owner: 'level', name: 'mood' },
+            becomes: { compare: 'isNot', value: 'calm' },
+        },
+        'mood becomes not "calm"',
+    ],
+    [{ kind: 'variableChanged', variable: null, becomes: null }, 'A variable changes'],
     [null, 'New trigger'],
 ];
 

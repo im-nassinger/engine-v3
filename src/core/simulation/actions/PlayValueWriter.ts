@@ -318,6 +318,9 @@ function changedNumber(op: ChangeOp, current: number, amount: number) {
             return current + amount;
         case 'subtract':
             return current - amount;
+        // Flip is a boolean's alone: a number is never offered it.
+        case 'flip':
+            return current;
     }
 }
 

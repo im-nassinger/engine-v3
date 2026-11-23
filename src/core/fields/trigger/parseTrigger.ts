@@ -9,20 +9,26 @@ import type {
     ChangeOp,
     Check,
     Compare,
+    Condition,
+    LiveValue,
     Press,
     Push,
+    ReadableValue,
     Repeat,
     Target,
     Trigger,
     ValueRef,
+    VariableRef,
     When,
 } from './Trigger.ts';
+import type { VariableValue } from '../variables/VariableValue.ts';
 
 type RawRecord = Readonly<Record<string, unknown>>;
 
 const PRESSES: readonly Press[] = ['pressed', 'released', 'held'];
 const COMPARES: readonly Compare[] = ['is', 'isNot', 'more', 'less', 'atLeast', 'atMost'];
-const CHANGE_OPS: readonly ChangeOp[] = ['set', 'add', 'subtract'];
+const CHANGE_OPS: readonly ChangeOp[] = ['set', 'add', 'subtract', 'flip'];
+const LIVE_VALUES: readonly LiveValue[] = ['speed', 'velocityX', 'velocityY'];
 // An amount is a value of a field, such as a fill: a few levels deep at most. Deeper is damaged data.
 const MAX_AMOUNT_DEPTH = 8;
 
@@ -77,7 +83,13 @@ function parseWhen(raw: unknown): ParseOutcome<When> {
         case 'touched':
         case 'untouched':
         case 'levelStart':
+        case 'collision':
+        case 'destroyed':
             return parseBareKind(raw, kind);
+        case 'custom':
+            return parseCustomWhen(raw);
+        case 'variableChanged':
+            return parseVariableChangedWhen(raw);
         case 'input':
             return parseInputWhen(raw);
         case 'key':
@@ -143,6 +155,65 @@ function parseTagLeftWhen(raw: RawRecord): ParseOutcome<When> {
     return accept({ kind: 'tagLeft', tag: tag.value });
 }
 
+function parseCustomWhen(raw: RawRecord): ParseOutcome<When> {
+    if (!hasExactlyKeys(raw, ['kind', 'name'])) return refuse({ reason: 'wrongType' });
+
+    const name = parseNullableText(raw['name']);
+    if (!name.ok) return name;
+
+    return accept({ kind: 'custom', name: name.value });
+}
+
+// Only the entity hears its own variables, so an own variable in a When is always `this`'s.
+function parseVariableChangedWhen(raw: RawRecord): ParseOutcome<When> {
+    if (!hasExactlyKeys(raw, ['kind', 'variable', 'becomes'])) return refuse({ reason: 'wrongType' });
+
+    const variable = parseNullable(raw['variable'], parseVariableRef);
+    if (!variable.ok) return variable;
+    if (variable.value?.owner === 'own' && variable.value.target.kind !== 'this') {
+        return refuse({ reason: 'wrongType' });
+    }
+
+    const becomes = parseNullable(raw['becomes'], parseCondition);
+    if (!becomes.ok) return becomes;
+
+    return accept({ kind: 'variableChanged', variable: variable.value, becomes: becomes.value });
+}
+
+// The level's variable as its name, as v3 saved it, or an entity's own as `{ "target": ..., "name": ... }`.
+function parseVariableRef(raw: unknown): ParseOutcome<VariableRef> {
+    if (typeof raw === 'string') return accept({ owner: 'level', name: raw });
+    if (!isPlainObject(raw)) return refuse({ reason: 'wrongType' });
+    if (!hasExactlyKeys(raw, ['target', 'name'])) return refuse({ reason: 'wrongType' });
+
+    const target = parseTarget(raw['target']);
+    if (!target.ok) return target;
+
+    const name = raw['name'];
+    if (typeof name !== 'string') return refuse({ reason: 'wrongType' });
+
+    return accept({ owner: 'own', target: target.value, name });
+}
+
+function parseCondition(raw: unknown): ParseOutcome<Condition> {
+    if (!isPlainObject(raw)) return refuse({ reason: 'wrongType' });
+    if (!hasExactlyKeys(raw, ['compare', 'value'])) return refuse({ reason: 'wrongType' });
+
+    const compare = parseChoice(raw['compare'], COMPARES);
+    if (!compare.ok) return compare;
+
+    const value = parseVariableValue(raw['value']);
+    if (!value.ok) return value;
+
+    return accept({ compare: compare.value, value: value.value });
+}
+
+function parseVariableValue(raw: unknown): ParseOutcome<VariableValue> {
+    if (typeof raw === 'string' || typeof raw === 'boolean') return accept(raw);
+
+    return parseFiniteNumber(raw);
+}
+
 function parseTarget(raw: unknown): ParseOutcome<Target> {
     if (!isPlainObject(raw)) return refuse({ reason: 'wrongType' });
 
@@ -185,6 +256,7 @@ function parseCheck(raw: unknown): ParseOutcome<Check> {
     const kind = raw['kind'];
     if (kind === 'hasTag') return parseHasTagCheck(raw);
     if (kind === 'compare') return parseCompareCheck(raw);
+    if (kind === 'compareValue') return parseCompareValueCheck(raw);
 
     return refuse({ reason: 'unknownChoice' });
 }
@@ -204,16 +276,56 @@ function parseHasTagCheck(raw: RawRecord): ParseOutcome<Check> {
 function parseCompareCheck(raw: RawRecord): ParseOutcome<Check> {
     if (!hasExactlyKeys(raw, ['kind', 'variable', 'compare', 'value'])) return refuse({ reason: 'wrongType' });
 
-    const variable = parseNullableText(raw['variable']);
+    const variable = parseNullable(raw['variable'], parseVariableRef);
     if (!variable.ok) return variable;
 
     const compare = parseChoice(raw['compare'], COMPARES);
     if (!compare.ok) return compare;
 
-    const value = parseNullable(raw['value'], parseFiniteNumber);
+    const value = parseNullable(raw['value'], parseVariableValue);
     if (!value.ok) return value;
 
     return accept({ kind: 'compare', variable: variable.value, compare: compare.value, value: value.value });
+}
+
+function parseCompareValueCheck(raw: RawRecord): ParseOutcome<Check> {
+    if (!hasExactlyKeys(raw, ['kind', 'target', 'value', 'compare', 'amount'])) {
+        return refuse({ reason: 'wrongType' });
+    }
+
+    const target = parseTarget(raw['target']);
+    if (!target.ok) return target;
+
+    const value = parseNullable(raw['value'], parseReadableValue);
+    if (!value.ok) return value;
+
+    const compare = parseChoice(raw['compare'], COMPARES);
+    if (!compare.ok) return compare;
+
+    const amount = parseNullable(raw['amount'], parseFiniteNumber);
+    if (!amount.ok) return amount;
+
+    return accept({
+        kind: 'compareValue',
+        target: target.value,
+        value: value.value,
+        compare: compare.value,
+        amount: amount.value,
+    });
+}
+
+function parseReadableValue(raw: unknown): ParseOutcome<ReadableValue> {
+    if (!isPlainObject(raw)) return refuse({ reason: 'wrongType' });
+
+    const kind = raw['kind'];
+    if (kind === 'field') return parseFieldRef(raw);
+    if (kind !== 'live') return refuse({ reason: 'unknownChoice' });
+    if (!hasExactlyKeys(raw, ['kind', 'live'])) return refuse({ reason: 'wrongType' });
+
+    const live = parseChoice(raw['live'], LIVE_VALUES);
+    if (!live.ok) return live;
+
+    return accept({ kind: 'live', live: live.value });
 }
 
 function parseAction(raw: unknown): ParseOutcome<Action> {
@@ -231,9 +343,37 @@ function parseAction(raw: unknown): ParseOutcome<Action> {
         case 'lose':
         case 'restart':
             return parseBareKind(raw, kind);
+        case 'fire':
+            return parseFireAction(raw);
+        case 'wait':
+            return parseWaitAction(raw);
         default:
             return refuse({ reason: 'unknownChoice' });
     }
+}
+
+function parseFireAction(raw: RawRecord): ParseOutcome<Action> {
+    if (!hasExactlyKeys(raw, ['kind', 'target', 'name', 'amount'])) return refuse({ reason: 'wrongType' });
+
+    const target = parseTarget(raw['target']);
+    if (!target.ok) return target;
+
+    const name = parseNullableText(raw['name']);
+    if (!name.ok) return name;
+
+    const amount = parseNullable(raw['amount'], parseFiniteNumber);
+    if (!amount.ok) return amount;
+
+    return accept({ kind: 'fire', target: target.value, name: name.value, amount: amount.value });
+}
+
+function parseWaitAction(raw: RawRecord): ParseOutcome<Action> {
+    if (!hasExactlyKeys(raw, ['kind', 'seconds'])) return refuse({ reason: 'wrongType' });
+
+    const seconds = parseNullable(raw['seconds'], parseFiniteNumber);
+    if (!seconds.ok) return seconds;
+
+    return accept({ kind: 'wait', seconds: seconds.value });
 }
 
 function parseChangeAction(raw: RawRecord): ParseOutcome<Action> {
@@ -309,7 +449,7 @@ function parseValueRef(raw: unknown): ParseOutcome<ValueRef> {
     const kind = raw['kind'];
     switch (kind) {
         case 'variable':
-            return parseVariableRef(raw);
+            return parseVariableValueRef(raw);
         case 'field':
             return parseFieldRef(raw);
         case 'tag':
@@ -321,16 +461,22 @@ function parseValueRef(raw: unknown): ParseOutcome<ValueRef> {
     }
 }
 
-function parseVariableRef(raw: RawRecord): ParseOutcome<ValueRef> {
-    if (!hasExactlyKeys(raw, ['kind', 'name'])) return refuse({ reason: 'wrongType' });
+// The level's variable as v3 saved it, or the target's own with `"own": true`.
+function parseVariableValueRef(raw: RawRecord): ParseOutcome<ValueRef> {
+    const isOwn = Object.hasOwn(raw, 'own');
+    const keys = isOwn ? ['kind', 'name', 'own'] : ['kind', 'name'];
+    if (!hasExactlyKeys(raw, keys)) return refuse({ reason: 'wrongType' });
 
     const name = raw['name'];
     if (typeof name !== 'string') return refuse({ reason: 'wrongType' });
+    if (!isOwn) return accept({ kind: 'variable', name });
+    if (raw['own'] !== true) return refuse({ reason: 'wrongType' });
 
-    return accept({ kind: 'variable', name });
+    return accept({ kind: 'variable', name, own: true });
 }
 
-function parseFieldRef(raw: RawRecord): ParseOutcome<ValueRef> {
+// A field by its key, and a vector's axis when it has one: in Change value, and in the component value check.
+function parseFieldRef(raw: RawRecord): ParseOutcome<ValueRef & ReadableValue & { readonly kind: 'field' }> {
     const hasAxis = Object.hasOwn(raw, 'axis');
     const keys = hasAxis ? ['kind', 'component', 'field', 'axis'] : ['kind', 'component', 'field'];
     if (!hasExactlyKeys(raw, keys)) return refuse({ reason: 'wrongType' });

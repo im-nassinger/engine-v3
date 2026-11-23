@@ -2,13 +2,9 @@ import type { FieldType } from '../FieldType.ts';
 import { wordName } from '../names/wordName.ts';
 import type { ParseOutcome } from '../ParseOutcome.ts';
 import { accept, hasExactlyKeys, isPlainObject, parseFiniteNumber, refuse } from '../rawChecks.ts';
+import { MAX_STRING_VARIABLE_LENGTH } from '../variables/VariableValue.ts';
+import type { VariableValue } from '../variables/VariableValue.ts';
 import { TextFieldType } from './TextFieldType.ts';
-
-// A variable's value: a number, a string or a boolean. Its type is the JSON type of the value, with no
-// type field beside it, so a v3 variable reads as a number with nothing added.
-export type VariableValue = number | string | boolean;
-
-export type VariableType = 'number' | 'string' | 'boolean';
 
 // A variable as its component lists it: a name and its starting value.
 export type Variable = {
@@ -16,24 +12,7 @@ export type Variable = {
     readonly value: VariableValue;
 };
 
-// The most characters a string variable holds; normalize cuts a longer one.
-export const MAX_STRING_VARIABLE_LENGTH = 1000;
-
 const STRING_VALUE = new TextFieldType({ maxLength: MAX_STRING_VARIABLE_LENGTH });
-
-const STARTING_VALUES: Readonly<Record<VariableType, VariableValue>> = { number: 0, string: '', boolean: false };
-
-export function variableTypeOf(value: VariableValue): VariableType {
-    if (typeof value === 'string') return 'string';
-    if (typeof value === 'boolean') return 'boolean';
-
-    return 'number';
-}
-
-// The value a variable is put back to when its type changes: 0, "" or false.
-export function startingValueOf(type: VariableType) {
-    return STARTING_VALUES[type];
-}
 
 // One variable, such as `{ "name": "coins", "value": 0 }` or `{ "name": "door_open", "value": false }`. Its
 // name follows the tag rule (wordName), so a script can use it in v5; the list it is in keeps the names

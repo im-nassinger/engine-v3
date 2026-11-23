@@ -90,7 +90,9 @@ describe('TriggerEdits', () => {
         const { component } = buildCard([
             {
                 when: { kind: 'after', seconds: null },
-                checks: [{ kind: 'compare', variable: 'coins', compare: 'atLeast', value: null }],
+                checks: [
+                    { kind: 'compare', variable: { owner: 'level', name: 'coins' }, compare: 'atLeast', value: null },
+                ],
                 actions: [{ kind: 'push', target: { kind: 'other' }, push: { kind: 'by', x: 0, y: -600 } }],
                 repeat: { kind: 'atMostEvery', seconds: 1 },
             },

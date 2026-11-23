@@ -1,5 +1,6 @@
 export type { BodyMatrixSource } from './caches/BodyMatrixSource.ts';
 export { BoundsCache } from './caches/BoundsCache.ts';
+export { CustomEventNames } from './custom-events/CustomEventNames.ts';
 export { DerivedCaches } from './DerivedCaches.ts';
 export { HiddenCache } from './caches/HiddenCache.ts';
 export { OwnBounds } from './caches/OwnBounds.ts';

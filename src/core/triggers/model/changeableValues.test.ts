@@ -50,7 +50,7 @@ describe('changeableValues', () => {
                 ops: ['set', 'add', 'subtract'],
             },
             { ref: { kind: 'tag' }, ops: ['add', 'subtract'] },
-            { ref: { kind: 'variable', name: 'worth' }, ops: ['set', 'add', 'subtract'] },
+            { ref: { kind: 'variable', name: 'worth', own: true }, ops: ['set', 'add', 'subtract'] },
             { ref: { kind: 'triggerOn', trigger: 1 }, ops: ['set'] },
             { ref: { kind: 'triggerOn', trigger: 3 }, ops: ['set'] },
         ]);
@@ -101,5 +101,52 @@ describe('changeableValues', () => {
         expect(sameValueRef({ kind: 'tag' }, { kind: 'tag' })).toBe(true);
         expect(sameValueRef({ kind: 'triggerOn', trigger: 2 }, { kind: 'triggerOn', trigger: 2 })).toBe(true);
         expect(sameValueRef({ kind: 'triggerOn', trigger: 2 }, { kind: 'tag' })).toBe(false);
+    });
+
+    test('offers own variables with the ops their type allows: Flip for booleans, Set only for strings', () => {
+        const level = Level.createNew();
+        const door = level.createEntity(level.world, 0);
+        const variables = [
+            { name: 'health', value: 3 },
+            { name: 'label', value: 'shut' },
+            { name: 'door_open', value: false },
+        ];
+        door.addComponent(new VariablesComponent({ variables }));
+
+        const offers = changeableValues(door, registry);
+        const ops = offers.map(({ ref, ops }) => ({ ref, ops }));
+        const label = offers.find((offer) => offer.ref.kind === 'variable' && offer.ref.name === 'label');
+        const open = offers.find((offer) => offer.ref.kind === 'variable' && offer.ref.name === 'door_open');
+
+        expect(ops).toEqual([
+            { ref: { kind: 'variable', name: 'health', own: true }, ops: ['set', 'add', 'subtract'] },
+            { ref: { kind: 'variable', name: 'label', own: true }, ops: ['set'] },
+            { ref: { kind: 'variable', name: 'door_open', own: true }, ops: ['set', 'flip'] },
+        ]);
+        expect(label?.amountType.parse('open').ok).toBe(true);
+        expect(label?.amountType.parse(1).ok).toBe(false);
+        expect(open?.amountType.parse(true).ok).toBe(true);
+    });
+
+    test("offers the World's variables as the level's, named as v3 saved them", () => {
+        const level = Level.createNew();
+        level.world.addComponent(new VariablesComponent({ variables: [{ name: 'coins', value: 0 }] }));
+
+        const refs = changeableValues(level.world, registry).map((offer) => offer.ref);
+
+        expect(refs).toContainEqual({ kind: 'variable', name: 'coins' });
+        expect(refs).not.toContainEqual({ kind: 'variable', name: 'coins', own: true });
+    });
+
+    test("sameValueRef tells the level's variable from an own one of the same name", () => {
+        expect(sameValueRef({ kind: 'variable', name: 'coins' }, { kind: 'variable', name: 'coins', own: true })).toBe(
+            false,
+        );
+        expect(
+            sameValueRef(
+                { kind: 'variable', name: 'coins', own: true },
+                { kind: 'variable', name: 'coins', own: true },
+            ),
+        ).toBe(true);
     });
 });

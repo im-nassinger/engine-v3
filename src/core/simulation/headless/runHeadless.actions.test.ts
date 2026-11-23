@@ -118,8 +118,13 @@ function touch(world: ScriptedWorld, simulation: Simulation, sensor: Entity, vis
 describe('checks', () => {
     test('a variable compared with a number', () => {
         const level = levelWithCoins(10);
-        const atLeastTen: Check = { kind: 'compare', variable: 'coins', compare: 'atLeast', value: 10 };
-        const isNine: Check = { kind: 'compare', variable: 'coins', compare: 'is', value: 9 };
+        const atLeastTen: Check = {
+            kind: 'compare',
+            variable: { owner: 'level', name: 'coins' },
+            compare: 'atLeast',
+            value: 10,
+        };
+        const isNine: Check = { kind: 'compare', variable: { owner: 'level', name: 'coins' }, compare: 'is', value: 9 };
         giveTriggers(level.world, [
             { checks: [atLeastTen], actions: [addCoins(1)] },
             { checks: [isNine], actions: [addCoins(100)] },

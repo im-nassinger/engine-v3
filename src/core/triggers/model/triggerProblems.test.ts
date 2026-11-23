@@ -16,15 +16,26 @@ import type { TriggerContext } from './triggerProblems.ts';
 
 const registry = createV1Registry();
 
-// A level whose World has `coins` and the input `jump`, and a coin holding a trigger with ids 1 and 2.
+// A level whose World has `coins`, `mood` (a string) and the input `jump`, and a door holding a trigger with
+// ids 1 and 2 and its own `health`, `label` (a string) and `open` (a boolean).
 function buildContext(): TriggerContext {
     const level = Level.createNew();
     level.world.removeComponent(InputComponent);
     level.world.addComponent(new InputComponent({ inputs: [{ name: 'jump', keys: ['Space' as KeyCode] }] }));
-    level.world.addComponent(new VariablesComponent({ variables: [{ name: 'coins', value: 0 }] }));
+    const levelVariables = [
+        { name: 'coins', value: 0 },
+        { name: 'mood', value: 'calm' },
+    ];
+    level.world.addComponent(new VariablesComponent({ variables: levelVariables }));
 
     const owner = level.createEntity(level.world, 0);
     owner.addComponent(new TransformComponent());
+    const ownVariables = [
+        { name: 'health', value: 3 },
+        { name: 'label', value: 'shut' },
+        { name: 'open', value: false },
+    ];
+    owner.addComponent(new VariablesComponent({ variables: ownVariables }));
     owner.addComponent(new TriggerComponent({ triggers: [trigger({ id: 1 }), trigger({ id: 2 })], nextTriggerId: 3 }));
 
     return { owner, level, registry };
@@ -65,6 +76,54 @@ const WHEN_CASES: readonly (readonly [When | null, readonly object[]])[] = [
     [{ kind: 'levelStart' }, []],
     [{ kind: 'tagLeft', tag: 'coin' }, []],
     [{ kind: 'tagLeft', tag: null }, [{ ...WHEN, slot: 'tag', reason: 'unset' }]],
+    [{ kind: 'collision' }, []],
+    [{ kind: 'destroyed' }, []],
+    [{ kind: 'custom', name: 'open' }, []],
+    [{ kind: 'custom', name: null }, [{ ...WHEN, slot: 'name', reason: 'unset' }]],
+    [{ kind: 'custom', name: 'touched' }, [{ ...WHEN, slot: 'name', reason: 'reservedName' }]],
+    [{ kind: 'custom', name: 'level_start' }, [{ ...WHEN, slot: 'name', reason: 'reservedName' }]],
+    [{ kind: 'variableChanged', variable: { owner: 'level', name: 'coins' }, becomes: null }, []],
+    [
+        {
+            kind: 'variableChanged',
+            variable: { owner: 'level', name: 'coins' },
+            becomes: { compare: 'atLeast', value: 10 },
+        },
+        [],
+    ],
+    [{ kind: 'variableChanged', variable: null, becomes: null }, [{ ...WHEN, slot: 'variable', reason: 'unset' }]],
+    [
+        { kind: 'variableChanged', variable: { owner: 'level', name: 'lives' }, becomes: null },
+        [{ ...WHEN, slot: 'variable', reason: 'unknownVariable' }],
+    ],
+    [
+        {
+            kind: 'variableChanged',
+            variable: { owner: 'own', target: { kind: 'this' }, name: 'open' },
+            becomes: { compare: 'is', value: true },
+        },
+        [],
+    ],
+    [
+        { kind: 'variableChanged', variable: { owner: 'own', target: { kind: 'this' }, name: 'coins' }, becomes: null },
+        [{ ...WHEN, slot: 'variable', reason: 'unknownVariable' }],
+    ],
+    [
+        {
+            kind: 'variableChanged',
+            variable: { owner: 'level', name: 'mood' },
+            becomes: { compare: 'more', value: 'calm' },
+        },
+        [{ ...WHEN, slot: 'compare', reason: 'wrongType' }],
+    ],
+    [
+        {
+            kind: 'variableChanged',
+            variable: { owner: 'own', target: { kind: 'this' }, name: 'open' },
+            becomes: { compare: 'is', value: 1 },
+        },
+        [{ ...WHEN, slot: 'number', reason: 'wrongType' }],
+    ],
 ];
 
 const CHECK = { section: 'check', index: 0 } as const;
@@ -76,7 +135,7 @@ const CHECK_CASES: readonly (readonly [Check, readonly object[]])[] = [
         { kind: 'hasTag', target: { kind: 'tagged', tag: null }, tag: 'player' },
         [{ ...CHECK, slot: 'target', reason: 'unset' }],
     ],
-    [{ kind: 'compare', variable: 'coins', compare: 'atLeast', value: 10 }, []],
+    [{ kind: 'compare', variable: { owner: 'level', name: 'coins' }, compare: 'atLeast', value: 10 }, []],
     [
         { kind: 'compare', variable: null, compare: 'is', value: null },
         [
@@ -85,8 +144,108 @@ const CHECK_CASES: readonly (readonly [Check, readonly object[]])[] = [
         ],
     ],
     [
-        { kind: 'compare', variable: 'lives', compare: 'less', value: 1 },
+        { kind: 'compare', variable: { owner: 'level', name: 'lives' }, compare: 'less', value: 1 },
         [{ ...CHECK, slot: 'variable', reason: 'unknownVariable' }],
+    ],
+    [{ kind: 'compare', variable: { owner: 'level', name: 'mood' }, compare: 'isNot', value: 'angry' }, []],
+    [
+        { kind: 'compare', variable: { owner: 'level', name: 'mood' }, compare: 'more', value: 'angry' },
+        [{ ...CHECK, slot: 'compare', reason: 'wrongType' }],
+    ],
+    [
+        { kind: 'compare', variable: { owner: 'level', name: 'mood' }, compare: 'atMost', value: null },
+        [
+            { ...CHECK, slot: 'number', reason: 'unset' },
+            { ...CHECK, slot: 'compare', reason: 'wrongType' },
+        ],
+    ],
+    [
+        { kind: 'compare', variable: { owner: 'level', name: 'coins' }, compare: 'is', value: 'ten' },
+        [{ ...CHECK, slot: 'number', reason: 'wrongType' }],
+    ],
+    [
+        {
+            kind: 'compare',
+            variable: { owner: 'own', target: { kind: 'this' }, name: 'health' },
+            compare: 'less',
+            value: 1,
+        },
+        [],
+    ],
+    [
+        {
+            kind: 'compare',
+            variable: { owner: 'own', target: { kind: 'this' }, name: 'open' },
+            compare: 'is',
+            value: true,
+        },
+        [],
+    ],
+    [
+        {
+            kind: 'compare',
+            variable: { owner: 'own', target: { kind: 'this' }, name: 'speed' },
+            compare: 'is',
+            value: 1,
+        },
+        [{ ...CHECK, slot: 'variable', reason: 'unknownVariable' }],
+    ],
+    // `other` and a tag are only known in play, where a target without the variable is skipped.
+    [
+        {
+            kind: 'compare',
+            variable: { owner: 'own', target: { kind: 'other' }, name: 'speed' },
+            compare: 'is',
+            value: 1,
+        },
+        [],
+    ],
+    [
+        {
+            kind: 'compare',
+            variable: { owner: 'own', target: { kind: 'entity', entity: null }, name: 'health' },
+            compare: 'is',
+            value: 1,
+        },
+        [{ ...CHECK, slot: 'target', reason: 'unset' }],
+    ],
+    [
+        {
+            kind: 'compareValue',
+            target: { kind: 'this' },
+            value: { kind: 'field', component: 'TransformComponent', field: 'position', axis: 'y' },
+            compare: 'more',
+            amount: 200,
+        },
+        [],
+    ],
+    [
+        {
+            kind: 'compareValue',
+            target: { kind: 'this' },
+            value: { kind: 'live', live: 'speed' },
+            compare: 'more',
+            amount: 200,
+        },
+        [{ ...CHECK, slot: 'value', reason: 'unknownValue' }],
+    ],
+    [
+        {
+            kind: 'compareValue',
+            target: { kind: 'other' },
+            value: { kind: 'live', live: 'speed' },
+            compare: 'more',
+            amount: 200,
+        },
+        [],
+    ],
+    [
+        { kind: 'compareValue', target: { kind: 'tagged', tag: null }, value: null, compare: 'less', amount: null },
+        [
+            { ...CHECK, slot: 'target', reason: 'unset' },
+            { ...CHECK, slot: 'value', reason: 'unset' },
+            { ...CHECK, slot: 'number', reason: 'unset' },
+        ],
     ],
 ];
 
@@ -113,6 +272,72 @@ const ACTION_CASES: readonly (readonly [Action, readonly object[]])[] = [
     [{ kind: 'win' }, []],
     [{ kind: 'lose' }, []],
     [{ kind: 'restart' }, []],
+    [{ kind: 'fire', target: { kind: 'tagged', tag: 'door' }, name: 'open', amount: null }, []],
+    [{ kind: 'fire', target: { kind: 'other' }, name: 'open', amount: 2 }, []],
+    [
+        { kind: 'fire', target: { kind: 'entity', entity: null }, name: null, amount: null },
+        [
+            { ...ACTION, slot: 'target', reason: 'unset' },
+            { ...ACTION, slot: 'name', reason: 'unset' },
+        ],
+    ],
+    [
+        { kind: 'fire', target: { kind: 'this' }, name: 'collision', amount: null },
+        [{ ...ACTION, slot: 'name', reason: 'reservedName' }],
+    ],
+    [{ kind: 'wait', seconds: 2 }, []],
+    [{ kind: 'wait', seconds: 0 }, []],
+    [{ kind: 'wait', seconds: null }, [{ ...ACTION, slot: 'seconds', reason: 'unset' }]],
+    [
+        {
+            kind: 'change',
+            target: { kind: 'this' },
+            value: { kind: 'variable', name: 'open', own: true },
+            op: 'flip',
+            amount: null,
+        },
+        [],
+    ],
+    [
+        {
+            kind: 'change',
+            target: { kind: 'this' },
+            value: { kind: 'variable', name: 'health', own: true },
+            op: 'flip',
+            amount: null,
+        },
+        [{ ...ACTION, slot: 'value', reason: 'unknownValue' }],
+    ],
+    [
+        {
+            kind: 'change',
+            target: { kind: 'this' },
+            value: { kind: 'variable', name: 'label', own: true },
+            op: 'add',
+            amount: 'x',
+        },
+        [{ ...ACTION, slot: 'value', reason: 'unknownValue' }],
+    ],
+    [
+        {
+            kind: 'change',
+            target: { kind: 'this' },
+            value: { kind: 'variable', name: 'label', own: true },
+            op: 'set',
+            amount: 'open',
+        },
+        [],
+    ],
+    [
+        {
+            kind: 'change',
+            target: { kind: 'this' },
+            value: { kind: 'variable', name: 'gold', own: true },
+            op: 'set',
+            amount: 1,
+        },
+        [{ ...ACTION, slot: 'value', reason: 'unknownVariable' }],
+    ],
 ];
 
 const REPEATS: readonly Repeat[] = [{ kind: 'everyTime' }, { kind: 'oncePerRun' }, { kind: 'atMostEvery', seconds: 1 }];
@@ -224,6 +449,21 @@ describe('triggerProblems', () => {
             { ...ACTION, slot: 'value', reason: 'unknownVariable' },
         ]);
         expect(problemsOf({ actions: [addTo({ kind: 'other' }, 'lives')] }, context)).toEqual([]);
+    });
+
+    test('`other` is the sender under a custom event and the entity hit under collision, and absent elsewhere', () => {
+        const destroyOther: Action = { kind: 'destroy', target: { kind: 'other' } };
+        const noOther = [{ ...ACTION, slot: 'target', reason: 'noOther' }];
+
+        expect(problemsOf({ when: { kind: 'collision' }, actions: [destroyOther] })).toEqual([]);
+        expect(problemsOf({ when: { kind: 'custom', name: 'open' }, actions: [destroyOther] })).toEqual([]);
+        expect(problemsOf({ when: { kind: 'destroyed' }, actions: [destroyOther] })).toEqual(noOther);
+        const coinsChange: When = {
+            kind: 'variableChanged',
+            variable: { owner: 'level', name: 'coins' },
+            becomes: null,
+        };
+        expect(problemsOf({ when: coinsChange, actions: [destroyOther] })).toEqual(noOther);
     });
 
     test('each part is placed by its index', () => {

@@ -1,16 +1,21 @@
+import { MAX_STRING_VARIABLE_LENGTH } from '../variables/VariableValue.ts';
+import type { VariableValue } from '../variables/VariableValue.ts';
 import { wordName } from '../names/wordName.ts';
 import { clamp } from '../rawChecks.ts';
 import type { JsonValue } from '../JsonValue.ts';
 
-import type { Action, Check, Repeat, Target, Trigger, ValueRef, When } from './Trigger.ts';
+import type { Action, Check, Condition, Repeat, Target, Trigger, ValueRef, VariableRef, When } from './Trigger.ts';
 
 // The same as an entity's name.
 export const MAX_TRIGGER_NAME_LENGTH = 60;
 // A day: a timer longer than that is a mistake, and the tick count it makes stays small.
 export const MAX_TRIGGER_SECONDS = 86_400;
+// An hour: a Wait holds a run in play until it is due, so a long one is a mistake.
+export const MAX_WAIT_SECONDS = 3600;
 
-// The trigger made clean: its own name trimmed (null when empty), every tag, variable and input name made a
-// word (null when nothing is left, so it reads as unset), and every time between 0 s and a day.
+// The trigger made clean: its own name trimmed (null when empty), every tag, variable, input and custom event
+// name made a word (null when nothing is left, so it reads as unset), every time between 0 s and a day, a
+// Wait's between 0 s and an hour, and a string compared cut as a string variable is.
 export function normalizeTrigger(trigger: Trigger): Trigger {
     return {
         id: trigger.id,
@@ -59,9 +64,39 @@ function normalizeWhen(when: When | null): When | null {
             return { kind: when.kind, seconds: normalizeSeconds(when.seconds) };
         case 'tagLeft':
             return { kind: 'tagLeft', tag: wordOrNull(when.tag) };
+        case 'custom':
+            return { kind: 'custom', name: wordOrNull(when.name) };
+        case 'variableChanged':
+            return {
+                kind: 'variableChanged',
+                variable: normalizeVariableRef(when.variable),
+                becomes: normalizeCondition(when.becomes),
+            };
         default:
             return when;
     }
+}
+
+function normalizeVariableRef(variable: VariableRef | null): VariableRef | null {
+    if (variable === null) return null;
+
+    const name = wordOrNull(variable.name);
+    if (name === null) return null;
+    if (variable.owner === 'level') return { owner: 'level', name };
+
+    return { owner: 'own', target: normalizeTarget(variable.target), name };
+}
+
+function normalizeCondition(condition: Condition | null): Condition | null {
+    if (condition === null) return null;
+
+    return { compare: condition.compare, value: normalizeVariableValue(condition.value) };
+}
+
+function normalizeVariableValue(value: VariableValue) {
+    if (typeof value !== 'string') return value;
+
+    return value.slice(0, MAX_STRING_VARIABLE_LENGTH);
 }
 
 function normalizeTarget(target: Target): Target {
@@ -75,7 +110,13 @@ function normalizeCheck(check: Check): Check {
         return { kind: 'hasTag', target: normalizeTarget(check.target), tag: wordOrNull(check.tag) };
     }
 
-    return { ...check, variable: wordOrNull(check.variable) };
+    if (check.kind === 'compare') {
+        const value = check.value === null ? null : normalizeVariableValue(check.value);
+
+        return { ...check, variable: normalizeVariableRef(check.variable), value };
+    }
+
+    return { ...check, target: normalizeTarget(check.target) };
 }
 
 function normalizeAction(action: Action): Action {
@@ -90,6 +131,12 @@ function normalizeAction(action: Action): Action {
             return { kind: 'destroy', target: normalizeTarget(action.target) };
         case 'push':
             return { kind: 'push', target: normalizeTarget(action.target), push: action.push };
+        case 'fire':
+            return { ...action, target: normalizeTarget(action.target), name: wordOrNull(action.name) };
+        case 'wait':
+            if (action.seconds === null) return action;
+
+            return { kind: 'wait', seconds: clamp(action.seconds, 0, MAX_WAIT_SECONDS) };
         default:
             return action;
     }
@@ -101,7 +148,7 @@ function normalizeValueRef(value: ValueRef | null): ValueRef | null {
     const name = wordOrNull(value.name);
     if (name === null) return null;
 
-    return { kind: 'variable', name };
+    return { ...value, name };
 }
 
 // A tag added or removed is a word like any tag. Any other amount is checked by its field's type in play.

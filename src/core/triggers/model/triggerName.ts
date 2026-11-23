@@ -1,9 +1,9 @@
-import type { Trigger, When } from '../../fields/index.ts';
+import type { Compare, Condition, Trigger, VariableValue, When } from '../../fields/index.ts';
 import { KeyCodes } from '../../keys/index.ts';
 import type { KeyCode } from '../../keys/index.ts';
 
 // What the trigger is called: its own name, or one made from its When, such as "Touched", "jump pressed",
-// "After 60 s" or "No coin left".
+// "After 60 s", "No coin left", "Hits something", "Gets open" or "coins becomes 10 or more".
 export function triggerName(trigger: Trigger) {
     if (trigger.name !== null) return trigger.name;
 
@@ -32,6 +32,42 @@ function nameOfWhen(when: When | null) {
             return 'Level start';
         case 'tagLeft':
             return `No ${when.tag ?? 'tag'} left`;
+        case 'collision':
+            return 'Hits something';
+        case 'destroyed':
+            return 'Destroyed';
+        case 'custom':
+            return when.name === null ? 'Gets an event' : `Gets ${when.name}`;
+        case 'variableChanged':
+            return variableChangedName(when.variable?.name ?? null, when.becomes);
+    }
+}
+
+// "coins changes", "coins becomes 10 or more"; "A variable changes" while the variable is unset.
+function variableChangedName(name: string | null, becomes: Condition | null) {
+    if (name === null) return 'A variable changes';
+    if (becomes === null) return `${name} changes`;
+
+    return `${name} becomes ${conditionName(becomes.compare, becomes.value)}`;
+}
+
+// "10 or more", "not 10", "more than 10"; a string in quotes, so "becomes "" " reads as the empty string.
+function conditionName(compare: Compare, value: VariableValue) {
+    const shown = typeof value === 'string' ? `"${value}"` : String(value);
+
+    switch (compare) {
+        case 'is':
+            return shown;
+        case 'isNot':
+            return `not ${shown}`;
+        case 'more':
+            return `more than ${shown}`;
+        case 'less':
+            return `less than ${shown}`;
+        case 'atLeast':
+            return `${shown} or more`;
+        case 'atMost':
+            return `${shown} or less`;
     }
 }
 

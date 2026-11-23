@@ -15,7 +15,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 3. Variables of three types, on any entity
   - Read: versions/v4/architecture.md#variables, requirements/triggers/variables-and-inputs.md#string-and-boolean-variables-on-any-entity--v4, versions/v4/design.md, design/controls.md
   - Done when: `VariableFieldType` holds a number, a string (at most 1,000 characters) or a boolean, typed by its JSON value, and a v3 level reads and writes back byte for byte; the VariablesComponent is allowed on any entity and in every Add Component menu; the Variables card's rows have the type menu (one step, resetting the value) and a number field, a text field or a checkbox as the design draws; Node and browser tests pass
-- [ ] 4. The trigger model's new kinds
+- [x] 4. The trigger model's new kinds
   - Read: versions/v4/architecture.md#the-trigger, architecture/core-model/triggers.md, requirements/triggers/triggers.md
   - Done when: the types in versions/v4/architecture.md#the-trigger are in `core/fields/trigger/`; `parseTrigger`, `normalizeTrigger`, `copyTrigger` and `mapTriggerEntities` handle every new kind and read v3's forms unchanged (a v3 level reads and writes back byte for byte); `triggerProblems` gives `wrongType`, `reservedName`, the unset parts and unknown own variables; `changeableValues` offers own variables with their ops (Flip for booleans, Set only for strings); `readableValues` and `CustomEventNames` exist; `triggerName` names the new Whens; Node tests cover every new kind
 - [ ] 5. The trigger card's model for v4

@@ -1,14 +1,15 @@
 import type { EntityLinkMapper, FieldType } from '../FieldType.ts';
-import type { JsonValue } from '../JsonValue.ts';
 import type { ParseOutcome } from '../ParseOutcome.ts';
 import { copyTrigger, jsonEquals } from '../trigger/copyTrigger.ts';
 import { mapTriggerEntities } from '../trigger/mapTriggerEntities.ts';
 import { normalizeTrigger } from '../trigger/normalizeTrigger.ts';
 import { parseTrigger } from '../trigger/parseTrigger.ts';
+import { savedTrigger } from '../trigger/savedTrigger.ts';
 import type { Trigger } from '../trigger/Trigger.ts';
 
-// One trigger of a TriggerComponent, saved in the same shape as its type (every key is one word). An unset
-// part is saved as null and read back as null. The list it is in keeps the ids unique (ListFieldType's itemId).
+// One trigger of a TriggerComponent, saved in the same shape as its type (every key is one word) but for its
+// variables, which are saved as v3 saved them (savedTrigger). An unset part is saved as null and read back as
+// null. The list it is in keeps the ids unique (ListFieldType's itemId).
 export class TriggerFieldType implements FieldType<Trigger> {
     readonly kind = 'trigger';
 
@@ -17,10 +18,7 @@ export class TriggerFieldType implements FieldType<Trigger> {
     }
 
     serialize(value: Trigger) {
-        const copy = copyTrigger(value);
-
-        // A trigger is JSON data: its one optional key, a value's axis, is left out by the copy when unset.
-        return copy as unknown as JsonValue;
+        return savedTrigger(value);
     }
 
     normalize(value: Trigger) {

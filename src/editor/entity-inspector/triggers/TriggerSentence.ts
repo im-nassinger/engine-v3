@@ -216,15 +216,24 @@ function addCheckWords(builder: SentenceBuilder, check: Check, index: number, so
         return;
     }
 
-    const variables = choices.variables((variable) => ({ section: 'check', index, check: { ...check, variable } }));
-    builder.slot({ slot: 'variable', text: check.variable, need: 'pick a variable', entry: menuOf(variables) });
+    // The component value check comes to the card with v4's.
+    if (check.kind === 'compareValue') return;
+
+    const variables = choices.variables((name) => ({
+        section: 'check',
+        index,
+        check: { ...check, variable: { owner: 'level', name } },
+    }));
+    const variableText = check.variable?.name ?? null;
+    builder.slot({ slot: 'variable', text: variableText, need: 'pick a variable', entry: menuOf(variables) });
 
     const compares = choices.compares((compare) => ({ section: 'check', index, check: { ...check, compare } }));
     const compareText = TriggerChoices.compareWord(check.compare);
     builder.slot({ slot: 'compare', text: compareText, need: 'compare', entry: menuOf(compares) });
 
     const valueText = check.value === null ? null : String(check.value);
-    builder.slot({ slot: 'number', text: valueText, need: 'a number', entry: numberEntry(check.value, undefined) });
+    const numberValue = typeof check.value === 'number' ? check.value : null;
+    builder.slot({ slot: 'number', text: valueText, need: 'a number', entry: numberEntry(numberValue, undefined) });
 }
 
 function addActionWords(builder: SentenceBuilder, action: Action, index: number, sources: SentenceSources) {
