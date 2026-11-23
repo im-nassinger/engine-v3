@@ -104,8 +104,14 @@ function variableValuesOf(target: Entity): readonly ChangeableValue[] {
             ? { kind: 'variable', name: variable.name }
             : { kind: 'variable', name: variable.name, own: true };
 
-        return { ref, ...VARIABLE_OFFERS[variableTypeOf(variable.value)] };
+        const type = variableTypeOf(variable.value);
+        return { ref, ...variableChangeOf(type) };
     });
+}
+
+// The ways a variable of this type may change, and what its amount is read with.
+export function variableChangeOf(type: VariableType) {
+    return VARIABLE_OFFERS[type];
 }
 
 function triggerValuesOf(target: Entity): readonly ChangeableValue[] {

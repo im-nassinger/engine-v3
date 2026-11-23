@@ -40,6 +40,12 @@ function slotNamed(sentence: TriggerSentence, slot: string) {
     return word;
 }
 
+function groupsOf(word: TriggerWord) {
+    if (word.kind !== 'slot' || word.entry.kind !== 'groups') throw new Error('Not a menu in groups.');
+
+    return word.entry.groups;
+}
+
 function menuLabels(word: TriggerWord) {
     if (word.kind !== 'slot' || word.entry.kind !== 'menu') throw new Error('Not a menu.');
 
@@ -126,6 +132,10 @@ describe('TriggerCardModel', () => {
             'every few seconds',
             'the level starts',
             'no entity with a tag is left',
+            'this hits something',
+            'this gets a custom event',
+            'this is destroyed',
+            'a variable changes',
         ]);
         expect(event.entry.choices[4]?.value).toEqual({ section: 'when', when: { kind: 'after', seconds: null } });
     });
@@ -250,26 +260,32 @@ describe('TriggerCardModel', () => {
         expect(rowText(block, 2, 3)).toBe('set 5, 6 as Transform position of this');
     });
 
-    test("the value menu lists the World's variables, then what the target may change", () => {
+    test("the value menu lists the level's variables, the target's own, then what the target may change", () => {
         const action: Action = { kind: 'change', target: { kind: 'this' }, value: null, op: 'add', amount: null };
         const value = slotNamed(sentenceOf(blockOf({ actions: [action] }), 2), 'value');
-        const labels = menuLabels(value);
+        const groups = groupsOf(value);
 
-        expect(labels.slice(0, 2)).toEqual(['the variable coins', 'the variable lives']);
-        expect(labels).toContain('a value of an entity: Transform position x');
-        expect(labels).toContain('a value of an entity: tags');
-        expect(labels).toContain('a value of an entity: trigger "Touched" on');
+        expect(groups.map((group) => group.title)).toEqual(["The level's", 'this', 'A value of an entity']);
+        expect(groups[0]?.choices.map((choice) => [choice.label, choice.note])).toEqual([
+            ['coins', 'number'],
+            ['lives', 'number'],
+        ]);
+        expect(groups[1]).toMatchObject({ choices: [], emptyText: 'no variables of its own' });
+
+        const otherLabels = groups[2]?.choices.map((choice) => choice.label);
+        expect(otherLabels).toContain('Transform position x');
+        expect(otherLabels).toContain('tags');
+        expect(otherLabels).toContain('trigger "Touched" on');
     });
 
     test('picking a variable makes the World the target; a field keeps the target and fixes the op', () => {
         const action: Action = { kind: 'change', target: { kind: 'other' }, value: null, op: 'add', amount: 'x' };
         const { component, context, level } = buildTriggerLevel([{ actions: [action] }]);
         const block = TriggerCardModel.build(component, context, []).triggers[0] as TriggerBlock;
-        const value = slotNamed(sentenceOf(block, 2), 'value');
-        if (value.entry.kind !== 'menu') throw new Error('Not a menu.');
+        const groups = groupsOf(slotNamed(sentenceOf(block, 2), 'value'));
 
-        const coins = value.entry.choices.find((choice) => choice.label === 'the variable coins');
-        const fill = value.entry.choices.find((choice) => choice.label === 'a value of an entity: Style fill');
+        const coins = groups[0]?.choices.find((choice) => choice.label === 'coins');
+        const fill = groups[2]?.choices.find((choice) => choice.label === 'Style fill');
 
         expect(coins?.value).toEqual({
             section: 'action',
@@ -311,14 +327,15 @@ describe('TriggerCardModel', () => {
         expect(rowText(block, 2, 0)).toBe('set off as trigger "Touched" on of this');
     });
 
-    test('Add check offers its two kinds and Add action its six; with no action, Add action is needed', () => {
+    test('Add check offers its three kinds and Add action its eight; with no action, Add action is needed', () => {
         const block = blockOf({ when: { kind: 'touched' } });
         const addCheck = block.sections[1].addRow;
         const addAction = block.sections[2].addRow;
 
         expect(addCheck?.choices.map((choice) => choice.label)).toEqual([
             'who is tagged…',
-            'a variable compared with a number',
+            'a variable compared with a value',
+            'a component value compared with a number',
         ]);
         expect(addCheck?.choices[0]?.value).toEqual({
             section: 'check',
@@ -329,6 +346,8 @@ describe('TriggerCardModel', () => {
             'change a value',
             'destroy',
             'push',
+            'fire a custom event',
+            'wait',
             'win',
             'lose',
             'restart the level',

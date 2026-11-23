@@ -2,14 +2,12 @@ import { useRef, useState } from 'react';
 import type { KeyboardEvent, RefObject } from 'react';
 import type { JsonValue } from '../../../../../../../../../../core/fields/index.ts';
 import { TriggerTyping } from '../../../../../../../../../../editor/entity-inspector/index.ts';
-import type { TriggerWordEntry } from '../../../../../../../../../../editor/entity-inspector/index.ts';
+import type { TriggerTypedEntry } from '../../../../../../../../../../editor/entity-inspector/index.ts';
 import { rectOf, usePopupClosing, usePopupPlacement } from '../../../../../../../../../shared/index.ts';
 import './TriggerWordField.css';
 
-type TypedEntry = Exclude<TriggerWordEntry, { readonly kind: 'menu' }>;
-
 export type TriggerWordFieldProps = {
-    entry: TypedEntry;
+    entry: TriggerTypedEntry;
     anchor: RefObject<HTMLElement | null>;
     onType: (value: JsonValue) => void;
     onClose: () => void;

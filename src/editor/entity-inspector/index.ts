@@ -34,8 +34,11 @@ export type { TriggerEdit } from './triggers/TriggerEdits.ts';
 export { TriggerSentence } from './triggers/TriggerSentence.ts';
 export type {
     TriggerChoice,
+    TriggerMenuGroup,
     TriggerPartValue,
     TriggerRowPart,
+    TriggerSubmenu,
+    TriggerTypedEntry,
     TriggerWord,
     TriggerWordAddress,
     TriggerWordEntry,

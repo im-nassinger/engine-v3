@@ -2,7 +2,12 @@ import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { JsonValue } from '../../../../../../../../../core/fields/index.ts';
 import { TriggerEdits } from '../../../../../../../../../editor/entity-inspector/index.ts';
-import type { TriggerChoice, TriggerWord } from '../../../../../../../../../editor/entity-inspector/index.ts';
+import type {
+    TriggerChoice,
+    TriggerTypedEntry,
+    TriggerWord,
+    TriggerWordEntry,
+} from '../../../../../../../../../editor/entity-inspector/index.ts';
 import { Menu, Tooltip } from '../../../../../../../../shared/index.ts';
 import type { MenuEntry } from '../../../../../../../../shared/index.ts';
 import type { CommitTriggerEdit } from '../../../../CommitTriggerEdit.ts';
@@ -22,27 +27,48 @@ export type TriggerSlotWordProps = {
 // tooltip says why.
 export function TriggerSlotWord({ word, triggerIndex, commit }: TriggerSlotWordProps) {
     const [isOpen, setIsOpen] = useState(false);
+    // A picked item that asks for a value first, such as "New name…".
+    const [asking, setAsking] = useState<TriggerChoice | undefined>(undefined);
     const anchorRef = useRef<HTMLButtonElement>(null);
     const { entry } = word;
 
     const toggle = () => setIsOpen((wasOpen) => !wasOpen);
-    const close = () => setIsOpen(false);
+    const closeMenu = () => setIsOpen(false);
+    const close = () => {
+        setIsOpen(false);
+        setAsking(undefined);
+    };
 
     const pick = (choice: TriggerChoice) => {
+        if (choice.asks !== undefined) {
+            setAsking(choice);
+            return;
+        }
+
         commit((component) => TriggerEdits.picked(component, triggerIndex, choice.value));
     };
 
     const typeValue = (value: JsonValue) => {
         close();
-        commit((component) => TriggerEdits.typed(component, triggerIndex, word.address, value));
+        if (asking === undefined) {
+            commit((component) => TriggerEdits.typed(component, triggerIndex, word.address, value));
+            return;
+        }
+
+        const picked = asking.value;
+        commit((component) => TriggerEdits.pickedAndTyped(component, triggerIndex, picked, word.address, value));
     };
 
+    // The menu closes as an item is picked; an item that asks keeps its field open after it.
     let popup: ReactNode = null;
-    if (isOpen && entry.kind === 'menu') {
-        const entries = menuEntriesOf(entry.choices, pick);
-        popup = <Menu entries={entries} onClose={close} anchor={anchorRef} />;
-    } else if (isOpen && entry.kind !== 'menu') {
-        popup = <TriggerWordField entry={entry} anchor={anchorRef} onType={typeValue} onClose={close} />;
+    const typedEntry = typedEntryOf(entry);
+    if (asking?.asks !== undefined) {
+        popup = <TriggerWordField entry={asking.asks} anchor={anchorRef} onType={typeValue} onClose={close} />;
+    } else if (isOpen && typedEntry !== undefined) {
+        popup = <TriggerWordField entry={typedEntry} anchor={anchorRef} onType={typeValue} onClose={close} />;
+    } else if (isOpen) {
+        const entries = menuEntriesOf(entry, pick);
+        popup = <Menu entries={entries} onClose={closeMenu} anchor={anchorRef} />;
     }
 
     const button = (
@@ -67,11 +93,40 @@ export function TriggerSlotWord({ word, triggerIndex, commit }: TriggerSlotWordP
     );
 }
 
-function menuEntriesOf(choices: readonly TriggerChoice[], pick: (choice: TriggerChoice) => void) {
+function typedEntryOf(entry: TriggerWordEntry): TriggerTypedEntry | undefined {
+    if (entry.kind === 'menu' || entry.kind === 'groups' || entry.kind === 'submenus') return undefined;
+
+    return entry;
+}
+
+// The groups follow each other with a line between them, and a component opens its values in a submenu.
+function menuEntriesOf(entry: TriggerWordEntry, pick: (choice: TriggerChoice) => void): MenuEntry[] {
+    if (entry.kind === 'menu') return actionsOf(entry.choices, pick, 'item');
+    if (entry.kind === 'submenus') {
+        return entry.submenus.map((submenu, index) => {
+            const entries = actionsOf(submenu.choices, pick, `submenu-${index}`);
+
+            return { kind: 'submenu', id: `submenu-${index}`, label: submenu.label, entries };
+        });
+    }
+    if (entry.kind !== 'groups') return [];
+
+    const entries: MenuEntry[] = [];
+    entry.groups.forEach((group, index) => {
+        if (index > 0) {
+            entries.push({ kind: 'separator', id: `separator-${index}` });
+        }
+        entries.push(...actionsOf(group.choices, pick, `group-${index}`));
+    });
+
+    return entries;
+}
+
+function actionsOf(choices: readonly TriggerChoice[], pick: (choice: TriggerChoice) => void, idPrefix: string) {
     return choices.map((choice, index) => {
-        const entry: MenuEntry = {
+        const entry: MenuEntry & { kind: 'action' } = {
             kind: 'action',
-            id: String(index),
+            id: `${idPrefix}-${index}`,
             label: choice.label,
             onChoose: () => pick(choice),
             disabledReason: choice.disabledReason,

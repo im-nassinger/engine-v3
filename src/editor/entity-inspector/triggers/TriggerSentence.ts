@@ -1,9 +1,8 @@
-import type { Action, Check, Repeat, Target, Trigger, When } from '../../../core/fields/index.ts';
+import type { Action, Check, Repeat, Target, Trigger, VariableValue, When } from '../../../core/fields/index.ts';
 import { KeyCodes } from '../../../core/keys/index.ts';
-import { labelName } from '../../../core/level/index.ts';
 import type { TriggerProblem } from '../../../core/triggers/index.ts';
 
-import { NO_OTHER_REASON, TriggerChoices } from './TriggerChoices.ts';
+import { NO_OTHER_REASON, shownValue, TriggerChoices } from './TriggerChoices.ts';
 import type {
     TriggerChoice,
     TriggerRowPart,
@@ -15,6 +14,10 @@ import type {
 
 type ChangeAction = Action & { readonly kind: 'change' };
 type PushAction = Action & { readonly kind: 'push' };
+type FireAction = Action & { readonly kind: 'fire' };
+type CompareCheck = Check & { readonly kind: 'compare' };
+type CompareValueCheck = Check & { readonly kind: 'compareValue' };
+type VariableChangedWhen = When & { readonly kind: 'variableChanged' };
 
 // What every row of one trigger is built from.
 export type SentenceSources = {
@@ -31,7 +34,14 @@ type SlotWord = {
     // What it says while unset.
     readonly need: string;
     readonly entry: TriggerWordEntry;
+    // Unset and nothing missing, such as Fire's number: it reads in grey, not yellow.
+    readonly isOptional?: boolean;
+    // The slots of triggerProblems this word shows, when it isn't its own: the condition of a variable
+    // changed When is one word for its compare and its value.
+    readonly problemSlots?: readonly TriggerWordSlot[];
 };
+
+type WordState = { state: TriggerWordState; reason: string | undefined };
 
 const MISSING_REASON = 'It was deleted: this part is skipped in play';
 
@@ -100,8 +110,15 @@ class SentenceBuilder {
     }
 
     slot(word: SlotWord) {
-        const problem = this.problemAt(word.slot);
-        const { state, reason } = stateOf(word.text, problem);
+        const slots = word.problemSlots ?? [word.slot];
+        const problem = this.problemAt(slots);
+        const isOptionalUnset = word.text === null && word.isOptional === true && problem === undefined;
+        let { state, reason } = stateOf(word.text, problem);
+        if (isOptionalUnset) {
+            state = 'optional';
+            reason = undefined;
+        }
+
         const text = word.text ?? word.need;
 
         this.words.push({
@@ -114,16 +131,16 @@ class SentenceBuilder {
         });
     }
 
-    private problemAt(slot: TriggerWordSlot) {
+    private problemAt(slots: readonly TriggerWordSlot[]) {
         return this.sources.problems.find((problem) => {
-            if (problem.slot !== slot) return false;
+            if (!slots.includes(problem.slot)) return false;
 
             return samePart(problem.part, this.part);
         });
     }
 }
 
-function stateOf(text: string | null, problem: TriggerProblem | undefined) {
+function stateOf(text: string | null, problem: TriggerProblem | undefined): WordState {
     let state: TriggerWordState = 'set';
     let reason: string | undefined;
 
@@ -151,7 +168,7 @@ function samePart(problemPart: TriggerProblem['part'], rowPart: TriggerRowPart) 
 }
 
 function numberEntry(value: number | null, unit: 's' | 'px/s' | undefined): TriggerWordEntry {
-    return { kind: 'number', value, unit };
+    return { kind: 'number', value, unit, clearLabel: undefined };
 }
 
 function addWhenWords(builder: SentenceBuilder, when: When | null, choices: TriggerChoices) {
@@ -187,9 +204,43 @@ function addWhenWords(builder: SentenceBuilder, when: When | null, choices: Trig
             builder.text('is left');
             return;
         }
+        case 'custom': {
+            const names = choices.names((name) => ({ section: 'when', when: { ...when, name } }));
+            builder.slot({ slot: 'name', text: when.name, need: 'pick a name', entry: menuOf(names) });
+            return;
+        }
+        case 'variableChanged':
+            addVariableChangedWords(builder, when, choices);
+            return;
         default:
             return;
     }
+}
+
+// "the variable score becomes 3 or more", "the variable health of this changes". Picking a variable of
+// another type takes the condition away.
+function addVariableChangedWords(builder: SentenceBuilder, when: VariableChangedWhen, choices: TriggerChoices) {
+    const type = choices.variableType(when.variable);
+    const variables = choices.variableGroups([{ kind: 'this' }], (variable, pickedType) => {
+        let { becomes } = when;
+        if (pickedType !== (type ?? 'number')) {
+            becomes = null;
+        }
+
+        return { section: 'when', when: { ...when, variable, becomes } };
+    });
+    const variableText = when.variable === null ? null : choices.variableWord(when.variable);
+    builder.slot({ slot: 'variable', text: variableText, need: 'pick a variable', entry: variables });
+
+    const becomesText = TriggerChoices.becomesWord(when.becomes);
+    const becomes = choices.becomes(when, type);
+    builder.slot({
+        slot: 'becomes',
+        text: becomesText,
+        need: 'changes',
+        entry: menuOf(becomes),
+        problemSlots: ['compare', 'number'],
+    });
 }
 
 type PressWhen = When & { readonly kind: 'input' | 'key' };
@@ -216,24 +267,93 @@ function addCheckWords(builder: SentenceBuilder, check: Check, index: number, so
         return;
     }
 
-    // The component value check comes to the card with v4's.
-    if (check.kind === 'compareValue') return;
+    if (check.kind === 'compareValue') {
+        addCompareValueWords(builder, check, index, sources);
+        return;
+    }
 
-    const variables = choices.variables((name) => ({
+    addCompareWords(builder, check, index, sources);
+}
+
+// "coins is at least 10", "door_open of other is true", "player_name is "Ada"". The compare words and the
+// value's field follow the variable's type; picking one of another type resets the value and the compare.
+function addCompareWords(builder: SentenceBuilder, check: CompareCheck, index: number, sources: SentenceSources) {
+    const { choices } = sources;
+    const type = choices.variableType(check.variable);
+
+    const owners: Target[] = [{ kind: 'this' }];
+    if (sources.eventHasOther) {
+        owners.push({ kind: 'other' });
+    }
+    const variables = choices.variableGroups(owners, (variable, pickedType) => {
+        let picked: Check = { ...check, variable };
+        if (pickedType !== (type ?? 'number')) {
+            picked = { ...picked, compare: 'is', value: null };
+        }
+
+        return { section: 'check', index, check: picked };
+    });
+    const variableText = check.variable === null ? null : choices.variableWord(check.variable);
+    builder.slot({ slot: 'variable', text: variableText, need: 'pick a variable', entry: variables });
+
+    const compares = choices.compares((compare) => ({ section: 'check', index, check: { ...check, compare } }), type);
+    const compareText = TriggerChoices.compareWord(check.compare);
+    builder.slot({ slot: 'compare', text: compareText, need: 'compare', entry: menuOf(compares) });
+
+    const valueText = check.value === null ? null : comparedText(check.value);
+    const valueEntry = choices.variableValueEntry(type, check.value, (value) => ({
         section: 'check',
         index,
-        check: { ...check, variable: { owner: 'level', name } },
+        check: { ...check, value },
     }));
-    const variableText = check.variable?.name ?? null;
-    builder.slot({ slot: 'variable', text: variableText, need: 'pick a variable', entry: menuOf(variables) });
+    builder.slot({ slot: 'number', text: valueText, need: valueNeed(type), entry: valueEntry });
+}
+
+// "this Body speed is more than 200".
+function addCompareValueWords(
+    builder: SentenceBuilder,
+    check: CompareValueCheck,
+    index: number,
+    sources: SentenceSources,
+) {
+    const { choices } = sources;
+
+    const targets = choices.targets(sources.eventHasOther, true, (target) => ({
+        section: 'check',
+        index,
+        check: { ...check, target },
+    }));
+    builder.slot(targetWord(check.target, targets, choices));
+
+    const values = choices.readables(check.target, (value) => ({
+        section: 'check',
+        index,
+        check: { ...check, value },
+    }));
+    const valueText = check.value === null ? null : choices.readableWord(check.value);
+    builder.slot({ slot: 'value', text: valueText, need: 'pick a value', entry: values });
 
     const compares = choices.compares((compare) => ({ section: 'check', index, check: { ...check, compare } }));
     const compareText = TriggerChoices.compareWord(check.compare);
     builder.slot({ slot: 'compare', text: compareText, need: 'compare', entry: menuOf(compares) });
 
-    const valueText = check.value === null ? null : String(check.value);
-    const numberValue = typeof check.value === 'number' ? check.value : null;
-    builder.slot({ slot: 'number', text: valueText, need: 'a number', entry: numberEntry(numberValue, undefined) });
+    const amountText = check.amount === null ? null : String(check.amount);
+    const amountEntry = numberEntry(check.amount, undefined);
+    builder.slot({ slot: 'number', text: amountText, need: 'a number', entry: amountEntry });
+}
+
+// A number as it is; a string in quotes.
+function comparedText(value: VariableValue) {
+    if (typeof value === 'number') return String(value);
+
+    return shownValue(value);
+}
+
+function valueNeed(type: string | undefined) {
+    if (type === 'string') return 'some text';
+    if (type === 'boolean') return 'true or false';
+
+    return 'a number';
 }
 
 function addActionWords(builder: SentenceBuilder, action: Action, index: number, sources: SentenceSources) {
@@ -260,27 +380,66 @@ function addActionWords(builder: SentenceBuilder, action: Action, index: number,
     if (action.kind === 'push') {
         addPushWords(builder, action, index, choices);
     }
+    if (action.kind === 'fire') {
+        addFireWords(builder, action, index, sources);
+    }
+    if (action.kind === 'wait') {
+        const secondsText = action.seconds === null ? null : String(action.seconds);
+        const entry = numberEntry(action.seconds, 's');
+        builder.slot({ slot: 'seconds', text: secondsText, need: 'how long', entry });
+        builder.text('s');
+    }
 }
 
-// "add 1 to coins", "set 0, 0 as Transform position of other", "subtract coin from tags of this".
+// "fire open on every door with 2"; the number is optional.
+function addFireWords(builder: SentenceBuilder, action: FireAction, index: number, sources: SentenceSources) {
+    const { choices } = sources;
+
+    const names = choices.names((name) => ({ section: 'action', index, action: { ...action, name } }));
+    builder.slot({ slot: 'name', text: action.name, need: 'pick a name', entry: menuOf(names) });
+
+    builder.text('on');
+    const targets = choices.targets(sources.eventHasOther, true, (target) => ({
+        section: 'action',
+        index,
+        action: { ...action, target },
+    }));
+    builder.slot(targetWord(action.target, targets, choices));
+
+    builder.text('with');
+    const amountText = action.amount === null ? null : String(action.amount);
+    const amountEntry: TriggerWordEntry = {
+        kind: 'number',
+        value: action.amount,
+        unit: undefined,
+        clearLabel: 'No number',
+    };
+    builder.slot({ slot: 'amount', text: amountText, need: 'no number', entry: amountEntry, isOptional: true });
+}
+
+// "add 1 to coins", "set 0, 0 as Transform position of other", "subtract coin from tags of this", "flip
+// door_open of this". A level's variable names no target; an own one and any other value do.
 function addChangeWords(builder: SentenceBuilder, action: ChangeAction, index: number, sources: SentenceSources) {
     const { choices } = sources;
 
-    const ops = choices.ops((op) => ({ section: 'action', index, action: { ...action, op } }));
+    const ops = choices.ops(action, (op) => ({ section: 'action', index, action: { ...action, op } }));
     builder.slot({ slot: 'op', text: action.op, need: 'set, add or subtract', entry: menuOf(ops) });
 
-    const amountEntry = choices.amountEntry(action, index);
-    const amountText = action.amount === null ? null : choices.amountWord(action, action.amount);
-    builder.slot({ slot: 'amount', text: amountText, need: 'a value', entry: amountEntry });
+    const isFlip = action.op === 'flip';
+    if (!isFlip) {
+        const amountEntry = choices.amountEntry(action, index);
+        const amountText = action.amount === null ? null : choices.amountWord(action, action.amount);
+        builder.slot({ slot: 'amount', text: amountText, need: 'a value', entry: amountEntry });
 
-    builder.text(joiningWord(action));
+        builder.text(joiningWord(action));
+    }
 
     const values = choices.values(action, index);
     const valueText = action.value === null ? null : choices.valueWord(action, action.value);
-    builder.slot({ slot: 'value', text: valueText, need: 'pick a value', entry: { kind: 'menu', choices: values } });
+    builder.slot({ slot: 'value', text: valueText, need: 'pick a value', entry: values });
 
-    const isVariable = action.value?.kind === 'variable';
-    if (action.value === null || isVariable) return;
+    const isLevelVariable = action.value?.kind === 'variable' && action.value.own !== true;
+    if (action.value === null || isLevelVariable) return;
 
     builder.text('of');
     const targets = choices.targets(sources.eventHasOther, true, (target) => ({
@@ -329,28 +488,9 @@ function addRepeatWords(builder: SentenceBuilder, repeat: Repeat, choices: Trigg
 }
 
 function targetWord(target: Target, targets: readonly TriggerChoice[], choices: TriggerChoices): SlotWord {
-    return { slot: 'target', text: targetText(target, choices), need: 'pick who', entry: menuOf(targets) };
-}
+    const text = choices.targetWord(target);
 
-// "this", "other", an entity's name, "missing entity", "every coin"; null while unset.
-function targetText(target: Target, choices: TriggerChoices) {
-    switch (target.kind) {
-        case 'this':
-        case 'other':
-            return target.kind;
-        case 'tagged':
-            if (target.tag === null) return null;
-
-            return `every ${target.tag}`;
-        case 'entity': {
-            if (target.entity === null) return null;
-
-            const entity = choices.knownTarget(target);
-            if (entity === undefined) return 'missing entity';
-
-            return labelName(entity);
-        }
-    }
+    return { slot: 'target', text, need: 'pick who', entry: menuOf(targets) };
 }
 
 function menuOf(choices: readonly TriggerChoice[]): TriggerWordEntry {

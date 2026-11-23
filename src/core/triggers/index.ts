@@ -1,4 +1,4 @@
-export { changeableValues, sameValueRef } from './model/changeableValues.ts';
+export { changeableValues, sameValueRef, variableChangeOf } from './model/changeableValues.ts';
 export type { ChangeableValue } from './model/changeableValues.ts';
 export { readableValues, sameReadableValue } from './model/readableValues.ts';
 export { isReservedEventName } from './model/reservedEventNames.ts';

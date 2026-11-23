@@ -1,10 +1,17 @@
-import { ColourFieldType, NumberFieldType, TextFieldType, VectorFieldType } from '../../../core/fields/index.ts';
+import {
+    ColourFieldType,
+    MAX_STRING_VARIABLE_LENGTH,
+    NumberFieldType,
+    TextFieldType,
+    VectorFieldType,
+    wordName,
+} from '../../../core/fields/index.ts';
 import type { JsonValue, Unit, ValueType } from '../../../core/fields/index.ts';
 
-import { ValueInput } from '../typing/ValueInput.ts';
-import type { TriggerWordEntry } from './TriggerWord.ts';
+import { isReservedEventName } from '../../../core/triggers/index.ts';
 
-type TypedEntry = Exclude<TriggerWordEntry, { readonly kind: 'menu' }>;
+import { ValueInput } from '../typing/ValueInput.ts';
+import type { TriggerTypedEntry } from './TriggerWord.ts';
 
 // value: what TriggerEdits.typed takes. restore: nothing typed, the word keeps its value. invalid: the box
 // turns red with the reason and Enter does nothing.
@@ -16,11 +23,12 @@ export type TriggerTypingResult =
 const ANY_NUMBER = new NumberFieldType();
 const VECTOR_PARTS = /^\s*([^,;\s]+)\s*[,;\s]\s*([^,;\s]+)\s*$/;
 
-// Reads what is typed into a word's small field: a number (seconds, a compared number, a kick), or a value
-// of another type (a colour code, a vector as "x, y", a text), checked by that type.
+// Reads what is typed into a word's small field: a number (seconds, a compared number, a kick), a value of
+// another type (a colour code, a vector as "x, y", a text) checked by that type, a string variable's text
+// (empty is a value), or a custom event's name, one word as a tag is.
 export class TriggerTyping {
     // The text the field starts with.
-    static shownText(entry: TypedEntry) {
+    static shownText(entry: TriggerTypedEntry) {
         const { value } = entry;
         if (value === null) return '';
         if (typeof value === 'number' || typeof value === 'string') return String(value);
@@ -29,11 +37,34 @@ export class TriggerTyping {
         return '';
     }
 
-    static parse(entry: TypedEntry, text: string): TriggerTypingResult {
-        if (entry.kind === 'number') return parseNumber(text, entry.unit);
-
-        return parseValue(text, entry.value, entry.valueType);
+    static parse(entry: TriggerTypedEntry, text: string): TriggerTypingResult {
+        switch (entry.kind) {
+            case 'number':
+                return parseNumber(text, entry.unit);
+            case 'text':
+                return parseText(text);
+            case 'word':
+                return parseWord(text);
+            case 'value':
+                return parseValue(text, entry.value, entry.valueType);
+        }
     }
+}
+
+function parseText(text: string): TriggerTypingResult {
+    if (text.length > MAX_STRING_VARIABLE_LENGTH) return { kind: 'invalid', reason: 'At most 1,000 characters' };
+
+    return { kind: 'value', value: text };
+}
+
+function parseWord(text: string): TriggerTypingResult {
+    if (text.trim() === '') return { kind: 'restore' };
+
+    const name = wordName(text);
+    if (name === '') return { kind: 'invalid', reason: 'Type a word, such as open' };
+    if (isReservedEventName(name)) return { kind: 'invalid', reason: `${name} is the name of an event` };
+
+    return { kind: 'value', value: name };
 }
 
 function parseNumber(text: string, unit: Unit | undefined): TriggerTypingResult {

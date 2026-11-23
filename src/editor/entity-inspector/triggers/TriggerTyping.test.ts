@@ -6,7 +6,7 @@ import { TriggerTyping } from './TriggerTyping.ts';
 
 describe('TriggerTyping', () => {
     test('reads a number, with or without its unit, and refuses what is not one', () => {
-        const entry = { kind: 'number', value: 2, unit: 's' } as const;
+        const entry = { kind: 'number', value: 2, unit: 's', clearLabel: undefined } as const;
 
         expect(TriggerTyping.shownText(entry)).toBe('2');
         expect(TriggerTyping.parse(entry, '5')).toEqual({ kind: 'value', value: 5 });

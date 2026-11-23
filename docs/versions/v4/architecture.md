@@ -80,6 +80,7 @@ export type ValueRef = /* v3's */ | { kind: 'variable'; name: string; own?: true
 - **The variable menu** has two groups: "The level's" (from the World's VariablesComponent) and the target's own (from the target's, when it is `this` or a named entity; for `other` and `tagged`, the names used by any entity's VariablesComponent in the level). Each item carries its type, which picks the compare words and the value field.
 - **The value field** of a compare or a Change value follows the variable's type: a number field, a text field, or a true or false choice.
 - **The Wait row** has a faint line under it, a class on the row, drawn only when actions follow it.
+- **As built (task 5, standing yes, 2026-11-22):** a word's menu is a plain list, titled groups (`groups`) or items opening submenus (`submenus`); an item can carry a faint `note` (a type, or "live") and `asks`, a field opened before the pick, which `TriggerEdits.pickedAndTyped` commits with the typed value as one step; Fire's unset number has the word state `optional`; a row knows `hasWaitLine`. See [decisions.md](../../decisions.md).
 
 ## Triggers in play
 

@@ -1,10 +1,10 @@
 import type { TriggerComponent } from '../../../core/components/index.ts';
-import { TriggerFieldType } from '../../../core/fields/index.ts';
-import type { Action, Check, JsonValue, Trigger, When } from '../../../core/fields/index.ts';
+import { MAX_WAIT_SECONDS, TriggerFieldType } from '../../../core/fields/index.ts';
+import type { Action, Check, JsonValue, Trigger, VariableValue, When } from '../../../core/fields/index.ts';
 import { newTriggerId, triggerName } from '../../../core/triggers/index.ts';
 import type { TriggerPart } from '../../../core/triggers/index.ts';
 
-import type { TriggerPartValue, TriggerWordAddress } from './TriggerWord.ts';
+import type { TriggerPartValue, TriggerWordAddress, TriggerWordSlot } from './TriggerWord.ts';
 
 // What one edit of the trigger card commits as one step: the component's new list, the id the next new
 // trigger gets, and the step's label, such as `Change trigger "Touched"`.
@@ -53,7 +53,28 @@ export class TriggerEdits {
         return replaced(component, triggerIndex, changed, label);
     }
 
-    // A number typed into a word: seconds, a compared number, an amount, a kick, a Repeat's time.
+    // A menu item that asks for a value first, such as "becomes … or more" or "New name…": the pick and the
+    // typed value are one step. Undefined when the value doesn't fit the word.
+    static pickedAndTyped(
+        component: TriggerComponent,
+        triggerIndex: number,
+        value: TriggerPartValue,
+        address: TriggerWordAddress,
+        typed: JsonValue,
+    ) {
+        const picked = TriggerEdits.picked(component, triggerIndex, value);
+        const pickedTrigger = picked.triggers[triggerIndex] as Trigger;
+        const changed = withTyped(pickedTrigger, address, typed);
+        if (changed === undefined) return undefined;
+
+        const triggers = [...picked.triggers];
+        triggers[triggerIndex] = changed;
+
+        return { ...picked, triggers };
+    }
+
+    // A value typed into a word: seconds, a compared value, an amount, a kick, a Repeat's time, a custom
+    // event's name, a condition's value; null clears Fire's optional number.
     static typed(component: TriggerComponent, triggerIndex: number, address: TriggerWordAddress, typed: JsonValue) {
         const trigger = triggerAt(component, triggerIndex);
         const changed = withTyped(trigger, address, typed);
@@ -189,26 +210,25 @@ function withItemAt<T>(items: readonly T[], index: number, item: T) {
 
 function withTyped(trigger: Trigger, address: TriggerWordAddress, typed: JsonValue): Trigger | undefined {
     const { part, slot } = address;
-    const isNumber = typeof typed === 'number' && Number.isFinite(typed);
 
     switch (part.section) {
         case 'when': {
-            if (slot !== 'seconds' || !isNumber) return undefined;
-
-            const when = withSeconds(trigger.when, typed);
+            const when = whenWithTyped(trigger.when, slot, typed);
             if (when === undefined) return undefined;
 
             return { ...trigger, when };
         }
         case 'repeat':
-            if (slot !== 'repeatSeconds' || !isNumber || trigger.repeat.kind !== 'atMostEvery') return undefined;
+            if (slot !== 'repeatSeconds' || !isNumber(typed) || trigger.repeat.kind !== 'atMostEvery') return undefined;
 
             return { ...trigger, repeat: { kind: 'atMostEvery', seconds: typed } };
         case 'check': {
             const check = trigger.checks[part.index];
-            if (check?.kind !== 'compare' || slot !== 'number' || !isNumber) return undefined;
+            if (check === undefined) return undefined;
 
-            const typedCheck: Check = { ...check, value: typed };
+            const typedCheck = checkWithTyped(check, slot, typed);
+            if (typedCheck === undefined) return undefined;
+
             return withPart(trigger, { section: 'check', index: part.index, check: typedCheck });
         }
         case 'action': {
@@ -223,16 +243,63 @@ function withTyped(trigger: Trigger, address: TriggerWordAddress, typed: JsonVal
     }
 }
 
-function withSeconds(when: When | null, seconds: number): When | undefined {
-    if (when?.kind !== 'after' && when?.kind !== 'every') return undefined;
-
-    return { kind: when.kind, seconds };
+function isNumber(typed: JsonValue): typed is number {
+    return typeof typed === 'number' && Number.isFinite(typed);
 }
 
-function actionWithTyped(action: Action, slot: TriggerWordAddress['slot'], typed: JsonValue): Action | undefined {
-    if (action.kind === 'change' && slot === 'amount') return { ...action, amount: typed };
-    if (action.kind !== 'push' || action.push === null) return undefined;
-    if (typeof typed !== 'number' || !Number.isFinite(typed)) return undefined;
+function isVariableValue(typed: JsonValue): typed is VariableValue {
+    return isNumber(typed) || typeof typed === 'string' || typeof typed === 'boolean';
+}
+
+function whenWithTyped(when: When | null, slot: TriggerWordSlot, typed: JsonValue): When | undefined {
+    if (when === null) return undefined;
+
+    const isTimer = when.kind === 'after' || when.kind === 'every';
+    if (isTimer && slot === 'seconds' && isNumber(typed)) return { kind: when.kind, seconds: typed };
+    if (when.kind === 'custom' && slot === 'name' && typeof typed === 'string') return { ...when, name: typed };
+
+    const hasCondition = when.kind === 'variableChanged' && when.becomes !== null;
+    if (!hasCondition || slot !== 'becomes' || !isVariableValue(typed)) return undefined;
+
+    return { ...when, becomes: { compare: when.becomes.compare, value: typed } };
+}
+
+function checkWithTyped(check: Check, slot: TriggerWordSlot, typed: JsonValue): Check | undefined {
+    if (slot !== 'number') return undefined;
+    if (check.kind === 'compare' && isVariableValue(typed)) return { ...check, value: typed };
+    if (check.kind === 'compareValue' && isNumber(typed)) return { ...check, amount: typed };
+
+    return undefined;
+}
+
+function actionWithTyped(action: Action, slot: TriggerWordSlot, typed: JsonValue): Action | undefined {
+    switch (action.kind) {
+        case 'change':
+            if (slot !== 'amount') return undefined;
+
+            return { ...action, amount: typed };
+        case 'fire':
+            if (slot === 'name' && typeof typed === 'string') return { ...action, name: typed };
+            if (slot === 'amount' && (typed === null || isNumber(typed))) return { ...action, amount: typed };
+
+            return undefined;
+        case 'wait': {
+            if (slot !== 'seconds' || !isNumber(typed)) return undefined;
+
+            const seconds = Math.min(Math.max(typed, 0), MAX_WAIT_SECONDS);
+            return { ...action, seconds };
+        }
+        case 'push':
+            return pushWithTyped(action, slot, typed);
+        default:
+            return undefined;
+    }
+}
+
+type PushAction = Action & { readonly kind: 'push' };
+
+function pushWithTyped(action: PushAction, slot: TriggerWordSlot, typed: JsonValue): Action | undefined {
+    if (action.push === null || !isNumber(typed)) return undefined;
 
     const { push } = action;
     if (push.kind === 'by' && slot === 'pushX') return { ...action, push: { ...push, x: typed } };

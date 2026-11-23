@@ -15,6 +15,8 @@ export type TriggerRow = {
     readonly sentence: TriggerSentence;
     // Checks and actions show an × on hover; the When and the Repeat never go.
     readonly canRemove: boolean;
+    // A Wait with actions after it: a faint line under its row, so the actions after it read as later.
+    readonly hasWaitLine: boolean;
 };
 
 // Add check or Add action, at the end of If and Do.
@@ -93,16 +95,24 @@ function blockOf(
     };
 }
 
-// Only touching names an `other` in v3. An unset When greys nothing yet.
+// Touching, hitting and a custom event (its sender) name an `other`. An unset When greys nothing yet.
 function whenHasOther(when: When | null) {
     if (when === null) return true;
 
-    return when.kind === 'touched' || when.kind === 'untouched';
+    switch (when.kind) {
+        case 'touched':
+        case 'untouched':
+        case 'collision':
+        case 'custom':
+            return true;
+        default:
+            return false;
+    }
 }
 
 function whenSection(trigger: Trigger, sources: SentenceSources): TriggerSection {
     const sentence = TriggerSentence.ofWhen(trigger, sources);
-    const row: TriggerRow = { part: { section: 'when' }, sentence, canRemove: false };
+    const row: TriggerRow = { part: { section: 'when' }, sentence, canRemove: false, hasWaitLine: false };
 
     return { title: 'When', hint: undefined, rows: [row], addRow: undefined };
 }
@@ -110,7 +120,7 @@ function whenSection(trigger: Trigger, sources: SentenceSources): TriggerSection
 function ifSection(trigger: Trigger, sources: SentenceSources): TriggerSection {
     const rows = trigger.checks.map((_check, index) => {
         const sentence = TriggerSentence.ofCheck(trigger, index, sources);
-        const row: TriggerRow = { part: { section: 'check', index }, sentence, canRemove: true };
+        const row: TriggerRow = { part: { section: 'check', index }, sentence, canRemove: true, hasWaitLine: false };
 
         return row;
     });
@@ -124,9 +134,11 @@ function ifSection(trigger: Trigger, sources: SentenceSources): TriggerSection {
 }
 
 function doSection(trigger: Trigger, sources: SentenceSources): TriggerSection {
-    const rows = trigger.actions.map((_action, index) => {
+    const lastIndex = trigger.actions.length - 1;
+    const rows = trigger.actions.map((action, index) => {
         const sentence = TriggerSentence.ofAction(trigger, index, sources);
-        const row: TriggerRow = { part: { section: 'action', index }, sentence, canRemove: true };
+        const hasWaitLine = action.kind === 'wait' && index < lastIndex;
+        const row: TriggerRow = { part: { section: 'action', index }, sentence, canRemove: true, hasWaitLine };
 
         return row;
     });
@@ -145,7 +157,7 @@ function doSection(trigger: Trigger, sources: SentenceSources): TriggerSection {
 
 function repeatSection(trigger: Trigger, sources: SentenceSources): TriggerSection {
     const sentence = TriggerSentence.ofRepeat(trigger, sources);
-    const row: TriggerRow = { part: { section: 'repeat' }, sentence, canRemove: false };
+    const row: TriggerRow = { part: { section: 'repeat' }, sentence, canRemove: false, hasWaitLine: false };
 
     return { title: 'Repeat', hint: undefined, rows: [row], addRow: undefined };
 }

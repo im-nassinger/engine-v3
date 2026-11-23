@@ -1,6 +1,6 @@
 import { cardTitle, TriggerComponent } from '../../../core/components/index.ts';
 import type { ComponentRegistry } from '../../../core/components/index.ts';
-import type { JsonValue, ValueRef } from '../../../core/fields/index.ts';
+import type { JsonValue, LiveValue, ReadableValue, ValueRef } from '../../../core/fields/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { triggerName } from '../../../core/triggers/index.ts';
 
@@ -18,6 +18,32 @@ export function valueName(value: ValueRef, registry: ComponentRegistry, target: 
     }
 }
 
+// What a live value reads in its submenu: "Speed", "Velocity x".
+export const LIVE_LABELS: Readonly<Record<LiveValue, string>> = {
+    speed: 'Speed',
+    velocityX: 'Velocity x',
+    velocityY: 'Velocity y',
+};
+
+// What the component value check's value word reads: "Transform position x", "Body speed".
+export function readableName(value: ReadableValue, registry: ComponentRegistry) {
+    if (value.kind === 'field') return fieldName(value, registry);
+
+    const title = cardTitle('BodyComponent');
+    const label = LIVE_LABELS[value.live].toLowerCase();
+
+    return `${title} ${label}`;
+}
+
+// A field's label with its axis, as its component's submenu lists it: "Position x", "Gravity scale".
+export function fieldLabel(value: FieldValue, registry: ComponentRegistry) {
+    const schema = registry.find(value.component)?.schema;
+    const label = schema?.findField(value.field)?.label ?? value.field;
+    if (value.axis === undefined) return label;
+
+    return `${label} ${value.axis}`;
+}
+
 function triggerOnName(triggerId: number, target: Entity | undefined) {
     const triggers = target?.getComponent(TriggerComponent)?.get('triggers') ?? [];
     const trigger = triggers.find((candidate) => candidate.id === triggerId);
@@ -27,14 +53,14 @@ function triggerOnName(triggerId: number, target: Entity | undefined) {
     return `trigger "${name}" on`;
 }
 
-function fieldName(value: ValueRef & { readonly kind: 'field' }, registry: ComponentRegistry) {
-    const title = cardTitle(value.component);
-    const schema = registry.find(value.component)?.schema;
-    const label = schema?.findField(value.field)?.label ?? value.field;
-    const lowerLabel = label.toLowerCase();
-    if (value.axis === undefined) return `${title} ${lowerLabel}`;
+type FieldValue = (ValueRef | ReadableValue) & { readonly kind: 'field' };
 
-    return `${title} ${lowerLabel} ${value.axis}`;
+function fieldName(value: FieldValue, registry: ComponentRegistry) {
+    const title = cardTitle(value.component);
+    const label = fieldLabel(value, registry);
+    const lowerLabel = label.toLowerCase();
+
+    return `${title} ${lowerLabel}`;
 }
 
 // What an amount reads as: a number, on or off, a tag, "100, 50" for a vector.
