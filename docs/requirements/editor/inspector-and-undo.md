@@ -52,7 +52,7 @@ Source: round 3: S2; round 4: FT1; owner: 2026-11-15; owner: 2026-11-16
 - Units show as a faded suffix and may be typed: `px`, `°`, `%`, `px/s`, `s`. Rotation is in degrees, lengths and speeds in pixels. A vector's box is narrow, so its unit is hidden when it and the value don't both fit (standing yes, 2026-11-19).
 - Both `1.5` and `1,5` are decimals. *Why: the owner's locale and many others use a comma.*
 - A number with both a minimum and a maximum is a filled slider: dragging across the field sets the value, changing the level while dragged and making one undo step when let go; a click without a drag types in it (owner, 2026-11-18).
-- An **entity** field is filled by dragging a row from the Entities viewer, from a dropdown, or with a picker that lets you click an entity in the level view. A deleted target shows a `missing entity` warning.
+- An **entity** field is filled by dragging a row from the Entities viewer, from the **entity picker** (the Entities viewer's tree, with a search), or with its target icon, which lets you click an entity in the level view (owner, 2026-11-23: the picker replaced a flat dropdown). A deleted target shows a `missing entity` warning.
 
 | Typed | Result |
 |---|---|
@@ -65,7 +65,7 @@ Source: round 3: S2; round 4: FT1; owner: 2026-11-15; owner: 2026-11-16
 
 - *Why the skew limit: at 90° the entity would be slanted flat, which no shape can be drawn or undone from, and a skew past 90° looks the same as a smaller one with the scale flipped, so two values would mean one look. It is refused, not clamped, because clamping would quietly change the shape (owner: 2026-11-14).*
 
-Source: round 3: 01 2.5; old: WS-114, WS-115, WS-119 to WS-122, WS-125, WS-126; owner: 2026-11-14
+Source: round 3: 01 2.5; old: WS-114, WS-115, WS-119 to WS-122, WS-125, WS-126; owner: 2026-11-14; owner: 2026-11-23
 
 ### Adding and removing components · v1
 

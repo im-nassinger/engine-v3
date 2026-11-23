@@ -134,15 +134,23 @@ describe('the entity field', () => {
         expect(session.status.current).toBe("The camera can't be picked");
     });
 
-    test('the dropdown lists the entities but the World and the camera, and a pick is one step', async () => {
+    test("the picker shows None and the Entities viewer's tree, the World and the camera greyed, and a pick is one step", async () => {
         const { level, player, session } = await showCameraWithPlayer();
         addBareEntity(level, 'Crate');
 
         await userEvent.click(requireElement(followField(), 'button'));
-        const entries = () => [...document.querySelectorAll('.menu [role="menuitemcheckbox"], .menu button')];
-        await expect.poll(() => entries().length).toBeGreaterThan(0);
-        const labels = entries().map((entry) => entry.textContent.trim());
-        expect(labels).toEqual(['None', 'Crate', 'Player']);
+        const rows = () => [...document.querySelectorAll<HTMLElement>('.entity-picker [role="treeitem"]')];
+        await expect.poll(() => rows().length).toBeGreaterThan(0);
+        const shown = rows().map((row) => [row.textContent.trim(), row.getAttribute('aria-disabled')]);
+        const none = requireElement(document, '.entity-picker [role="menuitem"]');
+
+        expect(none.textContent.trim()).toBe('None');
+        expect(shown).toEqual([
+            ['World', 'true'],
+            ['Crate', 'false'],
+            ['Player', 'false'],
+            ['Camera', 'true'],
+        ]);
 
         const search = requireElement<HTMLInputElement>(document, 'input[aria-label="Search entities"]');
         await userEvent.fill(search, 'play');
@@ -150,6 +158,26 @@ describe('the entity field', () => {
 
         expect(followOf(level)).toBe(player.id);
         expect(undoCount(session)).toBe(1);
+    });
+
+    test('a row of the tree picks its entity, and a greyed one says why', async () => {
+        const { level, session } = await showCameraWithPlayer();
+        const crate = addBareEntity(level, 'Crate');
+
+        await userEvent.click(requireElement(followField(), 'button'));
+        const rowNamed = (name: string) =>
+            [...document.querySelectorAll<HTMLElement>('.entity-picker [role="treeitem"]')].find(
+                (row) => row.textContent.trim() === name,
+            );
+        await expect.poll(() => rowNamed('Crate')).toBeDefined();
+
+        // A greyed row is aria-disabled, which the user event refuses to click.
+        rowNamed('World')?.click();
+        expect(session.status.current).toBe("The World can't be picked");
+
+        await userEvent.click(rowNamed('Crate') as HTMLElement);
+        expect(followOf(level)).toBe(crate.id);
+        expect(document.querySelector('.entity-picker')).toBeNull();
     });
 
     test('a deleted target shows `missing entity`, and undo brings its name back', async () => {

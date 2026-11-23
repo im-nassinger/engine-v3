@@ -77,7 +77,7 @@ src/
     hit-testing/       HitTester, HitProbe; areas/ (each entity's hit area), spatial-index/ (SpatialIndex, LinearSpatialIndex)
     snapping/          Snapper, GridSnapper
     view/              ViewState (pan and zoom), ViewSettings, the overlay sizes the drawing and hitting share
-    entities-viewer/   rows/ (EntitiesRows, the visible rows, and rowKind, a row's icon), clicks/ (RowClicks), drop/ (EntitiesDrop, where a drag lands)
+    entities-viewer/   rows/ (EntitiesRows, the visible rows, and rowKind, a row's icon), clicks/ (RowClicks), drop/ (EntitiesDrop, where a drag lands), picker/ (EntityPickerRows, the entity picker's tree)
     entity-inspector/  EntityInspectorModel, CardModel, FieldModel, CardFolds, ValueInput (typed text); tags-field/ variables-field/ inputs-field/ triggers/ (TriggerCardModel, TriggerSentence, TriggerChoices, TriggerEdits) (v3)
     messages/          EditorMessages, EditorMessageRule, rules/ (with TouchNeedsSurfaceRule, TriggerCantRunRule, MissingInputsRule from v3)
     clipboard/         ClipboardCodec, PastePlacement, IdRemapping
@@ -116,6 +116,7 @@ src/
     play-bar/          PlayBar/ (with PlayBarButton/)
     end-window/        EndWindow/: Win or Lose, the time, Leave and Restart (v3)
     shortcut-sheet/    ShortcutSheet/: the searchable list of shortcuts (v4)
+    entity-picker/     EntityPicker/: the Entities viewer's tree, searchable, to pick an entity (v4 fixes)
     testing/           editorPage: a component shown with the session, commands and tools, for browser tests
     main-menu/ level-view-host/ minimap/ entities-viewer/ entity-inspector/
     save-state/        SaveIndicatorContext

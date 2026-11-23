@@ -128,7 +128,7 @@ describe("the trigger card's v4 parts", () => {
         await expect.poll(() => blocks().length).toBe(1);
 
         await pickFromMenu(word('When', 'pick an event'), 'this gets a custom event');
-        await expect.poll(() => sentences('When')).toEqual(['this gets pick a name']);
+        await expect.poll(() => sentences('When')).toEqual(['this gets the custom event pick a name']);
 
         const stepsBeforeName = session.openLevel.history.undoCount;
         await openMenu(word('When', 'pick a name'), 'New name…');
@@ -137,7 +137,7 @@ describe("the trigger card's v4 parts", () => {
         expect(requireElement(wordField(), '.hint').textContent).toBe('One word, such as open');
         expect(wordFieldInput().placeholder).toBe('Type a name');
         await userEvent.type(wordFieldInput(), 'open{Enter}');
-        await expect.poll(() => sentences('When')).toEqual(['this gets open']);
+        await expect.poll(() => sentences('When')).toEqual(['this gets the custom event open']);
         expect(session.openLevel.history.undoCount).toBe(stepsBeforeName + 1);
 
         await pickFromMenu(addRow('Add action'), 'wait');
@@ -148,17 +148,18 @@ describe("the trigger card's v4 parts", () => {
 
         await pickFromMenu(addRow('Add action'), 'change a value');
         await expect.poll(() => doRows().length).toBe(2);
-        await expect.poll(() => sentences('Do')).toEqual(['wait 2 s', 'add a value to pick a value']);
-        await openMenu(word('Do', 'pick a value'), 'door_open');
-        expect(menuLines().slice(0, 5)).toEqual([
-            "# The level's",
+        await expect.poll(() => sentences('Do')).toEqual(['wait 2 s', 'add a value to this pick a value']);
+        await openMenu(word('Do', 'pick a value'), 'Variables');
+        expect(menuLines().slice(0, 4)).toEqual([
+            '# Level variables',
             'score | number',
             'player_name | string',
-            '# this',
-            'door_open | boolean',
+            '# Values of this',
         ]);
+        click(menuRowNamed('Variables') as HTMLElement);
+        await expect.poll(() => menuRowNamed('door_open')).toBeDefined();
         menuRowNamed('door_open')?.click();
-        await expect.poll(() => sentences('Do')).toEqual(['wait 2 s', 'flip door_open of this']);
+        await expect.poll(() => sentences('Do')).toEqual(['wait 2 s', 'flip this door_open']);
 
         expect(doRows()[0]?.dataset['waitLine']).toBe('true');
         expect(getComputedStyle(doRows()[0] as HTMLElement, '::after').opacity).toBe('0.45');
@@ -189,15 +190,16 @@ describe("the trigger card's v4 parts", () => {
         const fire: Action = { kind: 'fire', name: 'open', target: { kind: 'this' }, amount: 2 };
         withTrigger(door, { actions: [fire] });
         await showEntity(level, door);
-        await expect.poll(() => sentences('Do')).toEqual(['fire open on this with 2']);
+        await expect.poll(() => sentences('Do')).toEqual(['fire open on this with the number 2']);
 
-        click(word('Do', '2'));
+        click(word('Do', 'with the number 2'));
         await expect.poll(() => document.querySelector('.trigger-word-field .clear')).not.toBeNull();
         click(buttonNamed(wordField(), 'No number'));
 
-        await expect.poll(() => sentences('Do')).toEqual(['fire open on this with no number']);
-        expect(word('Do', 'no number').dataset['state']).toBe('optional');
-        expect(getComputedStyle(word('Do', 'no number')).fontStyle).toBe('normal');
+        const unsetNumber = 'with a number (for scripts)';
+        await expect.poll(() => sentences('Do')).toEqual([`fire open on this ${unsetNumber}`]);
+        expect(word('Do', unsetNumber).dataset['state']).toBe('optional');
+        expect(getComputedStyle(word('Do', unsetNumber)).fontStyle).toBe('normal');
         expect(triggersOf(door)[0]?.actions[0]).toEqual({ ...fire, amount: null });
     });
 
@@ -218,7 +220,7 @@ describe("the trigger card's v4 parts", () => {
         const valueWord = section('If').querySelectorAll<HTMLElement>('.trigger-slot-word')[2] as HTMLElement;
         click(valueWord);
         await expect.poll(() => document.querySelector('.trigger-word-field input')).not.toBeNull();
-        expect(wordFieldInput().placeholder).toBe('Text');
+        expect(wordFieldInput().placeholder).toBe('Type a text');
         await userEvent.type(wordFieldInput(), 'Bo{Enter}');
         await expect.poll(() => sentences('If')).toEqual(['player_name is "Bo"']);
 
@@ -236,15 +238,15 @@ describe("the trigger card's v4 parts", () => {
         await showEntity(level, door);
         await expect.poll(() => blocks().length).toBe(1);
 
-        await pickFromMenu(addRow('Add check'), 'a component value compared with a number');
+        await pickFromMenu(addRow('Add check'), 'a component value');
         const valueWord = requireElement<HTMLElement>(section('If'), '[data-state="unset"]');
         await openMenu(valueWord, 'Body');
         expect(menuLines()).toEqual(['Transform', 'Body']);
         click(menuRowNamed('Body') as HTMLElement);
         await expect.poll(() => menuRowNamed('Speed')).toBeDefined();
 
-        expect(menuLines().slice(-3)).toEqual(['Speed | live', 'Velocity x | live', 'Velocity y | live']);
+        expect(menuLines().slice(-2)).toEqual(['Speed | live', 'Velocity | live']);
         menuRowNamed('Speed')?.click();
-        await expect.poll(() => sentences('If')[0]).toMatch(/^this Body speed is more than/);
+        await expect.poll(() => sentences('If')[0]).toMatch(/^this Body › Speed is more than/);
     });
 });

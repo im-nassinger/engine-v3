@@ -25,4 +25,12 @@
         letter-spacing: var(--caps-spacing);
         text-transform: uppercase;
     }
+
+    &[data-plain='true'] {
+        min-width: 0;
+        max-height: none;
+        padding: 0;
+        background: none;
+        box-shadow: none;
+    }
 }

@@ -23,6 +23,7 @@ import {
     blocks,
     menuRowNamed,
     menuRows,
+    pickerRowNamed,
     notesOf,
     requireBlock,
     section,
@@ -115,12 +116,12 @@ describe('the trigger card', () => {
         await expect.poll(() => sentences('When')).toEqual(['something starts touching this']);
         expect(blockName()).toBe('Touched');
 
-        await pickFromMenu(addRow('Add check'), 'who is tagged…');
-        await expect.poll(() => sentences('If')).toEqual(['other is tagged pick a tag']);
+        await pickFromMenu(addRow('Add check'), 'an entity has a tag');
+        await expect.poll(() => sentences('If')).toEqual(['other has the tag pick a tag']);
         expect(history(session).undoLabel).toBe('Add check to trigger "Touched"');
         expect(section('If').querySelector('.hint')?.textContent).toBe('all must be true');
         await pickFromMenu(word('If', 'pick a tag'), 'player');
-        await expect.poll(() => sentences('If')).toEqual(['other is tagged player']);
+        await expect.poll(() => sentences('If')).toEqual(['other has the tag player']);
 
         await pickFromMenu(addRow('Add action'), 'win');
         await expect.poll(() => sentences('Do')).toEqual(['win']);
@@ -250,5 +251,58 @@ describe('the trigger card', () => {
         expect(blockName()).toBe('Touched');
         expect(triggersOf(button).map((trigger) => trigger.id)).toEqual([2]);
         expect(history(session).undoLabel).toBe('Delete trigger "Goal"');
+    });
+
+    test("a target word opens the entity picker: the Entities viewer's tree, its search, and this and other", async () => {
+        const { level, player, button } = buildLevel();
+        withTriggers(button, [{ actions: [{ kind: 'destroy', target: { kind: 'other' } }] }]);
+        const { session } = await showEntity(level, button);
+        await expect.poll(() => blocks().length).toBe(1);
+
+        click(word('Do', 'other'));
+        await expect.poll(() => pickerRowNamed('Player')).toBeDefined();
+        expect(menuRowNamed('this')).toBeDefined();
+        expect(menuRowNamed('every entity tagged player')).toBeDefined();
+
+        pickerRowNamed('Player')?.click();
+        await expect.poll(() => sentences('Do')).toEqual(['destroy Player']);
+        expect(triggersOf(button)[0]?.actions[0]).toEqual({
+            kind: 'destroy',
+            target: { kind: 'entity', entity: player.id },
+        });
+        expect(history(session).undoCount).toBe(1);
+
+        click(word('Do', 'Player'));
+        await expect.poll(() => pickerRowNamed('Button')).toBeDefined();
+        expect(pickerRowNamed('Player')?.getAttribute('aria-selected')).toBe('true');
+        const search = requireElement<HTMLInputElement>(document, '.entity-picker input[aria-label="Search entities"]');
+        await userEvent.type(search, 'butt{Enter}');
+        await expect.poll(() => sentences('Do')).toEqual(['destroy this']);
+    });
+
+    test('a vector opens two boxes, X and Y, typed in as one step', async () => {
+        const { level, button } = buildLevel();
+        const position = { kind: 'field', component: 'TransformComponent', field: 'position' } as const;
+        withTriggers(button, [
+            {
+                actions: [
+                    { kind: 'change', target: { kind: 'this' }, value: position, op: 'set', amount: { x: 1, y: 2 } },
+                ],
+            },
+        ]);
+        const { session } = await showEntity(level, button);
+        await expect.poll(() => sentences('Do')).toEqual(['set this Transform › Position to 1, 2']);
+
+        click(word('Do', '1, 2'));
+        await expect.poll(() => document.querySelector('.trigger-word-field input[aria-label="Y"]')).not.toBeNull();
+        const xBox = requireElement<HTMLInputElement>(document, '.trigger-word-field input[aria-label="X"]');
+        const yBox = requireElement<HTMLInputElement>(document, '.trigger-word-field input[aria-label="Y"]');
+        await userEvent.clear(xBox);
+        await userEvent.type(xBox, '100');
+        await userEvent.clear(yBox);
+        await userEvent.type(yBox, '-50{Enter}');
+
+        await expect.poll(() => sentences('Do')).toEqual(['set this Transform › Position to 100, -50']);
+        expect(history(session).undoCount).toBe(1);
     });
 });

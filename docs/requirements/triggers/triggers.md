@@ -13,14 +13,15 @@ A trigger is no-code logic on an entity, in three parts: **When** (one event), *
 - *Why three parts: an earlier one-sentence form hid the "who" inside the When, which only works for touching. When, If, Do gives every trigger the same shape: an event happens, checks decide, actions run.*
 - Every event gives the trigger two entities: **`this`**, the entity holding the trigger, and **`other`**, the entity that caused the event, when there is one. For touching, `other` is the entity that touched. For a custom event, it is the sender. A key, a timer or level start has no `other`, and checks and actions that use it are greyed out.
 - **Each check and action picks its target from: `this`, `other`, an entity by name, or every entity with a tag.**
-- In the Entity inspector a trigger reads as a **sentence with clickable parts**, such as "When something starts touching this, if it is tagged player: add 1 to coins, destroy this."
+- In the Entity inspector a trigger reads as a **sentence with clickable parts**, such as "When something starts touching this, if other has the tag player: add 1 to coins, destroy this."
+- **Every clickable part is picked the way the rest of the editor picks it** (owner, 2026-11-23): an entity from the Entities viewer's tree, with a search, or by clicking it in the level view, or by dropping an Entities viewer row on it; a vector in two boxes, x and y; a colour in the colour box; a number in the number box with its unit. A value on an entity is picked in two steps, its component and then the value ("Transform › Position"), and the entity comes before the value in the sentence, since the values offered are that entity's. Every item of the Add check and Add action menus says in one line what it does. *Why: the owner found the first card lazy: a flat list of every entity, vectors typed as "0, -600" in a text box, "Transform position x" listed beside "Transform position y", and words such as "who is tagged…" that said nothing.*
 - A part that isn't set yet is highlighted and says what it needs. A trigger with unset parts doesn't run.
 - Each trigger can be switched on or off. It is a value like any other, so one trigger switches another on or off with Change value.
 - Triggers can be dragged to reorder, duplicated and deleted. Every edit is one undo step.
 - Triggers do nothing a script can't: both use the same events and the same Lua API underneath.
 - A trigger on a hidden entity still runs.
 
-Source: scope TR1; round 1: C11; round 2: R10; round 5: T3, T4; round 9: 09 2.11, 09 2.14; decisions: D10; old: TR-01 to TR-04, TR-120 to TR-124; owner: 2026-11-13
+Source: scope TR1; round 1: C11; round 2: R10; round 5: T3, T4; round 9: 09 2.11, 09 2.14; decisions: D10; old: TR-01 to TR-04, TR-120 to TR-124; owner: 2026-11-13; owner: 2026-11-23
 
 ### Events · v3
 
@@ -93,7 +94,7 @@ Source: scope TR5; round 8: 09 2.2; old: TR-12, TR-22
 
 ### If checks · v3
 
-- **`other` has a tag:** "If other is tagged player". The tag may be on the touching entity or on any group above it, so tagging the player's group is enough.
+- **`other` has a tag:** "If other has the tag player". The tag may be on the touching entity or on any group above it, so tagging the player's group is enough.
 - **A variable compared with a value:** "If coins is 10 or more". Only a number variable is compared: the other types (from v4) are only checked with "is" or "is not", see [variables](variables-and-inputs.md).
 - All checks must be true. Anything more complex is a script.
 - *Why v3: a coin that only the player can pick up needs the tag check.*
@@ -102,12 +103,12 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27; owner: 2026-11-13
 
 ### Checking a component value · v4
 
-- **A component value compared with a number:** "If this BodyComponent speed is more than 200".
-- It offers every number value of the target's components, and each part of a vector by itself (position x, position y), plus what a body is doing right now: its **speed** and its **velocity** x and y, in px/s. *Why: speed is not a value anyone types, but "fast enough to break" is the example that asked for this check (standing yes, 2026-11-22).*
+- **A component value compared with a number:** "If this Body › Speed is more than 200".
+- It offers every number value of the target's components, and each vector once, whose x or y is then picked as a word of its own ("this Transform › Position y is at most 500"), plus what a body is doing right now: its **speed** and its **velocity**, x or y, in px/s. *Why: speed is not a value anyone types, but "fast enough to break" is the example that asked for this check (standing yes, 2026-11-22).*
 - With a tag as the target, the check is true when any tagged entity passes it, as the tag check is. A target without the value makes the check false.
 - *Why v4: v3's game needs only tags and its count (owner: 2026-11-20).*
 
-Source: scope TR6; owner: 2026-11-20
+Source: scope TR6; owner: 2026-11-20; owner: 2026-11-23
 
 ### Actions · v3
 
@@ -121,6 +122,7 @@ Source: scope TR6; owner: 2026-11-20
 
 - **If it's data, change it with Change value.** One action covers teleporting (the TransformComponent's position), variables (on the World's VariablesComponent for the level's, or on any entity's for its own), tags, switching triggers on or off, a joint's motor, the camera's zoom and follow target, gravity. *Why: the owner pointed out that teleporting is just changing a component value. What is left on the list does something no value can.*
 - Change value only offers values that are allowed to change during play.
+- **A vector is set, added to or subtracted from whole**, such as "add 5, 0 to this Transform › Position" (owner, 2026-11-23). A trigger saved before, which added to one axis, reads as the same vector with 0 on the other axis. *Why: one value, one word; listing Position x and Position y beside Position looked like three values.*
 - **Push's fixed kick is a vector, x and y**, in px/s: the change in velocity, like `push(id, x, y)` in Lua. Away from or towards `this` takes one strength in px/s instead, since the direction comes from where the two entities are. *Why: a kick is a direction and a size, which one vector holds (owner: 2026-11-15).*
 - **A destroyed entity disappears at the end of the tick**, so the actions after Destroy in the list still run.
 - **Restart is guarded against abuse**, such as a restart loop that could freeze the player's computer.
@@ -129,7 +131,7 @@ Source: scope TR6; owner: 2026-11-20
 - Actions on a group use the group's own components. Body actions go to the body the entity belongs to.
 - *Why v3: what a coin, a spike and a goal need (owner: 2026-11-20).*
 
-Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b, 09 2.9; round 8: 09 2.4; old: TR-30 to TR-53, TR-78 to TR-84; owner: 2026-11-13; owner: 2026-11-15; owner: 2026-11-20
+Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b, 09 2.9; round 8: 09 2.4; old: TR-30 to TR-53, TR-78 to TR-84; owner: 2026-11-13; owner: 2026-11-15; owner: 2026-11-20; owner: 2026-11-23
 
 ### Fire custom event and Wait · v4
 

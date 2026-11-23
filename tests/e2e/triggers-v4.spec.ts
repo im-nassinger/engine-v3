@@ -113,11 +113,35 @@ function triggerWord(block: Locator, title: string, text: string) {
 // A menu item by its label alone: an item may carry a faint note after it, such as a variable's type.
 async function pick(page: Page, opener: Locator, label: string) {
     await opener.click();
-    const item = page.locator('.menu [role="menuitem"]').filter({
-        has: page.locator('.label', { hasText: new RegExp(`^${label}$`) }),
+    await menuItem(page, label).click();
+    await expect(page.locator('.menu, .entity-picker')).toHaveCount(0);
+}
+
+// A menu's item, or one above the entity picker's tree, by its label and not the line under it.
+function menuItem(page: Page, label: string) {
+    const exactLabel = new RegExp(`^${label}$`);
+
+    return page.locator('.menu [role="menuitem"], .entity-picker [role="menuitem"]').filter({
+        has: page.locator('.label:not(:has(span)), .label > span:first-child', { hasText: exactLabel }),
     });
-    await item.click();
+}
+
+// A value in the value menu, inside its component's submenu.
+async function pickValue(page: Page, opener: Locator, component: string, value: string) {
+    await opener.click();
+    await menuItem(page, component).click();
+    await menuItem(page, value).click();
     await expect(page.locator('.menu')).toHaveCount(0);
+}
+
+// An entity in the entity picker's tree.
+async function pickEntity(page: Page, opener: Locator, name: string) {
+    await opener.click();
+    await page
+        .locator('.entity-picker [role="treeitem"]')
+        .filter({ hasText: new RegExp(`^${name}$`) })
+        .click();
+    await expect(page.locator('.entity-picker')).toHaveCount(0);
 }
 
 // A word that asks for a number, a name or a text opens a small field; Enter types the value in.
@@ -220,9 +244,9 @@ test('a button fires open on a door, which waits 2 s and flips door_open, and it
     await addAction(page, opens, 'wait');
     await typeWord(page, opens, 'Do', 'how long', String(DOOR_WAIT_S));
     await addAction(page, opens, 'change a value');
-    await pick(page, triggerWord(opens, 'Do', 'pick a value'), 'door_open');
-    await expectSentences(opens, 'When', ['this gets open']);
-    await expectSentences(opens, 'Do', [`wait ${DOOR_WAIT_S} s`, 'flip door_open of this']);
+    await pickValue(page, triggerWord(opens, 'Do', 'pick a value'), 'Variables', 'door_open');
+    await expectSentences(opens, 'When', ['this gets the custom event open']);
+    await expectSentences(opens, 'Do', [`wait ${DOOR_WAIT_S} s`, 'flip this door_open']);
 
     const opened = await addTrigger(page, 'a variable changes');
     await pick(page, triggerWord(opened, 'When', 'pick a variable'), 'door_open');
@@ -241,8 +265,8 @@ test('a button fires open on a door, which waits 2 s and flips door_open, and it
     const button = triggerBlock(page, 0);
     await addAction(page, button, 'fire a custom event');
     await pick(page, triggerWord(button, 'Do', 'pick a name'), 'open');
-    await pick(page, triggerWord(button, 'Do', 'this'), 'the entity Door');
-    await expectSentences(button, 'Do', ['fire open on Door with no number']);
+    await pickEntity(page, triggerWord(button, 'Do', 'this'), 'Door');
+    await expectSentences(button, 'Do', ['fire open on Door with a number (for scripts)']);
 
     await play(page);
     // The run's time when it is won: the ball's fall, then the door's 2 s wait.

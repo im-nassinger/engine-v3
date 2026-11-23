@@ -336,13 +336,27 @@ function changedNumber(op: ChangeOp, current: number, amount: number) {
     }
 }
 
-// Set takes the amount whole; Add and Subtract change a number, or one axis of a vector.
+// Set takes the amount whole; Add and Subtract change a number, a vector by a vector, or one axis of a
+// vector (a trigger saved with an axis that wasn't loaded through normalizeTrigger).
 function changedValue(op: ChangeOp, current: unknown, amount: unknown, axis: 'x' | 'y' | undefined): unknown {
     if (op === 'set') return amount;
+    if (axis === undefined && isPoint(current) && isPoint(amount)) {
+        const x = changedNumber(op, current.x, amount.x);
+        const y = changedNumber(op, current.y, amount.y);
+
+        return { ...current, x, y };
+    }
     if (axis === undefined) return changedNumber(op, current as number, amount as number);
 
     const vector = current as Point;
     const changed = changedNumber(op, vector[axis], amount as number);
 
     return { ...vector, [axis]: changed };
+}
+
+function isPoint(value: unknown): value is Point {
+    if (typeof value !== 'object' || value === null) return false;
+    if (!('x' in value) || !('y' in value)) return false;
+
+    return typeof value.x === 'number' && typeof value.y === 'number';
 }

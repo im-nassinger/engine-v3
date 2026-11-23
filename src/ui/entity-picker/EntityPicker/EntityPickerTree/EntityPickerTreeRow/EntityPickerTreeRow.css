@@ -1,0 +1,61 @@
+/* The Entities viewer's row, without its eye. */
+.entity-picker-tree-row {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    box-sizing: border-box;
+    width: 100%;
+    height: var(--row);
+    padding-right: var(--space-10);
+    border-radius: var(--radius);
+    color: var(--text);
+    cursor: default;
+    user-select: none;
+
+    > .fold {
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        width: var(--icon);
+        height: var(--icon);
+        padding: 0;
+        border: none;
+        background: none;
+        color: var(--muted);
+    }
+
+    > .name {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &:hover {
+        background: var(--hover);
+    }
+
+    &[data-faint='true'] > .name {
+        color: var(--muted);
+    }
+
+    &[aria-disabled='true'] {
+        color: var(--faint);
+
+        &:hover {
+            background: none;
+        }
+    }
+
+    &[aria-selected='true'] {
+        background: var(--accent-soft);
+
+        > .row-kind-icon {
+            color: var(--accent-text);
+        }
+    }
+}

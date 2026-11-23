@@ -19,7 +19,13 @@ export function TriggerBlock({ openLevel, block, commit }: TriggerBlockProps) {
         <div className="trigger-block" data-trigger-index={block.index} data-on={block.isOn}>
             <TriggerHead block={block} commit={commit} />
             {block.sections.map((section) => (
-                <TriggerSection key={section.title} section={section} triggerIndex={block.index} commit={commit} />
+                <TriggerSection
+                    key={section.title}
+                    openLevel={openLevel}
+                    section={section}
+                    triggerIndex={block.index}
+                    commit={commit}
+                />
             ))}
             {block.notes.map((note) => (
                 <CardNoteBox key={note.text} openLevel={openLevel} note={note} />

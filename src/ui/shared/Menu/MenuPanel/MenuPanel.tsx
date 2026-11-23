@@ -11,13 +11,15 @@ export type MenuPanelProps = {
     openSubmenuId?: string;
     onShowSubmenu?: (submenu: MenuSubmenu, row: HTMLElement) => void;
     onHideSubmenu?: () => void;
+    // Inside another popup, such as the entity picker: no panel of its own, only its entries.
+    isPlain?: boolean;
 };
 
 export function MenuPanel(props: MenuPanelProps) {
-    const { entries, onChoose, header, openSubmenuId, onShowSubmenu, onHideSubmenu } = props;
+    const { entries, onChoose, header, openSubmenuId, onShowSubmenu, onHideSubmenu, isPlain = false } = props;
 
     return (
-        <div className="menu-panel">
+        <div className="menu-panel" data-plain={isPlain}>
             {header}
             {entries.map((entry) => (
                 <MenuPanelEntry

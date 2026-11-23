@@ -1,0 +1,31 @@
+.entity-picker-search {
+    display: flex;
+    flex-direction: column;
+
+    > .row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+
+        > .search {
+            flex: 1;
+            min-width: 0;
+            height: var(--input);
+            padding: 0 var(--space-6);
+            border: none;
+            border-radius: calc(var(--input) / 2);
+            background: var(--field);
+            color: var(--text);
+
+            &:focus {
+                outline: 1px solid var(--accent);
+            }
+        }
+    }
+
+    > .none {
+        margin: 0;
+        padding: var(--space-4) var(--space-8);
+        color: var(--muted);
+    }
+}

@@ -35,8 +35,8 @@ describe("TriggerCardModel's v4 kinds", () => {
     test.each([
         [{ kind: 'collision' }, 'this hits something'],
         [{ kind: 'destroyed' }, 'this is destroyed'],
-        [{ kind: 'custom', name: 'open' }, 'this gets open'],
-        [{ kind: 'custom', name: null }, 'this gets pick a name'],
+        [{ kind: 'custom', name: 'open' }, 'this gets the custom event open'],
+        [{ kind: 'custom', name: null }, 'this gets the custom event pick a name'],
         [{ kind: 'variableChanged', variable: null, becomes: null }, 'the variable pick a variable changes'],
         [
             {
@@ -86,7 +86,7 @@ describe("TriggerCardModel's v4 kinds", () => {
         const sentence = whenRow({ kind: 'variableChanged', variable: null, becomes: null });
         const groups = groupsOf(slotOf(sentence, 'variable').entry);
 
-        expect(groups.map((group) => group.title)).toEqual(["The level's", 'this']);
+        expect(groups.map((group) => group.title)).toEqual(['Level variables', 'this']);
         expect(groups.map((group) => group.choices.map((choice) => [choice.label, choice.note]))).toEqual([
             [
                 ['coins', 'number'],
@@ -172,9 +172,9 @@ describe("TriggerCardModel's v4 kinds", () => {
         const touchedGroups = groupsOf(slotOf(checkRow(check), 'variable').entry);
         const startGroups = groupsOf(slotOf(checkRow(check, { kind: 'levelStart' }), 'variable').entry);
 
-        expect(touchedGroups.map((group) => group.title)).toEqual(["The level's", 'this', 'other']);
+        expect(touchedGroups.map((group) => group.title)).toEqual(['Level variables', 'this', 'other']);
         expect(labelsOf(touchedGroups[2]?.choices ?? [])).toEqual(['health', 'door_open', 'state']);
-        expect(startGroups.map((group) => group.title)).toEqual(["The level's", 'this']);
+        expect(startGroups.map((group) => group.title)).toEqual(['Level variables', 'this']);
     });
 
     test('the compare words and the value field follow the variable: text in quotes, true or false', () => {
@@ -217,7 +217,7 @@ describe("TriggerCardModel's v4 kinds", () => {
         });
     });
 
-    test('the component value check reads "this Body speed is more than 200"', () => {
+    test('the component value check reads "this Body › Speed is more than 200"', () => {
         const check: Check = {
             kind: 'compareValue',
             target: { kind: 'this' },
@@ -226,11 +226,33 @@ describe("TriggerCardModel's v4 kinds", () => {
             amount: 200,
         };
 
-        expect(checkRow(check).text).toBe('this Body speed is more than 200');
+        expect(checkRow(check).text).toBe('this Body › Speed is more than 200');
         expect(checkRow({ ...check, value: null, amount: null }).text).toBe('this pick a value is more than a number');
     });
 
-    test("the value menu lists the target's components, each with its numbers, and the body's live values last", () => {
+    test("a vector or a body's velocity is read on one axis, a word of its own", () => {
+        const check: Check = {
+            kind: 'compareValue',
+            target: { kind: 'this' },
+            value: { kind: 'field', component: 'TransformComponent', field: 'position', axis: 'y' },
+            compare: 'atMost',
+            amount: 500,
+        };
+        const axis = slotOf(checkRow(check), 'axis');
+        const velocity = checkRow({ ...check, value: { kind: 'live', live: 'velocityX' } });
+
+        expect(checkRow(check).text).toBe('this Transform › Position y is at most 500');
+        expect(labelsOf(choicesOf(axis.entry))).toEqual(['x', 'y']);
+        expect(choiceNamed(choicesOf(axis.entry), 'x').value).toMatchObject({
+            check: { value: { kind: 'field', field: 'position', axis: 'x' } },
+        });
+        expect(velocity.text).toBe('this Body › Velocity x is at most 500');
+        expect(choiceNamed(choicesOf(slotOf(velocity, 'axis').entry), 'y').value).toMatchObject({
+            check: { value: { kind: 'live', live: 'velocityY' } },
+        });
+    });
+
+    test("the value menu lists the target's components, each with its numbers and vectors once, and the body's live values last", () => {
         const check: Check = {
             kind: 'compareValue',
             target: { kind: 'this' },
@@ -243,13 +265,15 @@ describe("TriggerCardModel's v4 kinds", () => {
 
         const transform = entry.submenus.find((submenu) => submenu.label === 'Transform');
         const body = entry.submenus.find((submenu) => submenu.label === 'Body');
-        const liveChoices = body?.choices.slice(-3) ?? [];
+        const liveChoices = body?.choices.slice(-2) ?? [];
 
-        expect(labelsOf(transform?.choices ?? [])).toContain('Position x');
+        expect(labelsOf(transform?.choices ?? [])).toEqual(['Position', 'Rotation', 'Scale', 'Skew']);
+        expect(choiceNamed(transform?.choices ?? [], 'Position').value).toMatchObject({
+            check: { value: { kind: 'field', field: 'position', axis: 'x' } },
+        });
         expect(liveChoices.map((choice) => [choice.label, choice.note])).toEqual([
             ['Speed', 'live'],
-            ['Velocity x', 'live'],
-            ['Velocity y', 'live'],
+            ['Velocity', 'live'],
         ]);
         expect(liveChoices[1]?.value).toMatchObject({ check: { value: { kind: 'live', live: 'velocityX' } } });
     });
@@ -259,9 +283,9 @@ describe("TriggerCardModel's v4 kinds", () => {
         const row = actionRow(fire);
         const amount = slotOf(row.sentence, 'amount');
 
-        expect(row.sentence.text).toBe('fire open on every coin with no number');
+        expect(row.sentence.text).toBe('fire open on every coin with a number (for scripts)');
         expect(amount).toMatchObject({ state: 'optional', entry: { kind: 'number', clearLabel: 'No number' } });
-        expect(actionRow({ ...fire, amount: 2 }).sentence.text).toBe('fire open on every coin with 2');
+        expect(actionRow({ ...fire, amount: 2 }).sentence.text).toBe('fire open on every coin with the number 2');
         expect(slotOf(actionRow({ ...fire, name: null }).sentence, 'name').state).toBe('unset');
     });
 
@@ -287,11 +311,11 @@ describe("TriggerCardModel's v4 kinds", () => {
         };
         const sentence = actionRow(flip).sentence;
 
-        expect(sentence.text).toBe('flip door_open of this');
+        expect(sentence.text).toBe('flip this door_open');
         expect(labelsOf(choicesOf(slotOf(sentence, 'op').entry))).toEqual(['set', 'flip']);
 
         const set = actionRow({ ...flip, op: 'set', amount: true }).sentence;
-        expect(set.text).toBe('set true as door_open of this');
+        expect(set.text).toBe('set this door_open to true');
         expect(labelsOf(choicesOf(slotOf(set, 'amount').entry))).toEqual(['true', 'false']);
     });
 
@@ -307,17 +331,17 @@ describe("TriggerCardModel's v4 kinds", () => {
         component.set('triggers', [triggerWith({ actions: [set] })]);
         const sentence = rowOf(block(), DO).sentence;
 
-        expect(sentence.text).toBe('set "Bo" as player_name');
+        expect(sentence.text).toBe('set player_name to "Bo"');
         expect(labelsOf(choicesOf(slotOf(sentence, 'op').entry))).toEqual(['set']);
         expect(slotOf(sentence, 'amount').entry).toEqual({ kind: 'text', value: 'Bo' });
     });
 
-    test("Change value's menu offers its target's own variables; a boolean picked over add takes flip", () => {
+    test("Change value's menu offers its target's own variables under Variables; a boolean picked over add takes flip", () => {
         const add: Action = { kind: 'change', target: { kind: 'this' }, value: null, op: 'add', amount: 1 };
         const groups = groupsOf(slotOf(actionRow(add).sentence, 'value').entry);
-        const ownGroup = groups[1];
+        const ownGroup = groups[1]?.submenus?.find((submenu) => submenu.label === 'Variables');
 
-        expect(ownGroup?.title).toBe('this');
+        expect(groups[1]?.title).toBe('Values of this');
         expect(ownGroup?.choices.map((choice) => [choice.label, choice.note])).toEqual([
             ['door_open', 'boolean'],
             ['state', 'string'],

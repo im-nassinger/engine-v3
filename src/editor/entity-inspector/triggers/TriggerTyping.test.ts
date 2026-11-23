@@ -40,4 +40,22 @@ describe('TriggerTyping', () => {
         expect(TriggerTyping.parse(textEntry, ' Hello ')).toEqual({ kind: 'value', value: 'Hello' });
         expect(TriggerTyping.parse(otherEntry, '3').kind).toBe('invalid');
     });
+
+    test('reads the two boxes of a vector; an empty one keeps its axis, or 0 while unset', () => {
+        const entry = { kind: 'vector', value: { x: 1, y: 2 }, unit: 'px' } as const;
+        const unset = { ...entry, value: null };
+
+        expect(TriggerTyping.parseAxes(entry, '5', '-6 px')).toEqual({ kind: 'value', value: { x: 5, y: -6 } });
+        expect(TriggerTyping.parseAxes(entry, '', '7')).toEqual({ kind: 'value', value: { x: 1, y: 7 } });
+        expect(TriggerTyping.parseAxes(unset, '3', '')).toEqual({ kind: 'value', value: { x: 3, y: 0 } });
+        expect(TriggerTyping.parseAxes(entry, '1', 'up')).toEqual({ kind: 'invalid', reason: 'y: Not a number' });
+    });
+
+    test('a colour picked for a Fill is a solid fill of it', () => {
+        expect(TriggerTyping.colourValue({ kind: 'colour', value: null }, '#FF0000FF')).toBe('#FF0000FF');
+        expect(TriggerTyping.colourValue({ kind: 'colour', value: null, isFill: true }, '#FF0000FF')).toEqual({
+            kind: 'solid',
+            colour: '#FF0000FF',
+        });
+    });
 });

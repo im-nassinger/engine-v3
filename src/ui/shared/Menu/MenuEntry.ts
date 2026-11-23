@@ -10,6 +10,8 @@ export type MenuAction = {
     disabledReason?: string;
     // A small faint word at the right, such as a variable's type.
     note?: string;
+    // A faint line under the label saying what the entry does, such as Add action's "Kick a body".
+    description?: string;
 };
 
 // The title of the entries under it, in small caps: the variable menu's "The level's".

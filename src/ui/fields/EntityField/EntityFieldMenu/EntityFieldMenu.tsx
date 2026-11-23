@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import type { Entity, EntityId, Level } from '../../../../core/level/index.ts';
-import { labelName } from '../../../../core/level/index.ts';
+import type { EntityId, Level } from '../../../../core/level/index.ts';
 import { EntityChoices } from '../../../../editor/entity-inspector/index.ts';
-import { Menu, MenuSearch, useOpenMenu } from '../../../shared/index.ts';
+import { EntityPicker } from '../../../entity-picker/index.ts';
+import { useOpenMenu } from '../../../shared/index.ts';
 import type { MenuEntry } from '../../../shared/index.ts';
 
 export type EntityFieldMenuProps = {
@@ -13,49 +12,11 @@ export type EntityFieldMenuProps = {
     onChoose: (value: EntityId | null) => void;
 };
 
-// None, then the entities whose name holds what is typed, in panel order. Enter picks the first one.
+// None, then the entity picker's tree, where the World, the camera and the field's own entities are
+// greyed. Typing searches the names, and Enter picks the first one.
 export function EntityFieldMenu({ level, ownIds, chosenValue, onChoose }: EntityFieldMenuProps) {
-    // The choices are read from the level, which changes inside, so the React Compiler must not keep them.
-    'use no memo';
-
     const { close, anchor } = useOpenMenu();
-    const [search, setSearch] = useState('');
 
-    const choices = EntityChoices.matching(level, ownIds, search);
-
-    const chooseFirst = () => {
-        const first = choices[0];
-        if (first === undefined) return;
-
-        onChoose(first.id);
-        close();
-    };
-
-    let noneText;
-    if (choices.length === 0) {
-        noneText = 'No entity matches';
-    }
-
-    const searchBox = (
-        <MenuSearch
-            label="Search entities"
-            search={search}
-            onSearch={setSearch}
-            onEnter={chooseFirst}
-            noneText={noneText}
-        />
-    );
-
-    const entries = menuEntriesOf(choices, chosenValue, onChoose);
-
-    return <Menu entries={entries} onClose={close} anchor={anchor} header={searchBox} />;
-}
-
-function menuEntriesOf(
-    choices: readonly Entity[],
-    chosenValue: unknown,
-    onChoose: (value: EntityId | null) => void,
-): MenuEntry[] {
     const noneEntry: MenuEntry = {
         kind: 'action',
         id: 'none',
@@ -64,13 +25,18 @@ function menuEntriesOf(
         onChoose: () => onChoose(null),
     };
 
-    const entityEntries = choices.map((entity): MenuEntry => ({
-        kind: 'action',
-        id: String(entity.id),
-        label: labelName(entity),
-        checked: entity.id === chosenValue,
-        onChoose: () => onChoose(entity.id),
-    }));
+    const chosenId = typeof chosenValue === 'number' ? chosenValue : undefined;
+    const refusalOf = (entityId: EntityId) => EntityChoices.refusal(level, ownIds, entityId);
 
-    return [noneEntry, ...entityEntries];
+    return (
+        <EntityPicker
+            level={level}
+            anchor={anchor}
+            entries={[noneEntry]}
+            chosenId={chosenId}
+            refusalOf={refusalOf}
+            onPick={onChoose}
+            onClose={close}
+        />
+    );
 }

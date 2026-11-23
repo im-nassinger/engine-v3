@@ -40,6 +40,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Minimap | The island at the bottom right showing the whole level bounds small, with a rectangle for what the level view shows. Show-only in v1. |
 | Debug box | The island under the minimap showing the mouse position, the grid size and the zoom: `X: … Y: … GRID: … ZOOM: …`. |
 | Message pill | The pill at the bottom middle of the level view showing a status text while there is one, and a failed save until it is fixed. |
+| Entity picker | The popup that picks an entity for an entity field or a trigger's entity word: its first items name no one entity (None, or `this`, `other` and every entity with a tag), then a search box with the target icon, then the Entities viewer's tree, rows drawn the same way. The target icon closes it and picks the next entity clicked in the level view. |
 | Field | One editable value on a card. Fields come from one fixed list of field types. A list field holds several values of one type as one field, such as a shape's Points. |
 | Attribute | One value of a component, as the Lua API names it: the Entity inspector field "Linear damping" is the attribute `linear_damping`. Scripts read it with `get_attribute` and change it with `set_attribute`. |
 | Assets panel | The panel listing the level's files in folders, like a small file system. |
@@ -55,8 +56,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Grid | The editor's grid of lines in the level view. Never the collision grid. |
 | Pivot | The point an entity rotates and scales around. |
 | Editor message | A short note on the card it is about, never blocking, maybe with a fix button. Each shows only on its card. Two kinds: warning and tip. |
-| Warning | An editor message with a yellow icon: this setup may not work as expected. |
-| Tip | An editor message with a blue icon: this works, but there is an easier way. |
+| Warning, tip | The two kinds of editor message. A **warning** has a yellow icon: this setup may not work as expected. A **tip** has a blue icon: this works, but there is an easier way. |
 | Used by | The list at the bottom of the Entity inspector of every entity that points to the selected one. |
 | Component preset | A saved set of values for one component, picked from a menu on its card. Not in v1. |
 | Read-only tab | An older tab whose level was opened in a newer tab. It saved its changes first. You can look, select, pan, zoom, copy and export, but every edit is refused with "The level is open in another tab", and nothing more is saved. Reloading it takes the level back. |
@@ -137,7 +137,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Action | One step in a trigger's Do list, such as Change value or Spawn. Only ever used for triggers. |
 | When, If, Do | The three parts of a trigger, each a section of its card: **When** names its one event, **If** its checks, **Do** its actions, run top to bottom. |
 | Check | One condition in a trigger's If, such as "`other` has the tag `coin`" or "`coins` is at least 10". The actions run only when every check holds. |
-| Component value check | The check that compares a number value of the target's components, one part of a vector, or a body's **live value** (what it is doing right now, read from physics: its speed and its velocity x and y, in px/s) with a number: "If this BodyComponent speed is more than 200". |
+| Component value check | The check that compares a number value of the target's components, one part of a vector, or a body's **live value** (what it is doing right now, read from physics: its speed and its velocity x and y, in px/s) with a number: "If this Body › Speed is more than 200". A vector's x or y is a word of its own. |
 | Repeat | A trigger's setting for how often it may fire: every time (the default), once per run, or at most once every N seconds. |
 | Touched, no longer touched | The events for something starting or stopping touching an entity's sensor or surface, once per touching entity however many shapes it has. `other` is the entity that touched or left. |
 | Collision (event) | The event for this entity starting to hit a solid thing, once per entity hit however many shapes it has: "When this hits something". `other` is the entity hit. Not the same as the collision grid, which decides what hits what. |

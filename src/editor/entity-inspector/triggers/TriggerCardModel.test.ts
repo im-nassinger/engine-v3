@@ -52,6 +52,26 @@ function menuLabels(word: TriggerWord) {
     return word.entry.choices.map((choice) => choice.label);
 }
 
+function entitiesOf(word: TriggerWord) {
+    if (word.kind !== 'slot' || word.entry.kind !== 'entities') throw new Error('Not the entity picker.');
+
+    return word.entry;
+}
+
+function valueInMenu(word: TriggerWord, label: string) {
+    for (const group of groupsOf(word)) {
+        const direct = group.choices.find((choice) => choice.label === label);
+        if (direct !== undefined) return direct;
+
+        for (const submenu of group.submenus ?? []) {
+            const inside = submenu.choices.find((choice) => `${submenu.label} › ${choice.label}` === label);
+            if (inside !== undefined) return inside;
+        }
+    }
+
+    throw new Error(`No value ${label}.`);
+}
+
 const WHEN_CASES: readonly (readonly [When | null, string])[] = [
     [null, 'pick an event'],
     [{ kind: 'touched' }, 'something starts touching this'],
@@ -66,8 +86,8 @@ const WHEN_CASES: readonly (readonly [When | null, string])[] = [
 ];
 
 const CHECK_CASES: readonly (readonly [Check, string])[] = [
-    [{ kind: 'hasTag', target: { kind: 'other' }, tag: 'player' }, 'other is tagged player'],
-    [{ kind: 'hasTag', target: { kind: 'entity', entity: null }, tag: null }, 'pick who is tagged pick a tag'],
+    [{ kind: 'hasTag', target: { kind: 'other' }, tag: 'player' }, 'other has the tag player'],
+    [{ kind: 'hasTag', target: { kind: 'entity', entity: null }, tag: null }, 'pick an entity has the tag pick a tag'],
     [
         { kind: 'compare', variable: { owner: 'level', name: 'coins' }, compare: 'atLeast', value: 10 },
         'coins is at least 10',
@@ -131,7 +151,7 @@ describe('TriggerCardModel', () => {
             'after some time',
             'every few seconds',
             'the level starts',
-            'no entity with a tag is left',
+            'the last entity with a tag is gone',
             'this hits something',
             'this gets a custom event',
             'this is destroyed',
@@ -160,27 +180,49 @@ describe('TriggerCardModel', () => {
         expect(rowText(blockOf({ checks: [check] }), 1)).toBe(text);
     });
 
-    test("a check targets this, other or any entity but the trigger's own, never a tag", () => {
+    test("a check's target opens the entity picker: this, other, then the tree, never a tag", () => {
         const check: Check = { kind: 'hasTag', target: { kind: 'other' }, tag: 'player' };
-        const target = slotNamed(sentenceOf(blockOf({ checks: [check] }), 1), 'target');
+        const { component, context, player, coin } = buildTriggerLevel([{ checks: [check] }]);
+        const block = TriggerCardModel.build(component, context, []).triggers[0] as TriggerBlock;
+        const picker = entitiesOf(slotNamed(sentenceOf(block, 1), 'target'));
 
-        expect(menuLabels(target)).toEqual([
-            'this',
-            'other',
-            'the entity World',
-            'the entity Player',
-            'the entity Camera',
+        expect(picker.choices.map((choice) => [choice.label, choice.description])).toEqual([
+            ['this', 'The entity this trigger is on'],
+            ['other', 'The other entity of the event: the one touching, hit or firing'],
         ]);
+        expect(picker.tagged).toEqual([]);
+        expect(picker.chosenId).toBeUndefined();
+        expect(picker.placeEntity(player.id)).toMatchObject({
+            check: { ...check, target: { kind: 'entity', entity: player.id } },
+        });
+        expect(picker.placeEntity(coin.id)).toMatchObject({ check: { ...check, target: { kind: 'this' } } });
+    });
+
+    test("an action's target picker also offers every entity with a tag, and marks the entity picked", () => {
+        const { component, context, player } = buildTriggerLevel([
+            { actions: [{ kind: 'destroy', target: { kind: 'entity', entity: 0 } }] },
+        ]);
+        const trigger = component.get('triggers')[0] as Trigger;
+        const action: Action = { kind: 'destroy', target: { kind: 'entity', entity: player.id } };
+        component.set('triggers', [{ ...trigger, actions: [action] }]);
+        const block = TriggerCardModel.build(component, context, []).triggers[0] as TriggerBlock;
+        const picker = entitiesOf(slotNamed(sentenceOf(block, 2), 'target'));
+
+        expect(picker.tagged.map((choice) => choice.label)).toEqual([
+            'every entity tagged coin',
+            'every entity tagged player',
+        ]);
+        expect(picker.chosenId).toBe(player.id);
     });
 
     test('`other` under an event with none is greyed, with its reason, in the word and the menu', () => {
         const check: Check = { kind: 'hasTag', target: { kind: 'other' }, tag: 'player' };
         const block = blockOf({ when: { kind: 'levelStart' }, checks: [check] });
         const target = slotNamed(sentenceOf(block, 1), 'target');
-        if (target.entry.kind !== 'menu') throw new Error('Not a menu.');
+        const reason = 'This event has no other entity';
 
-        expect(target).toMatchObject({ text: 'other', state: 'greyed', reason: 'no other for this event' });
-        expect(target.entry.choices[1]).toMatchObject({ label: 'other', disabledReason: 'no other for this event' });
+        expect(target).toMatchObject({ text: 'other', state: 'greyed', reason });
+        expect(entitiesOf(target).choices[1]).toMatchObject({ label: 'other', disabledReason: reason });
     });
 
     test('a deleted entity reads `missing entity`', () => {
@@ -199,7 +241,7 @@ describe('TriggerCardModel', () => {
         [{ kind: 'push', target: { kind: 'other' }, push: null }, 'push other how'],
         [
             { kind: 'push', target: { kind: 'other' }, push: { kind: 'by', x: 0, y: -600 } },
-            'push other by 0 , -600 px/s',
+            'push other by 0, -600 px/s',
         ],
         [
             { kind: 'push', target: { kind: 'other' }, push: { kind: 'away', strength: 400 } },
@@ -207,7 +249,7 @@ describe('TriggerCardModel', () => {
         ],
         [
             { kind: 'change', target: { kind: 'entity', entity: null }, value: null, op: 'add', amount: null },
-            'add a value to pick a value',
+            'add a value to pick an entity pick a value',
         ],
     ] as const)('the action %j reads "%s"', (action, text) => {
         expect(rowText(blockOf({ actions: [action] }), 2)).toBe(text);
@@ -255,27 +297,28 @@ describe('TriggerCardModel', () => {
         const block = TriggerCardModel.build(component, context, []).triggers[0] as TriggerBlock;
 
         expect(rowText(block, 2, 0)).toBe('add 1 to coins');
-        expect(rowText(block, 2, 1)).toBe('subtract 10 from Transform position x of other');
-        expect(rowText(block, 2, 2)).toBe('add gone to tags of this');
-        expect(rowText(block, 2, 3)).toBe('set 5, 6 as Transform position of this');
+        expect(rowText(block, 2, 1)).toBe('subtract 10, 0 from other Transform › Position');
+        expect(rowText(block, 2, 2)).toBe('add gone to this tags');
+        expect(rowText(block, 2, 3)).toBe('set this Transform › Position to 5, 6');
     });
 
-    test("the value menu lists the level's variables, the target's own, then what the target may change", () => {
+    test("the value menu lists the level's variables, then the target's components, each opening its values", () => {
         const action: Action = { kind: 'change', target: { kind: 'this' }, value: null, op: 'add', amount: null };
         const value = slotNamed(sentenceOf(blockOf({ actions: [action] }), 2), 'value');
         const groups = groupsOf(value);
 
-        expect(groups.map((group) => group.title)).toEqual(["The level's", 'this', 'A value of an entity']);
+        expect(groups.map((group) => group.title)).toEqual(['Level variables', 'Values of this']);
         expect(groups[0]?.choices.map((choice) => [choice.label, choice.note])).toEqual([
             ['coins', 'number'],
             ['lives', 'number'],
         ]);
-        expect(groups[1]).toMatchObject({ choices: [], emptyText: 'no variables of its own' });
-
-        const otherLabels = groups[2]?.choices.map((choice) => choice.label);
-        expect(otherLabels).toContain('Transform position x');
-        expect(otherLabels).toContain('tags');
-        expect(otherLabels).toContain('trigger "Touched" on');
+        expect(
+            groups[1]?.submenus?.map((submenu) => [submenu.label, submenu.choices.map((choice) => choice.label)]),
+        ).toEqual([
+            ['Transform', ['Position', 'Rotation']],
+            ['Tags', ['Tags']],
+            ['Trigger', ['Touched on/off']],
+        ]);
     });
 
     test('picking a variable makes the World the target; a field keeps the target and fixes the op', () => {
@@ -284,8 +327,9 @@ describe('TriggerCardModel', () => {
         const block = TriggerCardModel.build(component, context, []).triggers[0] as TriggerBlock;
         const groups = groupsOf(slotNamed(sentenceOf(block, 2), 'value'));
 
+        const valueWord = slotNamed(sentenceOf(block, 2), 'value');
         const coins = groups[0]?.choices.find((choice) => choice.label === 'coins');
-        const fill = groups[2]?.choices.find((choice) => choice.label === 'Style fill');
+        const fill = valueInMenu(valueWord, 'Style › Fill');
 
         expect(coins?.value).toEqual({
             section: 'action',
@@ -323,36 +367,101 @@ describe('TriggerCardModel', () => {
 
         expect(onAmount.text).toBe('off');
         expect(menuLabels(onAmount)).toEqual(['on', 'off']);
-        expect(menuLabels(tagAmount)).toEqual(['coin', 'player']);
-        expect(rowText(block, 2, 0)).toBe('set off as trigger "Touched" on of this');
+        expect(menuLabels(tagAmount)).toEqual(['coin', 'player', 'New tag…']);
+        expect(rowText(block, 2, 0)).toBe('set this Trigger › Touched to off');
     });
 
-    test('Add check offers its three kinds and Add action its eight; with no action, Add action is needed', () => {
+    test("an amount opens the inspector's own boxes: a vector's two, a number with its unit, the colour box", () => {
+        const change = (field: string, component: `${string}Component`, amount: unknown) =>
+            ({
+                kind: 'change',
+                target: { kind: 'other' },
+                value: { kind: 'field', component, field },
+                op: 'set',
+                amount,
+            }) as Action;
+        const block = blockOf({
+            actions: [
+                change('position', 'TransformComponent', { x: 5, y: 6 }),
+                change('rotation', 'TransformComponent', 90),
+                change('outlineColour', 'StyleComponent', '#FF0000FF'),
+                change('fill', 'StyleComponent', { kind: 'solid', colour: '#00FF00FF' }),
+            ],
+        });
+
+        expect(slotNamed(sentenceOf(block, 2, 0), 'amount').entry).toEqual({
+            kind: 'vector',
+            value: { x: 5, y: 6 },
+            unit: 'px',
+        });
+        expect(slotNamed(sentenceOf(block, 2, 1), 'amount').entry).toEqual({ kind: 'number', value: 90, unit: '°' });
+        expect(slotNamed(sentenceOf(block, 2, 2), 'amount').entry).toEqual({ kind: 'colour', value: '#FF0000FF' });
+        expect(slotNamed(sentenceOf(block, 2, 3), 'amount')).toMatchObject({
+            text: '#00FF00FF',
+            entry: { kind: 'colour', value: '#00FF00FF', isFill: true },
+        });
+    });
+
+    test("an entity amount, such as the camera's Follow, opens the entity picker and reads the entity's name", () => {
+        const { component, context, level, player } = buildTriggerLevel([{}]);
+        const follow: Action = {
+            kind: 'change',
+            target: { kind: 'entity', entity: level.camera.id },
+            value: { kind: 'field', component: 'CameraComponent', field: 'follow' },
+            op: 'set',
+            amount: { entity: player.id },
+        };
+        const trigger = component.get('triggers')[0] as Trigger;
+        component.set('triggers', [{ ...trigger, actions: [follow] }]);
+        const block = TriggerCardModel.build(component, context, []).triggers[0] as TriggerBlock;
+        const amount = slotNamed(sentenceOf(block, 2), 'amount');
+
+        expect(rowText(block, 2)).toBe('set Camera Camera › Follow to Player');
+        expect(entitiesOf(amount).chosenId).toBe(player.id);
+        expect(entitiesOf(amount).placeEntity(level.world.id)).toMatchObject({
+            action: { amount: { entity: level.world.id } },
+        });
+    });
+
+    test('Push by a fixed kick is one vector word', () => {
+        const push: Action = { kind: 'push', target: { kind: 'other' }, push: { kind: 'by', x: 0, y: -600 } };
+        const kick = slotNamed(sentenceOf(blockOf({ actions: [push] }), 2), 'pushBy');
+
+        expect(kick).toMatchObject({
+            text: '0, -600',
+            entry: { kind: 'vector', value: { x: 0, y: -600 }, unit: 'px/s' },
+        });
+    });
+
+    test('Add check offers its three kinds and Add action its eight in groups, each saying what it does; with no action, Add action is needed', () => {
         const block = blockOf({ when: { kind: 'touched' } });
         const addCheck = block.sections[1].addRow;
         const addAction = block.sections[2].addRow;
 
-        expect(addCheck?.choices.map((choice) => choice.label)).toEqual([
-            'who is tagged…',
-            'a variable compared with a value',
-            'a component value compared with a number',
+        if (addCheck?.entry.kind !== 'menu' || addAction?.entry.kind !== 'groups') throw new Error('No add menus.');
+
+        expect(addCheck.entry.choices.map((choice) => [choice.label, choice.description])).toEqual([
+            ['an entity has a tag', 'Such as: other has the tag player'],
+            ["a variable's value", 'Such as: coins is at least 10'],
+            ['a component value', 'Such as: this Transform › Position y is more than 500'],
         ]);
-        expect(addCheck?.choices[0]?.value).toEqual({
+        expect(addCheck.entry.choices[0]?.value).toEqual({
             section: 'check',
             index: 0,
             check: { kind: 'hasTag', target: { kind: 'other' }, tag: null },
         });
-        expect(addAction?.choices.map((choice) => choice.label)).toEqual([
-            'change a value',
-            'destroy',
-            'push',
-            'fire a custom event',
-            'wait',
-            'win',
-            'lose',
-            'restart the level',
+        const actionGroups = addAction.entry.groups.map((group) => [
+            group.title,
+            group.choices.map((choice) => choice.label),
         ]);
-        expect(addAction?.isNeeded).toBe(true);
+        expect(actionGroups).toEqual([
+            ['Values', ['change a value']],
+            ['Entities', ['destroy', 'push']],
+            ['Events', ['fire a custom event', 'wait']],
+            ['The game', ['win', 'lose', 'restart the level']],
+        ]);
+        expect(addAction.entry.groups[1]?.choices[1]?.description).toBe('Kick a body, whatever its mass');
+        expect(addAction.isNeeded).toBe(true);
         expect(blockOf({ actions: [{ kind: 'win' }] }).sections[2].addRow?.isNeeded).toBe(false);
     });
 

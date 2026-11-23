@@ -32,18 +32,13 @@ function buildCoin() {
 }
 
 describe('changeableValues', () => {
-    test("offers an entity's changeable fields, its tag, its variables and each trigger's on/off", () => {
+    test("offers an entity's changeable fields (a vector whole), its tag, its variables and each trigger's on/off", () => {
         const offers = changeableValues(buildCoin(), registry).map(({ ref, ops }) => ({ ref, ops }));
 
         expect(offers).toEqual([
-            { ref: { kind: 'field', component: 'TransformComponent', field: 'position' }, ops: ['set'] },
             {
-                ref: { kind: 'field', component: 'TransformComponent', field: 'position', axis: 'x' },
-                ops: ['add', 'subtract'],
-            },
-            {
-                ref: { kind: 'field', component: 'TransformComponent', field: 'position', axis: 'y' },
-                ops: ['add', 'subtract'],
+                ref: { kind: 'field', component: 'TransformComponent', field: 'position' },
+                ops: ['set', 'add', 'subtract'],
             },
             {
                 ref: { kind: 'field', component: 'TransformComponent', field: 'rotation' },

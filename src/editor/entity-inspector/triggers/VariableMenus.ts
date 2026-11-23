@@ -16,7 +16,7 @@ export type KnownVariable = {
 // Builds the row a picked variable makes, knowing the variable's type.
 export type PlaceVariable = (ref: VariableRef, type: VariableType) => TriggerPartValue;
 
-export const LEVEL_GROUP_TITLE = "The level's";
+export const LEVEL_GROUP_TITLE = 'Level variables';
 const NO_OWN_VARIABLES = 'no variables of its own';
 
 // The variable menus of the trigger card: "The level's" (the World's VariablesComponent) first, then a group

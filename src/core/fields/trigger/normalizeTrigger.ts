@@ -122,8 +122,9 @@ function normalizeCheck(check: Check): Check {
 function normalizeAction(action: Action): Action {
     switch (action.kind) {
         case 'change': {
-            const value = normalizeValueRef(action.value);
-            const amount = normalizeAmount(value, action.amount);
+            const whole = wholeVectorChange(action.value, action.amount);
+            const value = normalizeValueRef(whole.value);
+            const amount = normalizeAmount(value, whole.amount);
 
             return { kind: 'change', target: normalizeTarget(action.target), value, op: action.op, amount };
         }
@@ -149,6 +150,18 @@ function normalizeValueRef(value: ValueRef | null): ValueRef | null {
     if (name === null) return null;
 
     return { ...value, name };
+}
+
+// Before 2026-11-23 a vector was added to one axis at a time, `{ ..., "axis": "x" }` with a number. It is
+// now added whole, so such a change reads as the same vector with 0 on the other axis.
+function wholeVectorChange(value: ValueRef | null, amount: JsonValue | null) {
+    if (value?.kind !== 'field' || value.axis === undefined) return { value, amount };
+
+    const wholeValue: ValueRef = { kind: 'field', component: value.component, field: value.field };
+    if (typeof amount !== 'number') return { value: wholeValue, amount };
+
+    const wholeAmount = value.axis === 'x' ? { x: amount, y: 0 } : { x: 0, y: amount };
+    return { value: wholeValue, amount: wholeAmount };
 }
 
 // A tag added or removed is a word like any tag. Any other amount is checked by its field's type in play.

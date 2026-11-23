@@ -57,7 +57,9 @@ export function slotOf(sentence: TriggerSentence, slot: string): SlotWord {
     return word;
 }
 
+// A menu's items; for the entity picker, the items above its tree: this, other, then each tag.
 export function choicesOf(entry: TriggerWordEntry) {
+    if (entry.kind === 'entities') return [...entry.choices, ...entry.tagged];
     if (entry.kind !== 'menu') throw new Error(`A ${entry.kind}, not a menu.`);
 
     return entry.choices;

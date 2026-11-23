@@ -98,20 +98,16 @@ function triggerWord(page: Page, title: string, text: string) {
 
 async function pick(page: Page, opener: ReturnType<Page['locator']>, label: string) {
     await opener.click();
-    await page.locator('.menu').getByRole('menuitem', { name: label, exact: true }).click();
+    const exactLabel = new RegExp(`^${label}$`);
+    const item = page.locator('.menu [role="menuitem"]').filter({
+        has: page.locator('.label:not(:has(span)), .label > span:first-child', { hasText: exactLabel }),
+    });
+    await item.click();
     await expect(page.locator('.menu')).toHaveCount(0);
 }
 
 async function addTriggerRow(page: Page, label: 'Add check' | 'Add action', kind: string) {
     await pick(page, triggerBlock(page).getByRole('button', { name: label }), kind);
-}
-
-// A number word opens a small field; Enter types the value in.
-async function typeWord(page: Page, title: string, text: string, value: string) {
-    await triggerWord(page, title, text).click();
-    const field = page.getByRole('textbox', { name: 'Value', exact: true });
-    await field.fill(value);
-    await field.press('Enter');
 }
 
 // Each row's words joined by spaces, as the card reads: its text runs them together.
@@ -249,9 +245,9 @@ test('a trigger drawn with the Trigger tool wins when a tagged ball falls into i
     await expect(card(page, 'SurfaceComponent').getByRole('checkbox', { name: 'Sensor' })).toBeChecked();
     await expectSentences(page, 'When', ['something starts touching this']);
 
-    await addTriggerRow(page, 'Add check', 'who is tagged…');
+    await addTriggerRow(page, 'Add check', 'an entity has a tag');
     await pick(page, triggerWord(page, 'If', 'pick a tag'), 'player');
-    await expectSentences(page, 'If', ['other is tagged player']);
+    await expectSentences(page, 'If', ['other has the tag player']);
     await addTriggerRow(page, 'Add action', 'win');
     await expectSentences(page, 'Do', ['win']);
     await expect(triggerBlock(page).locator('.card-note-box')).toHaveCount(0);
@@ -292,8 +288,11 @@ test('a key trigger pushes its body up when the key is pressed during play', asy
     await expectSentences(page, 'When', ['the key Space is pressed']);
     await addTriggerRow(page, 'Add action', 'push');
     await pick(page, triggerWord(page, 'Do', 'how'), 'by a fixed kick');
-    await typeWord(page, 'Do', '-600', KICK_Y);
-    await expectSentences(page, 'Do', [`push this by 0 , ${KICK_Y} px/s`]);
+    await triggerWord(page, 'Do', '0, -600').click();
+    const kickY = page.getByRole('textbox', { name: 'Y', exact: true });
+    await kickY.fill(KICK_Y);
+    await kickY.press('Enter');
+    await expectSentences(page, 'Do', [`push this by 0, ${KICK_Y} px/s`]);
     await expect(triggerBlock(page).locator('.card-note-box')).toHaveCount(0);
 
     await play(page);

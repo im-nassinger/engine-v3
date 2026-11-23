@@ -1,4 +1,6 @@
-import type { Action, Check, JsonValue, Repeat, ValueType, When } from '../../../core/fields/index.ts';
+import type { Action, Check, JsonValue, Repeat, Unit, ValueType, When } from '../../../core/fields/index.ts';
+import type { Point } from '../../../core/geometry/index.ts';
+import type { EntityId } from '../../../core/level/index.ts';
 import type { TriggerPart, TriggerSlot } from '../../../core/triggers/index.ts';
 
 // A row of the card: the When, one check, one action, or the Repeat setting.
@@ -10,9 +12,11 @@ export type TriggerWordSlot =
     | 'press'
     | 'op'
     | 'action'
-    | 'pushX'
-    | 'pushY'
+    // Push's fixed kick, one vector word.
+    | 'pushBy'
     | 'strength'
+    // The axis the component value check reads on a vector, x or y.
+    | 'axis'
     | 'repeat'
     | 'repeatSeconds'
     // A variable changed When's condition: "changes" or "becomes 3 or more", one word.
@@ -46,16 +50,21 @@ export type TriggerChoice = {
     // The faint word at the right: a variable's type (number, string, boolean), or "live" for what a body is
     // doing now; undefined for none.
     readonly note: string | undefined;
+    // A line under the label, saying what the item does: "Compare a variable with a value". Undefined for
+    // none.
+    readonly description?: string;
     // A field the pick opens before it is made, such as the number of "becomes … or more" or the word of
     // "New name…": the pick and what is typed are one step (TriggerEdits.pickedAndTyped). Undefined when
     // the pick is made at once.
     readonly asks: TriggerTypedEntry | undefined;
 };
 
-// One group of a menu with a title, such as the variable menu's "The level's".
+// One group of a menu with a title, such as the variable menu's "Level variables": its items, then the
+// items that open a submenu, such as each component of the entity, opening its values.
 export type TriggerMenuGroup = {
     readonly title: string;
     readonly choices: readonly TriggerChoice[];
+    readonly submenus?: readonly TriggerSubmenu[];
     // What a group with no choice says, disabled: "no variables of its own".
     readonly emptyText: string | undefined;
 };
@@ -72,20 +81,38 @@ export type TriggerTypedEntry =
     | {
           readonly kind: 'number';
           readonly value: number | null;
-          readonly unit: 's' | 'px/s' | undefined;
+          readonly unit: Unit | undefined;
           // The entry that leaves the number unset, "No number"; undefined when it must be set.
           readonly clearLabel: string | undefined;
       }
+    // Two number boxes, x and y.
+    | { readonly kind: 'vector'; readonly value: Point | null; readonly unit: Unit | undefined }
+    // The colour box, with its swatch and the browser's picker. A Fill's takes a solid fill of the colour.
+    | { readonly kind: 'colour'; readonly value: string | null; readonly isFill?: true }
     | { readonly kind: 'value'; readonly value: JsonValue | null; readonly valueType: ValueType<unknown> }
     | { readonly kind: 'text'; readonly value: string | null }
     | { readonly kind: 'word'; readonly value: string | null; readonly hint: string };
 
-// What clicking a word opens: a menu, a menu in titled groups, a menu whose items open submenus, or a small
-// field to type into.
+// What a target word opens: the entity picker. Its first items name no one entity (`this`, `other`, every
+// entity with a tag); then the level's tree, where a row picks that entity, and the trigger's own entity
+// picks `this`.
+export type TriggerEntitiesEntry = {
+    readonly kind: 'entities';
+    readonly choices: readonly TriggerChoice[];
+    // Every entity with a tag, one item per tag; empty where a tag can't be the target, as in the tag check.
+    readonly tagged: readonly TriggerChoice[];
+    // The entity picked now, marked in the tree; undefined for none.
+    readonly chosenId: EntityId | undefined;
+    readonly placeEntity: (entityId: EntityId) => TriggerPartValue;
+};
+
+// What clicking a word opens: a menu, a menu in titled groups, a menu whose items open submenus, the entity
+// picker, or a small field to type into.
 export type TriggerWordEntry =
     | { readonly kind: 'menu'; readonly choices: readonly TriggerChoice[] }
     | { readonly kind: 'groups'; readonly groups: readonly TriggerMenuGroup[] }
     | { readonly kind: 'submenus'; readonly submenus: readonly TriggerSubmenu[] }
+    | TriggerEntitiesEntry
     | TriggerTypedEntry;
 
 export type TriggerWord =

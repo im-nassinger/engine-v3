@@ -1,32 +1,38 @@
 import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { JsonValue } from '../../../../../../../../../core/fields/index.ts';
+import type { EntityId } from '../../../../../../../../../core/level/index.ts';
 import { TriggerEdits } from '../../../../../../../../../editor/entity-inspector/index.ts';
 import type {
     TriggerChoice,
-    TriggerMenuGroup,
+    TriggerEntitiesEntry,
     TriggerTypedEntry,
     TriggerWord,
     TriggerWordEntry,
 } from '../../../../../../../../../editor/entity-inspector/index.ts';
-import { Menu, Tooltip } from '../../../../../../../../shared/index.ts';
+import type { OpenLevel } from '../../../../../../../../../editor/session/index.ts';
+import { EntityPicker } from '../../../../../../../../entity-picker/index.ts';
+import { Menu, Tooltip, useEntityRowDrop } from '../../../../../../../../shared/index.ts';
 import type { MenuEntry } from '../../../../../../../../shared/index.ts';
 import type { CommitTriggerEdit } from '../../../../CommitTriggerEdit.ts';
+import { actionsOf, triggerMenuEntries } from '../../../../triggerMenuEntries.ts';
 import { TriggerWordField } from './TriggerWordField/index.ts';
 import './TriggerSlotWord.css';
 
 type SlotWord = TriggerWord & { readonly kind: 'slot' };
 
 export type TriggerSlotWordProps = {
+    openLevel: OpenLevel;
     word: SlotWord;
     triggerIndex: number;
     commit: CommitTriggerEdit;
 };
 
-// A word that can change: underlined, it opens a menu under it, or a small field for a number or a value.
-// Unset, it is yellow and says what it needs; `other` under an event with none is struck through, and its
-// tooltip says why.
-export function TriggerSlotWord({ word, triggerIndex, commit }: TriggerSlotWordProps) {
+// A word that can change: underlined, it opens a menu under it, the entity picker for a target, or a
+// small field for a number or a value. Unset, it is yellow and says what it needs; `other` under an
+// event with none is struck through, and its tooltip says why. A row dragged from the Entities viewer and
+// dropped on a target word picks that entity.
+export function TriggerSlotWord({ openLevel, word, triggerIndex, commit }: TriggerSlotWordProps) {
     const [isOpen, setIsOpen] = useState(false);
     // A picked item that asks for a value first, such as "New name…".
     const [asking, setAsking] = useState<TriggerChoice | undefined>(undefined);
@@ -49,6 +55,15 @@ export function TriggerSlotWord({ word, triggerIndex, commit }: TriggerSlotWordP
         commit((component) => TriggerEdits.picked(component, triggerIndex, choice.value));
     };
 
+    const pickEntity = (entityId: EntityId) => {
+        if (entry.kind !== 'entities') return;
+
+        const picked = entry.placeEntity(entityId);
+        commit((component) => TriggerEdits.picked(component, triggerIndex, picked));
+    };
+
+    const dropRef = useEntityRowDrop<HTMLSpanElement>(pickEntity);
+
     const typeValue = (value: JsonValue) => {
         close();
         if (asking === undefined) {
@@ -65,10 +80,23 @@ export function TriggerSlotWord({ word, triggerIndex, commit }: TriggerSlotWordP
     const typedEntry = typedEntryOf(entry);
     if (asking?.asks !== undefined) {
         popup = <TriggerWordField entry={asking.asks} anchor={anchorRef} onType={typeValue} onClose={close} />;
+    } else if (isOpen && entry.kind === 'entities') {
+        const entries = pickerEntriesOf(entry, pick);
+        popup = (
+            <EntityPicker
+                level={openLevel.level}
+                anchor={anchorRef}
+                entries={entries}
+                chosenId={entry.chosenId}
+                refusalOf={() => undefined}
+                onPick={pickEntity}
+                onClose={closeMenu}
+            />
+        );
     } else if (isOpen && typedEntry !== undefined) {
         popup = <TriggerWordField entry={typedEntry} anchor={anchorRef} onType={typeValue} onClose={close} />;
-    } else if (isOpen) {
-        const entries = menuEntriesOf(entry, pick);
+    } else if (isOpen && isMenuEntry(entry)) {
+        const entries = triggerMenuEntries(entry, pick);
         popup = <Menu entries={entries} onClose={closeMenu} anchor={anchorRef} />;
     }
 
@@ -85,63 +113,34 @@ export function TriggerSlotWord({ word, triggerIndex, commit }: TriggerSlotWordP
         </button>
     );
 
+    const shown = word.reason === undefined ? button : <Tooltip label={word.reason}>{button}</Tooltip>;
+
     return (
         <>
-            {word.reason === undefined && button}
-            {word.reason !== undefined && <Tooltip label={word.reason}>{button}</Tooltip>}
+            {entry.kind === 'entities' && <span ref={dropRef}>{shown}</span>}
+            {entry.kind !== 'entities' && shown}
             {popup}
         </>
     );
 }
 
 function typedEntryOf(entry: TriggerWordEntry): TriggerTypedEntry | undefined {
-    if (entry.kind === 'menu' || entry.kind === 'groups' || entry.kind === 'submenus') return undefined;
+    if (isMenuEntry(entry) || entry.kind === 'entities') return undefined;
 
     return entry;
 }
 
-// Each group is under its title, with a line before every group after the first, and a group with no
-// choice says so, disabled. A component opens its values in a submenu.
-function menuEntriesOf(entry: TriggerWordEntry, pick: (choice: TriggerChoice) => void): MenuEntry[] {
-    if (entry.kind === 'menu') return actionsOf(entry.choices, pick, 'item');
-    if (entry.kind === 'submenus') {
-        return entry.submenus.map((submenu, index) => {
-            const entries = actionsOf(submenu.choices, pick, `submenu-${index}`);
-
-            return { kind: 'submenu', id: `submenu-${index}`, label: submenu.label, entries };
-        });
-    }
-    if (entry.kind !== 'groups') return [];
-
-    return entry.groups.flatMap((group, index) => groupEntries(group, index, pick));
+function isMenuEntry(entry: TriggerWordEntry) {
+    return entry.kind === 'menu' || entry.kind === 'groups' || entry.kind === 'submenus';
 }
 
-function groupEntries(group: TriggerMenuGroup, index: number, pick: (choice: TriggerChoice) => void) {
-    const entries: MenuEntry[] = [];
-    if (index > 0) {
-        entries.push({ kind: 'separator', id: `separator-${index}` });
-    }
-    entries.push({ kind: 'heading', id: `heading-${index}`, label: group.title });
-    entries.push(...actionsOf(group.choices, pick, `group-${index}`));
-    if (group.choices.length === 0 && group.emptyText !== undefined) {
-        const empty = group.emptyText;
-        entries.push({ kind: 'action', id: `empty-${index}`, label: empty, onChoose: () => {}, disabledReason: empty });
-    }
+// `this` and `other`, then every entity with a tag, above the tree.
+function pickerEntriesOf(entry: TriggerEntitiesEntry, pick: (choice: TriggerChoice) => void) {
+    const entries: MenuEntry[] = actionsOf(entry.choices, pick, 'target');
+    if (entry.tagged.length === 0) return entries;
+
+    entries.push({ kind: 'heading', id: 'tagged', label: 'Every entity tagged' });
+    entries.push(...actionsOf(entry.tagged, pick, 'tagged'));
 
     return entries;
-}
-
-function actionsOf(choices: readonly TriggerChoice[], pick: (choice: TriggerChoice) => void, idPrefix: string) {
-    return choices.map((choice, index) => {
-        const entry: MenuEntry & { kind: 'action' } = {
-            kind: 'action',
-            id: `${idPrefix}-${index}`,
-            label: choice.label,
-            onChoose: () => pick(choice),
-            disabledReason: choice.disabledReason,
-            note: choice.note,
-        };
-
-        return entry;
-    });
 }

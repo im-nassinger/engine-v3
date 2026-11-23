@@ -309,7 +309,7 @@ describe('Change value tells physics when it owns the value', () => {
         const ball = placeBody(level, group, transform(100, 0));
         const position = { kind: 'field', component: 'TransformComponent', field: 'position' } as const;
         giveTriggers(ball, [
-            { actions: [{ kind: 'change', target: THIS, value: { ...position, axis: 'x' }, op: 'add', amount: 5 }] },
+            { actions: [{ kind: 'change', target: THIS, value: position, op: 'add', amount: { x: 5, y: 0 } }] },
             {
                 when: { kind: 'key', key: 'KeyR' as never, how: 'pressed' },
                 actions: [{ kind: 'change', target: THIS, value: position, op: 'set', amount: { x: 0, y: 50 } }],

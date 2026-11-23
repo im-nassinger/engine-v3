@@ -299,12 +299,21 @@ function actionWithTyped(action: Action, slot: TriggerWordSlot, typed: JsonValue
 type PushAction = Action & { readonly kind: 'push' };
 
 function pushWithTyped(action: PushAction, slot: TriggerWordSlot, typed: JsonValue): Action | undefined {
-    if (action.push === null || !isNumber(typed)) return undefined;
-
     const { push } = action;
-    if (push.kind === 'by' && slot === 'pushX') return { ...action, push: { ...push, x: typed } };
-    if (push.kind === 'by' && slot === 'pushY') return { ...action, push: { ...push, y: typed } };
-    if (push.kind !== 'by' && slot === 'strength') return { ...action, push: { ...push, strength: typed } };
+    if (push === null) return undefined;
+
+    const isKick = push.kind === 'by' && slot === 'pushBy' && isPoint(typed);
+    if (isKick) return { ...action, push: { kind: 'by', x: typed.x, y: typed.y } };
+
+    const isStrength = push.kind !== 'by' && slot === 'strength' && isNumber(typed);
+    if (isStrength) return { ...action, push: { ...push, strength: typed } };
 
     return undefined;
+}
+
+function isPoint(typed: JsonValue): typed is { readonly x: number; readonly y: number } {
+    if (typeof typed !== 'object' || typed === null) return false;
+    if (!('x' in typed) || !('y' in typed)) return false;
+
+    return isNumber(typed.x) && isNumber(typed.y);
 }

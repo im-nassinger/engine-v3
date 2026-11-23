@@ -8,7 +8,7 @@ import type { CardNote } from '../model/CardNote.ts';
 import { TriggerChoices } from './TriggerChoices.ts';
 import { TriggerSentence } from './TriggerSentence.ts';
 import type { SentenceSources } from './TriggerSentence.ts';
-import type { TriggerChoice, TriggerRowPart } from './TriggerWord.ts';
+import type { TriggerRowPart, TriggerWordEntry } from './TriggerWord.ts';
 
 export type TriggerRow = {
     readonly part: TriggerRowPart;
@@ -22,7 +22,8 @@ export type TriggerRow = {
 // Add check or Add action, at the end of If and Do.
 export type TriggerAddRow = {
     readonly label: 'Add check' | 'Add action';
-    readonly choices: readonly TriggerChoice[];
+    // The kinds of row it adds: a menu for checks, titled groups for actions.
+    readonly entry: TriggerWordEntry & { readonly kind: 'menu' | 'groups' };
     // Yellow: a trigger with no action does nothing.
     readonly isNeeded: boolean;
 };
@@ -128,7 +129,7 @@ function ifSection(trigger: Trigger, sources: SentenceSources): TriggerSection {
     const hint = rows.length === 0 ? 'optional' : 'all must be true';
     const newIndex = trigger.checks.length;
     const choices = sources.choices.newChecks(newIndex, sources.eventHasOther);
-    const addRow: TriggerAddRow = { label: 'Add check', choices, isNeeded: false };
+    const addRow: TriggerAddRow = { label: 'Add check', entry: { kind: 'menu', choices }, isNeeded: false };
 
     return { title: 'If', hint, rows, addRow };
 }
@@ -149,8 +150,9 @@ function doSection(trigger: Trigger, sources: SentenceSources): TriggerSection {
     }
 
     const newIndex = trigger.actions.length;
-    const choices = sources.choices.actions(newIndex, undefined);
-    const addRow: TriggerAddRow = { label: 'Add action', choices, isNeeded: rows.length === 0 };
+    const groups = sources.choices.actionGroups(newIndex);
+    const entry = { kind: 'groups', groups } as const;
+    const addRow: TriggerAddRow = { label: 'Add action', entry, isNeeded: rows.length === 0 };
 
     return { title: 'Do', hint, rows, addRow };
 }

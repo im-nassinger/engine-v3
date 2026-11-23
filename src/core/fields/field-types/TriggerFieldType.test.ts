@@ -403,6 +403,22 @@ describe('TriggerFieldType', () => {
         expect(normalized.when).toEqual({ kind: 'custom', name: null });
     });
 
+    test('normalize turns a change of one axis of a vector into a change of the whole vector', () => {
+        const position = { kind: 'field', component: 'TransformComponent', field: 'position' } as const;
+        const byAxis = {
+            kind: 'change',
+            target: { kind: 'this' },
+            value: { ...position, axis: 'y' },
+            op: 'subtract',
+            amount: 5,
+        };
+        const normalized = type.normalize(requireParsed(triggerWith({ actions: [byAxis] })));
+
+        expect(normalized.actions).toEqual([
+            { kind: 'change', target: { kind: 'this' }, value: position, op: 'subtract', amount: { x: 0, y: 5 } },
+        ]);
+    });
+
     test("a v3 trigger is read and written back byte for byte, its level's variables saved as names", () => {
         const v3 = triggerWith({
             name: 'Coin',

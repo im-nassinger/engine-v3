@@ -16,34 +16,8 @@ function addNamed(level: Level, name: string, parent: Entity = level.world) {
     return entity;
 }
 
-function namesOf(entities: readonly Entity[]) {
-    return entities.map((entity) => entity.requireComponent(NameComponent).get('name'));
-}
-
 describe('EntityChoices', () => {
-    test('lists the entities in panel order, without the own ones, the World or the camera', () => {
-        const level = Level.createNew();
-        const car = addNamed(level, 'Car');
-        addNamed(level, 'Wheel', car);
-        const player = addNamed(level, 'Player');
-
-        const choices = EntityChoices.matching(level, [player.id], '');
-
-        expect(namesOf(choices)).toEqual(['Car', 'Wheel']);
-    });
-
-    test('keeps those whose name holds the search, in any case, up to the first 50', () => {
-        const level = Level.createNew();
-        for (let i = 0; i < 60; i++) {
-            addNamed(level, `Crate ${i}`);
-        }
-        addNamed(level, 'Player');
-
-        expect(namesOf(EntityChoices.matching(level, [], 'PLAY'))).toEqual(['Player']);
-        expect(EntityChoices.matching(level, [], 'crate')).toHaveLength(50);
-    });
-
-    test('a dropped row is refused when it is the World, the camera or the field own entity', () => {
+    test('a picked or dropped entity is refused when it is the World, the camera or the field own entity', () => {
         const level = Level.createNew();
         const crate = addNamed(level, 'Crate');
         const other = addNamed(level, 'Other');

@@ -405,8 +405,9 @@ describe('triggerProblems', () => {
 
         expect(problemsOf({ actions: [change({})] })).toEqual([]);
         expect(problemsOf({ actions: [change({ value: position, op: 'set', amount: { x: 1, y: 2 } })] })).toEqual([]);
+        expect(problemsOf({ actions: [change({ value: position, amount: { x: 5, y: 0 } })] })).toEqual([]);
         expect(problemsOf({ actions: [change({ value: position })] })).toEqual([
-            { ...ACTION, slot: 'value', reason: 'unknownValue' },
+            { ...ACTION, slot: 'amount', reason: 'badAmount' },
         ]);
         expect(problemsOf({ actions: [change({ amount: 'ninety' })] })).toEqual([
             { ...ACTION, slot: 'amount', reason: 'badAmount' },

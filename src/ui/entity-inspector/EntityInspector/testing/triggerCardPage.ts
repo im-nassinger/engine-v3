@@ -42,13 +42,29 @@ export function word(title: string, text: string, blockIndex = 0) {
     return found;
 }
 
+// A menu's rows, or the rows above the entity picker's tree.
 export function menuRows() {
-    return [...document.querySelectorAll<HTMLElement>('.menu [role="menuitem"]')];
+    return [...document.querySelectorAll<HTMLElement>('.menu [role="menuitem"], .entity-picker [role="menuitem"]')];
+}
+
+// The entity picker's tree rows, by name.
+export function pickerRowNamed(name: string) {
+    const rows = document.querySelectorAll<HTMLElement>('.entity-picker [role="treeitem"]');
+
+    return [...rows].find((row) => row.querySelector('.name')?.textContent === name);
 }
 
 // By its label, not its faint word at the right.
 export function menuRowNamed(label: string) {
-    return menuRows().find((candidate) => candidate.querySelector('.label')?.textContent.trim() === label);
+    return menuRows().find((candidate) => labelOf(candidate) === label);
+}
+
+// A row with a description has its label first, then the description.
+function labelOf(row: HTMLElement) {
+    const label = row.querySelector('.label');
+    const first = label?.firstElementChild ?? label;
+
+    return first?.textContent.trim();
 }
 
 export function addRow(label: string, blockIndex = 0) {

@@ -21,6 +21,7 @@ export type TriggerTypingResult =
     | { readonly kind: 'invalid'; readonly reason: string };
 
 const ANY_NUMBER = new NumberFieldType();
+const ANY_VECTOR = new VectorFieldType();
 const VECTOR_PARTS = /^\s*([^,;\s]+)\s*[,;\s]\s*([^,;\s]+)\s*$/;
 
 // Reads what is typed into a word's small field: a number (seconds, a compared number, a kick), a value of
@@ -47,8 +48,47 @@ export class TriggerTyping {
                 return parseWord(text);
             case 'value':
                 return parseValue(text, entry.value, entry.valueType);
+            case 'vector':
+                return parseVector(text, ANY_VECTOR);
+            case 'colour':
+                return parseColour(text, entry.value);
         }
     }
+
+    // What a colour picked in the colour box gives: the colour, or a solid fill of it for a Fill.
+    static colourValue(entry: TriggerTypedEntry & { kind: 'colour' }, colour: string): JsonValue {
+        if (entry.isFill === true) return { kind: 'solid', colour };
+
+        return colour;
+    }
+
+    // The vector field's two boxes: an empty box keeps its axis as it was, or 0 while the vector is unset.
+    static parseAxes(entry: TriggerTypedEntry & { kind: 'vector' }, xText: string, yText: string): TriggerTypingResult {
+        const x = parseAxis(xText, entry.value?.x ?? 0, entry.unit);
+        if (x.kind === 'invalid') return { kind: 'invalid', reason: `x: ${x.reason}` };
+
+        const y = parseAxis(yText, entry.value?.y ?? 0, entry.unit);
+        if (y.kind === 'invalid') return { kind: 'invalid', reason: `y: ${y.reason}` };
+
+        return { kind: 'value', value: { x: x.value, y: y.value } };
+    }
+}
+
+type AxisResult =
+    { readonly kind: 'value'; readonly value: number } | { readonly kind: 'invalid'; readonly reason: string };
+
+function parseAxis(text: string, oldValue: number, unit: Unit | undefined): AxisResult {
+    const result = ValueInput.parseNumber(text, { label: 'The number', type: ANY_NUMBER, unit });
+    if (result.kind === 'restore') return { kind: 'value', value: oldValue };
+
+    return result;
+}
+
+function parseColour(text: string, oldValue: string | null): TriggerTypingResult {
+    if (text.trim() === '') return { kind: 'restore' };
+
+    const oldColour = oldValue ?? undefined;
+    return ValueInput.parseColour(text, oldColour);
 }
 
 function parseText(text: string): TriggerTypingResult {

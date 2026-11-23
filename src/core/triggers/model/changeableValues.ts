@@ -7,7 +7,7 @@ import {
     NumberFieldType,
     TextFieldType,
 } from '../../fields/index.ts';
-import type { ChangeOp, ValueRef, ValueType, VariableType } from '../../fields/index.ts';
+import type { ChangeOp, Unit, ValueRef, ValueType, VariableType } from '../../fields/index.ts';
 import { variableTypeOf } from '../../fields/index.ts';
 import type { Entity } from '../../level/index.ts';
 
@@ -17,6 +17,8 @@ export type ChangeableValue = {
     readonly ref: ValueRef;
     readonly ops: readonly ChangeOp[];
     readonly amountType: ValueType<unknown>;
+    // The field's unit, such as px for Position; undefined for none.
+    readonly unit?: Unit;
 };
 
 const SET_ONLY: readonly ChangeOp[] = ['set'];
@@ -38,8 +40,7 @@ const VARIABLE_OFFERS: Readonly<Record<VariableType, Omit<ChangeableValue, 'ref'
 };
 
 // What Change value may offer for a target, read from the schemas only, so a component added later is offered
-// with no trigger code: every field marked changeableInPlay, a vector whole for Set and by axis for Add and
-// Subtract, the tag to add or remove, and, on an entity known while editing, its variables with the ops their
+// with no trigger code: every field marked changeableInPlay, a vector whole for Set, Add and Subtract, the tag to add or remove, and, on an entity known while editing, its variables with the ops their
 // type allows and each of its triggers' on/off. The World's variables are the level's, named as v3 named
 // them; any other entity's are its own (`own: true`). With no entity (`other`, or every entity with a tag),
 // every registered component's fields.
@@ -83,14 +84,11 @@ function valuesOfField(schema: AnyComponentSchema, field: AnyFieldDefinition): r
     if (kind === 'tags') return [{ ref: { kind: 'tag' }, ops: ADD_OR_SUBTRACT, amountType: TAG_AMOUNT }];
 
     const ref = { kind: 'field', component: schema.typeName, field: field.key } as const;
-    if (kind === 'number' || kind === 'angle') return [{ ref, ops: EVERY_OP, amountType: field.type }];
-    if (kind !== 'vector') return [{ ref, ops: SET_ONLY, amountType: field.type }];
+    const isAddable = kind === 'number' || kind === 'angle' || kind === 'vector';
+    const ops = isAddable ? EVERY_OP : SET_ONLY;
+    if (field.unit === undefined) return [{ ref, ops, amountType: field.type }];
 
-    return [
-        { ref, ops: SET_ONLY, amountType: field.type },
-        { ref: { ...ref, axis: 'x' }, ops: ADD_OR_SUBTRACT, amountType: NUMBER_AMOUNT },
-        { ref: { ...ref, axis: 'y' }, ops: ADD_OR_SUBTRACT, amountType: NUMBER_AMOUNT },
-    ];
+    return [{ ref, ops, amountType: field.type, unit: field.unit }];
 }
 
 function variableValuesOf(target: Entity): readonly ChangeableValue[] {

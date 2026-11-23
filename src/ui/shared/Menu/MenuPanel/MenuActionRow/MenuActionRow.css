@@ -19,6 +19,20 @@
 
     > .label {
         flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        > .description {
+            color: var(--muted);
+            font-size: var(--text-tiny);
+        }
+    }
+
+    &[data-described='true'] {
+        height: auto;
+        min-height: var(--control);
+        padding-top: var(--space-4);
+        padding-bottom: var(--space-4);
     }
 
     > .shortcut {

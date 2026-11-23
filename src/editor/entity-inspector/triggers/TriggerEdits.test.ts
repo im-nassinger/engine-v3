@@ -68,8 +68,15 @@ describe('TriggerEdits', () => {
         const addAction = block().sections[2].addRow;
         if (addCheck === undefined || addAction === undefined) throw new Error('No add rows.');
 
-        const checkEdit = TriggerEdits.picked(component, 0, requireChoice(addCheck.choices, 'who is tagged…').value);
-        const actionEdit = TriggerEdits.picked(component, 0, requireChoice(addAction.choices, 'win').value);
+        if (addCheck.entry.kind !== 'menu' || addAction.entry.kind !== 'groups') throw new Error('No add menus.');
+        const actionChoices = addAction.entry.groups.flatMap((group) => group.choices);
+
+        const checkEdit = TriggerEdits.picked(
+            component,
+            0,
+            requireChoice(addCheck.entry.choices, 'an entity has a tag').value,
+        );
+        const actionEdit = TriggerEdits.picked(component, 0, requireChoice(actionChoices, 'win').value);
 
         expect(checkEdit.label).toBe('Add check to trigger "Touched"');
         expect(checkEdit.triggers[0]?.checks).toEqual([{ kind: 'hasTag', target: { kind: 'other' }, tag: null }]);
@@ -100,7 +107,9 @@ describe('TriggerEdits', () => {
 
         const seconds = TriggerEdits.typed(component, 0, { part: { section: 'when' }, slot: 'seconds' }, 60);
         const value = TriggerEdits.typed(component, 0, { part: { section: 'check', index: 0 }, slot: 'number' }, 10);
-        const kick = TriggerEdits.typed(component, 0, { part: { section: 'action', index: 0 }, slot: 'pushX' }, 200);
+        const kickAt = { part: { section: 'action', index: 0 }, slot: 'pushBy' } as const;
+        const kick = TriggerEdits.typed(component, 0, kickAt, { x: 200, y: -600 });
+        const notKick = TriggerEdits.typed(component, 0, kickAt, 200);
         const repeat = TriggerEdits.typed(component, 0, { part: { section: 'repeat' }, slot: 'repeatSeconds' }, 2);
         const refused = TriggerEdits.typed(component, 0, { part: { section: 'when' }, slot: 'event' }, 3);
 
@@ -108,6 +117,7 @@ describe('TriggerEdits', () => {
         expect(seconds?.triggers[0]?.when).toEqual({ kind: 'after', seconds: 60 });
         expect(value?.triggers[0]?.checks[0]).toMatchObject({ value: 10 });
         expect(kick?.triggers[0]?.actions[0]).toMatchObject({ push: { kind: 'by', x: 200, y: -600 } });
+        expect(notKick).toBeUndefined();
         expect(repeat?.triggers[0]?.repeat).toEqual({ kind: 'atMostEvery', seconds: 2 });
         expect(refused).toBeUndefined();
     });

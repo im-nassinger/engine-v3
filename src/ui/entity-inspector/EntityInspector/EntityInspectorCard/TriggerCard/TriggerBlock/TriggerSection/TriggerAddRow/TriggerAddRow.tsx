@@ -3,8 +3,8 @@ import { useRef, useState } from 'react';
 import { TriggerEdits } from '../../../../../../../../editor/entity-inspector/index.ts';
 import type { TriggerAddRow as TriggerAddRowModel } from '../../../../../../../../editor/entity-inspector/index.ts';
 import { Icon, Menu } from '../../../../../../../shared/index.ts';
-import type { MenuEntry } from '../../../../../../../shared/index.ts';
 import type { CommitTriggerEdit } from '../../../CommitTriggerEdit.ts';
+import { triggerMenuEntries } from '../../../triggerMenuEntries.ts';
 import './TriggerAddRow.css';
 
 export type TriggerAddRowProps = {
@@ -13,22 +13,15 @@ export type TriggerAddRowProps = {
     commit: CommitTriggerEdit;
 };
 
-// Add check or Add action at the end of If or Do: a + and its label, opening the kinds of row it can add.
+// Add check or Add action at the end of If or Do: a + and its label, opening the kinds of row it can add,
+// each with what it does, Add action's in groups.
 // With no action yet, Add action is yellow.
 export function TriggerAddRow({ addRow, triggerIndex, commit }: TriggerAddRowProps) {
     const [isOpen, setIsOpen] = useState(false);
     const anchorRef = useRef<HTMLButtonElement>(null);
 
-    const entries = addRow.choices.map((choice, index) => {
-        const entry: MenuEntry = {
-            kind: 'action',
-            id: String(index),
-            label: choice.label,
-            onChoose: () => commit((component) => TriggerEdits.picked(component, triggerIndex, choice.value)),
-            disabledReason: choice.disabledReason,
-        };
-
-        return entry;
+    const entries = triggerMenuEntries(addRow.entry, (choice) => {
+        commit((component) => TriggerEdits.picked(component, triggerIndex, choice.value));
     });
 
     const toggle = () => setIsOpen((wasOpen) => !wasOpen);

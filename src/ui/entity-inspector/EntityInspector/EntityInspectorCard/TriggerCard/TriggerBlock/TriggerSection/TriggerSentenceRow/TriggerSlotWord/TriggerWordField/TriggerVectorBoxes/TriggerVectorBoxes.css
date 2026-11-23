@@ -1,0 +1,15 @@
+.trigger-vector-boxes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+
+    > .boxes {
+        display: flex;
+        gap: var(--space-6);
+    }
+
+    > .refusal {
+        color: var(--danger);
+        font-size: var(--text-tiny);
+    }
+}
