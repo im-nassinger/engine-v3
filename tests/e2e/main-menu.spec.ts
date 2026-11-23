@@ -38,7 +38,10 @@ const MAIN_MENU: Record<string, [string, string][]> = {
         ['Selection', 'F'],
         ['Camera frame', 'Shift+3'],
     ],
-    Help: [['About', '']],
+    Help: [
+        ['Keyboard shortcuts', '?'],
+        ['About', ''],
+    ],
 };
 
 async function openEditor(page: Page) {

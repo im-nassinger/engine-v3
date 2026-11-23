@@ -50,6 +50,18 @@
         max-height: calc(100% - var(--island-gap) * 2 - var(--islands-bottom) - var(--minimap-height));
     }
 
+    /* In the Entities viewer's place, reaching down to 10 px above the minimap. */
+    > [data-area='shortcut-sheet'] {
+        top: var(--island-gap);
+        right: var(--island-gap);
+        bottom: calc(var(--islands-bottom) + var(--minimap-height) + var(--island-gap));
+        width: var(--shortcut-sheet);
+    }
+
+    &[data-shortcut-sheet-open='true'] > [data-area='entities-viewer'] {
+        visibility: hidden;
+    }
+
     > [data-area='minimap'] {
         right: var(--island-gap);
         bottom: var(--islands-bottom);

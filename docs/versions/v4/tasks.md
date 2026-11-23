@@ -48,7 +48,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 14. The shortcut catalog and its search
   - Read: versions/v4/architecture.md#the-shortcut-list, requirements/editor/workspace.md#the-searchable-list-of-shortcuts--v4, requirements/editor/shortcuts.md
   - Done when: `ShortcutCatalog` lists every shortcut in `ShortcutMap` and the commands, with its name, area and keys as the platform shows them (Cmd and Option on a Mac), plus the mouse shortcuts as fixed rows; `ShortcutSearch` filters by name words and key text, ignoring case and order; a Node test fails if a shortcut in `ShortcutMap` is missing from the catalog
-- [ ] 15. The shortcut sheet and the tooltips
+- [x] 15. The shortcut sheet and the tooltips
   - Read: versions/v4/architecture.md#the-shortcut-list, versions/v4/design.md, design/controls.md, design/mockups/v4.html
   - Done when: `ShortcutSheet` draws the catalog as the mockup does; `?` (by its character) and Help › Shortcuts in the main menu open and close it, its search takes focus and typing there reaches no editor shortcut, Esc closes it, and it stays open while the level is edited; a browser test checks every icon button has a tooltip with its name, and its shortcut when its command has one; browser tests pass in three browsers
 - [ ] 16. v4's journeys and speed test

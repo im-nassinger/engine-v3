@@ -4,7 +4,7 @@ import { rowKind } from '../../../../editor/entities-viewer/index.ts';
 import { MIXED } from '../../../../editor/entity-inspector/index.ts';
 import type { EntityInspectorHeader } from '../../../../editor/entity-inspector/index.ts';
 import type { OpenLevel } from '../../../../editor/session/index.ts';
-import { useCommands } from '../../../commands/index.ts';
+import { shortcutText, useCommands } from '../../../commands/index.ts';
 import { useEditorSession } from '../../../EditorContext.tsx';
 import { IconButton, RowKindIcon } from '../../../shared/index.ts';
 import { HeadNameBox } from './HeadNameBox/index.ts';
@@ -21,17 +21,19 @@ export type EntityInspectorHeadProps = {
 // several entities the title reads `3 entities` and the eye hides or shows them all, like Hide or show.
 export function EntityInspectorHead({ openLevel, header }: EntityInspectorHeadProps) {
     const session = useEditorSession();
-    const { registry, runner } = useCommands();
+    const { registry, runner, platform } = useCommands();
     const { level } = openLevel;
     const onlyEntity = header.entity;
     const isWorld = onlyEntity === level.world;
 
+    const hideOrShow = registry.find(HIDE_OR_SHOW);
+    if (hideOrShow === undefined) throw new Error(`No command has the id ${HIDE_OR_SHOW}.`);
+    // The eye does what Hide or show does to the selection, so its tooltip shows that command's key.
+    const eyeShortcut = shortcutText(hideOrShow, platform);
+
     const toggleHidden = () => {
         if (onlyEntity === undefined) {
-            const command = registry.find(HIDE_OR_SHOW);
-            if (command === undefined) throw new Error(`No command has the id ${HIDE_OR_SHOW}.`);
-
-            runner.run(command);
+            runner.run(hideOrShow);
             return;
         }
 
@@ -68,7 +70,14 @@ export function EntityInspectorHead({ openLevel, header }: EntityInspectorHeadPr
             {kindIcon}
             {title}
             {!isWorld && (
-                <IconButton icon={eyeIcon} label={eyeLabel} isOn={isHidden} look="quiet" onClick={toggleHidden} />
+                <IconButton
+                    icon={eyeIcon}
+                    label={eyeLabel}
+                    shortcut={eyeShortcut}
+                    isOn={isHidden}
+                    look="quiet"
+                    onClick={toggleHidden}
+                />
             )}
         </div>
     );

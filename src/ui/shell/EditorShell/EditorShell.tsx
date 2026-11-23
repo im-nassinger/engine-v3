@@ -9,6 +9,7 @@ import { MessagePill } from '../../message-pill/index.ts';
 import { Minimap } from '../../minimap/index.ts';
 import { usePlaySession } from '../../play/index.ts';
 import { PlayBar } from '../../play-bar/index.ts';
+import { ShortcutSheet } from '../../shortcut-sheet/index.ts';
 import { ToolColumn } from '../../tool-column/index.ts';
 import { useEditorSession } from '../../EditorContext.tsx';
 import { useReading, useVersion } from '../../hooks/index.ts';
@@ -28,7 +29,8 @@ const HIDES_ENTITY_INSPECTOR: ReadonlySet<string> = new Set(['shape', 'joint', '
 // the Trigger tool is active the Entity inspector's island is gone and the free area reaches the tool column. With nothing
 // selected the island is gone too, but the free area stays, so selecting doesn't move what fitting frames (owner, 2026-11-19). During test play
 // every panel and bar is hidden but kept, so Stop shows them as they were, scrolled and folded, and the Play bar floats
-// over the game, with the end window under it, over the last frame, once a Win or Lose ends the run.
+// over the game, with the end window under it, over the last frame, once a Win or Lose ends the run. The shortcut
+// list's sheet stands in the Entities viewer's place while open, the viewer hidden but kept (the v4 design).
 export function EditorShell() {
     // The session gives a new open level after New or Import while the session object stays the same, so the
     // React Compiler must not keep the old level's selection.
@@ -45,9 +47,16 @@ export function EditorShell() {
     const isNothingSelected = useReading(selection.version, readNothingSelected);
     const readPlaying = () => play.isRunGoing;
     const isPlaying = useReading(play.version, readPlaying);
+    const readSheetOpen = () => session.shortcutSheet.isOpen;
+    const isSheetOpen = useReading(session.shortcutSheet.version, readSheetOpen);
 
     return (
-        <div className="editor-shell" data-entity-inspector-hidden={isEntityInspectorHidden} data-playing={isPlaying}>
+        <div
+            className="editor-shell"
+            data-entity-inspector-hidden={isEntityInspectorHidden}
+            data-playing={isPlaying}
+            data-shortcut-sheet-open={isSheetOpen}
+        >
             <LevelViewHost />
             {isPlaying && (
                 <PanelErrorBoundary>
@@ -74,6 +83,11 @@ export function EditorShell() {
             <PanelPlace area="entities-viewer" label="Entities viewer">
                 <EntitiesViewer />
             </PanelPlace>
+            {isSheetOpen && (
+                <PanelPlace area="shortcut-sheet" label="Shortcut list">
+                    <ShortcutSheet />
+                </PanelPlace>
+            )}
             <PanelPlace area="minimap" label="Minimap">
                 <Minimap />
             </PanelPlace>

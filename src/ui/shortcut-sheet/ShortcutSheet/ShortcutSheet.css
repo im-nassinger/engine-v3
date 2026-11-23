@@ -1,0 +1,60 @@
+/* The v4 mockup's sheet: the search pill and × on top, then the sections, which scroll. */
+.shortcut-sheet {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+
+    > .head {
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        gap: var(--space-8);
+        padding: 12px 12px var(--space-8) var(--inset);
+
+        > .search {
+            display: flex;
+            flex: 1;
+            align-items: center;
+            gap: var(--space-6);
+            min-width: 0;
+            height: var(--control);
+            padding: 0 11px;
+            border-radius: calc(var(--control) / 2);
+            background: var(--field);
+            color: var(--muted);
+
+            &:focus-within {
+                outline: 1px solid var(--accent);
+            }
+
+            > input {
+                flex: 1;
+                min-width: 0;
+                padding: 0;
+                border: none;
+                outline: none;
+                background: none;
+                color: var(--text);
+                font: inherit;
+
+                &::placeholder {
+                    color: var(--muted);
+                }
+            }
+        }
+    }
+
+    > .list {
+        flex: 1;
+        min-height: 0;
+        padding-bottom: var(--space-10);
+        overflow: auto;
+
+        > .none {
+            margin: 0;
+            padding: 18px var(--inset);
+            color: var(--muted);
+        }
+    }
+}

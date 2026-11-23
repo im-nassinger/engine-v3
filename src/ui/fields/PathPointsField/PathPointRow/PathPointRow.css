@@ -27,7 +27,11 @@
             text-align: right;
         }
 
-        > .fold,
+        > .tooltip {
+            flex: 0 0 14px;
+        }
+
+        > .tooltip > .fold,
         > .no-fold {
             display: flex;
             flex: 0 0 14px;
@@ -40,7 +44,7 @@
             color: var(--muted);
         }
 
-        > .fold {
+        > .tooltip > .fold {
             cursor: pointer;
 
             &:hover {

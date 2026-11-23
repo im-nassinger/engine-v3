@@ -2,7 +2,9 @@
     position: relative;
     display: inline-flex;
 
-    > .toggle {
+    /* :where keeps the tooltip's wrapper out of the weight, so each look's rules still win over these. */
+    > .toggle,
+    > :where(.tooltip) > .toggle {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -60,7 +62,7 @@
         width: 100%;
         height: 100%;
 
-        > .toggle {
+        > :where(.tooltip) > .toggle {
             width: var(--tool);
             min-width: 0;
             height: var(--tool);
@@ -74,7 +76,7 @@
         }
     }
 
-    &[data-look='quiet'] > .toggle {
+    &[data-look='quiet'] > :where(.tooltip) > .toggle {
         color: var(--faint);
     }
 }

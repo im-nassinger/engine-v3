@@ -1,0 +1,40 @@
+/* A 28 px row: the name in --text on the left, the key caps on the right, joined by a faint + or "or". */
+.shortcut-sheet-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-10);
+    min-height: var(--control);
+    padding: 2px var(--inset);
+
+    > .name {
+        flex: 1;
+        min-width: 0;
+    }
+
+    > .keys {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 3px;
+        color: var(--faint);
+
+        > .or {
+            padding: 0 2px;
+        }
+
+        > kbd {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: var(--radius);
+            background: var(--raised);
+            color: var(--text);
+            font: inherit;
+            font-size: var(--text-tiny);
+        }
+    }
+}

@@ -19,6 +19,7 @@ import { ImportCommand } from './file/ImportCommand.ts';
 import { NewCommand } from './file/NewCommand.ts';
 import { SaveCommand } from './file/SaveCommand.ts';
 import { AboutCommand } from './help/AboutCommand.ts';
+import { ShortcutListCommand } from './help/ShortcutListCommand.ts';
 import { HideOrShowCommand } from './edit/HideOrShowCommand.ts';
 import { RedoCommand } from './edit/RedoCommand.ts';
 import { SelectAllCommand } from './edit/SelectAllCommand.ts';
@@ -108,6 +109,7 @@ export function createCommandRegistry(
         registry.register(new StepCommand(play));
     }
 
+    registry.register(new ShortcutListCommand(session.shortcutSheet));
     registry.register(new AboutCommand());
 
     return registry;

@@ -2,6 +2,7 @@ import { ChevronDown } from 'lucide-react';
 import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Icon } from '../Icon/index.ts';
+import { Tooltip } from '../Tooltip/index.ts';
 import { OpenMenuContext } from './OpenMenuContext.ts';
 import './MenuButton.css';
 
@@ -19,7 +20,8 @@ export type MenuButtonProps = {
     isDisabled?: boolean;
 };
 
-// A button in a bar that opens a menu under itself, and closes it on a second press.
+// A button in a bar that opens a menu under itself, and closes it on a second press. Its label is its
+// tooltip, except a field's, whose value already shows.
 export function MenuButton({
     label,
     children,
@@ -35,19 +37,29 @@ export function MenuButton({
     const close = () => setIsOpen(false);
     const openMenu = { close, anchor: anchorRef };
 
+    const toggleButton = (
+        <button
+            type="button"
+            className="toggle"
+            aria-label={label}
+            aria-expanded={isOpen}
+            disabled={isDisabled}
+            onClick={toggle}
+        >
+            {children}
+            {hasArrow && <MenuArrow />}
+        </button>
+    );
+    const hasTooltip = look !== 'field';
+
     return (
         <span className="menu-button" data-look={look} ref={anchorRef}>
-            <button
-                type="button"
-                className="toggle"
-                aria-label={label}
-                aria-expanded={isOpen}
-                disabled={isDisabled}
-                onClick={toggle}
-            >
-                {children}
-                {hasArrow && <MenuArrow />}
-            </button>
+            {hasTooltip && (
+                <Tooltip label={label} isSuppressed={isOpen}>
+                    {toggleButton}
+                </Tooltip>
+            )}
+            {!hasTooltip && toggleButton}
             <OpenMenuContext value={openMenu}>{isOpen && menu}</OpenMenuContext>
         </span>
     );

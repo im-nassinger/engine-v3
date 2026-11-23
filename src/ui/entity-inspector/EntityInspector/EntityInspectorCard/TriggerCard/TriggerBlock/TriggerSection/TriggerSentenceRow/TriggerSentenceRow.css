@@ -15,20 +15,27 @@
         top: 6px;
         right: 6px;
         display: flex;
-        padding: 0;
-        border: none;
-        background: none;
-        color: var(--faint);
         visibility: hidden;
-        cursor: pointer;
 
-        &:hover {
-            color: var(--text);
+        &:focus-within {
+            visibility: visible;
         }
 
-        &:focus-visible {
-            visibility: visible;
-            outline: 1px solid var(--accent);
+        button {
+            display: flex;
+            padding: 0;
+            border: none;
+            background: none;
+            color: var(--faint);
+            cursor: pointer;
+
+            &:hover {
+                color: var(--text);
+            }
+
+            &:focus-visible {
+                outline: 1px solid var(--accent);
+            }
         }
     }
 

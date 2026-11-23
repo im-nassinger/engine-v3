@@ -12,9 +12,9 @@ afterEach(() => {
 async function showMenuButton(props: Partial<MenuButtonProps> = {}) {
     const menu = createElement('div', { className: 'shown-menu' });
     showControl(createElement(MenuButton, { label: 'Kind', menu, children: 'Box', ...props }));
-    await expect.poll(() => document.querySelector('.menu-button > .toggle')).not.toBeNull();
+    await expect.poll(() => document.querySelector('.menu-button .toggle')).not.toBeNull();
 
-    return shownControl<HTMLButtonElement>('.menu-button > .toggle');
+    return shownControl<HTMLButtonElement>('.menu-button .toggle');
 }
 
 describe('MenuButton', () => {

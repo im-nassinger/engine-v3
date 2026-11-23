@@ -1,4 +1,5 @@
 import type { OpenLevel } from '../../session/index.ts';
+import type { ShortcutSheetState } from '../../shortcut-sheet/index.ts';
 import type { ToolController } from '../ToolController.ts';
 
 import type { OpenWindows } from './OpenWindows.ts';
@@ -6,9 +7,11 @@ import type { OpenWindows } from './OpenWindows.ts';
 // Which of the requirement's six answers Esc gave, or none.
 export type EscapeAnswer = 'drag' | 'window' | 'drawing' | 'tool' | 'group' | 'selection' | 'nothing';
 
-// The session, read at each Esc, since New and Import replace the open level.
+// The session, read at each Esc, since New and Import replace the open level. The shortcut list's sheet
+// is a window too, closed after the menus over it.
 export type OpenLevelSource = {
     readonly openLevel: OpenLevel;
+    readonly shortcutSheet: ShortcutSheetState;
 };
 
 // Esc does the first of the requirement's six that applies, walking outward. A field being typed in
@@ -27,6 +30,7 @@ export class EscapeChain {
     press(): EscapeAnswer {
         if (this.cancelDrag()) return 'drag';
         if (this.windows.isOpen()) return 'window';
+        if (this.source.shortcutSheet.close()) return 'window';
         if (this.tools.cancelDrawing()) return 'drawing';
         if (this.tools.returnToSelect()) return 'tool';
         if (this.goUpOneGroup()) return 'group';

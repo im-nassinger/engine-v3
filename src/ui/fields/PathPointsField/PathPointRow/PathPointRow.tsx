@@ -2,7 +2,7 @@ import { ChevronDown, ChevronRight } from 'lucide-react';
 import { ChoiceFieldType, VectorFieldType } from '../../../../core/fields/index.ts';
 import type { PathCorner, PathPoint, Point } from '../../../../core/geometry/index.ts';
 import type { FieldModel } from '../../../../editor/entity-inspector/index.ts';
-import { Icon } from '../../../shared/index.ts';
+import { Icon, Tooltip } from '../../../shared/index.ts';
 import { ChoiceField } from '../../ChoiceField/index.ts';
 import type { FieldSubject } from '../../FieldProps.ts';
 import { innerFieldOf, innerPropsOf } from '../../inner-fields/innerField.ts';
@@ -103,8 +103,10 @@ function FoldButton({ number, isUnfolded, onToggle }: FoldButtonProps) {
     const label = `Handles of point ${number}`;
 
     return (
-        <button type="button" className="fold" aria-label={label} aria-expanded={isUnfolded} onClick={onToggle}>
-            <Icon icon={icon} size="small" />
-        </button>
+        <Tooltip label={label}>
+            <button type="button" className="fold" aria-label={label} aria-expanded={isUnfolded} onClick={onToggle}>
+                <Icon icon={icon} size="small" />
+            </button>
+        </Tooltip>
     );
 }

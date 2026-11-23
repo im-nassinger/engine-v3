@@ -14,7 +14,8 @@
     cursor: default;
     user-select: none;
 
-    > .fold {
+    > .fold,
+    > .tooltip > .fold {
         display: flex;
         flex-shrink: 0;
         align-items: center;
@@ -34,7 +35,11 @@
         white-space: nowrap;
     }
 
-    > .eye {
+    > .tooltip {
+        flex-shrink: 0;
+    }
+
+    > .tooltip > .eye {
         display: flex;
         flex-shrink: 0;
         align-items: center;
@@ -44,14 +49,14 @@
         color: var(--faint);
     }
 
-    &[data-hidden-by-parent='true'] > .eye {
+    &[data-hidden-by-parent='true'] > .tooltip > .eye {
         opacity: 0.5;
     }
 
     &:hover {
         background: var(--hover);
 
-        > .eye {
+        > .tooltip > .eye {
             color: var(--muted);
         }
     }

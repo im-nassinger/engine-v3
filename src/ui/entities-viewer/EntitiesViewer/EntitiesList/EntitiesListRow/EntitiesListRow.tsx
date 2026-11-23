@@ -10,7 +10,7 @@ import { labelName } from '../../../../../core/level/index.ts';
 import { useCommands } from '../../../../commands/index.ts';
 import { useEditorSession } from '../../../../EditorContext.tsx';
 import { useEntityVersion, useReading } from '../../../../hooks/index.ts';
-import { Icon, RowKindIcon } from '../../../../shared/index.ts';
+import { Icon, RowKindIcon, Tooltip } from '../../../../shared/index.ts';
 import { indentAt } from '../rowLayout.ts';
 import { RowNameBox } from './RowNameBox/index.ts';
 import './EntitiesListRow.css';
@@ -136,9 +136,11 @@ function FoldArrow({ row, onToggle }: FoldArrowProps) {
     const label = row.isFolded ? 'Unfold' : 'Fold';
 
     return (
-        <button type="button" className="fold" aria-label={label} onClick={onToggle}>
-            <Icon icon={icon} size="small" />
-        </button>
+        <Tooltip label={label}>
+            <button type="button" className="fold" aria-label={label} onClick={onToggle}>
+                <Icon icon={icon} size="small" />
+            </button>
+        </Tooltip>
     );
 }
 
@@ -154,9 +156,11 @@ function EyeButton({ name, isHidden, onToggle }: EyeButtonProps) {
     const label = `${verb} ${name}`;
 
     return (
-        <button type="button" className="eye" aria-label={label} aria-pressed={isHidden} onClick={onToggle}>
-            <Icon icon={icon} />
-        </button>
+        <Tooltip label={label}>
+            <button type="button" className="eye" aria-label={label} aria-pressed={isHidden} onClick={onToggle}>
+                <Icon icon={icon} />
+            </button>
+        </Tooltip>
     );
 }
 

@@ -4,6 +4,7 @@ import type { Level } from '../../core/level/index.ts';
 import { FormatUpgrader, LevelReader, V1_LEVEL_LIMITS } from '../../core/level-data/index.ts';
 import { VersionCounter } from '../../core/events/index.ts';
 import { ReadOnlyMode } from '../history/index.ts';
+import { ShortcutSheetState } from '../shortcut-sheet/index.ts';
 import { CardFolds, ListFolds } from '../entity-inspector/index.ts';
 import type { FoldStore } from '../entity-inspector/index.ts';
 import { StatusText } from '../status/index.ts';
@@ -46,6 +47,8 @@ export class EditorSession {
     readonly openLevelChanged = new VersionCounter();
     // Turned on by the page when another tab holds the level's lock.
     readonly readOnlyMode = new ReadOnlyMode();
+    // Kept across New and Import: the sheet belongs to the editor, not to a level.
+    readonly shortcutSheet = new ShortcutSheetState();
     private readonly services: OpenLevelServices;
     private current: OpenLevel;
 

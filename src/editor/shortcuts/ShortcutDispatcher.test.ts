@@ -73,6 +73,23 @@ const TAB = recordedKey('Tab', 'Tab');
 const CTRL_S = recordedKey('KeyS', 's', { ctrlKey: true });
 
 describe('ShortcutDispatcher', () => {
+    test.each([
+        ['US', US_KEYS.questionMark],
+        ['ABNT2', ABNT2_KEYS.questionMark],
+        ['German', GERMAN_KEYS.questionMark],
+    ])('? on the %s layout opens and closes the shortcut list, and types in a text field', (_layout, key) => {
+        const { session, dispatcher } = buildEditorDispatcher();
+
+        expect(dispatcher.handleKeyDown(key, 'level', false)).toBe(true);
+        expect(session.shortcutSheet.isOpen).toBe(true);
+
+        expect(dispatcher.handleKeyDown(key, 'textField', false)).toBe(false);
+        expect(session.shortcutSheet.isOpen).toBe(true);
+
+        dispatcher.handleKeyDown(key, 'panel', false);
+        expect(session.shortcutSheet.isOpen).toBe(false);
+    });
+
     test('an editor key runs its command in the level view and in a panel', () => {
         const undo = fakeCommand('edit.undo', ['Ctrl+Z']);
         const { dispatcher } = buildDispatcher([undo]);

@@ -53,6 +53,7 @@ const WIDTHS: readonly (readonly [string, string])[] = [
     ['--indent', '16px'],
     ['--dialog', '400px'],
     ['--end-window', '320px'],
+    ['--shortcut-sheet', '320px'],
     ['--space-4', '4px'],
     ['--space-6', '6px'],
     ['--space-8', '8px'],

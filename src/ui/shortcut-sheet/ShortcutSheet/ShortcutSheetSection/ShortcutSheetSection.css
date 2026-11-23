@@ -1,0 +1,14 @@
+.shortcut-sheet-section {
+    > .title {
+        display: flex;
+        align-items: flex-end;
+        height: var(--row);
+        margin: 0;
+        padding: 0 var(--inset) var(--space-6);
+        color: var(--muted);
+        font-size: var(--text-tiny);
+        font-weight: var(--weight-heading);
+        letter-spacing: var(--caps-spacing);
+        text-transform: uppercase;
+    }
+}

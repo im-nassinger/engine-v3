@@ -82,6 +82,7 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--indent` | 16 px per level of the Entities viewer tree | |
 | `--dialog` | 400 px wide | |
 | `--end-window` | 320 px wide: the end window in test play | the v3 design |
+| `--shortcut-sheet` | 320 px wide: the shortcut sheet | the v4 design |
 | `--scrollbar-size` | 8 px: a scrollbar's width in WebKit; Firefox and Chromium draw their own thin one | owner's fix (2026-11-21) |
 
 ## Spacing, corners, the shadow

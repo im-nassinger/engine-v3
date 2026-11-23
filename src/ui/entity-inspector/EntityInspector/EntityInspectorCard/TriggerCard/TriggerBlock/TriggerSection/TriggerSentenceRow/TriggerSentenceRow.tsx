@@ -1,7 +1,7 @@
 import { X } from 'lucide-react';
 import { TriggerEdits } from '../../../../../../../../editor/entity-inspector/index.ts';
 import type { TriggerRow, TriggerWord } from '../../../../../../../../editor/entity-inspector/index.ts';
-import { Icon } from '../../../../../../../shared/index.ts';
+import { Icon, Tooltip } from '../../../../../../../shared/index.ts';
 import type { CommitTriggerEdit } from '../../../CommitTriggerEdit.ts';
 import { TriggerSlotWord } from './TriggerSlotWord/index.ts';
 import './TriggerSentenceRow.css';
@@ -29,11 +29,7 @@ export function TriggerSentenceRow({ row, triggerIndex, commit }: TriggerSentenc
             {sentence.words.map((word, wordIndex) => (
                 <SentenceWord key={wordIndex} word={word} triggerIndex={triggerIndex} commit={commit} />
             ))}
-            {canRemove && (
-                <button type="button" className="remove" aria-label={`Remove ${sentence.text}`} onClick={remove}>
-                    <Icon icon={X} size="small" />
-                </button>
-            )}
+            {canRemove && <RemoveButton label={`Remove ${sentence.text}`} onRemove={remove} />}
         </div>
     );
 }
@@ -48,4 +44,21 @@ function SentenceWord({ word, triggerIndex, commit }: SentenceWordProps) {
     if (word.kind === 'text') return <span className="text">{word.text}</span>;
 
     return <TriggerSlotWord word={word} triggerIndex={triggerIndex} commit={commit} />;
+}
+
+type RemoveButtonProps = {
+    label: string;
+    onRemove: () => void;
+};
+
+function RemoveButton({ label, onRemove }: RemoveButtonProps) {
+    return (
+        <span className="remove">
+            <Tooltip label={label}>
+                <button type="button" aria-label={label} onClick={onRemove}>
+                    <Icon icon={X} size="small" />
+                </button>
+            </Tooltip>
+        </span>
+    );
 }

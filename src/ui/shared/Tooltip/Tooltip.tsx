@@ -12,10 +12,12 @@ export type TooltipProps = {
     shortcut?: string;
     // A sentence, such as a field's description: it wraps and starts at the left edge instead of the middle.
     isLong?: boolean;
+    // While true no bubble shows: a menu button's, while its menu is open over the same place.
+    isSuppressed?: boolean;
     children: ReactNode;
 };
 
-export function Tooltip({ label, shortcut, isLong = false, children }: TooltipProps) {
+export function Tooltip({ label, shortcut, isLong = false, isSuppressed = false, children }: TooltipProps) {
     const [isShown, setIsShown] = useState(false);
     const rootRef = useRef<HTMLSpanElement>(null);
     const showTimer = useRef<number | undefined>(undefined);
@@ -37,6 +39,8 @@ export function Tooltip({ label, shortcut, isLong = false, children }: TooltipPr
 
     useEffect(() => cancelShowing, []);
 
+    const isBubbleShown = isShown && !isSuppressed;
+
     return (
         <span
             className="tooltip"
@@ -48,7 +52,7 @@ export function Tooltip({ label, shortcut, isLong = false, children }: TooltipPr
             onBlur={hide}
         >
             {children}
-            {isShown && <TooltipBubble label={label} shortcut={shortcut} isLong={isLong} owner={rootRef} />}
+            {isBubbleShown && <TooltipBubble label={label} shortcut={shortcut} isLong={isLong} owner={rootRef} />}
         </span>
     );
 }

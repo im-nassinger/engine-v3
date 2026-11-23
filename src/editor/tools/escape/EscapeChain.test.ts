@@ -50,6 +50,23 @@ describe('EscapeChain', () => {
         expect(openLevel.history.undoCount).toBe(0);
     });
 
+    test('closes the shortcut list after the menus over it, as a window, before ending a drawing', () => {
+        const { escape, controller, shape, session, windows } = buildChain();
+        controller.pick('shape');
+        shape.cancelAnswers = [true];
+        session.shortcutSheet.toggle();
+        windows.open = true;
+
+        expect(escape.press()).toBe('window');
+        expect(session.shortcutSheet.isOpen).toBe(true);
+        windows.open = false;
+
+        expect(escape.press()).toBe('window');
+        expect(session.shortcutSheet.isOpen).toBe(false);
+
+        expect(escape.press()).toBe('drawing');
+    });
+
     test('a cancelled drag ignores its release, so it never ends as a click', () => {
         const { escape, controller, select } = buildChain();
 

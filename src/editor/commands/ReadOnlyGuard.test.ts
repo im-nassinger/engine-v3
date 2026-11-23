@@ -18,7 +18,7 @@ const READ_ONLY = { enabled: false, reason: READ_ONLY_REASON };
 const REFUSED = { kind: 'refused', reason: READ_ONLY_REASON };
 
 // What a read-only tab may still do: look, select, go into a group, copy.
-const LOOKING_IDS = new Set(['edit.copy', 'edit.selectAll', 'arrange.goIntoGroup', 'help.about']);
+const LOOKING_IDS = new Set(['edit.copy', 'edit.selectAll', 'arrange.goIntoGroup', 'help.shortcuts', 'help.about']);
 
 function isLooking(id: string) {
     return LOOKING_IDS.has(id) || id.startsWith('view.');
