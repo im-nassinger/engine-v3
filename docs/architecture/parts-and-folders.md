@@ -59,6 +59,7 @@ src/
     derived/           DerivedCaches, levelBoundsOf
       caches/            WorldMatrixCache, BoundsCache, HiddenCache, PiecesCache
       tags/              LevelTags: every tag in the level (v3)
+      custom-events/     CustomEventNames: every custom event's name in the level (v4)
     level-data/        LevelData types, limits
       reading/           LevelReader and what it returns
       writing/           LevelWriter, LevelText
@@ -66,7 +67,7 @@ src/
     physics/           PhysicsWorld contract, PhysicsSceneBuilder (merging), BodyMass, JointEnds
       merging/           mergesInto: which body a shape merges into
       mass/              BodyMass: a body's mass from its surfaces
-    simulation/        run/ (Simulation, PlayRun), phases/ (the tick phases), bodies/ (BodyMatrices), removal/ (RemovalMarks), report/ (TickReport), hash/, start/ (startPlayCopy, startSimulation), testing/ (a scripted PhysicsWorld, test levels); CameraFollow; from v3 inputs/ (InputState, PlayInputs), triggers/ (TouchLedger, TriggerIndex, TriggerTimers, RunnableTriggers), actions/ (ActionRunner, PlayValueWriter), end/ (RunEnd)
+    simulation/        run/ (Simulation, PlayRun), phases/ (the tick phases), bodies/ (BodyMatrices), removal/ (RemovalMarks), report/ (TickReport), hash/, start/ (startPlayCopy, startSimulation), testing/ (a scripted PhysicsWorld, test levels); CameraFollow; from v3 inputs/ (InputState, PlayInputs), triggers/ (TouchLedger, TriggerIndex, TriggerTimers, RunnableTriggers; from v4 ContactLedger, VariableWatch, WaitingRuns), actions/ (ActionRunner, PlayValueWriter; from v4 readableValueOf, placementNow), end/ (RunEnd)
   editor/
     session/           EditorSession (the editor's root object), OpenLevel, CurrentGroup
     history/           History, HistoryStep, EditTransaction, changes/
@@ -80,7 +81,8 @@ src/
     entity-inspector/  EntityInspectorModel, CardModel, FieldModel, CardFolds, ValueInput (typed text); tags-field/ variables-field/ inputs-field/ triggers/ (TriggerCardModel, TriggerSentence, TriggerChoices, TriggerEdits) (v3)
     messages/          EditorMessages, EditorMessageRule, rules/ (with TouchNeedsSurfaceRule, TriggerCantRunRule, MissingInputsRule from v3)
     clipboard/         ClipboardCodec, PastePlacement, IdRemapping
-    shortcuts/         KeyChord, KeyPress, ShortcutMap, ShortcutDispatcher
+    shortcuts/         KeyChord, KeyPress, ShortcutMap, ShortcutDispatcher; catalog/ (ShortcutCatalog, ShortcutSearch, v4)
+    shortcut-sheet/    ShortcutSheetState: whether the shortcut sheet is open (v4)
     saving/            Autosave, SaveState, ProjectFile, ImportLevel, ExportLevel, contracts
     play/              session/ (PlaySession), pacing/ (TickPacer), watchdog/ (Watchdog), mirror/ (PlayMirror, NoPhysicsEngine), runner/ (the GameRunner contract), inputs/ (HeldKeys, the PageLifecycle contract), fixed-size/ (fixedSizeView), end/ (runTimeText) and warnings/ (playWarningText) (v3), testing/ (DirectGameRunner, FakePageLifecycle)
     status/            StatusText (what the message pill shows), outcomeText, mouseCoordinateText (the debug box's X and Y)
@@ -113,6 +115,7 @@ src/
     play/              PlayContext: the PlaySession for the shell, the Play button and the Play bar
     play-bar/          PlayBar/ (with PlayBarButton/)
     end-window/        EndWindow/: Win or Lose, the time, Leave and Restart (v3)
+    shortcut-sheet/    ShortcutSheet/: the searchable list of shortcuts (v4)
     testing/           editorPage: a component shown with the session, commands and tools, for browser tests
     main-menu/ level-view-host/ minimap/ entities-viewer/ entity-inspector/
     save-state/        SaveIndicatorContext

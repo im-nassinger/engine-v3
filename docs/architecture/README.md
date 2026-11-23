@@ -11,7 +11,7 @@ How engine-v3 is built: the stack, the five parts of the code and their folders,
 3. [core-model/](core-model/README.md): entities, the level, components and fields, geometry, the trigger model
 4. [editor/](editor/README.md): undo, selection, tools, the Entity inspector, the Entities viewer, clipboard, shortcuts
 5. [ui.md](ui.md): how React reads the core, and how the PixiJS level view fits
-6. [simulation.md](simulation.md): ticks, determinism, the game worker, Play and Stop; [triggers-in-play.md](triggers-in-play.md): events, triggers, the run's end and Restart (v3)
+6. [simulation.md](simulation.md): ticks, determinism, the game worker, Play and Stop; [triggers-in-play.md](triggers-in-play.md): events, triggers, waiting runs, the run's end and Restart (v3, v4)
 7. [adapters.md](adapters.md): the contracts and the classes that fulfil them
 8. [performance.md](performance.md), [persistence.md](persistence.md), [errors.md](errors.md), [testing.md](testing.md), [tooling.md](tooling.md)
 9. [plan.md](../plan.md): the v1 stages
@@ -26,16 +26,16 @@ How engine-v3 is built: the stack, the five parts of the code and their folders,
 | [core-model/entities-and-level.md](core-model/entities-and-level.md) | `Entity`, `Level`, ids, order, the World and the camera, change signals, derived caches, `EntityData` |
 | [core-model/components-and-fields.md](core-model/components-and-fields.md) | Value types, field types, schemas, `Component`, the registry, every v1 component, the fill and paths (v2) |
 | [core-model/geometry.md](core-model/geometry.md) | Units, matrices, bounds, collision pieces, mass, `DeterministicMath` |
-| [core-model/triggers.md](core-model/triggers.md) | The TagsComponent, VariablesComponent, InputComponent and TriggerComponent, their field types, `KeyCodes`, the `Trigger` model (v3) |
+| [core-model/triggers.md](core-model/triggers.md) | The TagsComponent, VariablesComponent, InputComponent and TriggerComponent, their field types, `KeyCodes`, the `Trigger` model (v3), typed variables and the trigger's v4 kinds |
 | [editor/README.md](editor/README.md) | `EditorSession`, `OpenLevel`, how an edit flows |
 | [editor/history.md](editor/history.md) | Changes, edit transactions, 512 history steps, drags |
 | [editor/selection-and-tools.md](editor/selection-and-tools.md) | Selection, current group, hit testing, tools, gradient handles, Esc, snapping |
 | [editor/drawing-and-points.md](editor/drawing-and-points.md) | The Shape tool, the pen, the Pencil, point editing, the Trigger tool |
-| [editor/inspector-and-entities.md](editor/inspector-and-entities.md) | The Entity inspector's model, typed values, editor messages, the Entities viewer's rows and drops, the trigger card |
-| [editor/clipboard-and-shortcuts.md](editor/clipboard-and-shortcuts.md) | Commands, the main menu, keys, the clipboard |
+| [editor/inspector-and-entities.md](editor/inspector-and-entities.md) | The Entity inspector's model, typed values, editor messages, the Entities viewer's rows and drops, the trigger card (v3, v4) |
+| [editor/clipboard-and-shortcuts.md](editor/clipboard-and-shortcuts.md) | Commands, the main menu, keys, the shortcut list and tooltips (v4), the clipboard |
 | [ui.md](ui.md) | `useVersion`, the one context, the screen, the level view's mount, panels, styles |
 | [simulation.md](simulation.md) | The game worker, pacing, the tick phases, bodies, determinism, the play mirror |
-| [triggers-in-play.md](triggers-in-play.md) | The tick from v3, touches, inputs, timers, Repeat, the chain limit, actions, changed values, the end window, Restart, keys during play |
+| [triggers-in-play.md](triggers-in-play.md) | The tick from v3, touches, collisions, Destroyed, variable changes, custom events, waiting runs, inputs, timers, Repeat, the chain limit, actions, changed values, the end window, Restart, keys during play |
 | [adapters.md](adapters.md) | Physics, rendering (gradients included), storage, input, time, workers, and the places for Lua and audio |
 | [performance.md](performance.md) | What v1 builds, what only gets a place, the speed tests |
 | [persistence.md](persistence.md) | `level.json`, the reader and writer, the project file, autosave, opening the editor |

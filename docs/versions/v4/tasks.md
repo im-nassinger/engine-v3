@@ -54,7 +54,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 16. v4's journeys and speed test
   - Read: versions/v4/architecture.md#tests, architecture/testing.md, architecture/performance.md
   - Done when: Playwright journeys in three browsers pass: a button that fires `open` on a door, which waits 2 s and flips `door_open`; a ball that hits a wall, the wall destroyed and adding 1 to `score`, "When score becomes 3 or more" winning; a boolean and a string variable on an entity edited, saved and read back; the shortcut sheet opened with `?`, searched and closed; the speed test of 1,000 collision triggers meets test play's targets, its numbers written in performance.md
-- [ ] 17. Close v4's docs
+- [x] 17. Close v4's docs
   - Read: versions/README.md#closing-a-version, versions/v3/architecture.md
   - Done when: v4's lasting parts are moved into architecture/ as v3's were, with `versions/v4/architecture.md` left as the record with a table of where each part went; the glossary has every new word; progress.md says v4 is built and waits for the owner's try; `node tools/check-sources.js` passes
 - [ ] 18. Try point: try the whole of v4: the new events (hits, destroyed, a variable changes, custom events), Fire custom event and Wait, the component value check, string and boolean variables on any entity with Flip, and the shortcut list with `?`

@@ -35,7 +35,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Card | One component as the Entity inspector shows it: a title and its fields. The title drops "Component": the TransformComponent's card reads `Transform` (owner: 2026-11-17). |
 | ☰ | The square island at the top left that opens the main menu: Play, then File, Edit, Arrange, View and Help. Every command is reached through it. |
 | Tool column | The island under ☰ holding the tools, one button each. |
-| Shortcut list | The sheet `?` opens: every shortcut by area, searchable, staying open while you work. |
+| Shortcut list | The sheet `?` opens, also called the shortcut sheet: every shortcut by area, searchable, staying open while you work. |
 | Kinds menu | The menu that stands open beside the Shape tool while it is active, to pick Rectangle, Circle or Polygon; the Joint tool's types (Hinge, Rope, Spring) have the same menu. |
 | Minimap | The island at the bottom right showing the whole level bounds small, with a rectangle for what the level view shows. Show-only in v1. |
 | Debug box | The island under the minimap showing the mouse position, the grid size and the zoom: `X: … Y: … GRID: … ZOOM: …`. |
@@ -137,6 +137,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Action | One step in a trigger's Do list, such as Change value or Spawn. Only ever used for triggers. |
 | When, If, Do | The three parts of a trigger, each a section of its card: **When** names its one event, **If** its checks, **Do** its actions, run top to bottom. |
 | Check | One condition in a trigger's If, such as "`other` has the tag `coin`" or "`coins` is at least 10". The actions run only when every check holds. |
+| Component value check | The check that compares a number value of the target's components, one part of a vector, or a body's **live value** (what it is doing right now, read from physics: its speed and its velocity x and y, in px/s) with a number: "If this BodyComponent speed is more than 200". |
 | Repeat | A trigger's setting for how often it may fire: every time (the default), once per run, or at most once every N seconds. |
 | Touched, no longer touched | The events for something starting or stopping touching an entity's sensor or surface, once per touching entity however many shapes it has. `other` is the entity that touched or left. |
 | Collision (event) | The event for this entity starting to hit a solid thing, once per entity hit however many shapes it has: "When this hits something". `other` is the entity hit. Not the same as the collision grid, which decides what hits what. |
@@ -144,8 +145,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | A variable changes | The event for a variable getting a new value, with an optional condition: "When coins becomes 10 or more" fires once, when the condition turns true. |
 | Change value | The action that sets, adds to or subtracts from a value on its target: a variable, a component value allowed to change during play, a tag, or a trigger's on or off. Teleporting is Change value on the position. |
 | Flip | Change value on a boolean variable that turns true into false and false into true. |
-| Wait | The action that delays the actions after it in a Do list, in whole ticks. |
-| Waiting run | What is left of a trigger's Do list while a Wait counts down. Each firing is its own; a trigger holds at most 32. |
+| Wait, waiting run | **Wait** is the action that delays the actions after it in a Do list, in whole ticks. A **waiting run** is what is left of a trigger's Do list while a Wait counts down. Each firing is its own; a trigger holds at most 32. |
 | Push | The action that gives a body a kick, ignoring its mass: a fixed vector in px/s, or a strength away from or towards `this`. |
 | Unset part | A part of a trigger not chosen yet, shown in yellow on its card. A trigger with an unset part doesn't run. |
 | Chain limit | Triggers setting off triggers stop after 32 rounds in one tick, with a play warning. The game keeps running. |
@@ -207,7 +207,7 @@ Words for how the game is built, used in [architecture/](architecture/README.md)
 | Status text | The short result the message pill shows for 4 seconds, such as "Undid: Move 3 entities". |
 | Browser event | Something the browser reports to the page, such as a key press or a paste. Never a game event. |
 | Body pose | A body's position and angle during play, as the physics engine reports it. |
-| Sensor event | What the physics world reports after a step when a surface starts (begin) or stops (end) overlapping a sensor. It names the sensor's entity, the visitor (the other surface's entity, Box2D's word) and the visitor's body. Not a game event: `TouchLedger` turns sensor events into "touched" and "no longer touched". |
+| Sensor event, contact event | What the physics world reports after a step when a surface starts (begin) or stops (end) overlapping a sensor. It names the sensor's entity, the visitor (the other surface's entity, Box2D's word) and the visitor's body. Not a game event: `TouchLedger` turns sensor events into "touched" and "no longer touched". A **contact event** is the same for two solid surfaces starting or stopping hitting (v4), only for the surfaces a run switched contact events on for; `ContactLedger` turns them into collision events. |
 | Firing | One trigger hearing one event in one tick (`TriggerFiring`): its entity, the trigger, and the entity that caused the event (`other`), if any. Two entities touching at once are two firings. `EventPhase` lists a tick's firings, `TriggerPhase` runs them. |
 | Round | One pass of `TriggerPhase` over a list of firings in one tick: the first is the firings `EventPhase` listed, each next one the firings the last round's actions set off. A tick stops after 32 (the chain limit). |
 | Play warning | Something that went wrong during play without stopping the run, such as the chain limit, given once per run (`PlayWarnings`). Shown in the message pill until the Console comes in v5. Not an editor message. |

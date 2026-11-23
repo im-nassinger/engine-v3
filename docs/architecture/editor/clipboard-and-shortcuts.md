@@ -103,6 +103,15 @@ export class ShortcutDispatcher {
 - The browser adapter `KeyboardInput` listens once on the window, early and not passive, calls `handleKeyDown`, and stops the browser's default only when it returns true. It also releases every held key when the window loses focus, so keys never stick.
 - The tool keys (Shift, Alt, Ctrl held during a drag, Enter and Backspace while drawing) go to the active tool first.
 
+## The shortcut list (v4)
+
+Built in v4's tasks 14 and 15 (standing yes, 2026-11-23), moved here from [v4's architecture](../../versions/v4/architecture.md) when v4 closed.
+
+- **`ShortcutCatalog`** (`editor/shortcuts/catalog/`) is the list the shortcut sheet shows: each shortcut's name, its area and its keys, built from `ShortcutMap` and the commands, so a shortcut added later shows with no work. *Why one source: the main menu, the tooltips and the sheet show the same keys, and only `ShortcutMap` decides them.* A row's name is the command's `shortcutName`, else its label, and commands with one name share a row (the four arrows are "Move 1 px"); its area is the command's `shortcutArea`, else its menu's (Edit and Arrange are Editing, Play is Test play, Help is View), else Editing. Each way to press it is a list of key caps from `KeyChord.caps`, spelled for the platform (Cmd and Option on a Mac). The tools' number keys come first (their names in `editor/tools`' `TOOL_NAMES`), and Space, Esc and the mouse shortcuts from [shortcuts.md](../../requirements/editor/shortcuts.md) are fixed rows in `fixedShortcuts.ts`. A Node test fails if a shortcut in `ShortcutMap` is missing from the catalog.
+- **`ShortcutSearch`** filters by words of the name and by the keys' text ("ctrl z"), case and order not counting. One typed character must be a whole key or a whole name word, a longer one may be a word's start, and accents don't count, so "ctrl z" finds Undo and Redo but not Zoom in. *Why: "ctrl z" finding every name with a z would bury what was asked for.*
+- **The sheet:** the session holds `ShortcutSheetState` (`editor/shortcut-sheet/`), which `ShortcutListCommand` (`help.shortcuts`, `?`, also Help › Shortcuts in the main menu) toggles. `?` is matched by its character (Shift and the key that holds `/`), so it works on other layouts. The sheet's ×, Esc in its search and `EscapeChain` (as a window, after the menus) close it. **`ShortcutSheet`** (`ui/shortcut-sheet/`) draws it as the [v4 design](../../versions/v4/design.md) says, in its own place over the Entities viewer's, hiding the viewer while it is open; its search field takes focus, and while it has the focus typing goes to the search, not to the editor's shortcuts. It stays open while the level is edited.
+- **Tooltips:** `MenuButton` shows its label as a tooltip unless it is a field's, and the bare icon buttons have a `Tooltip`; each shows the button's name and, when its command has one, its shortcut. `EditorShell.tooltips.browser.test.ts` checks every icon button on the page.
+
 ## The clipboard
 
 ```typescript

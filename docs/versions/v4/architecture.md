@@ -2,7 +2,24 @@
 
 ## TL;DR
 
-**How v4 is built**, Claude's draft (2026-11-22), built the same night under the owner's go-ahead ("plan everything needed and then use the orchestrator"). Every choice here is made under the standing yes and listed in [decisions.md](../../decisions.md). v4 grows what v3 built and adds no new part: **the trigger model** gains four Whens, one check, two actions and Flip; **variables** get a type and go on any entity; **the tick** gains contact events from Box2D, Destroyed, variable changes, custom events and **waiting runs**; and **the shortcut list** reads the shortcuts the editor already has. **Saved levels never change:** a level saved in v3 reads as before, and a level without the new parts saves as before. The v3 parts this grows are in [core-model/triggers.md](../../architecture/core-model/triggers.md) and [triggers-in-play.md](../../architecture/triggers-in-play.md).
+**How v4 is built**, Claude's draft (2026-11-22), built the same night under the owner's go-ahead ("plan everything needed and then use the orchestrator"). Every choice here is made under the standing yes and listed in [decisions.md](../../decisions.md). v4 grows what v3 built and adds no new part: **the trigger model** gains four Whens, one check, two actions and Flip; **variables** get a type and go on any entity; **the tick** gains contact events from Box2D, Destroyed, variable changes, custom events and **waiting runs**; and **the shortcut list** reads the shortcuts the editor already has. **Saved levels never change:** a level saved in v3 reads as before, and a level without the new parts saves as before. The v3 parts this grows are in [core-model/triggers.md](../../architecture/core-model/triggers.md) and [triggers-in-play.md](../../architecture/triggers-in-play.md). **v4 is built, and its lasting parts have moved into [architecture/](../../architecture/README.md)** (task 17, 2026-11-23), which is now where they are kept up to date. This file stays as the record of how v4 was planned and built, and is not updated any more:
+
+| Part of this file | Now in |
+|---|---|
+| Variables: the three types, any entity | [core-model/triggers.md](../../architecture/core-model/triggers.md#the-field-types); the Variables card in [inspector-and-entities.md](../../architecture/editor/inspector-and-entities.md#v4-the-trigger-cards-new-words-and-typed-variables) |
+| The trigger: the new types, `triggerProblems`, `changeableValues`, `readableValues`, `triggerName`, `CustomEventNames` | [core-model/triggers.md](../../architecture/core-model/triggers.md#what-v4-added-to-the-trigger) |
+| The trigger card | [inspector-and-entities.md](../../architecture/editor/inspector-and-entities.md#v4-the-trigger-cards-new-words-and-typed-variables) |
+| The tick, from v4 | [triggers-in-play.md](../../architecture/triggers-in-play.md#the-tick-from-v3) |
+| Collision, Destroyed, variable changes, custom events | [triggers-in-play.md](../../architecture/triggers-in-play.md#the-events-v4-added) |
+| Waiting runs | [triggers-in-play.md](../../architecture/triggers-in-play.md#waiting-runs) |
+| The component value check, Flip | [triggers-in-play.md](../../architecture/triggers-in-play.md#actions) |
+| Contact events and velocity in the physics contract, `removeSurfaces` | [adapters.md](../../architecture/adapters.md#physics); Box2D's facts in [tech-notes.md](../../tech-notes.md#physics-and-joints) |
+| Determinism | [triggers-in-play.md](../../architecture/triggers-in-play.md#determinism), [testing.md](../../architecture/testing.md#the-determinism-test) |
+| The shortcut list and the tooltips | [clipboard-and-shortcuts.md](../../architecture/editor/clipboard-and-shortcuts.md#the-shortcut-list-v4) |
+| Tests | [testing.md](../../architecture/testing.md) |
+| Speed | [performance.md](../../architecture/performance.md#targets-and-their-tests) |
+| Where things live | [parts-and-folders.md](../../architecture/parts-and-folders.md#the-folder-tree) |
+| Too many waiting runs as a play warning | [errors.md](../../architecture/errors.md#kinds-of-problem) |
 
 ## Where things live
 

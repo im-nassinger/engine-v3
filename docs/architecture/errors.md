@@ -18,7 +18,7 @@
 | Over a limit | A paste past 100,000 entities | `{ reason: 'overLimit', limit, max }` | The message names the limit: "A level holds at most 100,000 entities" |
 | A detail fails | IndexedDB full; no storage in a private window | `SaveState` `failed` | The message pill until a save works, and a level-wide warning |
 | A run fails | The worker stops answering or throws | `PlaySession` state `ended` with a reason | A message on the Play bar, one click from the editor |
-| Something goes wrong in play without stopping the run (v3) | The chain limit, an unknown input, a Restart in the first second, a value fixed in play | A `PlayWarning` in the tick report, once per run | The message pill, until the Console comes in v5 ([triggers-in-play.md](triggers-in-play.md#the-report-the-mirror-and-the-end)) |
+| Something goes wrong in play without stopping the run (v3) | The chain limit, an unknown input, a Restart in the first second, a value fixed in play, too many waiting runs (v4) | A `PlayWarning` in the tick report, once per run | The message pill, until the Console comes in v5 ([triggers-in-play.md](triggers-in-play.md#the-report-the-mirror-and-the-end)) |
 | A bug | An exception nobody expected | An exception | Below |
 
 ## Where the sentences come from
