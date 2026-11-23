@@ -8,7 +8,10 @@ import type { DropTarget } from '../../../../../editor/entities-viewer/index.ts'
 import type { OpenLevel } from '../../../../../editor/session/index.ts';
 import type { CloseWindow, OpenWindowCount } from '../../../../../editor/tools/index.ts';
 import { dropEntityRowAt } from '../../../../shared/index.ts';
-import { autoScrollSpeed } from './autoScrollSpeed.ts';
+import { autoScrollSpeed, autoScrollStep } from './autoScrollSpeed.ts';
+
+// The first frame of a scroll has no frame before it, so it counts as one at 60 frames a second.
+const FIRST_FRAME_MS = 1000 / 60;
 import { dropPointerAt } from './dropPointerAt.ts';
 
 // A press becomes a drag past 3 px, as in the level view; less is a click.
@@ -49,6 +52,8 @@ export class RowDrag {
     private pointerX = 0;
     private pointerY = 0;
     private scrollFrame: number | undefined;
+    // The time of the last frame that scrolled, undefined when the list isn't scrolling.
+    private lastScrollTime: number | undefined;
     private stopFollowingRows: Unsubscribe | undefined;
     // A drag ends with the button's release, which the browser follows with a click on the row under
     // it. That click must not change the selection.
@@ -216,8 +221,10 @@ export class RowDrag {
         this.scrollFrame = requestAnimationFrame(this.scrollOneFrame);
     }
 
-    private readonly scrollOneFrame = () => {
+    private readonly scrollOneFrame = (time: number) => {
         this.scrollFrame = undefined;
+        const lastTime = this.lastScrollTime;
+        this.lastScrollTime = undefined;
         const scroller = this.press?.elements.scroller;
         if (scroller === undefined || this.drag === undefined) return;
 
@@ -225,7 +232,9 @@ export class RowDrag {
         const speed = autoScrollSpeed(this.pointerY, scrollerBox);
         if (speed === 0) return;
 
-        scroller.scrollTop += speed;
+        const frameMs = lastTime === undefined ? FIRST_FRAME_MS : time - lastTime;
+        scroller.scrollTop += autoScrollStep(speed, frameMs);
+        this.lastScrollTime = time;
         this.keepScrolling();
     };
 
@@ -249,6 +258,7 @@ export class RowDrag {
             cancelAnimationFrame(this.scrollFrame);
             this.scrollFrame = undefined;
         }
+        this.lastScrollTime = undefined;
 
         if (wasDragging) {
             this.version.increment();

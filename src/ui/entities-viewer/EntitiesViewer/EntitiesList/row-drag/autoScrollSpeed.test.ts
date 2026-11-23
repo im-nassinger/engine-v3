@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { autoScrollSpeed } from './autoScrollSpeed.ts';
+import { autoScrollSpeed, autoScrollStep } from './autoScrollSpeed.ts';
 
 const EDGES = { top: 100, bottom: 700 };
 
@@ -21,7 +21,25 @@ describe('autoScrollSpeed', () => {
     });
 
     test('past an edge it scrolls at the fastest', () => {
-        expect(autoScrollSpeed(20, EDGES)).toBe(-20);
-        expect(autoScrollSpeed(900, EDGES)).toBe(20);
+        expect(autoScrollSpeed(20, EDGES)).toBe(-1200);
+        expect(autoScrollSpeed(900, EDGES)).toBe(1200);
+    });
+});
+
+describe('autoScrollStep', () => {
+    test('a longer frame scrolls further, so the speed per second holds at any frame rate', () => {
+        expect(autoScrollStep(1200, 1000 / 60)).toBe(20);
+        expect(autoScrollStep(1200, 1000 / 30)).toBe(40);
+        expect(autoScrollStep(-1200, 1000 / 30)).toBe(-40);
+    });
+
+    test('a slow speed still moves a pixel, and a still list none', () => {
+        expect(autoScrollStep(10, 1000 / 60)).toBe(1);
+        expect(autoScrollStep(-10, 1000 / 60)).toBe(-1);
+        expect(autoScrollStep(0, 1000 / 60)).toBe(0);
+    });
+
+    test('a frame after a long pause scrolls no more than a tenth of a second', () => {
+        expect(autoScrollStep(1200, 5000)).toBe(120);
     });
 });
