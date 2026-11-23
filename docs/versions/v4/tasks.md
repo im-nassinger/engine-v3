@@ -27,7 +27,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 7. Contact events and velocity in the physics world
   - Read: versions/v4/architecture.md#triggers-in-play, architecture/adapters.md#physics, tech-notes.md
   - Done when: the physics contract has `contactEvents()` after `step()` with the two entities (named from the adapter's own shape table, as sensor events are) and `velocity(body)`; contact events are switched on only for the shapes a run asks for; `NoPhysicsEngine` and the test fakes follow; tests on the real build pass
-- [ ] 8. The collision event
+- [x] 8. The collision event
   - Read: versions/v4/architecture.md#triggers-in-play, requirements/triggers/triggers.md#more-events--v4, architecture/triggers-in-play.md
   - Done when: `ContactLedger` counts per hit entity and hitting entity and fires collision once per entity hit, groups hearing their parts and parts of one group filtered out; `TriggerIndex` gives the shapes that need contact events at the start of a run; `EventPhase` lists collision after no longer touched; `runHeadless` tests cover a ball hitting a wall, a two-shape body hitting once, a group's trigger, and a hit after the two parted
 - [ ] 9. Destroyed and custom events

@@ -1,5 +1,5 @@
-import { TriggerComponent } from '../../components/index.ts';
-import type { Trigger, When } from '../../fields/index.ts';
+import { SurfaceComponent, TriggerComponent } from '../../components/index.ts';
+import type { EntityId, Trigger, When } from '../../fields/index.ts';
 import type { Entity, Level } from '../../level/index.ts';
 
 // One trigger as the index lists it. Its When never changes in play, so it is read once; its on/off does,
@@ -12,8 +12,9 @@ export type IndexedTrigger = {
 
 // The run's triggers by the kind of event they hear, each list in Entities viewer order, built when the run
 // starts and kept as entities are removed, so no tick walks every trigger. A When with an unset part hears
-// nothing and isn't listed. Touch triggers are found from their entity.
+// nothing and isn't listed. Touch and collision triggers are found from their entity.
 export class TriggerIndex {
+    private readonly level: Level;
     private levelStartList: IndexedTrigger[] = [];
     private keysAndInputsList: IndexedTrigger[] = [];
     private timersList: IndexedTrigger[] = [];
@@ -21,8 +22,13 @@ export class TriggerIndex {
     private readonly touchByOwner = new Map<Entity, IndexedTrigger[]>();
     // Each touch owner's place in Entities viewer order, to sort touches.
     private readonly touchPlace = new Map<Entity, number>();
+    private readonly collisionByOwner = new Map<Entity, IndexedTrigger[]>();
+    // Each collision owner's place in Entities viewer order, to sort hits.
+    private readonly collisionPlace = new Map<Entity, number>();
 
     constructor(level: Level) {
+        this.level = level;
+
         for (const owner of level.entitiesInPanelOrder()) {
             const triggers = owner.getComponent(TriggerComponent)?.get('triggers') ?? [];
 
@@ -62,6 +68,37 @@ export class TriggerIndex {
         return this.touchPlace.get(owner) ?? Number.POSITIVE_INFINITY;
     }
 
+    hearsCollision(entity: Entity) {
+        return this.collisionByOwner.has(entity);
+    }
+
+    // The entity's collision triggers, top to bottom in its card.
+    collisionTriggersOf(owner: Entity): readonly IndexedTrigger[] {
+        return this.collisionByOwner.get(owner) ?? [];
+    }
+
+    // Where a collision owner sits in Entities viewer order; an entity that hears no collision has no place.
+    collisionPlaceOf(owner: Entity) {
+        return this.collisionPlace.get(owner) ?? Number.POSITIVE_INFINITY;
+    }
+
+    // The surfaces whose shapes must send contact events: those whose entity, or a group above it, hears
+    // collisions. Read when the run starts, before its physics is built; triggers can't be added in play.
+    // A sensor is in it too, since Change value can make it solid.
+    contactEventSurfaces() {
+        const surfaces = new Set<EntityId>();
+        if (this.collisionByOwner.size === 0) return surfaces;
+
+        for (const entity of this.level.entitiesInPanelOrder()) {
+            if (!entity.hasComponent(SurfaceComponent)) continue;
+            if (!this.hearsCollisionAtOrAbove(entity)) continue;
+
+            surfaces.add(entity.id);
+        }
+
+        return surfaces;
+    }
+
     // The removed entities' triggers hear nothing more.
     forget(removed: ReadonlySet<Entity>) {
         const stays = (indexed: IndexedTrigger) => !removed.has(indexed.owner);
@@ -74,6 +111,8 @@ export class TriggerIndex {
         for (const entity of removed) {
             this.touchByOwner.delete(entity);
             this.touchPlace.delete(entity);
+            this.collisionByOwner.delete(entity);
+            this.collisionPlace.delete(entity);
         }
     }
 
@@ -100,21 +139,32 @@ export class TriggerIndex {
                 return;
             case 'touched':
             case 'untouched':
-                this.addTouch(owner, indexed);
+                addByOwner(this.touchByOwner, this.touchPlace, indexed);
+                return;
+            case 'collision':
+                addByOwner(this.collisionByOwner, this.collisionPlace, indexed);
                 return;
         }
     }
 
-    private addTouch(owner: Entity, indexed: IndexedTrigger) {
-        const ownTriggers = this.touchByOwner.get(owner);
-        if (ownTriggers !== undefined) {
-            ownTriggers.push(indexed);
-            return;
+    private hearsCollisionAtOrAbove(entity: Entity) {
+        for (let current: Entity | undefined = entity; current !== undefined; current = current.parent) {
+            if (this.hearsCollision(current)) return true;
         }
 
-        this.touchByOwner.set(owner, [indexed]);
-        this.touchPlace.set(owner, this.touchPlace.size);
+        return false;
     }
+}
+
+function addByOwner(byOwner: Map<Entity, IndexedTrigger[]>, places: Map<Entity, number>, indexed: IndexedTrigger) {
+    const ownTriggers = byOwner.get(indexed.owner);
+    if (ownTriggers !== undefined) {
+        ownTriggers.push(indexed);
+        return;
+    }
+
+    byOwner.set(indexed.owner, [indexed]);
+    places.set(indexed.owner, places.size);
 }
 
 // The trigger now, as its component holds it, or undefined once it is gone.

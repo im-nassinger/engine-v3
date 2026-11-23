@@ -1,4 +1,5 @@
 import type { LevelData, ReadOutcome } from '../../level-data/index.ts';
+import type { Level } from '../../level/index.ts';
 import type { PhysicsEngine } from '../../physics/index.ts';
 
 import { CameraSettings } from '../camera/CameraSettings.ts';
@@ -17,6 +18,7 @@ import { RemovalMarks } from '../removal/RemovalMarks.ts';
 import { PlayWarnings } from '../report/PlayWarnings.ts';
 import { ReportCollector } from '../report/ReportCollector.ts';
 import { PlayTriggers } from '../triggers/PlayTriggers.ts';
+import { TriggerIndex } from '../triggers/TriggerIndex.ts';
 
 import { RunEnding } from '../end/RunEnd.ts';
 import type { RunStart } from '../run/RunStart.ts';
@@ -27,8 +29,17 @@ import { startPlayCopy } from './startPlayCopy.ts';
 // The one way to build a run, used by runHeadless and the game worker alike, so the determinism test
 // proves the worker's runs. The engine must be loaded already.
 export function startSimulation(levelData: LevelData, engine: PhysicsEngine, start: RunStart): ReadOutcome<Simulation> {
-    const started = startPlayCopy(levelData, engine);
+    let index: TriggerIndex | undefined;
+    // The index is built from the read level before its physics, which switches on contact events for the
+    // surfaces collision triggers need.
+    const contactEventSurfacesOf = (level: Level) => {
+        index = new TriggerIndex(level);
+
+        return index.contactEventSurfaces();
+    };
+    const started = startPlayCopy(levelData, engine, contactEventSurfacesOf);
     if (!started.ok) return started;
+    if (index === undefined) throw new Error('The trigger index was not built.');
 
     const playCopy = started.value;
     const removals = new RemovalMarks();
@@ -36,7 +47,7 @@ export function startSimulation(levelData: LevelData, engine: PhysicsEngine, sta
     const cameraStart = startingCameraPosition(cameraSettings, playCopy.level);
     const camera = new CameraState(cameraStart);
     const inputs = new PlayInputs(playCopy.level);
-    const triggers = new PlayTriggers(playCopy.level, playCopy.registry);
+    const triggers = new PlayTriggers(playCopy.level, playCopy.registry, index);
     const ending = new RunEnding();
     const warnings = new PlayWarnings();
     const report = new ReportCollector();

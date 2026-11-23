@@ -1,22 +1,24 @@
 import type { ComponentRegistry } from '../../components/index.ts';
 import type { Entity, Level } from '../../level/index.ts';
-import type { SensorEvent } from '../../physics/index.ts';
+import type { ContactEvent, SensorEvent } from '../../physics/index.ts';
 
+import { ContactLedger } from './ContactLedger.ts';
 import { entitiesIn } from './entitiesIn.ts';
 import { RunnableTriggers } from './RunnableTriggers.ts';
 import { TagCounts } from './TagCounts.ts';
 import { TouchLedger } from './TouchLedger.ts';
 import type { TriggerFiring } from './TriggerFiring.ts';
-import { TriggerIndex, triggerOf } from './TriggerIndex.ts';
-import type { IndexedTrigger } from './TriggerIndex.ts';
+import { triggerOf } from './TriggerIndex.ts';
+import type { IndexedTrigger, TriggerIndex } from './TriggerIndex.ts';
 import { TriggerRepeats } from './TriggerRepeats.ts';
 import { TriggerTimers } from './TriggerTimers.ts';
 
 // What a run keeps about its triggers between the tick phases: the index of who hears what, the touches,
-// the timers, each trigger's last firing, which triggers can run, the tags held, and this tick's firings.
+// the hits, the timers, each trigger's last firing, which triggers can run, the tags held, and this tick's firings.
 export class PlayTriggers {
     readonly index: TriggerIndex;
     readonly touches: TouchLedger;
+    readonly contacts: ContactLedger;
     readonly timers: TriggerTimers;
     readonly repeats: TriggerRepeats;
     readonly runnable: RunnableTriggers;
@@ -28,9 +30,11 @@ export class PlayTriggers {
     private tagsRunOut: readonly string[] = [];
     private readonly sensorEvents: SensorEvent[] = [];
 
-    constructor(level: Level, registry: ComponentRegistry) {
-        this.index = new TriggerIndex(level);
+    // The index is built before the run's physics, which needs its contactEventSurfaces.
+    constructor(level: Level, registry: ComponentRegistry, index: TriggerIndex) {
+        this.index = index;
         this.touches = new TouchLedger(level, this.index);
+        this.contacts = new ContactLedger(level, this.index);
         this.timers = new TriggerTimers(this.index);
         this.repeats = new TriggerRepeats();
         this.runnable = new RunnableTriggers(level, registry);
@@ -47,6 +51,11 @@ export class PlayTriggers {
         this.sensorEvents.length = 0;
         read(this.sensorEvents);
         this.touches.readStep(this.sensorEvents);
+    }
+
+    // Called by PhysicsPhase after the step, with the world's contact events.
+    readContactEvents(events: readonly ContactEvent[]) {
+        this.contacts.readStep(events);
     }
 
     // The trigger's firing for an event, `other` its cause, or undefined when it doesn't hear it: it is off,
@@ -74,6 +83,7 @@ export class PlayTriggers {
         this.tags.forget(removedList);
         this.index.forget(removed);
         this.touches.forget(removed);
+        this.contacts.forget(removed);
         this.timers.forget(removed);
         this.repeats.forget(removed);
         this.runnable.forget(removed);

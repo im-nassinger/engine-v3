@@ -11,7 +11,7 @@
 | `InputPhase` | Builds `InputState` for the tick: each key and each input pressed, released or held |
 | `PhysicsPhase` | One step, then reads the moved bodies **and the sensor events** into `TouchLedger` |
 | `JointPathPhase` | As in v1 |
-| **`EventPhase`** | Lists the tick's events, in a fixed order: level start (first tick only), keys and inputs, timers, touches, no longer touched, "no entity with this tag is left" |
+| **`EventPhase`** | Lists the tick's events, in a fixed order: level start (first tick only), keys and inputs, timers, touches, no longer touched, collision (from v4, counted by `ContactLedger`, see [v4's architecture](../versions/v4/architecture.md#triggers-in-play)), "no entity with this tag is left" |
 | **`TriggerPhase`** | For each event in that order, the triggers that hear it, decided once, in Entities viewer order; their checks, then their actions |
 | `LevelBoundsPhase`, `CameraPhase` | As in v1. `CameraSettings` reads Follow and Smoothing each tick |
 | `EndOfTickPhase` | Removes destroyed and marked entities, finds tags that just ran out for the next tick, ends the run on Win or Lose, writes the report |

@@ -1,4 +1,5 @@
 import type { TickContext, TickPhase } from '../run/TickPhase.ts';
+import type { Hit } from '../triggers/ContactLedger.ts';
 import type { TouchChange } from '../triggers/TouchLedger.ts';
 import type { TriggerFiring } from '../triggers/TriggerFiring.ts';
 import type { IndexedTrigger } from '../triggers/TriggerIndex.ts';
@@ -7,7 +8,7 @@ import type { PlayTriggers } from '../triggers/PlayTriggers.ts';
 const LEVEL_START_TICK = 1;
 
 // Lists the tick's firings, in a fixed order: level start (the first tick only), keys and inputs, timers,
-// touched, no longer touched, then "no entity with this tag is left" for the tags that ran out last tick.
+// touched, no longer touched, collision, then "no entity with this tag is left" for the tags that ran out last tick.
 // Inside each, triggers come in Entities viewer order. A trigger that is off hears nothing, and a firing
 // its Repeat already refuses is dropped here.
 export class EventPhase implements TickPhase {
@@ -35,6 +36,7 @@ export class EventPhase implements TickPhase {
         listing.addAll(triggers.timers.due(tick.tick));
         listing.addTouches(triggers.touches.changes.touched, 'touched');
         listing.addTouches(triggers.touches.changes.untouched, 'untouched');
+        listing.addHits(triggers.contacts.hits);
 
         const runOut = new Set(triggers.tagsRunOutLastTick);
         for (const indexed of triggers.index.tagLeft) {
@@ -73,6 +75,15 @@ class FiringList {
                 if (indexed.when.kind !== kind) continue;
 
                 this.add(indexed, change.other);
+            }
+        }
+    }
+
+    // Each entity hit is its own firing of every collision trigger of the entity it hit.
+    addHits(hits: readonly Hit[]) {
+        for (const hit of hits) {
+            for (const indexed of this.triggers.index.collisionTriggersOf(hit.owner)) {
+                this.add(indexed, hit.other);
             }
         }
     }
