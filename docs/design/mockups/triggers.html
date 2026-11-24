@@ -205,7 +205,17 @@
   .o-branch .foot { margin-top: 10px; }
 
   /* 12 · Scratch: snap-together blocks. --nx is where a block's notch sits, --tx where its tab sits. */
-  .o-scratch { --sk-event: #b9822f; --sk-ctl: #2b8a7f; --sk-act: #3a66c4; --sk-wait: #6c55c2; --sk-cool: #5b6f86; }
+  .o-scratch { --sk-event: #8d5d1c; --sk-ctl: #1e796b; --sk-act: #3f6aa1; --sk-wait: #725b9a; --sk-cool: #625240; }
+  /* Block colours (OKLCH): every block at one lightness (0.52) and one chroma (0.10), so none shouts; the
+     hues are spread by what a block does: event amber 70, If teal 180, actions blue 255, Wait violet 300,
+     next to the actions it sits among. The cooldown belongs to the event, so it is the event's hue nearly
+     greyed out (0.45, 0.035). White text is 5.3:1 or more on each. Inside a block, a menu is the block's
+     own colour 0.09 darker, and an amount a near-white of its hue with dark text of its hue (11:1). */
+  .sb.hat  { --dd: #6f4606; --nb: #f8ece0; --nt: #4c2a00; }
+  .sb.cool { --dd: #483a2b; --nb: #f8ece0; --nt: #3c3023; }
+  .sb.ctl  { --dd: #055d51; --nb: #e1f3ef; --nt: #003e34; }
+  .sb.do   { --dd: #2b5180; --nb: #e6effc; --nt: #13335a; }
+  .sb.wait { --dd: #58437a; --nb: #f0ecfa; --nt: #392855; }
   .o-scratch .script { display: flex; flex-direction: column; padding-bottom: 6px; }
   .sb { --nx: 0px; --tx: 0px; position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; min-height: 40px;
     padding: 9px 10px 13px; margin-bottom: -6px; color: #fff; line-height: 22px; border-radius: 6px;
@@ -223,9 +233,9 @@
   .sc-mid { display: flex; }
   .sc-arm { width: 16px; flex: none; background: var(--sk-ctl); }
   .sc-inner { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-  .sk-dd { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 6px; border-radius: 6px; background: rgba(0,0,0,.22); cursor: pointer; white-space: nowrap; }
+  .sk-dd { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 6px; border-radius: 6px; background: var(--dd); cursor: pointer; white-space: nowrap; }
   .sk-dd::after { content: "▾"; font-size: 9px; opacity: .7; }
-  .sk-num { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 99px; background: rgba(255,255,255,.92); color: #1d2230; cursor: pointer; white-space: nowrap; }
+  .sk-num { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 99px; background: var(--nb); color: var(--nt); font-weight: 600; cursor: pointer; white-space: nowrap; }
   .o-scratch .foot { margin-top: 10px; }
   .fx { color: var(--ent); }
   .o-scratch .fx { color: inherit; }
