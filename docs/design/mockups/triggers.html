@@ -239,18 +239,22 @@
   .o-scratch .script { overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
   .o-scratch .stack { display: flex; flex-direction: column; width: max-content; min-width: 100%; padding: 2px; box-sizing: border-box; } /* 2px: room for the blocks' border */
   .o-scratch .sb { flex-wrap: nowrap; white-space: nowrap; }
-  /* A block is drawn by its ::before (the body, 6 px short of the bottom) and its ::after (the tab, a
-     20 px tooth hanging into the block below), both with slightly rounded corners. No notch is cut: the
-     tab of the block above, and the line around it, always covers where it would be. */
+  /* A block is its body (::before, 6 px short of the bottom) and its tooth (::after, 20 px hanging into the
+     block below), both slightly rounded. The 2 px gap around them is a ring of the trigger's background
+     (box-shadow), which keeps the corners' roundness, so the tooth sits in a hole 2 px bigger on every side
+     with corners rounded by 3 + 2 px. Layers, bottom to top: the tooth's ring (.tooth), the body and its
+     ring, the tooth (::after, which covers the body's ring where they join). No notch is cut: the tooth
+     above and its ring always cover where it would be. */
   .sb { --tx: 0px; --td: 6px; --r: 4px; --rtl: var(--r); --rtr: var(--r); --rbr: var(--r); --rbl: var(--r);
     position: relative; isolation: isolate; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; min-height: 40px;
     padding: 9px 10px 13px; margin-bottom: -6px; color: var(--text); line-height: 22px; }
-  .sb::before { content: ""; position: absolute; inset: 0 0 6px 0; z-index: -1; background: var(--bg);
-    border-radius: var(--rtl) var(--rtr) var(--rbr) var(--rbl); }
-  .sb::after { content: ""; position: absolute; left: calc(var(--tx) + 14px); width: 20px; top: calc(100% - 7px); height: calc(var(--td) + 1px);
+  .sb::before { content: ""; position: absolute; inset: 0 0 6px 0; z-index: -2; background: var(--bg);
+    border-radius: var(--rtl) var(--rtr) var(--rbr) var(--rbl); box-shadow: 0 0 0 2px var(--sk-gap); }
+  .sb::after, .sb > .tooth { content: ""; position: absolute; left: calc(var(--tx) + 14px); width: 20px; top: calc(100% - 7px); height: 7px;
     z-index: -1; background: var(--bg); border-radius: 0 0 3px 3px; }
-  .sb.end::after { display: none; }
-  .sk.open > .sb.end::after { display: block; }
+  .sb > .tooth { z-index: -3; box-shadow: 0 0 0 2px var(--sk-gap); }
+  .sb.end::after, .sb.end > .tooth { display: none; }
+  .sk.open > .sb.end::after, .sk.open > .sb.end > .tooth { display: block; }
   .sb.hat { padding-top: 7px; }
   .sb.hat { --bg: var(--sk-event); }
   .sb.do { --bg: var(--sk-act); }
@@ -274,8 +278,8 @@
   .sk.slot:hover > .sb.slot { color: var(--text); --bg: color-mix(in srgb, #fff 10%, var(--panel)); }
   .sb svg { width: 16px; height: 16px; }
   .sc-mid { display: flex; }
-  /* The border: a CSS border can't trace a body and its tab as one shape, so each block sits in a .sk wrapper whose
-     drop-shadows draw a 2 px line around the block's shape, tab included. Blocks overlap by their
+  /* The border: each block's body and tooth carry a 2 px ring in the trigger's own background (owner,
+     2026-11-24), so blocks read as cut apart by a gap. Blocks overlap by their
      whole 6 px tab, and a block draws above the ones under it (z-index set in scratch()), so its bottom line
      and tab are the seam. An If (.sc) draws its top, arm and bottom above the blocks it holds; the arm draws
      its own lines and covers the top's and bottom's lines where they meet it, so the If reads as one C. */
@@ -287,11 +291,7 @@
   .o-scratch .sc .sc-inner .sb { --rtl: 0px; --rbl: 0px; }
   .sc-arm { position: relative; z-index: 1001; width: 16px; flex: none; background: var(--sk-ctl);
     --line: var(--sk-gap); box-shadow: -2px 0 0 var(--line), inset -2px 0 0 var(--line); }
-  .sk { display: flex; flex-direction: column; position: relative;
-    filter: drop-shadow(1px 0 0 var(--line)) drop-shadow(-1px 0 0 var(--line)) drop-shadow(0 1px 0 var(--line)) drop-shadow(0 -1px 0 var(--line))
-      drop-shadow(1px 0 0 var(--line)) drop-shadow(-1px 0 0 var(--line)) drop-shadow(0 1px 0 var(--line)) drop-shadow(0 -1px 0 var(--line)); }
-  /* The border is the trigger's own background (owner, 2026-11-24), so blocks read as cut apart by a gap. */
-  .sk { --line: var(--sk-gap); }
+  .sk { display: flex; flex-direction: column; position: relative; }
   .sc-inner { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   .sk-dd { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 6px; border-radius: 6px; background: rgba(255,255,255,.09); cursor: pointer; white-space: nowrap; }
   .sk-dd::after { content: "▾"; font-size: 9px; opacity: .7; }
@@ -519,7 +519,7 @@ function scratch() {
       }).join('');
       // Every block starts with one icon saying what it does. Only If holds other blocks: it wraps the
       // whole Do list, since its checks guard every action. A trigger has one If, its checks joined by "and".
-      const wrap = (icon, top, inner, z, add) => `<div class="sc" style="z-index: ${z}"><div class="sk ctl" data-add="${add}"><div class="sb ctl top">${ic(icon)}${words(top)}</div></div>
+      const wrap = (icon, top, inner, z, add) => `<div class="sc" style="z-index: ${z}"><div class="sk ctl" data-add="${add}"><div class="sb ctl top"><i class="tooth"></i>${ic(icon)}${words(top)}</div></div>
            <div class="sc-mid"><div class="sc-arm"></div><div class="sc-inner">${inner}</div></div>
            <div class="sk ctl"><div class="sb ctl bottom end"></div></div></div>`;
       // A time's unit is a menu (seconds now, ticks later), not a fixed "s".
@@ -528,9 +528,9 @@ function scratch() {
       // A block draws above its slot, and its slot above the next block: z-index counts down the stack.
       let key = 0;
       const block = (kind, html, z, end = false, add = null, cls = '') =>
-        `<div class="sk ${kind}${cls}" style="z-index: ${z}"${add === null ? '' : ` data-add="${add}"`}><div class="sb ${kind}${end ? ' end' : ''}">${html}</div></div>`;
+        `<div class="sk ${kind}${cls}" style="z-index: ${z}"${add === null ? '' : ` data-add="${add}"`}><div class="sb ${kind}${end ? ' end' : ''}"><i class="tooth"></i>${html}</div></div>`;
       const slot = (add, z, end) =>
-        `<div class="sk slot" data-slot="${add}" style="z-index: ${z}"><div class="sb slot${end ? ' end' : ''}">${ic('plus')}<span>add a block</span></div></div>`;
+        `<div class="sk slot" data-slot="${add}" style="z-index: ${z}"><div class="sb slot${end ? ' end' : ''}"><i class="tooth"></i>${ic('plus')}<span>add a block</span></div></div>`;
       const last = tr.dos.length - 1;
       const stack = tr.dos.map((d, i) => {
         const k = key++;
