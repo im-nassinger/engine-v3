@@ -225,18 +225,22 @@
   .o-scratch .script { overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
   .o-scratch .stack { display: flex; flex-direction: column; width: max-content; min-width: 100%; padding: 2px; box-sizing: border-box; } /* 2px: room for the blocks' border */
   .o-scratch .sb { flex-wrap: nowrap; white-space: nowrap; }
-  .sb { --nx: 0px; --tx: 0px; position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; min-height: 40px;
+  .sb { --nx: 0px; --tx: 0px; --nd: 6px; --td: 6px; position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; min-height: 40px;
     padding: 9px 10px 13px; margin-bottom: -6px; color: var(--text); line-height: 22px; border-radius: 6px;
-    clip-path: polygon(0 0, calc(var(--nx) + 12px) 0, calc(var(--nx) + 17px) 6px, calc(var(--nx) + 31px) 6px, calc(var(--nx) + 36px) 0, 100% 0,
-      100% calc(100% - 6px), calc(var(--tx) + 36px) calc(100% - 6px), calc(var(--tx) + 31px) 100%, calc(var(--tx) + 17px) 100%, calc(var(--tx) + 12px) calc(100% - 6px), 0 calc(100% - 6px)); }
+    clip-path: polygon(0 0, calc(var(--nx) + 12px) 0, calc(var(--nx) + 17px) var(--nd), calc(var(--nx) + 31px) var(--nd), calc(var(--nx) + 36px) 0, 100% 0,
+      100% calc(100% - 6px), calc(var(--tx) + 36px) calc(100% - 6px), calc(var(--tx) + 31px) calc(100% - 6px + var(--td)), calc(var(--tx) + 17px) calc(100% - 6px + var(--td)), calc(var(--tx) + 12px) calc(100% - 6px), 0 calc(100% - 6px)); }
   .sb.hat { padding-top: 7px; border-radius: 40px 10px 6px 6px / 14px 10px 6px 6px;
-    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 36px calc(100% - 6px), 31px 100%, 17px 100%, 12px calc(100% - 6px), 0 calc(100% - 6px)); }
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 36px calc(100% - 6px), 31px calc(100% - 6px + var(--td)), 17px calc(100% - 6px + var(--td)), 12px calc(100% - 6px), 0 calc(100% - 6px)); }
   .sb.hat { background: var(--sk-event); }
   .sb.do { background: var(--sk-act); }
   .sb.wait { background: var(--sk-wait); }
   .sb.ctl { background: var(--sk-ctl); }
   .sb.ctl.top { --tx: 16px; }
-  .sb.ctl.bottom { --nx: 16px; min-height: 30px; padding: 0; }
+  /* A block with nothing under it has no tab (.end), and so the If's bottom has no notch. The last block
+     in an If gets 2 px more below its words, since the If's bottom draws its line over them. */
+  .sb.ctl.bottom { --nd: 0px; min-height: 30px; padding: 0; }
+  .sb.end { --td: 0px; }
+  .sc-inner > .sk:last-child > .sb { padding-bottom: 15px; }
   .sb svg { width: 16px; height: 16px; }
   .sc-mid { display: flex; }
   /* The border: a block's clip-path would cut off a CSS border, so each block sits in a .sk wrapper whose
@@ -268,10 +272,10 @@
   .o-scratch .fx { color: inherit; }
   /* 13 · Blocky: square corners and square notches */
   .o-scratch.blocky .sb { border-radius: 2px;
-    clip-path: polygon(0 0, calc(var(--nx) + 14px) 0, calc(var(--nx) + 14px) 6px, calc(var(--nx) + 34px) 6px, calc(var(--nx) + 34px) 0, 100% 0,
-      100% calc(100% - 6px), calc(var(--tx) + 34px) calc(100% - 6px), calc(var(--tx) + 34px) 100%, calc(var(--tx) + 14px) 100%, calc(var(--tx) + 14px) calc(100% - 6px), 0 calc(100% - 6px)); }
+    clip-path: polygon(0 0, calc(var(--nx) + 14px) 0, calc(var(--nx) + 14px) var(--nd), calc(var(--nx) + 34px) var(--nd), calc(var(--nx) + 34px) 0, 100% 0,
+      100% calc(100% - 6px), calc(var(--tx) + 34px) calc(100% - 6px), calc(var(--tx) + 34px) calc(100% - 6px + var(--td)), calc(var(--tx) + 14px) calc(100% - 6px + var(--td)), calc(var(--tx) + 14px) calc(100% - 6px), 0 calc(100% - 6px)); }
   .o-scratch.blocky .sb.hat { padding-top: 7px;
-    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 34px calc(100% - 6px), 34px 100%, 14px 100%, 14px calc(100% - 6px), 0 calc(100% - 6px)); }
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 34px calc(100% - 6px), 34px calc(100% - 6px + var(--td)), 14px calc(100% - 6px + var(--td)), 14px calc(100% - 6px), 0 calc(100% - 6px)); }
   .o-scratch.blocky .sk-dd, .o-scratch.blocky .sk-num { border-radius: 2px; }
 </style>
 </head>
@@ -493,13 +497,13 @@ function scratch(look) {
       // whole Do list, since its checks guard every action. A trigger has one If, its checks joined by "and".
       const wrap = (icon, top, inner, z) => `<div class="sc" style="z-index: ${z}"><div class="sk ctl"><div class="sb ctl top">${ic(icon)}${words(top)}</div></div>
            <div class="sc-mid"><div class="sc-arm"></div><div class="sc-inner">${inner}</div></div>
-           <div class="sk ctl"><div class="sb ctl bottom"></div></div></div>`;
+           <div class="sk ctl"><div class="sb ctl bottom end"></div></div></div>`;
       // A time's unit is a menu (seconds now, ticks later), not a fixed "s".
       const unit = c('seconds');
       const waitWords = (d) => [t('wait'), n(d.words[1].x.split(' ')[0]), unit];
       // A block draws above the blocks under it: z-index counts down the stack.
-      const block = (kind, html, z) => `<div class="sk ${kind}" style="z-index: ${z}"><div class="sb ${kind}">${html}</div></div>`;
-      const stack = tr.dos.map((d, i) => block(d.wait ? 'wait' : 'do', ic(d.icon) + words(d.wait ? waitWords(d) : d.words), 999 - i)).join('');
+      const block = (kind, html, z, end = false) => `<div class="sk ${kind}" style="z-index: ${z}"><div class="sb ${kind}${end ? ' end' : ''}">${html}</div></div>`;
+      const stack = tr.dos.map((d, i) => block(d.wait ? 'wait' : 'do', ic(d.icon) + words(d.wait ? waitWords(d) : d.words), 999 - i, i === tr.dos.length - 1)).join('');
       const checks = tr.ifs.flatMap((c, i) => i ? [t('and'), ...c.words] : c.words);
       const body = tr.ifs.length ? wrap('split', [t('if'), ...checks], stack, 998) : stack;
       const hat = block('hat', ic(tr.icon) + words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)]), 1000);
