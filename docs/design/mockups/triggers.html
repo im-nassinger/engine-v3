@@ -653,7 +653,10 @@ function slotFrame(now) {
     moving ||= next !== target;
   });
   const kept = anchor?.isConnected && anchor.getClientRects().length > 0 ? anchor.closest('.script') : null;
-  if (kept) keepInPlace(kept, anchor, anchorTop);
+  if (kept) {
+    keepInPlace(kept, anchor, anchorTop);
+    moving = reveal(kept, dt) || moving;
+  }
   document.querySelectorAll('.o-scratch .script').forEach((script) => {
     if (script === activeScript || script === kept) settling.delete(script);
     else moving = settle(script, now) || moving;
@@ -702,6 +705,22 @@ function drawSlot(slot, t) {
   slot.style.height = grown < 1 ? `${Math.round(slotHeight.get(slot) * eased)}px` : '';
   slot.style.overflow = grown < 1 ? 'hidden' : '';
   sb.style.opacity = String(easeInOut(fade));
+}
+
+// When the open slot reaches below the script's view, as the slot after the last block does, the script scrolls
+// down smoothly until all of it shows (owner, 2026-11-24). The hovered block then moves up, and stays where that
+// leaves it. Returns whether it still has some way to go.
+const REVEAL_MS = 60; // how fast the scroll closes in: about what's left of the way every REVEAL_MS
+function reveal(script, dt) {
+  if (!wantedSlot || wantedSlot.closest('.script') !== script || !wantedSlot.classList.contains('show')) return false;
+  const viewBottom = script.getBoundingClientRect().top + script.clientHeight;
+  const need = wantedSlot.getBoundingClientRect().bottom + 4 - viewBottom;
+  if (need <= 0.5) return false;
+  const was = script.scrollTop;
+  script.scrollTop += Math.max(0.5, need * (1 - Math.exp(-dt / REVEAL_MS)));
+  if (script.scrollTop === was) return false; // as far down as it goes
+  anchorTop = anchor.getBoundingClientRect().top;
+  return true;
 }
 
 // Scrolls the script so the anchor's top is back at `before`. When the script can't scroll that far, an empty
