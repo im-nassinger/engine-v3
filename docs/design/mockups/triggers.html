@@ -236,7 +236,22 @@
   .sb > svg { color: var(--ic); }
   /* The script scrolls sideways instead of wrapping: blocks grow to their words' width, and the stack is at
      least as wide as the card, so short blocks still fill it. */
-  .o-scratch .script { overflow: auto; overflow-anchor: none; padding-bottom: 6px; scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
+  .o-scratch .script { overflow: auto; overflow-anchor: none; padding-bottom: 6px; scrollbar-width: none; }
+  .o-scratch .script::-webkit-scrollbar { display: none; }
+  /* The script's own scrollbars: thin rounded bars drawn over the blocks, taking no room, so the vertical one
+     appearing can't make the script narrower and call up the horizontal one (owner, 2026-11-24). They show
+     while the mouse is on the script, and widen under the mouse. */
+  .o-scratch .script-box { position: relative; }
+  .o-scratch .bar { position: absolute; z-index: 1100; display: none; padding: 2px; cursor: default; opacity: 0; transition: opacity .2s; }
+  .o-scratch .bar.on { display: block; }
+  .o-scratch .script-box:hover .bar, .o-scratch .bar.drag { opacity: 1; }
+  .o-scratch .bar::before { content: ""; display: block; width: 100%; height: 100%; border-radius: 99px;
+    background: color-mix(in srgb, var(--text) 30%, transparent); transition: background .2s; }
+  .o-scratch .bar:hover::before, .o-scratch .bar.drag::before { background: color-mix(in srgb, var(--text) 55%, transparent); }
+  .o-scratch .bar.v { right: 0; width: 8px; }
+  .o-scratch .bar.h { bottom: 0; height: 8px; }
+  .o-scratch .bar.v:hover, .o-scratch .bar.v.drag { width: 11px; }
+  .o-scratch .bar.h:hover, .o-scratch .bar.h.drag { height: 11px; }
   .o-scratch .stack { display: flex; flex-direction: column; width: max-content; min-width: 100%; padding: 2px; box-sizing: border-box; } /* 2px: room for the blocks' border */
   .o-scratch .sb { flex-wrap: nowrap; white-space: nowrap; }
   /* A block is its body (::before, 6 px short of the bottom) and its tooth (::after, 20 px hanging into the
@@ -564,9 +579,9 @@ function scratch() {
         body = actions(underHat);
       }
       // No cooldown block: a trigger that must rest sets its Enabled to false, waits, and sets it to true.
-      return `<div class="trig o-scratch">${head(tr)}<div class="script"><div class="room"></div><div class="stack">
+      return `<div class="trig o-scratch">${head(tr)}<div class="script-box"><div class="script"><div class="room"></div><div class="stack">
         ${hat}${body}
-      </div><div class="room"></div></div></div>`;
+      </div><div class="room"></div></div><div class="bar v"></div><div class="bar h"></div></div></div>`;
     });
 }
 
@@ -582,7 +597,55 @@ function render() {
   // A Scratch script keeps the height it has with no slot open, so an opening slot scrolls it instead of growing it.
   document.querySelectorAll('.o-scratch .script').forEach((x) => { x.style.height = `${x.offsetHeight}px`; });
   lucide.createIcons();
+  document.querySelectorAll('.o-scratch .script').forEach(drawBars);
 }
+
+// Places a script's two bars from its scroll: each thumb is as long, against its track, as the view against the
+// content. A bar shows only when the script can scroll that way; with both, each stops short of the corner.
+const BAR = 8;
+function drawBars(script) {
+  const [v, h] = script.parentElement.querySelectorAll(':scope > .bar');
+  const canV = script.scrollHeight > script.clientHeight + 1;
+  const canH = script.scrollWidth > script.clientWidth + 1;
+  const place = (bar, on, view, content, scroll, track, start, along, across) => {
+    bar.classList.toggle('on', on);
+    if (!on) return;
+    const len = Math.max(24, (track * view) / content);
+    bar.style[along] = `${start + ((track - len) * scroll) / (content - view)}px`;
+    bar.style[across] = `${len}px`;
+  };
+  place(v, canV, script.clientHeight, script.scrollHeight, script.scrollTop, script.clientHeight - (canH ? BAR : 0), script.offsetTop, 'top', 'height');
+  place(h, canH, script.clientWidth, script.scrollWidth, script.scrollLeft, script.clientWidth - (canV ? BAR : 0), 0, 'left', 'width');
+}
+document.addEventListener('scroll', (ev) => { if (ev.target.matches?.('.o-scratch .script')) drawBars(ev.target); }, true);
+
+// Dragging a thumb scrolls its script by as much more as the content is longer than the track.
+let barDrag = null;
+document.addEventListener('pointerdown', (ev) => {
+  const bar = ev.target.closest('.o-scratch .bar');
+  if (!bar) return;
+  ev.preventDefault();
+  const script = bar.parentElement.querySelector('.script');
+  const vertical = bar.classList.contains('v');
+  bar.setPointerCapture(ev.pointerId);
+  bar.classList.add('drag');
+  barDrag = { bar, script, vertical, from: vertical ? ev.clientY : ev.clientX, scroll: vertical ? script.scrollTop : script.scrollLeft };
+});
+document.addEventListener('pointermove', (ev) => {
+  if (!barDrag) return;
+  const { bar, script, vertical, from, scroll } = barDrag;
+  const [view, content, len] = vertical
+    ? [script.clientHeight, script.scrollHeight, bar.offsetHeight]
+    : [script.clientWidth, script.scrollWidth, bar.offsetWidth];
+  const per = (content - view) / Math.max(1, view - len);
+  const d = ((vertical ? ev.clientY : ev.clientX) - from) * per;
+  if (vertical) script.scrollTop = scroll + d;
+  else script.scrollLeft = scroll + d;
+});
+document.addEventListener('pointerup', () => {
+  barDrag?.bar.classList.remove('drag');
+  barDrag = null;
+});
 
 // Scratch: a block has three bands (owner, 2026-11-24): its top third opens the slot above it, its bottom third the
 // slot below it, and its middle third, where its values are, opens none: any open slot closes (owner). A block is
@@ -628,7 +691,8 @@ document.addEventListener('mousemove', (ev) => {
   }
   const slot = trig && k !== null ? trig.querySelector(`[data-slot="${k}"]`) : null;
   const hovered = slotEl ?? blockEl;
-  const script = hovered?.closest('.o-scratch .script') ?? null;
+  // Anywhere on a script, its bars and empty space included, keeps it from gliding back.
+  const script = ev.target.closest('.o-scratch .script-box')?.querySelector('.script') ?? null;
   if (slot !== asked.slot || script !== asked.script) asked = { slot, script, at: performance.now() };
   if (hovered !== anchor) {
     anchor = script ? hovered : null;
@@ -666,6 +730,7 @@ function slotFrame(now) {
     if (script === activeScript || script === kept) settling.delete(script);
     else moving = settle(script, now) || moving;
   });
+  document.querySelectorAll('.o-scratch .script').forEach(drawBars);
   framing = moving;
   if (moving) requestAnimationFrame(slotFrame);
   else lastFrame = null;
