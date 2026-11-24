@@ -205,20 +205,23 @@
   .o-branch .foot { margin-top: 10px; }
 
   /* 12 · Scratch: snap-together blocks. --nx is where a block's notch sits, --tx where its tab sits. */
-  .o-scratch { --sk-event: #ddae6c; --sk-ctl: #7ec9b4; --sk-act: #90bce9; --sk-wait: #bface4; --sk-cool: #c5b59f; }
-  /* Block colours (OKLCH). Light blocks with dark text, so text reads at 8.5:1 or more and the blocks stand
-     out from the dark panel. Every block has one lightness (0.78) and one chroma (0.08 to 0.10), so none
-     shouts; the hue is the block's job: event amber, If teal, actions blue, Wait violet, the cooldown a
-     greyed event amber since it belongs to the event. Inside a block, a menu is its colour a step darker
-     and an amount a near-white of its hue; the text is a very dark shade of the block's own hue. */
-  .sb.hat  { --fg: #2a1500; --dd: #c69449; --nb: #fdf4e7; }
-  .sb.cool { --fg: #201910; --dd: #ad9b84; --nb: #f8f4f0; }
-  .sb.ctl  { --fg: #002219; --dd: #5db19b; --nb: #ebf9f4; }
-  .sb.do   { --fg: #071c30; --dd: #74a3d3; --nb: #edf6ff; }
-  .sb.wait { --fg: #1e152d; --dd: #a792cd; --nb: #f6f3ff; }
+  .o-scratch { --sk-event: color-mix(in srgb, var(--event) 24%, var(--panel)); --sk-ctl: color-mix(in srgb, var(--check) 24%, var(--panel));
+    --sk-act: color-mix(in srgb, var(--accent) 24%, var(--panel)); --sk-wait: color-mix(in srgb, var(--wait) 24%, var(--panel));
+    --sk-cool: color-mix(in srgb, var(--event) 14%, var(--panel)); }
+  /* Block colours in the editor's own way (tokens.md): a dark surface tinted with the kind's colour, as a
+     warning note is tinted with --warning, with the editor's --text on it and the icon in the full colour.
+     The colours are the mockup's event, check, accent and wait colours; the cooldown is a fainter event tint.
+     A changeable part is a field like the editor's. Blocks overlap by 4 px of their 6 px tabs, so a 2 px gap
+     traces each block's outline and notch, and two blocks of one colour don't merge. */
+  .sb.hat  { --ic: var(--event); }
+  .sb.cool { --ic: var(--event); }
+  .sb.ctl  { --ic: var(--check); }
+  .sb.do   { --ic: var(--accent); }
+  .sb.wait { --ic: var(--wait); }
+  .sb > svg { color: var(--ic); }
   .o-scratch .script { display: flex; flex-direction: column; padding-bottom: 6px; }
   .sb { --nx: 0px; --tx: 0px; position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; min-height: 40px;
-    padding: 9px 10px 13px; margin-bottom: -6px; color: var(--fg); line-height: 22px; border-radius: 6px;
+    padding: 9px 10px 13px; margin-bottom: -4px; color: var(--text); line-height: 22px; border-radius: 6px;
     clip-path: polygon(0 0, calc(var(--nx) + 12px) 0, calc(var(--nx) + 17px) 6px, calc(var(--nx) + 31px) 6px, calc(var(--nx) + 36px) 0, 100% 0,
       100% calc(100% - 6px), calc(var(--tx) + 36px) calc(100% - 6px), calc(var(--tx) + 31px) 100%, calc(var(--tx) + 17px) 100%, calc(var(--tx) + 12px) calc(100% - 6px), 0 calc(100% - 6px)); }
   .sb.hat { padding-top: 18px; border-radius: 60px 10px 6px 6px / 22px 10px 6px 6px;
@@ -233,9 +236,9 @@
   .sc-mid { display: flex; }
   .sc-arm { width: 16px; flex: none; background: var(--sk-ctl); }
   .sc-inner { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-  .sk-dd { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 6px; border-radius: 6px; background: var(--dd); cursor: pointer; white-space: nowrap; }
+  .sk-dd { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 6px; border-radius: 6px; background: rgba(255,255,255,.09); cursor: pointer; white-space: nowrap; }
   .sk-dd::after { content: "▾"; font-size: 9px; opacity: .7; }
-  .sk-num { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 99px; background: var(--nb); color: var(--fg); font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .sk-num { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 99px; background: rgba(255,255,255,.09); color: var(--text); cursor: pointer; white-space: nowrap; }
   .o-scratch .foot { margin-top: 10px; }
   .fx { color: var(--ent); }
   .o-scratch .fx { color: inherit; }
