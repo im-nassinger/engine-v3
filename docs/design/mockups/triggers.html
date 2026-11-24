@@ -183,6 +183,35 @@
   .o-tree .root svg { color: var(--event); }
   .o-tree .tn .kw { color: var(--check); margin-right: 6px; }
   .o-tree .tn .wait { color: var(--wait); }
+
+  /* 11 · Branch: Tree's shape with Flow's markers, and one underline per changeable word */
+  .seg { padding: 1px 2px 0; border-bottom: 2px solid; border-radius: 4px 4px 0 0; cursor: pointer; white-space: nowrap; }
+  .seg.e { color: var(--ent); border-color: rgba(156,189,255,.5); }
+  .seg.v { color: var(--val); border-color: rgba(201,184,255,.5); }
+  .seg.n { color: var(--num); border-color: rgba(132,220,179,.5); }
+  .seg.c { color: var(--text); border-bottom: 2px dotted var(--muted); }
+  .seg.c::after { content: " ▾"; font-size: 9px; color: var(--muted); }
+  .seg.e:hover { background: var(--ent-bg); } .seg.v:hover { background: var(--val-bg); }
+  .seg.n:hover { background: var(--num-bg); } .seg.c:hover { background: var(--field); }
+  .o-branch .t { color: var(--muted); }
+  .o-branch .txt { line-height: 26px; }
+  .o-branch .root { position: relative; padding-left: 38px; padding-bottom: 2px; }
+  .o-branch .root .m { position: absolute; left: 0; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--event); color: #1a1406; display: grid; place-items: center; }
+  .o-branch .root .m svg { width: 12px; height: 12px; stroke-width: 2.2; }
+  .o-branch .kids { position: relative; margin-left: 9px; }
+  .o-branch .kid { position: relative; padding: 6px 0 2px 38px; }
+  .o-branch .kid::before { content: ""; position: absolute; left: 0; top: 0; height: 19px; width: 16px; border-left: 2px solid rgba(255,255,255,.1); border-bottom: 2px solid rgba(255,255,255,.1); border-bottom-left-radius: 10px; }
+  .o-branch .kid::after { content: ""; position: absolute; left: 0; top: 19px; bottom: 0; border-left: 2px solid rgba(255,255,255,.1); }
+  .o-branch .kid.last::after { display: none; }
+  .o-branch .kid > .m { position: absolute; left: 17px; top: 13px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--ink); background: var(--panel); }
+  .o-branch .kid.if > .m { border-color: var(--check); border-radius: 2px; transform: rotate(45deg); }
+  .o-branch .kid.if .kw { color: var(--check); }
+  .o-branch .kid.wait > .m { border-color: var(--wait); }
+  .o-branch .kid.wait > .txt { display: flex; align-items: center; gap: 8px; color: var(--wait); }
+  .o-branch .kid.wait > .txt svg { color: var(--wait); }
+  .o-branch .kid.wait > .kids { margin-left: -15px; margin-top: 2px; }
+  .o-branch .kid.wait > .kids > .kid::before, .o-branch .kid.wait > .kids > .kid::after { border-color: color-mix(in srgb, var(--wait) 40%, transparent); }
+  .o-branch .foot { margin-top: 12px; }
 </style>
 </head>
 <body>
@@ -229,6 +258,9 @@ const ic = (name) => `<i data-lucide="${name}"></i>`;
 const chipWords = (ws) => ws.map((w) => w.k === 't' ? `<span class="t">${w.x}</span>` : `<span class="chip ${w.k}">${w.x}</span>`).join('');
 const chips = (ws) => `<span class="sent">${chipWords(ws)}</span>`;
 const dotted = (ws) => ws.map((w) => w.k === 't' ? w.x : `<span class="w-dot">${w.x}</span>`).join(' ');
+// Each changeable word on its own, with an underline in the colour of what it is, and a name on hover.
+const KIND_NAMES = { e: 'Entity: who', v: 'Value: which tag, variable or component value', n: 'Amount', c: 'Choice: how' };
+const segs = (ws) => ws.map((w) => w.k === 't' ? `<span class="t">${w.x}</span>` : `<span class="seg ${w.k}" title="${KIND_NAMES[w.k]}">${w.x}</span>`).join(' ');
 const hi = (ws) => ws.map((w) => w.k === 't' ? w.x : `<span class="w-hi">${w.x}</span>`).join(' ');
 const lower = (ws) => ws.map((w, i) => i === 0 && w.k === 't' ? t(w.x[0].toLowerCase() + w.x.slice(1)) : w);
 const fields = (list) => `<div class="fields">${list.map(([lab, val, menu]) => `<div class="frow"><span class="lab">${lab}</span><span class="pill">${val}${menu ? '<span>▾</span>' : ''}</span></div>`).join('')}</div>`;
@@ -351,13 +383,41 @@ const OPTIONS = [
       </div>${foot(tr)}</div>`;
     }),
   },
+  {
+    label: 'Branch', caption: "Tree and Flow together. Each part you can change has its own underline; hover one to see what it is.",
+    draw: () => all((tr) => {
+      // A Wait is a branch of its own: the actions after it hang under it, since they happen later.
+      const kids = (dos) => {
+        const out = [];
+        for (let i = 0; i < dos.length; i++) {
+          const d = dos[i];
+          if (d.wait) {
+            out.push({ cls: 'wait', html: `${ic('hourglass')}<span>${segs(d.words.slice(1))} later</span>`, kids: kids(dos.slice(i + 1)) });
+            break;
+          }
+          out.push({ cls: 'do', html: segs(d.words) });
+        }
+        return out;
+      };
+      const items = [
+        ...tr.ifs.map((p) => ({ cls: 'if', html: `<span class="kw">only if</span> ${segs(p.words)}` })),
+        ...kids(tr.dos),
+      ];
+      const branch = (list) => `<div class="kids">${list.map((k, i) => `<div class="kid ${k.cls} ${i === list.length - 1 ? 'last' : ''}">
+        <span class="m"></span><div class="txt">${k.html}</div>${k.kids ? branch(k.kids) : ''}</div>`).join('')}</div>`;
+      return `<div class="trig o-branch">${head(tr)}
+        <div class="root"><span class="m">${ic(tr.icon)}</span><div class="txt">${segs(tr.when.words)}</div></div>
+        ${branch(items)}
+      ${foot(tr)}</div>`;
+    }),
+  },
 ];
 
 // ---------- Page ----------
-let current = 1;
+let current = 10;
 function render() {
   document.getElementById('nav').innerHTML = OPTIONS.map((o, i) =>
-    `<button class="${i === current ? 'on' : ''}" data-opt="${i}">${(i + 1) % 10} · ${o.label}</button>`).join('');
+    `<button class="${i === current ? 'on' : ''}" data-opt="${i}">${i === 9 ? 0 : i + 1} · ${o.label}</button>`).join('');
   document.getElementById('caption').textContent = OPTIONS[current].caption;
   document.getElementById('body').innerHTML = OPTIONS[current].draw();
   lucide.createIcons();
