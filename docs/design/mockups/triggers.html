@@ -227,6 +227,8 @@
   .sk-dd::after { content: "▾"; font-size: 9px; opacity: .7; }
   .sk-num { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 99px; background: rgba(255,255,255,.92); color: #1d2230; cursor: pointer; white-space: nowrap; }
   .o-scratch .foot { margin-top: 10px; }
+  .fx { color: var(--ent); }
+  .o-scratch .fx { color: inherit; }
 </style>
 </head>
 <body>
@@ -244,10 +246,13 @@
 // Word kinds: t text, e entity, v value, n number, c choice.
 const t = (x) => ({ k: 't', x }), e = (x) => ({ k: 'e', x }), v = (x) => ({ k: 'v', x }), n = (x) => ({ k: 'n', x }), c = (x) => ({ k: 'c', x });
 
+// The event's "other" is not a part you can change, but it is an entity, so it is blue like one.
+const OTHER = t('<span class="fx">other</span>');
+
 const TRIGGERS = [
   {
     name: 'Coin pickup', icon: 'hand', sum: 'Add 1 to coins, destroy this',
-    when: { verb: 'Touch starts', words: [t('Other'), c('starts'), t('touching'), e('this')], short: [t('Other'), c('starts'), t('touching'), e('this')] },
+    when: { verb: 'Touch starts', words: [OTHER, c('starts'), t('touching'), e('this')], short: [OTHER, c('starts'), t('touching'), e('this')] },
     ifs: [{ icon: 'tag', verb: 'Has tag', words: [e('other'), c('has tag'), v('player')] }],
     dos: [
       { icon: 'plus', verb: 'Add', words: [t('Add'), n('1'), t('to'), v('coins')], fields: [['Change', 'add', true], ['Amount', '1'], ['Value', 'coins', true]] },
