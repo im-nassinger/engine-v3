@@ -206,12 +206,13 @@
 
   /* 12 · Scratch: snap-together blocks. --nx is where a block's notch sits, --tx where its tab sits. */
   .o-scratch { --sk-event: color-mix(in srgb, var(--event) 24%, var(--panel)); --sk-ctl: color-mix(in srgb, var(--check) 24%, var(--panel));
-    --sk-act: color-mix(in srgb, var(--accent) 24%, var(--panel)); --sk-wait: color-mix(in srgb, var(--wait) 24%, var(--panel)); }
+    --sk-act: color-mix(in srgb, var(--accent) 24%, var(--panel)); --sk-wait: color-mix(in srgb, var(--wait) 24%, var(--panel));
+    --sk-gap: color-mix(in srgb, #fff 4%, var(--panel)); } /* the trigger's background (--raised over --panel), opaque */
   /* Block colours in the editor's own way (tokens.md): a dark surface tinted with the kind's colour, as a
      warning note is tinted with --warning, with the editor's --text on it and the icon in the full colour.
      The colours are the mockup's event, check, accent and wait colours.
      A changeable part is a field like the editor's. Blocks touch with no gap; a 2 px border (.sk, below)
-     traces each block's outline and notch, so two blocks of one colour don't merge.
+     traces each block's outline and notch in the trigger's background colour, so two blocks of one colour don't merge.
      Every block shows the same 36 px of colour with its words centred: 9 px above them, of which the
      block above covers 2 with its line, and 13 below, of which the next block covers 6. The event block
      has nothing above it, so it gets 7 px. */
@@ -255,20 +256,19 @@
   .o-scratch .sc .sb.ctl.bottom { border-top-left-radius: 0; }
   .o-scratch .sc .sc-inner .sb { border-top-left-radius: 0; border-bottom-left-radius: 0; }
   .sc-arm { position: relative; z-index: 1001; width: 16px; flex: none; background: var(--sk-ctl);
-    --line: color-mix(in srgb, var(--check) 55%, var(--panel)); box-shadow: -2px 0 0 var(--line), inset -2px 0 0 var(--line); }
+    --line: var(--sk-gap); box-shadow: -2px 0 0 var(--line), inset -2px 0 0 var(--line); }
   .sk { display: flex; flex-direction: column; position: relative;
     filter: drop-shadow(1px 0 0 var(--line)) drop-shadow(-1px 0 0 var(--line)) drop-shadow(0 1px 0 var(--line)) drop-shadow(0 -1px 0 var(--line))
       drop-shadow(1px 0 0 var(--line)) drop-shadow(-1px 0 0 var(--line)) drop-shadow(0 1px 0 var(--line)) drop-shadow(0 -1px 0 var(--line)); }
-  .sk.hat { --line: color-mix(in srgb, var(--event) 55%, var(--panel)); }
-  .sk.do { --line: color-mix(in srgb, var(--accent) 55%, var(--panel)); }
-  .sk.wait { --line: color-mix(in srgb, var(--wait) 55%, var(--panel)); }
-  .sk.ctl { --line: color-mix(in srgb, var(--check) 55%, var(--panel)); }
+  /* The border is the trigger's own background (owner, 2026-11-24), so blocks read as cut apart by a gap. */
+  .sk { --line: var(--sk-gap); }
   .sc-inner { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   .sk-dd { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 6px; border-radius: 6px; background: rgba(255,255,255,.09); cursor: pointer; white-space: nowrap; }
   .sk-dd::after { content: "▾"; font-size: 9px; opacity: .7; }
   .sk-num { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 99px; background: rgba(255,255,255,.09); color: var(--text); cursor: pointer; white-space: nowrap; }
   .o-scratch .foot { margin-top: 10px; }
   .fx { color: var(--ent); }
+  .path { color: var(--muted); }
   .o-scratch .fx { color: inherit; }
   /* 13 · Blocky: square corners and square notches */
   .o-scratch.blocky .sb { border-radius: 2px;
@@ -293,6 +293,10 @@
 // ---------- Two example triggers ----------
 // Word kinds: t text, e entity, v value, n number, c choice.
 const t = (x) => ({ k: 't', x }), e = (x) => ({ k: 'e', x }), v = (x) => ({ k: 'v', x }), n = (x) => ({ k: 'n', x }), c = (x) => ({ k: 'c', x });
+// A component value shows its path from the entity: the component (and for a trigger's value, the trigger)
+// dim, the value itself bright, so "set this Enabled" can't read as switching the whole entity off.
+const path = (...parts) => v(parts.slice(0, -1).map((x) => `<span class="path">${x}</span><span class="path">›</span>`).join('') + parts.at(-1));
+const ENABLED = path('Triggers', 'Timed door', 'Enabled'), POSITION = path('Transform', 'Position');
 
 // The event's "other" is not a part you can change, but it is an entity, so it is blue like one.
 const OTHER = t('<span class="fx">other</span>');
@@ -313,12 +317,12 @@ const TRIGGERS = [
     when: { verb: 'Custom event', words: [t('This gets'), v('open')], short: [t('Gets the event'), v('open')] },
     ifs: [],
     dos: [
-      { icon: 'power-off', verb: 'Set', words: [t('Set'), e('this'), v('Enabled'), t('to'), c('false')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Enabled', true], ['To', 'false', true]] },
-      { icon: 'move', verb: 'Set', words: [t('Set'), e('this'), v('Position'), t('to'), n('0, -200')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Position', true], ['To', '0, -200']] },
+      { icon: 'power-off', verb: 'Set', words: [t('Set'), e('this'), ENABLED, t('to'), c('false')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Triggers › Timed door › Enabled', true], ['To', 'false', true]] },
+      { icon: 'move', verb: 'Set', words: [t('Set'), e('this'), POSITION, t('to'), n('0, -200')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Transform › Position', true], ['To', '0, -200']] },
       { icon: 'hourglass', verb: 'Wait', wait: true, words: [t('Wait'), n('2 s')], fields: [['For', '2 s']] },
-      { icon: 'move', verb: 'Set', words: [t('Set'), e('this'), v('Position'), t('to'), n('0, 0')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Position', true], ['To', '0, 0']] },
+      { icon: 'move', verb: 'Set', words: [t('Set'), e('this'), POSITION, t('to'), n('0, 0')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Transform › Position', true], ['To', '0, 0']] },
       { icon: 'hourglass', verb: 'Wait', wait: true, words: [t('Wait'), n('3 s')], fields: [['For', '3 s']] },
-      { icon: 'power', verb: 'Set', words: [t('Set'), e('this'), v('Enabled'), t('to'), c('true')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Enabled', true], ['To', 'true', true]] },
+      { icon: 'power', verb: 'Set', words: [t('Set'), e('this'), ENABLED, t('to'), c('true')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Triggers › Timed door › Enabled', true], ['To', 'true', true]] },
     ],
     repeat: 'every time',
   },

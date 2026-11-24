@@ -35,6 +35,8 @@ The owner finds the trigger card "ugly and convoluted" (2026-11-24) and asked fo
 - **Every block starts with one icon** saying what it does (the event's, If's split, each action's, Wait's hourglass, the power icon of switching a trigger off or on), in the block's full colour; the If's closing bar has none (Claude, asked to decide, 2026-11-24).
 - **Only If holds other blocks.** A trigger is When, If, Do, with no nesting beyond that: one If, its checks joined by "and", wrapping the whole Do list since its checks guard every action. When is the top block, Wait and the actions plain blocks; a C-shape for Wait would suggest a scope that doesn't exist (Claude, asked to decide, 2026-11-24).
 - **A time's unit is a menu**, "seconds", not a fixed "s", so ticks can be offered later (owner asked for "frames"; the glossary's word is tick) (owner, 2026-11-24).
+- **A component value shows its path** (owner, 2026-11-24): "set this Enabled to false" read as switching the whole entity off. Set's value box now shows the path from the entity, the steps dim and the value bright: `Transform › Position`, `Triggers › Timed door › Enabled`. *Rejected:* "this trigger" as a target with a bare `Enabled`, which hides where Position lives. The trigger's line is now 128 px wider than the 344 px Entity inspector, so it scrolls sideways.
+- **Blocks are cut apart by the trigger's own background** (owner, 2026-11-24): the 2 px border around every block is the colour of the trigger it sits in, not a stronger shade of the block's colour.
 - **No highlight stripe on the event block.** Blocky's lighter band on top was "ugly"; the event block is one flat colour.
 
 ## Open
