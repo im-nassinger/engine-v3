@@ -34,6 +34,7 @@ The owner finds the trigger card "ugly and convoluted" (2026-11-24) and asked fo
 - **Block colours: don't invent a palette.** Three invented ones were each worse (owner, 2026-11-24): the first clashed, with white text on mid colours; a muted one at one OKLCH lightness turned brown and dull; light pastel blocks with near-black text were "absolutely horrible". Now the blocks use the editor's own way: a dark surface tinted with the kind's colour, the editor's `--text` on it, the icon in the full colour, changeable parts as the editor's fields, and a 2 px gap tracing each block's outline.
 - **Every block starts with one icon** saying what it does (the event's, If's split, each action's, Wait's hourglass, the cooldown's timer), in the block's full colour; the If's closing bar has none (Claude, asked to decide, 2026-11-24).
 - **Only If holds other blocks.** A trigger is When, If, Do, with no nesting beyond that: one If, its checks joined by "and", wrapping the whole Do list since its checks guard every action. When is the top block, the cooldown a plain block under it, Wait and the actions plain blocks; a C-shape for Wait or the cooldown would suggest a scope that doesn't exist (Claude, asked to decide, 2026-11-24).
+- **A time's unit is a menu**, "seconds", not a fixed "s", so ticks can be offered later (owner asked for "frames"; the glossary's word is tick) (owner, 2026-11-24).
 - **No highlight stripe on the event block.** Blocky's lighter band on top was "ugly"; the event block is one flat colour.
 
 ## Open

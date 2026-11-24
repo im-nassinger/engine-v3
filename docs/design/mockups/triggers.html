@@ -469,12 +469,15 @@ function scratch(look) {
       const wrap = (icon, top, inner) => `<div class="sb ctl top">${ic(icon)}${words(top)}</div>
            <div class="sc-mid"><div class="sc-arm"></div><div class="sc-inner">${inner}</div></div>
            <div class="sb ctl bottom"></div>`;
-      const stack = tr.dos.map((d) => `<div class="sb ${d.wait ? 'wait' : 'do'}">${ic(d.icon)}${words(d.words)}</div>`).join('');
+      // A time's unit is a menu (seconds now, ticks later), not a fixed "s".
+      const unit = c('seconds');
+      const waitWords = (d) => [t('wait'), n(d.words[1].x.split(' ')[0]), unit];
+      const stack = tr.dos.map((d) => `<div class="sb ${d.wait ? 'wait' : 'do'}">${ic(d.icon)}${words(d.wait ? waitWords(d) : d.words)}</div>`).join('');
       const checks = tr.ifs.flatMap((c, i) => i ? [t('and'), ...c.words] : c.words);
       const body = tr.ifs.length ? wrap('split', [t('if'), ...checks], stack) : stack;
       const hat = `<div class="sb hat">${ic(tr.icon)}${words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)])}</div>`;
       // Every time draws nothing; a cooldown is its own block right under the event.
-      const cooldown = tr.every ? `<div class="sb cool">${ic('timer')}${words([t('cooldown'), n(String(tr.every)), t('s')])}</div>` : '';
+      const cooldown = tr.every ? `<div class="sb cool">${ic('timer')}${words([t('cooldown'), n(String(tr.every)), unit])}</div>` : '';
       return `<div class="trig o-scratch ${look}">${head(tr)}<div class="script">
         ${hat}${cooldown}${body}
       </div>${foot(tr, 'Add', false)}</div>`;
