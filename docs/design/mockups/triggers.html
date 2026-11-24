@@ -241,7 +241,17 @@
      in an If gets 2 px more below its words, since the If's bottom draws its line over them. */
   .sb.ctl.bottom { --nd: 0px; min-height: 30px; padding: 0; }
   .sb.end { --td: 0px; }
-  .sc-inner > .sk:last-child > .sb { padding-bottom: 15px; }
+  .sc-inner > .sk.last > .sb, .sc-inner > .sk.slot.show:last-child > .sb { padding-bottom: 15px; }
+  .sc-inner > .sk.last.open > .sb { padding-bottom: 13px; }
+  /* Adding a block (look only, nothing is added): hovering a block opens an empty slot under it, shaped
+     like a block, with the hovered block's tab fitting its notch. A block with nothing under it shows its
+     tab while its slot is open (.open). Only the spots a block can go: under the event when there's no If,
+     at the top of the If, and under any action. */
+  .sk.slot { display: none; cursor: pointer; }
+  .sk.slot.show { display: flex; }
+  .sk.open > .sb.end { --td: 6px; }
+  .sb.slot { background: color-mix(in srgb, #fff 7%, var(--panel)); color: var(--muted); }
+  .sk.slot:hover > .sb.slot { color: var(--text); background: color-mix(in srgb, #fff 10%, var(--panel)); }
   .sb svg { width: 16px; height: 16px; }
   .sc-mid { display: flex; }
   /* The border: a block's clip-path would cut off a CSS border, so each block sits in a .sk wrapper whose
@@ -499,18 +509,30 @@ function scratch(look) {
       }).join('');
       // Every block starts with one icon saying what it does. Only If holds other blocks: it wraps the
       // whole Do list, since its checks guard every action. A trigger has one If, its checks joined by "and".
-      const wrap = (icon, top, inner, z) => `<div class="sc" style="z-index: ${z}"><div class="sk ctl"><div class="sb ctl top">${ic(icon)}${words(top)}</div></div>
+      const wrap = (icon, top, inner, z, add) => `<div class="sc" style="z-index: ${z}"><div class="sk ctl" data-add="${add}"><div class="sb ctl top">${ic(icon)}${words(top)}</div></div>
            <div class="sc-mid"><div class="sc-arm"></div><div class="sc-inner">${inner}</div></div>
            <div class="sk ctl"><div class="sb ctl bottom end"></div></div></div>`;
       // A time's unit is a menu (seconds now, ticks later), not a fixed "s".
       const unit = c('seconds');
       const waitWords = (d) => [t('wait'), n(d.words[1].x.split(' ')[0]), unit];
-      // A block draws above the blocks under it: z-index counts down the stack.
-      const block = (kind, html, z, end = false) => `<div class="sk ${kind}" style="z-index: ${z}"><div class="sb ${kind}${end ? ' end' : ''}">${html}</div></div>`;
-      const stack = tr.dos.map((d, i) => block(d.wait ? 'wait' : 'do', ic(d.icon) + words(d.wait ? waitWords(d) : d.words), 999 - i, i === tr.dos.length - 1)).join('');
+      // A block draws above its slot, and its slot above the next block: z-index counts down the stack.
+      let key = 0;
+      const block = (kind, html, z, end = false, add = null, cls = '') =>
+        `<div class="sk ${kind}${cls}" style="z-index: ${z}"${add === null ? '' : ` data-add="${add}"`}><div class="sb ${kind}${end ? ' end' : ''}">${html}</div></div>`;
+      const slot = (add, z, end) =>
+        `<div class="sk slot" data-slot="${add}" style="z-index: ${z}"><div class="sb slot${end ? ' end' : ''}">${ic('plus')}<span>add a block</span></div></div>`;
+      const last = tr.dos.length - 1;
+      const stack = tr.dos.map((d, i) => {
+        const k = key++;
+        return block(d.wait ? 'wait' : 'do', ic(d.icon) + words(d.wait ? waitWords(d) : d.words), 900 - 2 * i, i === last, k, i === last ? ' last' : '')
+          + slot(k, 899 - 2 * i, i === last);
+      }).join('');
       const checks = tr.ifs.flatMap((c, i) => i ? [t('and'), ...c.words] : c.words);
-      const body = tr.ifs.length ? wrap('split', [t('if'), ...checks], stack, 998) : stack;
-      const hat = block('hat', ic(tr.icon) + words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)]), 1000);
+      const ifKey = key++;
+      const body = tr.ifs.length ? wrap('split', [t('if'), ...checks], slot(ifKey, 950, false) + stack, 998, ifKey) : stack;
+      const hatKey = key++;
+      const hat = block('hat', ic(tr.icon) + words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)]), 1000, false, tr.ifs.length ? null : hatKey)
+        + (tr.ifs.length ? '' : slot(hatKey, 999, false));
       // No cooldown block: a trigger that must rest sets its Enabled to false, waits, and sets it to true.
       return `<div class="trig o-scratch ${look}">${head(tr)}<div class="script"><div class="stack">
         ${hat}${body}
@@ -527,6 +549,17 @@ function render() {
   document.getElementById('body').innerHTML = OPTIONS[current].draw();
   lucide.createIcons();
 }
+
+// Scratch and Blocky: hovering a block, or its open slot, keeps that slot open. Keys are per trigger.
+document.addEventListener('mouseover', (ev) => {
+  const trig = ev.target.closest('.o-scratch');
+  const hit = ev.target.closest('[data-add], [data-slot]');
+  const k = hit && (hit.dataset.add ?? hit.dataset.slot);
+  document.querySelectorAll('.o-scratch .show, .o-scratch .open').forEach((x) => x.classList.remove('show', 'open'));
+  if (!trig || k === undefined || k === null) return;
+  trig.querySelector(`[data-slot="${k}"]`)?.classList.add('show');
+  trig.querySelector(`[data-add="${k}"]`)?.classList.add('open');
+});
 
 document.addEventListener('click', (ev) => {
   const opt = ev.target.closest('[data-opt]');
