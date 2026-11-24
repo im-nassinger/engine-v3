@@ -88,8 +88,20 @@ function changes(variable: VariableRef, becomes?: { compare: Compare; value: Var
     return { kind: 'variableChanged', variable, becomes: becomes ?? null };
 }
 
+// The value check reading a variable: the level's on the World, an own one on its target.
 function compare(variable: VariableRef, how: Compare, value: VariableValue): Check {
-    return { kind: 'compare', variable, compare: how, value };
+    if (variable.owner === 'level') {
+        return {
+            kind: 'value',
+            target: THIS,
+            value: { kind: 'variable', name: variable.name },
+            compare: how,
+            amount: value,
+        };
+    }
+
+    const own = { kind: 'variable', name: variable.name, own: true } as const;
+    return { kind: 'value', target: variable.target, value: own, compare: how, amount: value };
 }
 
 function variablesOf(entity: Entity) {

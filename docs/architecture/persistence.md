@@ -9,7 +9,7 @@
 ```json
 {
   "format": "engine-v3-level",
-  "formatVersion": 1,
+  "formatVersion": 2,
   "physicsVersion": 1,
   "name": "Castle",
   "editor": { "gridSize": 50, "foldedRows": [12, 40] },
@@ -85,7 +85,7 @@ export type ReadRefusal =
 ```
 
 - **Parse at the boundary:** `raw` is `unknown` until `LevelReader` has checked every entity, its children, components and values with their field types. After that, the rules trust the types.
-- **Upgrading:** `FormatUpgrader` holds a list of steps, each turning version N's JSON into N+1's, so the latest version is one more than the number of steps. v1 has none. A file with a higher `formatVersion` than the game knows is refused with "made by a newer version of the game". Versions are never rolled back, as the tech notes warn.
+- **Upgrading:** `FormatUpgrader` holds a list of steps, each turning version N's JSON into N+1's, so the latest version is one more than the number of steps. v1 had none. **Format version 2** (v4 fix 3, 2026-11-23) has one step, `removeSensorSetting`: a SurfaceComponent with Sensor ticked is removed and Sensor unticked is dropped, since the SurfaceComponent lost that setting. The writer writes 2; `FormatUpgrader.createCurrent()` is the game's upgrader. *Why a format version: an unknown value makes a file damaged, so a removed field needs an upgrade step, as the rules below say.* A file with a higher `formatVersion` than the game knows is refused with "made by a newer version of the game". Versions are never rolled back, as the tech notes warn.
 - **As built (2026-11-14), the reader's rules** *(standing yes, 2026-11-14)*:
   - **The top of the file and each entity must hold exactly their keys**: `format`, `formatVersion`, `physicsVersion`, `name`, `editor`, `world`, and `id`, `hidden`, `locked`, `components`, `children`. The writer always writes them all, and a later change to these shapes is a format version with an upgrade step. Only component values read as their defaults when missing.
   - **A physics version above the game's own is refused as `newerVersion`**, with the file's format version: only a newer game can write one.

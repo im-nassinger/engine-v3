@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
 import {
-    SurfaceComponent,
     TransformComponent,
     TriggerComponent,
     VariablesComponent,
@@ -10,7 +9,6 @@ import {
 import type { Trigger } from '../../../core/fields/index.ts';
 import { Level } from '../../../core/level/index.ts';
 
-import { TouchNeedsSurfaceRule } from './TouchNeedsSurfaceRule.ts';
 import { TriggerCantRunRule } from './TriggerCantRunRule.ts';
 
 function trigger(parts: Partial<Trigger>): Trigger {
@@ -36,43 +34,6 @@ function buildEntity(triggers: readonly Trigger[]) {
     return { level, entity };
 }
 
-describe('TouchNeedsSurfaceRule', () => {
-    test('each touch trigger of an entity with no Surface gets the note, whose fix adds one as a sensor', () => {
-        const { entity } = buildEntity([
-            trigger({ id: 1 }),
-            trigger({ id: 2, when: { kind: 'levelStart' } }),
-            trigger({ id: 3, when: { kind: 'untouched' } }),
-        ]);
-
-        const messages = new TouchNeedsSurfaceRule().check(entity);
-
-        expect(messages.map((message) => message.itemId)).toEqual([1, 3]);
-        expect(messages[0]).toEqual({
-            kind: 'warning',
-            entityId: entity.id,
-            componentType: 'TriggerComponent',
-            fieldKey: 'triggers',
-            itemId: 1,
-            text: 'Needs a Surface to notice touching.',
-            fix: {
-                kind: 'addComponent',
-                label: 'Add Surface as sensor',
-                componentType: 'SurfaceComponent',
-                savedValues: { sensor: true },
-            },
-        });
-    });
-
-    test('an entity with a Surface, or with no touch trigger, gets nothing', () => {
-        const withSurface = buildEntity([trigger({})]).entity;
-        withSurface.addComponent(new SurfaceComponent());
-        const keyOnly = buildEntity([trigger({ when: { kind: 'levelStart' } })]).entity;
-
-        expect(new TouchNeedsSurfaceRule().check(withSurface)).toEqual([]);
-        expect(new TouchNeedsSurfaceRule().check(keyOnly)).toEqual([]);
-    });
-});
-
 describe('TriggerCantRunRule', () => {
     const rule = new TriggerCantRunRule(createV1Registry());
 
@@ -83,7 +44,15 @@ describe('TriggerCantRunRule', () => {
             trigger({ id: 3, actions: [] }),
             trigger({
                 id: 4,
-                checks: [{ kind: 'compare', variable: { owner: 'level', name: 'lives' }, compare: 'is', value: 0 }],
+                checks: [
+                    {
+                        kind: 'value',
+                        target: { kind: 'this' },
+                        value: { kind: 'variable', name: 'lives' },
+                        compare: 'is',
+                        amount: 0,
+                    },
+                ],
             }),
         ]);
 

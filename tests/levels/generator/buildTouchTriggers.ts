@@ -4,6 +4,7 @@ import type { Entity } from '../../../src/core/level/index.ts';
 import {
     addBody,
     addEntity,
+    addShape,
     addSurface,
     at,
     circle,
@@ -11,7 +12,13 @@ import {
     setBounds,
     setGravity,
 } from '../determinism/build/levelParts.ts';
-import { changeVariable, giveTags, giveTriggers, giveVariables } from '../determinism/build/triggerParts.ts';
+import {
+    changeVariable,
+    giveTags,
+    giveTriggers,
+    giveVariables,
+    otherHasTag,
+} from '../determinism/build/triggerParts.ts';
 
 const SENSOR_COLUMNS = 40;
 const SENSOR_SIZE = 30;
@@ -32,7 +39,8 @@ export type TouchTriggers = {
     readonly balls: readonly Entity[];
 };
 
-// A level for v3's trigger speed test: a grid of Static sensor squares, each with a touch trigger that counts
+// A level for v3's trigger speed test: a grid of pass-through squares (a shape with no Surface, which the
+// touch trigger makes a sensor in play), each with a touch trigger that counts
 // a ball touching it on the World's `touches`, and Dynamic balls with no gravity that a level start trigger
 // sets going, drawn with a fill (the sensors have no style, so play draws only the balls), bouncing off the walls with Restitution 1 and no friction, so they sweep through the sensors
 // for the whole run and never rest. The balls start on the sensors' rows, BALLS_PER_ROW to a row.
@@ -60,11 +68,11 @@ export function buildTouchTriggers(sensorCount: number, ballCount: number): Touc
         const column = index % columns;
         const row = Math.floor(index / columns);
         const sensor = addEntity(level, level.world, `Sensor ${index + 1}`, at(cellX(column), cellY(row)));
-        addSurface(sensor, rectangle(SENSOR_SIZE, SENSOR_SIZE), { sensor: true });
+        addShape(sensor, rectangle(SENSOR_SIZE, SENSOR_SIZE));
         giveTriggers(sensor, [
             {
                 when: { kind: 'touched' },
-                checks: [{ kind: 'hasTag', target: { kind: 'other' }, tag: BALL_TAG }],
+                checks: [otherHasTag(BALL_TAG)],
                 actions: [changeVariable(level, TOUCHES_VARIABLE, 'add', 1)],
             },
         ]);
@@ -93,7 +101,13 @@ export function buildTouchTriggers(sensorCount: number, ballCount: number): Touc
         {
             when: { kind: 'levelStart' },
             actions: [
-                { kind: 'push', target: { kind: 'tagged', tag: BALL_TAG }, push: { kind: 'by', ...BALL_VELOCITY } },
+                {
+                    kind: 'change',
+                    target: { kind: 'tagged', tag: BALL_TAG },
+                    value: { kind: 'velocity' },
+                    op: 'add',
+                    amount: BALL_VELOCITY,
+                },
             ],
         },
     ]);

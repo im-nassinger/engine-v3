@@ -84,6 +84,7 @@ export class ShapeTable {
         into.push({
             kind,
             sensor: sensor.surface,
+            sensorBody: sensor.body,
             visitor: visitor.surface,
             visitorBody: visitor.body,
             visitorIsSensor: visitor.sensor,

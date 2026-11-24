@@ -30,4 +30,6 @@ export { BodyMembership } from './membership/BodyMembership.ts';
 export type { SurfaceTarget } from './membership/BodyMembership.ts';
 export { PhysicsSceneBuilder } from './scene/PhysicsSceneBuilder.ts';
 export type { SceneCaches } from './scene/PhysicsSceneBuilder.ts';
+export { NO_TOUCH_SURFACES } from './scene/TouchSurfaces.ts';
+export type { TouchSurfaces } from './scene/TouchSurfaces.ts';
 export type { JointSkipReason, PhysicsScene, SceneBody, SceneJoint, SkippedJoint } from './scene/PhysicsScene.ts';

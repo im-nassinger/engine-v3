@@ -12,7 +12,7 @@ import { History } from './History.ts';
 import type { EditedGroup } from './LevelEditor.ts';
 import { LevelEditor } from './LevelEditor.ts';
 
-const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createCurrent());
 
 // The real CurrentGroup lives in editor/session, which builds on editor/history, so tests here use a
 // stand-in that only remembers the path.

@@ -21,7 +21,7 @@ const POSITION_Y: ReadableValue = { kind: 'field', component: 'TransformComponen
 const FRICTION: ReadableValue = { kind: 'field', component: 'SurfaceComponent', field: 'friction' };
 
 function valueIs(target: Target, value: ReadableValue, compare: Compare, amount: number | null): Check {
-    return { kind: 'compareValue', target, value, compare, amount };
+    return { kind: 'value', target, value, compare, amount };
 }
 
 // A trigger heard every tick (every 1/60 s) with these checks.

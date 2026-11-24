@@ -1,20 +1,24 @@
+import type { Condition } from '../../../../src/core/fields/index.ts';
 import { Level } from '../../../../src/core/level/index.ts';
 
-import { addBody, addEntity, addSurface, at, circle, rectangle } from './levelParts.ts';
+import { addBody, addEntity, addShape, addSurface, at, circle, rectangle } from './levelParts.ts';
 import {
+    addVelocity,
     changeVariable,
     giveTags,
     giveTriggers,
     giveVariables,
     inputHeld,
-    pushBy,
+    otherHasTag,
     switchTrigger,
 } from './triggerParts.ts';
 
 const COIN_XS = [-400, -200, 0, 200, 400];
+const COINS_ALL: Condition = { compare: 'atLeast', value: COIN_XS.length };
 
-// A ball the recorded inputs push right and left along a floor, across five sensor coins that count
-// themselves on the World's `coins` and destroy themselves; a World trigger wins when no coin is left.
+// A ball the recorded inputs push right and left along a floor, across five pass-through coins (a shape with
+// no Surface) that count themselves on the World's `coins` and destroy themselves; a World trigger wins when
+// `coins` becomes 5 or more.
 export function triggerCoins() {
     const level = Level.createNew();
     giveVariables(level, ['coins']);
@@ -25,21 +29,24 @@ export function triggerCoins() {
 
     COIN_XS.forEach((x, i) => {
         const coin = addEntity(level, level.world, `Coin ${i + 1}`, at(x, 265));
-        addSurface(coin, circle(15), { sensor: true });
+        addShape(coin, circle(15));
         giveTags(coin, ['coin']);
         giveTriggers(coin, [
             {
                 when: { kind: 'touched' },
-                checks: [{ kind: 'hasTag', target: { kind: 'other' }, tag: 'player' }],
+                checks: [otherHasTag('player')],
                 actions: [changeVariable(level, 'coins', 'add', 1), { kind: 'destroy', target: { kind: 'this' } }],
             },
         ]);
     });
 
     giveTriggers(level.world, [
-        { when: inputHeld('right'), actions: [pushBy(ball, 4, 0)] },
-        { when: inputHeld('left'), actions: [pushBy(ball, -4, 0)] },
-        { when: { kind: 'tagLeft', tag: 'coin' }, actions: [{ kind: 'win' }] },
+        { when: inputHeld('right'), actions: [addVelocity(ball, 4, 0)] },
+        { when: inputHeld('left'), actions: [addVelocity(ball, -4, 0)] },
+        {
+            when: { kind: 'variableChanged', variable: { owner: 'level', name: 'coins' }, becomes: COINS_ALL },
+            actions: [{ kind: 'win' }],
+        },
     ]);
 
     return level;
@@ -58,7 +65,7 @@ export function triggerTimers() {
     giveTriggers(level.world, [
         {
             when: { kind: 'every', seconds: 0.5 },
-            actions: [changeVariable(level, 'beats', 'add', 1), pushBy(ball, 0, -150)],
+            actions: [changeVariable(level, 'beats', 'add', 1), addVelocity(ball, 0, -150)],
         },
         { when: { kind: 'after', seconds: 2 }, actions: [changeVariable(level, 'late', 'set', 1)] },
         { when: { kind: 'after', seconds: 4 }, actions: [switchTrigger(level.world, 1, false)] },
@@ -73,14 +80,14 @@ export function triggerTimers() {
     return level;
 }
 
-// A cart of three merged shapes falling into a sensor pad, which counts it once on `touches` though all
+// A cart of three merged shapes falling into a pass-through pad, which counts it once on `touches` though all
 // three shapes overlap it; the recorded inputs push it out, and `leaves` counts that once.
 export function triggerTouchGroups() {
     const level = Level.createNew();
     giveVariables(level, ['touches', 'leaves']);
     addSurface(addEntity(level, level.world, 'Floor', at(0, 300)), rectangle(1600, 20));
     const pad = addEntity(level, level.world, 'Pad', at(0, 250));
-    addSurface(pad, rectangle(300, 80), { sensor: true });
+    addShape(pad, rectangle(300, 80));
     giveTriggers(pad, [
         { when: { kind: 'touched' }, actions: [changeVariable(level, 'touches', 'add', 1)] },
         { when: { kind: 'untouched' }, actions: [changeVariable(level, 'leaves', 'add', 1)] },
@@ -91,7 +98,7 @@ export function triggerTouchGroups() {
         addSurface(addEntity(level, cart, `Crate ${i + 1}`, at(x, 0)), rectangle(40, 30), { friction: 0.4 });
     }
 
-    giveTriggers(level.world, [{ when: inputHeld('right'), actions: [pushBy(cart, 12, 0)] }]);
+    giveTriggers(level.world, [{ when: inputHeld('right'), actions: [addVelocity(cart, 12, 0)] }]);
 
     return level;
 }

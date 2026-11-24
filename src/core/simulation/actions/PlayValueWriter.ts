@@ -9,7 +9,7 @@ import {
     VariablesComponent,
 } from '../../components/index.ts';
 import type { AnyComponent } from '../../components/index.ts';
-import { TagsFieldType } from '../../fields/index.ts';
+import { TagsFieldType, VectorFieldType } from '../../fields/index.ts';
 import type { ChangeOp, JsonValue, ValueRef, VariableValue } from '../../fields/index.ts';
 import { Matrix2D } from '../../geometry/index.ts';
 import type { Point } from '../../geometry/index.ts';
@@ -35,7 +35,6 @@ export type ValueChange = {
 // written is told, the World's (the level's) and any other entity's own, with its value before and after,
 // even when the two are the same.
 export type ValueChangeEffects = {
-    tagRanOut(tag: string): void;
     triggerSwitchedOn(owner: Entity, triggerId: number): void;
     variableChanged(holder: Entity, name: string, before: VariableValue, after: VariableValue): void;
 };
@@ -46,9 +45,10 @@ export type ValueChangeEffects = {
 type PhysicsRole = 'pose' | 'surface' | 'gravity' | 'motor' | 'fixed' | 'none';
 
 const MOTOR_FIELDS: readonly string[] = ['motor', 'motorSpeed', 'motorStrength', 'resistance'];
-const SURFACE_FIELDS: readonly string[] = ['friction', 'restitution', 'sensor'];
+const SURFACE_FIELDS: readonly string[] = ['friction', 'restitution'];
 const POSE_FIELDS: readonly string[] = ['position', 'rotation'];
 const TAGS = new TagsFieldType();
+const VELOCITY_AMOUNT = new VectorFieldType();
 // What a Flip is given in place of an amount, which it never reads.
 const FLIP_AMOUNT = { ok: true, value: true } as const;
 
@@ -67,6 +67,8 @@ export class PlayValueWriter {
     }
 
     change(entity: Entity, change: ValueChange) {
+        if (change.value.kind === 'velocity') return this.changeVelocity(entity, change);
+
         const offers = changeableValues(entity, this.run.registry);
         const offer = offers.find((candidate) => sameValueRef(candidate.ref, change.value));
         if (offer === undefined || !offer.ops.includes(change.op)) return false;
@@ -85,6 +87,29 @@ export class PlayValueWriter {
             case 'field':
                 return this.changeField(entity, value, change.op, amount.value);
         }
+    }
+
+    // Body › Velocity of the body the entity belongs to, its own or the nearest one above it, so a shape
+    // inside a body's group, such as the `other` of a touch, moves its body. Set gives the speed in px/s,
+    // keeping the spin; Add and Subtract change it whatever the mass. A Static body doesn't move.
+    private changeVelocity(entity: Entity, change: ValueChange) {
+        const amount = VELOCITY_AMOUNT.parse(change.amount);
+        if (!amount.ok || change.op === 'flip') return false;
+
+        const body = bodyOfEntityOrAbove(entity, this.run);
+        if (body === undefined) return false;
+
+        const { world } = this.run.scene;
+        const { x, y } = amount.value;
+        if (change.op === 'set') {
+            world.setLinearVelocity(body.handle, { x, y });
+        } else if (change.op === 'add') {
+            world.addVelocity(body.handle, { x, y });
+        } else {
+            world.addVelocity(body.handle, { x: -x, y: -y });
+        }
+
+        return true;
     }
 
     // The amount was read with the variable's own type (changeableValues), and only the ops its type allows
@@ -134,9 +159,7 @@ export class PlayValueWriter {
             tags.filter((held) => held !== tag),
         );
         this.reportChange(entity, component, 'tags');
-        if (counts.tagTakenAway(tag)) {
-            this.effects.tagRanOut(tag);
-        }
+        counts.tagRemoved(tag);
 
         return true;
     }
@@ -201,7 +224,6 @@ export class PlayValueWriter {
             world.setSurfaceSettings(entity.id, {
                 friction: component.get('friction'),
                 restitution: component.get('restitution'),
-                sensor: component.get('sensor'),
             });
         }
 
@@ -294,6 +316,15 @@ function physicsRoleOf(ref: FieldRef): PhysicsRole {
         default:
             return 'none';
     }
+}
+
+function bodyOfEntityOrAbove(entity: Entity, run: PlayRun) {
+    for (let current: Entity | undefined = entity; current !== undefined; current = current.parent) {
+        const body = run.bodyMatrices.bodyOf(current);
+        if (body !== undefined) return body;
+    }
+
+    return undefined;
 }
 
 function holdsPhysics(top: Entity) {

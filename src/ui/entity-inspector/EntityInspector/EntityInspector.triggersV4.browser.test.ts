@@ -205,12 +205,12 @@ describe("the trigger card's v4 parts", () => {
 
     test("a string's value is a text field in quotes, and a boolean's is true or false", async () => {
         const { level, door } = buildLevel();
-        const compare: Check = { kind: 'compare', variable: null, compare: 'is', value: null };
+        const compare: Check = { kind: 'value', target: { kind: 'this' }, value: null, compare: 'is', amount: null };
         withTrigger(door, { checks: [compare], actions: [{ kind: 'win' }] });
         await showEntity(level, door);
         await expect.poll(() => blocks().length).toBe(1);
 
-        await pickFromMenu(word('If', 'pick a variable'), 'player_name');
+        await pickFromMenu(word('If', 'pick a value'), 'player_name');
         await expect.poll(() => sentences('If')[0]).toMatch(/^player_name is /);
         await openMenu(word('If', 'is'), 'is not');
         expect(menuLines()).toEqual(['is', 'is not']);
@@ -224,24 +224,27 @@ describe("the trigger card's v4 parts", () => {
         await userEvent.type(wordFieldInput(), 'Bo{Enter}');
         await expect.poll(() => sentences('If')).toEqual(['player_name is "Bo"']);
 
-        await pickFromMenu(word('If', 'player_name'), 'door_open');
-        await expect.poll(() => sentences('If')).toEqual(['door_open of this is true or false']);
+        await openMenu(word('If', 'player_name'), 'Variables');
+        click(menuRowNamed('Variables') as HTMLElement);
+        await expect.poll(() => menuRowNamed('door_open')).toBeDefined();
+        menuRowNamed('door_open')?.click();
+        await expect.poll(() => sentences('If')).toEqual(['this door_open is true or false']);
         await openMenu(word('If', 'true or false'), 'true');
         expect(menuLines()).toEqual(['true', 'false']);
         menuRowNamed('true')?.click();
-        await expect.poll(() => sentences('If')).toEqual(['door_open of this is true']);
+        await expect.poll(() => sentences('If')).toEqual(['this door_open is true']);
     });
 
-    test("the component value check's menu opens a component's values, a body's live ones last", async () => {
+    test("the value check's menu opens a component's values, a body's live ones last", async () => {
         const { level, door } = buildLevel();
-        withTrigger(door, { actions: [{ kind: 'win' }] });
+        withTrigger(door, { when: { kind: 'levelStart' }, actions: [{ kind: 'win' }] });
         await showEntity(level, door);
         await expect.poll(() => blocks().length).toBe(1);
 
-        await pickFromMenu(addRow('Add check'), 'a component value');
+        await pickFromMenu(addRow('Add check'), 'a value');
         const valueWord = requireElement<HTMLElement>(section('If'), '[data-state="unset"]');
         await openMenu(valueWord, 'Body');
-        expect(menuLines()).toEqual(['Transform', 'Body']);
+        expect(menuLines().slice(-4)).toEqual(['Transform', 'Body', 'Variables', 'Tags']);
         click(menuRowNamed('Body') as HTMLElement);
         await expect.poll(() => menuRowNamed('Speed')).toBeDefined();
 

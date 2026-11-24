@@ -44,10 +44,6 @@ const WHENS = [
     { kind: 'after', seconds: 60 },
     { kind: 'every', seconds: null },
     { kind: 'levelStart' },
-    { kind: 'tagLeft', tag: 'coin' },
-    { kind: 'tagLeft', tag: null },
-    { kind: 'collision' },
-    { kind: 'destroyed' },
     { kind: 'custom', name: 'open' },
     { kind: 'custom', name: null },
     { kind: 'variableChanged', variable: 'coins', becomes: null },
@@ -62,28 +58,38 @@ const WHENS = [
 ];
 
 const CHECKS = [
-    { kind: 'hasTag', target: { kind: 'other' }, tag: 'player' },
-    { kind: 'hasTag', target: { kind: 'this' }, tag: null },
-    { kind: 'compare', variable: 'coins', compare: 'atLeast', value: 10 },
-    { kind: 'compare', variable: null, compare: 'isNot', value: null },
-    { kind: 'compare', variable: 'mood', compare: 'is', value: 'calm' },
-    { kind: 'compare', variable: { target: { kind: 'other' }, name: 'health' }, compare: 'less', value: 1 },
-    { kind: 'compare', variable: { target: { kind: 'entity', entity: 3 }, name: 'open' }, compare: 'is', value: false },
+    { kind: 'value', target: { kind: 'other' }, value: { kind: 'tag' }, compare: 'is', amount: 'player' },
+    { kind: 'value', target: { kind: 'this' }, value: { kind: 'tag' }, compare: 'isNot', amount: null },
     {
-        kind: 'compareValue',
+        kind: 'value',
         target: { kind: 'this' },
-        value: { kind: 'live', live: 'speed' },
-        compare: 'more',
-        amount: 200,
+        value: { kind: 'variable', name: 'coins' },
+        compare: 'atLeast',
+        amount: 10,
+    },
+    { kind: 'value', target: { kind: 'this' }, value: null, compare: 'isNot', amount: null },
+    {
+        kind: 'value',
+        target: { kind: 'other' },
+        value: { kind: 'variable', name: 'mood', own: true },
+        compare: 'is',
+        amount: 'calm',
     },
     {
-        kind: 'compareValue',
+        kind: 'value',
+        target: { kind: 'entity', entity: 3 },
+        value: { kind: 'variable', name: 'open', own: true },
+        compare: 'is',
+        amount: false,
+    },
+    { kind: 'value', target: { kind: 'this' }, value: { kind: 'live', live: 'speed' }, compare: 'more', amount: 200 },
+    {
+        kind: 'value',
         target: { kind: 'tagged', tag: 'ball' },
         value: { kind: 'field', component: 'TransformComponent', field: 'position', axis: 'y' },
         compare: 'atMost',
         amount: -10,
     },
-    { kind: 'compareValue', target: { kind: 'other' }, value: null, compare: 'less', amount: null },
 ];
 
 const ACTIONS = [
@@ -113,10 +119,7 @@ const ACTIONS = [
     { kind: 'change', target: { kind: 'tagged', tag: null }, value: null, op: 'set', amount: null },
     { kind: 'destroy', target: { kind: 'this' } },
     { kind: 'destroy', target: { kind: 'entity', entity: null } },
-    { kind: 'push', target: { kind: 'other' }, push: { kind: 'by', x: 0, y: -600 } },
-    { kind: 'push', target: { kind: 'other' }, push: { kind: 'away', strength: 400 } },
-    { kind: 'push', target: { kind: 'tagged', tag: 'ball' }, push: { kind: 'towards', strength: 100 } },
-    { kind: 'push', target: { kind: 'this' }, push: null },
+    { kind: 'change', target: { kind: 'other' }, value: { kind: 'velocity' }, op: 'add', amount: { x: 0, y: -600 } },
     { kind: 'win' },
     { kind: 'lose' },
     { kind: 'restart' },
@@ -173,7 +176,7 @@ describe('TriggerFieldType', () => {
             name: 'Coin',
             on: false,
             when: { kind: 'touched' },
-            checks: [{ kind: 'hasTag', target: { kind: 'other' }, tag: null }],
+            checks: [{ kind: 'value', target: { kind: 'other' }, value: { kind: 'tag' }, compare: 'is', amount: null }],
             actions: [{ kind: 'destroy', target: { kind: 'entity', entity: null } }],
         });
 
@@ -199,7 +202,11 @@ describe('TriggerFieldType', () => {
         ['an unknown check', triggerWith({ checks: [{ kind: 'isMoving' }] }), 'unknownChoice'],
         [
             'an unknown comparison',
-            triggerWith({ checks: [{ kind: 'compare', variable: 'coins', compare: 'about', value: 1 }] }),
+            triggerWith({
+                checks: [
+                    { kind: 'value', target: { kind: 'this' }, value: { kind: 'tag' }, compare: 'about', amount: 'a' },
+                ],
+            }),
             'unknownChoice',
         ],
         ['an unknown action', triggerWith({ actions: [{ kind: 'spawn' }] }), 'unknownChoice'],
@@ -330,8 +337,20 @@ describe('TriggerFieldType', () => {
             name: '   ',
             when: { kind: 'every', seconds: -2 },
             checks: [
-                { kind: 'hasTag', target: { kind: 'tagged', tag: 'Big Coin' }, tag: '!!' },
-                { kind: 'compare', variable: 'Coins', compare: 'is', value: 3 },
+                {
+                    kind: 'value',
+                    target: { kind: 'tagged', tag: 'Big Coin' },
+                    value: { kind: 'tag' },
+                    compare: 'is',
+                    amount: '!!',
+                },
+                {
+                    kind: 'value',
+                    target: { kind: 'this' },
+                    value: { kind: 'variable', name: 'Coins' },
+                    compare: 'is',
+                    amount: 3,
+                },
             ],
             actions: [
                 { kind: 'change', target: { kind: 'this' }, value: { kind: 'tag' }, op: 'add', amount: 'Was Hit' },
@@ -351,8 +370,20 @@ describe('TriggerFieldType', () => {
         expect(normalized.name).toBeNull();
         expect(normalized.when).toEqual({ kind: 'every', seconds: 0 });
         expect(normalized.checks).toEqual([
-            { kind: 'hasTag', target: { kind: 'tagged', tag: 'big_coin' }, tag: null },
-            { kind: 'compare', variable: { owner: 'level', name: 'coins' }, compare: 'is', value: 3 },
+            {
+                kind: 'value',
+                target: { kind: 'tagged', tag: 'big_coin' },
+                value: { kind: 'tag' },
+                compare: 'is',
+                amount: null,
+            },
+            {
+                kind: 'value',
+                target: { kind: 'this' },
+                value: { kind: 'variable', name: 'coins' },
+                compare: 'is',
+                amount: 3,
+            },
         ]);
         expect(normalized.actions).toEqual([
             { kind: 'change', target: { kind: 'this' }, value: { kind: 'tag' }, op: 'add', amount: 'was_hit' },
@@ -369,7 +400,15 @@ describe('TriggerFieldType', () => {
                 variable: { target: { kind: 'this' }, name: 'Door Open' },
                 becomes: { compare: 'is', value: true },
             },
-            checks: [{ kind: 'compare', variable: 'mood', compare: 'is', value: 'x'.repeat(1200) }],
+            checks: [
+                {
+                    kind: 'value',
+                    target: { kind: 'this' },
+                    value: { kind: 'variable', name: 'mood' },
+                    compare: 'is',
+                    amount: 'x'.repeat(1200),
+                },
+            ],
             actions: [
                 { kind: 'fire', target: { kind: 'tagged', tag: 'Big Door' }, name: 'Open Now!', amount: null },
                 { kind: 'fire', target: { kind: 'this' }, name: '??', amount: 1 },
@@ -386,7 +425,13 @@ describe('TriggerFieldType', () => {
             becomes: { compare: 'is', value: true },
         });
         expect(normalized.checks).toEqual([
-            { kind: 'compare', variable: { owner: 'level', name: 'mood' }, compare: 'is', value: 'x'.repeat(1000) },
+            {
+                kind: 'value',
+                target: { kind: 'this' },
+                value: { kind: 'variable', name: 'mood' },
+                compare: 'is',
+                amount: 'x'.repeat(1000),
+            },
         ]);
         expect(normalized.actions).toEqual([
             { kind: 'fire', target: { kind: 'tagged', tag: 'big_door' }, name: 'open_now', amount: null },
@@ -419,37 +464,109 @@ describe('TriggerFieldType', () => {
         ]);
     });
 
-    test("a v3 trigger is read and written back byte for byte, its level's variables saved as names", () => {
+    test("a v3 trigger's checks read as value checks; its When, actions and level's variables save as before", () => {
+        const change = {
+            kind: 'change',
+            target: { kind: 'entity', entity: 1 },
+            value: { kind: 'variable', name: 'coins' },
+            op: 'add',
+            amount: 1,
+        };
         const v3 = triggerWith({
             name: 'Coin',
-            when: { kind: 'touched' },
+            when: { kind: 'variableChanged', variable: 'coins', becomes: null },
             checks: [
                 { kind: 'hasTag', target: { kind: 'other' }, tag: 'player' },
                 { kind: 'compare', variable: 'coins', compare: 'atLeast', value: 10 },
             ],
-            actions: [
-                {
-                    kind: 'change',
-                    target: { kind: 'entity', entity: 1 },
-                    value: { kind: 'variable', name: 'coins' },
-                    op: 'add',
-                    amount: 1,
-                },
-                { kind: 'destroy', target: { kind: 'this' } },
-            ],
+            actions: [change, { kind: 'destroy', target: { kind: 'this' } }],
             repeat: { kind: 'oncePerRun' },
         });
 
-        const parsed = requireParsed(v3);
-        const saved = type.serialize(type.normalize(parsed));
+        const saved = type.serialize(type.normalize(requireParsed(v3)));
 
-        expect(parsed.checks[1]).toEqual({
-            kind: 'compare',
-            variable: { owner: 'level', name: 'coins' },
-            compare: 'atLeast',
-            value: 10,
+        expect(saved).toEqual({
+            ...v3,
+            checks: [
+                { kind: 'value', target: { kind: 'other' }, value: { kind: 'tag' }, compare: 'is', amount: 'player' },
+                {
+                    kind: 'value',
+                    target: { kind: 'this' },
+                    value: { kind: 'variable', name: 'coins' },
+                    compare: 'atLeast',
+                    amount: 10,
+                },
+            ],
         });
-        expect(JSON.stringify(saved)).toBe(JSON.stringify(v3));
+    });
+
+    test('the three checks saved before simpler triggers read as value checks', () => {
+        const checks = [
+            { kind: 'compare', variable: null, compare: 'less', value: null },
+            { kind: 'compare', variable: { target: { kind: 'other' }, name: 'hp' }, compare: 'less', value: 1 },
+            {
+                kind: 'compareValue',
+                target: { kind: 'this' },
+                value: { kind: 'live', live: 'speed' },
+                compare: 'more',
+                amount: 200,
+            },
+        ];
+
+        const parsed = requireParsed(triggerWith({ checks }));
+
+        expect(parsed.checks).toEqual([
+            { kind: 'value', target: { kind: 'this' }, value: null, compare: 'less', amount: null },
+            {
+                kind: 'value',
+                target: { kind: 'other' },
+                value: { kind: 'variable', name: 'hp', own: true },
+                compare: 'less',
+                amount: 1,
+            },
+            {
+                kind: 'value',
+                target: { kind: 'this' },
+                value: { kind: 'live', live: 'speed' },
+                compare: 'more',
+                amount: 200,
+            },
+        ]);
+    });
+
+    test('this hits something reads as a touch; a tag left and this is destroyed as an unset When', () => {
+        const actions = [{ kind: 'win' }];
+
+        expect(requireParsed(triggerWith({ when: { kind: 'collision' }, actions })).when).toEqual({ kind: 'touched' });
+        for (const when of [{ kind: 'tagLeft', tag: 'coin' }, { kind: 'tagLeft', tag: null }, { kind: 'destroyed' }]) {
+            const parsed = requireParsed(triggerWith({ when, actions }));
+
+            expect(parsed.when).toBeNull();
+            expect(parsed.actions).toEqual(actions);
+        }
+    });
+
+    test("Push's fixed kick reads as adding to Body › Velocity; away, towards and unset are dropped", () => {
+        const actions = [
+            { kind: 'push', target: { kind: 'other' }, push: { kind: 'by', x: 0, y: -600 } },
+            { kind: 'push', target: { kind: 'other' }, push: { kind: 'away', strength: 400 } },
+            { kind: 'win' },
+            { kind: 'push', target: { kind: 'tagged', tag: 'ball' }, push: { kind: 'towards', strength: 100 } },
+            { kind: 'push', target: { kind: 'this' }, push: null },
+        ];
+
+        const parsed = requireParsed(triggerWith({ actions }));
+
+        expect(parsed.actions).toEqual([
+            {
+                kind: 'change',
+                target: { kind: 'other' },
+                value: { kind: 'velocity' },
+                op: 'add',
+                amount: { x: 0, y: -600 },
+            },
+            { kind: 'win' },
+        ]);
     });
 
     test('normalize keeps a name of its own, trimmed and cut at 60 characters', () => {

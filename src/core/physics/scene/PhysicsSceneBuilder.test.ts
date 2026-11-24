@@ -22,6 +22,7 @@ import type { BodyHandle, JointHandle } from '../contracts/Handles.ts';
 import type { JointDefinition } from '../contracts/JointDefinition.ts';
 import type { PhysicsWorld } from '../contracts/PhysicsWorld.ts';
 import type { SurfaceDefinition } from '../contracts/SurfaceDefinition.ts';
+import type { TouchSurfaces } from './TouchSurfaces.ts';
 
 import { PhysicsSceneBuilder } from './PhysicsSceneBuilder.ts';
 
@@ -82,6 +83,7 @@ class RecordingWorld implements PhysicsWorld {
     }
     setPose() {}
     addVelocity() {}
+    setLinearVelocity() {}
     setSurfaceSettings() {}
     setMotor() {}
     destroyBody() {}
@@ -121,6 +123,12 @@ function withSurface(entity: Entity, geometry: ShapeGeometry = SQUARE_20) {
     return entity;
 }
 
+function withShape(entity: Entity, geometry: ShapeGeometry = SQUARE_20) {
+    entity.addComponent(new ShapeComponent({ geometry }));
+
+    return entity;
+}
+
 function withBody(entity: Entity) {
     entity.addComponent(new BodyComponent());
 
@@ -148,9 +156,9 @@ function onlyJoint(world: RecordingWorld) {
     return call;
 }
 
-function build(level: Level, contactEventSurfaces?: ReadonlySet<EntityId>) {
+function build(level: Level, touchSurfaces?: TouchSurfaces) {
     const engine = new RecordingEngine();
-    const scene = PhysicsSceneBuilder.build(level, new DerivedCaches(level), engine, contactEventSurfaces);
+    const scene = PhysicsSceneBuilder.build(level, new DerivedCaches(level), engine, touchSurfaces);
     if (engine.world === undefined) throw new Error('The builder made no world.');
 
     return { scene, world: engine.world };
@@ -176,8 +184,34 @@ describe('PhysicsSceneBuilder', () => {
         const level = Level.createNew();
         const ball = withSurface(withBody(place(level, level.world, transform(0, 0))));
 
+        const touchSurfaces = { contactEvents: new Set([ball.id]), sensors: new Set<EntityId>() };
+
         expect(build(level).world.settings.contactEventSurfaces).toEqual(new Set());
-        expect(build(level, new Set([ball.id])).world.settings.contactEventSurfaces).toEqual(new Set([ball.id]));
+        expect(build(level, touchSurfaces).world.settings.contactEventSurfaces).toEqual(new Set([ball.id]));
+    });
+
+    test('a shape with no Surface is built as a sensor only when asked, into its body or the ground', () => {
+        const level = Level.createNew();
+        const coin = withShape(place(level, level.world, transform(0, 0)));
+        const cart = withBody(place(level, level.world, transform(100, 0)));
+        const flag = withShape(place(level, cart, transform(0, -20)));
+        const decoration = withShape(place(level, level.world, transform(200, 0)));
+        const solid = withSurface(place(level, level.world, transform(300, 0)));
+        const touchSurfaces = { contactEvents: new Set<EntityId>(), sensors: new Set([coin.id, flag.id, solid.id]) };
+
+        expect(build(level).world.surfaces()).toHaveLength(1);
+
+        const { world } = build(level, touchSurfaces);
+        const built = world.surfaces().map((call) => ({ entity: call.surface.entity, sensor: call.surface.sensor }));
+        expect(built).toEqual([
+            { entity: coin.id, sensor: true },
+            { entity: flag.id, sensor: true },
+            { entity: solid.id, sensor: false },
+        ]);
+        expect(built.some((surface) => surface.entity === decoration.id)).toBe(false);
+        const cartBody = world.bodies().find((call) => call.definition.entity === cart.id);
+        const flagCall = world.surfaces().find((call) => call.surface.entity === flag.id);
+        expect(flagCall?.body).toBe(cartBody?.handle);
     });
 
     test('bodies and surfaces come in Entities panel order', () => {

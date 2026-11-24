@@ -42,7 +42,7 @@ function buildSession() {
 function limitedSession(limits: Partial<LevelLimits>) {
     const timer = new ManualTimer();
     const registry = createV1Registry();
-    const reader = new LevelReader(registry, { ...V1_LEVEL_LIMITS, ...limits }, FormatUpgrader.createV1());
+    const reader = new LevelReader(registry, { ...V1_LEVEL_LIMITS, ...limits }, FormatUpgrader.createCurrent());
     const level = Level.createNew();
 
     return new EditorSession({ level, clock: timer.clock, timer, frames: new ManualFrames(), registry, reader });

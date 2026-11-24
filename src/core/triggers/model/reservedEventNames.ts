@@ -11,9 +11,6 @@ const RESERVED_BY_KIND: Readonly<Record<WhenKind, string>> = {
     after: 'after',
     every: 'every',
     levelStart: 'level_start',
-    tagLeft: 'tag_left',
-    collision: 'collision',
-    destroyed: 'destroyed',
     custom: 'custom',
     variableChanged: 'variable_changed',
 };

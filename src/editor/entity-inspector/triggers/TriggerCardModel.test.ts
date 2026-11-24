@@ -82,17 +82,40 @@ const WHEN_CASES: readonly (readonly [When | null, string])[] = [
     [{ kind: 'after', seconds: 60 }, 'after 60 seconds'],
     [{ kind: 'every', seconds: null }, 'every how many seconds'],
     [{ kind: 'levelStart' }, 'the level starts'],
-    [{ kind: 'tagLeft', tag: 'coin' }, 'no entity tagged coin is left'],
 ];
 
+const TAG = { kind: 'tag' } as const;
+const OTHER = { kind: 'other' } as const;
+const PLAYER_TAG_CHECK: Check = { kind: 'value', target: OTHER, value: TAG, compare: 'is', amount: 'player' };
+
 const CHECK_CASES: readonly (readonly [Check, string])[] = [
-    [{ kind: 'hasTag', target: { kind: 'other' }, tag: 'player' }, 'other has the tag player'],
-    [{ kind: 'hasTag', target: { kind: 'entity', entity: null }, tag: null }, 'pick an entity has the tag pick a tag'],
+    [PLAYER_TAG_CHECK, 'other has the tag player'],
+    [{ ...PLAYER_TAG_CHECK, compare: 'isNot' }, "other doesn't have the tag player"],
     [
-        { kind: 'compare', variable: { owner: 'level', name: 'coins' }, compare: 'atLeast', value: 10 },
+        { kind: 'value', target: { kind: 'entity', entity: null }, value: TAG, compare: 'is', amount: null },
+        'pick an entity has the tag pick a tag',
+    ],
+    [
+        {
+            kind: 'value',
+            target: { kind: 'this' },
+            value: { kind: 'variable', name: 'coins' },
+            compare: 'atLeast',
+            amount: 10,
+        },
         'coins is at least 10',
     ],
-    [{ kind: 'compare', variable: null, compare: 'isNot', value: null }, 'pick a variable is not a number'],
+    [{ kind: 'value', target: { kind: 'this' }, value: null, compare: 'isNot', amount: null }, 'this pick a value'],
+    [
+        {
+            kind: 'value',
+            target: OTHER,
+            value: { kind: 'field', component: 'TransformComponent', field: 'position', axis: 'y' },
+            compare: 'atMost',
+            amount: 500,
+        },
+        'other Transform › Position y is at most 500',
+    ],
 ];
 
 describe('TriggerCardModel', () => {
@@ -104,7 +127,7 @@ describe('TriggerCardModel', () => {
     test('a block has When, If, Do and Repeat, with their hints', () => {
         const empty = blockOf({ actions: [{ kind: 'win' }] });
         const full = blockOf({
-            checks: [{ kind: 'hasTag', target: { kind: 'other' }, tag: 'player' }],
+            checks: [PLAYER_TAG_CHECK],
             actions: [{ kind: 'win' }, { kind: 'lose' }],
         });
 
@@ -126,7 +149,7 @@ describe('TriggerCardModel', () => {
         const sentence = sentenceOf(blockOf({ when: { kind: 'input', input: null, how: 'held' } }), 0);
 
         expect(slots(sentence).map((word) => [word.text, word.state])).toEqual([
-            ['the input', 'set'],
+            ['input', 'set'],
             ['pick an input', 'unset'],
             ['held', 'set'],
         ]);
@@ -138,35 +161,56 @@ describe('TriggerCardModel', () => {
         expect(slotNamed(sentence, 'input')).toMatchObject({ text: 'fly', state: 'unset' });
     });
 
-    test("the event menu lists every event, and picking one resets the When's own parts", () => {
+    test('the event word of an unset When opens the six events', () => {
+        const event = slotNamed(sentenceOf(blockOf({ when: null }), 0), 'event');
+
+        expect(menuLabels(event)).toEqual([
+            'something starts or stops touching this',
+            'a key or input is pressed, released or held',
+            'after or every few seconds',
+            'the level starts',
+            'a variable changes',
+            'this gets a custom event',
+        ]);
+    });
+
+    test("a timer's event word picks after or every in place, keeping the time, then the events, which reset it", () => {
         const sentence = sentenceOf(blockOf({ when: { kind: 'after', seconds: 5 } }), 0);
         const event = slotNamed(sentence, 'event');
-        if (event.entry.kind !== 'menu') throw new Error('Not a menu.');
+        const groups = groupsOf(event);
 
-        expect(event.entry.choices.map((choice) => choice.label)).toEqual([
-            'something starts touching this',
-            'something stops touching this',
-            'an input is pressed, released or held',
-            'a key is pressed, released or held',
-            'after some time',
-            'every few seconds',
-            'the level starts',
-            'the last entity with a tag is gone',
-            'this hits something',
-            'this gets a custom event',
-            'this is destroyed',
-            'a variable changes',
+        expect(event.text).toBe('after');
+        expect(groups.map((group) => [group.title, group.choices.length])).toEqual([
+            ['Timer', 2],
+            ['Events', 6],
         ]);
-        expect(event.entry.choices[4]?.value).toEqual({ section: 'when', when: { kind: 'after', seconds: null } });
+        expect(groups[0]?.choices[1]?.value).toEqual({ section: 'when', when: { kind: 'every', seconds: 5 } });
+        expect(groups[1]?.choices[2]?.value).toEqual({ section: 'when', when: { kind: 'after', seconds: null } });
+    });
+
+    test('touching picks starts or stops in place, and a key or an input picks the other, keeping how it is pressed', () => {
+        const touch = slotNamed(sentenceOf(blockOf({ when: { kind: 'touched' } }), 0), 'event');
+        const key = slotNamed(sentenceOf(blockOf({ when: { kind: 'key', key: null, how: 'held' } }), 0), 'event');
+
+        expect(touch.text).toBe('starts');
+        expect(groupsOf(touch)[0]?.choices.map((choice) => [choice.label, choice.value])).toEqual([
+            ['starts touching', { section: 'when', when: { kind: 'touched' } }],
+            ['stops touching', { section: 'when', when: { kind: 'untouched' } }],
+        ]);
+        expect(groupsOf(key)[0]?.choices[1]?.value).toEqual({
+            section: 'when',
+            when: { kind: 'input', input: null, how: 'held' },
+        });
     });
 
     test("a word's menu offers the World's inputs, the level's tags, and the keys", () => {
         const input = slotNamed(sentenceOf(blockOf({ when: { kind: 'input', input: null, how: 'held' } }), 0), 'input');
-        const tag = slotNamed(sentenceOf(blockOf({ when: { kind: 'tagLeft', tag: null } }), 0), 'tag');
+        const tagCheck: Check = { ...PLAYER_TAG_CHECK, amount: null };
+        const tag = slotNamed(sentenceOf(blockOf({ checks: [tagCheck] }), 1), 'amount');
         const key = slotNamed(sentenceOf(blockOf({ when: { kind: 'key', key: null, how: 'held' } }), 0), 'key');
 
         expect(menuLabels(input)).toEqual(['left', 'right', 'up', 'down', 'jump']);
-        expect(menuLabels(tag)).toEqual(['coin', 'player']);
+        expect(menuLabels(tag)).toEqual(['coin', 'player', 'New tag…']);
         expect(menuLabels(key)).toContain('Left arrow');
     });
 
@@ -180,17 +224,20 @@ describe('TriggerCardModel', () => {
         expect(rowText(blockOf({ checks: [check] }), 1)).toBe(text);
     });
 
-    test("a check's target opens the entity picker: this, other, then the tree, never a tag", () => {
-        const check: Check = { kind: 'hasTag', target: { kind: 'other' }, tag: 'player' };
+    test("a check's target opens the entity picker: this, other, every entity with a tag, then the tree", () => {
+        const check = PLAYER_TAG_CHECK;
         const { component, context, player, coin } = buildTriggerLevel([{ checks: [check] }]);
         const block = TriggerCardModel.build(component, context, []).triggers[0] as TriggerBlock;
         const picker = entitiesOf(slotNamed(sentenceOf(block, 1), 'target'));
 
         expect(picker.choices.map((choice) => [choice.label, choice.description])).toEqual([
             ['this', 'The entity this trigger is on'],
-            ['other', 'The other entity of the event: the one touching, hit or firing'],
+            ['other', 'The other entity of the event: the one touching or firing'],
         ]);
-        expect(picker.tagged).toEqual([]);
+        expect(picker.tagged.map((choice) => choice.label)).toEqual([
+            'every entity tagged coin',
+            'every entity tagged player',
+        ]);
         expect(picker.chosenId).toBeUndefined();
         expect(picker.placeEntity(player.id)).toMatchObject({
             check: { ...check, target: { kind: 'entity', entity: player.id } },
@@ -216,8 +263,7 @@ describe('TriggerCardModel', () => {
     });
 
     test('`other` under an event with none is greyed, with its reason, in the word and the menu', () => {
-        const check: Check = { kind: 'hasTag', target: { kind: 'other' }, tag: 'player' };
-        const block = blockOf({ when: { kind: 'levelStart' }, checks: [check] });
+        const block = blockOf({ when: { kind: 'levelStart' }, checks: [PLAYER_TAG_CHECK] });
         const target = slotNamed(sentenceOf(block, 1), 'target');
         const reason = 'This event has no other entity';
 
@@ -238,14 +284,15 @@ describe('TriggerCardModel', () => {
         [{ kind: 'restart' }, 'restart the level'],
         [{ kind: 'destroy', target: { kind: 'this' } }, 'destroy this'],
         [{ kind: 'destroy', target: { kind: 'tagged', tag: 'coin' } }, 'destroy every coin'],
-        [{ kind: 'push', target: { kind: 'other' }, push: null }, 'push other how'],
         [
-            { kind: 'push', target: { kind: 'other' }, push: { kind: 'by', x: 0, y: -600 } },
-            'push other by 0, -600 px/s',
-        ],
-        [
-            { kind: 'push', target: { kind: 'other' }, push: { kind: 'away', strength: 400 } },
-            'push other away from this at 400 px/s',
+            {
+                kind: 'change',
+                target: { kind: 'other' },
+                value: { kind: 'velocity' },
+                op: 'add',
+                amount: { x: 0, y: -6 },
+            },
+            'add 0, -6 to other Body › Velocity',
         ],
         [
             { kind: 'change', target: { kind: 'entity', entity: null }, value: null, op: 'add', amount: null },
@@ -423,17 +470,23 @@ describe('TriggerCardModel', () => {
         });
     });
 
-    test('Push by a fixed kick is one vector word', () => {
-        const push: Action = { kind: 'push', target: { kind: 'other' }, push: { kind: 'by', x: 0, y: -600 } };
-        const kick = slotNamed(sentenceOf(blockOf({ actions: [push] }), 2), 'pushBy');
+    test("Body › Velocity's amount is one vector word in px/s", () => {
+        const kick: Action = {
+            kind: 'change',
+            target: { kind: 'other' },
+            value: { kind: 'velocity' },
+            op: 'add',
+            amount: { x: 0, y: -600 },
+        };
+        const amount = slotNamed(sentenceOf(blockOf({ actions: [kick] }), 2), 'amount');
 
-        expect(kick).toMatchObject({
+        expect(amount).toMatchObject({
             text: '0, -600',
             entry: { kind: 'vector', value: { x: 0, y: -600 }, unit: 'px/s' },
         });
     });
 
-    test('Add check offers its three kinds and Add action its eight in groups, each saying what it does; with no action, Add action is needed', () => {
+    test('Add check offers the value check and Add action its seven in groups, each saying what it does; with no action, Add action is needed', () => {
         const block = blockOf({ when: { kind: 'touched' } });
         const addCheck = block.sections[1].addRow;
         const addAction = block.sections[2].addRow;
@@ -441,14 +494,12 @@ describe('TriggerCardModel', () => {
         if (addCheck?.entry.kind !== 'menu' || addAction?.entry.kind !== 'groups') throw new Error('No add menus.');
 
         expect(addCheck.entry.choices.map((choice) => [choice.label, choice.description])).toEqual([
-            ['an entity has a tag', 'Such as: other has the tag player'],
-            ["a variable's value", 'Such as: coins is at least 10'],
-            ['a component value', 'Such as: this Transform › Position y is more than 500'],
+            ['a value', 'Such as: other has the tag player, coins is 10 or more, this Body › Speed'],
         ]);
         expect(addCheck.entry.choices[0]?.value).toEqual({
             section: 'check',
             index: 0,
-            check: { kind: 'hasTag', target: { kind: 'other' }, tag: null },
+            check: { kind: 'value', target: OTHER, value: null, compare: 'is', amount: null },
         });
         const actionGroups = addAction.entry.groups.map((group) => [
             group.title,
@@ -456,11 +507,11 @@ describe('TriggerCardModel', () => {
         ]);
         expect(actionGroups).toEqual([
             ['Values', ['change a value']],
-            ['Entities', ['destroy', 'push']],
+            ['Entities', ['destroy']],
             ['Events', ['fire a custom event', 'wait']],
             ['The game', ['win', 'lose', 'restart the level']],
         ]);
-        expect(addAction.entry.groups[1]?.choices[1]?.description).toBe('Kick a body, whatever its mass');
+        expect(addAction.entry.groups[1]?.choices[0]?.description).toBe('Take an entity out of the level');
         expect(addAction.isNeeded).toBe(true);
         expect(blockOf({ actions: [{ kind: 'win' }] }).sections[2].addRow?.isNeeded).toBe(false);
     });

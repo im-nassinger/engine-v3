@@ -173,7 +173,7 @@ describe('Duplicate', () => {
         const maxEntities = level.entityCount + 1;
         const timer = new ManualTimer();
         const registry = createV1Registry();
-        const reader = new LevelReader(registry, { ...V1_LEVEL_LIMITS, maxEntities }, FormatUpgrader.createV1());
+        const reader = new LevelReader(registry, { ...V1_LEVEL_LIMITS, maxEntities }, FormatUpgrader.createCurrent());
         const session = new EditorSession({
             level,
             clock: timer.clock,

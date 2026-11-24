@@ -1,6 +1,6 @@
 import type { TriggerComponent } from '../../../core/components/index.ts';
-import type { Trigger, When } from '../../../core/fields/index.ts';
-import { triggerName, triggerProblems } from '../../../core/triggers/index.ts';
+import type { Trigger } from '../../../core/fields/index.ts';
+import { eventHasOther, triggerName, triggerProblems } from '../../../core/triggers/index.ts';
 import type { TriggerContext } from '../../../core/triggers/index.ts';
 
 import type { CardNote } from '../model/CardNote.ts';
@@ -44,8 +44,7 @@ export type TriggerBlock = {
     readonly name: string;
     readonly isOn: boolean;
     readonly sections: readonly [TriggerSection, TriggerSection, TriggerSection, TriggerSection];
-    // The editor messages about this trigger: "Doesn't run until every yellow part is set." and the
-    // missing Surface's note with its fix.
+    // The editor messages about this trigger, such as "Doesn't run until every yellow part is set.".
     readonly notes: readonly CardNote[];
 };
 
@@ -77,8 +76,7 @@ function blockOf(
     notes: readonly CardNote[],
 ): TriggerBlock {
     const problems = triggerProblems(trigger, context);
-    const eventHasOther = whenHasOther(trigger.when);
-    const sources: SentenceSources = { choices, problems, eventHasOther };
+    const sources: SentenceSources = { choices, problems, eventHasOther: eventHasOther(trigger.when) };
     const ownNotes = notes.filter((note) => note.itemId === trigger.id);
 
     return {
@@ -94,21 +92,6 @@ function blockOf(
         ],
         notes: ownNotes,
     };
-}
-
-// Touching, hitting and a custom event (its sender) name an `other`. An unset When greys nothing yet.
-function whenHasOther(when: When | null) {
-    if (when === null) return true;
-
-    switch (when.kind) {
-        case 'touched':
-        case 'untouched':
-        case 'collision':
-        case 'custom':
-            return true;
-        default:
-            return false;
-    }
 }
 
 function whenSection(trigger: Trigger, sources: SentenceSources): TriggerSection {

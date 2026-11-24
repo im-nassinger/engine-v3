@@ -11,7 +11,13 @@ import {
     setBounds,
     setGravity,
 } from '../determinism/build/levelParts.ts';
-import { changeVariable, giveTags, giveTriggers, giveVariables } from '../determinism/build/triggerParts.ts';
+import {
+    changeVariable,
+    giveTags,
+    giveTriggers,
+    giveVariables,
+    otherHasTag,
+} from '../determinism/build/triggerParts.ts';
 
 const POST_COLUMNS = 40;
 const POST_SIZE = 20;
@@ -32,8 +38,8 @@ export type CollisionTriggers = {
     readonly balls: readonly Entity[];
 };
 
-// A level for v4's trigger speed test, the collision twin of buildTouchTriggers: a grid of solid squares on
-// the ground (posts), each with a collision trigger that counts a ball hitting it on the World's `hits`, and
+// A level for v4's trigger speed test, the solid twin of buildTouchTriggers: a grid of solid squares on
+// the ground (posts), each with a touch trigger that counts a ball touching it on the World's `hits`, and
 // Dynamic balls with no gravity, Restitution 1 and no friction, which a level start trigger sets going, so
 // they bounce between the posts and off the walls for the whole run and never rest. The balls start where
 // four posts' corners meet, clear of every post, BALL_COLUMNS to a row; the posts have no style, so play
@@ -62,8 +68,8 @@ export function buildCollisionTriggers(postCount: number, ballCount: number): Co
         addSurface(post, rectangle(POST_SIZE, POST_SIZE));
         giveTriggers(post, [
             {
-                when: { kind: 'collision' },
-                checks: [{ kind: 'hasTag', target: { kind: 'other' }, tag: BALL_TAG }],
+                when: { kind: 'touched' },
+                checks: [otherHasTag(BALL_TAG)],
                 actions: [changeVariable(level, HITS_VARIABLE, 'add', 1)],
             },
         ]);
@@ -89,7 +95,13 @@ export function buildCollisionTriggers(postCount: number, ballCount: number): Co
         {
             when: { kind: 'levelStart' },
             actions: [
-                { kind: 'push', target: { kind: 'tagged', tag: BALL_TAG }, push: { kind: 'by', ...BALL_VELOCITY } },
+                {
+                    kind: 'change',
+                    target: { kind: 'tagged', tag: BALL_TAG },
+                    value: { kind: 'velocity' },
+                    op: 'add',
+                    amount: BALL_VELOCITY,
+                },
             ],
         },
     ]);

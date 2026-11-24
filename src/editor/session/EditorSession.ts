@@ -92,7 +92,7 @@ export class EditorSession {
 }
 
 function createV1Reader(registry: ComponentRegistry) {
-    const upgrader = FormatUpgrader.createV1();
+    const upgrader = FormatUpgrader.createCurrent();
 
     return new LevelReader(registry, V1_LEVEL_LIMITS, upgrader);
 }

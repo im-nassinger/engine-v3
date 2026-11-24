@@ -3,13 +3,13 @@ import type { JsonValue } from '../../../core/fields/index.ts';
 import type { EntityId } from '../../../core/level/index.ts';
 
 // What a message's fix button does, as plain data, so the messages never import the edits. The only fix
-// adds a component: the missing partner, the five inputs, a Surface as sensor.
+// adds a component: the missing partner, or the World's InputComponent with its five inputs.
 export type MessageFix = {
     readonly kind: 'addComponent';
     // "Add Shape"
     readonly label: string;
     readonly componentType: ComponentTypeName;
-    // Values written over the component's defaults, in the file form, such as `{ sensor: true }`.
+    // Values written over the component's defaults, in the file form; undefined for none.
     readonly savedValues: Readonly<Record<string, JsonValue>> | undefined;
 };
 

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { ShapeComponent, TagsComponent, TriggerComponent } from '../../components/index.ts';
+import { ShapeComponent, TriggerComponent } from '../../components/index.ts';
 import type { EntityId, Repeat, Trigger, When } from '../../fields/index.ts';
 import { LevelWriter } from '../../level-data/index.ts';
 import { Level } from '../../level/index.ts';
@@ -47,10 +47,6 @@ function giveTriggers(entity: Entity, setups: readonly TriggerSetup[]) {
     const nextTriggerId = triggers.length + 1;
 
     entity.addComponent(new TriggerComponent({ triggers, nextTriggerId }));
-}
-
-function giveTags(entity: Entity, tags: readonly string[]) {
-    entity.addComponent(new TagsComponent({ tags }));
 }
 
 // A level 1,000 px square, so a Dynamic 20 px square at y 490 falls fully out of it on the third tick.
@@ -108,6 +104,7 @@ function begin(sensor: Entity, visitor: Entity, visitorBody = visitor): SensorEv
     return {
         kind: 'begin',
         sensor: sensor.id,
+        sensorBody: sensor.id,
         visitor: visitor.id,
         visitorBody: visitorBody.id,
         visitorIsSensor: false,
@@ -115,7 +112,7 @@ function begin(sensor: Entity, visitor: Entity, visitorBody = visitor): SensorEv
 }
 
 function end(sensor: Entity, visitor: Entity, visitorBody = visitor): SensorEvent {
-    return { kind: 'end', sensor: sensor.id, visitor: visitor.id, visitorBody: visitorBody.id, visitorIsSensor: false };
+    return { ...begin(sensor, visitor, visitorBody), kind: 'end' };
 }
 
 function atTick(wanted: Record<number, readonly SensorEvent[]>) {
@@ -295,7 +292,7 @@ describe('touched and no longer touched', () => {
         expect(heard).toEqual([{ tick: 2, owner: group.id, trigger: 1, kind: 'touched', other: ball.id }]);
     });
 
-    test('the ground touches a sensor as the World', () => {
+    test("the level's Walls, the World's own lines, touch as the World", () => {
         const { level, coin } = coinLevel();
         const sensorEventsAt = atTick({ 2: [begin(coin, level.world)] });
 
@@ -321,38 +318,10 @@ describe('touched and no longer touched', () => {
     });
 });
 
-describe('"no entity with this tag is left"', () => {
-    test('fires on the tick after the last entity with the tag leaves, and never for a tag no one held', () => {
-        const level = smallLevel();
-        giveTriggers(level.world, [
-            { when: { kind: 'tagLeft', tag: 'coin' } },
-            { when: { kind: 'tagLeft', tag: 'gem' } },
-        ]);
-        const fallingCoin = placeBody(level, level.world, transform(0, 490));
-        giveTags(fallingCoin, ['coin']);
-
-        const heard = play(level, { ticks: 6 });
-
-        expect(heard).toEqual([{ tick: 4, owner: level.world.id, trigger: 1, kind: 'tagLeft', other: null }]);
-    });
-
-    test('waits while another entity still holds the tag', () => {
-        const level = smallLevel();
-        giveTriggers(level.world, [{ when: { kind: 'tagLeft', tag: 'coin' } }]);
-        const fallingCoin = placeBody(level, level.world, transform(0, 490));
-        giveTags(fallingCoin, ['coin']);
-        const restingCoin = placeStatic(level, level.world, 0);
-        giveTags(restingCoin, ['coin']);
-
-        expect(play(level, { ticks: 6 })).toEqual([]);
-    });
-});
-
 describe('the order of a tick', () => {
-    test('level start, keys and inputs, timers, touched, no longer touched, then "no entity with this tag is left"', () => {
+    test('level start, keys and inputs, timers, then starts touching and stops touching', () => {
         const level = smallLevel();
         giveTriggers(level.world, [
-            { when: { kind: 'tagLeft', tag: 'coin' } },
             { when: { kind: 'every', seconds: 1 / 60 } },
             { when: { kind: 'key', key: SPACE, how: 'held' } },
             { when: { kind: 'levelStart' } },
@@ -361,8 +330,6 @@ describe('the order of a tick', () => {
         giveTriggers(sensor, [{ when: { kind: 'untouched' } }, { when: { kind: 'touched' } }]);
         const ball = placeStatic(level, level.world, 100);
         const crate = placeStatic(level, level.world, 200);
-        const fallingCoin = placeBody(level, level.world, transform(0, 490));
-        giveTags(fallingCoin, ['coin']);
         const sensorEventsAt = atTick({ 1: [begin(sensor, ball)], 4: [end(sensor, ball), begin(sensor, crate)] });
         const holdSpace = () => ({ heldKeys: ['Space'], pressedKeys: [] });
 
@@ -371,7 +338,7 @@ describe('the order of a tick', () => {
         const fourthTick = heard.filter((firing) => firing.tick === 4).map((firing) => firing.kind);
 
         expect(firstTick).toEqual(['levelStart', 'key', 'every', 'touched']);
-        expect(fourthTick).toEqual(['key', 'every', 'touched', 'untouched', 'tagLeft']);
+        expect(fourthTick).toEqual(['key', 'every', 'touched', 'untouched']);
     });
 });
 

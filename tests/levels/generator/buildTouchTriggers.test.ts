@@ -23,14 +23,14 @@ function touchesOf(simulation: Simulation): number {
 }
 
 describe('buildTouchTriggers', () => {
-    test('holds the sensors with a touch trigger each and the balls asked for', () => {
+    test('holds the pass-through squares with a touch trigger each and the balls asked for', () => {
         const { level, sensors, balls } = buildTouchTriggers(1_000, 100);
 
         // The World and the camera besides them.
         expect(level.entityCount).toBe(1_102);
         expect(sensors).toHaveLength(1_000);
         expect(balls).toHaveLength(100);
-        expect(sensors.every((sensor) => sensor.getComponent(SurfaceComponent)?.get('sensor') === true)).toBe(true);
+        expect(sensors.some((sensor) => sensor.hasComponent(SurfaceComponent))).toBe(false);
         const whens = sensors.map((sensor) => sensor.getComponent(TriggerComponent)?.get('triggers')[0]?.when?.kind);
         expect(new Set(whens)).toEqual(new Set(['touched']));
     });

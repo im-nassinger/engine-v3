@@ -16,6 +16,6 @@ describe('AboutCommand', () => {
         if (outcome.kind !== 'notice') throw new Error('About gave no notice.');
 
         expect(outcome.notice.title).toBe('About engine-v3');
-        expect(outcome.notice.text).toBe('engine-v3\nLevel file format version 1\nPhysics version 1 (Box2D 3.2)');
+        expect(outcome.notice.text).toBe('engine-v3\nLevel file format version 2\nPhysics version 1 (Box2D 3.2)');
     });
 });

@@ -12,10 +12,7 @@ export type TriggerWordSlot =
     | 'press'
     | 'op'
     | 'action'
-    // Push's fixed kick, one vector word.
-    | 'pushBy'
-    | 'strength'
-    // The axis the component value check reads on a vector, x or y.
+    // The axis the value check reads on a vector, x or y.
     | 'axis'
     | 'repeat'
     | 'repeatSeconds'
@@ -50,7 +47,7 @@ export type TriggerChoice = {
     // The faint word at the right: a variable's type (number, string, boolean), or "live" for what a body is
     // doing now; undefined for none.
     readonly note: string | undefined;
-    // A line under the label, saying what the item does: "Compare a variable with a value". Undefined for
+    // A line under the label, saying what the item does: "Take an entity out of the level". Undefined for
     // none.
     readonly description?: string;
     // A field the pick opens before it is made, such as the number of "becomes … or more" or the word of

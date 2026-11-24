@@ -2,7 +2,6 @@ import type { ComponentRegistry } from '../../components/index.ts';
 import type { Entity, Level } from '../../level/index.ts';
 import type { ContactEvent, SensorEvent } from '../../physics/index.ts';
 
-import { ContactLedger } from './ContactLedger.ts';
 import { entitiesIn } from './entitiesIn.ts';
 import { RunnableTriggers } from './RunnableTriggers.ts';
 import { TagCounts } from './TagCounts.ts';
@@ -16,12 +15,11 @@ import { VariableWatch } from './VariableWatch.ts';
 import { WaitingRuns } from './WaitingRuns.ts';
 
 // What a run keeps about its triggers between the tick phases: the index of who hears what, the touches,
-// the hits, the timers, each trigger's last firing, which triggers can run, the tags held, who hears which
+// the timers, each trigger's last firing, which triggers can run, the tags held, who hears which
 // variable change, the runs stopped at a Wait, and this tick's firings.
 export class PlayTriggers {
     readonly index: TriggerIndex;
     readonly touches: TouchLedger;
-    readonly contacts: ContactLedger;
     readonly timers: TriggerTimers;
     readonly repeats: TriggerRepeats;
     readonly runnable: RunnableTriggers;
@@ -32,14 +30,12 @@ export class PlayTriggers {
     listed: readonly TriggerFiring[] = [];
     // The firings whose actions TriggerPhase ran this tick, in the order they ran.
     readonly fired: TriggerFiring[] = [];
-    private tagsRunOut: readonly string[] = [];
     private readonly sensorEvents: SensorEvent[] = [];
 
-    // The index is built before the run's physics, which needs its contactEventSurfaces.
+    // The index is built before the run's physics, which needs its touchSurfaces.
     constructor(level: Level, registry: ComponentRegistry, index: TriggerIndex) {
         this.index = index;
         this.touches = new TouchLedger(level, this.index);
-        this.contacts = new ContactLedger(level, this.index);
         this.timers = new TriggerTimers(this.index);
         this.repeats = new TriggerRepeats();
         this.runnable = new RunnableTriggers(level, registry);
@@ -48,21 +44,11 @@ export class PlayTriggers {
         this.waiting = new WaitingRuns(level);
     }
 
-    // The tags that ran out last tick, which this tick's "no entity with this tag is left" hears.
-    get tagsRunOutLastTick() {
-        return this.tagsRunOut;
-    }
-
-    // Called by PhysicsPhase after the step, with the world's sensor events.
-    readSensorEvents(read: (into: SensorEvent[]) => void) {
+    // Called by PhysicsPhase after the step, with the world's sensor and contact events.
+    readTouches(readSensorEvents: (into: SensorEvent[]) => void, contactEvents: readonly ContactEvent[]) {
         this.sensorEvents.length = 0;
-        read(this.sensorEvents);
-        this.touches.readStep(this.sensorEvents);
-    }
-
-    // Called by PhysicsPhase after the step, with the world's contact events.
-    readContactEvents(events: readonly ContactEvent[]) {
-        this.contacts.readStep(events);
+        readSensorEvents(this.sensorEvents);
+        this.touches.readStep(this.sensorEvents, contactEvents);
     }
 
     // The trigger's firing for an event, `other` its cause, or undefined when it doesn't hear it: it is off,
@@ -90,15 +76,9 @@ export class PlayTriggers {
         this.tags.forget(removedList);
         this.index.forget(removed);
         this.touches.forget(removed);
-        this.contacts.forget(removed);
         this.timers.forget(removed);
         this.repeats.forget(removed);
         this.runnable.forget(removed);
         this.waiting.forget(removed);
-    }
-
-    // Called by EndOfTickPhase once the tick's removals are done.
-    endTick() {
-        this.tagsRunOut = this.tags.takeRunOut();
     }
 }

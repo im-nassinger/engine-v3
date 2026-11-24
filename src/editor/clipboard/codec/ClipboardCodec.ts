@@ -1,7 +1,7 @@
 import type { DerivedCaches } from '../../../core/derived/index.ts';
 import { Bounds } from '../../../core/geometry/index.ts';
 import type { Entity, Level } from '../../../core/level/index.ts';
-import { CURRENT_FORMAT_VERSION, PhysicsVersions } from '../../../core/level-data/index.ts';
+import { CURRENT_FORMAT_VERSION, entityWithoutSensor, PhysicsVersions } from '../../../core/level-data/index.ts';
 import type { EntityData, LevelWriter, ReadRefusal } from '../../../core/level-data/index.ts';
 import { isPlainObject } from '../../../core/fields/index.ts';
 
@@ -131,7 +131,13 @@ function decodeTagged(raw: RawRecord): ClipboardDecodeResult {
     if (!Array.isArray(entities)) return damaged('the entities are not a list');
     if (entities.length === 0) return damaged('the entities are an empty list');
 
-    return { kind: 'entities', fragment: { sourceToken, box, entities } };
+    // Copied by a game of format version 1, before the SurfaceComponent lost its Sensor setting.
+    let upgraded: unknown[] = entities;
+    if (raw['formatVersion'] === 1) {
+        upgraded = entities.map((entity: unknown) => entityWithoutSensor(entity));
+    }
+
+    return { kind: 'entities', fragment: { sourceToken, box, entities: upgraded } };
 }
 
 const BOX_KEYS = ['left', 'top', 'right', 'bottom'];

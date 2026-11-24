@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Logic without code. **Nothing here is in v1.** **In v3** an entity's TriggerComponent holds triggers shaped as When, If, Do, with events for touching, keys, timers and level start, six actions led by Change value, and a Repeat setting; the World holds the level's number variables and inputs. **In v4** come collision, custom events, destroyed, a variable changing, Wait, and string and boolean variables on any entity. **v5** adds the variable types scripts need, and **v7** Spawn. **Later:** mouse events, two more touch events, sound and camera actions, arrows to what a trigger affects, kept variables, gamepads, remapping and the mouse for scripts. Core rules: if it's data, change it with Change value, triggers and scripts share one list of events, and the order you see is the order things run.
+Logic without code. **Nothing here is in v1.** **In v3** an entity's TriggerComponent holds triggers shaped as When, If, Do, with events for touching, keys and inputs, timers and level start, one check (a value compared), five actions led by Change value, and a Repeat setting; the World holds the level's number variables and inputs. **In v4** come custom events, a variable changing, component values in the check, Fire custom event and Wait, and string and boolean variables on any entity. Since 2026-11-23 there are six events, one check and seven actions (owner). **v5** adds the variable types scripts need, and **v7** Spawn. **Later:** mouse events, two more touch events, sound and camera actions, arrows to what a trigger affects, kept variables, gamepads, remapping and the mouse for scripts. Core rules: if it's data, change it with Change value, triggers and scripts share one list of events, and the order you see is the order things run.
 
 ## Files
 
@@ -16,17 +16,16 @@ Logic without code. **Nothing here is in v1.** **In v3** an entity's TriggerComp
 | Feature | Version | File |
 |---|---|---|
 | When, If, Do as a sentence | v3 | triggers |
-| Events: touched, no longer touched, key or input, timer, level start | v3 | triggers |
-| The event "no entity with this tag is left" | v3 | triggers |
-| If checks: a tag, a number variable | v3 | triggers |
-| Actions: Change value, Destroy, Push, Win, Lose, Restart | v3 | triggers |
+| Events: touching (starts or stops), key or input, timer (after or every), level start | v3 | triggers |
+| The value check: a tag, a number variable | v3 | triggers |
+| Actions: Change value, Destroy, Win, Lose, Restart | v3 | triggers |
 | Repeat, order and limits | v3 | triggers |
 | The Trigger tool | v3 | triggers |
 | The TagsComponent | v3 | triggers |
 | Number variables on the World | v3 | variables-and-inputs |
 | Raw keys and inputs | v3 | variables-and-inputs |
-| Events: collision, custom event, destroyed, a variable changes | v4 | triggers |
-| Checking a component value | v4 | triggers |
+| Events: custom event, a variable changes | v4 | triggers |
+| The value check on a component value | v4 | triggers |
 | Fire custom event and Wait, custom events | v4 | triggers |
 | String and boolean variables, on any entity | v4 | variables-and-inputs |
 | The variable types scripts need, number limits | v5 | variables-and-inputs |

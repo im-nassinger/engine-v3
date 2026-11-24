@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-How entities move and collide. A **BodyComponent** says how something moves, a **SurfaceComponent** says how its shape collides. **v1:** add a body in one click, the Box2D body settings, the surface settings (density, friction, restitution, sensor), merging shapes in a group into one body, and the physics view. **v3:** sensors and touching, for triggers and scripts. **Later:** one-way platforms and the warnings for setups that behave badly. Core rules: new shapes have no physics until you add it, collision always matches what you see, and touching is detected by the physics engine alone.
+How entities move and collide. A **BodyComponent** says how something moves, a **SurfaceComponent** says how its shape collides. **v1:** add a body in one click, the Box2D body settings, the surface settings (density, friction, restitution), merging shapes in a group into one body, and the physics view. **v3:** surfaces and touching, for triggers and scripts: a Surface means solid, no Surface means things pass through. **Later:** one-way platforms and the warnings for setups that behave badly. Core rules: new shapes have no physics until you add it, collision always matches what you see, and touching is detected by the physics engine alone.
 
 Field names are Box2D's, so the Entity inspector, the Lua API and tutorials match. The scale is 50 px per metre and is not a setting.
 
@@ -23,7 +23,7 @@ Field names are Box2D's, so the Entity inspector, the Lua API and tutorials matc
 | Dynamic | Falls, gets pushed, and bounces off things | Crates, cars, players |
 | Kinematic | Moves only when told to. Nothing can push it, and it passes through walls | Moving platforms, doors |
 
-- A Dynamic body collides with anything. Static with Static, Static with Kinematic and Kinematic with Kinematic never collide, and sensors between those pairs don't fire either.
+- A Dynamic body collides with anything. Static with Static, Static with Kinematic and Kinematic with Kinematic never collide, and touching between solid shapes of those pairs isn't noticed either.
 - **A line can't go on a Dynamic body.** The Dynamic option is greyed out with the reason, and the shape shows a red badge. A line on a Static or Kinematic body is fine.
 - Lines collide from both sides, whichever way they were drawn. A line never collides with another line.
 
@@ -60,30 +60,32 @@ Source: scope PH2; round 3: P1; round 7: 05 2.4; old: PH-17 to PH-19; owner: 202
 | Density | How heavy it is for its size. A 100 px square at density 1 weighs 4 kg | 0 to 100 | 1 |
 | Friction | How much it grips. 0 is ice, 1 is very grippy. Both surfaces count, so ice is slippery on anything | 0 to 5 | 0.3 |
 | Restitution | How much speed it keeps after a hit. 0 stops dead, 1 bounces back fully. The bouncier of the two wins | 0 to 2 | 0 |
-| Sensor | Notices what touches it but never pushes | On or off | Off |
 
-- A SurfaceComponent makes its entity's shape collide. Without one, nothing collides.
+- A SurfaceComponent makes its entity's shape solid. Without one, things pass through it.
+- **It has no Sensor setting** (owner, 2026-11-23). *Why: to a user, "no Surface" and "a sensor" both meant "things pass through"; the only difference was noticing touches, which the game works out from the triggers.* A level saved with Sensor ticked opens with that SurfaceComponent removed, and Sensor unticked is dropped from the rest.
 - **There are no material presets.** *Why: presets would be a real feature of their own (browse and save presets on any component). Not in v1.*
 - **A surface with no BodyComponent on it or above it acts as Static.** No hidden body is created. *Why: nothing happens behind the user's back, and "a surface without a body stays still" is Unity's rule.*
-- Friction, Restitution and Sensor can change during play. Density can't.
+- Friction and Restitution can change during play. Density can't.
 - In v1 every solid surface hits every other one. What hits what is set Later by the [collision grid](world.md).
 - Only the shape collides, so a thick outline can overlap its neighbours by half its width.
 
-Source: scope PH3; round 1: C7; round 6: 05 2.5; round 7: SF1, SN1; round 8: CT1; old: PH-20, PH-21
+Source: scope PH3; round 1: C7; round 6: 05 2.5; round 7: SF1, SN1; round 8: CT1; old: PH-20, PH-21; owner: 2026-11-23
 
-### Sensors and touching · v3
+### Surfaces and touching · v3
 
-- A sensor notices things entering it but doesn't push them. Triggers and scripts decide what happens.
-- **Triggers that react to touching need a SurfaceComponent.** Without one, the trigger card shows "Needs a Surface to notice touching. [Add Surface as sensor]".
-- A coin is a ShapeComponent, a SurfaceComponent set to sensor, and a TriggerComponent.
+- **A SurfaceComponent means solid**: things bump into it. **No SurfaceComponent means things pass through.** **A touch trigger works on either** (owner, 2026-11-23). See [triggers](../triggers/triggers.md#events--v3).
+- A shape with no SurfaceComponent is noticed by what passes through it only when it, or a group above it, has a touch trigger (later, a script listening for touches too). Otherwise it stays out of physics: nothing notices plain decoration. Nothing is added to the entity: the game does this in play only.
+- A solid shape with a touch trigger stays solid, and notices both what bumps into it and what it passes through.
+- A coin is a ShapeComponent and a TriggerComponent with no SurfaceComponent.
+- Two pass-through entities never notice each other, and touching needs at least one Dynamic body.
 - *Why: Box2D detects touching, so we don't write a second collision system that would disagree at the edges and threaten determinism.*
-- A sensor is drawn like any other shape, so its StyleComponent decides whether players see it. With no StyleComponent it is invisible, and only the physics view shows it.
-- Sensors add no weight.
-- Sensors check once per tick. A Dynamic body is noticed even when it passes a sensor between two ticks, but a Kinematic one is not: at 600 px/s it travels 10 px each tick and can skip a sensor thinner than that. *Why: this is how Box2D 3.2 behaves (standing yes, 2026-11-22; written for older Box2D as "any fast entity can skip a thin sensor").*
-- A sensor notices bodies of every type, Static and Kinematic included, whatever its own body's type. *Why: Box2D 3.2 sensors do, so a Static coin notices a Kinematic platform's rider and the platform too (standing yes, 2026-11-22; written for older Box2D as "a Static sensor can't notice a Kinematic body").*
-- *Why v3: noticing a touch is only for triggers and scripts, and triggers come in v3. The Sensor setting itself is in v1, because it is one Box2D setting.*
+- A pass-through shape is drawn like any other shape, so its StyleComponent decides whether players see it. With no StyleComponent it is invisible, and only the physics view shows it.
+- Pass-through shapes add no weight.
+- Pass-through shapes check once per tick. A Dynamic body is noticed even when it passes one between two ticks, but a Kinematic one is not: at 600 px/s it travels 10 px each tick and can skip a pass-through shape thinner than that. *Why: this is how Box2D 3.2 sensors behave (standing yes, 2026-11-22; written for older Box2D as "any fast entity can skip a thin sensor").*
+- A pass-through shape notices bodies of every type, Static and Kinematic included, whatever its own body's type. *Why: Box2D 3.2 sensors do, so a Static coin notices a Kinematic platform's rider and the platform too (standing yes, 2026-11-22; written for older Box2D as "a Static sensor can't notice a Kinematic body").*
+- *Why v3: noticing a touch is only for triggers and scripts, and triggers come in v3.*
 
-Source: scope PH3; round 6: 05 2.11; round 7: SN1; old: PH-58 to PH-63; owner: 2026-11-13
+Source: scope PH3; round 6: 05 2.11; round 7: SN1; old: PH-58 to PH-63; owner: 2026-11-13; owner: 2026-11-23
 
 ### One-way platforms · Later
 
@@ -94,7 +96,6 @@ Source: scope PH3; round 6: 05 2.11; round 7: SN1; old: PH-58 to PH-63; owner: 2
 - The decision is shared by the whole body: if any part is passing through a platform, all its parts pass until none touches it.
 - A passing contact produces no collision event. A blocked one behaves like any collision.
 - Only faces looking along the arrow can block. Walking into the end of a platform passes through.
-- With Sensor on, One-way has no effect.
 - A script can make a body drop through the one-way platforms it is standing on. The builtin platformer script uses it for Down plus Jump.
 
 Source: scope PH5; round 6: 05 2.10; round 7: OW1; old: PH-47 to PH-57
@@ -107,7 +108,7 @@ Source: scope PH5; round 6: 05 2.10; round 7: OW1; old: PH-47 to PH-57
 - It merges into the nearest group above it that has a body. Groups without a body in between are skipped.
 - **Whether a child merges is the Merge checkbox on its BodyComponent**, on by default. A shape with a SurfaceComponent and no BodyComponent always merges into the body above it; to give it a body of its own, add a BodyComponent and untick Merge. *Why: it belongs with the body settings it greys out (owner: 2026-11-13).* **Merge can't change during play**, because play builds the bodies once at the start (standing yes, 2026-11-14).
 - **Nothing is lost when it changes.** A merged shape keeps its own body settings, greyed, and gets them back when unmerged. Grouping, ungrouping, adding and removing bodies and dragging out never destroy data.
-- The body decides how everything moves. Each surface keeps its own density, friction, restitution and sensor, so one body can mix them.
+- The body decides how everything moves. Each surface keeps its own density, friction and restitution, so one body can mix them, and a pass-through shape under a touch trigger can sit in it too.
 - A child with no physics inside a group with a body follows the body and doesn't collide.
 - A child with merging unticked stays where it is in the tree and draw order, but moves by its own body during play.
 - A merged shape's own body type doesn't matter: the group's wins.
@@ -133,7 +134,7 @@ Source: round 6: 05 2.7; old: PH-32 to PH-38; owner: 2026-11-15
 - A debug view that draws every physics shape on top of the level, whatever the drawing settings say: the eye, opacity, a parent's opacity.
 - Off by default. Available in the editor and in test play, never in a published level. It is a View menu switch.
 - It draws the same collision pieces the game gives the physics engine, so it shows exactly what collides, and looks the same in the editor, where no physics runs, and in test play.
-- *Why v1: a sensor with no StyleComponent is invisible, and this is the only way to see it.*
+- *Why v1: a shape with no StyleComponent is invisible, and this is the only way to see it.*
 - Even with the view off, selecting anything with physics outlines its whole body.
 - **There is no physics preview in the editor.** Press Play to see physics. *Why: test play already runs a copy that can't harm the level, with Pause and Step.*
 
@@ -150,8 +151,8 @@ Editor messages for setups likely to behave badly. None of them stops you playin
 | A Dynamic or Kinematic shape over 500 px long | Warning | "Very big for a moving entity, so it may feel slow or unstable. Split it into joined pieces, or make it Static." | Make Static |
 | A Static shape over 2,500 px long | Tip | "Long static shapes work, but past 2500 px contacts can get less exact. If things jitter here, split it." | |
 | A Dynamic shape longer than 20 times its thickness | Tip | "Long thin moving shapes can wobble or slip through other moving things. Make it thicker, or turn on Bullet." | Turn on Bullet |
-| A sensor under 10 px on its short side | Tip | "Fast entities can skip thin sensors." | |
-| A Dynamic body whose surfaces are all sensors | Warning | "This sensor will fall during play, because its body is Dynamic." | Make Static |
+| A pass-through shape with a touch trigger under 10 px on its short side | Tip | "Fast entities can pass through thin shapes unnoticed." | |
+| A Dynamic body whose shapes all let things pass through | Warning | "This will fall during play, because its body is Dynamic." | Make Static |
 | A group with a body and nothing inside that collides | Warning | "Car has a body, but nothing inside collides. It will fall through everything." | |
 | A Dynamic body with density 0 everywhere | Warning | "Nothing here has weight, so it counts as 1 kg and can't spin. Set Density above 0." | Set Density to 1 |
 | A Dynamic circle scaled unevenly | Tip | "This stretched circle collides as a many-sided shape, so it won't roll perfectly." | Make scale even |
@@ -171,7 +172,7 @@ Small features from the old draft and review that the scope review never asked a
 |---|---|---|
 | Start asleep, starting velocity, starting spin | Three body fields from the old draft. The reviewed field list doesn't include them | Later |
 | "New shapes: no physics, Static, Dynamic" | A Shape tool option so that laying out ground takes no extra clicks | Later |
-| Physics view details | Colour per body, hatched fill for Static, dashed for sensors, centre of mass, contact points, a legend. v1 draws the pieces without these details | Later |
+| Physics view details | Colour per body, hatched fill for Static, dashed for pass-through shapes, centre of mass, contact points, a legend. v1 draws the pieces without these details | Later |
 | Mass ratio hint | Stacks and joints turn wobbly past 10 to 1 in mass. The Density hint says so | Later |
 
 Source: old: PH-02 to PH-13, PH-17, PH-22, PH-23, PH-41, PH-43; owner: 2026-11-14

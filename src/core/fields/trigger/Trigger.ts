@@ -21,7 +21,11 @@ export type Trigger = {
 
 export type Press = 'pressed' | 'released' | 'held';
 
+// Six events as the user sees them. Touching (starts or stops), a key or an input, and a timer (after or
+// every) are each two kinds here, as v3 saved them, so a saved When keeps its shape; the trigger card shows
+// each pair as one event with the in-place word that picks between them.
 export type When =
+    // Any touch: a pass-through entity overlapping, or two solid ones bumping.
     | { readonly kind: 'touched' }
     | { readonly kind: 'untouched' }
     | { readonly kind: 'input'; readonly input: string | null; readonly how: Press }
@@ -29,9 +33,6 @@ export type When =
     | { readonly kind: 'after'; readonly seconds: number | null }
     | { readonly kind: 'every'; readonly seconds: number | null }
     | { readonly kind: 'levelStart' }
-    | { readonly kind: 'tagLeft'; readonly tag: string | null }
-    | { readonly kind: 'collision' }
-    | { readonly kind: 'destroyed' }
     // An event named by the level, such as `open`, heard when a Fire custom event names it.
     | { readonly kind: 'custom'; readonly name: string | null }
     // Without a condition, any change of the variable's value.
@@ -63,39 +64,33 @@ export type Condition = { readonly compare: Compare; readonly value: VariableVal
 // out here because field types sit below the components.
 type ComponentName = `${string}Component`;
 
-// What the component value check reads on its target: a number field, or one axis of a vector field, or
-// what a body is doing now, in px/s, read from physics.
+// A number the value check reads on its target: a number field, or one axis of a vector field, or what a
+// body is doing now, in px/s, read from physics.
 export type ReadableValue =
     | { readonly kind: 'field'; readonly component: ComponentName; readonly field: string; readonly axis?: 'x' | 'y' }
     | { readonly kind: 'live'; readonly live: LiveValue };
 
 export type LiveValue = 'speed' | 'velocityX' | 'velocityY';
 
-export type Check =
-    | { readonly kind: 'hasTag'; readonly target: Target; readonly tag: string | null }
-    | {
-          readonly kind: 'compare';
-          readonly variable: VariableRef | null;
-          readonly compare: Compare;
-          readonly value: VariableValue | null;
-      }
-    | {
-          readonly kind: 'compareValue';
-          readonly target: Target;
-          readonly value: ReadableValue | null;
-          readonly compare: Compare;
-          readonly amount: number | null;
-      };
+// What the value check reads on its target: a variable (the level's, read on the World whatever the
+// target, or with `own` the target's own), the tags (is: has the tag, isNot: doesn't), or a number.
+export type CheckedValue =
+    | { readonly kind: 'variable'; readonly name: string; readonly own?: true }
+    | { readonly kind: 'tag' }
+    | ReadableValue;
 
-export type CheckKind = Check['kind'];
+// The one check: a value of the target compared with an amount, as Change value changes one. The amount is
+// the variable's value, the tag, or a number.
+export type Check = {
+    readonly kind: 'value';
+    readonly target: Target;
+    readonly value: CheckedValue | null;
+    readonly compare: Compare;
+    readonly amount: VariableValue | null;
+};
 
 // Flip turns a boolean variable to the other value, and needs no amount.
 export type ChangeOp = 'set' | 'add' | 'subtract' | 'flip';
-
-// Changes in velocity, in px/s, ignoring mass: a fixed vector, or one strength away from or towards `this`.
-export type Push =
-    | { readonly kind: 'by'; readonly x: number; readonly y: number }
-    | { readonly kind: 'away' | 'towards'; readonly strength: number };
 
 // The value Change value changes on its target.
 export type ValueRef =
@@ -107,7 +102,9 @@ export type ValueRef =
     // Add or subtract the tag in the action's amount.
     | { readonly kind: 'tag' }
     // A trigger's on/off, by its id in the target's TriggerComponent.
-    | { readonly kind: 'triggerOn'; readonly trigger: number };
+    | { readonly kind: 'triggerOn'; readonly trigger: number }
+    // Body › Velocity, in px/s, of the body the target belongs to: its own, or the nearest one above it.
+    | { readonly kind: 'velocity' };
 
 export type Action =
     | {
@@ -118,7 +115,6 @@ export type Action =
           readonly amount: JsonValue | null;
       }
     | { readonly kind: 'destroy'; readonly target: Target }
-    | { readonly kind: 'push'; readonly target: Target; readonly push: Push | null }
     | { readonly kind: 'win' }
     | { readonly kind: 'lose' }
     | { readonly kind: 'restart' }

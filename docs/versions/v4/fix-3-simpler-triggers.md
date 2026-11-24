@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The owner found triggers convoluted, with too many options that overlap (2026-11-23). Agreed in that session, **not built yet**:
+The owner found triggers convoluted, with too many options that overlap (2026-11-23). Agreed in that session, and **built the same day** (row 3 of [fixes.md](fixes.md)); what was picked while building, and the two places it differs from this plan (the in-place word is also the event word, and the two speed tests stay two), are in [decisions.md](../../decisions.md):
 - **When:** 12 events become 6.
 - **If:** 3 checks become 1.
 - **Do:** 8 actions become 7, since Push goes.

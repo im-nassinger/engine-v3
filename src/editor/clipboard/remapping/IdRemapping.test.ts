@@ -23,7 +23,7 @@ import type { PasteTarget } from './IdRemapping.ts';
 
 const registry = createV1Registry();
 const writer = new LevelWriter();
-const reader = new LevelReader(registry, V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+const reader = new LevelReader(registry, V1_LEVEL_LIMITS, FormatUpgrader.createCurrent());
 const codec = new ClipboardCodec(writer);
 const remapping = new IdRemapping(registry);
 
@@ -225,7 +225,15 @@ function buildButtonAndDoor() {
         name: null,
         on: true,
         when: { kind: 'touched' },
-        checks: [{ kind: 'hasTag', target: { kind: 'entity', entity: door.id }, tag: 'door' }],
+        checks: [
+            {
+                kind: 'value',
+                target: { kind: 'entity', entity: door.id },
+                value: { kind: 'tag' },
+                compare: 'is',
+                amount: 'door',
+            },
+        ],
         actions: [{ kind: 'destroy', target: { kind: 'entity', entity: door.id } }, { kind: 'win' }],
         repeat: { kind: 'everyTime' },
     };

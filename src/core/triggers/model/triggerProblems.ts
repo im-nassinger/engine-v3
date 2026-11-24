@@ -4,8 +4,10 @@ import { variableTypeOf } from '../../fields/index.ts';
 import type {
     Action,
     Check,
+    CheckedValue,
     Compare,
     Condition,
+    ReadableValue,
     Target,
     Trigger,
     ValueRef,
@@ -27,26 +29,15 @@ export type TriggerPart =
     | { readonly section: 'action'; readonly index: number };
 
 // The word of the part's sentence the problem is on.
-// `number` is the value a variable is compared with, whatever its type; `name` a custom event's.
+// `number` is the value a "variable changes" When compares with, whatever its type; `amount` what a check
+// compares with or Change value changes by; `name` a custom event's.
 export type TriggerSlot =
-    | 'event'
-    | 'input'
-    | 'key'
-    | 'seconds'
-    | 'tag'
-    | 'target'
-    | 'variable'
-    | 'compare'
-    | 'number'
-    | 'value'
-    | 'amount'
-    | 'push'
-    | 'name';
+    'event' | 'input' | 'key' | 'seconds' | 'target' | 'variable' | 'compare' | 'number' | 'value' | 'amount' | 'name';
 
 // Reasons, never sentences: the editor writes what the user reads.
 export type TriggerProblemReason =
     | 'unset'
-    // `other` under an event that has none: a key, a timer, level start, a tag running out.
+    // `other` under an event that has none: a key, a timer, level start, a variable changing.
     | 'noOther'
     | 'unknownInput'
     | 'unknownVariable'
@@ -54,7 +45,7 @@ export type TriggerProblemReason =
     | 'unknownValue'
     // An amount the value's type refuses, such as a word for a number.
     | 'badAmount'
-    // A comparison or a value the variable's type doesn't have: `more` on a string, a word for a number.
+    // A comparison or an amount the value's type doesn't have: `more` on a string, a word for a number.
     | 'wrongType'
     // A custom event named as a builtin event is, such as `touched`.
     | 'reservedName'
@@ -104,15 +95,14 @@ export function triggerCanRun(problems: readonly TriggerProblem[]) {
     return !problems.some(stopsTrigger);
 }
 
-// Touching, hitting and a custom event (its sender) name an `other`. An unset When says nothing yet, so it
-// greys nothing.
-function eventHasOther(when: When | null) {
+// Touching and a custom event (its sender) name an `other`. An unset When says nothing yet, so it greys
+// nothing.
+export function eventHasOther(when: When | null) {
     if (when === null) return true;
 
     switch (when.kind) {
         case 'touched':
         case 'untouched':
-        case 'collision':
         case 'custom':
             return true;
         default:
@@ -138,10 +128,6 @@ function whenProblems(when: When | null, context: TriggerContext): readonly Trig
         case 'after':
         case 'every':
             if (when.seconds === null) return [{ part: WHEN, slot: 'seconds', reason: 'unset' }];
-
-            return [];
-        case 'tagLeft':
-            if (when.tag === null) return [{ part: WHEN, slot: 'tag', reason: 'unset' }];
 
             return [];
         case 'custom':
@@ -170,19 +156,19 @@ function variableChangedProblems(when: VariableChangedWhen, context: TriggerCont
     if (found === 'unknown') return [{ part: WHEN, slot: 'variable', reason: 'unknownVariable' } as const];
     if (becomes === null || found === 'inPlay') return [];
 
-    return conditionProblems(found, becomes, WHEN);
+    return conditionProblems(found, becomes, WHEN, 'number');
 }
 
 // A comparison the variable's type allows, with a value of its type: a string or a boolean is only compared
-// with is or isNot.
-function conditionProblems(variable: Variable, condition: Condition, part: TriggerPart) {
+// with is or isNot. `valueSlot` is the word holding the value compared.
+function conditionProblems(variable: Variable, condition: Condition, part: TriggerPart, valueSlot: TriggerSlot) {
     const problems: TriggerProblem[] = [];
 
     if (!comparesAs(variable.value, condition.compare)) {
         problems.push({ part, slot: 'compare', reason: 'wrongType' });
     }
     if (variableTypeOf(variable.value) !== variableTypeOf(condition.value)) {
-        problems.push({ part, slot: 'number', reason: 'wrongType' });
+        problems.push({ part, slot: valueSlot, reason: 'wrongType' });
     }
 
     return problems;
@@ -194,64 +180,103 @@ function comparesAs(value: VariableValue, compare: Compare) {
     return compare === 'is' || compare === 'isNot';
 }
 
+// The value check: the target, the value it reads there, the compare and the amount. A level's variable is
+// read on the World, so its target says nothing and has no problem.
 function checkProblems(check: Check, part: TriggerPart, hasOther: boolean, context: TriggerContext) {
+    const { value } = check;
+    const isLevelVariable = value?.kind === 'variable' && value.own !== true;
     const problems: TriggerProblem[] = [];
 
-    if (check.kind === 'hasTag') {
+    if (!isLevelVariable) {
         problems.push(...targetProblems(check.target, part, hasOther, context));
-        if (check.tag === null) {
-            problems.push({ part, slot: 'tag', reason: 'unset' });
-        }
-
-        return problems;
-    }
-
-    if (check.kind === 'compareValue') return compareValueProblems(check, part, hasOther, context);
-
-    const { variable, value } = check;
-    if (variable?.owner === 'own') {
-        problems.push(...targetProblems(variable.target, part, hasOther, context));
-    }
-
-    const found = variable === null ? undefined : findVariable(variable, context);
-    if (variable === null) {
-        problems.push({ part, slot: 'variable', reason: 'unset' });
-    } else if (found === 'unknown') {
-        problems.push({ part, slot: 'variable', reason: 'unknownVariable' });
     }
 
     if (value === null) {
-        problems.push({ part, slot: 'number', reason: 'unset' });
+        problems.push({ part, slot: 'value', reason: 'unset' });
+        return problems;
     }
 
-    if (typeof found === 'object' && value !== null) {
-        problems.push(...conditionProblems(found, { compare: check.compare, value }, part));
-    } else if (typeof found === 'object' && !comparesAs(found.value, check.compare)) {
+    problems.push(...checkedValueProblems(check, value, part, context));
+
+    return problems;
+}
+
+function checkedValueProblems(
+    check: Check,
+    value: CheckedValue,
+    part: TriggerPart,
+    context: TriggerContext,
+): readonly TriggerProblem[] {
+    switch (value.kind) {
+        case 'variable':
+            return checkedVariableProblems(check, value, part, context);
+        case 'tag':
+            return checkedTagProblems(check, part);
+        default:
+            return checkedNumberProblems(check, value, part, context);
+    }
+}
+
+type CheckedVariable = CheckedValue & { readonly kind: 'variable' };
+
+function checkedVariableProblems(check: Check, value: CheckedVariable, part: TriggerPart, context: TriggerContext) {
+    const problems: TriggerProblem[] = [];
+    const ref: VariableRef =
+        value.own === true
+            ? { owner: 'own', target: check.target, name: value.name }
+            : { owner: 'level', name: value.name };
+    const found = findVariable(ref, context);
+    const { amount, compare } = check;
+
+    if (found === 'unknown') {
+        problems.push({ part, slot: 'value', reason: 'unknownVariable' });
+    }
+    if (amount === null) {
+        problems.push({ part, slot: 'amount', reason: 'unset' });
+    }
+    if (typeof found !== 'object') return problems;
+
+    if (amount !== null) {
+        problems.push(...conditionProblems(found, { compare, value: amount }, part, 'amount'));
+    } else if (!comparesAs(found.value, compare)) {
         problems.push({ part, slot: 'compare', reason: 'wrongType' });
     }
 
     return problems;
 }
 
-type CompareValueCheck = Check & { readonly kind: 'compareValue' };
+// "has the tag" (is) or "doesn't have the tag" (isNot), and a tag.
+function checkedTagProblems(check: Check, part: TriggerPart) {
+    const problems: TriggerProblem[] = [];
 
-// A target known while editing must have the value; one only known in play is false there without it.
-function compareValueProblems(check: CompareValueCheck, part: TriggerPart, hasOther: boolean, context: TriggerContext) {
-    const problems: TriggerProblem[] = [...targetProblems(check.target, part, hasOther, context)];
-    const { value } = check;
+    if (check.compare !== 'is' && check.compare !== 'isNot') {
+        problems.push({ part, slot: 'compare', reason: 'wrongType' });
+    }
+    if (check.amount === null) {
+        problems.push({ part, slot: 'amount', reason: 'unset' });
+    } else if (typeof check.amount !== 'string') {
+        problems.push({ part, slot: 'amount', reason: 'wrongType' });
+    }
 
-    if (value === null) {
-        problems.push({ part, slot: 'value', reason: 'unset' });
-    } else {
-        const target = knownTarget(check.target, context);
-        const offers = target === undefined ? [] : readableValues(target, context.registry);
-        if (target !== undefined && !offers.some((offer) => sameReadableValue(offer, value))) {
+    return problems;
+}
+
+// A target known while editing must have the number; one only known in play is false there without it.
+function checkedNumberProblems(check: Check, value: ReadableValue, part: TriggerPart, context: TriggerContext) {
+    const problems: TriggerProblem[] = [];
+    const target = knownTarget(check.target, context);
+
+    if (target !== undefined) {
+        const offers = readableValues(target, context.registry);
+        if (!offers.some((offer) => sameReadableValue(offer, value))) {
             problems.push({ part, slot: 'value', reason: 'unknownValue' });
         }
     }
 
     if (check.amount === null) {
-        problems.push({ part, slot: 'number', reason: 'unset' });
+        problems.push({ part, slot: 'amount', reason: 'unset' });
+    } else if (typeof check.amount !== 'number') {
+        problems.push({ part, slot: 'amount', reason: 'wrongType' });
     }
 
     return problems;
@@ -278,14 +303,6 @@ function actionProblems(action: Action, part: TriggerPart, hasOther: boolean, co
             ];
         case 'destroy':
             return targetProblems(action.target, part, hasOther, context);
-        case 'push': {
-            const problems = [...targetProblems(action.target, part, hasOther, context)];
-            if (action.push === null) {
-                problems.push({ part, slot: 'push', reason: 'unset' });
-            }
-
-            return problems;
-        }
         case 'fire':
             return [...targetProblems(action.target, part, hasOther, context), ...eventNameProblems(action.name, part)];
         case 'wait':

@@ -30,17 +30,17 @@ function hitsOf(simulation: Simulation): number {
 }
 
 describe('buildCollisionTriggers', () => {
-    test('holds the solid posts on the ground with a collision trigger each and the balls asked for', () => {
+    test('holds the solid posts on the ground with a touch trigger each and the balls asked for', () => {
         const { level, posts, balls } = buildCollisionTriggers(1_000, 100);
 
         // The World and the camera besides them.
         expect(level.entityCount).toBe(1_102);
         expect(posts).toHaveLength(1_000);
         expect(balls).toHaveLength(100);
-        expect(posts.every((post) => post.getComponent(SurfaceComponent)?.get('sensor') === false)).toBe(true);
+        expect(posts.every((post) => post.hasComponent(SurfaceComponent))).toBe(true);
         expect(posts.some((post) => post.getComponent(BodyComponent) !== undefined)).toBe(false);
         const whens = posts.map((post) => post.getComponent(TriggerComponent)?.get('triggers')[0]?.when?.kind);
-        expect(new Set(whens)).toEqual(new Set(['collision']));
+        expect(new Set(whens)).toEqual(new Set(['touched']));
     });
 
     test('keeps the balls hitting the posts all through 10 s', () => {

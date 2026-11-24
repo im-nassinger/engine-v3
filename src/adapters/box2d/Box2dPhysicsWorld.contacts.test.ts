@@ -139,20 +139,6 @@ describe('Box2dPhysicsWorld: contact events', () => {
         world.destroy();
     });
 
-    test('a surface rebuilt in play gets its switch again, so its new contact begins', () => {
-        const { world } = landedBox([BOX]);
-        const settings = { friction: 0.3, restitution: 0 };
-
-        // Two changes of Sensor before a step: the box is rebuilt solid where it rests. The new shape's begin
-        // and the old one's end come in the same step, begins first.
-        world.setSurfaceSettings(BOX, { ...settings, sensor: true });
-        world.setSurfaceSettings(BOX, { ...settings, sensor: false });
-        const kinds = stepAndRecord(world, 5).flatMap(({ events }) => events.map((event) => event.kind));
-
-        expect(kinds).toEqual(['begin', 'end']);
-        world.destroy();
-    });
-
     test('two shapes of one surface touching the ground send a begin each, in the same step', () => {
         const world = worldWith([GROUND]);
         addGround(world);

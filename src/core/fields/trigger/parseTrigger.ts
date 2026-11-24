@@ -8,11 +8,11 @@ import type {
     Action,
     ChangeOp,
     Check,
+    CheckedValue,
     Compare,
     Condition,
     LiveValue,
     Press,
-    Push,
     ReadableValue,
     Repeat,
     Target,
@@ -56,6 +56,7 @@ export function parseTrigger(raw: unknown): ParseOutcome<Trigger> {
 
     const actions = parseList(raw['actions'], parseAction);
     if (!actions.ok) return actions;
+    const keptActions = actions.value.filter((action) => action !== null);
 
     const repeat = parseRepeat(raw['repeat']);
     if (!repeat.ok) return repeat;
@@ -66,7 +67,7 @@ export function parseTrigger(raw: unknown): ParseOutcome<Trigger> {
         on,
         when: when.value,
         checks: checks.value,
-        actions: actions.value,
+        actions: keptActions,
         repeat: repeat.value,
     });
 }
@@ -75,7 +76,10 @@ export function isPositiveWholeNumber(raw: unknown): raw is number {
     return typeof raw === 'number' && Number.isSafeInteger(raw) && raw >= 1;
 }
 
-function parseWhen(raw: unknown): ParseOutcome<When> {
+// Saved before 2026-11-23's simpler triggers: "this hits something" (`collision`) is now a touch, and "the
+// last entity with a tag is gone" (`tagLeft`) and "this is destroyed" (`destroyed`) are gone, so they read as
+// an unset When, keeping the trigger's If and Do.
+function parseWhen(raw: unknown): ParseOutcome<When | null> {
     if (!isPlainObject(raw)) return refuse({ reason: 'wrongType' });
 
     const kind = raw['kind'];
@@ -83,9 +87,13 @@ function parseWhen(raw: unknown): ParseOutcome<When> {
         case 'touched':
         case 'untouched':
         case 'levelStart':
-        case 'collision':
-        case 'destroyed':
             return parseBareKind(raw, kind);
+        case 'collision':
+            return parseBareKind(raw, 'touched');
+        case 'destroyed':
+            return parseDroppedWhen(raw, ['kind']);
+        case 'tagLeft':
+            return parseDroppedWhen(raw, ['kind', 'tag']);
         case 'custom':
             return parseCustomWhen(raw);
         case 'variableChanged':
@@ -97,8 +105,6 @@ function parseWhen(raw: unknown): ParseOutcome<When> {
         case 'after':
         case 'every':
             return parseTimerWhen(raw, kind);
-        case 'tagLeft':
-            return parseTagLeftWhen(raw);
         default:
             return refuse({ reason: 'unknownChoice' });
     }
@@ -146,13 +152,15 @@ function parseTimerWhen(raw: RawRecord, kind: 'after' | 'every'): ParseOutcome<W
     return accept({ kind, seconds: seconds.value });
 }
 
-function parseTagLeftWhen(raw: RawRecord): ParseOutcome<When> {
-    if (!hasExactlyKeys(raw, ['kind', 'tag'])) return refuse({ reason: 'wrongType' });
+// A When of a kind that is gone: its shape is still checked, as any damaged data is refused.
+function parseDroppedWhen(raw: RawRecord, keys: readonly string[]): ParseOutcome<null> {
+    if (!hasExactlyKeys(raw, keys)) return refuse({ reason: 'wrongType' });
+    if (Object.hasOwn(raw, 'tag')) {
+        const tag = parseNullableText(raw['tag']);
+        if (!tag.ok) return tag;
+    }
 
-    const tag = parseNullableText(raw['tag']);
-    if (!tag.ok) return tag;
-
-    return accept({ kind: 'tagLeft', tag: tag.value });
+    return accept(null);
 }
 
 function parseCustomWhen(raw: RawRecord): ParseOutcome<When> {
@@ -250,10 +258,13 @@ function parseTaggedTarget(raw: RawRecord): ParseOutcome<Target> {
     return accept({ kind: 'tagged', tag: tag.value });
 }
 
+// Saved before 2026-11-23's simpler triggers as three checks: "an entity has a tag" (`hasTag`), "a
+// variable's value" (`compare`) and "a component value" (`compareValue`), now each the value check.
 function parseCheck(raw: unknown): ParseOutcome<Check> {
     if (!isPlainObject(raw)) return refuse({ reason: 'wrongType' });
 
     const kind = raw['kind'];
+    if (kind === 'value') return parseValueCheck(raw);
     if (kind === 'hasTag') return parseHasTagCheck(raw);
     if (kind === 'compare') return parseCompareCheck(raw);
     if (kind === 'compareValue') return parseCompareValueCheck(raw);
@@ -261,6 +272,43 @@ function parseCheck(raw: unknown): ParseOutcome<Check> {
     return refuse({ reason: 'unknownChoice' });
 }
 
+function parseValueCheck(raw: RawRecord): ParseOutcome<Check> {
+    if (!hasExactlyKeys(raw, ['kind', 'target', 'value', 'compare', 'amount'])) {
+        return refuse({ reason: 'wrongType' });
+    }
+
+    const target = parseTarget(raw['target']);
+    if (!target.ok) return target;
+
+    const value = parseNullable(raw['value'], parseCheckedValue);
+    if (!value.ok) return value;
+
+    const compare = parseChoice(raw['compare'], COMPARES);
+    if (!compare.ok) return compare;
+
+    const amount = parseNullable(raw['amount'], parseVariableValue);
+    if (!amount.ok) return amount;
+
+    return accept({
+        kind: 'value',
+        target: target.value,
+        value: value.value,
+        compare: compare.value,
+        amount: amount.value,
+    });
+}
+
+function parseCheckedValue(raw: unknown): ParseOutcome<CheckedValue> {
+    if (!isPlainObject(raw)) return refuse({ reason: 'wrongType' });
+
+    const kind = raw['kind'];
+    if (kind === 'variable') return parseVariableValueRef(raw);
+    if (kind === 'tag') return parseBareKind(raw, kind);
+
+    return parseReadableValue(raw);
+}
+
+// "other has the tag player" was its own check.
 function parseHasTagCheck(raw: RawRecord): ParseOutcome<Check> {
     if (!hasExactlyKeys(raw, ['kind', 'target', 'tag'])) return refuse({ reason: 'wrongType' });
 
@@ -270,9 +318,11 @@ function parseHasTagCheck(raw: RawRecord): ParseOutcome<Check> {
     const tag = parseNullableText(raw['tag']);
     if (!tag.ok) return tag;
 
-    return accept({ kind: 'hasTag', target: target.value, tag: tag.value });
+    return accept({ kind: 'value', target: target.value, value: { kind: 'tag' }, compare: 'is', amount: tag.value });
 }
 
+// A variable compared named its owner in the variable: the level's is now read on the World whatever the
+// target, so it keeps `this`; an own one's owner becomes the check's target.
 function parseCompareCheck(raw: RawRecord): ParseOutcome<Check> {
     if (!hasExactlyKeys(raw, ['kind', 'variable', 'compare', 'value'])) return refuse({ reason: 'wrongType' });
 
@@ -282,10 +332,20 @@ function parseCompareCheck(raw: RawRecord): ParseOutcome<Check> {
     const compare = parseChoice(raw['compare'], COMPARES);
     if (!compare.ok) return compare;
 
-    const value = parseNullable(raw['value'], parseVariableValue);
-    if (!value.ok) return value;
+    const amount = parseNullable(raw['value'], parseVariableValue);
+    if (!amount.ok) return amount;
 
-    return accept({ kind: 'compare', variable: variable.value, compare: compare.value, value: value.value });
+    const ref = variable.value;
+    let target: Target = { kind: 'this' };
+    let value: CheckedValue | null = null;
+    if (ref?.owner === 'level') {
+        value = { kind: 'variable', name: ref.name };
+    } else if (ref?.owner === 'own') {
+        target = ref.target;
+        value = { kind: 'variable', name: ref.name, own: true };
+    }
+
+    return accept({ kind: 'value', target, value, compare: compare.value, amount: amount.value });
 }
 
 function parseCompareValueCheck(raw: RawRecord): ParseOutcome<Check> {
@@ -306,7 +366,7 @@ function parseCompareValueCheck(raw: RawRecord): ParseOutcome<Check> {
     if (!amount.ok) return amount;
 
     return accept({
-        kind: 'compareValue',
+        kind: 'value',
         target: target.value,
         value: value.value,
         compare: compare.value,
@@ -328,7 +388,8 @@ function parseReadableValue(raw: unknown): ParseOutcome<ReadableValue> {
     return accept({ kind: 'live', live: live.value });
 }
 
-function parseAction(raw: unknown): ParseOutcome<Action> {
+// Null for an action that is gone and has no replacement: it is dropped, keeping the trigger's other actions.
+function parseAction(raw: unknown): ParseOutcome<Action | null> {
     if (!isPlainObject(raw)) return refuse({ reason: 'wrongType' });
 
     const kind = raw['kind'];
@@ -403,7 +464,9 @@ function parseDestroyAction(raw: RawRecord): ParseOutcome<Action> {
     return accept({ kind: 'destroy', target: target.value });
 }
 
-function parsePushAction(raw: RawRecord): ParseOutcome<Action> {
+// Push, saved before 2026-11-23's simpler triggers, changed velocity whatever the mass, as adding to Body ›
+// Velocity does. Its fixed kick becomes that change; away from or towards `this` has none, so it is dropped.
+function parsePushAction(raw: RawRecord): ParseOutcome<Action | null> {
     if (!hasExactlyKeys(raw, ['kind', 'target', 'push'])) return refuse({ reason: 'wrongType' });
 
     const target = parseTarget(raw['target']);
@@ -411,11 +474,13 @@ function parsePushAction(raw: RawRecord): ParseOutcome<Action> {
 
     const push = parseNullable(raw['push'], parsePush);
     if (!push.ok) return push;
+    if (push.value === null) return accept(null);
 
-    return accept({ kind: 'push', target: target.value, push: push.value });
+    return accept({ kind: 'change', target: target.value, value: { kind: 'velocity' }, op: 'add', amount: push.value });
 }
 
-function parsePush(raw: unknown): ParseOutcome<Push> {
+// The fixed kick as a vector; null for away from or towards `this`.
+function parsePush(raw: unknown): ParseOutcome<{ readonly x: number; readonly y: number } | null> {
     if (!isPlainObject(raw)) return refuse({ reason: 'wrongType' });
 
     const kind = raw['kind'];
@@ -428,7 +493,7 @@ function parsePush(raw: unknown): ParseOutcome<Push> {
         const y = parseFiniteNumber(raw['y']);
         if (!y.ok) return y;
 
-        return accept({ kind, x: x.value, y: y.value });
+        return accept({ x: x.value, y: y.value });
     }
 
     if (kind === 'away' || kind === 'towards') {
@@ -437,7 +502,7 @@ function parsePush(raw: unknown): ParseOutcome<Push> {
         const strength = parseFiniteNumber(raw['strength']);
         if (!strength.ok) return strength;
 
-        return accept({ kind, strength: strength.value });
+        return accept(null);
     }
 
     return refuse({ reason: 'unknownChoice' });
@@ -456,13 +521,15 @@ function parseValueRef(raw: unknown): ParseOutcome<ValueRef> {
             return parseBareKind(raw, kind);
         case 'triggerOn':
             return parseTriggerOnRef(raw);
+        case 'velocity':
+            return parseBareKind(raw, kind);
         default:
             return refuse({ reason: 'unknownChoice' });
     }
 }
 
 // The level's variable as v3 saved it, or the target's own with `"own": true`.
-function parseVariableValueRef(raw: RawRecord): ParseOutcome<ValueRef> {
+function parseVariableValueRef(raw: RawRecord): ParseOutcome<ValueRef & CheckedValue & { readonly kind: 'variable' }> {
     const isOwn = Object.hasOwn(raw, 'own');
     const keys = isOwn ? ['kind', 'name', 'own'] : ['kind', 'name'];
     if (!hasExactlyKeys(raw, keys)) return refuse({ reason: 'wrongType' });
@@ -475,7 +542,7 @@ function parseVariableValueRef(raw: RawRecord): ParseOutcome<ValueRef> {
     return accept({ kind: 'variable', name, own: true });
 }
 
-// A field by its key, and a vector's axis when it has one: in Change value, and in the component value check.
+// A field by its key, and a vector's axis when it has one: in Change value, and in the value check.
 function parseFieldRef(raw: RawRecord): ParseOutcome<ValueRef & ReadableValue & { readonly kind: 'field' }> {
     const hasAxis = Object.hasOwn(raw, 'axis');
     const keys = hasAxis ? ['kind', 'component', 'field', 'axis'] : ['kind', 'component', 'field'];

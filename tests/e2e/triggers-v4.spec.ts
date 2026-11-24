@@ -254,7 +254,7 @@ test('a button fires open on a door, which waits 2 s and flips door_open, and it
     await addAction(page, opened, 'win');
     await expectSentences(opened, 'When', ['the variable door_open of this becomes true']);
 
-    // The button: the Trigger tool's sensor under the ball, firing open on the door when touched.
+    // The button: the Trigger tool's pass-through rectangle under the ball, firing open on the door when touched.
     await tool(page, 'Trigger').click();
     await page.mouse.move(middle.x - BUTTON_HALF_WIDTH_PX, middle.y + BUTTON_TOP_BELOW_PX);
     await page.mouse.down();
@@ -276,7 +276,7 @@ test('a button fires open on a door, which waits 2 s and flips door_open, and it
     expect(errors).toEqual([]);
 });
 
-test('a ball hits a wall, the wall is destroyed and adds 1 to score, and score becoming 3 or more wins', async ({
+test('a ball touches a solid wall, which adds 1 to score and is destroyed, and score becoming 3 or more wins', async ({
     page,
 }) => {
     const errors: string[] = [];
@@ -300,17 +300,16 @@ test('a ball hits a wall, the wall is destroyed and adds 1 to score, and score b
 
     await placeBall(page, middle);
 
-    // The wall: a surface on the ground under the ball, destroyed when hit, adding 1 to score as it goes.
+    // The wall: a surface on the ground under the ball, adding 1 to score and destroyed when touched.
     await placeShape(page, 'Rectangle', { x: middle.x, y: middle.y + WALL_BELOW_PX });
     await addComponent(page, 'SurfaceComponent');
-    const hit = await addTrigger(page, 'this hits something');
-    await addAction(page, hit, 'destroy');
-    await expectSentences(hit, 'Do', ['destroy this']);
-    const destroyed = await addTrigger(page, 'this is destroyed');
-    await addAction(page, destroyed, 'change a value');
-    await pick(page, triggerWord(destroyed, 'Do', 'pick a value'), 'score');
-    await typeWord(page, destroyed, 'Do', 'a value', '1');
-    await expectSentences(destroyed, 'Do', ['add 1 to score']);
+    const touched = await addTrigger(page, 'something starts or stops touching this');
+    await addAction(page, touched, 'change a value');
+    await pick(page, triggerWord(touched, 'Do', 'pick a value'), 'score');
+    await typeWord(page, touched, 'Do', 'a value', '1');
+    await addAction(page, touched, 'destroy');
+    await expectSentences(touched, 'When', ['something starts touching this']);
+    await expectSentences(touched, 'Do', ['add 1 to score', 'destroy this']);
 
     await play(page);
     await wonAfterSeconds(page);

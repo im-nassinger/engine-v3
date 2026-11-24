@@ -12,11 +12,11 @@ function addStepMark(mark: string) {
 }
 
 describe('FormatUpgrader', () => {
-    test('has no steps in v1, so its latest version is the one the writer writes', () => {
-        const upgrader = FormatUpgrader.createV1();
+    test('its latest version is the one the writer writes', () => {
+        const upgrader = FormatUpgrader.createCurrent();
 
         expect(upgrader.latestVersion).toBe(CURRENT_FORMAT_VERSION);
-        expect(upgrader.upgrade({ kept: true }, 1)).toEqual({ kept: true });
+        expect(upgrader.upgrade({ kept: true }, CURRENT_FORMAT_VERSION)).toEqual({ kept: true });
     });
 
     test('runs every step from the file version up to the latest, in order', () => {

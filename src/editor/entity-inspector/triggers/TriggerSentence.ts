@@ -4,8 +4,8 @@ import type { TriggerProblem } from '../../../core/triggers/index.ts';
 
 import { NO_OTHER_REASON, shownValue, TriggerChoices } from './TriggerChoices.ts';
 import { readableAxis } from './valueNames.ts';
+import type { CheckedType } from './TriggerChoices.ts';
 import type {
-    TriggerPartValue,
     TriggerRowPart,
     TriggerWord,
     TriggerWordEntry,
@@ -15,17 +15,14 @@ import type {
 
 type ChangeAction = Action & { readonly kind: 'change' };
 type TriggerMenuChoices = (TriggerWordEntry & { readonly kind: 'menu' })['choices'];
-type PushAction = Action & { readonly kind: 'push' };
 type FireAction = Action & { readonly kind: 'fire' };
-type CompareCheck = Check & { readonly kind: 'compare' };
-type CompareValueCheck = Check & { readonly kind: 'compareValue' };
 type VariableChangedWhen = When & { readonly kind: 'variableChanged' };
 
 // What every row of one trigger is built from.
 export type SentenceSources = {
     readonly choices: TriggerChoices;
     readonly problems: readonly TriggerProblem[];
-    // False under an event with no `other`: a key, a timer, level start, a tag running out.
+    // False under an event with no `other`: a key, a timer, level start, a variable changing.
     readonly eventHasOther: boolean;
 };
 
@@ -48,7 +45,7 @@ type WordState = { state: TriggerWordState; reason: string | undefined };
 const MISSING_REASON = 'It was deleted: this part is skipped in play';
 
 // One row of the trigger card: a sentence of plain words and slots, each slot with its state and what it
-// opens. "something starts touching this", "other is tagged player", "add 1 to coins".
+// opens. "something starts touching this", "other has the tag player", "add 1 to coins".
 export class TriggerSentence {
     readonly words: readonly TriggerWord[];
 
@@ -173,13 +170,27 @@ function numberEntry(value: number | null, unit: Unit | undefined): TriggerWordE
     return { kind: 'number', value, unit, clearLabel: undefined };
 }
 
+// "something starts touching this", "the key Space is pressed", "every 2 seconds", "the level starts". The
+// event word is the in-place word where the event has one (starts, key, every), so it opens both.
 function addWhenWords(builder: SentenceBuilder, when: When | null, choices: TriggerChoices) {
-    const eventMenu: TriggerWordEntry = { kind: 'menu', choices: choices.events() };
+    const eventMenu = choices.eventEntry(when);
     const eventText = when === null ? null : TriggerChoices.eventWord(when.kind);
+    const isTouch = when?.kind === 'touched' || when?.kind === 'untouched';
+    const isPress = when?.kind === 'key' || when?.kind === 'input';
+    if (isTouch) {
+        builder.text('something');
+    }
+    if (isPress) {
+        builder.text('the');
+    }
     builder.slot({ slot: 'event', text: eventText, need: 'pick an event', entry: eventMenu });
     if (when === null) return;
 
     switch (when.kind) {
+        case 'touched':
+        case 'untouched':
+            builder.text('touching this');
+            return;
         case 'input': {
             const inputs = choices.inputs((input) => ({ section: 'when', when: { ...when, input } }));
             builder.slot({ slot: 'input', text: when.input, need: 'pick an input', entry: menuOf(inputs) });
@@ -198,12 +209,6 @@ function addWhenWords(builder: SentenceBuilder, when: When | null, choices: Trig
             const secondsText = when.seconds === null ? null : `${when.seconds} seconds`;
             const entry = numberEntry(when.seconds, 's');
             builder.slot({ slot: 'seconds', text: secondsText, need: 'how many seconds', entry });
-            return;
-        }
-        case 'tagLeft': {
-            const tags = choices.tags((tag) => ({ section: 'when', when: { ...when, tag } }));
-            builder.slot({ slot: 'tag', text: when.tag, need: 'pick a tag', entry: menuOf(tags) });
-            builder.text('is left');
             return;
         }
         case 'custom': {
@@ -253,101 +258,73 @@ function addPressWords(builder: SentenceBuilder, when: PressWhen, choices: Trigg
     builder.slot({ slot: 'press', text: when.how, need: 'pressed', entry: menuOf(presses) });
 }
 
+// The value check: "coins is 10 or more" (a level's variable names no entity: it is the World's), "other
+// has the tag player", "this health is less than 1", "this Body › Speed is more than 200", "other
+// Transform › Position y is at most 500". Until the value is picked, only the entity and the value show.
 function addCheckWords(builder: SentenceBuilder, check: Check, index: number, sources: SentenceSources) {
     const { choices } = sources;
+    const { value } = check;
+    const type = choices.checkType(check);
 
-    if (check.kind === 'hasTag') {
-        const targets = choices.targets(check.target, sources.eventHasOther, false, (target) => ({
+    const isLevelVariable = value?.kind === 'variable' && value.own !== true;
+    if (!isLevelVariable) {
+        const targets = choices.targets(check.target, sources.eventHasOther, true, (target) => ({
             section: 'check',
             index,
             check: { ...check, target },
         }));
         builder.slot(targetWord(check.target, targets, choices));
-        builder.text('has the tag');
-        const tags = choices.tags((tag) => ({ section: 'check', index, check: { ...check, tag } }));
-        builder.slot({ slot: 'tag', text: check.tag, need: 'pick a tag', entry: menuOf(tags) });
+    }
+
+    const values = choices.checkValues(check, index);
+    const valueText = value === null ? null : choices.checkValueWord(value);
+    const valueWord: SlotWord = { slot: 'value', text: valueText, need: 'pick a value', entry: values };
+    if (value === null) {
+        builder.slot(valueWord);
         return;
     }
 
-    if (check.kind === 'compareValue') {
-        addCompareValueWords(builder, check, index, sources);
-        return;
+    const compares = choices.checkCompares(check, index);
+    const compareText = TriggerChoices.checkCompareWord(check.compare, type);
+    const compareWord: SlotWord = { slot: 'compare', text: compareText, need: 'compare', entry: menuOf(compares) };
+
+    if (type === 'tag') {
+        builder.slot(compareWord);
+        builder.slot(valueWord);
+    } else {
+        builder.slot(valueWord);
+        addCheckAxisWord(builder, check, index, choices);
+        builder.slot(compareWord);
     }
 
-    addCompareWords(builder, check, index, sources);
+    const amountText = check.amount === null ? null : checkedAmountText(check.amount, type);
+    const amountEntry = choices.checkAmountEntry(check, index);
+    builder.slot({ slot: 'amount', text: amountText, need: amountNeed(type), entry: amountEntry });
 }
 
-// "coins is at least 10", "door_open of other is true", "player_name is "Ada"". The compare words and the
-// value's field follow the variable's type; picking one of another type resets the value and the compare.
-function addCompareWords(builder: SentenceBuilder, check: CompareCheck, index: number, sources: SentenceSources) {
-    const { choices } = sources;
-    const type = choices.variableType(check.variable);
+// x or y, for a vector or a body's velocity.
+function addCheckAxisWord(builder: SentenceBuilder, check: Check, index: number, choices: TriggerChoices) {
+    const { value } = check;
+    if (value === null || value.kind === 'variable' || value.kind === 'tag') return;
 
-    const owners: Target[] = [{ kind: 'this' }];
-    if (sources.eventHasOther) {
-        owners.push({ kind: 'other' });
-    }
-    const variables = choices.variableGroups(owners, (variable, pickedType) => {
-        let picked: Check = { ...check, variable };
-        if (pickedType !== (type ?? 'number')) {
-            picked = { ...picked, compare: 'is', value: null };
-        }
+    const axis = readableAxis(value);
+    if (axis === undefined) return;
 
-        return { section: 'check', index, check: picked };
-    });
-    const variableText = check.variable === null ? null : choices.variableWord(check.variable);
-    builder.slot({ slot: 'variable', text: variableText, need: 'pick a variable', entry: variables });
-
-    const compares = choices.compares((compare) => ({ section: 'check', index, check: { ...check, compare } }), type);
-    const compareText = TriggerChoices.compareWord(check.compare);
-    builder.slot({ slot: 'compare', text: compareText, need: 'compare', entry: menuOf(compares) });
-
-    const valueText = check.value === null ? null : comparedText(check.value);
-    const valueEntry = choices.variableValueEntry(type, check.value, (value) => ({
-        section: 'check',
-        index,
-        check: { ...check, value },
-    }));
-    builder.slot({ slot: 'number', text: valueText, need: valueNeed(type), entry: valueEntry });
+    const axes = choices.axes(value, (picked) => ({ section: 'check', index, check: { ...check, value: picked } }));
+    builder.slot({ slot: 'axis', text: axis, need: 'x or y', entry: menuOf(axes) });
 }
 
-// "this Body › Speed is more than 200", "other Transform › Position y is at most 500".
-function addCompareValueWords(
-    builder: SentenceBuilder,
-    check: CompareValueCheck,
-    index: number,
-    sources: SentenceSources,
-) {
-    const { choices } = sources;
+// A tag as it is; a string variable's value in quotes.
+function checkedAmountText(amount: VariableValue, type: CheckedType | undefined) {
+    if (type === 'tag' && typeof amount === 'string') return amount;
 
-    const targets = choices.targets(check.target, sources.eventHasOther, true, (target) => ({
-        section: 'check',
-        index,
-        check: { ...check, target },
-    }));
-    builder.slot(targetWord(check.target, targets, choices));
+    return comparedText(amount);
+}
 
-    const placeValue = (value: CompareValueCheck['value']) => {
-        const picked: TriggerPartValue = { section: 'check', index, check: { ...check, value } };
-        return picked;
-    };
-    const values = choices.readables(check.target, check.value, placeValue);
-    const valueText = check.value === null ? null : choices.readableWord(check.value);
-    builder.slot({ slot: 'value', text: valueText, need: 'pick a value', entry: values });
+function amountNeed(type: CheckedType | undefined) {
+    if (type === 'tag') return 'pick a tag';
 
-    const axis = check.value === null ? undefined : readableAxis(check.value);
-    if (check.value !== null && axis !== undefined) {
-        const axes = choices.axes(check.value, placeValue);
-        builder.slot({ slot: 'axis', text: axis, need: 'x or y', entry: menuOf(axes) });
-    }
-
-    const compares = choices.compares((compare) => ({ section: 'check', index, check: { ...check, compare } }));
-    const compareText = TriggerChoices.compareWord(check.compare);
-    builder.slot({ slot: 'compare', text: compareText, need: 'compare', entry: menuOf(compares) });
-
-    const amountText = check.amount === null ? null : String(check.amount);
-    const amountEntry = numberEntry(check.amount, undefined);
-    builder.slot({ slot: 'number', text: amountText, need: 'a number', entry: amountEntry });
+    return valueNeed(type);
 }
 
 // A number as it is; a string in quotes.
@@ -376,7 +353,7 @@ function addActionWords(builder: SentenceBuilder, action: Action, index: number,
     const kindText = TriggerChoices.actionWord(action.kind);
     builder.slot({ slot: 'action', text: kindText, need: 'pick an action', entry: menuOf(kinds) });
 
-    if (action.kind === 'destroy' || action.kind === 'push') {
+    if (action.kind === 'destroy') {
         const targets = choices.targets(action.target, sources.eventHasOther, true, (target) => ({
             section: 'action',
             index,
@@ -385,9 +362,6 @@ function addActionWords(builder: SentenceBuilder, action: Action, index: number,
         builder.slot(targetWord(action.target, targets, choices));
     }
 
-    if (action.kind === 'push') {
-        addPushWords(builder, action, index, choices);
-    }
     if (action.kind === 'fire') {
         addFireWords(builder, action, index, sources);
     }
@@ -472,24 +446,6 @@ function joiningWord(action: ChangeAction) {
     if (action.op === 'subtract') return 'from';
 
     return 'to';
-}
-
-// "by 0, -600 px/s", "away from this at 400 px/s".
-function addPushWords(builder: SentenceBuilder, action: PushAction, index: number, choices: TriggerChoices) {
-    const pushes = choices.pushes((push) => ({ section: 'action', index, action: { ...action, push } }));
-    const { push } = action;
-    const pushText = push === null ? null : TriggerChoices.pushWord(push.kind);
-    builder.slot({ slot: 'push', text: pushText, need: 'how', entry: menuOf(pushes) });
-    if (push === null) return;
-
-    if (push.kind === 'by') {
-        const kick: TriggerWordEntry = { kind: 'vector', value: { x: push.x, y: push.y }, unit: 'px/s' };
-        builder.slot({ slot: 'pushBy', text: `${push.x}, ${push.y}`, need: 'x, y', entry: kick });
-    } else {
-        const strengthEntry = numberEntry(push.strength, 'px/s');
-        builder.slot({ slot: 'strength', text: String(push.strength), need: 'how strong', entry: strengthEntry });
-    }
-    builder.text('px/s');
 }
 
 function addRepeatWords(builder: SentenceBuilder, repeat: Repeat, choices: TriggerChoices) {

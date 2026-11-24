@@ -1,6 +1,6 @@
 import type { EntityId } from '../../fields/index.ts';
 import type { Entity, Level } from '../../level/index.ts';
-import type { SensorEvent } from '../../physics/index.ts';
+import type { ContactEvent, SensorEvent } from '../../physics/index.ts';
 
 import { isPartOf } from './isPartOf.ts';
 import { OwnerCounts } from './OwnerCounts.ts';
@@ -17,17 +17,20 @@ export type TouchChanges = {
 
 const NO_CHANGES: TouchChanges = { touched: [], untouched: [] };
 
-// How many surfaces of each touching entity overlap each trigger owner, from the physics step's sensor
-// events, so an entity built from several shapes touches once and sliding from one shape to the next fires
-// nothing. The owners of a sensor are its own entity and every group above it, when they hear touches; the
-// touching entity is the visitor's body entity. Two sensors never touch, and neither do an owner and a part
-// of itself. Counts are compared before and after all of a step's events (OwnerCounts).
+// How many shapes of each touching entity touch each trigger owner, from both kinds of report a physics
+// step gives: a sensor overlapping a solid shape (a pass-through entity) and two solid shapes touching. Both
+// are touching, so an entity built from several shapes touches once, and sliding from one shape to the next
+// fires nothing. Each report counts both ways: the owners of a shape are its own entity and every group
+// above it, when they hear touches, and the entity touching them is the other shape's body entity, or that
+// shape's own entity when it is on the ground, since naming the World would say nothing (standing yes,
+// 2026-11-22). Two sensors never touch, and neither do an owner and a part of itself. Counts are compared
+// before and after all of a step's reports (OwnerCounts).
 export class TouchLedger {
     private readonly level: Level;
     private readonly index: TriggerIndex;
     private readonly counts = new OwnerCounts();
-    // Each sensor's owners, read at its first event: its ends may come after it is removed.
-    private readonly ownersBySensor = new Map<EntityId, readonly Entity[]>();
+    // Each shape's owners, read at its first report: its ends may come after it is removed.
+    private readonly ownersByShape = new Map<EntityId, readonly Entity[]>();
     private lastChanges = NO_CHANGES;
 
     constructor(level: Level, index: TriggerIndex) {
@@ -41,13 +44,21 @@ export class TouchLedger {
         return this.lastChanges;
     }
 
-    readStep(events: readonly SensorEvent[]) {
-        for (const event of events) {
+    readStep(sensorEvents: readonly SensorEvent[], contactEvents: readonly ContactEvent[]) {
+        for (const event of sensorEvents) {
             if (event.visitorIsSensor) continue;
 
-            for (const owner of this.ownersOf(event.sensor)) {
-                this.count(owner, event);
-            }
+            const visitorToucher = this.toucherOf(event.visitor, event.visitorBody);
+            const sensorToucher = this.toucherOf(event.sensor, event.sensorBody);
+            this.countSide(event.kind, event.sensor, visitorToucher);
+            this.countSide(event.kind, event.visitor, sensorToucher);
+        }
+
+        for (const event of contactEvents) {
+            const toucherOfA = this.toucherOf(event.surfaceB, event.bodyB);
+            const toucherOfB = this.toucherOf(event.surfaceA, event.bodyA);
+            this.countSide(event.kind, event.surfaceA, toucherOfA);
+            this.countSide(event.kind, event.surfaceB, toucherOfB);
         }
 
         const changes = this.counts.takeChanges((owner) => this.index.touchPlaceOf(owner));
@@ -58,22 +69,30 @@ export class TouchLedger {
         this.counts.forget(removed);
     }
 
-    private count(owner: Entity, event: SensorEvent) {
-        if (event.kind === 'end') {
-            this.counts.remove(owner, event.visitorBody);
-            return;
-        }
-        if (isPartOf(this.level, owner, event.visitorBody)) return;
+    private countSide(kind: 'begin' | 'end', shape: EntityId, toucher: EntityId) {
+        for (const owner of this.ownersOf(shape)) {
+            if (kind === 'end') {
+                this.counts.remove(owner, toucher);
+                continue;
+            }
+            if (isPartOf(this.level, owner, toucher)) continue;
 
-        this.counts.add(owner, event.visitorBody);
+            this.counts.add(owner, toucher);
+        }
     }
 
-    private ownersOf(sensor: EntityId) {
-        const known = this.ownersBySensor.get(sensor);
+    private toucherOf(shape: EntityId, body: EntityId) {
+        const onGround = body === this.level.world.id;
+
+        return onGround ? shape : body;
+    }
+
+    private ownersOf(shape: EntityId) {
+        const known = this.ownersByShape.get(shape);
         if (known !== undefined) return known;
 
         const owners: Entity[] = [];
-        let entity = this.level.findEntity(sensor);
+        let entity = this.level.findEntity(shape);
 
         for (; entity !== undefined; entity = entity.parent) {
             if (this.index.hearsTouch(entity)) {
@@ -81,7 +100,7 @@ export class TouchLedger {
             }
         }
 
-        this.ownersBySensor.set(sensor, owners);
+        this.ownersByShape.set(shape, owners);
 
         return owners;
     }

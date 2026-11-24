@@ -73,7 +73,7 @@ export class TriggerEdits {
         return { ...picked, triggers };
     }
 
-    // A value typed into a word: seconds, a compared value, an amount, a kick, a Repeat's time, a custom
+    // A value typed into a word: seconds, a compared value, an amount, a Repeat's time, a custom
     // event's name, a condition's value; null clears Fire's optional number.
     static typed(component: TriggerComponent, triggerIndex: number, address: TriggerWordAddress, typed: JsonValue) {
         const trigger = triggerAt(component, triggerIndex);
@@ -264,12 +264,15 @@ function whenWithTyped(when: When | null, slot: TriggerWordSlot, typed: JsonValu
     return { ...when, becomes: { compare: when.becomes.compare, value: typed } };
 }
 
+// The value check's amount: a tag or a variable's value, or a number for the rest.
 function checkWithTyped(check: Check, slot: TriggerWordSlot, typed: JsonValue): Check | undefined {
-    if (slot !== 'number') return undefined;
-    if (check.kind === 'compare' && isVariableValue(typed)) return { ...check, value: typed };
-    if (check.kind === 'compareValue' && isNumber(typed)) return { ...check, amount: typed };
+    if (slot !== 'amount' || !isVariableValue(typed)) return undefined;
 
-    return undefined;
+    const readsNumber = check.value !== null && check.value.kind !== 'variable' && check.value.kind !== 'tag';
+    if (readsNumber && !isNumber(typed)) return undefined;
+    if (check.value?.kind === 'tag' && typeof typed !== 'string') return undefined;
+
+    return { ...check, amount: typed };
 }
 
 function actionWithTyped(action: Action, slot: TriggerWordSlot, typed: JsonValue): Action | undefined {
@@ -289,31 +292,7 @@ function actionWithTyped(action: Action, slot: TriggerWordSlot, typed: JsonValue
             const seconds = Math.min(Math.max(typed, 0), MAX_WAIT_SECONDS);
             return { ...action, seconds };
         }
-        case 'push':
-            return pushWithTyped(action, slot, typed);
         default:
             return undefined;
     }
-}
-
-type PushAction = Action & { readonly kind: 'push' };
-
-function pushWithTyped(action: PushAction, slot: TriggerWordSlot, typed: JsonValue): Action | undefined {
-    const { push } = action;
-    if (push === null) return undefined;
-
-    const isKick = push.kind === 'by' && slot === 'pushBy' && isPoint(typed);
-    if (isKick) return { ...action, push: { kind: 'by', x: typed.x, y: typed.y } };
-
-    const isStrength = push.kind !== 'by' && slot === 'strength' && isNumber(typed);
-    if (isStrength) return { ...action, push: { ...push, strength: typed } };
-
-    return undefined;
-}
-
-function isPoint(typed: JsonValue): typed is { readonly x: number; readonly y: number } {
-    if (typeof typed !== 'object' || typed === null) return false;
-    if (!('x' in typed) || !('y' in typed)) return false;
-
-    return isNumber(typed.x) && isNumber(typed.y);
 }

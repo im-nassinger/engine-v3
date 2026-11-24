@@ -1,6 +1,6 @@
 {
     "format": "engine-v3-level",
-    "formatVersion": 1,
+    "formatVersion": 2,
     "physicsVersion": 1,
     "name": "Castle",
     "editor": {
@@ -137,8 +137,7 @@
                     "SurfaceComponent": {
                         "density": 2.5,
                         "friction": 0.9,
-                        "restitution": 0.6,
-                        "sensor": true
+                        "restitution": 0.6
                     },
                     "TagsComponent": {
                         "tags": ["coin", "pickup"]

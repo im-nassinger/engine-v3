@@ -4,7 +4,7 @@ export { readableValues, sameReadableValue } from './model/readableValues.ts';
 export { isReservedEventName } from './model/reservedEventNames.ts';
 export { newTriggerId } from './model/newTriggerId.ts';
 export { triggerName } from './model/triggerName.ts';
-export { stopsTrigger, triggerCanRun, triggerProblems } from './model/triggerProblems.ts';
+export { eventHasOther, stopsTrigger, triggerCanRun, triggerProblems } from './model/triggerProblems.ts';
 export type {
     TriggerContext,
     TriggerPart,

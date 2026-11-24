@@ -28,7 +28,7 @@ function castle() {
 const castleJson = JSON.stringify(writer.write(castle()));
 
 function check(files: readonly FakeZipFile[] | undefined, limits: LevelLimits = V1_LEVEL_LIMITS) {
-    const reader = new LevelReader(createV1Registry(), limits, FormatUpgrader.createV1());
+    const reader = new LevelReader(createV1Registry(), limits, FormatUpgrader.createCurrent());
     const zip = new FakeZipReader(files);
 
     return { outcome: new ImportCheck({ zip, reader, writer, limits }).check(BYTES), zip };

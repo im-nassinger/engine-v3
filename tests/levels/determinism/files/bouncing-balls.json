@@ -1,6 +1,6 @@
 {
     "format": "engine-v3-level",
-    "formatVersion": 1,
+    "formatVersion": 2,
     "physicsVersion": 1,
     "name": "bouncing-balls",
     "editor": {
@@ -159,8 +159,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.1,
-                        "restitution": 0.5,
-                        "sensor": false
+                        "restitution": 0.5
                     }
                 },
                 "children": []
@@ -203,8 +202,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.1,
-                        "restitution": 0.6,
-                        "sensor": false
+                        "restitution": 0.6
                     }
                 },
                 "children": []
@@ -247,8 +245,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.1,
-                        "restitution": 0.7,
-                        "sensor": false
+                        "restitution": 0.7
                     }
                 },
                 "children": []
@@ -291,8 +288,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.1,
-                        "restitution": 0.8,
-                        "sensor": false
+                        "restitution": 0.8
                     }
                 },
                 "children": []
@@ -335,8 +331,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.1,
-                        "restitution": 0.9,
-                        "sensor": false
+                        "restitution": 0.9
                     }
                 },
                 "children": []
@@ -379,8 +374,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.1,
-                        "restitution": 1,
-                        "sensor": false
+                        "restitution": 1
                     }
                 },
                 "children": []

@@ -2,11 +2,10 @@ import { createV1Registry } from '../../components/index.ts';
 import { DerivedCaches } from '../../derived/index.ts';
 import { FormatUpgrader, LevelReader, V1_LEVEL_LIMITS } from '../../level-data/index.ts';
 import type { LevelData, ReadOutcome } from '../../level-data/index.ts';
-import type { EntityId } from '../../fields/index.ts';
 import type { Level } from '../../level/index.ts';
-import { BodyPoses, PhysicsSceneBuilder } from '../../physics/index.ts';
+import { BodyPoses, NO_TOUCH_SURFACES, PhysicsSceneBuilder } from '../../physics/index.ts';
 import type { ComponentRegistry } from '../../components/index.ts';
-import type { PhysicsEngine, PhysicsScene } from '../../physics/index.ts';
+import type { PhysicsEngine, PhysicsScene, TouchSurfaces } from '../../physics/index.ts';
 
 import { BodyMatrices } from '../bodies/BodyMatrices.ts';
 import { PlayJoints } from '../joints/PlayJoints.ts';
@@ -23,20 +22,20 @@ export type PlayCopy = {
     readonly joints: PlayJoints;
 };
 
-// The surfaces of the read level whose shapes send contact events.
-export type ContactEventSurfacesOf = (level: Level) => ReadonlySet<EntityId>;
+// What the read level's touch triggers need from physics.
+export type TouchSurfacesOf = (level: Level) => TouchSurfaces;
 
-const NO_CONTACT_EVENTS: ContactEventSurfacesOf = () => new Set();
+const NO_TOUCHES: TouchSurfacesOf = () => NO_TOUCH_SURFACES;
 
 // Reads the level data and builds its physics scene. The worker's play copy and the page's PlayMirror both
 // come from here, so the mirror's matrices are the play copy's. The engine must be loaded already.
 export function startPlayCopy(
     levelData: LevelData,
     engine: PhysicsEngine,
-    contactEventSurfacesOf = NO_CONTACT_EVENTS,
+    touchSurfacesOf = NO_TOUCHES,
 ): ReadOutcome<PlayCopy> {
     const registry = createV1Registry();
-    const reader = new LevelReader(registry, V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+    const reader = new LevelReader(registry, V1_LEVEL_LIMITS, FormatUpgrader.createCurrent());
     const read = reader.read(levelData);
     if (!read.ok) return read;
 
@@ -44,8 +43,8 @@ export function startPlayCopy(
     const poses = new BodyPoses();
     const bodyMatrices = new BodyMatrices(poses);
     const caches = new DerivedCaches(level, bodyMatrices);
-    const contactEventSurfaces = contactEventSurfacesOf(level);
-    const scene = PhysicsSceneBuilder.build(level, caches, engine, contactEventSurfaces);
+    const touchSurfaces = touchSurfacesOf(level);
+    const scene = PhysicsSceneBuilder.build(level, caches, engine, touchSurfaces);
 
     // From here on each body entity's matrix is its pose times its rest.
     for (const body of scene.bodies) {

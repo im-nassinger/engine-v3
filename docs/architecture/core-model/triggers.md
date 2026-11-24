@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**What v3 and v4 added to the core model**, moved here from [v3's architecture](../../versions/v3/architecture.md) when v3 closed (2026-11-22) and from [v4's](../../versions/v4/architecture.md) when v4 closed (2026-11-23). Four components (TagsComponent, VariablesComponent, InputComponent, TriggerComponent), registered at the end of the registry; their field types (`TagsFieldType`, `VariableFieldType`, `InputFieldType`, `TriggerFieldType`); `KeyCodes`, the keys a level may use; and **the trigger model in core** (`Trigger`, `triggerProblems`, `changeableValues`, `triggerName`), which both the Entity inspector and the game read, so "yellow in the editor" and "doesn't run in play" can't disagree. v4 gives variables a type (number, string or boolean) and puts them on any entity, and grows the trigger model by four Whens, the component value check, Fire custom event, Wait and Flip. Each plugs into a seam v1 left ([components-and-fields.md](components-and-fields.md#seams-for-later-versions)). **Saved levels never change:** a level without the new components reads as before. How triggers run is in [triggers-in-play.md](../triggers-in-play.md); the trigger card in [inspector-and-entities.md](../editor/inspector-and-entities.md#v3-the-trigger-card-tags-variables-and-inputs).
+**What v3 and v4 added to the core model**, moved here from [v3's architecture](../../versions/v3/architecture.md) when v3 closed (2026-11-22) and from [v4's](../../versions/v4/architecture.md) when v4 closed (2026-11-23). Four components (TagsComponent, VariablesComponent, InputComponent, TriggerComponent), registered at the end of the registry; their field types (`TagsFieldType`, `VariableFieldType`, `InputFieldType`, `TriggerFieldType`); `KeyCodes`, the keys a level may use; and **the trigger model in core** (`Trigger`, `triggerProblems`, `changeableValues`, `triggerName`), which both the Entity inspector and the game read, so "yellow in the editor" and "doesn't run in play" can't disagree. v4 gives variables a type (number, string or boolean) and puts them on any entity, and grows the trigger model by new Whens, component values in the check, Fire custom event, Wait and Flip. **Fix 3** (2026-11-23) drops three Whens, merges the checks into one value check, replaces Push by Body › Velocity in Change value, and removes the SurfaceComponent's Sensor setting with a level format upgrade. Each plugs into a seam v1 left ([components-and-fields.md](components-and-fields.md#seams-for-later-versions)). **Old levels still open:** a level without the new components reads as before, and fix 3 converts what it removed as it reads (below). How triggers run is in [triggers-in-play.md](../triggers-in-play.md); the trigger card in [inspector-and-entities.md](../editor/inspector-and-entities.md#v3-the-trigger-card-tags-variables-and-inputs).
 
 ## The components
 
@@ -54,9 +54,6 @@ export type When =
     | { kind: 'key'; key: KeyCode | null; how: Press }
     | { kind: 'after'; seconds: number | null } | { kind: 'every'; seconds: number | null }
     | { kind: 'levelStart' }
-    | { kind: 'tagLeft'; tag: string | null }
-    | { kind: 'collision' }                                               // v4
-    | { kind: 'destroyed' }                                               // v4
     | { kind: 'custom'; name: string | null }                             // v4
     | { kind: 'variableChanged'; variable: VariableRef | null; becomes: Condition | null };   // v4; null: any change
 export type Press = 'pressed' | 'released' | 'held';
@@ -66,10 +63,12 @@ export type Target =
     | { kind: 'entity'; entity: EntityId | null }
     | { kind: 'tagged'; tag: string | null };
 
-export type Check =
-    | { kind: 'hasTag'; target: Target; tag: string | null }
-    | { kind: 'compare'; variable: VariableRef | null; compare: Compare; value: VariableValue | null }
-    | { kind: 'compareValue'; target: Target; value: ReadableValue | null; compare: Compare; amount: number | null };   // v4
+// Fix 3: one check, a value of the target compared with an amount.
+export type Check = { kind: 'value'; target: Target; value: CheckedValue | null; compare: Compare; amount: VariableValue | null };
+export type CheckedValue =
+    | { kind: 'variable'; name: string; own?: true }       // without own, the level's, read on the World whatever the target
+    | { kind: 'tag' }                                      // is: has the tag (on it or a group above), isNot: doesn't
+    | ReadableValue;
 export type Compare = 'is' | 'isNot' | 'more' | 'less' | 'atLeast' | 'atMost';
 
 // v4: which variable, the level's (the World's) or one of an entity's own.
@@ -87,36 +86,43 @@ export type ReadableValue =                                               // v4
 export type Action =
     | { kind: 'change'; target: Target; value: ValueRef | null; op: 'set' | 'add' | 'subtract' | 'flip'; amount: JsonValue | null }   // flip: v4
     | { kind: 'destroy'; target: Target }
-    | { kind: 'push'; target: Target; push: Push | null }
     | { kind: 'win' } | { kind: 'lose' } | { kind: 'restart' }
     | { kind: 'fire'; target: Target; name: string | null; amount: number | null }   // v4
     | { kind: 'wait'; seconds: number | null };                                      // v4
-export type Push =
-    | { kind: 'by'; x: number; y: number }                 // px/s
-    | { kind: 'away' | 'towards'; strength: number };       // px/s
 
 export type ValueRef =
     | { kind: 'variable'; name: string; own?: true }       // without own, the level's, as v3 saved
     | { kind: 'field'; component: ComponentName; field: string; axis?: 'x' | 'y' }
     | { kind: 'tag' }                                      // op is add or subtract: add or remove the tag in amount
-    | { kind: 'triggerOn'; trigger: number };              // a trigger on the target, by its id
+    | { kind: 'triggerOn'; trigger: number }               // a trigger on the target, by its id
+    | { kind: 'velocity' };                                // fix 3: Body › Velocity of the body the target belongs to, px/s
 
 export type Repeat = { kind: 'everyTime' } | { kind: 'oncePerRun' } | { kind: 'atMostEvery'; seconds: number };
 ```
 
 - **Unset is `null`**, so a trigger half made is saved and read back half made: a trigger with unset parts doesn't run.
 - **`triggerProblems(trigger, level)`** lists what stops a trigger running: an unset part, a missing entity, an unknown variable, input or value. **The Entity inspector and the game both call it.** A missing entity shows `missing` and only that action is skipped in play; an unset part stops the whole trigger.
-- **`changeableValues(entity, registry)`** lists what Change value may offer for a target: every field whose schema marks it `changeableInPlay`, the TagsComponent's tag, each trigger's on/off, and the World's variables. It reads the schemas only, so a component added later is offered with no trigger code. A vector is offered whole for Set, Add and Subtract, with its field's unit (owner, 2026-11-23). **`normalizeTrigger` turns a change saved on one axis** (`"axis": "x"` with a number, as v3 and v4 made them) into the whole vector with 0 on the other axis, so such a trigger is read the new way; play still adds to one axis for a trigger that never went through it. The component value check keeps its axis, since it compares one number.
-- **`triggerName(trigger)`** gives "Touched", "jump pressed", "After 60 s", "No coin left". A trigger with a name of its own keeps it.
+- **`changeableValues(entity, registry)`** lists what Change value may offer for a target: every field whose schema marks it `changeableInPlay`, Body › Velocity after a BodyComponent's fields (fix 3), the TagsComponent's tag, each trigger's on/off, and the World's variables. It reads the schemas only, so a component added later is offered with no trigger code. A vector is offered whole for Set, Add and Subtract, with its field's unit (owner, 2026-11-23). **`normalizeTrigger` turns a change saved on one axis** (`"axis": "x"` with a number, as v3 and v4 made them) into the whole vector with 0 on the other axis, so such a trigger is read the new way; play still adds to one axis for a trigger that never went through it. A component value in the check keeps its axis, since it compares one number.
+- **`triggerName(trigger)`** gives "Touched", "jump pressed", "After 60 s". A trigger with a name of its own keeps it.
 - **Ids are never reused** (standing yes, 2026-11-22): the TriggerComponent stores `nextTriggerId` beside its list, and `newTriggerId(component)` gives the next one, above every id the list holds. The list refuses two triggers with one id (`ListFieldType`'s `itemId`, the problem `repeatedId`).
 
 ### What v4 added to the trigger
 
-- **A v3 trigger reads unchanged**: a check's `variable` as a string is the level's; a Change value's variable without `own` is the level's. `parseTrigger` accepts both forms. The trigger holds a `VariableRef` in memory, and `savedTrigger` writes the level's variable back as its name, so `normalizeTrigger` keeps the type and **a v3 level saves byte for byte the same**.
+- **A v3 trigger reads unchanged**: a "variable changes" When's `variable` as a string is the level's; a Change value's variable without `own` is the level's. `parseTrigger` accepts both forms. The When holds a `VariableRef` in memory, and `savedTrigger` writes the level's variable back as its name.
 - **Strings and booleans compare with `is` and `isNot` only.** `triggerProblems` lists a `more` on a string, or a value of the wrong type, as `wrongType`, in the slots `compare` (a compare the type lacks) or the value's; the card never offers them.
-- **`triggerProblems`** also lists an unset name, variable, value or seconds; a custom name that is a builtin event's name (`reservedName`, in the slot `name`: the names of every When kind, in snake_case, such as `touched`, `collision`, `level_start`); an unknown own variable when the target is `this` or a named entity (a `tagged` or `other` target can't be known before play, so it is skipped in play when missing). A Wait's seconds are 0 to 3,600.
+- **`triggerProblems`** also lists an unset name, variable, value or seconds; a custom name that is a builtin event's name (`reservedName`, in the slot `name`: the names of every When kind, in snake_case, such as `touched`, `level_start`); an unknown own variable when the target is `this` or a named entity (a `tagged` or `other` target can't be known before play, so it is skipped in play when missing). A Wait's seconds are 0 to 3,600.
 - **`changeableValues(entity)`** adds the entity's own variables, each with the ops its type allows: number Set, Add, Subtract; string Set; boolean Set, Flip. The level's variables are offered for every target, as before.
-- **`readableValues(entity, registry)`** lists what the component value check offers: every `number` field and each axis of every `vector` field the entity's components have, and, when the entity is a body, the three live values. It reads the schemas only, like `changeableValues`.
-- **`triggerName`**: "Hits something", "Gets open", "Destroyed", "coins changes", "coins becomes 10 or more".
-- **`mapTriggerEntities`** maps the targets of `fire`, `compareValue` and an own `VariableRef`, so copying keeps their links.
+- **`readableValues(entity, registry)`** lists the numbers the value check offers: every `number` field and each axis of every `vector` field the entity's components have, and, when the entity is a body, the three live values. It reads the schemas only, like `changeableValues`.
+- **`triggerName`**: "Gets open", "coins changes", "coins becomes 10 or more".
+- **`mapTriggerEntities`** maps the targets of every check and action, and an own variable's target in a check saved before fix 3, so copying keeps their links.
 - **A custom event's name** uses `wordName`, the tags' rule. **`CustomEventNames`** (`core/derived/custom-events/`) lists every name used in a When or a Fire in the level, for the card's suggestions.
+
+### What fix 3 changed (2026-11-23)
+
+The plan and the owner's words are in [fix-3-simpler-triggers.md](../../versions/v4/fix-3-simpler-triggers.md).
+
+- **The When kinds stay as v3 saved them**, two per event where the card shows one event with an in-place word (`touched`/`untouched`, `key`/`input`, `after`/`every`), so a saved When keeps its shape (standing yes, 2026-11-23). *Why: the six events are what the user sees; keeping the kinds means no level's When needs converting, and the engine already handles each.*
+- **`parseTrigger` converts what is gone as it reads:** `collision` becomes `touched`; `tagLeft` and `destroyed` become an unset When (the card shows "pick an event"), keeping the If and Do; `hasTag`, `compare` and `compareValue` become the value check (a level's variable with target `this`, an own one with its owner as the target); Push's fixed kick becomes "add the kick to Body › Velocity", and Push away, towards or unset is dropped with the other actions kept. Their shapes are still checked, so damaged data is refused as before.
+- **`triggerProblems` for the value check:** the value unset; a variable unknown on a known holder; a compare or amount its type lacks (`wrongType`, in `compare` or `amount`); a tag compared other than is or isNot, or with a non-word; a number the known target lacks (`unknownValue`). A level's variable has no target problem, since it is read on the World. `eventHasOther` is exported for the card.
+- **The SurfaceComponent lost `sensor`.** Format version 2's upgrade step, `removeSensorSetting` (`level-data/versions/`), removes a SurfaceComponent with `"sensor": true` and drops `"sensor": false` from the rest, walking the tree with a list, not by going down, so the 50,000-deep file still reaches the reader's depth limit. `FormatUpgrader.createCurrent()` holds it; the clipboard runs it on entities copied by a version 1 game (`entityWithoutSensor`). See [persistence.md](../persistence.md).
+

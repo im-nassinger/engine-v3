@@ -36,4 +36,4 @@ export type LevelData = {
 export const LEVEL_FORMAT = 'engine-v3-level';
 
 // Goes up with every change to the shape of level.json, with an upgrade step for each.
-export const CURRENT_FORMAT_VERSION = 1;
+export const CURRENT_FORMAT_VERSION = 2;

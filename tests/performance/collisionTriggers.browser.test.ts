@@ -4,8 +4,8 @@ import { buildCollisionTriggers, HITS_VARIABLE } from '../levels/generator/build
 import { closePlayPages, measurePlay, openPlayPage } from './testing/playPage.ts';
 import type { PlayPage } from './testing/playPage.ts';
 
-// v4's speed test (versions/v4/architecture.md#tests): 1,000 collision triggers with 100 balls bouncing
-// between them for 10 s, in the real game worker, keeping v1's test play targets: 95% of frames within
+// v4's speed test (versions/v4/architecture.md#tests): 1,000 touch triggers on solid posts, which hear
+// Box2D's contact events, with 100 balls bouncing between them for 10 s, in the real game worker, keeping v1's test play targets: 95% of frames within
 // 16.7 ms and 600 ticks in 10 s.
 const POST_COUNT = 1_000;
 const BALL_COUNT = 100;
@@ -29,7 +29,7 @@ function hitsCounted(opened: PlayPage) {
     return typeof hits === 'number' ? hits : 0;
 }
 
-describe('test play with 1,000 collision triggers', () => {
+describe('test play with 1,000 touch triggers on solid posts', () => {
     test('100 balls hitting them for 10 s keep 95% of frames within 16.7 ms at 60 ticks a second', async () => {
         const { level } = buildCollisionTriggers(POST_COUNT, BALL_COUNT);
         const opened = await openPlayPage(level);
@@ -39,7 +39,7 @@ describe('test play with 1,000 collision triggers', () => {
         const hits = hitsCounted(opened);
 
         console.info(
-            `Test play with ${POST_COUNT} collision triggers and ${BALL_COUNT} balls: the first tick drawn ` +
+            `Test play with ${POST_COUNT} touch triggers on solid posts and ${BALL_COUNT} balls: the first tick drawn ` +
                 `${measured.firstTickMs.toFixed(0)} ms after Play; in ${measured.playedSeconds.toFixed(1)} s, ` +
                 `${measured.frameTimes.length} frames, 95% within ${measured.smoothMs.toFixed(1)} ms ` +
                 `(target ${FRAME_TIME_LIMIT_MS} ms), ${measured.ticks} ticks (target ${measured.expectedTicks}, ` +

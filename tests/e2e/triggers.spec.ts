@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
 // v3's journeys (testing.md, journeys 9 to 11): a trigger drawn with the Trigger tool that wins when a
-// tagged ball falls into it, then Restart and Leave; a key trigger pushing a body; the World's variables
+// tagged ball falls into it, then Restart and Leave; a key trigger adding to a body's velocity; the World's variables
 // and inputs edited, saved and read back after a reload.
 
 type ScreenPoint = { x: number; y: number };
@@ -19,8 +19,7 @@ const TRIGGER_HALF_WIDTH_PX = 120;
 const TRIGGER_TOP_BELOW_PX = 40;
 const TRIGGER_BOTTOM_BELOW_PX = 120;
 // The pushed box starts at the camera's middle, so it stays in view falling and rising. Its Linear damping
-// makes it fall slowly, about 80 px a second on screen, and the kick of 1,200 px/s up typed into the push
-// moves it about 300 px up, 200 px on screen, before damping stops it: still plain to see after Chromium's
+// makes it fall slowly, about 80 px a second on screen, and the 1,200 px/s up added to its velocity moves it about 300 px up, 200 px on screen, before damping stops it: still plain to see after Chromium's
 // column screenshots, which take about 0.5 s each.
 const LINEAR_DAMPING = '4';
 const KICK_Y = '-1200';
@@ -98,12 +97,17 @@ function triggerWord(page: Page, title: string, text: string) {
 
 async function pick(page: Page, opener: ReturnType<Page['locator']>, label: string) {
     await opener.click();
+    await menuItem(page, label).click();
+    await expect(page.locator('.menu')).toHaveCount(0);
+}
+
+// A menu's item by its label alone, not the line under it.
+function menuItem(page: Page, label: string) {
     const exactLabel = new RegExp(`^${label}$`);
-    const item = page.locator('.menu [role="menuitem"]').filter({
+
+    return page.locator('.menu [role="menuitem"]').filter({
         has: page.locator('.label:not(:has(span)), .label > span:first-child', { hasText: exactLabel }),
     });
-    await item.click();
-    await expect(page.locator('.menu')).toHaveCount(0);
 }
 
 async function addTriggerRow(page: Page, label: 'Add check' | 'Add action', kind: string) {
@@ -233,7 +237,8 @@ test('a trigger drawn with the Trigger tool wins when a tagged ball falls into i
     await placeBody(page, 'Circle', { x: middle.x, y: middle.y - BALL_ABOVE_PX });
     await addTag(page, 'player');
 
-    // The Trigger tool drags a rectangle under the ball: a sensor with a touch trigger, selected.
+    // The Trigger tool drags a rectangle under the ball: a touch trigger and no Surface, so the ball falls
+    // through it, selected.
     await tool(page, 'Trigger').click();
     await page.mouse.move(middle.x - TRIGGER_HALF_WIDTH_PX, middle.y + TRIGGER_TOP_BELOW_PX);
     await page.mouse.down();
@@ -242,10 +247,14 @@ test('a trigger drawn with the Trigger tool wins when a tagged ball falls into i
     await page.mouse.up();
     await expect(entityRow(page, 'Trigger 1')).toHaveAttribute('aria-selected', 'true');
     await expect(tool(page, 'Select')).toHaveAttribute('aria-pressed', 'true');
-    await expect(card(page, 'SurfaceComponent').getByRole('checkbox', { name: 'Sensor' })).toBeChecked();
+    await expect(card(page, 'SurfaceComponent')).toHaveCount(0);
     await expectSentences(page, 'When', ['something starts touching this']);
 
-    await addTriggerRow(page, 'Add check', 'an entity has a tag');
+    await addTriggerRow(page, 'Add check', 'a value');
+    await triggerWord(page, 'If', 'pick a value').click();
+    await menuItem(page, 'Tags').first().click();
+    await menuItem(page, 'Tags').last().click();
+    await expect(page.locator('.menu')).toHaveCount(0);
     await pick(page, triggerWord(page, 'If', 'pick a tag'), 'player');
     await expectSentences(page, 'If', ['other has the tag player']);
     await addTriggerRow(page, 'Add action', 'win');
@@ -272,7 +281,9 @@ test('a trigger drawn with the Trigger tool wins when a tagged ball falls into i
     expect(errors).toEqual([]);
 });
 
-test('a key trigger pushes its body up when the key is pressed during play', async ({ page }) => {
+test("a key trigger adds to its body's velocity, sending it up, when the key is pressed during play", async ({
+    page,
+}) => {
     await openEditor(page);
     const middle = await levelMiddle(page);
     await placeBody(page, 'Rectangle', middle);
@@ -283,16 +294,21 @@ test('a key trigger pushes its body up when the key is pressed during play', asy
 
     await addComponent(page, 'TriggerComponent');
     await card(page, 'TriggerComponent').getByRole('button', { name: 'Add trigger' }).click();
-    await pick(page, triggerWord(page, 'When', 'pick an event'), 'a key is pressed, released or held');
+    await pick(page, triggerWord(page, 'When', 'pick an event'), 'a key or input is pressed, released or held');
     await pick(page, triggerWord(page, 'When', 'pick a key'), 'Space');
     await expectSentences(page, 'When', ['the key Space is pressed']);
-    await addTriggerRow(page, 'Add action', 'push');
-    await pick(page, triggerWord(page, 'Do', 'how'), 'by a fixed kick');
-    await triggerWord(page, 'Do', '0, -600').click();
+    await addTriggerRow(page, 'Add action', 'change a value');
+    await triggerWord(page, 'Do', 'pick a value').click();
+    await menuItem(page, 'Body').click();
+    await menuItem(page, 'Velocity').click();
+    await expect(page.locator('.menu')).toHaveCount(0);
+    await triggerWord(page, 'Do', 'a value').click();
+    const kickX = page.getByRole('textbox', { name: 'X', exact: true });
+    await kickX.fill('0');
     const kickY = page.getByRole('textbox', { name: 'Y', exact: true });
     await kickY.fill(KICK_Y);
     await kickY.press('Enter');
-    await expectSentences(page, 'Do', [`push this by 0, ${KICK_Y} px/s`]);
+    await expectSentences(page, 'Do', [`add 0, ${KICK_Y} to this Body › Velocity`]);
     await expect(triggerBlock(page).locator('.card-note-box')).toHaveCount(0);
 
     await play(page);

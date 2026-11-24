@@ -141,10 +141,11 @@ describe('Wait', () => {
     test('a resumed run asks neither its checks nor its Repeat again', () => {
         const level = levelWith({ gate: 0, closed: 0 });
         const isOpen: Check = {
-            kind: 'compare',
-            variable: { owner: 'level', name: 'gate' },
+            kind: 'value',
+            target: { kind: 'this' },
+            value: { kind: 'variable', name: 'gate' },
             compare: 'is',
-            value: 0,
+            amount: 0,
         };
         giveTriggers(level.world, [
             {

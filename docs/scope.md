@@ -10,7 +10,7 @@ Every feature in one line, with the version it ships in and why. **v1 is the sma
 |---|---|
 | **v1** | Build and watch. The smallest thing that can be tested. |
 | **v2** | Draw curves: the Bézier pen, the Pencil, gradients. |
-| **v3** | A first game without code: sensors, tags, the first triggers, number variables on the World, inputs, Win and Lose. |
+| **v3** | A first game without code: touching, tags, the first triggers, number variables on the World, inputs, Win and Lose. |
 | **v4** | The rest of the triggers, string and boolean variables on any entity, the shortcut list. |
 | **v5** | Scripts, the code editor, the Console, the Assets panel. |
 | **v6** | Text, and entities inside the camera. |
@@ -45,7 +45,7 @@ These versions were decided during the requirements review, or by the owner afte
 | Variables are a number, a string, a boolean, an entity, an asset, a colour, a vector, an angle or tags | v3 to v5 | Variables come from v3. The owner wants text too (owner: 2026-11-13), named the first three types (owner: 2026-11-14), and added the rest when variables replaced the values scripts kept (owner: 2026-11-16) |
 | Variables on any entity, number limits, and a warning on the ScriptComponent's card that adds the variables a script needs | v4 and v5 | They replace the values scripts kept on the ScriptComponent, which were v2 (owner: 2026-11-16) |
 | Flip a boolean variable in a trigger | v4 | A light switch is then one trigger (owner: 2026-11-14) |
-| Sensors noticing touches, the random seed | v3 and v5 | Only triggers and scripts use them (owner: 2026-11-13) |
+| Noticing touches, the random seed | v3 and v5 | Only triggers and scripts use them (owner: 2026-11-13). Since 2026-11-23 a shape with no Surface and a touch trigger is noticed by what passes through it, with no Sensor setting (owner) |
 | Convert a trigger into a script, and switching a script off with a checkbox that triggers can change | Later | A way out when a trigger needs branches or loops; links that switched the trigger switch the script (owner: 2026-11-20) |
 | Weld, Rod, Slider and Wheel joints | Later | Merging shapes into one body already glues them, and Rod is Rope that can't go slack |
 | The EffectsComponent: pixelate, shadow, blur | Later | Each effect needs a shader pass per entity |
@@ -74,7 +74,7 @@ Rules: [requirements/editor](requirements/editor/README.md)
 | ED5 | Snapping to other entities, with pink guides showing what is aligned. Example: you drag a platform, and a pink guide appears when its top edge is level with the next platform's. | Later | The grid already aligns things. Guides are a comfort, not a need. |
 | ED6 | Resize and collapse the panels. Drag a panel's edge to make it wider, or click its title to fold it away. | Later | Panels in fixed places at one size are enough to test with. |
 | ED7 | Right-click a field to copy and paste its value, and copy a whole component onto other selected entities. Example: copy a crate's SurfaceComponent and paste it onto ten other crates at once. | Later | Saves time in big levels, but values can be typed by hand. |
-| ED8 | Warnings: a yellow note on the card it's about, with a fix button when there is one (no count since the redesign, owner: 2026-11-18). Example: a trigger that reacts to touching on an entity with no SurfaceComponent shows 'Needs a Surface to notice touching. [Add Surface as sensor]'. | v1 | Without it, a coin that does nothing gives no clue why. v1 needs only the warnings for missing partner components and failed saves. |
+| ED8 | Warnings: a yellow note on the card it's about, with a fix button when there is one (no count since the redesign, owner: 2026-11-18). Example: a SurfaceComponent with no ShapeComponent shows 'Needs a Shape to collide.'; a trigger with an unset part shows 'Doesn't run until every yellow part is set.'. | v1 | Without it, a coin that does nothing gives no clue why. v1 needs only the warnings for missing partner components and failed saves. |
 | ED9 | Tips: a blue note saying something works but there's an easier way. Example: an entity with more than 12 triggers gets a tip suggesting a script. | Later | Tips help people learn, but nothing breaks without them. |
 | ED10 | Warnings for setups likely to behave badly in physics and joints. Examples: a joint end that is off its entity, or a small, fast Dynamic body without Bullet that may pass through walls. | Later | Each warning is its own small rule to find and write. Add them as testing shows which problems people hit. |
 
@@ -141,12 +141,12 @@ Rules: [requirements/physics](requirements/physics/README.md)
 |---|---|---|---|
 | PH1 | Add a BodyComponent in one click: Static, Dynamic or Kinematic. | v1 | Physics is the heart of the game. |
 | PH2 | Body settings: Gravity scale, Linear damping, Angular damping, Fixed rotation, Bullet, and the read-only Mass. | v1 | They're Box2D's own settings, so they cost little, and the builtin player needs Fixed rotation and Gravity scale. |
-| PH3 | SurfaceComponent: Density, Friction, Restitution and Sensor. | v1 | Without it nothing collides, and coins need Sensor. |
+| PH3 | SurfaceComponent: Density, Friction, Restitution. A shape with no Surface lets things pass through. | v1 | Without it nothing collides. Its Sensor setting was removed on 2026-11-23 (owner): a coin is a shape with no Surface and a touch trigger. |
 | PH4 | Shapes inside a group with a body merge into that one body. Example: a car body made of three shapes moves as one piece. | v1 | It's how anything made of several parts is built. |
 | PH5 | One-way platforms you can jump up through, set on the SurfaceComponent. | Later | A platformer can be tested with solid platforms. |
-| PH6 | The collision grid: pick which tags hit which. Example: enemies pass through each other but still hit the player. | Later | In v1 every solid surface hits every other, and sensors cover coins and finish zones. |
+| PH6 | The collision grid: pick which tags hit which. Example: enemies pass through each other but still hit the player. | Later | In v1 every solid surface hits every other, and shapes with no Surface cover coins and finish zones. |
 | PH7 | The Collision check: right-click two entities, 'Why do these collide?'. | Later | Comes with the collision grid. |
-| PH8 | The physics view: draws every physics shape on top of the level. | v1 | A sensor with no StyleComponent is invisible, and this is the only way to see it. |
+| PH8 | The physics view: draws every physics shape on top of the level. | v1 | A shape with no StyleComponent is invisible, and this is the only way to see it. |
 | PH9 | Gravity as one vector, and the background colour, on the World. | v1 | Basic level settings. |
 | PH10 | Buttons for gravity: Earth, Moon, Arcade, None. | Later | Typing a number works. |
 | PH11 | Game speed on the World, so triggers and scripts can slow the whole level down. Example: slow motion for 2 seconds after the player hits a bomb. | Later | An effect, not something a test needs. |
@@ -200,12 +200,12 @@ Rules: [requirements/triggers](requirements/triggers/README.md)
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
 | TR1 | The TriggerComponent: When, If, Do, shown as a sentence with clickable parts. | v3 | Logic comes after v1. Was v1 in the scope review: No-code logic is a core idea of the game. |
-| TR2 | Events: touched, no longer touched, collision, key or input, timer, level start, custom event, destroyed, a variable changes. | v3 and v4 | Logic comes after v1. Was v1 in the scope review: Enough for coins, doors, buttons, timers and hazards. |
-| TR3 | The event 'no entity with this tag is left'. Example: on the World, when no coin is left, Win. Adding coins needs no other change. | v3 | Logic comes after v1. Was v1 in the scope review: 'Collect everything to win' is the simplest level goal. |
+| TR2 | Events: something starts or stops touching this, a key or input, after or every N seconds, level start, a variable changes, a custom event (six since 2026-11-23, owner). | v3 and v4 | Logic comes after v1. Was v1 in the scope review: Enough for coins, doors, buttons, timers and hazards. |
+| TR3 | The event 'no entity with this tag is left'. Removed on 2026-11-23 (owner): a variable counting coins does it, see [rejected.md](rejected.md). | Rejected | Logic comes after v1. Was v1 in the scope review: 'Collect everything to win' is the simplest level goal. |
 | TR4 | Mouse events: this is clicked, the mouse is over this. | Later | Keys are enough for a platformer test. Mouse events also need the rules for which entity gets the click. |
 | TR5 | The events 'while touching' and 'left the level'. | Later | Touched and no longer touched cover the same cases with a little more work. |
-| TR6 | If checks: other has a tag, a variable compared with a number, a component value compared with a number. | v3 and v4 | Logic comes after v1. Was v1 in the scope review: A coin that only the player can pick up needs the tag check. |
-| TR7 | Actions: Change value, Spawn, Destroy, Push, Fire custom event, Wait, Win, Lose, Restart. | v3, v4 and v7 | Logic comes after v1. Was v1 in the scope review: The full set except sound and camera shake. |
+| TR6 | If: one check, a value compared: other has a tag, a variable compared, a component value compared with a number (one check since 2026-11-23, owner). | v3 and v4 | Logic comes after v1. Was v1 in the scope review: A coin that only the player can pick up needs the tag check. |
+| TR7 | Actions: Change value (Body › Velocity included, which replaced Push on 2026-11-23, owner), Spawn, Destroy, Fire custom event, Wait, Win, Lose, Restart. | v3, v4 and v7 | Logic comes after v1. Was v1 in the scope review: The full set except sound and camera shake. |
 | TR8 | The Repeat setting: every time, once per run, or at most once every N seconds. Example: a spike that hurts at most once a second. | v3 | Logic comes after v1. Was v1 in the scope review: Small, and without it a trigger can fire every tick. |
 | TR9 | Arrows from the selected entity to what its triggers affect. | Later | Helps reading big levels. |
 | VA1 | Variables on the World, and from 2026-11-16 on any entity: a name and a starting value, which triggers and scripts read and change. Example: coins = 0. | v3 to v5 | Logic comes after v1. Was v1 in the scope review: A score needs one. |

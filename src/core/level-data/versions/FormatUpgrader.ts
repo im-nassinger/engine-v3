@@ -1,3 +1,5 @@
+import { removeSensorSetting } from './removeSensorSetting.ts';
+
 // Turns one format version's level.json into the next one's. Works on the raw JSON, before the reader
 // checks anything, so it must not trust what it is given.
 export type FormatUpgradeStep = (fileData: unknown) => unknown;
@@ -11,9 +13,9 @@ export class FormatUpgrader {
         this.steps = [...steps];
     }
 
-    // v1 has no steps.
-    static createV1() {
-        return new FormatUpgrader([]);
+    // Every step there is: 1 to 2 removed the SurfaceComponent's Sensor setting.
+    static createCurrent() {
+        return new FormatUpgrader([removeSensorSetting]);
     }
 
     get latestVersion() {

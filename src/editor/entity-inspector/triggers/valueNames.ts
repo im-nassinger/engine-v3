@@ -7,7 +7,8 @@ import { triggerName } from '../../../core/triggers/index.ts';
 // Between a component and one of its values in a word: "Transform › Position".
 export const VALUE_SEPARATOR = ' › ';
 
-// What Change value's value word reads: "coins", "Transform › Position", "tags", "Triggers › Touched". A
+// What Change value's value word reads: "coins", "Transform › Position", "tags", "Triggers › Touched",
+// "Body › Velocity". A
 // vector's axis, which only a trigger made before vectors were added whole has, reads after it.
 export function valueName(value: ValueRef, registry: ComponentRegistry, target: Entity | undefined) {
     switch (value.kind) {
@@ -17,6 +18,8 @@ export function valueName(value: ValueRef, registry: ComponentRegistry, target: 
             return 'tags';
         case 'triggerOn':
             return `${cardTitle('TriggerComponent')}${VALUE_SEPARATOR}${triggerLabel(value.trigger, target)}`;
+        case 'velocity':
+            return `${cardTitle('BodyComponent')}${VALUE_SEPARATOR}${LIVE_LABELS.velocityX}`;
         case 'field': {
             const name = componentValueName(value, registry);
             if (value.axis === undefined) return name;
@@ -33,7 +36,7 @@ export const LIVE_LABELS: Readonly<Record<LiveValue, string>> = {
     velocityY: 'Velocity',
 };
 
-// The axis of a vector a value reads, which the component value check shows as its own word; undefined
+// The axis of a vector a value reads, which the value check shows as its own word; undefined
 // for a number.
 export function readableAxis(value: ReadableValue) {
     if (value.kind === 'field') return value.axis;
@@ -43,7 +46,7 @@ export function readableAxis(value: ReadableValue) {
     return undefined;
 }
 
-// What the component value check's value word reads, its axis apart: "Transform › Position", "Body › Speed".
+// What the value check's number word reads, its axis apart: "Transform › Position", "Body › Speed".
 export function readableName(value: ReadableValue, registry: ComponentRegistry) {
     if (value.kind === 'field') return componentValueName(value, registry);
 

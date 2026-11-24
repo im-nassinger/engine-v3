@@ -76,7 +76,7 @@ describe('FflateZipReader', () => {
 
     test('a zip bomb whose directory lies is stopped at 256 MB', { timeout: 60_000 }, () => {
         const bomb = lieAboutSizes(zipSync({ [LEVEL_JSON_PATH]: new Uint8Array(300 * MB) }, { level: 1 }), 1000);
-        const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+        const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createCurrent());
         const check = new ImportCheck({ zip: zipReader, reader, writer: new LevelWriter(), limits: V1_LEVEL_LIMITS });
 
         expect(zipReader.readDirectory(bomb)).toEqual([{ path: LEVEL_JSON_PATH, declaredBytes: 1000 }]);
@@ -91,7 +91,7 @@ describe('FflateZipReader', () => {
         level.rename('castle');
         const writer = new LevelWriter();
         const zip = zipSync({ [LEVEL_JSON_PATH]: strToU8(JSON.stringify(writer.write(level))) });
-        const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+        const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createCurrent());
 
         const outcome = new ImportCheck({ zip: zipReader, reader, writer, limits: V1_LEVEL_LIMITS }).check(zip);
 

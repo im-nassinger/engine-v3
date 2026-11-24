@@ -88,27 +88,28 @@ describe("TriggerEdits on v4's kinds", () => {
 
     test("a compared string and a component value's number are typed in", () => {
         const stringCheck: Check = {
-            kind: 'compare',
-            variable: { owner: 'level', name: 'player_name' },
+            kind: 'value',
+            target: { kind: 'this' },
+            value: { kind: 'variable', name: 'player_name' },
             compare: 'is',
-            value: null,
+            amount: null,
         };
         const valueCheck: Check = {
-            kind: 'compareValue',
+            kind: 'value',
             target: { kind: 'this' },
             value: { kind: 'live', live: 'speed' },
             compare: 'more',
             amount: null,
         };
         const { component, block } = buildV4TriggerLevel([{ checks: [stringCheck, valueCheck] }]);
-        const stringValue = slotOf(rowOf(block(), 1, 0).sentence, 'number');
-        const amount = slotOf(rowOf(block(), 1, 1).sentence, 'number');
+        const stringValue = slotOf(rowOf(block(), 1, 0).sentence, 'amount');
+        const amount = slotOf(rowOf(block(), 1, 1).sentence, 'amount');
 
         const stringEdit = TriggerEdits.typed(component, 0, stringValue.address, 'Ada');
         const amountEdit = TriggerEdits.typed(component, 0, amount.address, 200);
 
         expect(stringEdit?.label).toBe('Change trigger "Touched"');
-        expect(stringEdit?.triggers[0]?.checks[0]).toEqual({ ...stringCheck, value: 'Ada' });
+        expect(stringEdit?.triggers[0]?.checks[0]).toEqual({ ...stringCheck, amount: 'Ada' });
         expect(amountEdit?.triggers[0]?.checks[1]).toEqual({ ...valueCheck, amount: 200 });
         expect(TriggerEdits.typed(component, 0, amount.address, 'fast')).toBeUndefined();
     });

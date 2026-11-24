@@ -16,6 +16,8 @@ import type { JointSkipReason, PhysicsScene, SceneBody, SceneJoint, SkippedJoint
 import { jointDefinitionOf } from './jointDefinitionOf.ts';
 import { piecesInBodySpace } from './piecesInBodySpace.ts';
 import { splitBodyMatrix } from './splitBodyMatrix.ts';
+import { NO_TOUCH_SURFACES } from './TouchSurfaces.ts';
+import type { TouchSurfaces } from './TouchSurfaces.ts';
 
 // The play copy's caches the builder reads: each shape's pieces and each entity's level matrix.
 export type SceneCaches = {
@@ -38,30 +40,32 @@ export class PhysicsSceneBuilder {
     private readonly caches: SceneCaches;
     private readonly membership: BodyMembership;
     private readonly world: PhysicsWorld;
+    private readonly sensors: ReadonlySet<EntityId>;
     private readonly bodies = new Map<Entity, BuiltBody>();
     private readonly skippedLines: Entity[] = [];
     private readonly joints: SceneJoint[] = [];
     private readonly skippedJoints: SkippedJoint[] = [];
     private ground: BodyHandle | undefined;
 
-    private constructor(level: Level, caches: SceneCaches, world: PhysicsWorld) {
+    private constructor(level: Level, caches: SceneCaches, world: PhysicsWorld, sensors: ReadonlySet<EntityId>) {
         this.level = level;
         this.caches = caches;
         this.membership = new BodyMembership(level);
         this.world = world;
+        this.sensors = sensors;
     }
 
-    // Makes a world with the World's Gravity and builds the level into it. Only the surfaces of
-    // contactEventSurfaces send contact events.
+    // Makes a world with the World's Gravity and builds the level into it. Only the surfaces of the touch
+    // surfaces' contactEvents send contact events, and only its sensors are built without a SurfaceComponent.
     static build(
         level: Level,
         caches: SceneCaches,
         engine: PhysicsEngine,
-        contactEventSurfaces: ReadonlySet<EntityId> = new Set(),
+        touchSurfaces: TouchSurfaces = NO_TOUCH_SURFACES,
     ): PhysicsScene {
         const gravity = level.world.requireComponent(PhysicsWorldComponent).get('gravity');
-        const world = engine.createWorld({ gravity, contactEventSurfaces });
-        const builder = new PhysicsSceneBuilder(level, caches, world);
+        const world = engine.createWorld({ gravity, contactEventSurfaces: touchSurfaces.contactEvents });
+        const builder = new PhysicsSceneBuilder(level, caches, world, touchSurfaces.sensors);
 
         return builder.buildAll();
     }
@@ -72,6 +76,9 @@ export class PhysicsSceneBuilder {
                 this.buildBody(entity);
             }
             this.addSurfaceOf(entity);
+            if (this.sensors.has(entity.id)) {
+                this.addSensorOf(entity);
+            }
         }
         this.addWalls();
         for (const entity of this.level.entitiesInPanelOrder()) {
@@ -135,24 +142,50 @@ export class PhysicsSceneBuilder {
         }
     }
 
+    // A shape with no SurfaceComponent under a touch trigger: a sensor, going where a surface would. A line
+    // a Dynamic body can't hold is left out without a word, as such a shape is out of physics anyway.
+    private addSensorOf(entity: Entity) {
+        if (entity.hasComponent(SurfaceComponent)) return;
+
+        const target = this.membership.shapeTargetOf(entity);
+        if (target === undefined || target.kind === 'skipped') return;
+
+        const values = { ...SurfaceComponent.schema.defaults(), sensor: true };
+        if (target.kind === 'static') {
+            this.addPieces(this.requireGround(), entity, this.caches.worldMatrices.matrixOf(entity), values);
+            return;
+        }
+
+        const body = this.requireBody(target.body);
+        this.addPieces(body.handle, entity, this.toBodyOf(entity, body), values);
+    }
+
     private addSurfaceToBody(entity: Entity, body: BuiltBody) {
-        // The body's own surface uses its rest exactly, so a body alone has no rounding from the inverse.
-        const toBody =
-            entity === body.entity ? body.rest : body.fromLevel.multiply(this.caches.worldMatrices.matrixOf(entity));
-        this.addSurface(body.handle, entity, toBody);
+        this.addSurface(body.handle, entity, this.toBodyOf(entity, body));
+    }
+
+    // The body's own surface uses its rest exactly, so a body alone has no rounding from the inverse.
+    private toBodyOf(entity: Entity, body: BuiltBody) {
+        if (entity === body.entity) return body.rest;
+
+        return body.fromLevel.multiply(this.caches.worldMatrices.matrixOf(entity));
     }
 
     private addSurface(handle: BodyHandle, entity: Entity, toBody: Matrix2D) {
-        const pieces = piecesInBodySpace(entity, toBody, this.caches.pieces);
-        if (pieces.length === 0) return;
-
         const surface = entity.requireComponent(SurfaceComponent);
         const values: SurfaceValuesRead = {
             density: surface.get('density'),
             friction: surface.get('friction'),
             restitution: surface.get('restitution'),
-            sensor: surface.get('sensor'),
+            sensor: false,
         };
+        this.addPieces(handle, entity, toBody, values);
+    }
+
+    private addPieces(handle: BodyHandle, entity: Entity, toBody: Matrix2D, values: SurfaceValuesRead) {
+        const pieces = piecesInBodySpace(entity, toBody, this.caches.pieces);
+        if (pieces.length === 0) return;
+
         this.world.addSurface(handle, surfaceDefinition(entity.id, pieces, values));
     }
 
@@ -175,7 +208,7 @@ export class PhysicsSceneBuilder {
         ];
 
         const ground = this.requireGround();
-        const values = SurfaceComponent.schema.defaults();
+        const values = { ...SurfaceComponent.schema.defaults(), sensor: false };
         for (const edge of edges) {
             const piece: SurfacePiece = { kind: 'line', points: edge };
             this.world.addSurface(ground, surfaceDefinition(this.level.world.id, [piece], values));

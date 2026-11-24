@@ -1,6 +1,6 @@
 {
     "format": "engine-v3-level",
-    "formatVersion": 1,
+    "formatVersion": 2,
     "physicsVersion": 1,
     "name": "trigger-hits",
     "editor": {
@@ -111,13 +111,16 @@
                         "checks": [],
                         "actions": [
                             {
-                                "kind": "push",
+                                "kind": "change",
                                 "target": {
                                     "kind": "entity",
                                     "entity": 5
                                 },
-                                "push": {
-                                    "kind": "by",
+                                "value": {
+                                    "kind": "velocity"
+                                },
+                                "op": "add",
+                                "amount": {
                                     "x": 4,
                                     "y": 0
                                 }
@@ -139,13 +142,16 @@
                         "checks": [],
                         "actions": [
                             {
-                                "kind": "push",
+                                "kind": "change",
                                 "target": {
                                     "kind": "entity",
                                     "entity": 5
                                 },
-                                "push": {
-                                    "kind": "by",
+                                "value": {
+                                    "kind": "velocity"
+                                },
+                                "op": "add",
+                                "amount": {
                                     "x": -4,
                                     "y": 0
                                 }
@@ -242,8 +248,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": false
+                        "restitution": 0
                     }
                 },
                 "children": []
@@ -278,8 +283,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": false
+                        "restitution": 0
                     }
                 },
                 "children": []
@@ -322,8 +326,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.6,
-                        "restitution": 0.3,
-                        "sensor": false
+                        "restitution": 0.3
                     },
                     "TagsComponent": {
                         "tags": [
@@ -345,7 +348,7 @@
                                 "name": null,
                                 "on": true,
                                 "when": {
-                                    "kind": "collision"
+                                    "kind": "touched"
                                 },
                                 "checks": [],
                                 "actions": [
@@ -403,8 +406,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": false
+                        "restitution": 0
                     },
                     "TagsComponent": {
                         "tags": [
@@ -418,37 +420,21 @@
                                 "name": null,
                                 "on": true,
                                 "when": {
-                                    "kind": "collision"
+                                    "kind": "touched"
                                 },
                                 "checks": [
                                     {
-                                        "kind": "hasTag",
+                                        "kind": "value",
                                         "target": {
                                             "kind": "other"
                                         },
-                                        "tag": "ball"
+                                        "value": {
+                                            "kind": "tag"
+                                        },
+                                        "compare": "is",
+                                        "amount": "ball"
                                     }
                                 ],
-                                "actions": [
-                                    {
-                                        "kind": "destroy",
-                                        "target": {
-                                            "kind": "this"
-                                        }
-                                    }
-                                ],
-                                "repeat": {
-                                    "kind": "everyTime"
-                                }
-                            },
-                            {
-                                "id": 2,
-                                "name": null,
-                                "on": true,
-                                "when": {
-                                    "kind": "destroyed"
-                                },
-                                "checks": [],
                                 "actions": [
                                     {
                                         "kind": "change",
@@ -462,6 +448,12 @@
                                         },
                                         "op": "add",
                                         "amount": 1
+                                    },
+                                    {
+                                        "kind": "destroy",
+                                        "target": {
+                                            "kind": "this"
+                                        }
                                     }
                                 ],
                                 "repeat": {
@@ -469,7 +461,7 @@
                                 }
                             }
                         ],
-                        "next_trigger_id": 3
+                        "next_trigger_id": 2
                     }
                 },
                 "children": []
@@ -504,8 +496,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": false
+                        "restitution": 0
                     },
                     "TagsComponent": {
                         "tags": [
@@ -519,37 +510,21 @@
                                 "name": null,
                                 "on": true,
                                 "when": {
-                                    "kind": "collision"
+                                    "kind": "touched"
                                 },
                                 "checks": [
                                     {
-                                        "kind": "hasTag",
+                                        "kind": "value",
                                         "target": {
                                             "kind": "other"
                                         },
-                                        "tag": "ball"
+                                        "value": {
+                                            "kind": "tag"
+                                        },
+                                        "compare": "is",
+                                        "amount": "ball"
                                     }
                                 ],
-                                "actions": [
-                                    {
-                                        "kind": "destroy",
-                                        "target": {
-                                            "kind": "this"
-                                        }
-                                    }
-                                ],
-                                "repeat": {
-                                    "kind": "everyTime"
-                                }
-                            },
-                            {
-                                "id": 2,
-                                "name": null,
-                                "on": true,
-                                "when": {
-                                    "kind": "destroyed"
-                                },
-                                "checks": [],
                                 "actions": [
                                     {
                                         "kind": "change",
@@ -563,6 +538,12 @@
                                         },
                                         "op": "add",
                                         "amount": 1
+                                    },
+                                    {
+                                        "kind": "destroy",
+                                        "target": {
+                                            "kind": "this"
+                                        }
                                     }
                                 ],
                                 "repeat": {
@@ -570,7 +551,7 @@
                                 }
                             }
                         ],
-                        "next_trigger_id": 3
+                        "next_trigger_id": 2
                     }
                 },
                 "children": []
@@ -605,8 +586,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": false
+                        "restitution": 0
                     },
                     "TagsComponent": {
                         "tags": [
@@ -620,37 +600,21 @@
                                 "name": null,
                                 "on": true,
                                 "when": {
-                                    "kind": "collision"
+                                    "kind": "touched"
                                 },
                                 "checks": [
                                     {
-                                        "kind": "hasTag",
+                                        "kind": "value",
                                         "target": {
                                             "kind": "other"
                                         },
-                                        "tag": "ball"
+                                        "value": {
+                                            "kind": "tag"
+                                        },
+                                        "compare": "is",
+                                        "amount": "ball"
                                     }
                                 ],
-                                "actions": [
-                                    {
-                                        "kind": "destroy",
-                                        "target": {
-                                            "kind": "this"
-                                        }
-                                    }
-                                ],
-                                "repeat": {
-                                    "kind": "everyTime"
-                                }
-                            },
-                            {
-                                "id": 2,
-                                "name": null,
-                                "on": true,
-                                "when": {
-                                    "kind": "destroyed"
-                                },
-                                "checks": [],
                                 "actions": [
                                     {
                                         "kind": "change",
@@ -664,6 +628,12 @@
                                         },
                                         "op": "add",
                                         "amount": 1
+                                    },
+                                    {
+                                        "kind": "destroy",
+                                        "target": {
+                                            "kind": "this"
+                                        }
                                     }
                                 ],
                                 "repeat": {
@@ -671,7 +641,7 @@
                                 }
                             }
                         ],
-                        "next_trigger_id": 3
+                        "next_trigger_id": 2
                     }
                 },
                 "children": []

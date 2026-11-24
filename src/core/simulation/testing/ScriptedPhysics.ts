@@ -32,6 +32,7 @@ type ScriptedBody = {
 export type ScriptedChange =
     | { readonly call: 'setPose'; readonly entity: EntityId; readonly pose: BodyPose }
     | { readonly call: 'addVelocity'; readonly entity: EntityId; readonly velocity: Point }
+    | { readonly call: 'setLinearVelocity'; readonly entity: EntityId; readonly velocity: Point }
     | { readonly call: 'setSurfaceSettings'; readonly entity: EntityId; readonly settings: SurfaceSettings }
     | { readonly call: 'setMotor'; readonly joint: JointHandle; readonly motor: HingeMotor }
     | { readonly call: 'setGravity'; readonly gravity: Point };
@@ -157,6 +158,10 @@ export class ScriptedWorld implements PhysicsWorld {
 
     addVelocity(handle: BodyHandle, velocity: Point) {
         this.changes.push({ call: 'addVelocity', entity: this.requireBody(handle).entity, velocity });
+    }
+
+    setLinearVelocity(handle: BodyHandle, velocity: Point) {
+        this.changes.push({ call: 'setLinearVelocity', entity: this.requireBody(handle).entity, velocity });
     }
 
     setSurfaceSettings(entity: EntityId, settings: SurfaceSettings) {

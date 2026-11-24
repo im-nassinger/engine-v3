@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { SurfaceComponent, TagsComponent, TriggerComponent } from '../../../core/components/index.ts';
-import type { Trigger } from '../../../core/fields/index.ts';
+import type { Check, Trigger } from '../../../core/fields/index.ts';
 import { Level } from '../../../core/level/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import type { EditorSession } from '../../../editor/session/index.ts';
@@ -95,10 +95,16 @@ function history(session: EditorSession) {
 }
 
 const CANT_RUN = "Doesn't run until every yellow part is set.";
-const NEEDS_SURFACE = 'Needs a Surface to notice touching. Add Surface as sensor';
+const PLAYER_TAG_CHECK: Check = {
+    kind: 'value',
+    target: { kind: 'other' },
+    value: { kind: 'tag' },
+    compare: 'is',
+    amount: 'player',
+};
 
 describe('the trigger card', () => {
-    test('makes a trigger from nothing: Add trigger, the When, a check, an action, then the Surface', async () => {
+    test('makes a trigger from nothing: Add trigger, the When, a check, then an action, needing no Surface', async () => {
         const { level, button } = buildLevel();
         const { session, frames } = await showEntity(level, button);
 
@@ -112,13 +118,19 @@ describe('the trigger card', () => {
         expect(word('When', 'pick an event').dataset['state']).toBe('unset');
         expect(addRow('Add action').dataset['needed']).toBe('true');
 
-        await pickFromMenu(word('When', 'pick an event'), 'something starts touching this');
+        await pickFromMenu(word('When', 'pick an event'), 'something starts or stops touching this');
         await expect.poll(() => sentences('When')).toEqual(['something starts touching this']);
         expect(blockName()).toBe('Touched');
 
-        await pickFromMenu(addRow('Add check'), 'an entity has a tag');
-        await expect.poll(() => sentences('If')).toEqual(['other has the tag pick a tag']);
+        await pickFromMenu(addRow('Add check'), 'a value');
+        await expect.poll(() => sentences('If')).toEqual(['other pick a value']);
         expect(history(session).undoLabel).toBe('Add check to trigger "Touched"');
+        click(word('If', 'pick a value'));
+        await expect.poll(() => menuRowNamed('Tags')).toBeDefined();
+        click(menuRowNamed('Tags') as HTMLElement);
+        await expect.poll(() => menuRows().filter((row) => row.textContent.includes('Tags')).length).toBe(2);
+        menuRows().at(-1)?.click();
+        await expect.poll(() => sentences('If')).toEqual(['other has the tag pick a tag']);
         expect(section('If').querySelector('.hint')?.textContent).toBe('all must be true');
         await pickFromMenu(word('If', 'pick a tag'), 'player');
         await expect.poll(() => sentences('If')).toEqual(['other has the tag player']);
@@ -129,11 +141,8 @@ describe('the trigger card', () => {
         expect(sentences('Repeat')).toEqual(['every time']);
 
         frames.runFrame();
-        await expect.poll(() => notesOf()).toEqual([NEEDS_SURFACE]);
-        click(buttonNamed(requireBlock(), 'Add Surface as sensor'));
-        expect(button.requireComponent(SurfaceComponent).get('sensor')).toBe(true);
-        frames.runFrame();
         await expect.poll(() => notesOf()).toEqual([]);
+        expect(button.hasComponent(SurfaceComponent)).toBe(false);
 
         expect(triggersOf(button)).toEqual([
             {
@@ -141,7 +150,7 @@ describe('the trigger card', () => {
                 name: null,
                 on: true,
                 when: { kind: 'touched' },
-                checks: [{ kind: 'hasTag', target: { kind: 'other' }, tag: 'player' }],
+                checks: [PLAYER_TAG_CHECK],
                 actions: [{ kind: 'win' }],
                 repeat: { kind: 'everyTime' },
             },
@@ -150,8 +159,7 @@ describe('the trigger card', () => {
 
     test('says a trigger with unset words does not run, and draws them yellow', async () => {
         const { level, button } = buildLevel();
-        button.addComponent(new SurfaceComponent({ ...SurfaceComponent.schema.defaults(), sensor: true }));
-        withTriggers(button, [{ checks: [{ kind: 'hasTag', target: { kind: 'other' }, tag: null }] }]);
+        withTriggers(button, [{ checks: [{ ...PLAYER_TAG_CHECK, amount: null }] }]);
         const { frames } = await showEntity(level, button);
         frames.runFrame();
 
@@ -163,11 +171,11 @@ describe('the trigger card', () => {
 
     test('a key event strikes `other` through, and it can no longer be picked', async () => {
         const { level, button } = buildLevel();
-        withTriggers(button, [{ checks: [{ kind: 'hasTag', target: { kind: 'other' }, tag: 'player' }] }]);
+        withTriggers(button, [{ checks: [PLAYER_TAG_CHECK] }]);
         await showEntity(level, button);
         await expect.poll(() => blocks().length).toBe(1);
 
-        await pickFromMenu(word('When', 'something starts touching this'), 'a key is pressed, released or held');
+        await pickFromMenu(word('When', 'starts'), 'a key or input is pressed, released or held');
 
         await expect.poll(() => word('If', 'other').dataset['state']).toBe('greyed');
         expect(getComputedStyle(word('If', 'other')).textDecorationLine).toBe('line-through');

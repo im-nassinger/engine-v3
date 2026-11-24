@@ -8,7 +8,13 @@ import type { TriggerBlock } from './TriggerCardModel.ts';
 import { TriggerEdits } from './TriggerEdits.ts';
 import type { TriggerChoice } from './TriggerWord.ts';
 
-const TAG_CHECK: Check = { kind: 'hasTag', target: { kind: 'other' }, tag: 'player' };
+const TAG_CHECK: Check = {
+    kind: 'value',
+    target: { kind: 'other' },
+    value: { kind: 'tag' },
+    compare: 'is',
+    amount: 'player',
+};
 
 function buildCard(triggers: readonly Partial<Trigger>[] = [{}]) {
     const built = buildTriggerLevel(triggers);
@@ -25,9 +31,16 @@ function buildCard(triggers: readonly Partial<Trigger>[] = [{}]) {
 function choiceOf(block: TriggerBlock, sectionIndex: number, slot: string, label: string, rowIndex = 0) {
     const sentence = block.sections[sectionIndex]?.rows[rowIndex]?.sentence;
     const word = sentence?.words.find((candidate) => candidate.kind === 'slot' && candidate.address.slot === slot);
-    if (word?.kind !== 'slot' || word.entry.kind !== 'menu') throw new Error(`No ${slot} menu.`);
+    if (word?.kind !== 'slot') throw new Error(`No ${slot} word.`);
 
-    return requireChoice(word.entry.choices, label);
+    const { entry } = word;
+    if (entry.kind === 'menu') return requireChoice(entry.choices, label);
+    if (entry.kind === 'groups') {
+        const choices = entry.groups.flatMap((group) => group.choices);
+        return requireChoice(choices, label);
+    }
+
+    throw new Error(`No ${slot} menu.`);
 }
 
 function requireChoice(choices: readonly TriggerChoice[], label: string) {
@@ -40,7 +53,7 @@ function requireChoice(choices: readonly TriggerChoice[], label: string) {
 describe('TriggerEdits', () => {
     test('a new event resets the When and keeps the checks and actions, as `Change trigger "Touched"`', () => {
         const { component, block } = buildCard([{ checks: [TAG_CHECK], actions: [{ kind: 'win' }] }]);
-        const choice = choiceOf(block(), 0, 'event', 'a key is pressed, released or held');
+        const choice = choiceOf(block(), 0, 'event', 'a key or input is pressed, released or held');
 
         const edit = TriggerEdits.picked(component, 0, choice.value);
 
@@ -54,12 +67,12 @@ describe('TriggerEdits', () => {
     });
 
     test("a tag picked on a check's word goes into that check", () => {
-        const { component, block } = buildCard([{ checks: [{ ...TAG_CHECK, tag: null }] }]);
-        const choice = choiceOf(block(), 1, 'tag', 'coin');
+        const { component, block } = buildCard([{ checks: [{ ...TAG_CHECK, amount: null }] }]);
+        const choice = choiceOf(block(), 1, 'amount', 'coin');
 
         const edit = TriggerEdits.picked(component, 0, choice.value);
 
-        expect(edit.triggers[0]?.checks).toEqual([{ ...TAG_CHECK, tag: 'coin' }]);
+        expect(edit.triggers[0]?.checks).toEqual([{ ...TAG_CHECK, amount: 'coin' }]);
     });
 
     test('Add check and Add action add their row at the end, each labelled', () => {
@@ -71,26 +84,26 @@ describe('TriggerEdits', () => {
         if (addCheck.entry.kind !== 'menu' || addAction.entry.kind !== 'groups') throw new Error('No add menus.');
         const actionChoices = addAction.entry.groups.flatMap((group) => group.choices);
 
-        const checkEdit = TriggerEdits.picked(
-            component,
-            0,
-            requireChoice(addCheck.entry.choices, 'an entity has a tag').value,
-        );
+        const checkEdit = TriggerEdits.picked(component, 0, requireChoice(addCheck.entry.choices, 'a value').value);
         const actionEdit = TriggerEdits.picked(component, 0, requireChoice(actionChoices, 'win').value);
 
         expect(checkEdit.label).toBe('Add check to trigger "Touched"');
-        expect(checkEdit.triggers[0]?.checks).toEqual([{ kind: 'hasTag', target: { kind: 'other' }, tag: null }]);
+        expect(checkEdit.triggers[0]?.checks).toEqual([
+            { kind: 'value', target: { kind: 'other' }, value: null, compare: 'is', amount: null },
+        ]);
         expect(actionEdit.label).toBe('Add action to trigger "Touched"');
         expect(actionEdit.triggers[0]?.actions).toEqual([{ kind: 'win' }]);
     });
 
     test("an action's own word turns it into another kind, keeping its target", () => {
         const { component, block } = buildCard([{ actions: [{ kind: 'destroy', target: { kind: 'other' } }] }]);
-        const choice = choiceOf(block(), 2, 'action', 'push');
+        const choice = choiceOf(block(), 2, 'action', 'fire a custom event');
 
         const edit = TriggerEdits.picked(component, 0, choice.value);
 
-        expect(edit.triggers[0]?.actions).toEqual([{ kind: 'push', target: { kind: 'other' }, push: null }]);
+        expect(edit.triggers[0]?.actions).toEqual([
+            { kind: 'fire', target: { kind: 'other' }, name: null, amount: null },
+        ]);
     });
 
     test('a number is typed into its word; a word that takes none gives no edit', () => {
@@ -98,26 +111,38 @@ describe('TriggerEdits', () => {
             {
                 when: { kind: 'after', seconds: null },
                 checks: [
-                    { kind: 'compare', variable: { owner: 'level', name: 'coins' }, compare: 'atLeast', value: null },
+                    {
+                        kind: 'value',
+                        target: { kind: 'this' },
+                        value: { kind: 'variable', name: 'coins' },
+                        compare: 'atLeast',
+                        amount: null,
+                    },
                 ],
-                actions: [{ kind: 'push', target: { kind: 'other' }, push: { kind: 'by', x: 0, y: -600 } }],
+                actions: [
+                    {
+                        kind: 'change',
+                        target: { kind: 'other' },
+                        value: { kind: 'velocity' },
+                        op: 'add',
+                        amount: { x: 0, y: -600 },
+                    },
+                ],
                 repeat: { kind: 'atMostEvery', seconds: 1 },
             },
         ]);
 
         const seconds = TriggerEdits.typed(component, 0, { part: { section: 'when' }, slot: 'seconds' }, 60);
-        const value = TriggerEdits.typed(component, 0, { part: { section: 'check', index: 0 }, slot: 'number' }, 10);
-        const kickAt = { part: { section: 'action', index: 0 }, slot: 'pushBy' } as const;
+        const value = TriggerEdits.typed(component, 0, { part: { section: 'check', index: 0 }, slot: 'amount' }, 10);
+        const kickAt = { part: { section: 'action', index: 0 }, slot: 'amount' } as const;
         const kick = TriggerEdits.typed(component, 0, kickAt, { x: 200, y: -600 });
-        const notKick = TriggerEdits.typed(component, 0, kickAt, 200);
         const repeat = TriggerEdits.typed(component, 0, { part: { section: 'repeat' }, slot: 'repeatSeconds' }, 2);
         const refused = TriggerEdits.typed(component, 0, { part: { section: 'when' }, slot: 'event' }, 3);
 
         expect(seconds?.label).toBe('Change trigger "After a time"');
         expect(seconds?.triggers[0]?.when).toEqual({ kind: 'after', seconds: 60 });
-        expect(value?.triggers[0]?.checks[0]).toMatchObject({ value: 10 });
-        expect(kick?.triggers[0]?.actions[0]).toMatchObject({ push: { kind: 'by', x: 200, y: -600 } });
-        expect(notKick).toBeUndefined();
+        expect(value?.triggers[0]?.checks[0]).toMatchObject({ amount: 10 });
+        expect(kick?.triggers[0]?.actions[0]).toMatchObject({ amount: { x: 200, y: -600 } });
         expect(repeat?.triggers[0]?.repeat).toEqual({ kind: 'atMostEvery', seconds: 2 });
         expect(refused).toBeUndefined();
     });

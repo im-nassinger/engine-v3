@@ -1,4 +1,4 @@
-import { TriggerComponent, VariablesComponent } from '../../components/index.ts';
+import { BodyComponent, TriggerComponent, VariablesComponent } from '../../components/index.ts';
 import type { AnyComponentSchema, AnyFieldDefinition, ComponentRegistry } from '../../components/index.ts';
 import {
     CheckboxFieldType,
@@ -6,6 +6,7 @@ import {
     MAX_STRING_VARIABLE_LENGTH,
     NumberFieldType,
     TextFieldType,
+    VectorFieldType,
 } from '../../fields/index.ts';
 import type { ChangeOp, Unit, ValueRef, ValueType, VariableType } from '../../fields/index.ts';
 import { variableTypeOf } from '../../fields/index.ts';
@@ -30,6 +31,13 @@ const NUMBER_AMOUNT = new NumberFieldType();
 const ON_AMOUNT = new CheckboxFieldType();
 const TAG_AMOUNT = new TextFieldType({ minLength: 1, trimmed: true });
 const STRING_AMOUNT = new TextFieldType({ maxLength: MAX_STRING_VARIABLE_LENGTH });
+// Body › Velocity, a vector in px/s like Push's kick was, set, added to or subtracted from whole.
+const VELOCITY: ChangeableValue = {
+    ref: { kind: 'velocity' },
+    ops: EVERY_OP,
+    amountType: new VectorFieldType(),
+    unit: 'px/s',
+};
 
 // What each type of variable may do, and what its amount is read with. Flip needs no amount, but the
 // trigger still holds one, so a boolean's is read as a boolean.
@@ -40,8 +48,9 @@ const VARIABLE_OFFERS: Readonly<Record<VariableType, Omit<ChangeableValue, 'ref'
 };
 
 // What Change value may offer for a target, read from the schemas only, so a component added later is offered
-// with no trigger code: every field marked changeableInPlay, a vector whole for Set, Add and Subtract, the tag to add or remove, and, on an entity known while editing, its variables with the ops their
-// type allows and each of its triggers' on/off. The World's variables are the level's, named as v3 named
+// with no trigger code: every field marked changeableInPlay, a vector whole for Set, Add and Subtract, the tag
+// to add or remove, a body's Velocity after its Body's fields, and, on an entity known while editing, its
+// variables with the ops their type allows and each of its triggers' on/off. The World's variables are the level's, named as v3 named
 // them; any other entity's are its own (`own: true`). With no entity (`other`, or every entity with a tag),
 // every registered component's fields.
 export function changeableValues(target: Entity | undefined, registry: ComponentRegistry) {
@@ -72,6 +81,9 @@ function fieldValuesOf(schema: AnyComponentSchema) {
         if (!field.changeableInPlay) continue;
 
         values.push(...valuesOfField(schema, field));
+    }
+    if (schema.typeName === BodyComponent.schema.typeName) {
+        values.push(VELOCITY);
     }
 
     return values;
@@ -138,5 +150,7 @@ export function sameValueRef(first: ValueRef, second: ValueRef) {
             return second.kind === 'tag';
         case 'triggerOn':
             return second.kind === 'triggerOn' && first.trigger === second.trigger;
+        case 'velocity':
+            return second.kind === 'velocity';
     }
 }

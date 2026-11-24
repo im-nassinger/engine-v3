@@ -46,8 +46,9 @@ export type PhysicsWorld = {
     contactEvents(): readonly ContactEvent[];       // v4: the last step's begins, then ends
     velocity(body: BodyHandle): BodyVelocity;       // the live px/s and °/s (velocityOf until v4)
     setPose(body: BodyHandle, pose: BodyPose): void;                 // v3: a teleport
-    addVelocity(body: BodyHandle, velocity: Point): void;            // v3: Push, ignoring mass
-    setSurfaceSettings(entity: EntityId, settings: SurfaceSettings): void; // v3: Sensor rebuilds
+    addVelocity(body: BodyHandle, velocity: Point): void;            // v3: adds to the speed, ignoring mass
+    setLinearVelocity(body: BodyHandle, velocity: Point): void;      // v4 fix 3: sets the speed, keeping the spin
+    setSurfaceSettings(entity: EntityId, settings: SurfaceSettings): void; // v3: Friction and Restitution
     setMotor(joint: JointHandle, motor: HingeMotor): void;          // v3: a Hinge's motor values
     destroyBody(body: BodyHandle): void;
     removeSurfaces(entity: EntityId): void;          // v4: a merged surface destroyed in play
@@ -184,3 +185,4 @@ The editor never calls `Date.now`, `setTimeout` or `requestAnimationFrame` itsel
 ### The unstyled shape overlay (v3)
 
 - **`UnstyledShapeOverlay`** (`adapters/pixi/overlays/unstyled/`) draws any shape with no StyleComponent, such as a trigger the [Trigger tool](editor/drawing-and-points.md#the-trigger-tool-v3) made, as a dashed edge with a bolt, so it can be seen (v3 task 8, standing yes, 2026-11-22). It sits over the grid and under the selection, and hides in play with the other editor-only drawing. The level itself no longer draws an unstyled shape's thin line, only an unstyled path's. The bolt is a filled polygon on the outline's centroid on screen, upright at any rotation, 0.9 times the outline's inradius on screen tall (twice its area over its perimeter, so a long thin trigger's bolt fits its short side), and left out under 10 px and on a line (standing yes, 2026-11-22, after the owner asked for it to scale with the zoom).
+- **As built in v4 fix 3** (2026-11-23): **a `SensorEvent` also names `sensorBody`**, the entity of the sensor's body, so `TouchLedger` can name the sensor's side as `other` for a solid visitor's touch trigger. **`SurfaceSettings` lost `sensor`**, since the SurfaceComponent did: `setSurfaceSettings` changes Friction and Restitution in place and never rebuilds a surface. `SurfaceDefinition.sensor` stays, set by `PhysicsSceneBuilder` for a pass-through shape under a touch trigger ([triggers-in-play.md](triggers-in-play.md#the-tick-from-v3)). **`setLinearVelocity(body, v)`** joins the contract for Change value's Set on Body › Velocity, waking the body; a Static body doesn't move. `WorldSettings.contactEventSurfaces` is filled from `TriggerIndex.touchSurfaces().contactEvents`, the solid shapes under a touch trigger.

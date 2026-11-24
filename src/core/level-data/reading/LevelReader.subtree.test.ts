@@ -21,7 +21,7 @@ const SMALL_LIMITS: LevelLimits = {
 };
 
 function createReader(limits = V1_LEVEL_LIMITS) {
-    return new LevelReader(createV1Registry(), limits, FormatUpgrader.createV1());
+    return new LevelReader(createV1Registry(), limits, FormatUpgrader.createCurrent());
 }
 
 function addNamed(level: Level, parent: Entity, name: string, skew = 0) {

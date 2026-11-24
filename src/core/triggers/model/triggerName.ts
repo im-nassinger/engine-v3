@@ -3,7 +3,7 @@ import { KeyCodes } from '../../keys/index.ts';
 import type { KeyCode } from '../../keys/index.ts';
 
 // What the trigger is called: its own name, or one made from its When, such as "Touched", "jump pressed",
-// "After 60 s", "No coin left", "Hits something", "Gets open" or "coins becomes 10 or more".
+// "After 60 s", "Gets open" or "coins becomes 10 or more".
 export function triggerName(trigger: Trigger) {
     if (trigger.name !== null) return trigger.name;
 
@@ -30,12 +30,6 @@ function nameOfWhen(when: When | null) {
             return timerName('Every', when.seconds);
         case 'levelStart':
             return 'Level start';
-        case 'tagLeft':
-            return `No ${when.tag ?? 'tag'} left`;
-        case 'collision':
-            return 'Hits something';
-        case 'destroyed':
-            return 'Destroyed';
         case 'custom':
             return when.name === null ? 'Gets an event' : `Gets ${when.name}`;
         case 'variableChanged':

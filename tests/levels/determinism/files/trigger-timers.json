@@ -1,6 +1,6 @@
 {
     "format": "engine-v3-level",
-    "formatVersion": 1,
+    "formatVersion": 2,
     "physicsVersion": 1,
     "name": "trigger-timers",
     "editor": {
@@ -131,13 +131,16 @@
                                 "amount": 1
                             },
                             {
-                                "kind": "push",
+                                "kind": "change",
                                 "target": {
                                     "kind": "entity",
                                     "entity": 4
                                 },
-                                "push": {
-                                    "kind": "by",
+                                "value": {
+                                    "kind": "velocity"
+                                },
+                                "op": "add",
+                                "amount": {
                                     "x": 0,
                                     "y": -150
                                 }
@@ -327,8 +330,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": false
+                        "restitution": 0
                     }
                 },
                 "children": []
@@ -371,8 +373,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.3,
-                        "restitution": 0.2,
-                        "sensor": false
+                        "restitution": 0.2
                     }
                 },
                 "children": []

@@ -45,7 +45,7 @@ describe('test play with 1,000 touch triggers', () => {
                 `${measured.ticksTheFramesAllow} as the frames allow), ${touches} touches counted`,
         );
         expect(opened.play.state).toBe('playing');
-        // The triggers ran: the balls touched sensors all through the run.
+        // The triggers ran: the balls touched the pass-through squares all through the run.
         expect(touches).toBeGreaterThan(measured.ticks);
         expect(measured.firstTickMs).toBeLessThan(LARGE_SLOWDOWN * FIRST_TICK_LIMIT_MS);
         expect(measured.smoothMs).toBeLessThan(LARGE_SLOWDOWN * FRAME_TIME_LIMIT_MS);

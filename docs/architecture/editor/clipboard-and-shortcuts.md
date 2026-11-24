@@ -132,7 +132,7 @@ The text is JSON with a tag, as the tech notes suggest:
 ```json
 {
   "engine-v3": "entities",
-  "formatVersion": 1,
+  "formatVersion": 2,
   "physicsVersion": 1,
   "sourceToken": "k3x9...",
   "box": { "left": 1160, "top": 620, "right": 1240, "bottom": 660 },

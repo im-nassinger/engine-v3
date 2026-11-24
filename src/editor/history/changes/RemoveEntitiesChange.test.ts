@@ -6,7 +6,7 @@ import { FormatUpgrader, LevelReader, V1_LEVEL_LIMITS } from '../../../core/leve
 import { buildChangesTestLevel, snapshotOf } from './changesTestLevel.ts';
 import { RemoveEntitiesChange } from './RemoveEntitiesChange.ts';
 
-const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createCurrent());
 
 describe('RemoveEntitiesChange', () => {
     test('removes a group with its skewed child, and revert gives back the same ids, values and order', () => {

@@ -40,7 +40,15 @@ export class BodyMembership {
     // Where the entity's surface goes in play. undefined for an entity without a SurfaceComponent, the
     // World and the camera.
     surfaceTargetOf(entity: Entity): SurfaceTarget | undefined {
-        if (this.isWorldOrCamera(entity) || !entity.hasComponent(SurfaceComponent)) return undefined;
+        if (!entity.hasComponent(SurfaceComponent)) return undefined;
+
+        return this.shapeTargetOf(entity);
+    }
+
+    // Where a shape goes in play, by the same rule whether it is solid or a sensor. undefined for the World
+    // and the camera.
+    shapeTargetOf(entity: Entity): SurfaceTarget | undefined {
+        if (this.isWorldOrCamera(entity)) return undefined;
 
         const body = bodyOf(entity);
         if (body === undefined) return STATIC;

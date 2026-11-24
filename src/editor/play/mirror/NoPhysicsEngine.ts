@@ -40,6 +40,7 @@ class NoPhysicsWorld implements PhysicsWorld {
 
     setPose() {}
     addVelocity() {}
+    setLinearVelocity() {}
     setSurfaceSettings() {}
     setMotor() {}
     destroyBody() {}

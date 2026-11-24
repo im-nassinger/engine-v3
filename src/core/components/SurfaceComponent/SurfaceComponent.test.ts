@@ -9,7 +9,11 @@ describe('SurfaceComponent', () => {
         expect(surface.get('density')).toBe(1);
         expect(surface.get('friction')).toBe(0.3);
         expect(surface.get('restitution')).toBe(0);
-        expect(surface.get('sensor')).toBe(false);
+        expect(SurfaceComponent.schema.fields.map((field) => field.key)).toEqual([
+            'density',
+            'friction',
+            'restitution',
+        ]);
     });
 
     test('values are clamped to their ranges', () => {

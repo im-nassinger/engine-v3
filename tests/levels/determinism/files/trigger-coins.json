@@ -1,6 +1,6 @@
 {
     "format": "engine-v3-level",
-    "formatVersion": 1,
+    "formatVersion": 2,
     "physicsVersion": 1,
     "name": "trigger-coins",
     "editor": {
@@ -111,13 +111,16 @@
                         "checks": [],
                         "actions": [
                             {
-                                "kind": "push",
+                                "kind": "change",
                                 "target": {
                                     "kind": "entity",
                                     "entity": 4
                                 },
-                                "push": {
-                                    "kind": "by",
+                                "value": {
+                                    "kind": "velocity"
+                                },
+                                "op": "add",
+                                "amount": {
                                     "x": 4,
                                     "y": 0
                                 }
@@ -139,13 +142,16 @@
                         "checks": [],
                         "actions": [
                             {
-                                "kind": "push",
+                                "kind": "change",
                                 "target": {
                                     "kind": "entity",
                                     "entity": 4
                                 },
-                                "push": {
-                                    "kind": "by",
+                                "value": {
+                                    "kind": "velocity"
+                                },
+                                "op": "add",
+                                "amount": {
                                     "x": -4,
                                     "y": 0
                                 }
@@ -160,8 +166,12 @@
                         "name": null,
                         "on": true,
                         "when": {
-                            "kind": "tagLeft",
-                            "tag": "coin"
+                            "kind": "variableChanged",
+                            "variable": "coins",
+                            "becomes": {
+                                "compare": "atLeast",
+                                "value": 5
+                            }
                         },
                         "checks": [],
                         "actions": [
@@ -238,8 +248,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": false
+                        "restitution": 0
                     }
                 },
                 "children": []
@@ -282,8 +291,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.6,
-                        "restitution": 0,
-                        "sensor": false
+                        "restitution": 0
                     },
                     "TagsComponent": {
                         "tags": [
@@ -319,12 +327,6 @@
                             "radius": 15
                         }
                     },
-                    "SurfaceComponent": {
-                        "density": 1,
-                        "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": true
-                    },
                     "TagsComponent": {
                         "tags": [
                             "coin"
@@ -341,11 +343,15 @@
                                 },
                                 "checks": [
                                     {
-                                        "kind": "hasTag",
+                                        "kind": "value",
                                         "target": {
                                             "kind": "other"
                                         },
-                                        "tag": "player"
+                                        "value": {
+                                            "kind": "tag"
+                                        },
+                                        "compare": "is",
+                                        "amount": "player"
                                     }
                                 ],
                                 "actions": [
@@ -405,12 +411,6 @@
                             "radius": 15
                         }
                     },
-                    "SurfaceComponent": {
-                        "density": 1,
-                        "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": true
-                    },
                     "TagsComponent": {
                         "tags": [
                             "coin"
@@ -427,11 +427,15 @@
                                 },
                                 "checks": [
                                     {
-                                        "kind": "hasTag",
+                                        "kind": "value",
                                         "target": {
                                             "kind": "other"
                                         },
-                                        "tag": "player"
+                                        "value": {
+                                            "kind": "tag"
+                                        },
+                                        "compare": "is",
+                                        "amount": "player"
                                     }
                                 ],
                                 "actions": [
@@ -491,12 +495,6 @@
                             "radius": 15
                         }
                     },
-                    "SurfaceComponent": {
-                        "density": 1,
-                        "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": true
-                    },
                     "TagsComponent": {
                         "tags": [
                             "coin"
@@ -513,11 +511,15 @@
                                 },
                                 "checks": [
                                     {
-                                        "kind": "hasTag",
+                                        "kind": "value",
                                         "target": {
                                             "kind": "other"
                                         },
-                                        "tag": "player"
+                                        "value": {
+                                            "kind": "tag"
+                                        },
+                                        "compare": "is",
+                                        "amount": "player"
                                     }
                                 ],
                                 "actions": [
@@ -577,12 +579,6 @@
                             "radius": 15
                         }
                     },
-                    "SurfaceComponent": {
-                        "density": 1,
-                        "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": true
-                    },
                     "TagsComponent": {
                         "tags": [
                             "coin"
@@ -599,11 +595,15 @@
                                 },
                                 "checks": [
                                     {
-                                        "kind": "hasTag",
+                                        "kind": "value",
                                         "target": {
                                             "kind": "other"
                                         },
-                                        "tag": "player"
+                                        "value": {
+                                            "kind": "tag"
+                                        },
+                                        "compare": "is",
+                                        "amount": "player"
                                     }
                                 ],
                                 "actions": [
@@ -663,12 +663,6 @@
                             "radius": 15
                         }
                     },
-                    "SurfaceComponent": {
-                        "density": 1,
-                        "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": true
-                    },
                     "TagsComponent": {
                         "tags": [
                             "coin"
@@ -685,11 +679,15 @@
                                 },
                                 "checks": [
                                     {
-                                        "kind": "hasTag",
+                                        "kind": "value",
                                         "target": {
                                             "kind": "other"
                                         },
-                                        "tag": "player"
+                                        "value": {
+                                            "kind": "tag"
+                                        },
+                                        "compare": "is",
+                                        "amount": "player"
                                     }
                                 ],
                                 "actions": [

@@ -53,7 +53,7 @@ type CreatedBody = {
     readonly surfaces: CreatedSurface[];
 };
 
-// One addSurface call: what it was given, so a change of Sensor can build it again, and the shapes made.
+// One addSurface call: what it was given, kept up to date by setSurfaceSettings, and the shapes made.
 type CreatedSurface = {
     definition: SurfaceDefinition;
     shapes: b2ShapeId[];
@@ -153,16 +153,8 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
     setSurfaceSettings(entity: EntityId, settings: SurfaceSettings) {
         this.checkAlive();
 
-        for (const { body, surface } of this.surfacesByEntity.get(entity) ?? []) {
-            const definition = { ...surface.definition, ...settings };
-            const sensorChanged = settings.sensor !== surface.definition.sensor;
-            surface.definition = definition;
-
-            if (sensorChanged) {
-                this.destroyShapes(surface.shapes);
-                surface.shapes = this.createShapes(body, definition);
-                continue;
-            }
+        for (const { surface } of this.surfacesByEntity.get(entity) ?? []) {
+            surface.definition = { ...surface.definition, ...settings };
 
             for (const shapeId of surface.shapes) {
                 this.box2d.b2Shape_SetFriction(shapeId, settings.friction);
@@ -327,6 +319,19 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         current.delete();
         box2d.b2Body_SetLinearVelocity(bodyId, sum);
         sum.delete();
+        box2d.b2Body_SetAwake(bodyId, true);
+    }
+
+    setLinearVelocity(body: BodyHandle, velocity: Point) {
+        this.checkAlive();
+        const box2d = this.box2d;
+        const createdBody = this.bodyAt(body);
+        if (createdBody.type === 'static') return;
+
+        const bodyId = createdBody.bodyId;
+        const linear = new box2d.b2Vec2(Units.toMetres(velocity.x), Units.toMetres(velocity.y));
+        box2d.b2Body_SetLinearVelocity(bodyId, linear);
+        linear.delete();
         box2d.b2Body_SetAwake(bodyId, true);
     }
 

@@ -15,7 +15,6 @@ import { place, placeBody, transform } from '../testing/scriptedLevel.ts';
 const START = { clockTimeMs: 0 };
 const THIS: Target = { kind: 'this' };
 const LEVEL_START: When = { kind: 'levelStart' };
-const DESTROYED: When = { kind: 'destroyed' };
 // The World is entity 1 in a new level.
 const WORLD: Target = { kind: 'entity', entity: 1 };
 
@@ -64,10 +63,6 @@ const addCoin: Action = {
     op: 'add',
     amount: 1,
 };
-
-function destroy(target: Target): Action {
-    return { kind: 'destroy', target };
-}
 
 function fire(target: Target, name: string): Action {
     return { kind: 'fire', target, name, amount: null };
@@ -120,56 +115,6 @@ function play(level: Level, options: PlayOptions, watched: readonly Entity[] = [
     return { heard, after, warnings };
 }
 
-describe('Destroyed', () => {
-    test('every entity in a destroyed group hears its own Destroyed once, parents first, in the same tick', () => {
-        const level = Level.createNew();
-        const group = place(level, level.world, transform(0, 0));
-        const top = place(level, group, transform(0, 0));
-        const lower = place(level, group, transform(10, 0));
-        const inner = place(level, lower, transform(0, 0));
-        const outside = place(level, level.world, transform(50, 0));
-        for (const entity of [group, top, lower, inner, outside]) {
-            giveTriggers(entity, [{ when: DESTROYED }]);
-        }
-        // The second Destroy finds `lower` already marked, so it hears nothing twice.
-        giveTriggers(level.world, [
-            {
-                when: LEVEL_START,
-                actions: [destroy({ kind: 'entity', entity: group.id }), destroy({ kind: 'entity', entity: lower.id })],
-            },
-        ]);
-
-        const { heard, after } = play(level, { ticks: 2 }, [group, top, lower, inner, outside]);
-        const destroyed = heard.filter((firing) => firing.kind === 'destroyed');
-
-        expect(destroyed).toEqual([
-            { tick: 1, owner: group.id, kind: 'destroyed', other: null },
-            { tick: 1, owner: top.id, kind: 'destroyed', other: null },
-            { tick: 1, owner: lower.id, kind: 'destroyed', other: null },
-            { tick: 1, owner: inner.id, kind: 'destroyed', other: null },
-        ]);
-        expect(after[0]?.present).toEqual([outside.id]);
-    });
-
-    test('a Destroyed trigger reads its entity, still there, and changes a variable', () => {
-        const level = levelWithCoins();
-        const coin = placeBody(level, level.world, transform(0, 0), 'static');
-        giveTags(coin, ['coin']);
-        const isCoin: Check = { kind: 'hasTag', target: THIS, tag: 'coin' };
-        giveTriggers(coin, [
-            { when: LEVEL_START, actions: [destroy(THIS)] },
-            { when: DESTROYED, checks: [isCoin], actions: [addCoin] },
-        ]);
-
-        const { after } = play(level, { ticks: 2 }, [coin]);
-
-        expect(after).toEqual([
-            { coins: 1, present: [] },
-            { coins: 1, present: [] },
-        ]);
-    });
-});
-
 describe('custom events', () => {
     test('a button fires `open` on every tagged door, each hearing it in the same tick from the button', () => {
         const level = levelWithCoins();
@@ -188,6 +133,7 @@ describe('custom events', () => {
         const touch: SensorEvent = {
             kind: 'begin',
             sensor: button.id,
+            sensorBody: button.id,
             visitor: ball.id,
             visitorBody: ball.id,
             visitorIsSensor: false,

@@ -34,12 +34,12 @@ function placeBox(level: Level, parent: Entity, x: number, y: number, width: num
     return entity;
 }
 
-function hearsCollision(entity: Entity) {
+function hearsTouch(entity: Entity) {
     const trigger = {
         id: 1,
         name: null,
         on: true,
-        when: { kind: 'collision' as const },
+        when: { kind: 'touched' as const },
         checks: [],
         actions: [],
         repeat: { kind: 'everyTime' as const },
@@ -69,10 +69,10 @@ describe('collision with Box2D', () => {
     test("a ball falling on a wall fires the wall's trigger once, naming the ball, and the ball's naming the wall", () => {
         const level = Level.createNew();
         const wall = placeBox(level, level.world, 0, 200, 400);
-        hearsCollision(wall);
+        hearsTouch(wall);
         const ball = placeBox(level, level.world, 0, 0, 20);
         ball.addComponent(new BodyComponent());
-        hearsCollision(ball);
+        hearsTouch(ball);
 
         const heard = playHeard(level, 180);
 

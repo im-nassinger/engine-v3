@@ -107,7 +107,7 @@ describe('applyMessageFix', () => {
         expect(openLevel.messages.all()).toEqual([]);
     });
 
-    test('a touch trigger\'s "Add Surface as sensor" adds a Surface with Sensor ticked in one step', () => {
+    test('a touch trigger on a shape with no Surface gets no note: things pass through it and it notices them', () => {
         const { session, frames } = buildCrates();
         const openLevel = session.openLevel;
         const pad = openLevel.level.createEntity(openLevel.level.world, 0);
@@ -122,20 +122,8 @@ describe('applyMessageFix', () => {
             repeat: { kind: 'everyTime' },
         } as const;
         pad.addComponent(new TriggerComponent({ triggers: [touchTrigger], nextTriggerId: 2 }));
-        openLevel.selection.replace([pad.id]);
         frames.runFrame();
 
-        const triggerCard = openLevel.entityInspector.cards.find((card) => card.typeName === 'TriggerComponent');
-        const [note] = triggerCard?.notes ?? [];
-        expect(note).toMatchObject({ text: 'Needs a Surface to notice touching.', itemId: 1 });
-        if (note?.fix === undefined) throw new Error('The note has no fix.');
-
-        const stepsBefore = openLevel.history.undoCount;
-        applyMessageFix(openLevel, note.fix, note.entityIds);
-        frames.runFrame();
-
-        expect(pad.getComponent(SurfaceComponent)?.get('sensor')).toBe(true);
-        expect(openLevel.history.undoCount).toBe(stepsBefore + 1);
         expect(openLevel.messages.forEntity(pad.id)).toEqual([]);
     });
 
@@ -150,7 +138,15 @@ describe('applyMessageFix', () => {
             name: null,
             on: true,
             when: { kind: 'levelStart' },
-            checks: [{ kind: 'compare', variable: { owner: 'level', name: 'coins' }, compare: 'is', value: 0 }],
+            checks: [
+                {
+                    kind: 'value',
+                    target: { kind: 'this' },
+                    value: { kind: 'variable', name: 'coins' },
+                    compare: 'is',
+                    amount: 0,
+                },
+            ],
             actions: [{ kind: 'win' }],
             repeat: { kind: 'everyTime' },
         } as const;

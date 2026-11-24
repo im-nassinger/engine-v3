@@ -34,7 +34,7 @@ const BUILT_BESIDES = 2;
 const databaseName = `engine-v3-performance-${Date.now()}`;
 const store = new IndexedDbLevelStore(databaseName);
 const writer = new LevelWriter();
-const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createCurrent());
 const projectFile = new ProjectFile(writer, new FflateZipCodec());
 const levelImport = new LevelImport({ importer: new ImportWorkerClient(createImportWorker), reader });
 

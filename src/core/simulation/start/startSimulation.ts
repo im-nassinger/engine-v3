@@ -30,14 +30,13 @@ import { startPlayCopy } from './startPlayCopy.ts';
 // proves the worker's runs. The engine must be loaded already.
 export function startSimulation(levelData: LevelData, engine: PhysicsEngine, start: RunStart): ReadOutcome<Simulation> {
     let index: TriggerIndex | undefined;
-    // The index is built from the read level before its physics, which switches on contact events for the
-    // surfaces collision triggers need.
-    const contactEventSurfacesOf = (level: Level) => {
+    // The index is built from the read level before its physics, which builds what touch triggers need.
+    const touchSurfacesOf = (level: Level) => {
         index = new TriggerIndex(level);
 
-        return index.contactEventSurfaces();
+        return index.touchSurfaces();
     };
-    const started = startPlayCopy(levelData, engine, contactEventSurfacesOf);
+    const started = startPlayCopy(levelData, engine, touchSurfacesOf);
     if (!started.ok) return started;
     if (index === undefined) throw new Error('The trigger index was not built.');
 

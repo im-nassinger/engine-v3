@@ -8,6 +8,12 @@ What we decided against, and why. **Check here before proposing something**: an 
 
 | Idea | What we do instead | Why | Source |
 |---|---|---|---|
+| The Sensor setting on the SurfaceComponent | A SurfaceComponent means solid, and no Surface means things pass through; a touch trigger notices either. The engine builds a sensor for a pass-through shape under a touch trigger | To a user, "no Surface" and "a sensor" both meant "things pass through"; the only difference was noticing touches, which the engine works out from the triggers | owner: 2026-11-23 |
+| "This hits something" (collision) as an event apart from touching | One touching event, starts or stops, for solid and pass-through things alike | With two, the user can pick the wrong one, nothing fires, and they can't tell why. The owner weighed keeping "overlaps" and "collides" and chose one | owner: 2026-11-23 |
+| The event "no entity with this tag is left" | A variable: each coin adds 1 to `coins`, and the World wins when `coins` becomes 10 or more. Adding an 11th coin means changing the 10 | The owner asked why it was needed; a variable does the same with one concept fewer | scope TR3; round 8: 09 2.2; old: TR-21; owner: 2026-11-23 |
+| The event "this is destroyed" | The trigger holding the Destroy action does the rest itself. It can come back when breaking joints (Later) need it | Only a Destroy action set it off | owner: 2026-11-23 |
+| The Push action | Change value adds a vector to Body › Velocity. Away from or towards `this` is left to scripts | Push ignored mass and changed velocity directly: if it's data, change it with Change value | owner: 2026-11-23 |
+| Three If checks: a tag, a variable's value, a component value | One check, a value compared, with Change value's pickers | All three already checked a value; If and Do now mirror each other | owner: 2026-11-23 |
 | A custom event heard only by the entity it is fired on | It goes down the tree: that entity and everything inside it hear it, so one fired on the World reaches the whole level | The owner fired an event on the World and expected a trigger elsewhere to hear it | owner: 2026-11-23 |
 | A shape with no StyleComponent is hit on its edge only, and its bolt is a fixed 15 px in its top left corner | It is hit inside too, and its bolt sits in its middle, sized with the shape and the zoom | The owner couldn't click a trigger except on its edge, and found the fixed-size bolt strange | owner: 2026-11-22 |
 | A Rope or Spring has one icon, halfway between its ends, and its ends can't be moved after placing | An icon on each end, each draggable; the joint sits at end A | The owner found a Rope or Spring couldn't be changed after placing it | owner: 2026-11-21 |
@@ -53,7 +59,7 @@ What we decided against, and why. **Check here before proposing something**: an 
 | A one-way component or script | A SurfaceComponent setting | It must be decided inside the physics step | round 7: OW1 |
 | A joint that follows its bodies in the editor, or is copied with them | A joint moves and copies only when selected | Only what is selected moves or copies | round 7: 06 2.9, 06 2.10; round 8: JM1, JC1 |
 | A joint's automatic place in the tree | A joint sits where the user puts it | A joint is an ordinary entity | round 1: D45 |
-| A "joint broke" event | The ordinary "destroyed" event | Breaking is being destroyed | round 5: R45; round 6: JB1 |
+| A "joint broke" event | No event for now. When breaking joints come (Later), "this is destroyed" may come back for them, since breaking is being destroyed | Breaking is being destroyed | round 5: R45; round 6: JB1 |
 | A "joints of this body" list | The Used by list | "What points to this?" is the general question | round 8: LK1 |
 | A line on a Dynamic body with a warning | The Dynamic option is greyed out for lines | Decided in round 2 | round 2: O8 |
 | Level bounds of 3840×2160, then 2000×1000 | 20000×10000 px | The owner's size | round 6: 05 2.15; round 7: BND2 |

@@ -1,4 +1,4 @@
-import { CheckboxFieldType, NumberFieldType } from '../../fields/index.ts';
+import { NumberFieldType } from '../../fields/index.ts';
 
 import { ComponentSchema } from '../schema/ComponentSchema.ts';
 
@@ -33,14 +33,6 @@ export const surfaceSchema = new ComponentSchema<SurfaceValues>({
             type: new NumberFieldType({ min: 0, max: 2 }),
             defaultValue: 0,
             description: 'How much speed it keeps after a hit. 0 stops dead, 1 bounces back fully.',
-            changeableInPlay: true,
-        },
-        {
-            key: 'sensor',
-            label: 'Sensor',
-            type: new CheckboxFieldType(),
-            defaultValue: false,
-            description: 'Notices what touches it but never pushes.',
             changeableInPlay: true,
         },
     ],

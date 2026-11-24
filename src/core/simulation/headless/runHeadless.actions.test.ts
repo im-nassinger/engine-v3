@@ -97,7 +97,14 @@ function tagsIn(simulation: Simulation, entity: Entity) {
 }
 
 function begin(sensor: Entity, visitor: Entity): SensorEvent {
-    return { kind: 'begin', sensor: sensor.id, visitor: visitor.id, visitorBody: visitor.id, visitorIsSensor: false };
+    return {
+        kind: 'begin',
+        sensor: sensor.id,
+        sensorBody: sensor.id,
+        visitor: visitor.id,
+        visitorBody: visitor.id,
+        visitorIsSensor: false,
+    };
 }
 
 // A sensor at the origin whose touched trigger runs the actions, and a Dynamic ball 100 px right of it.
@@ -118,13 +125,9 @@ function touch(world: ScriptedWorld, simulation: Simulation, sensor: Entity, vis
 describe('checks', () => {
     test('a variable compared with a number', () => {
         const level = levelWithCoins(10);
-        const atLeastTen: Check = {
-            kind: 'compare',
-            variable: { owner: 'level', name: 'coins' },
-            compare: 'atLeast',
-            value: 10,
-        };
-        const isNine: Check = { kind: 'compare', variable: { owner: 'level', name: 'coins' }, compare: 'is', value: 9 };
+        const coins = { kind: 'variable', name: 'coins' } as const;
+        const atLeastTen: Check = { kind: 'value', target: THIS, value: coins, compare: 'atLeast', amount: 10 };
+        const isNine: Check = { kind: 'value', target: THIS, value: coins, compare: 'is', amount: 9 };
         giveTriggers(level.world, [
             { checks: [atLeastTen], actions: [addCoins(1)] },
             { checks: [isNine], actions: [addCoins(100)] },
@@ -140,7 +143,13 @@ describe('checks', () => {
     test("`other`'s tag may be on a group above it, and a failed check doesn't use up once per run", () => {
         const level = levelWithCoins();
         const sensor = placeBody(level, level.world, transform(0, 0), 'static');
-        const isPlayer: Check = { kind: 'hasTag', target: OTHER, tag: 'player' };
+        const isPlayer: Check = {
+            kind: 'value',
+            target: OTHER,
+            value: { kind: 'tag' },
+            compare: 'is',
+            amount: 'player',
+        };
         giveTriggers(sensor, [
             { when: { kind: 'touched' }, checks: [isPlayer], actions: [addCoins(1)], repeat: { kind: 'oncePerRun' } },
         ]);
@@ -229,7 +238,7 @@ describe('Change value', () => {
         expect(inRun(simulation, styled)?.requireComponent(StyleComponent).get('opacity')).toBe(1);
     });
 
-    test('adds and removes a tag, and "no entity with this tag is left" hears it in the same tick', () => {
+    test('adds and removes a tag, which a tag check reads in the same tick', () => {
         const level = levelWithCoins();
         const door = place(level, level.world, transform(0, 0));
         giveTags(door, ['closed']);
@@ -242,16 +251,24 @@ describe('Change value', () => {
                 ],
             },
         ]);
-        giveTriggers(level.world, [{ when: { kind: 'tagLeft', tag: 'closed' }, actions: [addCoins(1)] }]);
+        const isClosed: Check = {
+            kind: 'value',
+            target: { kind: 'entity', entity: door.id },
+            value: tag,
+            compare: 'is',
+            amount: 'closed',
+        };
+        const isOpen: Check = { ...isClosed, amount: 'open_door' };
+        // Below the door, so its triggers run after the door's.
+        const watcher = place(level, level.world, transform(0, 0));
+        giveTriggers(watcher, [
+            { checks: [isClosed], actions: [addCoins(100)] },
+            { checks: [isOpen, { ...isClosed, compare: 'isNot' }], actions: [addCoins(1)] },
+        ]);
         const { simulation } = start(level);
 
         simulation.runTick(PRESS_SPACE);
         expect(tagsIn(simulation, door)).toEqual(['open_door']);
-        expect(coinsIn(simulation)).toBe(1);
-        expect(simulation.firings.map((firing) => firing.when.kind)).toEqual(['key', 'tagLeft']);
-
-        // Heard once: not again on the next tick.
-        simulation.runTick(NOTHING);
         expect(coinsIn(simulation)).toBe(1);
     });
 
@@ -390,7 +407,7 @@ describe('Change value tells physics when it owns the value', () => {
             {
                 call: 'setSurfaceSettings',
                 entity: wheel.id,
-                settings: { friction: 2, restitution: surface?.get('restitution'), sensor: false },
+                settings: { friction: 2, restitution: surface?.get('restitution') },
             },
             { call: 'setGravity', gravity: { x: 0, y: 0 } },
             {
@@ -450,7 +467,7 @@ describe('Destroy', () => {
     test('removes the target and its children at the end of the tick, so the actions after it still run', () => {
         const { level, sensor, ball } = touchLevel([
             { kind: 'destroy', target: OTHER },
-            { kind: 'push', target: OTHER, push: { kind: 'by', x: 0, y: -300 } },
+            { kind: 'change', target: OTHER, value: { kind: 'velocity' }, op: 'add', amount: { x: 0, y: -300 } },
             { kind: 'destroy', target: { kind: 'entity', entity: 1 } },
         ]);
         const child = place(level, ball, transform(0, 0));
@@ -470,19 +487,22 @@ describe('Destroy', () => {
     });
 });
 
-describe('Push', () => {
-    test('away from or towards `this`, at the strength given, whatever the mass', () => {
+describe('Body › Velocity', () => {
+    test('set, add and subtract, whatever the mass', () => {
+        const velocity = { kind: 'velocity' } as const;
         const { level, sensor, ball } = touchLevel([
-            { kind: 'push', target: OTHER, push: { kind: 'away', strength: 200 } },
-            { kind: 'push', target: OTHER, push: { kind: 'towards', strength: 50 } },
+            { kind: 'change', target: OTHER, value: velocity, op: 'set', amount: { x: 200, y: 0 } },
+            { kind: 'change', target: OTHER, value: velocity, op: 'add', amount: { x: 0, y: -50 } },
+            { kind: 'change', target: OTHER, value: velocity, op: 'subtract', amount: { x: 10, y: 20 } },
         ]);
         const { simulation, world } = start(level);
 
         touch(world, simulation, sensor, ball);
 
         expect(world.changes).toEqual([
-            { call: 'addVelocity', entity: ball.id, velocity: { x: 200, y: 0 } },
-            { call: 'addVelocity', entity: ball.id, velocity: { x: -50, y: -0 } },
+            { call: 'setLinearVelocity', entity: ball.id, velocity: { x: 200, y: 0 } },
+            { call: 'addVelocity', entity: ball.id, velocity: { x: 0, y: -50 } },
+            { call: 'addVelocity', entity: ball.id, velocity: { x: -10, y: -20 } },
         ]);
     });
 
@@ -493,9 +513,14 @@ describe('Push', () => {
         giveTags(part, ['kick']);
         const loose = place(level, level.world, transform(0, 0));
         giveTags(loose, ['kick']);
-        giveTriggers(level.world, [
-            { actions: [{ kind: 'push', target: { kind: 'tagged', tag: 'kick' }, push: { kind: 'by', x: 10, y: 0 } }] },
-        ]);
+        const kick: Action = {
+            kind: 'change',
+            target: { kind: 'tagged', tag: 'kick' },
+            value: { kind: 'velocity' },
+            op: 'add',
+            amount: { x: 10, y: 0 },
+        };
+        giveTriggers(level.world, [{ actions: [kick] }]);
         const { simulation, world } = start(level);
 
         simulation.runTick(PRESS_SPACE);
@@ -571,7 +596,7 @@ describe('what keeps a trigger or an action from running', () => {
             amount: 1,
         };
         giveTriggers(level.world, [
-            { actions: [addCoins(1), { kind: 'push', target: THIS, push: null }] },
+            { actions: [addCoins(1), { kind: 'wait', seconds: null }] },
             { actions: [addCoins(1), unknown] },
             { actions: [addCoins(10)] },
         ]);
@@ -601,35 +626,21 @@ describe('what keeps a trigger or an action from running', () => {
 describe('the chain limit', () => {
     test('triggers setting off triggers stop after 32 rounds in one tick, with one warning', () => {
         const level = levelWithCoins();
-        const flag = place(level, level.world, transform(0, 0));
-        giveTags(flag, ['flag']);
-        const tag = { kind: 'tag' } as const;
-        const takeAway: Action = {
-            kind: 'change',
-            target: { kind: 'entity', entity: flag.id },
-            value: tag,
-            op: 'subtract',
-            amount: 'flag',
+        const coinsChange: TriggerParts['when'] = {
+            kind: 'variableChanged',
+            variable: { owner: 'level', name: 'coins' },
+            becomes: null,
         };
-        const giveBack: Action = {
-            kind: 'change',
-            target: { kind: 'entity', entity: flag.id },
-            value: tag,
-            op: 'add',
-            amount: 'flag',
-        };
-        giveTriggers(level.world, [
-            { actions: [takeAway] },
-            { when: { kind: 'tagLeft', tag: 'flag' }, actions: [addCoins(1), giveBack, takeAway] },
-        ]);
+        giveTriggers(level.world, [{ actions: [addCoins(1)] }, { when: coinsChange, actions: [addCoins(1)] }]);
         const { simulation } = start(level);
 
+        // The key's round adds 1, then 31 rounds of "coins changes" add 1 each; the 33rd is dropped.
         simulation.runTick(PRESS_SPACE);
-        expect(coinsIn(simulation)).toBe(31);
+        expect(coinsIn(simulation)).toBe(32);
         expect(simulation.warnings).toEqual([{ kind: 'chainLimit' }]);
 
         // The dropped round is not heard on the next tick.
         simulation.runTick(NOTHING);
-        expect(coinsIn(simulation)).toBe(31);
+        expect(coinsIn(simulation)).toBe(32);
     });
 });

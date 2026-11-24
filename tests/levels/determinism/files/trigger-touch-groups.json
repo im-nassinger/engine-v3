@@ -1,6 +1,6 @@
 {
     "format": "engine-v3-level",
-    "formatVersion": 1,
+    "formatVersion": 2,
     "physicsVersion": 1,
     "name": "trigger-touch-groups",
     "editor": {
@@ -115,13 +115,16 @@
                         "checks": [],
                         "actions": [
                             {
-                                "kind": "push",
+                                "kind": "change",
                                 "target": {
                                     "kind": "entity",
                                     "entity": 5
                                 },
-                                "push": {
-                                    "kind": "by",
+                                "value": {
+                                    "kind": "velocity"
+                                },
+                                "op": "add",
+                                "amount": {
                                     "x": 12,
                                     "y": 0
                                 }
@@ -196,8 +199,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": false
+                        "restitution": 0
                     }
                 },
                 "children": []
@@ -228,12 +230,6 @@
                             "width": 300,
                             "height": 80
                         }
-                    },
-                    "SurfaceComponent": {
-                        "density": 1,
-                        "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": true
                     },
                     "TriggerComponent": {
                         "triggers": [
@@ -358,8 +354,7 @@
                             "SurfaceComponent": {
                                 "density": 1,
                                 "friction": 0.4,
-                                "restitution": 0,
-                                "sensor": false
+                                "restitution": 0
                             }
                         },
                         "children": []
@@ -394,8 +389,7 @@
                             "SurfaceComponent": {
                                 "density": 1,
                                 "friction": 0.4,
-                                "restitution": 0,
-                                "sensor": false
+                                "restitution": 0
                             }
                         },
                         "children": []
@@ -430,8 +424,7 @@
                             "SurfaceComponent": {
                                 "density": 1,
                                 "friction": 0.4,
-                                "restitution": 0,
-                                "sensor": false
+                                "restitution": 0
                             }
                         },
                         "children": []

@@ -35,8 +35,8 @@ function giveTriggers(entity: Entity, whens: readonly When[]) {
     entity.addComponent(new TriggerComponent({ triggers, nextTriggerId: triggers.length + 1 }));
 }
 
-function hearsCollision(entity: Entity) {
-    giveTriggers(entity, [{ kind: 'collision' }]);
+function hearsTouch(entity: Entity) {
+    giveTriggers(entity, [{ kind: 'touched' }]);
 }
 
 function placeStatic(level: Level, parent: Entity, x: number) {
@@ -101,30 +101,30 @@ function play(level: Level, options: PlayOptions) {
     return { heard, contactEventSurfaces };
 }
 
-describe('collision', () => {
-    test("a ball hitting a wall fires the wall's trigger and the ball's, each naming the other", () => {
+describe('touching between solid entities', () => {
+    test("a ball touching a wall fires the wall's trigger and the ball's, each naming the other", () => {
         const level = Level.createNew();
         const wall = placeStatic(level, level.world, 0);
-        hearsCollision(wall);
+        hearsTouch(wall);
         const ball = placeBody(level, level.world, transform(100, 0));
-        hearsCollision(ball);
+        hearsTouch(ball);
         const contactsAt = { 2: [begins(side(ball), side(wall))] };
 
         const { heard } = play(level, { ticks: 3, contactsAt });
 
         expect(heard).toEqual([
-            { tick: 2, owner: wall.id, kind: 'collision', other: ball.id },
-            { tick: 2, owner: ball.id, kind: 'collision', other: wall.id },
+            { tick: 2, owner: wall.id, kind: 'touched', other: ball.id },
+            { tick: 2, owner: ball.id, kind: 'touched', other: wall.id },
         ]);
     });
 
-    test('only the surfaces of entities hearing collisions, or inside a group that does, send contact events', () => {
+    test('only the surfaces of entities hearing touches, or inside a group that does, send contact events', () => {
         const level = Level.createNew();
         const wall = placeStatic(level, level.world, 0);
-        hearsCollision(wall);
+        hearsTouch(wall);
         placeStatic(level, level.world, 100);
         const group = place(level, level.world, transform(200, 0));
-        hearsCollision(group);
+        hearsTouch(group);
         const part = placeStatic(level, group, 0);
 
         const { contactEventSurfaces } = play(level, { ticks: 1 });
@@ -132,17 +132,17 @@ describe('collision', () => {
         expect(contactEventSurfaces).toEqual([wall.id, part.id]);
     });
 
-    test('a level with no collision trigger asks for no contact events', () => {
+    test('a level with no touch trigger asks for no contact events', () => {
         const level = Level.createNew();
         placeStatic(level, level.world, 0);
 
         expect(play(level, { ticks: 1 }).contactEventSurfaces).toEqual([]);
     });
 
-    test('a body of two shapes hitting with both fires once, and again only after both have parted', () => {
+    test('a body of two shapes touching with both fires once, and again only after both have parted', () => {
         const level = Level.createNew();
         const wall = placeStatic(level, level.world, 0);
-        hearsCollision(wall);
+        hearsTouch(wall);
         const crate = placeBody(level, level.world, transform(100, 0));
         const left = placeSurface(level, crate, -5);
         const right = placeSurface(level, crate, 5);
@@ -157,15 +157,15 @@ describe('collision', () => {
         const { heard } = play(level, { ticks: 8, contactsAt });
 
         expect(heard).toEqual([
-            { tick: 2, owner: wall.id, kind: 'collision', other: crate.id },
-            { tick: 7, owner: wall.id, kind: 'collision', other: crate.id },
+            { tick: 2, owner: wall.id, kind: 'touched', other: crate.id },
+            { tick: 7, owner: wall.id, kind: 'touched', other: crate.id },
         ]);
     });
 
-    test('a hit after the two parted fires again, a hit while still touching does not', () => {
+    test('a touch after the two parted fires again, a touch while still touching does not', () => {
         const level = Level.createNew();
         const wall = placeStatic(level, level.world, 0);
-        hearsCollision(wall);
+        hearsTouch(wall);
         const ball = placeBody(level, level.world, transform(100, 0));
         const hit = begins(side(ball), side(wall));
         const parted = ends(side(ball), side(wall));
@@ -176,10 +176,10 @@ describe('collision', () => {
         expect(heard.map((firing) => firing.tick)).toEqual([2, 5]);
     });
 
-    test('a group hears hits on its parts, and its parts hitting each other fire nothing', () => {
+    test('a group hears touches on its parts, and its parts touching each other fire nothing', () => {
         const level = Level.createNew();
         const group = place(level, level.world, transform(0, 0));
-        hearsCollision(group);
+        hearsTouch(group);
         const part = placeBody(level, group, transform(0, 0));
         const otherPart = placeBody(level, group, transform(30, 0));
         const ball = placeBody(level, level.world, transform(100, 0));
@@ -190,25 +190,25 @@ describe('collision', () => {
 
         const { heard } = play(level, { ticks: 3, contactsAt });
 
-        expect(heard).toEqual([{ tick: 2, owner: group.id, kind: 'collision', other: ball.id }]);
+        expect(heard).toEqual([{ tick: 2, owner: group.id, kind: 'touched', other: ball.id }]);
     });
 
-    test('a shape on the ground is hit as itself, not as the World', () => {
+    test('a shape on the ground touches as itself, not as the World', () => {
         const level = Level.createNew();
         const floor = placeSurface(level, level.world, 0);
         const ball = placeBody(level, level.world, transform(0, -20));
-        hearsCollision(ball);
+        hearsTouch(ball);
         const contactsAt = { 2: [begins(side(floor, level.world), side(ball))] };
 
         const { heard } = play(level, { ticks: 2, contactsAt });
 
-        expect(heard).toEqual([{ tick: 2, owner: ball.id, kind: 'collision', other: floor.id }]);
+        expect(heard).toEqual([{ tick: 2, owner: ball.id, kind: 'touched', other: floor.id }]);
     });
 
-    test('each hitting entity is counted on its own', () => {
+    test('each touching entity is counted on its own', () => {
         const level = Level.createNew();
         const wall = placeStatic(level, level.world, 0);
-        hearsCollision(wall);
+        hearsTouch(wall);
         const ball = placeBody(level, level.world, transform(100, 0));
         const crate = placeBody(level, level.world, transform(200, 0));
         const contactsAt = {
@@ -224,28 +224,67 @@ describe('collision', () => {
         ]);
     });
 
-    test('collision comes after touched and no longer touched in a tick', () => {
+    test('a solid touch and a pass-through overlap with one entity are one touch, which stops when both end', () => {
         const level = Level.createNew();
-        const wall = placeStatic(level, level.world, 0);
-        giveTriggers(wall, [{ kind: 'collision' }, { kind: 'untouched' }, { kind: 'touched' }]);
-        const ball = placeBody(level, level.world, transform(100, 0));
-        const crate = placeBody(level, level.world, transform(200, 0));
-        const sensorTouch = (kind: SensorEvent['kind'], visitor: Entity): SensorEvent => ({
+        const pad = placeStatic(level, level.world, 0);
+        giveTriggers(pad, [{ kind: 'touched' }, { kind: 'untouched' }]);
+        const cart = placeBody(level, level.world, transform(100, 0));
+        const overlap = (kind: SensorEvent['kind']): SensorEvent => ({
             kind,
-            sensor: wall.id,
-            visitor: visitor.id,
-            visitorBody: visitor.id,
+            sensor: pad.id,
+            sensorBody: pad.id,
+            visitor: cart.id,
+            visitorBody: cart.id,
             visitorIsSensor: false,
         });
-        const sensorEventsAt = {
-            2: [sensorTouch('begin', ball)],
-            3: [sensorTouch('end', ball), sensorTouch('begin', crate)],
+        const contactsAt = { 2: [begins(side(cart), side(pad))], 4: [ends(side(cart), side(pad))] };
+        const sensorEventsAt = { 3: [overlap('begin')], 5: [overlap('end')] };
+
+        const { heard } = play(level, { ticks: 6, contactsAt, sensorEventsAt });
+
+        expect(heard.map((firing) => [firing.tick, firing.kind])).toEqual([
+            [2, 'touched'],
+            [5, 'untouched'],
+        ]);
+    });
+
+    test('both sides hear a pass-through touch: the solid visitor fires too, naming the sensor', () => {
+        const level = Level.createNew();
+        const coin = placeSurface(level, level.world, 0);
+        coin.removeComponent(SurfaceComponent);
+        hearsTouch(coin);
+        const player = placeBody(level, level.world, transform(100, 0));
+        hearsTouch(player);
+        const touch: SensorEvent = {
+            kind: 'begin',
+            sensor: coin.id,
+            sensorBody: level.world.id,
+            visitor: player.id,
+            visitorBody: player.id,
+            visitorIsSensor: false,
         };
-        const contactsAt = { 3: [begins(side(crate), side(wall))] };
 
-        const { heard } = play(level, { ticks: 3, contactsAt, sensorEventsAt });
-        const thirdTick = heard.filter((firing) => firing.tick === 3).map((firing) => firing.kind);
+        const { heard } = play(level, { ticks: 2, sensorEventsAt: { 2: [touch] } });
 
-        expect(thirdTick).toEqual(['touched', 'untouched', 'collision']);
+        expect(heard).toEqual([
+            { tick: 2, owner: coin.id, kind: 'touched', other: player.id },
+            { tick: 2, owner: player.id, kind: 'touched', other: coin.id },
+        ]);
+    });
+
+    test('two pass-through shapes never touch', () => {
+        const level = Level.createNew();
+        const coin = placeSurface(level, level.world, 0);
+        hearsTouch(coin);
+        const touch: SensorEvent = {
+            kind: 'begin',
+            sensor: coin.id,
+            sensorBody: level.world.id,
+            visitor: 99,
+            visitorBody: 99,
+            visitorIsSensor: true,
+        };
+
+        expect(play(level, { ticks: 2, sensorEventsAt: { 2: [touch] } }).heard).toEqual([]);
     });
 });

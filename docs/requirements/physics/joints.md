@@ -13,7 +13,7 @@ All lengths are pixels and all angles are degrees. Positive angles and speeds ar
 - A joint is an entity with a TransformComponent and a JointComponent. It has its own row in the Entities viewer, and can be renamed and hidden like any entity.
 - It can hold children, triggers and scripts, like any entity. *Why: one rule for every entity. Treating joints as special was left over from an earlier design.*
 - The JointComponent names its two entities in fields **A** and **B**. Clicking a field selects that entity. An empty B pins A to the background.
-- Joints connect bodies. A sensor or a line can be an end.
+- Joints connect bodies. A line can be an end.
 - Joints show an editor-only icon so they can be selected, one shape per type: a Hinge one at its point, a Rope or Spring one on each end. **The icon grows and shrinks with the zoom**, like the level, but never gets too small to see or click. "Joint icons" in the View menu hides them. *Why: the owner found an icon of one fixed size on screen looked wrong beside the zoomed level (owner: 2026-11-21, replacing "always the same size on screen").*
 - Hovering or selecting a joint shows thin lines to its two entities.
 - **Joints have no special drawing in play.** An unstyled joint is invisible, like any entity.

@@ -10,7 +10,6 @@ const COIN_BODY = 1;
 const COIN = 2;
 const BALL_BODY = 3;
 const BALL = 4;
-const SURFACE_SETTINGS = { friction: 0.3, restitution: 0 };
 
 const engine = new Box2dPhysicsEngine();
 
@@ -43,7 +42,7 @@ function eventsOfStep(world: PhysicsWorld) {
 }
 
 function ballEvent(kind: SensorEvent['kind']): SensorEvent {
-    return { kind, sensor: COIN, visitor: BALL, visitorBody: BALL_BODY, visitorIsSensor: false };
+    return { kind, sensor: COIN, sensorBody: COIN_BODY, visitor: BALL, visitorBody: BALL_BODY, visitorIsSensor: false };
 }
 
 describe('Box2dPhysicsWorld: sensor events', () => {
@@ -91,7 +90,7 @@ describe('Box2dPhysicsWorld: sensor events', () => {
         addBall(world, { x: 0, y: 0 }, { body: 7, surface: 8 });
 
         expect(eventsOfStep(world)).toEqual([
-            { kind: 'begin', sensor: COIN, visitor: 8, visitorBody: 7, visitorIsSensor: false },
+            { kind: 'begin', sensor: COIN, sensorBody: COIN_BODY, visitor: 8, visitorBody: 7, visitorIsSensor: false },
             ballEvent('end'),
         ]);
         expect(eventsOfStep(world)).toEqual([]);
@@ -121,6 +120,7 @@ describe('Box2dPhysicsWorld: sensor events', () => {
         expect(events).toContainEqual({
             kind: 'begin',
             sensor: COIN,
+            sensorBody: COIN_BODY,
             visitor: BALL,
             visitorBody: BALL_BODY,
             visitorIsSensor: true,
@@ -128,6 +128,7 @@ describe('Box2dPhysicsWorld: sensor events', () => {
         expect(events).toContainEqual({
             kind: 'begin',
             sensor: BALL,
+            sensorBody: BALL_BODY,
             visitor: COIN,
             visitorBody: COIN_BODY,
             visitorIsSensor: true,
@@ -143,36 +144,8 @@ describe('Box2dPhysicsWorld: sensor events', () => {
         world.addSurface(ballBody, surfaceDefinition({ entity: BALL, pieces: [boxPiece(100, 100)], sensor: true }));
 
         expect(eventsOfStep(world)).toEqual([
-            { kind: 'begin', sensor: BALL, visitor: 0, visitorBody: 0, visitorIsSensor: false },
+            { kind: 'begin', sensor: BALL, sensorBody: BALL_BODY, visitor: 0, visitorBody: 0, visitorIsSensor: false },
         ]);
-        world.destroy();
-    });
-
-    test('switching Sensor off ends its overlaps, and on again begins them, each in the next step', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
-        addCoin(world);
-        addBall(world, { x: 0, y: 0 });
-        eventsOfStep(world);
-
-        world.setSurfaceSettings(COIN, { ...SURFACE_SETTINGS, sensor: false });
-        expect(eventsOfStep(world)).toEqual([ballEvent('end')]);
-
-        world.setSurfaceSettings(COIN, { ...SURFACE_SETTINGS, sensor: true });
-        expect(eventsOfStep(world)).toEqual([ballEvent('begin')]);
-        world.destroy();
-    });
-
-    test('a visitor rebuilt as a sensor sends its end and its new begin in the same step', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
-        addCoin(world);
-        addBall(world, { x: 0, y: 0 });
-        eventsOfStep(world);
-
-        world.setSurfaceSettings(BALL, { ...SURFACE_SETTINGS, sensor: true });
-        const events = eventsOfStep(world);
-
-        expect(events).toContainEqual(ballEvent('end'));
-        expect(events).toContainEqual({ ...ballEvent('begin'), visitorIsSensor: true });
         world.destroy();
     });
 
@@ -182,8 +155,8 @@ describe('Box2dPhysicsWorld: sensor events', () => {
         addBall(world, { x: 0, y: 0 });
         eventsOfStep(world);
 
-        world.setSurfaceSettings(COIN, { friction: 1, restitution: 1, sensor: true });
-        world.setSurfaceSettings(BALL, { friction: 1, restitution: 1, sensor: false });
+        world.setSurfaceSettings(COIN, { friction: 1, restitution: 1 });
+        world.setSurfaceSettings(BALL, { friction: 1, restitution: 1 });
 
         expect(eventsOfStep(world)).toEqual([]);
         world.destroy();

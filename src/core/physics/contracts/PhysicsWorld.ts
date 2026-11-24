@@ -41,9 +41,10 @@ export type PhysicsWorld = {
     setPose(body: BodyHandle, pose: BodyPose): void;
     // Adds to a body's speed in px/s, whatever its mass, and wakes it. A Static body doesn't move.
     addVelocity(body: BodyHandle, velocity: Point): void;
+    // Gives a body this speed in px/s, keeping its spin, and wakes it. A Static body doesn't move.
+    setLinearVelocity(body: BodyHandle, velocity: Point): void;
     // Changes every surface the entity gave this world; one play left out has nothing to change. Friction
-    // and Restitution change in place. A change of Sensor rebuilds the surface, so its overlaps end and
-    // begin again in the next step.
+    // and Restitution change in place.
     setSurfaceSettings(entity: EntityId, settings: SurfaceSettings): void;
     // Changes a Hinge's motor and wakes its bodies. Does nothing if its body took it.
     setMotor(joint: JointHandle, motor: HingeMotor): void;

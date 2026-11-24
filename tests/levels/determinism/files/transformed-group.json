@@ -1,6 +1,6 @@
 {
     "format": "engine-v3-level",
-    "formatVersion": 1,
+    "formatVersion": 2,
     "physicsVersion": 1,
     "name": "transformed-group",
     "editor": {
@@ -151,8 +151,7 @@
                     "SurfaceComponent": {
                         "density": 1,
                         "friction": 0.3,
-                        "restitution": 0,
-                        "sensor": false
+                        "restitution": 0
                     }
                 },
                 "children": []
@@ -218,8 +217,7 @@
                             "SurfaceComponent": {
                                 "density": 1,
                                 "friction": 0.3,
-                                "restitution": 0,
-                                "sensor": false
+                                "restitution": 0
                             }
                         },
                         "children": []
@@ -253,8 +251,7 @@
                             "SurfaceComponent": {
                                 "density": 1,
                                 "friction": 0.3,
-                                "restitution": 0,
-                                "sensor": false
+                                "restitution": 0
                             }
                         },
                         "children": []
@@ -301,8 +298,7 @@
                             "SurfaceComponent": {
                                 "density": 1,
                                 "friction": 0.3,
-                                "restitution": 0,
-                                "sensor": false
+                                "restitution": 0
                             }
                         },
                         "children": []

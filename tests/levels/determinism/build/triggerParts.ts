@@ -63,8 +63,9 @@ export function switchTrigger(owner: Entity, trigger: number, on: boolean): Acti
     };
 }
 
-export function pushBy(entity: Entity, x: number, y: number): Action {
-    return { kind: 'push', target: entityTarget(entity), push: { kind: 'by', x, y } };
+// Adds to the body's Body › Velocity, in px/s, whatever its mass.
+export function addVelocity(entity: Entity, x: number, y: number): Action {
+    return { kind: 'change', target: entityTarget(entity), value: { kind: 'velocity' }, op: 'add', amount: { x, y } };
 }
 
 export function inputHeld(input: string): When {
@@ -83,16 +84,6 @@ export function changeOwnVariable(name: string, op: ChangeOp, amount: JsonValue 
     return { kind: 'change', target: { kind: 'this' }, value: { kind: 'variable', name, own: true }, op, amount };
 }
 
-export function setOwnSensor(sensor: boolean): Action {
-    return {
-        kind: 'change',
-        target: { kind: 'this' },
-        value: { kind: 'field', component: 'SurfaceComponent', field: 'sensor' },
-        op: 'set',
-        amount: sensor,
-    };
-}
-
 export function fireAtTagged(tag: string, name: string): Action {
     return { kind: 'fire', target: { kind: 'tagged', tag }, name, amount: null };
 }
@@ -102,5 +93,5 @@ export function wait(seconds: number): Action {
 }
 
 export function otherHasTag(tag: string): Check {
-    return { kind: 'hasTag', target: { kind: 'other' }, tag };
+    return { kind: 'value', target: { kind: 'other' }, value: { kind: 'tag' }, compare: 'is', amount: tag };
 }

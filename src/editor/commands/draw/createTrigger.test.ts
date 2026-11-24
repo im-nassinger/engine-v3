@@ -32,7 +32,7 @@ function requireCreated(outcome: ReturnType<typeof createTrigger>) {
 }
 
 describe('createTrigger', () => {
-    test('makes a sensor rectangle with one touch trigger and no style, on top, selected, as one step', () => {
+    test('makes a rectangle with one touch trigger, no Surface and no style, on top, selected, as one step', () => {
         const { session, level } = buildSession();
 
         const id = requireCreated(createTrigger(session.openLevel, session.reader, RECTANGLE));
@@ -44,9 +44,7 @@ describe('createTrigger', () => {
         expect(transform.get('position')).toEqual({ x: 800, y: 410 });
         expect(transform.get('rotation')).toBe(15);
         expect(trigger.requireComponent(ShapeComponent).get('geometry')).toEqual(RECTANGLE.geometry);
-        const surface = trigger.requireComponent(SurfaceComponent);
-        expect(surface.get('sensor')).toBe(true);
-        expect(surface.get('density')).toBe(new SurfaceComponent().get('density'));
+        expect(trigger.hasComponent(SurfaceComponent)).toBe(false);
         expect(trigger.hasComponent(StyleComponent)).toBe(false);
         const triggers = trigger.requireComponent(TriggerComponent);
         expect(triggers.get('triggers')).toEqual([

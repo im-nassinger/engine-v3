@@ -1,5 +1,6 @@
 export { FormatUpgrader } from './versions/FormatUpgrader.ts';
 export type { FormatUpgradeStep } from './versions/FormatUpgrader.ts';
+export { entityWithoutSensor } from './versions/removeSensorSetting.ts';
 export { CURRENT_FORMAT_VERSION, LEVEL_FORMAT } from './LevelData.ts';
 export type { ComponentData, EditorData, EntityData, LevelData } from './LevelData.ts';
 export { V1_LEVEL_LIMITS } from './LevelLimits.ts';

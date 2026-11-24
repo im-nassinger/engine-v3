@@ -45,7 +45,7 @@ const DEFAULT_TRANSFORM = {
 };
 
 function createReader(limits = V1_LEVEL_LIMITS) {
-    return new LevelReader(createV1Registry(), limits, FormatUpgrader.createV1());
+    return new LevelReader(createV1Registry(), limits, FormatUpgrader.createCurrent());
 }
 
 function newLevelData() {
@@ -212,7 +212,7 @@ describe('LevelReader variables', () => {
         expectDamaged(levelData);
     });
 
-    test('a v3 level, its variables all numbers, writes back byte for byte', () => {
+    test('a level, its variables all numbers, writes back byte for byte', () => {
         const savedText = JSON.stringify(everyComponentLevel);
         const level = requireLevel(createReader().readJson(savedText));
 
@@ -335,24 +335,24 @@ describe('LevelReader refuses what is not a level', () => {
     });
 
     test('refuses a format version above the latest as made by a newer version', () => {
-        const levelData = { ...recordedNewLevel, formatVersion: 2 };
+        const levelData = { ...recordedNewLevel, formatVersion: 3 };
         const outcome = createReader().read(levelData);
 
-        expect(outcome).toEqual({ ok: false, refusal: { reason: 'newerVersion', fileVersion: 2 } });
+        expect(outcome).toEqual({ ok: false, refusal: { reason: 'newerVersion', fileVersion: 3 } });
     });
 
     test('refuses a physics version above the current one as made by a newer version', () => {
         const levelData = { ...recordedNewLevel, physicsVersion: 2 };
         const outcome = createReader().read(levelData);
 
-        expect(outcome).toEqual({ ok: false, refusal: { reason: 'newerVersion', fileVersion: 1 } });
+        expect(outcome).toEqual({ ok: false, refusal: { reason: 'newerVersion', fileVersion: 2 } });
     });
 
     test('runs the upgrade steps before checking the level', () => {
         const renameStep = (fileData: unknown) => ({ ...(fileData as object), name: 'Upgraded', formatVersion: 2 });
         const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, new FormatUpgrader([renameStep]));
 
-        const outcome = reader.read(recordedNewLevel);
+        const outcome = reader.read({ ...recordedNewLevel, formatVersion: 1 });
         const level = requireLevel(outcome);
 
         expect(level.name).toBe('Upgraded');

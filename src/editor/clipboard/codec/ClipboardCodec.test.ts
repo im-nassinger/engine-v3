@@ -91,7 +91,7 @@ function withoutTransforms(data: EntityData): EntityData {
 }
 
 function levelMatrixOfRoot(fragment: EntityFragment, index: number) {
-    const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+    const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createCurrent());
     const target = Level.createNew();
     const read = reader.readSubtree(target, fragment.entities, target.world, 0);
     if (!read.ok) throw new Error(`The copy was refused: ${read.refusal.reason}.`);
@@ -167,7 +167,7 @@ describe('ClipboardCodec.encode', () => {
         const originals = new LevelWriter().writeSubtree([rope, crate, group]);
 
         const fragment = requireFragment(codec.decode(codec.encode([group, crate, rope], source)));
-        const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+        const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createCurrent());
         const target = Level.createNew();
         const read = reader.readSubtree(target, fragment.entities, target.world, 0);
         if (!read.ok) throw new Error('The copy was refused.');

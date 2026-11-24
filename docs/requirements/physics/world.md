@@ -9,7 +9,7 @@ The level-wide physics settings, all on the World entity. **v1:** gravity as one
 ### Gravity and background colour · v1
 
 - The World has a **PhysicsWorldComponent** holding gravity, game speed and the collision grid. *Why one component: all world physics settings in one place.*
-- **Gravity is one vector, x and y, in m/s²**, **default 0, 9.8**: straight down, since y points down. Each of x and y goes from −100 to 100 (standing yes, 2026-11-15: the old strength's limit of 100, per axis). *Why: a pull is a direction and a size, which one vector holds, like Push's kick (owner: 2026-11-15).*
+- **Gravity is one vector, x and y, in m/s²**, **default 0, 9.8**: straight down, since y points down. Each of x and y goes from −100 to 100 (standing yes, 2026-11-15: the old strength's limit of 100, per axis). *Why: a pull is a direction and a size, which one vector holds, like the kick the Push action took until 2026-11-23 (owner: 2026-11-15).*
 - Zero gravity is 0, 0, so it keeps no direction. Typing a new vector sets both again.
 - Sizes and speeds are in pixels. Gravity is in m/s², like real life, and mass is in kg. These are the only physical units.
 - The 9.8 default feels floaty for a platformer. The fix is the player's Gravity scale, not the world's gravity: the builtin platformer script sets it from its jump variables.
@@ -52,10 +52,10 @@ Source: scope DR11; round 6: 05 2.14; old: PH-88
 - Changing an entity's tags during play changes its collisions at once.
 - Up to 64 grid tags, which is Box2D's limit.
 - The grid opens from "Edit collision grid" on the PhysicsWorldComponent's card.
-- The grid applies to sensors too: if a pair is unticked, the sensor never fires.
+- The grid applies to touching too: if a pair is unticked, neither bumping nor passing through is noticed.
 - **Nothing extra for ragdolls.** There is no "parts don't collide" setting and no collision group component. Give the parts the right tags. The trade-off, accepted by the owner: two ragdolls sharing a tag pass through each other.
 - *Why tags: the owner's idea, one label system instead of two. "Either tag" is how Box2D's filter bits already work. And once the grid exists, nothing else is needed.*
-- In v1 there is no grid: every solid surface hits every other, and sensors cover coins and finish zones.
+- In v1 there is no grid: every solid surface hits every other, and shapes with no Surface cover coins and finish zones.
 - Hovering a cell shows a sentence, such as "player and enemy collide". A new grid tag collides with everything until you untick boxes.
 
 Source: scope PH6; round 6: 05 2.12, 05 2.13; round 7: CF1; round 8: CF3, CF4, CT1; old: PH-64 to PH-77
@@ -71,7 +71,7 @@ Source: scope PH6; round 6: 05 2.12, 05 2.13; round 7: CF1; round 8: CF3, CF4, C
 | 3 | No joint between them, or the joint lets connected entities collide | "They are joined, and the joint has Let connected objects collide off" |
 | 4 | Their tags are ticked in the grid | "player and coin are unticked in the grid" |
 
-- These are the only rules. If either is a sensor, the answer reads "These overlap but don't push". If either is one-way, it adds "from one side only".
+- These are the only rules. If either has no Surface, the answer reads "These overlap but don't push". If either is one-way, it adds "from one side only".
 
 Source: scope PH7; round 6: 05 2.13; round 8: CF4; old: PH-80, PH-81
 

@@ -6,7 +6,7 @@ import type { EditOutcome } from '../../history/index.ts';
 import type { OpenLevel } from '../../session/index.ts';
 
 // Add Component and a note's fix: the component with its defaults, or with the fix's values written over
-// them (a Surface with Sensor ticked), only on the given entities that lack it, as one step labelled
+// them, only on the given entities that lack it, as one step labelled
 // "Add BodyComponent". Whether a component may be added at all is the Entity inspector's rule, given with
 // its reason before this is called.
 export function addComponent(

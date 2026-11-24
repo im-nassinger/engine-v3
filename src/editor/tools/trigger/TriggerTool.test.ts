@@ -41,7 +41,7 @@ describe('the Trigger tool', () => {
         expect(labelName(trigger)).toBe('Trigger 1');
         expect(geometryOf(trigger)).toEqual({ kind: 'rectangle', width: 200, height: 100 });
         expect(positionOf(trigger)).toEqual({ x: 200, y: 150 });
-        expect(trigger.requireComponent(SurfaceComponent).get('sensor')).toBe(true);
+        expect(trigger.hasComponent(SurfaceComponent)).toBe(false);
         expect(trigger.requireComponent(TriggerComponent).get('triggers')).toHaveLength(1);
         expect(trigger.hasComponent(StyleComponent)).toBe(false);
         expect(setup.controller.active.id).toBe('select');

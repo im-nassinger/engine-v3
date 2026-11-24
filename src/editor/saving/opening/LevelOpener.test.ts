@@ -39,7 +39,7 @@ function openEditor(setup: Setup = {}) {
     const store = setup.store ?? new InMemoryLevelStore();
     const settingsStore = setup.settings ?? new InMemorySettingsStore();
     const settings = new EditorSettings(settingsStore, new ManualFrames());
-    const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+    const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createCurrent());
     const opener = new LevelOpener({
         tabGuard: new FakeTabGuard(setup.heldElsewhere),
         store,
@@ -163,7 +163,7 @@ describe('LevelOpener', () => {
         const opener = new LevelOpener({
             tabGuard: new FakeTabGuard(),
             store,
-            reader: new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createV1()),
+            reader: new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createCurrent()),
             writer,
             sessionOpen: settings.sessionOpen,
             clock: new ManualClock(NOW_MS),

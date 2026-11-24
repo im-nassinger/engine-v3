@@ -66,7 +66,7 @@ describe('buildTestLevel', () => {
     );
 
     test('is a level the game reads back as it was written', () => {
-        const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+        const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createCurrent());
         const writer = new LevelWriter();
         const written = writer.write(buildTestLevel(25).level);
 

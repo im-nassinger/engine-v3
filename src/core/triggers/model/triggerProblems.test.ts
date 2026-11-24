@@ -74,10 +74,6 @@ const WHEN_CASES: readonly (readonly [When | null, readonly object[]])[] = [
     [{ kind: 'every', seconds: 2 }, []],
     [{ kind: 'every', seconds: null }, [{ ...WHEN, slot: 'seconds', reason: 'unset' }]],
     [{ kind: 'levelStart' }, []],
-    [{ kind: 'tagLeft', tag: 'coin' }, []],
-    [{ kind: 'tagLeft', tag: null }, [{ ...WHEN, slot: 'tag', reason: 'unset' }]],
-    [{ kind: 'collision' }, []],
-    [{ kind: 'destroyed' }, []],
     [{ kind: 'custom', name: 'open' }, []],
     [{ kind: 'custom', name: null }, [{ ...WHEN, slot: 'name', reason: 'unset' }]],
     [{ kind: 'custom', name: 'touched' }, [{ ...WHEN, slot: 'name', reason: 'reservedName' }]],
@@ -128,123 +124,65 @@ const WHEN_CASES: readonly (readonly [When | null, readonly object[]])[] = [
 
 const CHECK = { section: 'check', index: 0 } as const;
 
+// The value check, `this` unless said otherwise.
+function check(value: Check['value'], compare: Check['compare'], amount: Check['amount'], target?: Target): Check {
+    return { kind: 'value', target: target ?? { kind: 'this' }, value, compare, amount };
+}
+
+const TAG = { kind: 'tag' } as const;
+const OTHER = { kind: 'other' } as const;
+
+function levelVariable(name: string) {
+    return { kind: 'variable', name } as const;
+}
+
+function ownVariable(name: string) {
+    return { kind: 'variable', name, own: true } as const;
+}
+
 const CHECK_CASES: readonly (readonly [Check, readonly object[]])[] = [
-    [{ kind: 'hasTag', target: { kind: 'other' }, tag: 'player' }, []],
-    [{ kind: 'hasTag', target: { kind: 'other' }, tag: null }, [{ ...CHECK, slot: 'tag', reason: 'unset' }]],
+    [check(TAG, 'is', 'player', OTHER), []],
+    [check(TAG, 'isNot', 'player', OTHER), []],
+    [check(TAG, 'is', null, OTHER), [{ ...CHECK, slot: 'amount', reason: 'unset' }]],
+    [check(TAG, 'more', 'player', OTHER), [{ ...CHECK, slot: 'compare', reason: 'wrongType' }]],
+    [check(TAG, 'is', 3, OTHER), [{ ...CHECK, slot: 'amount', reason: 'wrongType' }]],
+    [check(TAG, 'is', 'player', { kind: 'tagged', tag: null }), [{ ...CHECK, slot: 'target', reason: 'unset' }]],
+    [check(null, 'is', null), [{ ...CHECK, slot: 'value', reason: 'unset' }]],
+    [check(levelVariable('coins'), 'atLeast', 10), []],
+    // A level's variable is read on the World, so its target says nothing.
+    [check(levelVariable('coins'), 'atLeast', 10, { kind: 'entity', entity: null }), []],
+    [check(levelVariable('lives'), 'less', 1), [{ ...CHECK, slot: 'value', reason: 'unknownVariable' }]],
+    [check(levelVariable('mood'), 'isNot', 'angry'), []],
+    [check(levelVariable('mood'), 'more', 'angry'), [{ ...CHECK, slot: 'compare', reason: 'wrongType' }]],
     [
-        { kind: 'hasTag', target: { kind: 'tagged', tag: null }, tag: 'player' },
-        [{ ...CHECK, slot: 'target', reason: 'unset' }],
-    ],
-    [{ kind: 'compare', variable: { owner: 'level', name: 'coins' }, compare: 'atLeast', value: 10 }, []],
-    [
-        { kind: 'compare', variable: null, compare: 'is', value: null },
+        check(levelVariable('mood'), 'atMost', null),
         [
-            { ...CHECK, slot: 'variable', reason: 'unset' },
-            { ...CHECK, slot: 'number', reason: 'unset' },
-        ],
-    ],
-    [
-        { kind: 'compare', variable: { owner: 'level', name: 'lives' }, compare: 'less', value: 1 },
-        [{ ...CHECK, slot: 'variable', reason: 'unknownVariable' }],
-    ],
-    [{ kind: 'compare', variable: { owner: 'level', name: 'mood' }, compare: 'isNot', value: 'angry' }, []],
-    [
-        { kind: 'compare', variable: { owner: 'level', name: 'mood' }, compare: 'more', value: 'angry' },
-        [{ ...CHECK, slot: 'compare', reason: 'wrongType' }],
-    ],
-    [
-        { kind: 'compare', variable: { owner: 'level', name: 'mood' }, compare: 'atMost', value: null },
-        [
-            { ...CHECK, slot: 'number', reason: 'unset' },
+            { ...CHECK, slot: 'amount', reason: 'unset' },
             { ...CHECK, slot: 'compare', reason: 'wrongType' },
         ],
     ],
-    [
-        { kind: 'compare', variable: { owner: 'level', name: 'coins' }, compare: 'is', value: 'ten' },
-        [{ ...CHECK, slot: 'number', reason: 'wrongType' }],
-    ],
-    [
-        {
-            kind: 'compare',
-            variable: { owner: 'own', target: { kind: 'this' }, name: 'health' },
-            compare: 'less',
-            value: 1,
-        },
-        [],
-    ],
-    [
-        {
-            kind: 'compare',
-            variable: { owner: 'own', target: { kind: 'this' }, name: 'open' },
-            compare: 'is',
-            value: true,
-        },
-        [],
-    ],
-    [
-        {
-            kind: 'compare',
-            variable: { owner: 'own', target: { kind: 'this' }, name: 'speed' },
-            compare: 'is',
-            value: 1,
-        },
-        [{ ...CHECK, slot: 'variable', reason: 'unknownVariable' }],
-    ],
+    [check(levelVariable('coins'), 'is', 'ten'), [{ ...CHECK, slot: 'amount', reason: 'wrongType' }]],
+    [check(ownVariable('health'), 'less', 1), []],
+    [check(ownVariable('open'), 'is', true), []],
+    [check(ownVariable('speed'), 'is', 1), [{ ...CHECK, slot: 'value', reason: 'unknownVariable' }]],
     // `other` and a tag are only known in play, where a target without the variable is skipped.
+    [check(ownVariable('speed'), 'is', 1, OTHER), []],
     [
-        {
-            kind: 'compare',
-            variable: { owner: 'own', target: { kind: 'other' }, name: 'speed' },
-            compare: 'is',
-            value: 1,
-        },
-        [],
-    ],
-    [
-        {
-            kind: 'compare',
-            variable: { owner: 'own', target: { kind: 'entity', entity: null }, name: 'health' },
-            compare: 'is',
-            value: 1,
-        },
+        check(ownVariable('health'), 'is', 1, { kind: 'entity', entity: null }),
         [{ ...CHECK, slot: 'target', reason: 'unset' }],
     ],
+    [check({ kind: 'field', component: 'TransformComponent', field: 'position', axis: 'y' }, 'more', 200), []],
+    [check({ kind: 'live', live: 'speed' }, 'more', 200), [{ ...CHECK, slot: 'value', reason: 'unknownValue' }]],
+    [check({ kind: 'live', live: 'speed' }, 'more', 200, OTHER), []],
     [
-        {
-            kind: 'compareValue',
-            target: { kind: 'this' },
-            value: { kind: 'field', component: 'TransformComponent', field: 'position', axis: 'y' },
-            compare: 'more',
-            amount: 200,
-        },
-        [],
+        check({ kind: 'live', live: 'speed' }, 'more', 'fast', OTHER),
+        [{ ...CHECK, slot: 'amount', reason: 'wrongType' }],
     ],
     [
-        {
-            kind: 'compareValue',
-            target: { kind: 'this' },
-            value: { kind: 'live', live: 'speed' },
-            compare: 'more',
-            amount: 200,
-        },
-        [{ ...CHECK, slot: 'value', reason: 'unknownValue' }],
-    ],
-    [
-        {
-            kind: 'compareValue',
-            target: { kind: 'other' },
-            value: { kind: 'live', live: 'speed' },
-            compare: 'more',
-            amount: 200,
-        },
-        [],
-    ],
-    [
-        { kind: 'compareValue', target: { kind: 'tagged', tag: null }, value: null, compare: 'less', amount: null },
+        check(null, 'less', null, { kind: 'tagged', tag: null }),
         [
             { ...CHECK, slot: 'target', reason: 'unset' },
             { ...CHECK, slot: 'value', reason: 'unset' },
-            { ...CHECK, slot: 'number', reason: 'unset' },
         ],
     ],
 ];
@@ -266,9 +204,14 @@ const ACTION_CASES: readonly (readonly [Action, readonly object[]])[] = [
     ],
     [{ kind: 'destroy', target: { kind: 'this' } }, []],
     [{ kind: 'destroy', target: { kind: 'entity', entity: null } }, [{ ...ACTION, slot: 'target', reason: 'unset' }]],
-    [{ kind: 'push', target: { kind: 'other' }, push: { kind: 'by', x: 0, y: -600 } }, []],
-    [{ kind: 'push', target: { kind: 'other' }, push: { kind: 'away', strength: 400 } }, []],
-    [{ kind: 'push', target: { kind: 'other' }, push: null }, [{ ...ACTION, slot: 'push', reason: 'unset' }]],
+    [
+        { kind: 'change', target: { kind: 'other' }, value: { kind: 'velocity' }, op: 'add', amount: { x: 0, y: -6 } },
+        [],
+    ],
+    [
+        { kind: 'change', target: { kind: 'this' }, value: { kind: 'velocity' }, op: 'add', amount: { x: 0, y: -6 } },
+        [{ ...ACTION, slot: 'value', reason: 'unknownValue' }],
+    ],
     [{ kind: 'win' }, []],
     [{ kind: 'lose' }, []],
     [{ kind: 'restart' }, []],
@@ -282,7 +225,7 @@ const ACTION_CASES: readonly (readonly [Action, readonly object[]])[] = [
         ],
     ],
     [
-        { kind: 'fire', target: { kind: 'this' }, name: 'collision', amount: null },
+        { kind: 'fire', target: { kind: 'this' }, name: 'level_start', amount: null },
         [{ ...ACTION, slot: 'name', reason: 'reservedName' }],
     ],
     [{ kind: 'wait', seconds: 2 }, []],
@@ -452,13 +395,13 @@ describe('triggerProblems', () => {
         expect(problemsOf({ actions: [addTo({ kind: 'other' }, 'lives')] }, context)).toEqual([]);
     });
 
-    test('`other` is the sender under a custom event and the entity hit under collision, and absent elsewhere', () => {
+    test('`other` is the sender under a custom event and the entity touching under touching, and absent elsewhere', () => {
         const destroyOther: Action = { kind: 'destroy', target: { kind: 'other' } };
         const noOther = [{ ...ACTION, slot: 'target', reason: 'noOther' }];
 
-        expect(problemsOf({ when: { kind: 'collision' }, actions: [destroyOther] })).toEqual([]);
+        expect(problemsOf({ when: { kind: 'touched' }, actions: [destroyOther] })).toEqual([]);
         expect(problemsOf({ when: { kind: 'custom', name: 'open' }, actions: [destroyOther] })).toEqual([]);
-        expect(problemsOf({ when: { kind: 'destroyed' }, actions: [destroyOther] })).toEqual(noOther);
+        expect(problemsOf({ when: { kind: 'every', seconds: 1 }, actions: [destroyOther] })).toEqual(noOther);
         const coinsChange: When = {
             kind: 'variableChanged',
             variable: { owner: 'level', name: 'coins' },
@@ -468,14 +411,11 @@ describe('triggerProblems', () => {
     });
 
     test('each part is placed by its index', () => {
-        const checks: Check[] = [
-            { kind: 'hasTag', target: { kind: 'other' }, tag: 'player' },
-            { kind: 'hasTag', target: { kind: 'other' }, tag: null },
-        ];
+        const checks: Check[] = [check(TAG, 'is', 'player', OTHER), check(TAG, 'is', null, OTHER)];
         const actions: Action[] = [{ kind: 'win' }, { kind: 'destroy', target: { kind: 'tagged', tag: null } }];
 
         expect(problemsOf({ checks, actions })).toEqual([
-            { section: 'check', index: 1, slot: 'tag', reason: 'unset' },
+            { section: 'check', index: 1, slot: 'amount', reason: 'unset' },
             { section: 'action', index: 1, slot: 'target', reason: 'unset' },
         ]);
     });

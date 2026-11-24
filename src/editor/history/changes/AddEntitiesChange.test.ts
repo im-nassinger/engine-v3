@@ -7,7 +7,7 @@ import { FormatUpgrader, LevelReader, LevelWriter, V1_LEVEL_LIMITS } from '../..
 import { AddEntitiesChange } from './AddEntitiesChange.ts';
 import { buildChangesTestLevel, snapshotOf } from './changesTestLevel.ts';
 
-const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+const reader = new LevelReader(createV1Registry(), V1_LEVEL_LIMITS, FormatUpgrader.createCurrent());
 
 // The group and its child as data under new ids, as paste will give them. The lists are the test's own,
 // so a test can change them.

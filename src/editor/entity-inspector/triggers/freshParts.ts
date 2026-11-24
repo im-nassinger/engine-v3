@@ -2,8 +2,6 @@ import type {
     Action,
     ActionKind,
     Check,
-    CheckKind,
-    Push,
     Repeat,
     RepeatKind,
     Target,
@@ -11,14 +9,11 @@ import type {
     WhenKind,
 } from '../../../core/fields/index.ts';
 
-// "pick who": a target not picked yet.
+// "pick an entity": a target not picked yet.
 export const UNSET_TARGET: Target = { kind: 'entity', entity: null };
 
 const THIS_TARGET: Target = { kind: 'this' };
 
-// The kick the menu's "by" starts with: up, as a jump pad.
-const DEFAULT_PUSH_BY: Push = { kind: 'by', x: 0, y: -600 };
-const DEFAULT_PUSH_STRENGTH = 400;
 const DEFAULT_REPEAT_SECONDS = 1;
 
 // A When of this kind with its own parts unset, as picking a new event gives.
@@ -31,8 +26,6 @@ export function freshWhen(kind: WhenKind): When {
         case 'after':
         case 'every':
             return { kind, seconds: null };
-        case 'tagLeft':
-            return { kind, tag: null };
         case 'custom':
             return { kind, name: null };
         case 'variableChanged':
@@ -42,22 +35,19 @@ export function freshWhen(kind: WhenKind): When {
     }
 }
 
-// Add check's kinds. The tag check starts on `other` when the event has one, as most do; the component value
-// check on `this`.
-export function freshCheck(kind: CheckKind, eventHasOther: boolean): Check {
-    if (kind === 'compare') return { kind, variable: null, compare: 'atLeast', value: null };
-    if (kind === 'compareValue') return { kind, target: THIS_TARGET, value: null, compare: 'more', amount: null };
-
-    let target = UNSET_TARGET;
+// The value check, its value still to pick: about `other` when the event has one, as most checks are ("other
+// has the tag player"), else about `this`.
+export function freshCheck(eventHasOther: boolean): Check {
+    let target = THIS_TARGET;
     if (eventHasOther) {
         target = { kind: 'other' };
     }
 
-    return { kind, target, tag: null };
+    return { kind: 'value', target, value: null, compare: 'is', amount: null };
 }
 
-// An action of this kind, keeping the target it replaces when it has one, so destroy other turns into
-// push other.
+// An action of this kind, keeping the target it replaces when it has one, so destroy other turns into fire
+// on other.
 export function freshAction(kind: ActionKind, keptTarget: Target | undefined): Action {
     const target = keptTarget ?? THIS_TARGET;
 
@@ -66,8 +56,6 @@ export function freshAction(kind: ActionKind, keptTarget: Target | undefined): A
             return { kind, target, value: null, op: 'add', amount: null };
         case 'destroy':
             return { kind, target };
-        case 'push':
-            return { kind, target, push: null };
         case 'fire':
             return { kind, target, name: null, amount: null };
         case 'wait':
@@ -75,12 +63,6 @@ export function freshAction(kind: ActionKind, keptTarget: Target | undefined): A
         default:
             return { kind };
     }
-}
-
-export function freshPush(kind: Push['kind']): Push {
-    if (kind === 'by') return DEFAULT_PUSH_BY;
-
-    return { kind, strength: DEFAULT_PUSH_STRENGTH };
 }
 
 export function freshRepeat(kind: RepeatKind): Repeat {
@@ -93,7 +75,6 @@ export function targetOf(action: Action) {
     switch (action.kind) {
         case 'change':
         case 'destroy':
-        case 'push':
         case 'fire':
             return action.target;
         default:

@@ -80,9 +80,9 @@ describe('the determinism levels with triggers do what they are built to show', 
         const won = ticks.find((tick) => tick.end !== null);
 
         // Each coin counts once, the last after the left and the second right push, and the run ends in
-        // the tick the last coin is destroyed, since its tag runs out at the end of that tick.
+        // the tick the last coin is counted, as `coins` becoming 5 is heard in that tick.
         expect(ticksReaching(ticks, 'coins')).toEqual([116, 159, 196, 237, 274]);
-        expect(won?.tick).toBe(275);
+        expect(won?.tick).toBe(274);
         expect(won?.end).toBe('won');
         expect(ticks.at(-1)?.variables['coins']).toBe(5);
     });
@@ -107,7 +107,8 @@ describe('the determinism levels with triggers do what they are built to show', 
 
     test('trigger-doors: the button fires open, each door waits and closes, and the switch flips', async () => {
         const ticks = await runTriggerLevel('trigger-doors');
-        // The ball reaches the button once; both doors hear `open` in that tick and close 1 s and 2 s later.
+        // The ball reaches the pass-through button once; both doors hear `open` in that tick, move up, and come
+        // down 1 s and 2 s later.
         expect(ticksReaching(ticks, 'Button.presses')).toEqual([156]);
         expect(ticksReaching(ticks, 'opened')).toEqual([156]);
         expect(ticks.find((tick) => tick.tick === 156)?.variables['opened']).toBe(2);
@@ -118,15 +119,15 @@ describe('the determinism levels with triggers do what they are built to show', 
         expect(ticksReaching(ticks, 'lit')).toEqual([100, 450]);
     });
 
-    test('trigger-hits: collisions are counted, destroyed bricks score and score becoming 3 wins', async () => {
+    test('trigger-hits: solid touches are counted, touched bricks score and score becoming 3 wins', async () => {
         const ticks = await runTriggerLevel('trigger-hits');
         const won = ticks.find((tick) => tick.end !== null);
 
         // The ball's own `hits`: the floor it starts on, the wall and the floor, then the three bricks, with a
         // landing on the floor after the first two.
         expect(ticksReaching(ticks, 'Ball.hits')).toEqual([1, 111, 120, 255, 283, 370, 391, 512]);
-        // Each brick hit is destroyed and its Destroyed trigger scores in the same tick; the ball rolls on
-        // through the gap it left. `score` becoming 3 wins in that tick.
+        // Each brick the ball touches scores and destroys itself in the same tick; the ball rolls on through
+        // the gap it left. `score` becoming 3 wins in that tick.
         expect(ticksReaching(ticks, 'score')).toEqual([255, 370, 512]);
         expect(won?.tick).toBe(512);
         expect(won?.end).toBe('won');

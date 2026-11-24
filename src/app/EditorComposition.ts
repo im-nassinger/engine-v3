@@ -166,7 +166,7 @@ export class EditorComposition {
         const writer = new LevelWriter();
         // One registry and reader for the opening and the session, so the saved level is read as an import is.
         const registry = createV1Registry();
-        const reader = new LevelReader(registry, V1_LEVEL_LIMITS, FormatUpgrader.createV1());
+        const reader = new LevelReader(registry, V1_LEVEL_LIMITS, FormatUpgrader.createCurrent());
         const tabGuard = new WebLockTabGuard();
         const opening = await new LevelOpener({
             tabGuard,

@@ -47,7 +47,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Console | The panel at the bottom showing errors, `print()` messages and trigger lines from test play. |
 | View menu | The main menu's View submenu, holding the editor's view settings: Grid, Grid snapping, Joint icons, Camera frame, Physics view, and the zooms. There is no View button of its own. |
 | Tool | What the mouse does in the level view: Select, Pencil, Bézier pen, Shape, Text, Joint, Trigger. |
-| Trigger tool | The tool on key 6 that draws a rectangle sensor holding one touch trigger, ready for its actions. A shape with no StyleComponent, as it makes, shows in the editor as a dashed edge with a bolt and isn't drawn in play. |
+| Trigger tool | The tool on key 6 that draws a pass-through rectangle holding one touch trigger, ready for its actions. A shape with no StyleComponent, as it makes, shows in the editor as a dashed edge with a bolt and isn't drawn in play. |
 | Selection | The entities currently selected. There is one selection, shown in the level view, the Entities viewer and the Entity inspector. |
 | Draw order | Which entity is painted on top when entities overlap. It is the Entities viewer order. |
 | Hidden | An entity whose eye icon is off. It is not drawn, in the editor or in play. It still collides and runs its triggers and scripts. |
@@ -94,11 +94,12 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Static | A body type that never moves: floors, walls. |
 | Dynamic | A body type moved by gravity and by hitting things: crates, balls, a player. |
 | Kinematic | A body type that moves only when a script or trigger tells it to, and is never pushed. Used for moving platforms. |
-| Surface | The SurfaceComponent makes a shape collide: its density, friction, restitution and whether it is a sensor. Box2D calls this a shape, and older Box2D a fixture. |
+| Surface | The SurfaceComponent makes a shape solid: its density, friction and restitution. Without one, things pass through the shape. Box2D calls this a shape, and older Box2D a fixture. |
 | Density | How heavy a surface is for its size. Mass = area × density. |
 | Friction | How much a surface grips: 0 is ice, 1 is rubber. |
 | Restitution | How bouncy a surface is: 0 doesn't bounce, 1 bounces back to full height. |
-| Sensor | A surface with Sensor ticked: it notices what touches it but pushes nothing. Used for coins and finish zones. |
+| Pass-through | A shape with no SurfaceComponent: things pass through it. Under a touch trigger (on it or a group above it), what passes through is noticed. Used for coins and finish zones. |
+| Sensor | An engine word only: the Box2D shape play builds for a pass-through shape under a touch trigger, which notices what overlaps it but pushes nothing. Users never see it. Until 2026-11-23 it was a SurfaceComponent setting (owner). |
 | One-way | A surface setting: things pass through from one side and land on the other. |
 | Gravity scale | How strongly gravity pulls a body: 1 is normal, 0 floats. |
 | Damping | Slowing down over time, like air. Linear damping slows movement, angular damping slows spinning. |
@@ -136,17 +137,14 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Fire custom event | The action that fires a custom event on its target, with an optional number. |
 | Action | One step in a trigger's Do list, such as Change value or Spawn. Only ever used for triggers. |
 | When, If, Do | The three parts of a trigger, each a section of its card: **When** names its one event, **If** its checks, **Do** its actions, run top to bottom. |
-| Check | One condition in a trigger's If, such as "`other` has the tag `coin`" or "`coins` is at least 10". The actions run only when every check holds. |
-| Component value check | The check that compares a number value of the target's components, one part of a vector, or a body's **live value** (what it is doing right now, read from physics: its speed and its velocity x and y, in px/s) with a number: "If this Body › Speed is more than 200". A vector's x or y is a word of its own. |
+| Check | One condition in a trigger's If. There is one kind, the value check. The actions run only when every check holds. |
+| Value check | The one check: a value of the target compared with an amount, picked as Change value picks it. A tag ("If other has the tag player", or "doesn't have"), a variable ("If coins is 10 or more"), or a number value of the target's components, one part of a vector, or a body's **live value** (what it is doing right now, read from physics: its speed and its velocity x and y, in px/s): "If this Body › Speed is more than 200". A vector's x or y is a word of its own. |
 | Repeat | A trigger's setting for how often it may fire: every time (the default), once per run, or at most once every N seconds. |
-| Touched, no longer touched | The events for something starting or stopping touching an entity's sensor or surface, once per touching entity however many shapes it has. `other` is the entity that touched or left. |
-| Collision (event) | The event for this entity starting to hit a solid thing, once per entity hit however many shapes it has: "When this hits something". `other` is the entity hit. Not the same as the collision grid, which decides what hits what. |
-| Destroyed | The event for a Destroy action taking this entity or a group above it. Its triggers run before the entity disappears at the end of the tick. |
+| Touching, touched, no longer touched | The touching event, "When something starts / stops touching this": **touched** when something starts touching an entity's shape, solid or pass-through, **no longer touched** when it stops, once per touching entity however many shapes it has. `other` is the entity that touched or left. |
 | A variable changes | The event for a variable getting a new value, with an optional condition: "When coins becomes 10 or more" fires once, when the condition turns true. |
-| Change value | The action that sets, adds to or subtracts from a value on its target: a variable, a component value allowed to change during play, a tag, or a trigger's on or off. Teleporting is Change value on the position. |
+| Change value | The action that sets, adds to or subtracts from a value on its target: a variable, a component value allowed to change during play, a body's velocity (Body › Velocity, in px/s, whatever its mass), a tag, or a trigger's on or off. Teleporting is Change value on the position. |
 | Flip | Change value on a boolean variable that turns true into false and false into true. |
 | Wait, waiting run | **Wait** is the action that delays the actions after it in a Do list, in whole ticks. A **waiting run** is what is left of a trigger's Do list while a Wait counts down. Each firing is its own; a trigger holds at most 32. |
-| Push | The action that gives a body a kick, ignoring its mass: a fixed vector in px/s, or a strength away from or towards `this`. |
 | Unset part | A part of a trigger not chosen yet, shown in yellow on its card. A trigger with an unset part doesn't run. |
 | Chain limit | Triggers setting off triggers stop after 32 rounds in one tick, with a play warning. The game keeps running. |
 | `this` and `other` | In a trigger: `this` is the entity holding the trigger, `other` is the entity that caused the event, when there is one. In a script: `this` is the id of the entity the script is on, and `other` is what a handler receives. |
@@ -207,13 +205,13 @@ Words for how the game is built, used in [architecture/](architecture/README.md)
 | Status text | The short result the message pill shows for 4 seconds, such as "Undid: Move 3 entities". |
 | Browser event | Something the browser reports to the page, such as a key press or a paste. Never a game event. |
 | Body pose | A body's position and angle during play, as the physics engine reports it. |
-| Sensor event, contact event | What the physics world reports after a step when a surface starts (begin) or stops (end) overlapping a sensor. It names the sensor's entity, the visitor (the other surface's entity, Box2D's word) and the visitor's body. Not a game event: `TouchLedger` turns sensor events into "touched" and "no longer touched". A **contact event** is the same for two solid surfaces starting or stopping hitting (v4), only for the surfaces a run switched contact events on for; `ContactLedger` turns them into collision events. |
+| Sensor event, contact event | What the physics world reports after a step when a surface starts (begin) or stops (end) overlapping a sensor. It names the sensor's entity and body, the visitor (the other surface's entity, Box2D's word) and the visitor's body. A **contact event** is the same for two solid surfaces starting or stopping touching, only for the surfaces a run switched contact events on for. Not game events: `TouchLedger` turns both into "touched" and "no longer touched". |
 | Firing | One trigger hearing one event in one tick (`TriggerFiring`): its entity, the trigger, and the entity that caused the event (`other`), if any. Two entities touching at once are two firings. `EventPhase` lists a tick's firings, `TriggerPhase` runs them. |
 | Round | One pass of `TriggerPhase` over a list of firings in one tick: the first is the firings `EventPhase` listed, each next one the firings the last round's actions set off. A tick stops after 32 (the chain limit). |
 | Play warning | Something that went wrong during play without stopping the run, such as the chain limit, given once per run (`PlayWarnings`). Shown in the message pill until the Console comes in v5. Not an editor message. |
 | Changed value | A value Change value wrote during play, sent in the tick report so the play mirror and the Entity inspector show it. |
 | Recorded inputs | The keys a determinism test level holds and presses on each tick, written as code beside the levels, so every run of the test plays the same inputs. |
-| Trigger owner | The entity holding a trigger (`this`). For touches, the sensor's entity and every group above it with a touch trigger. |
+| Trigger owner | The entity holding a trigger (`this`). For touches, the touched shape's entity and every group above it with a touch trigger. |
 | Render chunk | A run of the World's children, next to each other in the draw order, that PixiJS draws as its own render group. Moving an entity uploads again only the shapes of its render chunk, not the whole level's. |
 | Runner | The script that built v1, stages 0 to 19, without the owner: one fresh Claude session per step, with reports to Discord. Moved out of this project on 2026-11-20, to `~/projects/orchestrator/old-runner/`, to become a tool for any project. |
 
@@ -298,3 +296,5 @@ Don't use these. Each was replaced in the requirements review.
 | Transform | TransformComponent | Component names end in `Component` (owner: 2026-11-13). Only a card's title drops it (owner: 2026-11-17) |
 | Layers panel, Entities panel | Entities viewer | Renamed (owner: 2026-11-14, then 2026-11-17) |
 | Inspector | Entity inspector | Renamed (owner: 2026-11-17) |
+| Collision (event), destroyed (event) | Touching, for solid and pass-through things; the trigger holding the Destroy action does the rest | Fewer events that overlap (owner: 2026-11-23) |
+| Push (action) | Change value: add to Body › Velocity | If it's data, change it with Change value (owner: 2026-11-23) |

@@ -29,6 +29,13 @@ export function at(x: number, y: number): Partial<TransformValues> {
 }
 
 // A shape with a surface, which collides; with no body of its own it merges up or is Static.
+// A shape with no SurfaceComponent: out of physics, or, under a touch trigger, passed through and noticed.
+export function addShape(entity: Entity, geometry: ShapeGeometry) {
+    entity.addComponent(new ShapeComponent({ geometry }));
+
+    return entity;
+}
+
 export function addSurface(entity: Entity, geometry: ShapeGeometry, surface: Partial<SurfaceValues> = {}) {
     entity.addComponent(new ShapeComponent({ geometry }));
     entity.addComponent(new SurfaceComponent({ ...SurfaceComponent.schema.defaults(), ...surface }));

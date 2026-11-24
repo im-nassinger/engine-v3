@@ -1,11 +1,9 @@
 import { TagsComponent } from '../../components/index.ts';
 import type { Entity, Level } from '../../level/index.ts';
 
-// How many entities in the run hold each tag, and the tags whose last entity left or lost them since they
-// were last taken, for "no entity with this tag is left". A tag no entity ever held never runs out.
+// How many entities in the run hold each tag, so a tag nobody holds is known without walking the level.
 export class TagCounts {
     private readonly counts = new Map<string, number>();
-    private runOut: string[] = [];
 
     constructor(level: Level) {
         for (const entity of level.entitiesInPanelOrder()) {
@@ -29,20 +27,6 @@ export class TagCounts {
         if (count === 0) return;
 
         this.counts.set(tag, count - 1);
-        if (count === 1 && !this.runOut.includes(tag)) {
-            this.runOut.push(tag);
-        }
-    }
-
-    // A tag Change value took away, whose running out is heard in the same tick rather than the next:
-    // true when that was its last entity.
-    tagTakenAway(tag: string) {
-        const count = this.count(tag);
-        if (count === 0) return false;
-
-        this.counts.set(tag, count - 1);
-
-        return count === 1;
     }
 
     // The removed entities' tags leave with them.
@@ -52,14 +36,6 @@ export class TagCounts {
                 this.tagRemoved(tag);
             }
         }
-    }
-
-    // The tags that ran out, in the order they did, leaving out any held again since.
-    takeRunOut() {
-        const stillOut = this.runOut.filter((tag) => this.count(tag) === 0);
-        this.runOut = [];
-
-        return stillOut;
     }
 }
 

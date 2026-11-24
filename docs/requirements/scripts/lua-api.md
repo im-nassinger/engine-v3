@@ -34,17 +34,14 @@ Status: **Review** means the review named it. **Owner** means the owner decided 
 | Event | When | The handler gets | Status |
 |---|---|---|---|
 | `"tick"` | Every tick, 60 times a second | | Review |
-| `"touched"`, `"no_longer_touched"` | Something starts or stops touching this | `other` | Review, Owner |
-| `"collision"` | This hits something | `other` | Owner |
+| `"touched"`, `"no_longer_touched"` | Something starts or stops touching this, solid or passing through | `other` | Review, Owner |
 | `"level_start"` | The level starts, or this entity is spawned | | Owner |
 | `"input_pressed"`, `"input_released"` | An input is pressed or released | the input's name | Owner |
 | `"key_pressed"`, `"key_released"` | A raw key is pressed or released | the key's name | Owner |
-| `"destroyed"` | This entity is destroyed | | Owner |
 | `"variable_changed"` | A variable changes | the variable's name | Owner |
-| `"no_entity_with_tag_left"` | The last entity with a tag is gone | the tag | Owner |
 | A custom event, such as `"open"` | Something fires it on this entity or on an entity holding it, such as the World | the sender, the number | Review, Owner |
 
-Script event names are the trigger events in snake_case.
+Script event names are the trigger events in snake_case. `"collision"`, `"destroyed"` and `"no_entity_with_tag_left"` went with their trigger events (owner, 2026-11-23): `"touched"` covers two solid things bumping, and scripts keep matching trigger events.
 
 Source: round 9: 10 2.3; round 10: EV1; owner: 2026-11-13; owner: 2026-11-23
 
@@ -83,7 +80,7 @@ Source: round 3: D66; round 9: 10 2.8; owner: 2026-11-13
 | `teleport(id, x, y)` | Moves a group with the bodies inside it, keeping their layout and speed | Owner |
 | `get_velocity(id)`, `set_velocity(id, x, y)` | The body's speed in px/s | Owner |
 | `get_angular_velocity(id)`, `set_angular_velocity(id, speed)` | The body's spin in °/s | Owner |
-| `push(id, x, y)` | Changes the velocity by this much, whatever the mass, like the trigger action Push | Owner |
+| `push(id, x, y)` | Changes the velocity by this much, whatever the mass, like adding to Body › Velocity in a trigger | Owner |
 | `apply_force(id, x, y)`, `apply_impulse(id, x, y)` | Box2D's own pushes, where mass counts | Owner |
 | `is_touching(id, other)` | True while the two touch | Owner |
 | `raycast(from_x, from_y, to_x, to_y)` | The first entity hit and where: `id, x, y`, or `nil` | Owner |

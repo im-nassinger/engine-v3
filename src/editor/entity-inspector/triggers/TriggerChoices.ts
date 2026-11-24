@@ -14,11 +14,12 @@ import type {
     Action,
     ActionKind,
     ChangeOp,
+    Check,
+    CheckedValue,
     Compare,
     Condition,
     JsonValue,
     Press,
-    Push,
     ReadableValue,
     RepeatKind,
     Target,
@@ -37,7 +38,7 @@ import type { Entity, EntityId } from '../../../core/level/index.ts';
 import { changeableValues, readableValues, sameValueRef, variableChangeOf } from '../../../core/triggers/index.ts';
 import type { ChangeableValue, TriggerContext } from '../../../core/triggers/index.ts';
 
-import { freshAction, freshCheck, freshPush, freshRepeat, freshWhen, targetOf } from './freshParts.ts';
+import { freshAction, freshCheck, freshRepeat, freshWhen, targetOf } from './freshParts.ts';
 import {
     amountText,
     fieldLabel,
@@ -63,6 +64,10 @@ import type {
 type ChangeAction = Action & { readonly kind: 'change' };
 type VariableChangedWhen = When & { readonly kind: 'variableChanged' };
 
+// What the value check's value is, which picks its compare words and its amount's field: a variable's type,
+// a tag, or a number.
+export type CheckedType = VariableType | 'tag';
+
 // What a change of a value allows: its ops and the type its amount is read with.
 type ValueChange = Omit<ChangeableValue, 'ref'>;
 
@@ -81,20 +86,31 @@ type Named<T> = {
 
 export const NO_OTHER_REASON = 'This event has no other entity';
 
-const EVENTS: readonly Named<WhenKind>[] = [
-    { value: 'touched', label: 'something starts touching this', word: 'something starts touching this' },
-    { value: 'untouched', label: 'something stops touching this', word: 'something stops touching this' },
-    { value: 'input', label: 'an input is pressed, released or held', word: 'the input' },
-    { value: 'key', label: 'a key is pressed, released or held', word: 'the key' },
-    { value: 'after', label: 'after some time', word: 'after' },
-    { value: 'every', label: 'every few seconds', word: 'every' },
-    { value: 'levelStart', label: 'the level starts', word: 'the level starts' },
-    { value: 'tagLeft', label: 'the last entity with a tag is gone', word: 'no entity tagged' },
-    { value: 'collision', label: 'this hits something', word: 'this hits something' },
-    { value: 'custom', label: 'this gets a custom event', word: 'this gets the custom event' },
-    { value: 'destroyed', label: 'this is destroyed', word: 'this is destroyed' },
-    { value: 'variableChanged', label: 'a variable changes', word: 'the variable' },
+// The When menu: six events. Picking one gives its first kind; the in-place word picks the other.
+const EVENTS: readonly Omit<Named<WhenKind>, 'word'>[] = [
+    { value: 'touched', label: 'something starts or stops touching this' },
+    { value: 'key', label: 'a key or input is pressed, released or held' },
+    { value: 'after', label: 'after or every few seconds' },
+    { value: 'levelStart', label: 'the level starts' },
+    { value: 'variableChanged', label: 'a variable changes' },
+    { value: 'custom', label: 'this gets a custom event' },
 ];
+
+// The word of the When's sentence that picks the event. Touching, a key or an input and a timer have no other
+// word to hold it, so it is the in-place word: starts or stops, key or input, after or every.
+const EVENT_WORDS: Readonly<Record<WhenKind, string>> = {
+    touched: 'starts',
+    untouched: 'stops',
+    key: 'key',
+    input: 'input',
+    after: 'after',
+    every: 'every',
+    levelStart: 'the level starts',
+    variableChanged: 'the variable',
+    custom: 'this gets the custom event',
+};
+
+const EVENTS_TITLE = 'Events';
 
 const PRESSES: readonly Press[] = ['pressed', 'released', 'held'];
 
@@ -117,10 +133,9 @@ const ACTIONS: readonly Named<ActionKind>[] = [
         value: 'change',
         label: 'change a value',
         word: 'change',
-        description: 'Set, add to or subtract from coins, a Position, a tag…',
+        description: 'Set, add to or subtract from coins, a Position, a Velocity, a tag…',
     },
     { value: 'destroy', label: 'destroy', word: 'destroy', description: 'Take an entity out of the level' },
-    { value: 'push', label: 'push', word: 'push', description: 'Kick a body, whatever its mass' },
     {
         value: 'fire',
         label: 'fire a custom event',
@@ -136,15 +151,9 @@ const ACTIONS: readonly Named<ActionKind>[] = [
 // Add action's menu, in titled groups.
 const ACTION_GROUPS: readonly { readonly title: string; readonly kinds: readonly ActionKind[] }[] = [
     { title: 'Values', kinds: ['change'] },
-    { title: 'Entities', kinds: ['destroy', 'push'] },
+    { title: 'Entities', kinds: ['destroy'] },
     { title: 'Events', kinds: ['fire', 'wait'] },
     { title: 'The game', kinds: ['win', 'lose', 'restart'] },
-];
-
-const PUSHES: readonly Named<Push['kind']>[] = [
-    { value: 'by', label: 'by a fixed kick', word: 'by' },
-    { value: 'away', label: 'away from this', word: 'away from this at' },
-    { value: 'towards', label: 'towards this', word: 'towards this at' },
 ];
 
 const REPEATS: readonly Named<RepeatKind>[] = [
@@ -164,15 +173,20 @@ const TRUTH_CHOICES: readonly boolean[] = [true, false];
 const NEW_NAME_LABEL = 'New name…';
 const NEW_TAG_LABEL = 'New tag…';
 const NO_LEVEL_VARIABLES = 'None yet: add them on the World';
-const OTHER_DESCRIPTION = 'The other entity of the event: the one touching, hit or firing';
+const OTHER_DESCRIPTION = 'The other entity of the event: the one touching or firing';
+const TAG_COMPARES: readonly Named<Compare>[] = [
+    { value: 'is', label: 'has', word: 'has' },
+    { value: 'isNot', label: "doesn't have", word: "doesn't have" },
+];
+const TAG_WORD = 'the tag';
 const NAME_HINT = 'One word, such as open';
 const BODY_COMPONENT = 'BodyComponent';
 const AXES: readonly ('x' | 'y')[] = ['x', 'y'];
 
 // The menus of the trigger card, built from the level: the events, the targets (`this`, `other`, every
 // entity but the trigger's own, every tag), the variables in their groups, the World's inputs, the keys, the
-// custom events' names, the values changeableValues offers for the target picked, and the ones
-// readableValues offers for the component value check.
+// custom events' names, the values changeableValues offers for the target picked, and the ones the value
+// check reads.
 export class TriggerChoices {
     private readonly context: TriggerContext;
     private readonly levelTags: readonly string[];
@@ -187,7 +201,7 @@ export class TriggerChoices {
     }
 
     static eventWord(kind: WhenKind) {
-        return wordOf(EVENTS, kind);
+        return EVENT_WORDS[kind];
     }
 
     static compareWord(compare: Compare) {
@@ -196,10 +210,6 @@ export class TriggerChoices {
 
     static actionWord(kind: ActionKind) {
         return wordOf(ACTIONS, kind);
-    }
-
-    static pushWord(kind: Push['kind']) {
-        return wordOf(PUSHES, kind);
     }
 
     static repeatWord(kind: RepeatKind) {
@@ -309,39 +319,133 @@ export class TriggerChoices {
         return choices;
     }
 
-    // The component value check's menu: each component of the target, opening its number and vector
-    // values, a vector once (its axis is a word of its own); a body's ends with its live Speed and
-    // Velocity. A vector picked keeps the axis the check had.
-    readables(target: Target, current: ReadableValue | null, place: Place<ReadableValue>) {
-        const entity = this.knownTarget(target);
-        const values = readableValues(entity, this.context.registry);
-        const keptAxis = current === null ? 'x' : (readableAxis(current) ?? 'x');
-        const submenus = new Map<string, TriggerChoice[]>();
-        const seen = new Set<string>();
+    // The value check's value menu, laid out as Change value's: the level's variables first, which make the
+    // World the target, then the target's values, each component opening its values in a submenu: its
+    // numbers and each vector once (its axis is a word of its own), a body's live Speed and Velocity after
+    // Body's, the target's own variables under Variables, and its tags under Tags. Picking one keeps the
+    // compare and the amount when the new value's type reads them.
+    checkValues(check: Check, index: number) {
+        const world = this.context.level.world;
+        const worldTarget: Target = { kind: 'entity', entity: world.id };
+        const keptTarget = keptCheckTargetFor(check, world);
+        const keptAxis = check.value === null ? 'x' : (checkedAxis(check.value) ?? 'x');
+        const placed = (value: CheckedValue, target: Target, type: CheckedType) => {
+            const changed = withCheckedValue(check, value, target, type, this.checkType(check));
+            return { section: 'check', index, check: changed } as const;
+        };
 
-        for (const value of values) {
-            const picked = withReadableAxis(value, keptAxis);
-            const key = readableKey(picked);
+        const levelChoices = this.variableMenus.levelVariables().map((variable) => {
+            const value: CheckedValue = { kind: 'variable', name: variable.name };
+            const picked = choice(variable.name, placed(value, worldTarget, variable.type));
+
+            return { ...picked, note: variable.type };
+        });
+        const levelGroup: TriggerMenuGroup = {
+            title: LEVEL_GROUP_TITLE,
+            choices: levelChoices,
+            emptyText: NO_LEVEL_VARIABLES,
+        };
+
+        const entity = this.knownTarget(keptTarget);
+        const submenus = new Map<string, TriggerChoice[]>();
+        const addTo = (component: string, picked: TriggerChoice) => {
+            const choices = submenus.get(component) ?? [];
+            choices.push(picked);
+            submenus.set(component, choices);
+        };
+
+        const seen = new Set<string>();
+        for (const value of readableValues(entity, this.context.registry)) {
+            const withAxis = withReadableAxis(value, keptAxis);
+            const key = readableKey(withAxis);
             if (seen.has(key)) continue;
 
             seen.add(key);
-            const component = value.kind === 'field' ? value.component : BODY_COMPONENT;
-            const choices = submenus.get(component) ?? [];
-            choices.push(this.readableChoice(picked, place));
-            submenus.set(component, choices);
+            const component = withAxis.kind === 'field' ? withAxis.component : BODY_COMPONENT;
+            addTo(
+                component,
+                this.readableChoice(withAxis, (picked) => placed(picked, keptTarget, 'number')),
+            );
         }
 
-        const menus: TriggerSubmenu[] = [];
+        const ownVariables = this.variableMenus.ownVariables(keptTarget) ?? [];
+        for (const variable of ownVariables) {
+            const value: CheckedValue = { kind: 'variable', name: variable.name, own: true };
+            const picked = choice(variable.name, placed(value, keptTarget, variable.type));
+            addTo('VariablesComponent', { ...picked, note: variable.type });
+        }
+
+        addTo('TagsComponent', choice('Tags', placed({ kind: 'tag' }, keptTarget, 'tag')));
+
+        const componentMenus: TriggerSubmenu[] = [];
         for (const [component, choices] of submenus) {
-            const label = cardTitleOf(component);
-            menus.push({ label, choices });
+            componentMenus.push({ label: cardTitleOf(component), choices });
         }
 
-        const entry: TriggerWordEntry = { kind: 'submenus', submenus: menus };
+        const owner = this.targetWord(keptTarget) ?? 'the entity';
+        const valuesGroup: TriggerMenuGroup = {
+            title: `Values of ${owner}`,
+            choices: [],
+            submenus: componentMenus,
+            emptyText: undefined,
+        };
+
+        const entry: TriggerWordEntry = { kind: 'groups', groups: [levelGroup, valuesGroup] };
         return entry;
     }
 
-    // x and y, for a vector the component value check reads.
+    // What the value check's value word reads: "coins", "health", "the tag", "Body › Speed".
+    checkValueWord(value: CheckedValue) {
+        if (value.kind === 'variable') return value.name;
+        if (value.kind === 'tag') return TAG_WORD;
+
+        return readableName(value, this.context.registry);
+    }
+
+    // The type of the value a check reads; undefined while unset, or for a variable not known.
+    checkType(check: Check): CheckedType | undefined {
+        const { value } = check;
+        if (value === null) return undefined;
+        if (value.kind === 'tag') return 'tag';
+        if (value.kind !== 'variable') return 'number';
+
+        let ref: VariableRef = { owner: 'level', name: value.name };
+        if (value.own === true) {
+            ref = { owner: 'own', target: check.target, name: value.name };
+        }
+
+        return this.variableMenus.typeOf(ref);
+    }
+
+    // has and doesn't have for a tag, else the compares the type allows.
+    checkCompares(check: Check, index: number) {
+        const place = (compare: Compare) => ({ section: 'check', index, check: { ...check, compare } }) as const;
+        const type = this.checkType(check);
+        if (type !== 'tag') return this.compares(place, type);
+
+        return TAG_COMPARES.map((compare) => choice(compare.label, place(compare.value)));
+    }
+
+    static checkCompareWord(compare: Compare, type: CheckedType | undefined) {
+        if (type !== 'tag') return wordOf(COMPARES, compare);
+
+        const tagCompare = TAG_COMPARES.find((candidate) => candidate.value === compare);
+        return tagCompare?.word ?? wordOf(COMPARES, compare);
+    }
+
+    // The amount's field: the level's tags and "New tag…" for a tag, the variable's type's field for a
+    // variable, a number for the rest.
+    checkAmountEntry(check: Check, index: number): TriggerWordEntry {
+        const place = (amount: VariableValue) => ({ section: 'check', index, check: { ...check, amount } }) as const;
+        const type = this.checkType(check);
+
+        if (type === 'tag') return { kind: 'menu', choices: this.tagsWithNew(place) };
+        if (check.value?.kind === 'variable') return this.variableValueEntry(type, check.amount, place);
+
+        return numberEntry(check.amount);
+    }
+
+    // x and y, for a vector the value check reads.
     axes(value: ReadableValue, place: Place<ReadableValue>) {
         return AXES.map((axis) => choice(axis, place(withReadableAxis(value, axis))));
     }
@@ -352,6 +456,23 @@ export class TriggerChoices {
 
             return choice(event.label, { section: 'when', when });
         });
+    }
+
+    // What the event word opens: the When menu, and first, for touching, a key or an input, and a timer,
+    // the in-place choice between its two kinds, which keeps the rest of the When.
+    eventEntry(when: When | null): TriggerWordEntry {
+        const events = this.events();
+        const variants = when === null ? undefined : eventVariantsOf(when);
+        if (variants === undefined) return { kind: 'menu', choices: events };
+
+        const variantGroup: TriggerMenuGroup = {
+            title: variants.title,
+            choices: variants.choices,
+            emptyText: undefined,
+        };
+        const eventGroup: TriggerMenuGroup = { title: EVENTS_TITLE, choices: events, emptyText: undefined };
+
+        return { kind: 'groups', groups: [variantGroup, eventGroup] };
     }
 
     presses(place: Place<Press>) {
@@ -396,14 +517,6 @@ export class TriggerChoices {
         return ops.map((op) => choice(op, place(op)));
     }
 
-    pushes(place: Place<Push>) {
-        return PUSHES.map((push) => {
-            const fresh = freshPush(push.value);
-
-            return choice(push.label, place(fresh));
-        });
-    }
-
     repeats() {
         return REPEATS.map((repeat) => {
             const fresh = freshRepeat(repeat.value);
@@ -412,26 +525,12 @@ export class TriggerChoices {
         });
     }
 
-    // Add check's menu.
+    // Add check's menu: the one check, a value.
     newChecks(index: number, eventHasOther: boolean): readonly TriggerChoice[] {
-        const tagCheck = freshCheck('hasTag', eventHasOther);
-        const compareCheck = freshCheck('compare', eventHasOther);
-        const valueCheck = freshCheck('compareValue', eventHasOther);
+        const check = freshCheck(eventHasOther);
+        const picked = choice('a value', { section: 'check', index, check });
 
-        return [
-            described(
-                choice('an entity has a tag', { section: 'check', index, check: tagCheck }),
-                'Such as: other has the tag player',
-            ),
-            described(
-                choice("a variable's value", { section: 'check', index, check: compareCheck }),
-                'Such as: coins is at least 10',
-            ),
-            described(
-                choice('a component value', { section: 'check', index, check: valueCheck }),
-                'Such as: this Transform › Position y is more than 500',
-            ),
-        ];
+        return [described(picked, 'Such as: other has the tag player, coins is 10 or more, this Body › Speed')];
     }
 
     // The menu of an action's own word, which keeps its target.
@@ -670,7 +769,7 @@ export class TriggerChoices {
         return this.variableMenus.typeOf(ref);
     }
 
-    private readableChoice(value: ReadableValue, place: Place<ReadableValue>) {
+    private readableChoice(value: ReadableValue, place: (value: ReadableValue) => TriggerPartValue) {
         if (value.kind === 'field') {
             const label = fieldLabel(value, this.context.registry);
             return choice(label, place(value));
@@ -684,6 +783,7 @@ export class TriggerChoices {
     private valueLabel(value: ValueRef, target: Entity | undefined) {
         if (value.kind === 'field') return fieldLabel(value, this.context.registry);
         if (value.kind === 'tag') return 'Tags';
+        if (value.kind === 'velocity') return LIVE_LABELS.velocityX;
         if (value.kind === 'triggerOn') return `${triggerLabel(value.trigger, target)} on/off`;
 
         return value.name;
@@ -756,6 +856,8 @@ function componentOfValue(value: ValueRef) {
             return 'TriggerComponent';
         case 'variable':
             return 'VariablesComponent';
+        case 'velocity':
+            return BODY_COMPONENT;
     }
 }
 
@@ -832,6 +934,87 @@ function wordOf<T>(list: readonly Named<T>[], value: T) {
     if (named === undefined) throw new Error(`No word for ${String(value)}.`);
 
     return named.word;
+}
+
+// The touching, a key or an input, and a timer's in-place choice between its two kinds.
+function eventVariantsOf(when: When) {
+    const place = (picked: When) => ({ section: 'when', when: picked }) as const;
+
+    switch (when.kind) {
+        case 'touched':
+        case 'untouched':
+            return {
+                title: 'Touching',
+                choices: [
+                    choice('starts touching', place({ kind: 'touched' })),
+                    choice('stops touching', place({ kind: 'untouched' })),
+                ],
+            };
+        case 'key':
+        case 'input': {
+            let key: When = { kind: 'key', key: null, how: when.how };
+            let input: When = { kind: 'input', input: null, how: when.how };
+            if (when.kind === 'key') {
+                key = when;
+            } else {
+                input = when;
+            }
+
+            return { title: 'Key or input', choices: [choice('a key', place(key)), choice('an input', place(input))] };
+        }
+        case 'after':
+        case 'every': {
+            const { seconds } = when;
+            const after = choice('after', place({ kind: 'after', seconds }));
+            const every = choice('every', place({ kind: 'every', seconds }));
+
+            return { title: 'Timer', choices: [after, every] };
+        }
+        default:
+            return undefined;
+    }
+}
+
+// The value check, its value picked: a level's variable makes the World the target. The compare is kept when
+// the new type allows it (else is), and the amount when the type is the same. A check's first value starts it
+// as v4's checks started: a number variable at "is at least", any other number at "is more than".
+function withCheckedValue(
+    check: Check,
+    value: CheckedValue,
+    target: Target,
+    type: CheckedType,
+    oldType: CheckedType | undefined,
+): Check {
+    let { compare, amount } = check;
+    const allowed = type === 'tag' ? EQUAL_COMPARES : comparesOf(type);
+    if (!allowed.includes(compare)) {
+        compare = 'is';
+    }
+    if (check.value === null && type === 'number') {
+        compare = value.kind === 'variable' ? 'atLeast' : 'more';
+    }
+    if (type !== oldType) {
+        amount = null;
+    }
+
+    return { kind: 'value', target, value, compare, amount };
+}
+
+// A level's variable made the World the target; any other value is about `this` unless another target was
+// picked.
+function keptCheckTargetFor(check: Check, world: Entity): Target {
+    const isWorldForVariable =
+        check.value?.kind === 'variable' && check.target.kind === 'entity' && check.target.entity === world.id;
+    if (isWorldForVariable) return { kind: 'this' };
+
+    return check.target;
+}
+
+// The axis a checked number reads on a vector or a body's velocity; undefined for any other.
+function checkedAxis(value: CheckedValue) {
+    if (value.kind === 'variable' || value.kind === 'tag') return undefined;
+
+    return readableAxis(value);
 }
 
 // A variable made the World the target; any other value is about `this` unless another target was picked.

@@ -18,6 +18,18 @@ const IF = 1;
 const DO = 2;
 
 const OWN_DOOR_OPEN = { owner: 'own', target: { kind: 'this' }, name: 'door_open' } as const;
+const OTHER = { kind: 'other' } as const;
+const PLAYER_TAG_CHECK: Check = {
+    kind: 'value',
+    target: OTHER,
+    value: { kind: 'tag' },
+    compare: 'is',
+    amount: 'player',
+};
+
+function levelVariableCheck(name: string, compare: Check['compare'], amount: Check['amount']): Check {
+    return { kind: 'value', target: { kind: 'this' }, value: { kind: 'variable', name }, compare, amount };
+}
 
 function whenRow(when: When) {
     return rowOf(buildV4TriggerLevel([{ when }]).block(), WHEN).sentence;
@@ -33,8 +45,6 @@ function actionRow(action: Action, index = 0, actions: readonly Action[] = [acti
 
 describe("TriggerCardModel's v4 kinds", () => {
     test.each([
-        [{ kind: 'collision' }, 'this hits something'],
-        [{ kind: 'destroyed' }, 'this is destroyed'],
         [{ kind: 'custom', name: 'open' }, 'this gets the custom event open'],
         [{ kind: 'custom', name: null }, 'this gets the custom event pick a name'],
         [{ kind: 'variableChanged', variable: null, becomes: null }, 'the variable pick a variable changes'],
@@ -59,12 +69,16 @@ describe("TriggerCardModel's v4 kinds", () => {
         expect(whenRow(when).text).toBe(text);
     });
 
-    test('a hit and a custom event name an other; being destroyed does not', () => {
-        const check: Check = { kind: 'hasTag', target: { kind: 'other' }, tag: 'player' };
+    test('touching and a custom event name an other; a variable changing does not', () => {
+        const coinsChange: When = {
+            kind: 'variableChanged',
+            variable: { owner: 'level', name: 'coins' },
+            becomes: null,
+        };
 
-        expect(slotOf(checkRow(check, { kind: 'collision' }), 'target').state).toBe('set');
-        expect(slotOf(checkRow(check, { kind: 'custom', name: 'open' }), 'target').state).toBe('set');
-        expect(slotOf(checkRow(check, { kind: 'destroyed' }), 'target').state).toBe('greyed');
+        expect(slotOf(checkRow(PLAYER_TAG_CHECK, { kind: 'untouched' }), 'target').state).toBe('set');
+        expect(slotOf(checkRow(PLAYER_TAG_CHECK, { kind: 'custom', name: 'open' }), 'target').state).toBe('set');
+        expect(slotOf(checkRow(PLAYER_TAG_CHECK, coinsChange), 'target').state).toBe('greyed');
     });
 
     test("a custom event's name menu offers the level's names, then New name…, which asks for a word", () => {
@@ -167,59 +181,63 @@ describe("TriggerCardModel's v4 kinds", () => {
         expect(slotOf(whenRow(when), 'becomes').state).toBe('unset');
     });
 
-    test("a compared variable's menu adds other's group when the event has one, from every entity's names", () => {
-        const check: Check = { kind: 'compare', variable: null, compare: 'atLeast', value: null };
-        const touchedGroups = groupsOf(slotOf(checkRow(check), 'variable').entry);
-        const startGroups = groupsOf(slotOf(checkRow(check, { kind: 'levelStart' }), 'variable').entry);
+    test("the check's value menu has the level's variables, then other's values, its variables from every entity's names", () => {
+        const check: Check = { kind: 'value', target: OTHER, value: null, compare: 'is', amount: null };
+        const groups = groupsOf(slotOf(checkRow(check), 'value').entry);
+        const submenus = groups[1]?.submenus ?? [];
+        const variables = submenus.find((submenu) => submenu.label === 'Variables');
+        const tags = submenus.find((submenu) => submenu.label === 'Tags');
 
-        expect(touchedGroups.map((group) => group.title)).toEqual(['Level variables', 'this', 'other']);
-        expect(labelsOf(touchedGroups[2]?.choices ?? [])).toEqual(['health', 'door_open', 'state']);
-        expect(startGroups.map((group) => group.title)).toEqual(['Level variables', 'this']);
+        expect(groups.map((group) => group.title)).toEqual(['Level variables', 'Values of other']);
+        expect(labelsOf(variables?.choices ?? [])).toEqual(['health', 'door_open', 'state']);
+        expect(labelsOf(tags?.choices ?? [])).toEqual(['Tags']);
+        expect(choiceNamed(tags?.choices ?? [], 'Tags').value).toMatchObject({
+            check: { target: OTHER, value: { kind: 'tag' }, compare: 'is', amount: null },
+        });
     });
 
-    test('the compare words and the value field follow the variable: text in quotes, true or false', () => {
-        const stringCheck: Check = {
-            kind: 'compare',
-            variable: { owner: 'level', name: 'player_name' },
-            compare: 'is',
-            value: 'Ada',
-        };
+    test('the compare words and the amount follow the value: text in quotes, true or false, has the tag', () => {
+        const stringCheck = levelVariableCheck('player_name', 'is', 'Ada');
         const booleanCheck: Check = {
-            kind: 'compare',
-            variable: { owner: 'own', target: { kind: 'other' }, name: 'door_open' },
+            kind: 'value',
+            target: OTHER,
+            value: { kind: 'variable', name: 'door_open', own: true },
             compare: 'isNot',
-            value: null,
+            amount: null,
         };
         const stringRow = checkRow(stringCheck);
         const booleanRow = checkRow(booleanCheck);
+        const tagRow = checkRow(PLAYER_TAG_CHECK);
 
         expect(stringRow.text).toBe('player_name is "Ada"');
         expect(labelsOf(choicesOf(slotOf(stringRow, 'compare').entry))).toEqual(['is', 'is not']);
-        expect(slotOf(stringRow, 'number').entry).toEqual({ kind: 'text', value: 'Ada' });
-        expect(booleanRow.text).toBe('door_open of other is not true or false');
-        expect(labelsOf(choicesOf(slotOf(booleanRow, 'number').entry))).toEqual(['true', 'false']);
+        expect(slotOf(stringRow, 'amount').entry).toEqual({ kind: 'text', value: 'Ada' });
+        expect(booleanRow.text).toBe('other door_open is not true or false');
+        expect(labelsOf(choicesOf(slotOf(booleanRow, 'amount').entry))).toEqual(['true', 'false']);
+        expect(labelsOf(choicesOf(slotOf(tagRow, 'compare').entry))).toEqual(['has', "doesn't have"]);
     });
 
-    test('picking a variable of another type resets the compare to is and the value to unset', () => {
-        const check: Check = {
-            kind: 'compare',
-            variable: { owner: 'level', name: 'coins' },
-            compare: 'more',
-            value: 2,
-        };
-        const groups = groupsOf(slotOf(checkRow(check), 'variable').entry);
+    test('picking a level variable makes the World the target; another type resets the compare and the amount', () => {
+        const check = levelVariableCheck('coins', 'more', 2);
+        const { block, level } = buildV4TriggerLevel([{ checks: [check] }]);
+        const groups = groupsOf(slotOf(rowOf(block(), IF).sentence, 'value').entry);
 
         expect(choiceNamed(groups[0]?.choices ?? [], 'player_name').value).toMatchObject({
-            check: { variable: { owner: 'level', name: 'player_name' }, compare: 'is', value: null },
+            check: {
+                target: { kind: 'entity', entity: level.world.id },
+                value: { kind: 'variable', name: 'player_name' },
+                compare: 'is',
+                amount: null,
+            },
         });
         expect(choiceNamed(groups[0]?.choices ?? [], 'lives').value).toMatchObject({
-            check: { compare: 'more', value: 2 },
+            check: { compare: 'more', amount: 2 },
         });
     });
 
-    test('the component value check reads "this Body › Speed is more than 200"', () => {
+    test('the value check reads "this Body › Speed is more than 200"', () => {
         const check: Check = {
-            kind: 'compareValue',
+            kind: 'value',
             target: { kind: 'this' },
             value: { kind: 'live', live: 'speed' },
             compare: 'more',
@@ -227,12 +245,12 @@ describe("TriggerCardModel's v4 kinds", () => {
         };
 
         expect(checkRow(check).text).toBe('this Body › Speed is more than 200');
-        expect(checkRow({ ...check, value: null, amount: null }).text).toBe('this pick a value is more than a number');
+        expect(checkRow({ ...check, value: null, amount: null }).text).toBe('this pick a value');
     });
 
     test("a vector or a body's velocity is read on one axis, a word of its own", () => {
         const check: Check = {
-            kind: 'compareValue',
+            kind: 'value',
             target: { kind: 'this' },
             value: { kind: 'field', component: 'TransformComponent', field: 'position', axis: 'y' },
             compare: 'atMost',
@@ -253,18 +271,11 @@ describe("TriggerCardModel's v4 kinds", () => {
     });
 
     test("the value menu lists the target's components, each with its numbers and vectors once, and the body's live values last", () => {
-        const check: Check = {
-            kind: 'compareValue',
-            target: { kind: 'this' },
-            value: null,
-            compare: 'more',
-            amount: 0,
-        };
-        const entry = slotOf(checkRow(check), 'value').entry;
-        if (entry.kind !== 'submenus') throw new Error('Not a menu of submenus.');
+        const check: Check = { kind: 'value', target: { kind: 'this' }, value: null, compare: 'more', amount: 0 };
+        const submenus = groupsOf(slotOf(checkRow(check), 'value').entry)[1]?.submenus ?? [];
 
-        const transform = entry.submenus.find((submenu) => submenu.label === 'Transform');
-        const body = entry.submenus.find((submenu) => submenu.label === 'Body');
+        const transform = submenus.find((submenu) => submenu.label === 'Transform');
+        const body = submenus.find((submenu) => submenu.label === 'Body');
         const liveChoices = body?.choices.slice(-2) ?? [];
 
         expect(labelsOf(transform?.choices ?? [])).toEqual(['Position', 'Rotation', 'Scale', 'Skew']);

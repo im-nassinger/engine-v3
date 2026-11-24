@@ -35,7 +35,7 @@ How engine-v3 is built: the stack, the five parts of the code and their folders,
 | [editor/clipboard-and-shortcuts.md](editor/clipboard-and-shortcuts.md) | Commands, the main menu, keys, the shortcut list and tooltips (v4), the clipboard |
 | [ui.md](ui.md) | `useVersion`, the one context, the screen, the level view's mount, panels, styles |
 | [simulation.md](simulation.md) | The game worker, pacing, the tick phases, bodies, determinism, the play mirror |
-| [triggers-in-play.md](triggers-in-play.md) | The tick from v3, touches, collisions, Destroyed, variable changes, custom events, waiting runs, inputs, timers, Repeat, the chain limit, actions, changed values, the end window, Restart, keys during play |
+| [triggers-in-play.md](triggers-in-play.md) | The tick from v3, touches (solid and pass-through), variable changes, custom events, waiting runs, inputs, timers, Repeat, the chain limit, actions, changed values, the end window, Restart, keys during play |
 | [adapters.md](adapters.md) | Physics, rendering (gradients included), storage, input, time, workers, and the places for Lua and audio |
 | [performance.md](performance.md) | What v1 builds, what only gets a place, the speed tests |
 | [persistence.md](persistence.md) | `level.json`, the reader and writer, the project file, autosave, opening the editor |

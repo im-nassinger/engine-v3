@@ -141,7 +141,7 @@ describe('Box2dPhysicsWorld: setSurfaceSettings', () => {
         world.addSurface(box, surfaceDefinition(surface));
         stepTimes(world, poses, 10);
 
-        world.setSurfaceSettings(BOX, { friction: frictionAfterLanding, restitution: 0, sensor: false });
+        world.setSurfaceSettings(BOX, { friction: frictionAfterLanding, restitution: 0 });
         world.addVelocity(box, { x: 300, y: 0 });
         stepTimes(world, poses, 2 * ONE_SECOND);
         const x = poses.poseOf(BOX)?.x ?? 0;
@@ -164,7 +164,7 @@ describe('Box2dPhysicsWorld: setSurfaceSettings', () => {
         const poses = new BodyPoses();
         addFloor(world);
         addBox(world, BOX, { x: 0, y: -220 });
-        world.setSurfaceSettings(BOX, { friction: 0.3, restitution, sensor: false });
+        world.setSurfaceSettings(BOX, { friction: 0.3, restitution });
 
         let landed = false;
         let highest = Infinity;
@@ -184,40 +184,10 @@ describe('Box2dPhysicsWorld: setSurfaceSettings', () => {
         expect(bounceHeight(0.8)).toBeGreaterThan(80);
     });
 
-    test('switching Sensor on lets things through, and off again holds them', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
-        const poses = new BodyPoses();
-        addFloor(world);
-        const box = addBox(world, BOX, { x: 0, y: -20 });
-
-        world.setSurfaceSettings(GROUND, { friction: 0.3, restitution: 0, sensor: true });
-        stepTimes(world, poses, 30);
-        expect(poses.poseOf(BOX)?.y).toBeGreaterThan(30);
-
-        world.setSurfaceSettings(GROUND, { friction: 0.3, restitution: 0, sensor: false });
-        world.setPose(box, { x: 0, y: -100, angle: 0 });
-        stepTimes(world, poses, ONE_SECOND);
-        expect(poses.poseOf(BOX)?.y).toBeCloseTo(-20, 0);
-        world.destroy();
-    });
-
-    test('a Dynamic body whose only surface becomes a sensor keeps 1 kg, so it still falls', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
-        const poses = new BodyPoses();
-        addFloor(world);
-        addBox(world, BOX, { x: 0, y: -20 });
-
-        world.setSurfaceSettings(BOX, { friction: 0.3, restitution: 0, sensor: true });
-        stepTimes(world, poses, 30);
-
-        expect(poses.poseOf(BOX)?.y).toBeGreaterThan(30);
-        world.destroy();
-    });
-
     test('an entity with no surface in the world changes nothing', () => {
         const world = engine.createWorld({ gravity: NO_GRAVITY });
 
-        expect(() => world.setSurfaceSettings(99, { friction: 1, restitution: 1, sensor: true })).not.toThrow();
+        expect(() => world.setSurfaceSettings(99, { friction: 1, restitution: 1 })).not.toThrow();
         world.destroy();
     });
 });
