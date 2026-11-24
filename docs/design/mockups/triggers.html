@@ -206,12 +206,12 @@
 
   /* 12 · Scratch: snap-together blocks with a little roundness. --tx is where a block's tab sits. */
   /* Scratch's categories, in deeper colours the owner picked the tone of (2026-11-24: "#3d66c3, #2f897e,
-     #b88133, etc."): amber for the event, blue for Motion (Position), violet for Variables. Each other kind
-     has its own colour in that tone too (owner, 2026-11-24: different kinds had one colour): teal for the
-     If, rose for Wait, red for Destroy, green for a trigger's Enabled (Claude). White words and icons, menus
-     in the kind's colour darkened by a quarter, numbers as white ovals with Scratch's grey text. */
+     #b88133, etc."): a colour per kind of block, whatever it changes (owner, 2026-11-24: every Set is blue):
+     amber for the event, teal for the If, blue for Set, violet for Add, rose for Wait, red for Destroy
+     (Claude, in the owner's tone). White words and icons, menus in the kind's colour darkened by a quarter,
+     numbers as white ovals with Scratch's grey text. */
   .o-scratch { --sk-event: #b88133; --sk-ctl: #2f897e; --sk-act: #2f897e; --sk-wait: #ad4a7c;
-    --sk-motion: #3d66c3; --sk-var: #7d58b8; --sk-destroy: #b5473d; --sk-enabled: #46812f;
+    --sk-set: #3d66c3; --sk-add: #7d58b8; --sk-destroy: #b5473d;
     --sk-gap: color-mix(in srgb, #fff 4%, var(--panel)); } /* the trigger's background (--raised over --panel), opaque */
   /* Block colours in the editor's own way (tokens.md): a dark surface tinted with the kind's colour, as a
      warning note is tinted with --warning, with the editor's --text on it and the icon in the full colour.
@@ -223,10 +223,9 @@
      has nothing above it, so it gets 7 px. */
   .sb.hat  { --ic: var(--event); }
   .o-scratch .sb { --dd: color-mix(in srgb, var(--bg) 75%, #000); color: #fff; }
-  .o-scratch .sb.k-motion { --bg: var(--sk-motion); }
-  .o-scratch .sb.k-var { --bg: var(--sk-var); }
+  .o-scratch .sb.k-set { --bg: var(--sk-set); }
+  .o-scratch .sb.k-add { --bg: var(--sk-add); }
   .o-scratch .sb.k-destroy { --bg: var(--sk-destroy); }
-  .o-scratch .sb.k-enabled { --bg: var(--sk-enabled); }
   .o-scratch .sb > svg { color: #fff; }
   .o-scratch .sk-dd { background: var(--dd); color: #fff; }
   .o-scratch .sk-dd .path { color: rgba(255,255,255,.7); }
@@ -544,8 +543,7 @@ function scratch() {
         let above = first, html = '';
         tr.dos.forEach((d, i) => {
           const below = key++;
-          const kinds = { move: ' k-motion', plus: ' k-var', 'trash-2': ' k-destroy', power: ' k-enabled', 'power-off': ' k-enabled' };
-          const cat = kinds[d.icon] ?? '';
+          const cat = { Set: ' k-set', Add: ' k-add', Destroy: ' k-destroy' }[d.verb] ?? '';
           html += slot(above, false)
             + block((d.wait ? 'wait' : 'do') + cat, ic(d.icon) + words(d.wait ? waitWords(d) : d.words), above, below, i === last, i === last ? ' last' : '');
           above = below;
@@ -587,8 +585,7 @@ function render() {
 }
 
 // Scratch: a block has three bands (owner, 2026-11-24): its top third opens the slot above it, its bottom third the
-// slot below it, and its middle third, where its values are, changes nothing: a slot already open next to the block
-// stays open, any other closes. The If is measured whole, its C included; any other block without its tooth. The event
+// slot below it, and its middle third, where its values are, opens none: any open slot closes (owner). The If is measured whole, its C included; any other block without its tooth. The event
 // block has no slot above, so its top third is like its middle. Hovering an open slot keeps it open. The block above an
 // open slot shows its tooth. Keys are per trigger.
 // Nothing moves for SLOT_DELAY_MS after the mouse asks for a change (owner, 2026-11-24), so a mouse passing over blocks
@@ -624,10 +621,8 @@ document.addEventListener('mousemove', (ev) => {
     const r = (isIf ? blockEl.closest('.sc') : blockEl.querySelector('.sb')).getBoundingClientRect();
     const third = Math.min(2, Math.floor((3 * (ev.clientY - r.top)) / (isIf ? r.height : r.height - 6)));
     const { above, below } = blockEl.dataset;
-    const askedHere = asked.slot?.closest('.o-scratch') === trig ? asked.slot.dataset.slot : null;
     if (third <= 0 && above !== undefined) k = above;
     else if (third >= 2) k = below;
-    else k = askedHere === above || askedHere === below ? askedHere : null;
   }
   const slot = trig && k !== null ? trig.querySelector(`[data-slot="${k}"]`) : null;
   const hovered = slotEl ?? blockEl;
