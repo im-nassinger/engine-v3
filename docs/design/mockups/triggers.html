@@ -229,6 +229,13 @@
   .o-scratch .foot { margin-top: 10px; }
   .fx { color: var(--ent); }
   .o-scratch .fx { color: inherit; }
+  /* 13 · Blocky: square corners and square notches */
+  .o-scratch.blocky .sb { border-radius: 2px;
+    clip-path: polygon(0 0, calc(var(--nx) + 14px) 0, calc(var(--nx) + 14px) 6px, calc(var(--nx) + 34px) 6px, calc(var(--nx) + 34px) 0, 100% 0,
+      100% calc(100% - 6px), calc(var(--tx) + 34px) calc(100% - 6px), calc(var(--tx) + 34px) 100%, calc(var(--tx) + 14px) 100%, calc(var(--tx) + 14px) calc(100% - 6px), 0 calc(100% - 6px)); }
+  .o-scratch.blocky .sb.hat { padding-top: 13px; box-shadow: inset 0 4px 0 rgba(255,255,255,.22);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 34px calc(100% - 6px), 34px 100%, 14px 100%, 14px calc(100% - 6px), 0 calc(100% - 6px)); }
+  .o-scratch.blocky .sk-dd, .o-scratch.blocky .sk-num { border-radius: 2px; }
 </style>
 </head>
 <body>
@@ -426,7 +433,17 @@ const OPTIONS = [
   },
   {
     label: 'Scratch', caption: 'Snap-together blocks: the event on top, If wraps the actions it guards, and every changeable part is its own little box.',
-    draw: () => all((tr) => {
+    draw: () => scratch(''),
+  },
+  {
+    label: 'Blocky', caption: 'The same snap-together blocks with square corners and square notches, closer to the editor\'s flat look.',
+    draw: () => scratch('blocky'),
+  },
+];
+
+// Snap-together blocks, round (Scratch) or square (Blocky).
+function scratch(look) {
+    return all((tr) => {
       const words = (ws) => ws.map((w, i) => {
         const x = i <= 1 ? w.x[0].toLowerCase() + w.x.slice(1) : w.x;
         if (w.k === 't') return `<span>${x}</span>`;
@@ -438,15 +455,14 @@ const OPTIONS = [
            <div class="sc-mid"><div class="sc-arm"></div><div class="sc-inner">${stack}</div></div>
            <div class="sb ctl bottom"></div>`
         : stack;
-      return `<div class="trig o-scratch">${head(tr)}<div class="script">
+      return `<div class="trig o-scratch ${look}">${head(tr)}<div class="script">
         <div class="sb hat">${ic(tr.icon)}${words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)])}</div>${body}
       </div>${foot(tr)}</div>`;
-    }),
-  },
-];
+    });
+}
 
 // ---------- Page ----------
-let current = 11;
+let current = 12;
 function render() {
   document.getElementById('nav').innerHTML = OPTIONS.map((o, i) =>
     `<button class="${i === current ? 'on' : ''}" data-opt="${i}">${i === 9 ? 0 : i + 1} · ${o.label}</button>`).join('');
