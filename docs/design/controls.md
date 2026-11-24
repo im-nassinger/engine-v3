@@ -177,6 +177,8 @@ The owner found triggers convoluted (2026-11-23); the plan is [fix-3-simpler-tri
 
 ### To settle before it is built
 
+The build plan, with Claude's recommendation for each point below, is [fix-4-scratch-triggers.md](../versions/v4/fix-4-scratch-triggers.md) (2026-11-24).
+
 - **The requirement change for resting** (owner's yes, 2026-11-24, not written into the requirements yet): Repeat drops its cooldown choice, and **a trigger that switches itself off doesn't cancel the run doing it**, so that run can wait and switch it back on. Today switching a trigger off cancels all its waiting runs ([requirements/triggers/triggers.md](../requirements/triggers/triggers.md), Wait), and so does the game (`architecture/triggers-in-play.md`, Waiting runs). Also to settle: whether old levels' cooldowns become these blocks when loaded.
 - **The word *Enabled*:** the trigger's on/off value, as Set's Value menu shows it. It has no name in the glossary or the requirements yet (Change value sets "a trigger's on or off"). Add it to the glossary before it goes past the mockup.
 - **How once per run is drawn**, Repeat's other choice; the mockup has no example of it yet.

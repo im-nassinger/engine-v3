@@ -16,4 +16,4 @@ What the owner asked to change while trying v4, in their words, and what became 
 
 | # | The owner's words | State |
 |---|---|---|
-| 4 | The trigger card is "ugly and convoluted"; after the [mockup](../../design/mockups/triggers.html)'s rounds: "we have a winner: lets do the scratch one." | **Picked, not built** (2026-11-24). The card becomes Scratch blocks. The rules, and what is left to settle before building (resting by switching off, the word *Enabled*, "other" in the event, a wider Entity inspector), are in [controls.md](../../design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks) |
+| 4 | The trigger card is "ugly and convoluted"; after the [mockup](../../design/mockups/triggers.html)'s rounds: "we have a winner: lets do the scratch one." | **Planned, not built** (2026-11-24). The card becomes Scratch blocks; the look is in [controls.md](../../design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks), the build plan, six points for the owner to confirm and its tasks in [fix-4-scratch-triggers.md](fix-4-scratch-triggers.md). Built by the orchestrator, since it is about nine sessions of work |
