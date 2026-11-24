@@ -234,7 +234,7 @@
   .sb.ctl.bottom { --nx: 16px; min-height: 30px; padding: 0; }
   .sb svg { width: 16px; height: 16px; }
   .sc-mid { display: flex; }
-  .sc-arm { width: 16px; flex: none; background: var(--sk-ctl); }
+  .sc-arm { width: 16px; flex: none; margin-top: -2px; background: var(--sk-ctl); } /* -2px: closes the gap under the If's top, which the 2 px gap between blocks would leave */
   .sc-inner { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   .sk-dd { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 6px; border-radius: 6px; background: rgba(255,255,255,.09); cursor: pointer; white-space: nowrap; }
   .sk-dd::after { content: "▾"; font-size: 9px; opacity: .7; }
@@ -464,12 +464,14 @@ function scratch(look) {
         if (w.k === 't') return `<span>${x}</span>`;
         return w.k === 'n' ? `<span class="sk-num">${x}</span>` : `<span class="sk-dd">${x}</span>`;
       }).join('');
-      // A C-shaped block: its words on top, the blocks it holds inside.
-      const wrap = (top, inner) => `<div class="sb ctl top">${words(top)}</div>
+      // Every block starts with one icon saying what it does. Only If holds other blocks: it wraps the
+      // whole Do list, since its checks guard every action. A trigger has one If, its checks joined by "and".
+      const wrap = (icon, top, inner) => `<div class="sb ctl top">${ic(icon)}${words(top)}</div>
            <div class="sc-mid"><div class="sc-arm"></div><div class="sc-inner">${inner}</div></div>
            <div class="sb ctl bottom"></div>`;
-      const stack = tr.dos.map((d) => `<div class="sb ${d.wait ? 'wait' : 'do'}">${words(d.words)}</div>`).join('');
-      const body = tr.ifs.length ? wrap([t('if'), ...tr.ifs[0].words], stack) : stack;
+      const stack = tr.dos.map((d) => `<div class="sb ${d.wait ? 'wait' : 'do'}">${ic(d.icon)}${words(d.words)}</div>`).join('');
+      const checks = tr.ifs.flatMap((c, i) => i ? [t('and'), ...c.words] : c.words);
+      const body = tr.ifs.length ? wrap('split', [t('if'), ...checks], stack) : stack;
       const hat = `<div class="sb hat">${ic(tr.icon)}${words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)])}</div>`;
       // Every time draws nothing; a cooldown is its own block right under the event.
       const cooldown = tr.every ? `<div class="sb cool">${ic('timer')}${words([t('cooldown'), n(String(tr.every)), t('s')])}</div>` : '';
