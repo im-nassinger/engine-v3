@@ -205,8 +205,11 @@
   .o-branch .foot { margin-top: 10px; }
 
   /* 12 · Scratch: snap-together blocks. --nx is where a block's notch sits, --tx where its tab sits. */
-  .o-scratch { --sk-event: color-mix(in srgb, var(--event) 24%, var(--panel)); --sk-ctl: color-mix(in srgb, var(--check) 24%, var(--panel));
-    --sk-act: color-mix(in srgb, var(--accent) 24%, var(--panel)); --sk-wait: color-mix(in srgb, var(--wait) 24%, var(--panel));
+  /* Scratch 3's own block colours (owner, 2026-11-24): Events for the event, Control for If, Wait and
+     Destroy (Scratch's "delete this clone"), Motion for Position, Variables for a variable. A trigger's
+     Enabled has no Scratch block; it is Control, like the rest of a script's flow. White words and icons,
+     menus in the category's darker shade, numbers as white ovals with Scratch's grey text. */
+  .o-scratch { --sk-event: #ffbf00; --sk-ctl: #ffab19; --sk-act: #ffab19; --sk-wait: #ffab19;
     --sk-gap: color-mix(in srgb, #fff 4%, var(--panel)); } /* the trigger's background (--raised over --panel), opaque */
   /* Block colours in the editor's own way (tokens.md): a dark surface tinted with the kind's colour, as a
      warning note is tinted with --warning, with the editor's --text on it and the icon in the full colour.
@@ -217,6 +220,16 @@
      block above covers 2 with its line, and 13 below, of which the next block covers 6. The event block
      has nothing above it, so it gets 7 px. */
   .sb.hat  { --ic: var(--event); }
+  .o-scratch .sb { --dd: #cf8b17; color: #fff; }
+  .o-scratch .sb.hat { --dd: #cc9900; }
+  .o-scratch .sb.k-motion { background: #4c97ff; --dd: #3373cc; }
+  .o-scratch .sb.k-var { background: #ff8c1a; --dd: #db6e00; }
+  .o-scratch .sb > svg { color: #fff; }
+  .o-scratch .sk-dd { background: var(--dd); color: #fff; }
+  .o-scratch .sk-dd .path { color: rgba(255,255,255,.7); }
+  .o-scratch .sk-num { background: #fff; color: #575e75; }
+  .o-scratch .sb.slot { color: var(--muted); }
+  .o-scratch .sb.slot > svg { color: inherit; }
   .sb.ctl  { --ic: var(--check); }
   .sb.do   { --ic: var(--accent); }
   .sb.wait { --ic: var(--wait); }
@@ -524,7 +537,8 @@ function scratch(look) {
       const last = tr.dos.length - 1;
       const stack = tr.dos.map((d, i) => {
         const k = key++;
-        return block(d.wait ? 'wait' : 'do', ic(d.icon) + words(d.wait ? waitWords(d) : d.words), 900 - 2 * i, i === last, k, i === last ? ' last' : '')
+        const cat = d.icon === 'move' ? ' k-motion' : d.icon === 'plus' ? ' k-var' : '';
+        return block((d.wait ? 'wait' : 'do') + cat, ic(d.icon) + words(d.wait ? waitWords(d) : d.words), 900 - 2 * i, i === last, k, i === last ? ' last' : '')
           + slot(k, 899 - 2 * i, i === last);
       }).join('');
       const checks = tr.ifs.flatMap((c, i) => i ? [t('and'), ...c.words] : c.words);
