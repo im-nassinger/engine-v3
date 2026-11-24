@@ -279,16 +279,16 @@ const TRIGGERS = [
     repeat: 'every time',
   },
   {
-    name: 'Timed door', icon: 'radio', sum: 'Switch off, move up and back, wait 3 s, switch on',
+    name: 'Timed door', icon: 'radio', sum: 'Set Enabled to false, move up and back, wait 3 s, set Enabled to true',
     when: { verb: 'Custom event', words: [t('This gets'), v('open')], short: [t('Gets the event'), v('open')] },
     ifs: [],
     dos: [
-      { icon: 'power-off', verb: 'Set', words: [t('Switch'), e('this trigger'), c('off')], fields: [['Change', 'set', true], ['Target', 'this trigger', true], ['To', 'off', true]] },
+      { icon: 'power-off', verb: 'Set', words: [t('Set'), e('this'), v('Enabled'), t('to'), c('false')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Enabled', true], ['To', 'false', true]] },
       { icon: 'move', verb: 'Set', words: [t('Set'), e('this'), v('Position'), t('to'), n('0, -200')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Position', true], ['To', '0, -200']] },
       { icon: 'hourglass', verb: 'Wait', wait: true, words: [t('Wait'), n('2 s')], fields: [['For', '2 s']] },
       { icon: 'move', verb: 'Set', words: [t('Set'), e('this'), v('Position'), t('to'), n('0, 0')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Position', true], ['To', '0, 0']] },
       { icon: 'hourglass', verb: 'Wait', wait: true, words: [t('Wait'), n('3 s')], fields: [['For', '3 s']] },
-      { icon: 'power', verb: 'Set', words: [t('Switch'), e('this trigger'), c('on')], fields: [['Change', 'set', true], ['Target', 'this trigger', true], ['To', 'on', true]] },
+      { icon: 'power', verb: 'Set', words: [t('Set'), e('this'), v('Enabled'), t('to'), c('true')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Enabled', true], ['To', 'true', true]] },
     ],
     repeat: 'every time',
   },
@@ -475,7 +475,7 @@ function scratch(look) {
       const checks = tr.ifs.flatMap((c, i) => i ? [t('and'), ...c.words] : c.words);
       const body = tr.ifs.length ? wrap('split', [t('if'), ...checks], stack) : stack;
       const hat = `<div class="sb hat">${ic(tr.icon)}${words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)])}</div>`;
-      // No cooldown block: a trigger that must rest switches itself off, waits, and switches itself on.
+      // No cooldown block: a trigger that must rest sets its Enabled to false, waits, and sets it to true.
       return `<div class="trig o-scratch ${look}">${head(tr)}<div class="script">
         ${hat}${body}
       </div>${foot(tr, 'Add', false)}</div>`;
