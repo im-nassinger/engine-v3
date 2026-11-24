@@ -518,33 +518,47 @@ function scratch() {
       }).join('');
       // Every block starts with one icon saying what it does. Only If holds other blocks: it wraps the
       // whole Do list, since its checks guard every action. A trigger has one If, its checks joined by "and".
-      const wrap = (icon, top, inner, z, add) => `<div class="sc" style="z-index: ${z}"><div class="sk ctl" data-add="${add}"><div class="sb ctl top"><i class="tooth"></i>${ic(icon)}${words(top)}</div></div>
+      // Hovering the top half of a block opens the slot above it, the bottom half the slot below it
+      // (owner, 2026-11-24). Every gap between blocks has one slot, keyed by a number; a block knows the
+      // gap above it (data-above) and below it (data-below). The If's top bar is measured alone, without
+      // the rest of its C: its top half opens the slot above the If, its bottom half the slot after it.
+      const wrap = (icon, top, inner, z, above, below) => `<div class="sc" style="z-index: ${z}"><div class="sk ctl" data-above="${above}" data-below="${below}"><div class="sb ctl top"><i class="tooth"></i>${ic(icon)}${words(top)}</div></div>
            <div class="sc-mid"><div class="sc-arm"></div><div class="sc-inner">${inner}</div></div>
-           <div class="sk ctl" data-add="${add}"><div class="sb ctl bottom end"><i class="tooth"></i></div></div></div>`;
+           <div class="sk ctl" data-below="${below}"><div class="sb ctl bottom end"><i class="tooth"></i></div></div></div>`;
       // A time's unit is a menu (seconds now, ticks later), not a fixed "s".
       const unit = c('seconds');
       const waitWords = (d) => [t('wait'), n(d.words[1].x.split(' ')[0]), unit];
-      // A block draws above its slot, and its slot above the next block: z-index counts down the stack.
-      let key = 0;
-      const block = (kind, html, z, end = false, add = null, cls = '') =>
-        `<div class="sk ${kind}${cls}" style="z-index: ${z}"${add === null ? '' : ` data-add="${add}"`}><div class="sb ${kind}${end ? ' end' : ''}"><i class="tooth"></i>${html}</div></div>`;
-      const slot = (add, z, end) =>
-        `<div class="sk slot" data-slot="${add}" style="z-index: ${z}"><div class="sb slot${end ? ' end' : ''}"><i class="tooth"></i>${ic('plus')}<span>add a block</span></div></div>`;
+      // Each block draws above everything after it: z-index counts down as the stack is written.
+      let key = 0, z = 990;
+      const block = (kind, html, above, below, end = false, cls = '') =>
+        `<div class="sk ${kind}${cls}" style="z-index: ${z--}"${above === null ? '' : ` data-above="${above}"`} data-below="${below}"><div class="sb ${kind}${end ? ' end' : ''}"><i class="tooth"></i>${html}</div></div>`;
+      const slot = (k, end) =>
+        `<div class="sk slot" data-slot="${k}" style="z-index: ${z--}"><div class="sb slot${end ? ' end' : ''}"><i class="tooth"></i>${ic('plus')}<span>add a block</span></div></div>`;
       // A slot opens only on hover; the card has no other Add button (owner, 2026-11-24).
-      const last = tr.dos.length - 1;
-      const stack = tr.dos.map((d, i) => {
-        const k = key++;
-        const cat = d.icon === 'move' ? ' k-motion' : d.icon === 'plus' ? ' k-var' : '';
-        return block((d.wait ? 'wait' : 'do') + cat, ic(d.icon) + words(d.wait ? waitWords(d) : d.words), 900 - 2 * i, i === last, k, i === last ? ' last' : '')
-          + slot(k, 899 - 2 * i, i === last);
-      }).join('');
+      const actions = (first) => {
+        const last = tr.dos.length - 1;
+        let above = first, html = '';
+        tr.dos.forEach((d, i) => {
+          const below = key++;
+          const cat = d.icon === 'move' ? ' k-motion' : d.icon === 'plus' ? ' k-var' : '';
+          html += slot(above, false)
+            + block((d.wait ? 'wait' : 'do') + cat, ic(d.icon) + words(d.wait ? waitWords(d) : d.words), above, below, i === last, i === last ? ' last' : '');
+          above = below;
+        });
+        return html + slot(above, true);
+      };
       const checks = tr.ifs.flatMap((c, i) => i ? [t('and'), ...c.words] : c.words);
-      const ifKey = key++;
-      // Hovering the If opens a slot after the whole If, outside it (owner, 2026-11-24); its bottom shows its tooth.
-      const body = tr.ifs.length ? wrap('split', [t('if'), ...checks], stack, 998, ifKey) + slot(ifKey, 997, true) : stack;
-      const hatKey = key++;
-      const hat = block('hat', ic(tr.icon) + words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)]), 1000, false, tr.ifs.length ? null : hatKey)
-        + (tr.ifs.length ? '' : slot(hatKey, 999, false));
+      const underHat = key++;
+      const hat = block('hat', ic(tr.icon) + words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)]), null, underHat);
+      let body;
+      if (tr.ifs.length) {
+        const afterIf = key++;
+        const before = slot(underHat, false), ifZ = z--;
+        z = 900;
+        body = before + wrap('split', [t('if'), ...checks], actions(key++), ifZ, underHat, afterIf) + slot(afterIf, true);
+      } else {
+        body = actions(underHat);
+      }
       // No cooldown block: a trigger that must rest sets its Enabled to false, waits, and sets it to true.
       return `<div class="trig o-scratch">${head(tr)}<div class="script"><div class="stack">
         ${hat}${body}
@@ -555,6 +569,7 @@ function scratch() {
 // ---------- Page ----------
 let current = 11;
 function render() {
+  openKey = null;
   document.getElementById('nav').innerHTML = OPTIONS.map((o, i) =>
     `<button class="${i === current ? 'on' : ''}" data-opt="${i}">${i === 9 ? 0 : i + 1} · ${o.label}</button>`).join('');
   document.getElementById('caption').textContent = OPTIONS[current].caption;
@@ -562,15 +577,27 @@ function render() {
   lucide.createIcons();
 }
 
-// Scratch: hovering a block, or its open slot, keeps that slot open. Keys are per trigger.
-document.addEventListener('mouseover', (ev) => {
+// Scratch: the top half of a block (its tooth left out) opens the slot above it, the bottom half the slot
+// below it; hovering an open slot keeps it open. The block above an open slot shows its tooth. Keys are per trigger.
+let openKey = null;
+document.addEventListener('mousemove', (ev) => {
   const trig = ev.target.closest('.o-scratch');
-  const hit = ev.target.closest('[data-add], [data-slot]');
-  const k = hit && (hit.dataset.add ?? hit.dataset.slot);
+  let k = null;
+  const slotEl = ev.target.closest('[data-slot]');
+  const blockEl = ev.target.closest('[data-below]');
+  if (slotEl) k = slotEl.dataset.slot;
+  else if (blockEl) {
+    const r = blockEl.querySelector('.sb').getBoundingClientRect();
+    const top = ev.clientY < r.top + (r.height - 6) / 2;
+    k = top && blockEl.dataset.above !== undefined ? blockEl.dataset.above : blockEl.dataset.below;
+  }
+  const id = trig && k !== null ? `${[...document.querySelectorAll('.o-scratch')].indexOf(trig)}:${k}` : null;
+  if (id === openKey) return;
+  openKey = id;
   document.querySelectorAll('.o-scratch .show, .o-scratch .open').forEach((x) => x.classList.remove('show', 'open'));
-  if (!trig || k === undefined || k === null) return;
+  if (id === null) return;
   trig.querySelector(`[data-slot="${k}"]`)?.classList.add('show');
-  trig.querySelectorAll(`[data-add="${k}"]`).forEach((x) => x.classList.add('open'));
+  trig.querySelectorAll(`[data-below="${k}"]`).forEach((x) => x.classList.add('open'));
 });
 
 document.addEventListener('click', (ev) => {
