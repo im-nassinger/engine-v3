@@ -4,16 +4,15 @@
 
 **v1 is built** (stages 0 to 19, done 2026-11-19), with 2,048 tests in Node, 1,269 browser tests and 292 Playwright tests in three browsers. **The versions after v1 are small** (owner, round 12, 2026-11-20): v2 curves and gradients, v3 a first game without code, v4 the rest of the triggers, v5 scripts, v6 text, v7 `.entity` files and the builtin player; see [scope.md](scope.md). **v2 is done** (curves and gradients): built, tried by the owner, the [fixes](versions/v2/fixes.md) asked built, and the owner's last test passed (2026-11-22); its lasting parts are in [architecture/](architecture/README.md). **v3 is done** (a first game without code: tags, the World's variables and inputs, triggers, the Trigger tool, Win, Lose and Restart): built by the orchestrator, tried by the owner, its two [fixes](versions/v3/fixes.md) built, and marked sound by the owner (2026-11-22). **v4 is built** (the rest of the triggers, string and boolean variables on any entity, the shortcut list): the orchestrator built its [tasks](versions/v4/tasks.md) 1 to 17 (2026-11-22 to 2026-11-23), and **the owner is trying it** (task 18); the [fixes](versions/v4/fixes.md) asked so far are built: the trigger card's pickers and boxes, and **simpler triggers** (six events, one check, no Push, no Sensor setting; 2026-11-23). Its plan stays in [versions/v4/](versions/v4/requirements.md); its lasting parts are in [architecture/](architecture/README.md), mainly [core-model/triggers.md](architecture/core-model/triggers.md) and [triggers-in-play.md](architecture/triggers-in-play.md). The repo is public since 2026-11-20, so CI runs on every push.
 
-## Last session (2026-11-23)
+## Last session (2026-11-24)
 
-Built v4 fix 3, simpler triggers, from [its plan](versions/v4/fix-3-simpler-triggers.md).
+The owner finds the trigger card ugly and convoluted, so we made a mockup of other ways to draw it: [design/mockups/triggers.html](design/mockups/triggers.html).
 
-1. The trigger model: three Whens dropped, one value check, Body › Velocity in Change value; old triggers converted as they are read.
-2. Play: one `TouchLedger` for sensor and contact events, both sides hearing a touch, and a sensor built in play for a shape with no Surface under a touch trigger.
-3. The Sensor setting removed, with level format version 2 and its upgrade step.
-4. The trigger card's six events, in-place words and value check; the determinism trigger levels rebuilt and re-recorded; every test, journey and doc updated.
+1. A first mockup with 11 variants at once was far too busy; it became one card at a time.
+2. Over several rounds, more room inside every container, 13 options, and the owner's favourites: Branch (Tree and Flow merged), Scratch and Blocky (snap-together blocks, round or square).
+3. The event now reads "When other starts touching this", `other` in the entity colour.
 
-**Where we stopped:** built and committed; waiting for the owner to try it (item 4 below).
+**Where we stopped:** the owner is choosing an option. What they said about each round is in [proposals/trigger-card-look.md](proposals/trigger-card-look.md). Nothing in the game changed.
 
 ## Where things stand
 
@@ -43,8 +42,9 @@ Each item is removed in the same commit that settles it, wherever that commit is
 
 ## Next
 
-1. The owner tries v4 (task 18), and the fixes asked go into `versions/v4/fixes.md`; then v5 (scripts) is planned.
-2. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
+1. The owner picks a look for the trigger card ([proposal](proposals/trigger-card-look.md)); it is written into [design/controls.md](design/controls.md) and built as a v4 fix.
+2. The owner tries v4 (task 18), and the fixes asked go into `versions/v4/fixes.md`; then v5 (scripts) is planned.
+3. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
 
 ## How to change a requirement
 
@@ -57,6 +57,8 @@ Each item is removed in the same commit that settles it, wherever that commit is
 The original text of any review question can be found with `git log -p -S'"ID"' -- review/open.js` in `ecs-game-v2`.
 
 ## Open questions for the owner
+
+- **"When other starts touching this" in the game too?** The mockup says it; the real card and the requirements still say "something" (2026-11-24).
 
 Under the owner's standing yes (2026-11-14), Claude decides what the docs don't answer and lists it in [decisions.md](decisions.md#decided-under-the-standing-yes) for the owner to review whenever they like. The [review page](review.html) holds round 12's record, settled on 2026-11-20; earlier rounds are in git history.
 
