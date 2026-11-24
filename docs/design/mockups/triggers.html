@@ -516,19 +516,18 @@ function scratch() {
       }).join('');
       // Every block starts with one icon saying what it does. Only If holds other blocks: it wraps the
       // whole Do list, since its checks guard every action. A trigger has one If, its checks joined by "and".
-      // Hovering the top half of a block opens the slot above it, the bottom half the slot below it
-      // (owner, 2026-11-24). Every gap between blocks has one slot, keyed by a number; a block knows the
-      // gap above it (data-above) and below it (data-below). The If is measured whole, its C included (owner,
-      // 2026-11-24): hovering its top bar, arm or bottom bar, the top half of the C opens the slot above
-      // the If, the bottom half the slot after it.
-      const wrap = (icon, top, inner, z, above, below) => `<div class="sc" style="z-index: ${z}"><div class="sk ctl" data-above="${above}" data-below="${below}"><div class="sb ctl top"><i class="tooth"></i>${ic(icon)}${words(top)}</div></div>
-           <div class="sc-mid"><div class="sc-arm" data-above="${above}" data-below="${below}"></div><div class="sc-inner">${inner}</div></div>
-           <div class="sk ctl" data-above="${above}" data-below="${below}"><div class="sb ctl bottom end"><i class="tooth"></i></div></div></div>`;
+      // Every gap between blocks has one slot, keyed by a number; a block knows the gap above it
+      // (data-above) and below it (data-below). The If is two bars, each a block of its own (owner,
+      // 2026-11-24): its top bar sits between the gap above the If and the If's first inner gap, its bottom
+      // bar between the If's last inner gap and the gap after the If. Its arm opens no slot.
+      const wrap = (icon, top, inner, z, above, first, last, below) => `<div class="sc" style="z-index: ${z}"><div class="sk ctl" data-above="${above}" data-below="${first}"><div class="sb ctl top"><i class="tooth"></i>${ic(icon)}${words(top)}</div></div>
+           <div class="sc-mid"><div class="sc-arm"></div><div class="sc-inner">${inner}</div></div>
+           <div class="sk ctl" data-above="${last}" data-below="${below}"><div class="sb ctl bottom end"><i class="tooth"></i></div></div></div>`;
       // A time's unit is a menu (seconds now, ticks later), not a fixed "s".
       const unit = c('seconds');
       const waitWords = (d) => [t('wait'), n(d.words[1].x.split(' ')[0]), unit];
       // Each block draws above everything after it: z-index counts down as the stack is written.
-      let key = 0, z = 990;
+      let key = 0, z = 990, lastGap = 0; // lastGap: the last gap actions() wrote
       const block = (kind, html, above, below, end = false, cls = '') =>
         `<div class="sk ${kind}${cls}" style="z-index: ${z--}"${above === null ? '' : ` data-above="${above}"`} data-below="${below}"><div class="sb ${kind}${end ? ' end' : ''}"><i class="tooth"></i>${html}</div></div>`;
       const slot = (k, end) =>
@@ -544,6 +543,7 @@ function scratch() {
             + block((d.wait ? 'wait' : 'do') + cat, ic(d.icon) + words(d.wait ? waitWords(d) : d.words), above, below, i === last, i === last ? ' last' : '');
           above = below;
         });
+        lastGap = above;
         return html + slot(above, true);
       };
       const checks = tr.ifs.flatMap((c, i) => i ? [t('and'), ...c.words] : c.words);
@@ -554,7 +554,8 @@ function scratch() {
         const afterIf = key++;
         const before = slot(underHat, false), ifZ = z--;
         z = 900;
-        body = before + wrap('split', [t('if'), ...checks], actions(key++), ifZ, underHat, afterIf) + slot(afterIf, true);
+        const first = key++, inner = actions(first);
+        body = before + wrap('split', [t('if'), ...checks], inner, ifZ, underHat, first, lastGap, afterIf) + slot(afterIf, true);
       } else {
         body = actions(underHat);
       }
@@ -580,7 +581,9 @@ function render() {
 }
 
 // Scratch: a block has three bands (owner, 2026-11-24): its top third opens the slot above it, its bottom third the
-// slot below it, and its middle third, where its values are, opens none: any open slot closes (owner). The If is measured whole, its C included; any other block without its tooth. The event
+// slot below it, and its middle third, where its values are, opens none: any open slot closes (owner). A block is
+// measured without its tooth. The If's top and bottom bars are each such a block (owner, 2026-11-24): the top bar's
+// bottom third opens the If's first inner slot, the bottom bar's top third its last inner slot; its arm opens none. The event
 // block has no slot above, so its top third is like its middle. Hovering an open slot keeps it open. The block above an
 // open slot shows its tooth. Keys are per trigger.
 // Nothing moves for SLOT_DELAY_MS after the mouse asks for a change (owner, 2026-11-24), so a mouse passing over blocks
@@ -609,12 +612,11 @@ document.addEventListener('mousemove', (ev) => {
   const trig = ev.target.closest('.o-scratch');
   let k = null;
   const slotEl = ev.target.closest('[data-slot]');
-  const blockEl = ev.target.closest('[data-below]');
+  const blockEl = ev.target.closest('[data-below], .sc-arm');
   if (slotEl) k = slotEl.dataset.slot;
-  else if (blockEl) {
-    const isIf = blockEl.matches('.sc > .sk, .sc-arm');
-    const r = (isIf ? blockEl.closest('.sc') : blockEl.querySelector('.sb')).getBoundingClientRect();
-    const third = Math.min(2, Math.floor((3 * (ev.clientY - r.top)) / (isIf ? r.height : r.height - 6)));
+  else if (blockEl?.dataset.below !== undefined) {
+    const r = blockEl.querySelector('.sb').getBoundingClientRect();
+    const third = Math.min(2, Math.floor((3 * (ev.clientY - r.top)) / (r.height - 6)));
     const { above, below } = blockEl.dataset;
     if (third <= 0 && above !== undefined) k = above;
     else if (third >= 2) k = below;
