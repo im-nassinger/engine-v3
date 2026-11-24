@@ -211,7 +211,10 @@
      warning note is tinted with --warning, with the editor's --text on it and the icon in the full colour.
      The colours are the mockup's event, check, accent and wait colours.
      A changeable part is a field like the editor's. Blocks touch with no gap; a 2 px border (.sk, below)
-     traces each block's outline and notch, so two blocks of one colour don't merge. */
+     traces each block's outline and notch, so two blocks of one colour don't merge.
+     Every block shows the same 36 px of colour with its words centred: 9 px above them, of which the
+     block above covers 2 with its line, and 13 below, of which the next block covers 6. The event block
+     has nothing above it, so it gets 7 px. */
   .sb.hat  { --ic: var(--event); }
   .sb.ctl  { --ic: var(--check); }
   .sb.do   { --ic: var(--accent); }
@@ -226,7 +229,7 @@
     padding: 9px 10px 13px; margin-bottom: -6px; color: var(--text); line-height: 22px; border-radius: 6px;
     clip-path: polygon(0 0, calc(var(--nx) + 12px) 0, calc(var(--nx) + 17px) 6px, calc(var(--nx) + 31px) 6px, calc(var(--nx) + 36px) 0, 100% 0,
       100% calc(100% - 6px), calc(var(--tx) + 36px) calc(100% - 6px), calc(var(--tx) + 31px) 100%, calc(var(--tx) + 17px) 100%, calc(var(--tx) + 12px) calc(100% - 6px), 0 calc(100% - 6px)); }
-  .sb.hat { padding-top: 10px; border-radius: 40px 10px 6px 6px / 14px 10px 6px 6px;
+  .sb.hat { padding-top: 7px; border-radius: 40px 10px 6px 6px / 14px 10px 6px 6px;
     clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 36px calc(100% - 6px), 31px 100%, 17px 100%, 12px calc(100% - 6px), 0 calc(100% - 6px)); }
   .sb.hat { background: var(--sk-event); }
   .sb.do { background: var(--sk-act); }
@@ -236,13 +239,20 @@
   .sb.ctl.bottom { --nx: 16px; min-height: 30px; padding: 0; }
   .sb svg { width: 16px; height: 16px; }
   .sc-mid { display: flex; }
-  .sc-arm { width: 16px; flex: none; background: var(--sk-ctl); }
   /* The border: a block's clip-path would cut off a CSS border, so each block sits in a .sk wrapper whose
      drop-shadows draw a 2 px line around the block's shape, notch and tab included. Blocks overlap by their
-     whole 6 px tab, so a later block's line is the seam over the one above it. An If's top, arm and bottom
-     share one wrapper, so the If is outlined as one C; the blocks inside it sit above its bottom, so their
-     lines show there too. */
-  .sk { display: flex; flex-direction: column; position: relative; z-index: 1;
+     whole 6 px tab, and a block draws above the ones under it (z-index set in scratch()), so its bottom line
+     and tab are the seam. An If (.sc) draws its top, arm and bottom above the blocks it holds; the arm draws
+     its own lines and covers the top's and bottom's lines where they meet it, so the If reads as one C. */
+  .sc { position: relative; display: flex; flex-direction: column; }
+  .sc > .sk { z-index: 1000; }
+  /* Corners that meet the arm are square, so the C's lines run straight through its joints. */
+  .o-scratch .sc .sb.ctl.top { border-bottom-left-radius: 0; }
+  .o-scratch .sc .sb.ctl.bottom { border-top-left-radius: 0; }
+  .o-scratch .sc .sc-inner .sb { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+  .sc-arm { position: relative; z-index: 1001; width: 16px; flex: none; background: var(--sk-ctl);
+    --line: color-mix(in srgb, var(--check) 55%, var(--panel)); box-shadow: -2px 0 0 var(--line), inset -2px 0 0 var(--line); }
+  .sk { display: flex; flex-direction: column; position: relative;
     filter: drop-shadow(1px 0 0 var(--line)) drop-shadow(-1px 0 0 var(--line)) drop-shadow(0 1px 0 var(--line)) drop-shadow(0 -1px 0 var(--line))
       drop-shadow(1px 0 0 var(--line)) drop-shadow(-1px 0 0 var(--line)) drop-shadow(0 1px 0 var(--line)) drop-shadow(0 -1px 0 var(--line)); }
   .sk.hat { --line: color-mix(in srgb, var(--event) 55%, var(--panel)); }
@@ -260,7 +270,7 @@
   .o-scratch.blocky .sb { border-radius: 2px;
     clip-path: polygon(0 0, calc(var(--nx) + 14px) 0, calc(var(--nx) + 14px) 6px, calc(var(--nx) + 34px) 6px, calc(var(--nx) + 34px) 0, 100% 0,
       100% calc(100% - 6px), calc(var(--tx) + 34px) calc(100% - 6px), calc(var(--tx) + 34px) 100%, calc(var(--tx) + 14px) 100%, calc(var(--tx) + 14px) calc(100% - 6px), 0 calc(100% - 6px)); }
-  .o-scratch.blocky .sb.hat { padding-top: 9px;
+  .o-scratch.blocky .sb.hat { padding-top: 7px;
     clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 34px calc(100% - 6px), 34px 100%, 14px 100%, 14px calc(100% - 6px), 0 calc(100% - 6px)); }
   .o-scratch.blocky .sk-dd, .o-scratch.blocky .sk-num { border-radius: 2px; }
 </style>
@@ -481,17 +491,18 @@ function scratch(look) {
       }).join('');
       // Every block starts with one icon saying what it does. Only If holds other blocks: it wraps the
       // whole Do list, since its checks guard every action. A trigger has one If, its checks joined by "and".
-      const wrap = (icon, top, inner) => `<div class="sk ctl"><div class="sb ctl top">${ic(icon)}${words(top)}</div>
+      const wrap = (icon, top, inner, z) => `<div class="sc" style="z-index: ${z}"><div class="sk ctl"><div class="sb ctl top">${ic(icon)}${words(top)}</div></div>
            <div class="sc-mid"><div class="sc-arm"></div><div class="sc-inner">${inner}</div></div>
-           <div class="sb ctl bottom"></div></div>`;
+           <div class="sk ctl"><div class="sb ctl bottom"></div></div></div>`;
       // A time's unit is a menu (seconds now, ticks later), not a fixed "s".
       const unit = c('seconds');
       const waitWords = (d) => [t('wait'), n(d.words[1].x.split(' ')[0]), unit];
-      const block = (kind, html) => `<div class="sk ${kind}"><div class="sb ${kind}">${html}</div></div>`;
-      const stack = tr.dos.map((d) => block(d.wait ? 'wait' : 'do', ic(d.icon) + words(d.wait ? waitWords(d) : d.words))).join('');
+      // A block draws above the blocks under it: z-index counts down the stack.
+      const block = (kind, html, z) => `<div class="sk ${kind}" style="z-index: ${z}"><div class="sb ${kind}">${html}</div></div>`;
+      const stack = tr.dos.map((d, i) => block(d.wait ? 'wait' : 'do', ic(d.icon) + words(d.wait ? waitWords(d) : d.words), 999 - i)).join('');
       const checks = tr.ifs.flatMap((c, i) => i ? [t('and'), ...c.words] : c.words);
-      const body = tr.ifs.length ? wrap('split', [t('if'), ...checks], stack) : stack;
-      const hat = block('hat', ic(tr.icon) + words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)]));
+      const body = tr.ifs.length ? wrap('split', [t('if'), ...checks], stack, 998) : stack;
+      const hat = block('hat', ic(tr.icon) + words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)]), 1000);
       // No cooldown block: a trigger that must rest sets its Enabled to false, waits, and sets it to true.
       return `<div class="trig o-scratch ${look}">${head(tr)}<div class="script"><div class="stack">
         ${hat}${body}
