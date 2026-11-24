@@ -217,7 +217,11 @@
   .sb.do   { --ic: var(--accent); }
   .sb.wait { --ic: var(--wait); }
   .sb > svg { color: var(--ic); }
-  .o-scratch .script { display: flex; flex-direction: column; padding-bottom: 6px; }
+  /* The script scrolls sideways instead of wrapping: blocks grow to their words' width, and the stack is at
+     least as wide as the card, so short blocks still fill it. */
+  .o-scratch .script { overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
+  .o-scratch .stack { display: flex; flex-direction: column; width: max-content; min-width: 100%; }
+  .o-scratch .sb { flex-wrap: nowrap; white-space: nowrap; }
   .sb { --nx: 0px; --tx: 0px; position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; min-height: 40px;
     padding: 9px 10px 13px; margin-bottom: -4px; color: var(--text); line-height: 22px; border-radius: 6px;
     clip-path: polygon(0 0, calc(var(--nx) + 12px) 0, calc(var(--nx) + 17px) 6px, calc(var(--nx) + 31px) 6px, calc(var(--nx) + 36px) 0, 100% 0,
@@ -476,9 +480,9 @@ function scratch(look) {
       const body = tr.ifs.length ? wrap('split', [t('if'), ...checks], stack) : stack;
       const hat = `<div class="sb hat">${ic(tr.icon)}${words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)])}</div>`;
       // No cooldown block: a trigger that must rest sets its Enabled to false, waits, and sets it to true.
-      return `<div class="trig o-scratch ${look}">${head(tr)}<div class="script">
+      return `<div class="trig o-scratch ${look}">${head(tr)}<div class="script"><div class="stack">
         ${hat}${body}
-      </div>${foot(tr, 'Add', false)}</div>`;
+      </div></div>${foot(tr, 'Add', false)}</div>`;
     });
 }
 
