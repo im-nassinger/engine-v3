@@ -238,6 +238,7 @@
      least as wide as the card, so short blocks still fill it. */
   .o-scratch .script { overflow: auto; overflow-anchor: none; padding-bottom: 6px; scrollbar-width: none; }
   .o-scratch .script::-webkit-scrollbar { display: none; }
+  .o-scratch .script { mask-composite: intersect; }
   /* The script's own scrollbars: thin rounded bars drawn over the blocks, taking no room, so the vertical one
      appearing can't make the script narrower and call up the horizontal one (owner, 2026-11-24). They show
      while the mouse is on the script, and widen under the mouse. */
@@ -616,6 +617,25 @@ function drawBars(script) {
   };
   place(v, canV, script.clientHeight, script.scrollHeight, script.scrollTop, script.clientHeight - (canH ? BAR : 0), script.offsetTop, 'top', 'height');
   place(h, canH, script.clientWidth, script.scrollWidth, script.scrollLeft, script.clientWidth - (canV ? BAR : 0), 0, 'left', 'width');
+  fadeEdges(script);
+}
+
+// Where the script hides blocks past an edge, that edge fades them into the card instead of cutting them
+// (owner, 2026-11-24): a mask over the last FADE px, which grows with how much is hidden, up to FADE.
+const FADE = 18;
+function fadeEdges(script) {
+  const top = Math.min(FADE, script.scrollTop);
+  const bottom = Math.min(FADE, script.scrollHeight - script.clientHeight - script.scrollTop);
+  const left = Math.min(FADE, script.scrollLeft);
+  const right = Math.min(FADE, script.scrollWidth - script.clientWidth - script.scrollLeft);
+  if (Math.max(top, bottom, left, right) < 0.5) {
+    script.style.maskImage = '';
+    return;
+  }
+  const end = (px) => (px < 0.5 ? '#000' : 'transparent');
+  const fade = (dir, a, b) =>
+    `linear-gradient(${dir}, ${end(a)}, #000 ${Math.max(0, a)}px, #000 calc(100% - ${Math.max(0, b)}px), ${end(b)})`;
+  script.style.maskImage = `${fade('to bottom', top, bottom)}, ${fade('to right', left, right)}`;
 }
 document.addEventListener('scroll', (ev) => { if (ev.target.matches?.('.o-scratch .script')) drawBars(ev.target); }, true);
 
