@@ -17,11 +17,7 @@
     --num-bg: rgba(63,178,127,.16); --num: #84dcb3;
   }
   * { box-sizing: border-box; }
-  /* The page always scrolls a little (body one pixel taller than the window), so a slot opening above the
-     hovered block can be scrolled away; the browser's own scroll anchoring is off, the Scratch hover does it. */
-  html { overflow-anchor: none; }
-  body { min-height: calc(100vh + 1px); }
-  html, body { margin: 0; background: var(--app); color: var(--text); font: 12px/1.5 "JetBrains Mono", ui-monospace, monospace; }
+  html, body { margin: 0; min-height: 100%; background: var(--app); color: var(--text); font: 12px/1.5 "JetBrains Mono", ui-monospace, monospace; }
   svg.lucide { width: 14px; height: 14px; stroke-width: 1.8; flex: none; }
 
   /* The page: option buttons, a caption, one card. */
@@ -240,7 +236,7 @@
   .sb > svg { color: var(--ic); }
   /* The script scrolls sideways instead of wrapping: blocks grow to their words' width, and the stack is at
      least as wide as the card, so short blocks still fill it. */
-  .o-scratch .script { overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
+  .o-scratch .script { overflow: auto; overflow-anchor: none; padding-bottom: 6px; scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
   .o-scratch .stack { display: flex; flex-direction: column; width: max-content; min-width: 100%; padding: 2px; box-sizing: border-box; } /* 2px: room for the blocks' border */
   .o-scratch .sb { flex-wrap: nowrap; white-space: nowrap; }
   /* A block is its body (::before, 6 px short of the bottom) and its tooth (::after, 20 px hanging into the
@@ -565,9 +561,9 @@ function scratch() {
         body = actions(underHat);
       }
       // No cooldown block: a trigger that must rest sets its Enabled to false, waits, and sets it to true.
-      return `<div class="trig o-scratch">${head(tr)}<div class="script"><div class="stack">
+      return `<div class="trig o-scratch">${head(tr)}<div class="script"><div class="room"></div><div class="stack">
         ${hat}${body}
-      </div></div></div>`;
+      </div><div class="room"></div></div></div>`;
     });
 }
 
@@ -579,13 +575,16 @@ function render() {
     `<button class="${i === current ? 'on' : ''}" data-opt="${i}">${i === 9 ? 0 : i + 1} · ${o.label}</button>`).join('');
   document.getElementById('caption').textContent = OPTIONS[current].caption;
   document.getElementById('body').innerHTML = OPTIONS[current].draw();
+  // A Scratch script keeps the height it has with no slot open, so an opening slot scrolls it instead of growing it.
+  document.querySelectorAll('.o-scratch .script').forEach((x) => { x.style.height = `${x.offsetHeight}px`; });
   lucide.createIcons();
 }
 
 // Scratch: the top half of a block (the If whole, any other block without its tooth) opens the slot above it, the bottom half the slot
 // below it; hovering an open slot keeps it open. The block above an open slot shows its tooth. Keys are per trigger.
-// A slot opening or closing above the hovered block would push it out from under the mouse, so the page scrolls by
-// the same amount at once: the hovered block, and the point of it under the mouse, stay where they were (owner, 2026-11-24).
+// A slot opening or closing above the hovered block would push it out from under the mouse, so the script (the box
+// that also scrolls sideways) scrolls by the same amount at once: the hovered block, and the point of it under the
+// mouse, stay where they were (owner, 2026-11-24). Once the mouse leaves a script, it goes back to its start.
 let openKey = null;
 document.addEventListener('mousemove', (ev) => {
   const trig = ev.target.closest('.o-scratch');
@@ -610,9 +609,34 @@ document.addEventListener('mousemove', (ev) => {
     trig.querySelector(`[data-slot="${k}"]`)?.classList.add('show');
     trig.querySelectorAll(`[data-below="${k}"]`).forEach((x) => x.classList.add('open'));
   }
-  if (anchor.isConnected && anchor.getClientRects().length > 0)
-    window.scrollBy({ top: anchor.getBoundingClientRect().top - before, behavior: 'instant' });
+  const script = anchor.closest('.o-scratch .script');
+  document.querySelectorAll('.o-scratch .script').forEach((x) => {
+    if (x === script) return;
+    x.querySelectorAll(':scope > .room').forEach((r) => { r.style.height = '0px'; });
+    x.scrollTop = 0;
+  });
+  if (script && anchor !== script && anchor.getClientRects().length > 0) keepInPlace(script, anchor, before);
 });
+
+// Scrolls the script so the anchor's top is back at `before`. When the script can't scroll that far, an empty
+// .room strip above or below its blocks grows by what's missing; out of view, the strips shrink back.
+function keepInPlace(script, anchor, before) {
+  const [topRoom, bottomRoom] = script.querySelectorAll(':scope > .room');
+  const setHeight = (room, h) => { room.style.height = `${h}px`; };
+  const maxScroll = () => script.scrollHeight - script.clientHeight;
+  const d = anchor.getBoundingClientRect().top - before;
+  const shortBelow = script.scrollTop + d - maxScroll();
+  if (d > 0 && shortBelow > 0) setHeight(bottomRoom, bottomRoom.offsetHeight + shortBelow);
+  const shortAbove = -(script.scrollTop + d);
+  if (d < 0 && shortAbove > 0) setHeight(topRoom, topRoom.offsetHeight + shortAbove);
+  script.scrollTop += anchor.getBoundingClientRect().top - before;
+  // The top strip shrinks by what is above the view, the script scrolling back by as much; the bottom strip by
+  // what is below it.
+  const hiddenTop = Math.min(topRoom.offsetHeight, script.scrollTop);
+  setHeight(topRoom, topRoom.offsetHeight - hiddenTop);
+  script.scrollTop -= hiddenTop;
+  setHeight(bottomRoom, bottomRoom.offsetHeight - Math.min(bottomRoom.offsetHeight, maxScroll() - script.scrollTop));
+}
 
 document.addEventListener('click', (ev) => {
   const opt = ev.target.closest('[data-opt]');
