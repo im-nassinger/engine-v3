@@ -75,6 +75,7 @@ What we decided against, and why. **Check here before proposing something**: an 
 | Actions for teleport, variables, tags, switching triggers, world settings | Change value | If it's data, change it with Change value | round 9: 09 2.4b |
 | "Messages" | Custom events | "Event" was already in use, and "messages" was unclear | round 3: M1; round 9: MSG2 |
 | A "Call Lua function" action | Fire a custom event the script listens for | One way for triggers and scripts to talk | round 10: EV1 |
+| A trigger with no When (or a "when called" When), run by a "call" action like a function | A trigger whose When is a custom event, run with Fire custom event | Custom events already do it. The one thing a call adds, the caller waiting for the trigger to finish, isn't needed yet | owner: 2026-11-24 |
 | A fixed set of inputs that creators can't change | Inputs defined on the World's InputComponent, plus raw keys | The owner wanted both | round 9: 09 2.8; round 10: IN1 |
 | "Lowest id first" run order | Entities panel order | The order you see is the order things run | round 9: 09 2.12; round 10: OR1 |
 | Trigger templates | Component presets, not in v1 | A preset works the same on every component | round 9: 09 2.14; round 10: CP1 |
