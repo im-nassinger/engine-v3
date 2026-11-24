@@ -275,6 +275,8 @@ const chips = (ws) => `<span class="sent">${chipWords(ws)}</span>`;
 const dotted = (ws) => ws.map((w) => w.k === 't' ? w.x : `<span class="w-dot">${w.x}</span>`).join(' ');
 const hi = (ws) => ws.map((w) => w.k === 't' ? w.x : `<span class="w-hi">${w.x}</span>`).join(' ');
 const lower = (ws) => ws.map((w, i) => i === 0 && w.k === 't' ? t(w.x[0].toLowerCase() + w.x.slice(1)) : w);
+// The event as a sentence that starts with When, for the options that have no When label.
+const whenWords = (tr) => [t('When'), ...lower(tr.when.words)];
 const fields = (list) => `<div class="fields">${list.map(([lab, val, menu]) => `<div class="frow"><span class="lab">${lab}</span><span class="pill">${val}${menu ? '<span>▾</span>' : ''}</span></div>`).join('')}</div>`;
 const head = (tr, withIcon = false) => `<div class="head">${withIcon ? `<span class="ev">${ic(tr.icon)}</span>` : ''}<span class="name">${tr.name}</span><span class="sw"></span><span class="icon-btn">${ic('ellipsis')}</span></div>`;
 const foot = (tr, label = 'Add') => `<div class="foot"><span class="add">${ic('plus')} ${label}</span><span class="rep">${ic('repeat')} ${tr.repeat}</span></div>`;
@@ -316,7 +318,7 @@ const OPTIONS = [
           <div><div class="verb">${verb}</div><div class="args">${hi(ws)}</div></div>${isOpen && f ? fields(f) : ''}</div>`;
       };
       return `<div class="trig o-icons">${head(tr)}<div class="list">
-        ${row('when', tr.icon, tr.when.verb, tr.when.words)}
+        ${row('when', tr.icon, tr.when.verb, whenWords(tr))}
         ${tr.ifs.map((p) => row('if', p.icon, p.verb, p.words)).join('')}
         <div class="div"></div>
         ${tr.dos.map((d, i) => row(d.wait ? 'wait' : '', d.icon, d.verb, d.words.slice(1), `${ti}:${i}`, d.fields)).join('')}
@@ -326,7 +328,7 @@ const OPTIONS = [
   {
     label: 'Blocks', caption: 'Soft blocks: the event on top, checks and actions stacked under it.',
     draw: () => all((tr) => `<div class="trig o-blocks">${head(tr)}<div class="stack">
-      <div class="b when">${ic(tr.icon)}${chips(tr.when.words)}</div>
+      <div class="b when">${ic(tr.icon)}${chips(whenWords(tr))}</div>
       ${tr.ifs.map((p) => `<div class="b if">${ic('circle-help')}${chips([t('If'), ...p.words])}</div>`).join('')}
       ${tr.dos.map((d) => `<div class="b ${d.wait ? 'wait' : 'do'}">${ic(d.icon)}${chips(d.words)}</div>`).join('')}
     </div>${foot(tr)}</div>`),
@@ -390,7 +392,7 @@ const OPTIONS = [
         ...tr.dos.map((d) => d.wait ? `<span class="wait">${hi(d.words)}</span>` : hi(d.words)),
       ];
       return `<div class="trig o-tree">${head(tr)}<div class="tree">
-        <div class="root">${ic(tr.icon)}<span>${hi(tr.when.words)}</span></div>
+        <div class="root">${ic(tr.icon)}<span>${hi(whenWords(tr))}</span></div>
         ${items.map((x, i) => `<div class="tn ${i === items.length - 1 ? 'last' : ''}">${x}</div>`).join('')}
       </div>${foot(tr)}</div>`;
     }),
@@ -413,7 +415,7 @@ const OPTIONS = [
       const branch = (list) => `<div class="kids">${list.map((k, i) => `<div class="kid ${k.cls} ${i === list.length - 1 ? 'last' : ''}">
         <div class="line">${ic(k.icon)}<span class="txt">${k.html}</span></div>${k.kids ? branch(k.kids) : ''}</div>`).join('')}</div>`;
       return `<div class="trig o-branch">${head(tr)}
-        <div class="line root">${ic(tr.icon)}<span class="txt">${words(tr.when.short)}</span></div>
+        <div class="line root">${ic(tr.icon)}<span class="txt">${words(whenWords(tr))}</span></div>
         ${branch(items)}${foot(tr)}</div>`;
     }),
   },
