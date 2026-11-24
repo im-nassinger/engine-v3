@@ -7,8 +7,8 @@ The owner picked **Scratch** from the [trigger card mockup](../../design/mockups
 - **Mostly a new way to draw the same trigger.** A Scratch trigger is still When, one If, a flat Do list: the `Trigger` type keeps `when`, `checks` and `actions`, and `ActionRunner` keeps running the actions top to bottom, stopping at a Wait. Nothing nests, so play needs no "run a chain of blocks with scopes".
 - **The logic changes in two places:** Repeat goes (a trigger rests by switching itself off with blocks, and once per run becomes one block), and a fresh firing of a trigger that is off by the time it runs is dropped. Old levels aren't converted (owner, 2026-11-24).
 - **New words:** *Enabled*, the trigger's on/off value as Set shows it (`Triggers › Timed door › Enabled`), and "when **other** starts touching this".
-- **Five points wait for the owner's yes** (below, each with Claude's recommendation). The plan is written as if each recommendation is taken.
-- **Built by the orchestrator**, unlike fixes 1 to 3: it is about nine sessions of work. Once the owner says yes, the [tasks](#tasks) move to the end of [tasks.md](tasks.md) as tasks 19 onward.
+- **Five points the owner confirmed** (2026-11-24: "I agree with all your points"), below, each Claude's recommendation.
+- **Built by the orchestrator**, unlike fixes 1 to 3: it is about nine sessions of work. Its tasks are 19 to 27 in [tasks.md](tasks.md).
 
 ## The owner's words
 
@@ -16,11 +16,11 @@ The owner picked **Scratch** from the [trigger card mockup](../../design/mockups
 
 > "we have a winner: lets do the scratch one."
 
-## For the owner to confirm
+## Confirmed by the owner
 
-Each one changes a requirement or an owner rule, so Claude doesn't take it under the standing yes alone.
+Each one changes a requirement or an owner rule, so Claude asked rather than taking it under the standing yes. **The owner agreed to all five (2026-11-24).**
 
-| # | Question | Claude's recommendation | Why |
+| # | Question | Decided | Why |
 |---|---|---|---|
 | A | Once per run, Repeat's other choice: how is it drawn? | **Repeat goes entirely.** Once per run becomes a first block "set this `Triggers › <trigger> › Enabled` to false", with nothing switching it back. | Resting already works this way (owner, 2026-11-24), so one idea covers both, and the card loses its last setting outside the blocks. The one difference: another trigger can switch it on again, which once per run couldn't. That reads as a feature. |
 | B | "When **other** starts touching this" in the game, not "something" | **Yes**, in the When menu, the event block, the requirement and the tests. | The mockup settled on it, and `other` is the word the If and the actions already use for the same entity, so the event names it once. |
@@ -96,30 +96,4 @@ Everything in [controls.md](../../design/controls.md#v4-fix-4-the-trigger-card-a
 
 ## Tasks
 
-In the orchestrator's format. Every task also needs `npm run check` to pass. They move to the end of [tasks.md](tasks.md), numbered from 19, once the owner confirms A to E.
-
-- [ ] 1. The rules in the requirements and the glossary
-  - Read: versions/v4/fix-4-scratch-triggers.md, requirements/triggers/triggers.md, glossary.md, requirements/README.md
-  - Done when: the glossary has *Enabled* and lists Repeat and cooldown as dropped; triggers.md has no Repeat, the Wait rule says the run switching its own trigger off goes on, the event reads "when other starts touching this", and Change value names *Enabled*; workspace.md and tokens.md say 344 px; rejected.md has the two rows; `node tools/check-docs.js` and `node tools/check-sources.js` pass
-- [ ] 2. Repeat leaves the saved trigger
-  - Read: versions/v4/fix-4-scratch-triggers.md#1-repeat-goes-logic, architecture/core-model/triggers.md
-  - Done when: `Trigger` has no `repeat`; `parseTrigger` ignores a saved one; a saved trigger has no `repeat`; `TriggerRepeats`, the Repeat menu and their uses are gone; unit tests cover a trigger saved with and without `repeat`
-- [ ] 3. A switched-off trigger in play
-  - Read: versions/v4/fix-4-scratch-triggers.md#2-a-switched-off-trigger-in-play-logic, architecture/triggers-in-play.md
-  - Done when: `TriggerPhase` drops a fresh firing whose trigger is off when reached, and runs a resumed one; `runHeadless` tests show a resting spike hurts once for two touches in one tick and again after the wait, a once-per-run trigger fires once and a trigger switched off by another trigger during its rest stays off
-- [ ] 4. The block model
-  - Read: versions/v4/fix-4-scratch-triggers.md#4-the-card-becomes-blocks-look, design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks
-  - Done when: the editor's model gives each trigger its blocks (kind, icon, words and value boxes, the If's two bars only when it has checks) and its gaps, with no gap outside the If; Set's value box shows its path (`Transform › Position`, `Triggers › Timed door › Enabled`); the add menu's entries come from it (the check group, then the actions); unit tests cover a trigger with and without checks, a Wait, a missing entity and an unset part
-- [ ] 5. The blocks on screen
-  - Read: design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks, design/mockups/triggers.html
-  - Done when: the Triggers card draws each trigger as the mockup's Scratch blocks (colours, icons, teeth, the ring, menus, number ovals, the unit menu), every value box opens fix 2's picker or box, the × removes a block, the Entity inspector is 344 px; browser tests cover drawing, editing a value and removing; a screenshot beside the mockup's matches
-- [ ] 6. Adding a block on hover
-  - Read: design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks (Adding a block anywhere), design/mockups/triggers.html
-  - Done when: the bands, cursors, 200 ms wait, 400 ms open and close, the still hovered block, the scroll to a clipped slot, the empty strip and the glide back work as in the mockup; clicking a slot opens the add menu and adds the block there, one undo step; a check added with no If wraps every action in one; browser tests cover each
-- [ ] 7. The script box's scrollbars and fades
-  - Read: design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks, design/mockups/triggers.html
-  - Done when: the script scrolls sideways under thin overlay bars that can be dragged, and fades with the grain where blocks are hidden, only on those edges; browser tests cover both
-- [ ] 8. Journeys and close fix 4's docs
-  - Read: versions/v4/fix-4-scratch-triggers.md#docs-to-update-when-its-built, versions/v4/tasks.md#tasks
-  - Done when: the Playwright journeys that make or edit triggers pass with the blocks in three browsers; the speed tests still meet their targets; every doc in "Docs to update" is updated; fixes.md row 4 says built
-- [ ] 9. Try point: make a coin, a door that opens on a custom event, and a spike that rests 1 second, all with the Scratch blocks, and say how the card feels
+Tasks 19 to 27 of [tasks.md](tasks.md), in the orchestrator's format.

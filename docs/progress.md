@@ -17,7 +17,9 @@ The owner finds the trigger card ugly and convoluted, so we made a mockup of oth
 
 6. The build plan: [versions/v4/fix-4-scratch-triggers.md](versions/v4/fix-4-scratch-triggers.md). The trigger stays When, one If, a flat Do list, so play keeps its runner; the logic changes are Repeat going (resting and once per run become Enabled blocks, old levels not converted (owner)) and a fresh firing being dropped when its trigger is already off. Nine orchestrator tasks.
 
-**Where we stopped:** the plan is written; its five points (A to E) wait for the owner. Nothing in the game changed yet.
+7. The owner agreed to all five of its points (Repeat goes, "other" in the event, no block outside the If, adding a check from the slot's menu, a 344 px Entity inspector), and its tasks became 19 to 27 in `versions/v4/tasks.md`.
+
+**Where we stopped:** fix 4 is planned and confirmed, waiting for the orchestrator. Nothing in the game changed yet.
 
 ## Where things stand
 
@@ -45,11 +47,10 @@ Each item is removed in the same commit that settles it, wherever that commit is
 3. **Try the trigger card's pickers and boxes** (2026-11-23, v4 [fix](versions/v4/fixes.md) 2): the entity picker (the Entities viewer's tree, its search and target icon) on every trigger entity word and entity field, Change value's menu by component then value, vectors added whole, the x and y boxes, and the plainer words. **One change from the approved plan:** the menus say "value" (`pick a value`, `Values of this`, `change a value`, `a component value`), not "property", because the glossary's word for it is value and "property" would be a second word for one thing; say if "property" should replace "value" everywhere instead. The other picks are in [decisions.md](decisions.md) (2026-11-23).
 4. **Try simpler triggers** (2026-11-23, v4 [fix](versions/v4/fixes.md) 3): the When menu's six events with starts or stops, key or input and after or every picked in place; Add check's one "a value"; "add 0, -500 to other Body › Velocity" in place of Push; and the Surface card with no Sensor (a coin is a shape with no Surface and a touch trigger; old levels open with Sensor-ticked Surfaces removed). **Two differences from the plan:** the in-place word is also the event word, so its menu lists the two kinds and then the six events, since a key or input and a timer have no other word to hold the event; and the 1,000 touch and 1,000 solid-touch speed tests stay two, since they measure Box2D's two kinds of report. A door that opened by switching Sensor now has to move or be destroyed. The other picks are in [decisions.md](decisions.md) (2026-11-23).
 
-5. **Confirm fix 4's five points** (2026-11-24, [plan](versions/v4/fix-4-scratch-triggers.md#for-the-owner-to-confirm)): Repeat goes entirely (once per run becomes an Enabled block), "when other starts touching this", no block outside the If, adding a check from the slot's menu, the Entity inspector 344 px.
 
 ## Next
 
-1. The owner confirms points A to E of [fix 4's plan](versions/v4/fix-4-scratch-triggers.md#for-the-owner-to-confirm); then its tasks move to the end of `versions/v4/tasks.md` and the orchestrator builds them.
+1. The orchestrator builds v4 fix 4, tasks 19 to 27 in [versions/v4/tasks.md](versions/v4/tasks.md) ([plan](versions/v4/fix-4-scratch-triggers.md)), once the owner says to start it.
 2. The owner tries v4 (task 18), and the fixes asked go into `versions/v4/fixes.md`; then v5 (scripts) is planned.
 3. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
 

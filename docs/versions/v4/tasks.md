@@ -58,3 +58,33 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
   - Read: versions/README.md#closing-a-version, versions/v3/architecture.md
   - Done when: v4's lasting parts are moved into architecture/ as v3's were, with `versions/v4/architecture.md` left as the record with a table of where each part went; the glossary has every new word; progress.md says v4 is built and waits for the owner's try; `node tools/check-sources.js` passes
 - [ ] 18. Try point: try the whole of v4: the new events (hits, destroyed, a variable changes, custom events), Fire custom event and Wait, the component value check, string and boolean variables on any entity with Flip, and the shortcut list with `?`
+
+### v4 fix 4: the trigger card as Scratch blocks
+
+Planned in [fix-4-scratch-triggers.md](fix-4-scratch-triggers.md), confirmed by the owner (2026-11-24). Every task also needs `npm run check` to pass.
+
+- [ ] 19. The rules in the requirements and the glossary
+  - Read: versions/v4/fix-4-scratch-triggers.md, requirements/triggers/triggers.md, glossary.md, requirements/README.md
+  - Done when: the glossary has *Enabled* and lists Repeat and cooldown as dropped; triggers.md has no Repeat, the Wait rule says the run switching its own trigger off goes on, the event reads "when other starts touching this", and Change value names *Enabled*; workspace.md and tokens.md say 344 px; rejected.md has the two rows; `node tools/check-docs.js` and `node tools/check-sources.js` pass
+- [ ] 20. Repeat leaves the saved trigger
+  - Read: versions/v4/fix-4-scratch-triggers.md#1-repeat-goes-logic, architecture/core-model/triggers.md
+  - Done when: `Trigger` has no `repeat`; `parseTrigger` ignores a saved one; a saved trigger has no `repeat`; `TriggerRepeats`, the Repeat menu and their uses are gone; unit tests cover a trigger saved with and without `repeat`
+- [ ] 21. A switched-off trigger in play
+  - Read: versions/v4/fix-4-scratch-triggers.md#2-a-switched-off-trigger-in-play-logic, architecture/triggers-in-play.md
+  - Done when: `TriggerPhase` drops a fresh firing whose trigger is off when reached, and runs a resumed one; `runHeadless` tests show a resting spike hurts once for two touches in one tick and again after the wait, a once-per-run trigger fires once and a trigger switched off by another trigger during its rest stays off
+- [ ] 22. The block model
+  - Read: versions/v4/fix-4-scratch-triggers.md#4-the-card-becomes-blocks-look, design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks
+  - Done when: the editor's model gives each trigger its blocks (kind, icon, words and value boxes, the If's two bars only when it has checks) and its gaps, with no gap outside the If; Set's value box shows its path (`Transform › Position`, `Triggers › Timed door › Enabled`); the add menu's entries come from it (the check group, then the actions); unit tests cover a trigger with and without checks, a Wait, a missing entity and an unset part
+- [ ] 23. The blocks on screen
+  - Read: design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks, design/mockups/triggers.html
+  - Done when: the Triggers card draws each trigger as the mockup's Scratch blocks (colours, icons, teeth, the ring, menus, number ovals, the unit menu), every value box opens fix 2's picker or box, the × removes a block, the Entity inspector is 344 px; browser tests cover drawing, editing a value and removing; a screenshot beside the mockup's matches
+- [ ] 24. Adding a block on hover
+  - Read: design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks (Adding a block anywhere), design/mockups/triggers.html
+  - Done when: the bands, cursors, 200 ms wait, 400 ms open and close, the still hovered block, the scroll to a clipped slot, the empty strip and the glide back work as in the mockup; clicking a slot opens the add menu and adds the block there, one undo step; a check added with no If wraps every action in one; browser tests cover each
+- [ ] 25. The script box's scrollbars and fades
+  - Read: design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks, design/mockups/triggers.html
+  - Done when: the script scrolls sideways under thin overlay bars that can be dragged, and fades with the grain where blocks are hidden, only on those edges; browser tests cover both
+- [ ] 26. Journeys and close fix 4's docs
+  - Read: versions/v4/fix-4-scratch-triggers.md#docs-to-update-when-its-built, versions/v4/tasks.md#tasks
+  - Done when: the Playwright journeys that make or edit triggers pass with the blocks in three browsers; the speed tests still meet their targets; every doc in "Docs to update" is updated; fixes.md row 4 says built
+- [ ] 27. Try point: make a coin, a door that opens on a custom event, and a spike that rests 1 second, all with the Scratch blocks, and say how the card feels
