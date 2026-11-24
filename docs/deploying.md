@@ -11,3 +11,7 @@ The editor is published on Netlify at https://ecs-engine.netlify.app (project `e
 3. `npx -y netlify-cli deploy --prod --dir=dist --no-build`.
 
 The Netlify CLI isn't installed globally, so it always runs through `npx -y netlify-cli`. Deploy only when the owner asks: it publishes.
+
+## The trigger card mockup
+
+`docs/design/mockups/triggers.html` is published on its own site, https://engine-v3-triggers.netlify.app (project `engine-v3-triggers`, same account), since 2026-11-24, so it never replaces the editor on `ecs-engine` (owner). It is one self-contained page: copy it as `index.html` into an empty folder outside the project, then run `npx -y netlify-cli deploy --prod --dir=. --no-build --site engine-v3-triggers` from there.
