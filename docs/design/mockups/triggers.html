@@ -587,9 +587,10 @@ function render() {
 // in; closing runs the other way. So a mouse moving fast reaches the block it's heading for before anything moves.
 // A slot opening or closing above the hovered block would push it out from under the mouse, so the script (the box
 // that also scrolls sideways) scrolls by the same amount on every frame: the hovered block, and the point of it under
-// the mouse, stay where they were (owner, 2026-11-24). Once the mouse leaves a script, it goes back to its start.
+// the mouse, stay where they were (owner, 2026-11-24). Once the mouse leaves a script, it glides back to its start.
 const SLOT_MOVE_MS = 400;
 const SLOT_FADE_MS = 100;
+const SETTLE_PX_PER_MS = 0.1; // how fast a script the mouse left scrolls back to its start and drops its empty strips
 const slotTime = new WeakMap(); // a slot → how far it is open, in ms, from 0 (closed) to SLOT_MOVE_MS + SLOT_FADE_MS
 const slotHeight = new WeakMap(); // a slot → its full height
 let wantedSlot = null; // the slot the mouse asks for
@@ -617,11 +618,6 @@ document.addEventListener('mousemove', (ev) => {
     anchor = script ? hovered : null;
     anchorTop = anchor ? anchor.getBoundingClientRect().top : 0;
   }
-  document.querySelectorAll('.o-scratch .script').forEach((x) => {
-    if (x === script) return;
-    x.querySelectorAll(':scope > .room').forEach((r) => { r.style.height = '0px'; });
-    x.scrollTop = 0;
-  });
   if (lastFrame === null) requestAnimationFrame(slotFrame);
 });
 
@@ -638,9 +634,22 @@ function slotFrame(now) {
     drawSlot(slot, next);
     moving ||= next !== target;
   });
-  if (anchor?.isConnected && anchor.getClientRects().length > 0) keepInPlace(anchor.closest('.script'), anchor, anchorTop);
+  const kept = anchor?.isConnected && anchor.getClientRects().length > 0 ? anchor.closest('.script') : null;
+  if (kept) keepInPlace(kept, anchor, anchorTop);
+  document.querySelectorAll('.o-scratch .script').forEach((script) => {
+    if (script !== kept) moving = settle(script, Math.max(1, dt * SETTLE_PX_PER_MS)) || moving;
+  });
   lastFrame = moving ? now : null;
   if (moving) requestAnimationFrame(slotFrame);
+}
+
+// Moves a script the mouse isn't on up to `px` toward its start: no scroll, no empty strips. Returns whether it
+// still has some way to go.
+function settle(script, px) {
+  const rooms = [...script.querySelectorAll(':scope > .room')];
+  rooms.forEach((r) => { r.style.height = `${Math.max(0, (parseFloat(r.style.height) || 0) - px)}px`; });
+  script.scrollTop = Math.max(0, script.scrollTop - px);
+  return script.scrollTop > 0 || rooms.some((r) => parseFloat(r.style.height) > 0);
 }
 
 // Draws a slot `t` ms open: its room grows (eased) over SLOT_MOVE_MS, then it fades in over SLOT_FADE_MS.
