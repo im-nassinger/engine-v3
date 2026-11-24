@@ -675,7 +675,8 @@ document.addEventListener('pointerup', () => {
 });
 
 // Scratch: a block has three bands (owner, 2026-11-24): its top third opens the slot above it, its bottom third the
-// slot below it, and its middle third, where its values are, opens none: any open slot closes (owner). A block is
+// slot below it, and its middle third, where its values are, opens none: any open slot closes (owner). A value box
+// acts as the middle wherever it reaches (owner, 2026-11-24). A block is
 // measured without its tooth. The If's top and bottom bars are each such a block (owner, 2026-11-24): the top bar's
 // bottom third opens the If's first inner slot, the bottom bar's top third its last inner slot; its arm opens none. The event
 // block has no slot above, so its top third is like its middle. Hovering an open slot keeps it open. The block above an
@@ -707,7 +708,11 @@ document.addEventListener('mousemove', (ev) => {
   let k = null;
   const slotEl = ev.target.closest('[data-slot]');
   const blockEl = ev.target.closest('[data-below], .sc-arm');
+  // A value box acts as a block's middle, whichever band it reaches into: it opens no slot and closes any open
+  // one, so the box can be clicked without a slot opening (owner, 2026-11-24).
+  const onValue = ev.target.closest('.o-scratch .sk-num, .o-scratch .sk-dd') !== null;
   if (slotEl) k = slotEl.dataset.slot;
+  else if (onValue && blockEl?.dataset.below !== undefined) blockEl.dataset.band = 'middle';
   else if (blockEl?.dataset.below !== undefined) {
     const r = blockEl.querySelector('.sb').getBoundingClientRect();
     const third = Math.min(2, Math.floor((3 * (ev.clientY - r.top)) / (r.height - 6)));
