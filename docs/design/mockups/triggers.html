@@ -17,7 +17,11 @@
     --num-bg: rgba(63,178,127,.16); --num: #84dcb3;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; min-height: 100%; background: var(--app); color: var(--text); font: 12px/1.5 "JetBrains Mono", ui-monospace, monospace; }
+  /* The page always scrolls a little (body one pixel taller than the window), so a slot opening above the
+     hovered block can be scrolled away; the browser's own scroll anchoring is off, the Scratch hover does it. */
+  html { overflow-anchor: none; }
+  body { min-height: calc(100vh + 1px); }
+  html, body { margin: 0; background: var(--app); color: var(--text); font: 12px/1.5 "JetBrains Mono", ui-monospace, monospace; }
   svg.lucide { width: 14px; height: 14px; stroke-width: 1.8; flex: none; }
 
   /* The page: option buttons, a caption, one card. */
@@ -580,6 +584,8 @@ function render() {
 
 // Scratch: the top half of a block (the If whole, any other block without its tooth) opens the slot above it, the bottom half the slot
 // below it; hovering an open slot keeps it open. The block above an open slot shows its tooth. Keys are per trigger.
+// A slot opening or closing above the hovered block would push it out from under the mouse, so the page scrolls by
+// the same amount at once: the hovered block, and the point of it under the mouse, stay where they were (owner, 2026-11-24).
 let openKey = null;
 document.addEventListener('mousemove', (ev) => {
   const trig = ev.target.closest('.o-scratch');
@@ -597,10 +603,15 @@ document.addEventListener('mousemove', (ev) => {
   const id = trig && k !== null ? `${[...document.querySelectorAll('.o-scratch')].indexOf(trig)}:${k}` : null;
   if (id === openKey) return;
   openKey = id;
+  const anchor = slotEl ?? blockEl ?? ev.target;
+  const before = anchor.getBoundingClientRect().top;
   document.querySelectorAll('.o-scratch .show, .o-scratch .open').forEach((x) => x.classList.remove('show', 'open'));
-  if (id === null) return;
-  trig.querySelector(`[data-slot="${k}"]`)?.classList.add('show');
-  trig.querySelectorAll(`[data-below="${k}"]`).forEach((x) => x.classList.add('open'));
+  if (id !== null) {
+    trig.querySelector(`[data-slot="${k}"]`)?.classList.add('show');
+    trig.querySelectorAll(`[data-below="${k}"]`).forEach((x) => x.classList.add('open'));
+  }
+  if (anchor.isConnected && anchor.getClientRects().length > 0)
+    window.scrollBy({ top: anchor.getBoundingClientRect().top - before, behavior: 'instant' });
 });
 
 document.addEventListener('click', (ev) => {
