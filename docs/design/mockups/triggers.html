@@ -238,7 +238,6 @@
      least as wide as the card, so short blocks still fill it. */
   .o-scratch .script { overflow: auto; overflow-anchor: none; padding-bottom: 6px; scrollbar-width: none; }
   .o-scratch .script::-webkit-scrollbar { display: none; }
-  .o-scratch .script { mask-composite: intersect; }
   /* The script's own scrollbars: thin rounded bars drawn over the blocks, taking no room, so the vertical one
      appearing can't make the script narrower and call up the horizontal one (owner, 2026-11-24). They show
      while the mouse is on the script, and widen under the mouse. */
@@ -621,21 +620,29 @@ function drawBars(script) {
 }
 
 // Where the script hides blocks past an edge, that edge fades them into the card instead of cutting them
-// (owner, 2026-11-24): a mask over the last FADE px, which grows with how much is hidden, up to FADE.
-const FADE = 18;
+// (owner, 2026-11-24): a mask over the last FADE px, which grows with how much is hidden, up to FADE. A straight
+// fade looked artificial (owner), so it eases (EASE: how opaque, from the edge in) and is grainy: the mask is
+// G × (G + N × (1 − G)), G the eased fade and N a noise texture, so the grain is strongest halfway through the
+// fade and gone at both its ends.
+const FADE = 24;
+const EASE = [0, 0.04, 0.14, 0.3, 0.5, 0.7, 0.86, 0.96, 1];
+const NOISE = `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2.6 0 0 0 -.8'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>`).replace('%2523', '%23')}")`;
 function fadeEdges(script) {
   const top = Math.min(FADE, script.scrollTop);
   const bottom = Math.min(FADE, script.scrollHeight - script.clientHeight - script.scrollTop);
   const left = Math.min(FADE, script.scrollLeft);
   const right = Math.min(FADE, script.scrollWidth - script.clientWidth - script.scrollLeft);
   if (Math.max(top, bottom, left, right) < 0.5) {
-    script.style.maskImage = '';
+    script.style.maskImage = script.style.maskComposite = '';
     return;
   }
-  const end = (px) => (px < 0.5 ? '#000' : 'transparent');
+  // One side's stops, from its edge in: none when nothing is hidden there.
+  const side = (px, from) => (px < 0.5 ? [] : EASE.map((a, i) => `rgba(0,0,0,${a}) ${from(px * (i / (EASE.length - 1)))}`));
   const fade = (dir, a, b) =>
-    `linear-gradient(${dir}, ${end(a)}, #000 ${Math.max(0, a)}px, #000 calc(100% - ${Math.max(0, b)}px), ${end(b)})`;
-  script.style.maskImage = `${fade('to bottom', top, bottom)}, ${fade('to right', left, right)}`;
+    `linear-gradient(${dir}, #000, ${[...side(a, (x) => `${x}px`), ...side(b, (x) => `calc(100% - ${x}px)`).reverse()].join(', ') || '#000'}, #000)`;
+  const v = fade('to bottom', top, bottom), h = fade('to right', left, right);
+  script.style.maskImage = [v, h, NOISE, v, h].join(', ');
+  script.style.maskComposite = 'intersect, intersect, add, intersect, add';
 }
 document.addEventListener('scroll', (ev) => { if (ev.target.matches?.('.o-scratch .script')) drawBars(ev.target); }, true);
 
