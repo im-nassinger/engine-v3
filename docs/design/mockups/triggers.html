@@ -205,11 +205,12 @@
   .o-branch .foot { margin-top: 10px; }
 
   /* 12 · Scratch: snap-together blocks with a little roundness. --tx is where a block's tab sits. */
-  /* Scratch 3's own block colours (owner, 2026-11-24): Events for the event, Control for If, Wait and
-     Destroy (Scratch's "delete this clone"), Motion for Position, Variables for a variable. A trigger's
-     Enabled has no Scratch block; it is Control, like the rest of a script's flow. White words and icons,
-     menus in the category's darker shade, numbers as white ovals with Scratch's grey text. */
-  .o-scratch { --sk-event: #ffbf00; --sk-ctl: #ffab19; --sk-act: #ffab19; --sk-wait: #ffab19;
+  /* Scratch's categories, in deeper colours the owner picked the tone of (2026-11-24: "#3d66c3, #2f897e,
+     #b88133, etc."): amber for the event, teal for Control (If, Wait, Destroy, a trigger's Enabled), blue
+     for Motion (Position), violet for Variables. White words and icons, menus in the category's colour
+     darkened by a quarter, numbers as white ovals with Scratch's grey text. */
+  .o-scratch { --sk-event: #b88133; --sk-ctl: #2f897e; --sk-act: #2f897e; --sk-wait: #2f897e;
+    --sk-motion: #3d66c3; --sk-var: #7d58b8;
     --sk-gap: color-mix(in srgb, #fff 4%, var(--panel)); } /* the trigger's background (--raised over --panel), opaque */
   /* Block colours in the editor's own way (tokens.md): a dark surface tinted with the kind's colour, as a
      warning note is tinted with --warning, with the editor's --text on it and the icon in the full colour.
@@ -220,10 +221,9 @@
      block above covers 2 with its line, and 13 below, of which the next block covers 6. The event block
      has nothing above it, so it gets 7 px. */
   .sb.hat  { --ic: var(--event); }
-  .o-scratch .sb { --dd: #cf8b17; color: #fff; }
-  .o-scratch .sb.hat { --dd: #cc9900; }
-  .o-scratch .sb.k-motion { --bg: #4c97ff; --dd: #3373cc; }
-  .o-scratch .sb.k-var { --bg: #ff8c1a; --dd: #db6e00; }
+  .o-scratch .sb { --dd: color-mix(in srgb, var(--bg) 75%, #000); color: #fff; }
+  .o-scratch .sb.k-motion { --bg: var(--sk-motion); }
+  .o-scratch .sb.k-var { --bg: var(--sk-var); }
   .o-scratch .sb > svg { color: #fff; }
   .o-scratch .sk-dd { background: var(--dd); color: #fff; }
   .o-scratch .sk-dd .path { color: rgba(255,255,255,.7); }
