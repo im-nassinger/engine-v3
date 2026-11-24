@@ -247,7 +247,7 @@ const t = (x) => ({ k: 't', x }), e = (x) => ({ k: 'e', x }), v = (x) => ({ k: '
 const TRIGGERS = [
   {
     name: 'Coin pickup', icon: 'hand', sum: 'Add 1 to coins, destroy this',
-    when: { verb: 'Touch starts', words: [t('Something'), c('starts'), t('touching'), e('this')], short: [c('Starts'), t('touching'), e('this')] },
+    when: { verb: 'Touch starts', words: [t('Other'), c('starts'), t('touching'), e('this')], short: [t('Other'), c('starts'), t('touching'), e('this')] },
     ifs: [{ icon: 'tag', verb: 'Has tag', words: [e('other'), c('has tag'), v('player')] }],
     dos: [
       { icon: 'plus', verb: 'Add', words: [t('Add'), n('1'), t('to'), v('coins')], fields: [['Change', 'add', true], ['Amount', '1'], ['Value', 'coins', true]] },
