@@ -30,7 +30,7 @@ The owner finds the trigger card "ugly and convoluted" (2026-11-24) and asked fo
 - **Each changeable part must look separate.** "other has tag player" in one colour read as one thing, though `other`, `has tag` and `player` are three choices. Branch tells them apart by colour alone (entity blue, value violet, amount green, choice white, fixed words grey); Scratch and Blocky give each its own box.
 - **The event names who touches:** "When **other** starts touching this", not "something starts touching this" or "Other starts touching this". The sentence starts with When where no label says When, and `other` is blue like an entity, with no chip or menu, since it can't be changed.
 - **Square blocks are fine.** The owner doesn't like the rounded Scratch look; Blocky is the square version.
-- **The repeat is a block, not a footer line** (Scratch and Blocky). Every time draws nothing; at most every 3 s is a C-shaped "at most once every 3 s" block wrapping everything under the event, 3 a changeable amount. "every 3 seconds" alone read like a timer firing every 3 s, so "at most once" was added (Claude, owner to check, 2026-11-24).
+- **The repeat is not a footer line** (Scratch and Blocky). Every time draws nothing. A limit is a second line in the event block, since it limits how often the event is heard: "not again for 3 s", the kind a menu (not again for, only once per run) and 3 a changeable amount. *Rejected:* a C-shaped "every 3 seconds" block around the actions read like a timer firing every 3 s, and "at most once every 3 s" was too hard to read (owner, 2026-11-24).
 - **No highlight stripe on the event block.** Blocky's lighter band on top was "ugly"; the event block is one flat colour.
 
 ## Open

@@ -236,6 +236,10 @@
   .o-scratch.blocky .sb.hat { padding-top: 13px;
     clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 34px calc(100% - 6px), 34px 100%, 14px 100%, 14px calc(100% - 6px), 0 calc(100% - 6px)); }
   .o-scratch.blocky .sk-dd, .o-scratch.blocky .sk-num { border-radius: 2px; }
+  /* The Repeat limit is a second line in the event block: it limits how often the event is heard. */
+  .sb.hat.limited { flex-direction: column; align-items: stretch; gap: 6px; }
+  .sk-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+  .sk-limit { color: rgba(255,255,255,.85); }
 </style>
 </head>
 <body>
@@ -454,11 +458,15 @@ function scratch(look) {
            <div class="sc-mid"><div class="sc-arm"></div><div class="sc-inner">${inner}</div></div>
            <div class="sb ctl bottom"></div>`;
       const stack = tr.dos.map((d) => `<div class="sb ${d.wait ? 'wait' : 'do'}">${words(d.words)}</div>`).join('');
-      const guarded = tr.ifs.length ? wrap([t('if'), ...tr.ifs[0].words], stack) : stack;
-      // Every time needs no block; a cooldown wraps everything under the event.
-      const body = tr.every ? wrap([t('at most once every'), n(String(tr.every)), t('s')], guarded) : guarded;
+      const body = tr.ifs.length ? wrap([t('if'), ...tr.ifs[0].words], stack) : stack;
+      // Every time draws nothing; a limit is a second line in the event block, its kind a menu.
+      const event = `${ic(tr.icon)}${words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)])}`;
+      const hat = tr.every
+        ? `<div class="sb hat limited"><div class="sk-row">${event}</div>
+             <div class="sk-row sk-limit">${ic('timer')}<span class="sk-dd">not again for</span><span class="sk-num">${tr.every}</span><span>s</span></div></div>`
+        : `<div class="sb hat">${event}</div>`;
       return `<div class="trig o-scratch ${look}">${head(tr)}<div class="script">
-        <div class="sb hat">${ic(tr.icon)}${words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)])}</div>${body}
+        ${hat}${body}
       </div>${foot(tr, 'Add', false)}</div>`;
     });
 }
