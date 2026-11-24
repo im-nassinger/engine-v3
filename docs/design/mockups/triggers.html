@@ -520,11 +520,12 @@ function scratch() {
       // whole Do list, since its checks guard every action. A trigger has one If, its checks joined by "and".
       // Hovering the top half of a block opens the slot above it, the bottom half the slot below it
       // (owner, 2026-11-24). Every gap between blocks has one slot, keyed by a number; a block knows the
-      // gap above it (data-above) and below it (data-below). The If's top bar is measured alone, without
-      // the rest of its C: its top half opens the slot above the If, its bottom half the slot after it.
+      // gap above it (data-above) and below it (data-below). The If is measured whole, its C included (owner,
+      // 2026-11-24): hovering its top bar, arm or bottom bar, the top half of the C opens the slot above
+      // the If, the bottom half the slot after it.
       const wrap = (icon, top, inner, z, above, below) => `<div class="sc" style="z-index: ${z}"><div class="sk ctl" data-above="${above}" data-below="${below}"><div class="sb ctl top"><i class="tooth"></i>${ic(icon)}${words(top)}</div></div>
-           <div class="sc-mid"><div class="sc-arm"></div><div class="sc-inner">${inner}</div></div>
-           <div class="sk ctl" data-below="${below}"><div class="sb ctl bottom end"><i class="tooth"></i></div></div></div>`;
+           <div class="sc-mid"><div class="sc-arm" data-above="${above}" data-below="${below}"></div><div class="sc-inner">${inner}</div></div>
+           <div class="sk ctl" data-above="${above}" data-below="${below}"><div class="sb ctl bottom end"><i class="tooth"></i></div></div></div>`;
       // A time's unit is a menu (seconds now, ticks later), not a fixed "s".
       const unit = c('seconds');
       const waitWords = (d) => [t('wait'), n(d.words[1].x.split(' ')[0]), unit];
@@ -577,7 +578,7 @@ function render() {
   lucide.createIcons();
 }
 
-// Scratch: the top half of a block (its tooth left out) opens the slot above it, the bottom half the slot
+// Scratch: the top half of a block (the If whole, any other block without its tooth) opens the slot above it, the bottom half the slot
 // below it; hovering an open slot keeps it open. The block above an open slot shows its tooth. Keys are per trigger.
 let openKey = null;
 document.addEventListener('mousemove', (ev) => {
@@ -587,8 +588,10 @@ document.addEventListener('mousemove', (ev) => {
   const blockEl = ev.target.closest('[data-below]');
   if (slotEl) k = slotEl.dataset.slot;
   else if (blockEl) {
-    const r = blockEl.querySelector('.sb').getBoundingClientRect();
-    const top = ev.clientY < r.top + (r.height - 6) / 2;
+    // The If counts whole, its C included; any other block counts without its tooth.
+    const isIf = blockEl.matches('.sc > .sk, .sc-arm');
+    const r = (isIf ? blockEl.closest('.sc') : blockEl.querySelector('.sb')).getBoundingClientRect();
+    const top = ev.clientY < r.top + (isIf ? r.height : r.height - 6) / 2;
     k = top && blockEl.dataset.above !== undefined ? blockEl.dataset.above : blockEl.dataset.below;
   }
   const id = trig && k !== null ? `${[...document.querySelectorAll('.o-scratch')].indexOf(trig)}:${k}` : null;
