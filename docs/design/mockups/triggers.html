@@ -203,6 +203,30 @@
   .o-branch .kid.last::after { display: none; }
   .o-branch .kid.wait > .kids > .kid::before, .o-branch .kid.wait > .kids > .kid::after { border-color: color-mix(in srgb, var(--wait) 45%, transparent); }
   .o-branch .foot { margin-top: 10px; }
+
+  /* 12 · Scratch: snap-together blocks. --nx is where a block's notch sits, --tx where its tab sits. */
+  .o-scratch { --sk-event: #b9822f; --sk-ctl: #2b8a7f; --sk-act: #3a66c4; --sk-wait: #6c55c2; }
+  .o-scratch .script { display: flex; flex-direction: column; padding-bottom: 6px; }
+  .sb { --nx: 0px; --tx: 0px; position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; min-height: 40px;
+    padding: 9px 10px 13px; margin-bottom: -6px; color: #fff; line-height: 22px; border-radius: 6px;
+    clip-path: polygon(0 0, calc(var(--nx) + 12px) 0, calc(var(--nx) + 17px) 6px, calc(var(--nx) + 31px) 6px, calc(var(--nx) + 36px) 0, 100% 0,
+      100% calc(100% - 6px), calc(var(--tx) + 36px) calc(100% - 6px), calc(var(--tx) + 31px) 100%, calc(var(--tx) + 17px) 100%, calc(var(--tx) + 12px) calc(100% - 6px), 0 calc(100% - 6px)); }
+  .sb.hat { padding-top: 18px; border-radius: 60px 10px 6px 6px / 22px 10px 6px 6px;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 36px calc(100% - 6px), 31px 100%, 17px 100%, 12px calc(100% - 6px), 0 calc(100% - 6px)); }
+  .sb.hat { background: var(--sk-event); }
+  .sb.do { background: var(--sk-act); }
+  .sb.wait { background: var(--sk-wait); }
+  .sb.ctl { background: var(--sk-ctl); }
+  .sb.ctl.top { --tx: 16px; }
+  .sb.ctl.bottom { --nx: 16px; min-height: 30px; padding: 0; }
+  .sb svg { width: 16px; height: 16px; }
+  .sc-mid { display: flex; }
+  .sc-arm { width: 16px; flex: none; background: var(--sk-ctl); }
+  .sc-inner { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .sk-dd { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 6px; border-radius: 6px; background: rgba(0,0,0,.22); cursor: pointer; white-space: nowrap; }
+  .sk-dd::after { content: "▾"; font-size: 9px; opacity: .7; }
+  .sk-num { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 99px; background: rgba(255,255,255,.92); color: #1d2230; cursor: pointer; white-space: nowrap; }
+  .o-scratch .foot { margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -393,10 +417,29 @@ const OPTIONS = [
         ${branch(items)}${foot(tr)}</div>`;
     }),
   },
+  {
+    label: 'Scratch', caption: 'Snap-together blocks: the event on top, If wraps the actions it guards, and every changeable part is its own little box.',
+    draw: () => all((tr) => {
+      const words = (ws) => ws.map((w, i) => {
+        const x = i <= 1 ? w.x[0].toLowerCase() + w.x.slice(1) : w.x;
+        if (w.k === 't') return `<span>${x}</span>`;
+        return w.k === 'n' ? `<span class="sk-num">${x}</span>` : `<span class="sk-dd">${x}</span>`;
+      }).join('');
+      const stack = tr.dos.map((d) => `<div class="sb ${d.wait ? 'wait' : 'do'}">${words(d.words)}</div>`).join('');
+      const body = tr.ifs.length
+        ? `<div class="sb ctl top">${words([t('if'), ...tr.ifs[0].words])}</div>
+           <div class="sc-mid"><div class="sc-arm"></div><div class="sc-inner">${stack}</div></div>
+           <div class="sb ctl bottom"></div>`
+        : stack;
+      return `<div class="trig o-scratch">${head(tr)}<div class="script">
+        <div class="sb hat">${ic(tr.icon)}${words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)])}</div>${body}
+      </div>${foot(tr)}</div>`;
+    }),
+  },
 ];
 
 // ---------- Page ----------
-let current = 10;
+let current = 11;
 function render() {
   document.getElementById('nav').innerHTML = OPTIONS.map((o, i) =>
     `<button class="${i === current ? 'on' : ''}" data-opt="${i}">${i === 9 ? 0 : i + 1} · ${o.label}</button>`).join('');
