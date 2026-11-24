@@ -206,11 +206,12 @@
 
   /* 12 · Scratch: snap-together blocks with a little roundness. --tx is where a block's tab sits. */
   /* Scratch's categories, in deeper colours the owner picked the tone of (2026-11-24: "#3d66c3, #2f897e,
-     #b88133, etc."): amber for the event, teal for Control (If, Wait, Destroy, a trigger's Enabled), blue
-     for Motion (Position), violet for Variables. White words and icons, menus in the category's colour
-     darkened by a quarter, numbers as white ovals with Scratch's grey text. */
-  .o-scratch { --sk-event: #b88133; --sk-ctl: #2f897e; --sk-act: #2f897e; --sk-wait: #2f897e;
-    --sk-motion: #3d66c3; --sk-var: #7d58b8;
+     #b88133, etc."): amber for the event, blue for Motion (Position), violet for Variables. Each other kind
+     has its own colour in that tone too (owner, 2026-11-24: different kinds had one colour): teal for the
+     If, rose for Wait, red for Destroy, green for a trigger's Enabled (Claude). White words and icons, menus
+     in the kind's colour darkened by a quarter, numbers as white ovals with Scratch's grey text. */
+  .o-scratch { --sk-event: #b88133; --sk-ctl: #2f897e; --sk-act: #2f897e; --sk-wait: #ad4a7c;
+    --sk-motion: #3d66c3; --sk-var: #7d58b8; --sk-destroy: #b5473d; --sk-enabled: #46812f;
     --sk-gap: color-mix(in srgb, #fff 4%, var(--panel)); } /* the trigger's background (--raised over --panel), opaque */
   /* Block colours in the editor's own way (tokens.md): a dark surface tinted with the kind's colour, as a
      warning note is tinted with --warning, with the editor's --text on it and the icon in the full colour.
@@ -224,6 +225,8 @@
   .o-scratch .sb { --dd: color-mix(in srgb, var(--bg) 75%, #000); color: #fff; }
   .o-scratch .sb.k-motion { --bg: var(--sk-motion); }
   .o-scratch .sb.k-var { --bg: var(--sk-var); }
+  .o-scratch .sb.k-destroy { --bg: var(--sk-destroy); }
+  .o-scratch .sb.k-enabled { --bg: var(--sk-enabled); }
   .o-scratch .sb > svg { color: #fff; }
   .o-scratch .sk-dd { background: var(--dd); color: #fff; }
   .o-scratch .sk-dd .path { color: rgba(255,255,255,.7); }
@@ -541,7 +544,8 @@ function scratch() {
         let above = first, html = '';
         tr.dos.forEach((d, i) => {
           const below = key++;
-          const cat = d.icon === 'move' ? ' k-motion' : d.icon === 'plus' ? ' k-var' : '';
+          const kinds = { move: ' k-motion', plus: ' k-var', 'trash-2': ' k-destroy', power: ' k-enabled', 'power-off': ' k-enabled' };
+          const cat = kinds[d.icon] ?? '';
           html += slot(above, false)
             + block((d.wait ? 'wait' : 'do') + cat, ic(d.icon) + words(d.wait ? waitWords(d) : d.words), above, below, i === last, i === last ? ' last' : '');
           above = below;
@@ -594,8 +598,8 @@ function render() {
 // that also scrolls sideways) scrolls by the same amount on every frame: the hovered block, and the point of it under
 // the mouse, stay where they were (owner, 2026-11-24). Once the mouse has left a script, it glides back to its start.
 const SLOT_DELAY_MS = 250;
-const SLOT_MOVE_MS = 400;
-const SLOT_FADE_MS = 100;
+const SLOT_MOVE_MS = 300;
+const SLOT_FADE_MS = 250;
 const SETTLE_MS = 400; // how long a script the mouse left takes to scroll back to its start and drop its empty strips
 const easeInOut = (x) => (x < 0.5 ? 4 * x ** 3 : 1 - (2 - 2 * x) ** 3 / 2);
 const slotTime = new WeakMap(); // a slot → how far it is open, in ms, from 0 (closed) to SLOT_MOVE_MS + SLOT_FADE_MS
