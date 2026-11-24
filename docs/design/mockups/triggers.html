@@ -272,6 +272,10 @@
      tab while its slot is open (.open). Only the spots a block can go: under the event when there's no If,
      at the top of the If, and under any action. */
   .sk.slot { display: none; cursor: pointer; }
+  /* The cursor says what the hovered band does (owner, 2026-11-24): an arrow up over a band that opens the slot
+     above, down over one that opens the slot below, the plain arrow over a middle. Values keep their pointer. */
+  .o-scratch [data-band="top"] { cursor: n-resize; }
+  .o-scratch [data-band="bottom"] { cursor: s-resize; }
   .sk.slot.show { display: flex; }
   .sk.open > .sb.end { --td: 6px; }
   .sb.slot { --bg: color-mix(in srgb, #fff 7%, var(--panel)); color: var(--muted); }
@@ -620,6 +624,7 @@ document.addEventListener('mousemove', (ev) => {
     const { above, below } = blockEl.dataset;
     if (third <= 0 && above !== undefined) k = above;
     else if (third >= 2) k = below;
+    blockEl.dataset.band = k === null ? 'middle' : k === above ? 'top' : 'bottom';
   }
   const slot = trig && k !== null ? trig.querySelector(`[data-slot="${k}"]`) : null;
   const hovered = slotEl ?? blockEl;
