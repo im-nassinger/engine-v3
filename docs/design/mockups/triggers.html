@@ -20,13 +20,11 @@
   html, body { margin: 0; min-height: 100%; background: var(--app); color: var(--text); font: 12px/1.5 "JetBrains Mono", ui-monospace, monospace; }
   svg.lucide { width: 14px; height: 14px; stroke-width: 1.8; flex: none; }
 
-  /* The page: option buttons, a caption, one card. */
-  nav { display: flex; justify-content: center; gap: 4px; padding: 32px 16px 0; flex-wrap: wrap; max-width: 860px; margin: 0 auto; }
+  /* The page: option buttons, one card. */
+  nav { display: flex; justify-content: center; gap: 4px; padding: 32px 16px 28px; flex-wrap: wrap; max-width: 860px; margin: 0 auto; }
   nav button { font: inherit; color: var(--muted); background: none; border: 0; padding: 7px 12px; border-radius: 8px; cursor: pointer; }
   nav button:hover { background: var(--hover); color: var(--text); }
   nav button.on { background: var(--soft); color: var(--ink); }
-  .caption { text-align: center; color: var(--muted); margin: 16px 16px 6px; }
-  .keys { text-align: center; color: var(--faint); font-size: 10px; margin-bottom: 28px; }
   .stage { display: flex; justify-content: center; padding: 0 16px 80px; }
 
   /* The Triggers card in a 344 px Entity inspector (the game starts it at 300 px; 344 fits Scratch's longest line). Spacing: 8 outside, 12 inside a trigger, 8 between rows. */
@@ -307,8 +305,6 @@
 <body>
 
 <nav id="nav"></nav>
-<div class="caption" id="caption"></div>
-<div class="keys">← → or 1–9, 0 to switch</div>
 <div class="stage"><div class="insp">
   <div class="card-head"><i data-lucide="zap"></i>Triggers</div>
   <div class="body" id="body"></div>
@@ -383,7 +379,7 @@ function lanes(tr) {
 // ---------- The options ----------
 const OPTIONS = [
   {
-    label: 'Now', caption: "Today's card, for comparison.",
+    label: 'Now',
     draw: () => all((tr) => `<div class="trig o-now">${head(tr)}
       <div class="sec"><div class="smallcaps">When<span>one event</span></div><div class="line">${dotted(tr.when.words)}</div></div>
       <div class="sec"><div class="smallcaps">If<span>all must be true</span></div>${tr.ifs.map((p) => `<div class="line">${dotted(p.words)}</div>`).join('')}<div class="addline">+ Add check</div></div>
@@ -391,11 +387,11 @@ const OPTIONS = [
       <div class="sec"><div class="smallcaps">Repeat</div><div class="line"><span class="w-dot">${tr.repeat}</span></div></div></div>`),
   },
   {
-    label: 'Chips', caption: 'A lane for When, If and Do; each word you can change is a chip, coloured by what it is.',
+    label: 'Chips',
     draw: () => all((tr) => `<div class="trig o-lane">${head(tr)}${lanes(tr)}</div>`),
   },
   {
-    label: 'Icon rows', caption: 'Each part is an icon, a verb, and its details. Click a row to edit it.',
+    label: 'Icon rows',
     draw: () => all((tr, ti) => {
       const row = (tile, icon, verb, ws, key, f) => {
         const isOpen = key === openRow;
@@ -411,7 +407,7 @@ const OPTIONS = [
     }),
   },
   {
-    label: 'Blocks', caption: 'Soft blocks: the event on top, checks and actions stacked under it.',
+    label: 'Blocks',
     draw: () => all((tr) => `<div class="trig o-blocks">${head(tr)}<div class="stack">
       <div class="b when">${ic(tr.icon)}${chips(whenWords(tr))}</div>
       ${tr.ifs.map((p) => `<div class="b if">${ic('circle-help')}${chips([t('If'), ...p.words])}</div>`).join('')}
@@ -419,7 +415,7 @@ const OPTIONS = [
     </div>${foot(tr)}</div>`),
   },
   {
-    label: 'Flow', caption: 'A line from the event, through the check, to each action. A wait shows as a gap in time.',
+    label: 'Flow',
     draw: () => all((tr) => `<div class="trig o-flow">${head(tr)}<div class="flow">
       <div class="node when"><span class="m"></span><span class="smallcaps">When</span>${hi(tr.when.words)}</div>
       ${tr.ifs.map((p) => `<div class="node if"><span class="m"></span><span class="smallcaps">Only if</span>${hi(p.words)}</div>`).join('')}
@@ -427,7 +423,7 @@ const OPTIONS = [
     </div>${foot(tr)}</div>`),
   },
   {
-    label: 'Steps', caption: 'Plain lines with a quiet label in front. The calmest list.',
+    label: 'Steps',
     draw: () => all((tr) => {
       const row = (cls, label, ws) => `<div class="row ${cls}"><span class="smallcaps">${label}</span><span>${hi(ws)}</span></div>`;
       return `<div class="trig o-steps">${head(tr)}<div class="list">
@@ -439,7 +435,7 @@ const OPTIONS = [
     }),
   },
   {
-    label: 'Folded', caption: 'One line per trigger. Click one to open it, drawn with chips.',
+    label: 'Folded',
     draw: () => TRIGGERS.map((tr, i) => {
       const isOpen = i === openFold;
       return `<div class="o-fold"><div class="fold ${isOpen ? 'open' : ''}">
@@ -450,7 +446,7 @@ const OPTIONS = [
     }).join('') + ADD_TRIGGER,
   },
   {
-    label: 'Sentence', caption: 'The whole trigger as one sentence; the parts you can change are soft pills.',
+    label: 'Sentence',
     draw: () => all((tr) => {
       const ws = [t('When'), ...lower([tr.when.words[0]]), ...tr.when.words.slice(1)];
       if (tr.ifs.length) ws.push(t(', if'), ...tr.ifs[0].words);
@@ -461,7 +457,7 @@ const OPTIONS = [
     }),
   },
   {
-    label: 'When / Then', caption: 'The event in one box, what happens in another.',
+    label: 'When / Then',
     draw: () => all((tr) => `<div class="trig o-wt">${head(tr)}
       <div class="box when"><span class="smallcaps">When</span><div class="item">${ic(tr.icon)}<span>${hi(tr.when.words)}</span></div>
         ${tr.ifs.map((p) => `<div class="cond">${ic('filter')}<span>only if ${hi(p.words)}</span></div>`).join('')}</div>
@@ -470,7 +466,7 @@ const OPTIONS = [
       ${foot(tr)}</div>`),
   },
   {
-    label: 'Tree', caption: 'Like a file tree: the event is the root, and everything it does hangs under it.',
+    label: 'Tree',
     draw: () => all((tr) => {
       const items = [
         ...tr.ifs.map((p) => `<span class="kw">if</span>${hi(p.words)}`),
@@ -483,7 +479,7 @@ const OPTIONS = [
     }),
   },
   {
-    label: 'Branch', caption: 'Tree and Flow together: one line per part, each with its icon. Coloured words are the parts you can change.',
+    label: 'Branch',
     draw: () => all((tr) => {
       const words = (ws) => ws.map((w) => w.k === 't' ? `<span class="t">${w.x}</span>` : `<span class="w ${w.k}">${w.x}</span>`).join(' ');
       // A Wait is a branch of its own: the actions after it hang under it, since they happen later.
@@ -505,7 +501,7 @@ const OPTIONS = [
     }),
   },
   {
-    label: 'Scratch', caption: 'Snap-together blocks in Scratch\'s colours: the event on top, If wraps the actions it guards, and every changeable part is its own little box.',
+    label: 'Scratch',
     draw: () => scratch(),
   },
 ];
@@ -575,7 +571,6 @@ function render() {
   openKey = null;
   document.getElementById('nav').innerHTML = OPTIONS.map((o, i) =>
     `<button class="${i === current ? 'on' : ''}" data-opt="${i}">${i === 9 ? 0 : i + 1} · ${o.label}</button>`).join('');
-  document.getElementById('caption').textContent = OPTIONS[current].caption;
   document.getElementById('body').innerHTML = OPTIONS[current].draw();
   wantedSlot = activeScript = anchor = null;
   asked = { slot: null, script: null, at: 0 };
