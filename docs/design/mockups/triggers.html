@@ -707,18 +707,21 @@ function drawSlot(slot, t) {
   sb.style.opacity = String(easeInOut(fade));
 }
 
-// When the open slot reaches below the script's view, as the slot after the last block does, the script scrolls
-// down smoothly until all of it shows (owner, 2026-11-24). The hovered block then moves up, and stays where that
-// leaves it. Returns whether it still has some way to go.
+// When the open slot would be clipped by the script's view, above or below, wherever the hovered block is, the
+// script scrolls smoothly by what's needed to show all of it (owner, 2026-11-24). The hovered block moves with the
+// scroll, and stays where that leaves it. Returns whether it still has some way to go.
 const REVEAL_MS = 60; // how fast the scroll closes in: about what's left of the way every REVEAL_MS
 function reveal(script, dt) {
   if (!wantedSlot || wantedSlot.closest('.script') !== script || !wantedSlot.classList.contains('show')) return false;
-  const viewBottom = script.getBoundingClientRect().top + script.clientHeight;
-  const need = wantedSlot.getBoundingClientRect().bottom + 4 - viewBottom;
-  if (need <= 0.5) return false;
+  const view = script.getBoundingClientRect();
+  const r = wantedSlot.getBoundingClientRect();
+  const below = r.bottom + 4 - (view.top + script.clientHeight);
+  const above = view.top - (r.top - 4);
+  const need = below > 0.5 ? below : above > 0.5 ? -above : 0;
+  if (need === 0) return false;
   const was = script.scrollTop;
-  script.scrollTop += Math.max(0.5, need * (1 - Math.exp(-dt / REVEAL_MS)));
-  if (script.scrollTop === was) return false; // as far down as it goes
+  script.scrollTop += Math.sign(need) * Math.max(0.5, Math.abs(need) * (1 - Math.exp(-dt / REVEAL_MS)));
+  if (script.scrollTop === was) return false; // as far as it goes
   anchorTop = anchor.getBoundingClientRect().top;
   return true;
 }
