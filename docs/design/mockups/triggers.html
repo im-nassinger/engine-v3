@@ -206,15 +206,13 @@
 
   /* 12 · Scratch: snap-together blocks. --nx is where a block's notch sits, --tx where its tab sits. */
   .o-scratch { --sk-event: color-mix(in srgb, var(--event) 24%, var(--panel)); --sk-ctl: color-mix(in srgb, var(--check) 24%, var(--panel));
-    --sk-act: color-mix(in srgb, var(--accent) 24%, var(--panel)); --sk-wait: color-mix(in srgb, var(--wait) 24%, var(--panel));
-    --sk-cool: color-mix(in srgb, var(--event) 14%, var(--panel)); }
+    --sk-act: color-mix(in srgb, var(--accent) 24%, var(--panel)); --sk-wait: color-mix(in srgb, var(--wait) 24%, var(--panel)); }
   /* Block colours in the editor's own way (tokens.md): a dark surface tinted with the kind's colour, as a
      warning note is tinted with --warning, with the editor's --text on it and the icon in the full colour.
-     The colours are the mockup's event, check, accent and wait colours; the cooldown is a fainter event tint.
+     The colours are the mockup's event, check, accent and wait colours.
      A changeable part is a field like the editor's. Blocks overlap by 4 px of their 6 px tabs, so a 2 px gap
      traces each block's outline and notch, and two blocks of one colour don't merge. */
   .sb.hat  { --ic: var(--event); }
-  .sb.cool { --ic: var(--event); }
   .sb.ctl  { --ic: var(--check); }
   .sb.do   { --ic: var(--accent); }
   .sb.wait { --ic: var(--wait); }
@@ -249,8 +247,6 @@
   .o-scratch.blocky .sb.hat { padding-top: 13px;
     clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 34px calc(100% - 6px), 34px 100%, 14px 100%, 14px calc(100% - 6px), 0 calc(100% - 6px)); }
   .o-scratch.blocky .sk-dd, .o-scratch.blocky .sk-num { border-radius: 2px; }
-  /* The cooldown is its own block, snapped right under the event. */
-  .sb.cool { background: var(--sk-cool); }
 </style>
 </head>
 <body>
@@ -283,15 +279,18 @@ const TRIGGERS = [
     repeat: 'every time',
   },
   {
-    name: 'Timed door', icon: 'radio', sum: 'Move up, wait 2 s, move back',
+    name: 'Timed door', icon: 'radio', sum: 'Switch off, move up and back, wait 3 s, switch on',
     when: { verb: 'Custom event', words: [t('This gets'), v('open')], short: [t('Gets the event'), v('open')] },
     ifs: [],
     dos: [
+      { icon: 'power-off', verb: 'Set', words: [t('Switch'), e('this trigger'), c('off')], fields: [['Change', 'set', true], ['Target', 'this trigger', true], ['To', 'off', true]] },
       { icon: 'move', verb: 'Set', words: [t('Set'), e('this'), v('Position'), t('to'), n('0, -200')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Position', true], ['To', '0, -200']] },
       { icon: 'hourglass', verb: 'Wait', wait: true, words: [t('Wait'), n('2 s')], fields: [['For', '2 s']] },
       { icon: 'move', verb: 'Set', words: [t('Set'), e('this'), v('Position'), t('to'), n('0, 0')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Position', true], ['To', '0, 0']] },
+      { icon: 'hourglass', verb: 'Wait', wait: true, words: [t('Wait'), n('3 s')], fields: [['For', '3 s']] },
+      { icon: 'power', verb: 'Set', words: [t('Switch'), e('this trigger'), c('on')], fields: [['Change', 'set', true], ['Target', 'this trigger', true], ['To', 'on', true]] },
     ],
-    repeat: 'at most every 3 s', every: 3,
+    repeat: 'every time',
   },
 ];
 
@@ -476,10 +475,9 @@ function scratch(look) {
       const checks = tr.ifs.flatMap((c, i) => i ? [t('and'), ...c.words] : c.words);
       const body = tr.ifs.length ? wrap('split', [t('if'), ...checks], stack) : stack;
       const hat = `<div class="sb hat">${ic(tr.icon)}${words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)])}</div>`;
-      // Every time draws nothing; a cooldown is its own "do and rest for" block right under the event.
-      const cooldown = tr.every ? `<div class="sb cool">${ic('timer')}${words([t('do and rest for'), n(String(tr.every)), unit])}</div>` : '';
+      // No cooldown block: a trigger that must rest switches itself off, waits, and switches itself on.
       return `<div class="trig o-scratch ${look}">${head(tr)}<div class="script">
-        ${hat}${cooldown}${body}
+        ${hat}${body}
       </div>${foot(tr, 'Add', false)}</div>`;
     });
 }
