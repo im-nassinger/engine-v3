@@ -5,9 +5,9 @@
 The owner picked **Scratch** from the [trigger card mockup](../../design/mockups/triggers.html) (2026-11-24, row 4 of [fixes.md](fixes.md)). This is the plan to build it. Its look and the rules settled over the mockup's rounds are in [controls.md](../../design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks); this file doesn't repeat them.
 
 - **Mostly a new way to draw the same trigger.** A Scratch trigger is still When, one If, a flat Do list: the `Trigger` type keeps `when`, `checks` and `actions`, and `ActionRunner` keeps running the actions top to bottom, stopping at a Wait. Nothing nests, so play needs no "run a chain of blocks with scopes".
-- **The logic changes in three places:** Repeat goes (a trigger rests by switching itself off with blocks, and once per run becomes one block), a fresh firing of a trigger that is off by the time it runs is dropped, and old levels' Repeat is turned into those blocks when read.
+- **The logic changes in two places:** Repeat goes (a trigger rests by switching itself off with blocks, and once per run becomes one block), and a fresh firing of a trigger that is off by the time it runs is dropped. Old levels aren't converted (owner, 2026-11-24).
 - **New words:** *Enabled*, the trigger's on/off value as Set shows it (`Triggers › Timed door › Enabled`), and "when **other** starts touching this".
-- **Six points wait for the owner's yes** (below, each with Claude's recommendation). The plan is written as if each recommendation is taken.
+- **Five points wait for the owner's yes** (below, each with Claude's recommendation). The plan is written as if each recommendation is taken.
 - **Built by the orchestrator**, unlike fixes 1 to 3: it is about nine sessions of work. Once the owner says yes, the [tasks](#tasks) move to the end of [tasks.md](tasks.md) as tasks 19 onward.
 
 ## The owner's words
@@ -26,8 +26,7 @@ Each one changes a requirement or an owner rule, so Claude doesn't take it under
 | B | "When **other** starts touching this" in the game, not "something" | **Yes**, in the When menu, the event block, the requirement and the tests. | The mockup settled on it, and `other` is the word the If and the actions already use for the same entity, so the event names it once. |
 | C | A block before or after the If (the mockup's hover slots open one there) | **No such block.** With an If, there are no slots above or below it: the top third of the If's top bar and the bottom third of its bottom bar act like a middle. The event block's bottom third opens the If's first inner slot. | "The If wraps the whole Do list" (controls.md) stays true, and play keeps one flat list. A block outside the If would need a second action list, or nested scopes, in the saved trigger and the runner. |
 | D | How a check is added, since the card has no Add button but the slots (owner) | **The slot's menu has a check group at its top: "if … (a value)".** With no If, it wraps every action in a new If. With one, it adds the check joined by "and". Removing the last check removes the If. | One kind of add button stays one (owner, 2026-11-24), and a trigger without checks draws no empty If. |
-| E | Old levels' cooldown ("at most once every N s") | **Read as blocks:** "set this … Enabled to false" first, then the actions, then "wait N seconds" and "set this … Enabled to true". | It's the owner's resting pattern. It times the rest from the end of the actions, not from the firing, so it differs only where the actions hold a Wait. |
-| F | The Entity inspector 344 px wide, not 300 (mockup) | **Yes:** `--entity-inspector` becomes 344 px, and the workspace requirement says so. | Scratch's longest lines fit with no sideways scroll; at 300 px they need 42 px more. |
+| E | The Entity inspector 344 px wide, not 300 (mockup) | **Yes:** `--entity-inspector` becomes 344 px, and the workspace requirement says so. | Scratch's longest lines fit with no sideways scroll; at 300 px they need 42 px more. |
 
 ## What stays
 
@@ -41,7 +40,7 @@ Each one changes a requirement or an owner rule, so Claude doesn't take it under
 ### 1. Repeat goes (logic)
 
 - **`Trigger` loses `repeat`**, and `TriggerRepeats` goes. `PlayTriggers.hear` and `TriggerPhase` stop asking it.
-- **`parseTrigger` converts it as it reads** (A and E): `everyTime` is dropped; `oncePerRun` puts "set this `triggerOn(<its id>)` to false" before the actions; `atMostEvery N` puts that block first and "wait N", "set it to true" last. A Repeat with bad data is refused as today. `savedTrigger` stops writing `repeat`. *Why in `parseTrigger`: fix 3 converted the trigger's dropped parts the same way, so no format version is needed.*
+- **Old levels aren't converted** (owner, 2026-11-24: "you don't need to deal with old levels"). `parseTrigger` ignores a saved `repeat`, and `savedTrigger` stops writing it.
 - **The Repeat menu leaves the card.**
 
 ### 2. A switched-off trigger in play (logic)
@@ -68,12 +67,11 @@ Everything in [controls.md](../../design/controls.md#v4-fix-4-the-trigger-card-a
 
 ### 5. The wider Entity inspector
 
-`--entity-inspector` 344 px in [tokens.md](../../design/tokens.md) and the code, and the starting size in [workspace.md](../../requirements/editor/workspace.md) (F).
+`--entity-inspector` 344 px in [tokens.md](../../design/tokens.md) and the code, and the starting size in [workspace.md](../../requirements/editor/workspace.md) (E).
 
 ## Saved levels
 
-- A trigger with `repeat` is read with blocks in its place (1, E), and saved without it. A level saved after this can't be read by an older build, as after fix 3.
-- Nothing else in a level changes.
+- Not converted (owner, 2026-11-24). A saved `repeat` is ignored, so an old cooldown simply stops; the rest of the level reads as before.
 
 ## Where the code is
 
@@ -98,17 +96,17 @@ Everything in [controls.md](../../design/controls.md#v4-fix-4-the-trigger-card-a
 
 ## Tasks
 
-In the orchestrator's format. Every task also needs `npm run check` to pass. They move to the end of [tasks.md](tasks.md), numbered from 19, once the owner confirms A to F.
+In the orchestrator's format. Every task also needs `npm run check` to pass. They move to the end of [tasks.md](tasks.md), numbered from 19, once the owner confirms A to E.
 
 - [ ] 1. The rules in the requirements and the glossary
   - Read: versions/v4/fix-4-scratch-triggers.md, requirements/triggers/triggers.md, glossary.md, requirements/README.md
   - Done when: the glossary has *Enabled* and lists Repeat and cooldown as dropped; triggers.md has no Repeat, the Wait rule says the run switching its own trigger off goes on, the event reads "when other starts touching this", and Change value names *Enabled*; workspace.md and tokens.md say 344 px; rejected.md has the two rows; `node tools/check-docs.js` and `node tools/check-sources.js` pass
-- [ ] 2. Repeat becomes blocks in the saved trigger
+- [ ] 2. Repeat leaves the saved trigger
   - Read: versions/v4/fix-4-scratch-triggers.md#1-repeat-goes-logic, architecture/core-model/triggers.md
-  - Done when: `Trigger` has no `repeat`; `parseTrigger` turns `oncePerRun` and `atMostEvery` into the Enabled blocks and drops `everyTime`; a saved trigger has no `repeat`; `TriggerRepeats` and its uses are gone; unit tests cover each Repeat, bad Repeat data, and a v3 level read and saved again
+  - Done when: `Trigger` has no `repeat`; `parseTrigger` ignores a saved one; a saved trigger has no `repeat`; `TriggerRepeats`, the Repeat menu and their uses are gone; unit tests cover a trigger saved with and without `repeat`
 - [ ] 3. A switched-off trigger in play
   - Read: versions/v4/fix-4-scratch-triggers.md#2-a-switched-off-trigger-in-play-logic, architecture/triggers-in-play.md
-  - Done when: `TriggerPhase` drops a fresh firing whose trigger is off when reached, and runs a resumed one; `runHeadless` tests show a resting spike hurts once for two touches in one tick and again after the wait, a once-per-run trigger fires once, a trigger switched off by another trigger during its rest stays off, and the converted old cooldowns behave as before where their actions hold no Wait
+  - Done when: `TriggerPhase` drops a fresh firing whose trigger is off when reached, and runs a resumed one; `runHeadless` tests show a resting spike hurts once for two touches in one tick and again after the wait, a once-per-run trigger fires once and a trigger switched off by another trigger during its rest stays off
 - [ ] 4. The block model
   - Read: versions/v4/fix-4-scratch-triggers.md#4-the-card-becomes-blocks-look, design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks
   - Done when: the editor's model gives each trigger its blocks (kind, icon, words and value boxes, the If's two bars only when it has checks) and its gaps, with no gap outside the If; Set's value box shows its path (`Transform › Position`, `Triggers › Timed door › Enabled`); the add menu's entries come from it (the check group, then the actions); unit tests cover a trigger with and without checks, a Wait, a missing entity and an unset part
