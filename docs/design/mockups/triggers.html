@@ -265,14 +265,13 @@
      in an If gets 2 px more below its words, since the If's bottom draws its line over them. */
   .sb.ctl.bottom { min-height: 30px; padding: 0; }
   .sb.end { --td: 0px; }
-  .sc-inner > .sk.last > .sb, .sc-inner > .sk.slot.show:last-child > .sb { padding-bottom: 15px; }
-  .sc-inner > .sk.last.open > .sb { padding-bottom: 13px; }
+  .sc-inner > .sk.slot:last-child > .sb { padding-bottom: 15px; }
   /* Adding a block (look only, nothing is added): hovering a block opens an empty slot under it, shaped
      like a block, with the hovered block's tab fitting its notch. A block with nothing under it shows its
      tab while its slot is open (.open). Only the spots a block can go: under the event when there's no If,
      at the top of the If, and under any action. */
   .sk.slot { display: none; cursor: pointer; }
-  .sk.slot.show { display: flex; }
+  .sk.slot.show, .sk.slot.keep { display: flex; }
   .sk.open > .sb.end { --td: 6px; }
   .sb.slot { --bg: color-mix(in srgb, #fff 7%, var(--panel)); color: var(--muted); }
   .sk.slot:hover > .sb.slot { color: var(--text); --bg: color-mix(in srgb, #fff 10%, var(--panel)); }
@@ -296,7 +295,6 @@
   .sk-dd { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 6px; border-radius: 6px; background: rgba(255,255,255,.09); cursor: pointer; white-space: nowrap; }
   .sk-dd::after { content: "▾"; font-size: 9px; opacity: .7; }
   .sk-num { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 99px; background: rgba(255,255,255,.09); color: var(--text); cursor: pointer; white-space: nowrap; }
-  .o-scratch .foot { margin-top: 10px; }
   .fx { color: var(--ent); }
   .path { color: var(--muted); }
   .o-scratch .fx { color: inherit; }
@@ -529,14 +527,16 @@ function scratch() {
       let key = 0;
       const block = (kind, html, z, end = false, add = null, cls = '') =>
         `<div class="sk ${kind}${cls}" style="z-index: ${z}"${add === null ? '' : ` data-add="${add}"`}><div class="sb ${kind}${end ? ' end' : ''}"><i class="tooth"></i>${html}</div></div>`;
-      const slot = (add, z, end) =>
-        `<div class="sk slot" data-slot="${add}" style="z-index: ${z}"><div class="sb slot${end ? ' end' : ''}"><i class="tooth"></i>${ic('plus')}<span>add a block</span></div></div>`;
+      const slot = (add, z, end, keep = false) =>
+        `<div class="sk slot${keep ? ' keep' : ''}" data-slot="${add}" style="z-index: ${z}"><div class="sb slot${end ? ' end' : ''}"><i class="tooth"></i>${ic('plus')}<span>add a block</span></div></div>`;
+      // The slot after the last action is always open: it is the script's one Add, so the card has no
+      // other Add button (owner, 2026-11-24), and the last action always shows its tooth.
       const last = tr.dos.length - 1;
       const stack = tr.dos.map((d, i) => {
         const k = key++;
         const cat = d.icon === 'move' ? ' k-motion' : d.icon === 'plus' ? ' k-var' : '';
-        return block((d.wait ? 'wait' : 'do') + cat, ic(d.icon) + words(d.wait ? waitWords(d) : d.words), 900 - 2 * i, i === last, k, i === last ? ' last' : '')
-          + slot(k, 899 - 2 * i, i === last);
+        return block((d.wait ? 'wait' : 'do') + cat, ic(d.icon) + words(d.wait ? waitWords(d) : d.words), 900 - 2 * i, false, k)
+          + slot(k, 899 - 2 * i, i === last, i === last);
       }).join('');
       const checks = tr.ifs.flatMap((c, i) => i ? [t('and'), ...c.words] : c.words);
       const ifKey = key++;
@@ -547,7 +547,7 @@ function scratch() {
       // No cooldown block: a trigger that must rest sets its Enabled to false, waits, and sets it to true.
       return `<div class="trig o-scratch">${head(tr)}<div class="script"><div class="stack">
         ${hat}${body}
-      </div></div>${foot(tr, 'Add', false)}</div>`;
+      </div></div></div>`;
     });
 }
 
