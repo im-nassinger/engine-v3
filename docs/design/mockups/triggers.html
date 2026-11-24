@@ -204,7 +204,7 @@
   .o-branch .kid.wait > .kids > .kid::before, .o-branch .kid.wait > .kids > .kid::after { border-color: color-mix(in srgb, var(--wait) 45%, transparent); }
   .o-branch .foot { margin-top: 10px; }
 
-  /* 12 · Scratch: snap-together blocks. --nx is where a block's notch sits, --tx where its tab sits. */
+  /* 12 · Scratch: snap-together blocks with a little roundness. --tx is where a block's tab sits. */
   /* Scratch 3's own block colours (owner, 2026-11-24): Events for the event, Control for If, Wait and
      Destroy (Scratch's "delete this clone"), Motion for Position, Variables for a variable. A trigger's
      Enabled has no Scratch block; it is Control, like the rest of a script's flow. White words and icons,
@@ -222,8 +222,8 @@
   .sb.hat  { --ic: var(--event); }
   .o-scratch .sb { --dd: #cf8b17; color: #fff; }
   .o-scratch .sb.hat { --dd: #cc9900; }
-  .o-scratch .sb.k-motion { background: #4c97ff; --dd: #3373cc; }
-  .o-scratch .sb.k-var { background: #ff8c1a; --dd: #db6e00; }
+  .o-scratch .sb.k-motion { --bg: #4c97ff; --dd: #3373cc; }
+  .o-scratch .sb.k-var { --bg: #ff8c1a; --dd: #db6e00; }
   .o-scratch .sb > svg { color: #fff; }
   .o-scratch .sk-dd { background: var(--dd); color: #fff; }
   .o-scratch .sk-dd .path { color: rgba(255,255,255,.7); }
@@ -239,20 +239,27 @@
   .o-scratch .script { overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
   .o-scratch .stack { display: flex; flex-direction: column; width: max-content; min-width: 100%; padding: 2px; box-sizing: border-box; } /* 2px: room for the blocks' border */
   .o-scratch .sb { flex-wrap: nowrap; white-space: nowrap; }
-  .sb { --nx: 0px; --tx: 0px; --nd: 6px; --td: 6px; position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; min-height: 40px;
-    padding: 9px 10px 13px; margin-bottom: -6px; color: var(--text); line-height: 22px; border-radius: 6px;
-    clip-path: polygon(0 0, calc(var(--nx) + 12px) 0, calc(var(--nx) + 17px) var(--nd), calc(var(--nx) + 31px) var(--nd), calc(var(--nx) + 36px) 0, 100% 0,
-      100% calc(100% - 6px), calc(var(--tx) + 36px) calc(100% - 6px), calc(var(--tx) + 31px) calc(100% - 6px + var(--td)), calc(var(--tx) + 17px) calc(100% - 6px + var(--td)), calc(var(--tx) + 12px) calc(100% - 6px), 0 calc(100% - 6px)); }
-  .sb.hat { padding-top: 7px; border-radius: 40px 10px 6px 6px / 14px 10px 6px 6px;
-    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 36px calc(100% - 6px), 31px calc(100% - 6px + var(--td)), 17px calc(100% - 6px + var(--td)), 12px calc(100% - 6px), 0 calc(100% - 6px)); }
-  .sb.hat { background: var(--sk-event); }
-  .sb.do { background: var(--sk-act); }
-  .sb.wait { background: var(--sk-wait); }
-  .sb.ctl { background: var(--sk-ctl); }
+  /* A block is drawn by its ::before (the body, 6 px short of the bottom) and its ::after (the tab, a
+     20 px tooth hanging into the block below), both with slightly rounded corners. No notch is cut: the
+     tab of the block above, and the line around it, always covers where it would be. */
+  .sb { --tx: 0px; --td: 6px; --r: 4px; --rtl: var(--r); --rtr: var(--r); --rbr: var(--r); --rbl: var(--r);
+    position: relative; isolation: isolate; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; min-height: 40px;
+    padding: 9px 10px 13px; margin-bottom: -6px; color: var(--text); line-height: 22px; }
+  .sb::before { content: ""; position: absolute; inset: 0 0 6px 0; z-index: -1; background: var(--bg);
+    border-radius: var(--rtl) var(--rtr) var(--rbr) var(--rbl); }
+  .sb::after { content: ""; position: absolute; left: calc(var(--tx) + 14px); width: 20px; top: calc(100% - 7px); height: calc(var(--td) + 1px);
+    z-index: -1; background: var(--bg); border-radius: 0 0 3px 3px; }
+  .sb.end::after { display: none; }
+  .sk.open > .sb.end::after { display: block; }
+  .sb.hat { padding-top: 7px; }
+  .sb.hat { --bg: var(--sk-event); }
+  .sb.do { --bg: var(--sk-act); }
+  .sb.wait { --bg: var(--sk-wait); }
+  .sb.ctl { --bg: var(--sk-ctl); }
   .sb.ctl.top { --tx: 16px; }
   /* A block with nothing under it has no tab (.end), and so the If's bottom has no notch. The last block
      in an If gets 2 px more below its words, since the If's bottom draws its line over them. */
-  .sb.ctl.bottom { --nd: 0px; min-height: 30px; padding: 0; }
+  .sb.ctl.bottom { min-height: 30px; padding: 0; }
   .sb.end { --td: 0px; }
   .sc-inner > .sk.last > .sb, .sc-inner > .sk.slot.show:last-child > .sb { padding-bottom: 15px; }
   .sc-inner > .sk.last.open > .sb { padding-bottom: 13px; }
@@ -263,21 +270,21 @@
   .sk.slot { display: none; cursor: pointer; }
   .sk.slot.show { display: flex; }
   .sk.open > .sb.end { --td: 6px; }
-  .sb.slot { background: color-mix(in srgb, #fff 7%, var(--panel)); color: var(--muted); }
-  .sk.slot:hover > .sb.slot { color: var(--text); background: color-mix(in srgb, #fff 10%, var(--panel)); }
+  .sb.slot { --bg: color-mix(in srgb, #fff 7%, var(--panel)); color: var(--muted); }
+  .sk.slot:hover > .sb.slot { color: var(--text); --bg: color-mix(in srgb, #fff 10%, var(--panel)); }
   .sb svg { width: 16px; height: 16px; }
   .sc-mid { display: flex; }
-  /* The border: a block's clip-path would cut off a CSS border, so each block sits in a .sk wrapper whose
-     drop-shadows draw a 2 px line around the block's shape, notch and tab included. Blocks overlap by their
+  /* The border: a CSS border can't trace a body and its tab as one shape, so each block sits in a .sk wrapper whose
+     drop-shadows draw a 2 px line around the block's shape, tab included. Blocks overlap by their
      whole 6 px tab, and a block draws above the ones under it (z-index set in scratch()), so its bottom line
      and tab are the seam. An If (.sc) draws its top, arm and bottom above the blocks it holds; the arm draws
      its own lines and covers the top's and bottom's lines where they meet it, so the If reads as one C. */
   .sc { position: relative; display: flex; flex-direction: column; }
   .sc > .sk { z-index: 1000; }
   /* Corners that meet the arm are square, so the C's lines run straight through its joints. */
-  .o-scratch .sc .sb.ctl.top { border-bottom-left-radius: 0; }
-  .o-scratch .sc .sb.ctl.bottom { border-top-left-radius: 0; }
-  .o-scratch .sc .sc-inner .sb { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+  .o-scratch .sc .sb.ctl.top { --rbl: 0px; }
+  .o-scratch .sc .sb.ctl.bottom { --rtl: 0px; }
+  .o-scratch .sc .sc-inner .sb { --rtl: 0px; --rbl: 0px; }
   .sc-arm { position: relative; z-index: 1001; width: 16px; flex: none; background: var(--sk-ctl);
     --line: var(--sk-gap); box-shadow: -2px 0 0 var(--line), inset -2px 0 0 var(--line); }
   .sk { display: flex; flex-direction: column; position: relative;
@@ -293,13 +300,7 @@
   .fx { color: var(--ent); }
   .path { color: var(--muted); }
   .o-scratch .fx { color: inherit; }
-  /* 13 · Blocky: square corners and square notches */
-  .o-scratch.blocky .sb { border-radius: 2px;
-    clip-path: polygon(0 0, calc(var(--nx) + 14px) 0, calc(var(--nx) + 14px) var(--nd), calc(var(--nx) + 34px) var(--nd), calc(var(--nx) + 34px) 0, 100% 0,
-      100% calc(100% - 6px), calc(var(--tx) + 34px) calc(100% - 6px), calc(var(--tx) + 34px) calc(100% - 6px + var(--td)), calc(var(--tx) + 14px) calc(100% - 6px + var(--td)), calc(var(--tx) + 14px) calc(100% - 6px), 0 calc(100% - 6px)); }
-  .o-scratch.blocky .sb.hat { padding-top: 7px;
-    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 34px calc(100% - 6px), 34px calc(100% - 6px + var(--td)), 14px calc(100% - 6px + var(--td)), 14px calc(100% - 6px), 0 calc(100% - 6px)); }
-  .o-scratch.blocky .sk-dd, .o-scratch.blocky .sk-num { border-radius: 2px; }
+  .o-scratch .sk-dd, .o-scratch .sk-num { border-radius: 4px; }
 </style>
 </head>
 <body>
@@ -503,17 +504,13 @@ const OPTIONS = [
     }),
   },
   {
-    label: 'Scratch', caption: 'Snap-together blocks: the event on top, If wraps the actions it guards, and every changeable part is its own little box.',
-    draw: () => scratch(''),
-  },
-  {
-    label: 'Blocky', caption: 'The same snap-together blocks with square corners and square notches, closer to the editor\'s flat look.',
-    draw: () => scratch('blocky'),
+    label: 'Scratch', caption: 'Snap-together blocks in Scratch\'s colours: the event on top, If wraps the actions it guards, and every changeable part is its own little box.',
+    draw: () => scratch(),
   },
 ];
 
-// Snap-together blocks, round (Scratch) or square (Blocky).
-function scratch(look) {
+// Snap-together blocks, slightly rounded.
+function scratch() {
     return all((tr) => {
       const words = (ws) => ws.map((w, i) => {
         const x = i <= 1 ? w.x[0].toLowerCase() + w.x.slice(1) : w.x;
@@ -548,14 +545,14 @@ function scratch(look) {
       const hat = block('hat', ic(tr.icon) + words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)]), 1000, false, tr.ifs.length ? null : hatKey)
         + (tr.ifs.length ? '' : slot(hatKey, 999, false));
       // No cooldown block: a trigger that must rest sets its Enabled to false, waits, and sets it to true.
-      return `<div class="trig o-scratch ${look}">${head(tr)}<div class="script"><div class="stack">
+      return `<div class="trig o-scratch">${head(tr)}<div class="script"><div class="stack">
         ${hat}${body}
       </div></div>${foot(tr, 'Add', false)}</div>`;
     });
 }
 
 // ---------- Page ----------
-let current = 12;
+let current = 11;
 function render() {
   document.getElementById('nav').innerHTML = OPTIONS.map((o, i) =>
     `<button class="${i === current ? 'on' : ''}" data-opt="${i}">${i === 9 ? 0 : i + 1} · ${o.label}</button>`).join('');
@@ -564,7 +561,7 @@ function render() {
   lucide.createIcons();
 }
 
-// Scratch and Blocky: hovering a block, or its open slot, keeps that slot open. Keys are per trigger.
+// Scratch: hovering a block, or its open slot, keeps that slot open. Keys are per trigger.
 document.addEventListener('mouseover', (ev) => {
   const trig = ev.target.closest('.o-scratch');
   const hit = ev.target.closest('[data-add], [data-slot]');

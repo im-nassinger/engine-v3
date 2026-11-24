@@ -11,6 +11,7 @@ The owner finds the trigger card ugly and convoluted, so we made a mockup of oth
 1. A first mockup with 11 variants at once was far too busy; it became one card at a time.
 2. Over several rounds, more room inside every container, 13 options, and the owner's favourites: Branch (Tree and Flow merged), Scratch and Blocky (snap-together blocks, round or square).
 3. The event now reads "When other starts touching this", `other` in the entity colour.
+4. Later the same day: Set's value box shows its path (`Transform › Position`), hovering a block opens an "add a block" slot, and Scratch and Blocky merged into one **Scratch** option in Scratch's own colours, slightly rounded.
 
 **Where we stopped:** the owner is choosing an option. What they said about each round is in [proposals/trigger-card-look.md](proposals/trigger-card-look.md). Nothing in the game changed.
 
