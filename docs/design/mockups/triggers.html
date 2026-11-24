@@ -575,27 +575,38 @@ function render() {
     `<button class="${i === current ? 'on' : ''}" data-opt="${i}">${i === 9 ? 0 : i + 1} · ${o.label}</button>`).join('');
   document.getElementById('caption').textContent = OPTIONS[current].caption;
   document.getElementById('body').innerHTML = OPTIONS[current].draw();
-  wantedSlot = anchor = null;
+  wantedSlot = activeScript = anchor = null;
+  asked = { slot: null, script: null, at: 0 };
   // A Scratch script keeps the height it has with no slot open, so an opening slot scrolls it instead of growing it.
   document.querySelectorAll('.o-scratch .script').forEach((x) => { x.style.height = `${x.offsetHeight}px`; });
   lucide.createIcons();
 }
 
-// Scratch: the top half of a block (the If whole, any other block without its tooth) opens the slot above it, the bottom half the slot
-// below it; hovering an open slot keeps it open. The block above an open slot shows its tooth. Keys are per trigger.
-// A slot takes about half a second (owner, 2026-11-24): first the blocks move apart to make its room, then the slot fades
-// in; closing runs the other way. So a mouse moving fast reaches the block it's heading for before anything moves.
+// Scratch: a block has three bands (owner, 2026-11-24): its top third opens the slot above it, its bottom third the
+// slot below it, and its middle third, where its values are, changes nothing: a slot already open next to the block
+// stays open, any other closes. The If is measured whole, its C included; any other block without its tooth. The event
+// block has no slot above, so its top third is like its middle. Hovering an open slot keeps it open. The block above an
+// open slot shows its tooth. Keys are per trigger.
+// Nothing moves for SLOT_DELAY_MS after the mouse asks for a change (owner, 2026-11-24), so a mouse passing over blocks
+// doesn't push them. Then a slot takes about half a second: first the blocks move apart to make its room, then the
+// slot fades in; closing runs the other way. Every move eases in and out (owner).
 // A slot opening or closing above the hovered block would push it out from under the mouse, so the script (the box
 // that also scrolls sideways) scrolls by the same amount on every frame: the hovered block, and the point of it under
-// the mouse, stay where they were (owner, 2026-11-24). Once the mouse leaves a script, it glides back to its start.
+// the mouse, stay where they were (owner, 2026-11-24). Once the mouse has left a script, it glides back to its start.
+const SLOT_DELAY_MS = 250;
 const SLOT_MOVE_MS = 400;
 const SLOT_FADE_MS = 100;
-const SETTLE_PX_PER_MS = 0.1; // how fast a script the mouse left scrolls back to its start and drops its empty strips
+const SETTLE_MS = 400; // how long a script the mouse left takes to scroll back to its start and drop its empty strips
+const easeInOut = (x) => (x < 0.5 ? 4 * x ** 3 : 1 - (2 - 2 * x) ** 3 / 2);
 const slotTime = new WeakMap(); // a slot → how far it is open, in ms, from 0 (closed) to SLOT_MOVE_MS + SLOT_FADE_MS
 const slotHeight = new WeakMap(); // a slot → its full height
-let wantedSlot = null; // the slot the mouse asks for
+const settling = new WeakMap(); // a script gliding back → { start, scroll, rooms } it glides from
+let asked = { slot: null, script: null, at: 0 }; // what the mouse asks for, and since when
+let wantedSlot = null; // the slot open or opening: what was asked, once SLOT_DELAY_MS passed
+let activeScript = null; // the script the mouse is on, once SLOT_DELAY_MS passed
 let anchor = null; // the hovered block or slot, kept at anchorTop
 let anchorTop = 0;
+let framing = false;
 let lastFrame = null;
 
 document.addEventListener('mousemove', (ev) => {
@@ -605,26 +616,37 @@ document.addEventListener('mousemove', (ev) => {
   const blockEl = ev.target.closest('[data-below]');
   if (slotEl) k = slotEl.dataset.slot;
   else if (blockEl) {
-    // The If counts whole, its C included; any other block counts without its tooth.
     const isIf = blockEl.matches('.sc > .sk, .sc-arm');
     const r = (isIf ? blockEl.closest('.sc') : blockEl.querySelector('.sb')).getBoundingClientRect();
-    const top = ev.clientY < r.top + (isIf ? r.height : r.height - 6) / 2;
-    k = top && blockEl.dataset.above !== undefined ? blockEl.dataset.above : blockEl.dataset.below;
+    const third = Math.min(2, Math.floor((3 * (ev.clientY - r.top)) / (isIf ? r.height : r.height - 6)));
+    const { above, below } = blockEl.dataset;
+    const askedHere = asked.slot?.closest('.o-scratch') === trig ? asked.slot.dataset.slot : null;
+    if (third <= 0 && above !== undefined) k = above;
+    else if (third >= 2) k = below;
+    else k = askedHere === above || askedHere === below ? askedHere : null;
   }
-  wantedSlot = trig && k !== null ? trig.querySelector(`[data-slot="${k}"]`) : null;
+  const slot = trig && k !== null ? trig.querySelector(`[data-slot="${k}"]`) : null;
   const hovered = slotEl ?? blockEl;
   const script = hovered?.closest('.o-scratch .script') ?? null;
+  if (slot !== asked.slot || script !== asked.script) asked = { slot, script, at: performance.now() };
   if (hovered !== anchor) {
     anchor = script ? hovered : null;
     anchorTop = anchor ? anchor.getBoundingClientRect().top : 0;
   }
-  if (lastFrame === null) requestAnimationFrame(slotFrame);
+  if (!framing) {
+    framing = true;
+    requestAnimationFrame(slotFrame);
+  }
 });
 
-// Moves every slot one frame toward open or closed, then scrolls the hovered block's script to keep it in place.
+// Moves every slot one frame toward open or closed, then scrolls the hovered block's script to keep it in place and
+// glides back the scripts the mouse has left.
 function slotFrame(now) {
   const dt = lastFrame === null ? 16 : now - lastFrame;
-  let moving = false;
+  lastFrame = now;
+  const waiting = asked.slot !== wantedSlot || asked.script !== activeScript;
+  if (waiting && now - asked.at >= SLOT_DELAY_MS) ({ slot: wantedSlot, script: activeScript } = asked);
+  let moving = asked.slot !== wantedSlot || asked.script !== activeScript;
   document.querySelectorAll('.o-scratch .sk.slot').forEach((slot) => {
     const t = slotTime.get(slot) ?? 0;
     const target = slot === wantedSlot ? SLOT_MOVE_MS + SLOT_FADE_MS : 0;
@@ -637,22 +659,33 @@ function slotFrame(now) {
   const kept = anchor?.isConnected && anchor.getClientRects().length > 0 ? anchor.closest('.script') : null;
   if (kept) keepInPlace(kept, anchor, anchorTop);
   document.querySelectorAll('.o-scratch .script').forEach((script) => {
-    if (script !== kept) moving = settle(script, Math.max(1, dt * SETTLE_PX_PER_MS)) || moving;
+    if (script === activeScript || script === kept) settling.delete(script);
+    else moving = settle(script, now) || moving;
   });
-  lastFrame = moving ? now : null;
+  framing = moving;
   if (moving) requestAnimationFrame(slotFrame);
+  else lastFrame = null;
 }
 
-// Moves a script the mouse isn't on up to `px` toward its start: no scroll, no empty strips. Returns whether it
-// still has some way to go.
-function settle(script, px) {
+// Glides a script the mouse has left back to its start over SETTLE_MS: no scroll, no empty strips. Returns whether
+// it still has some way to go.
+function settle(script, now) {
   const rooms = [...script.querySelectorAll(':scope > .room')];
-  rooms.forEach((r) => { r.style.height = `${Math.max(0, (parseFloat(r.style.height) || 0) - px)}px`; });
-  script.scrollTop = Math.max(0, script.scrollTop - px);
-  return script.scrollTop > 0 || rooms.some((r) => parseFloat(r.style.height) > 0);
+  const heights = rooms.map((r) => parseFloat(r.style.height) || 0);
+  if (!settling.has(script)) {
+    if (script.scrollTop === 0 && heights.every((h) => h === 0)) return false;
+    settling.set(script, { start: now, scroll: script.scrollTop, rooms: heights });
+  }
+  const from = settling.get(script);
+  const left = 1 - easeInOut(Math.min(1, (now - from.start) / SETTLE_MS));
+  rooms.forEach((r, i) => { r.style.height = `${from.rooms[i] * left}px`; });
+  script.scrollTop = from.scroll * left;
+  if (left > 0) return true;
+  settling.delete(script);
+  return false;
 }
 
-// Draws a slot `t` ms open: its room grows (eased) over SLOT_MOVE_MS, then it fades in over SLOT_FADE_MS.
+// Draws a slot `t` ms open: its room grows over SLOT_MOVE_MS, then it fades in over SLOT_FADE_MS, both eased.
 function drawSlot(slot, t) {
   const sb = slot.firstElementChild;
   const opened = slot.closest('.o-scratch').querySelectorAll(`[data-below="${slot.dataset.slot}"]`);
@@ -669,10 +702,10 @@ function drawSlot(slot, t) {
     slotHeight.set(slot, slot.offsetHeight);
   }
   const grown = Math.min(1, t / SLOT_MOVE_MS);
-  const eased = grown < 0.5 ? 2 * grown * grown : 1 - (2 - 2 * grown) ** 2 / 2;
+  const eased = easeInOut(grown);
   slot.style.height = grown < 1 ? `${Math.round(slotHeight.get(slot) * eased)}px` : '';
   slot.style.overflow = grown < 1 ? 'hidden' : '';
-  sb.style.opacity = String(fade);
+  sb.style.opacity = String(easeInOut(fade));
 }
 
 // Scrolls the script so the anchor's top is back at `before`. When the script can't scroll that far, an empty
