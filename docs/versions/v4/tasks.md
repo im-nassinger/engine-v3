@@ -57,7 +57,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 - [x] 17. Close v4's docs
   - Read: versions/README.md#closing-a-version, versions/v3/architecture.md
   - Done when: v4's lasting parts are moved into architecture/ as v3's were, with `versions/v4/architecture.md` left as the record with a table of where each part went; the glossary has every new word; progress.md says v4 is built and waits for the owner's try; `node tools/check-sources.js` passes
-- [ ] 18. Try point: try the whole of v4: the new events (hits, destroyed, a variable changes, custom events), Fire custom event and Wait, the component value check, string and boolean variables on any entity with Flip, and the shortcut list with `?`
+- [x] 18. Try point: try the whole of v4: the new events (hits, destroyed, a variable changes, custom events), Fire custom event and Wait, the component value check, string and boolean variables on any entity with Flip, and the shortcut list with `?`
 
 ### v4 fix 4: the trigger card as Scratch blocks
 
