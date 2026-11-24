@@ -205,7 +205,7 @@
   .o-branch .foot { margin-top: 10px; }
 
   /* 12 · Scratch: snap-together blocks. --nx is where a block's notch sits, --tx where its tab sits. */
-  .o-scratch { --sk-event: #b9822f; --sk-ctl: #2b8a7f; --sk-act: #3a66c4; --sk-wait: #6c55c2; }
+  .o-scratch { --sk-event: #b9822f; --sk-ctl: #2b8a7f; --sk-act: #3a66c4; --sk-wait: #6c55c2; --sk-cool: #5b6f86; }
   .o-scratch .script { display: flex; flex-direction: column; padding-bottom: 6px; }
   .sb { --nx: 0px; --tx: 0px; position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; min-height: 40px;
     padding: 9px 10px 13px; margin-bottom: -6px; color: #fff; line-height: 22px; border-radius: 6px;
@@ -236,10 +236,8 @@
   .o-scratch.blocky .sb.hat { padding-top: 13px;
     clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 34px calc(100% - 6px), 34px 100%, 14px 100%, 14px calc(100% - 6px), 0 calc(100% - 6px)); }
   .o-scratch.blocky .sk-dd, .o-scratch.blocky .sk-num { border-radius: 2px; }
-  /* The Repeat limit is a second line in the event block: it limits how often the event is heard. */
-  .sb.hat.limited { flex-direction: column; align-items: stretch; gap: 6px; }
-  .sk-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
-  .sk-limit { color: rgba(255,255,255,.85); }
+  /* The cooldown is its own block, snapped right under the event. */
+  .sb.cool { background: var(--sk-cool); }
 </style>
 </head>
 <body>
@@ -459,14 +457,11 @@ function scratch(look) {
            <div class="sb ctl bottom"></div>`;
       const stack = tr.dos.map((d) => `<div class="sb ${d.wait ? 'wait' : 'do'}">${words(d.words)}</div>`).join('');
       const body = tr.ifs.length ? wrap([t('if'), ...tr.ifs[0].words], stack) : stack;
-      // Every time draws nothing; a limit is a second line in the event block, its kind a menu.
-      const event = `${ic(tr.icon)}${words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)])}`;
-      const hat = tr.every
-        ? `<div class="sb hat limited"><div class="sk-row">${event}</div>
-             <div class="sk-row sk-limit">${ic('timer')}<span class="sk-dd">not again for</span><span class="sk-num">${tr.every}</span><span>s</span></div></div>`
-        : `<div class="sb hat">${event}</div>`;
+      const hat = `<div class="sb hat">${ic(tr.icon)}${words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)])}</div>`;
+      // Every time draws nothing; a cooldown is its own block right under the event.
+      const cooldown = tr.every ? `<div class="sb cool">${ic('timer')}${words([t('cooldown'), n(String(tr.every)), t('s')])}</div>` : '';
       return `<div class="trig o-scratch ${look}">${head(tr)}<div class="script">
-        ${hat}${body}
+        ${hat}${cooldown}${body}
       </div>${foot(tr, 'Add', false)}</div>`;
     });
 }

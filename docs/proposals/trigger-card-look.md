@@ -30,11 +30,12 @@ The owner finds the trigger card "ugly and convoluted" (2026-11-24) and asked fo
 - **Each changeable part must look separate.** "other has tag player" in one colour read as one thing, though `other`, `has tag` and `player` are three choices. Branch tells them apart by colour alone (entity blue, value violet, amount green, choice white, fixed words grey); Scratch and Blocky give each its own box.
 - **The event names who touches:** "When **other** starts touching this", not "something starts touching this" or "Other starts touching this". The sentence starts with When where no label says When, and `other` is blue like an entity, with no chip or menu, since it can't be changed.
 - **Square blocks are fine.** The owner doesn't like the rounded Scratch look; Blocky is the square version.
-- **The repeat is not a footer line** (Scratch and Blocky). Every time draws nothing. A limit is a second line in the event block, since it limits how often the event is heard: "not again for 3 s", the kind a menu (not again for, only once per run) and 3 a changeable amount. *Rejected:* a C-shaped "every 3 seconds" block around the actions read like a timer firing every 3 s, and "at most once every 3 s" was too hard to read (owner, 2026-11-24).
+- **The repeat is not a footer line** (Scratch and Blocky). Every time draws nothing. A cooldown is its own block snapped right under the event block: "cooldown 3 s", 3 a changeable amount (owner: call it a cooldown, the When block first and the cooldown after, 2026-11-24). *Rejected:* a C-shaped "every 3 seconds" block around the actions read like a timer firing every 3 s; "at most once every 3 s" was too hard to read; a second line "not again for 3 s" inside the event block was disliked. A Wait at the end can't replace it, since a firing during a Wait starts its own run.
 - **No highlight stripe on the event block.** Blocky's lighter band on top was "ugly"; the event block is one flat colour.
 
 ## Open
 
 - **Which option**, and whether parts of two are combined.
+- **How once per run is drawn**, Repeat's third choice; the mockup has no example of it yet. The requirement and the real card still say "at most once every N seconds" for the cooldown, to change when a look is picked.
 - **The game's own wording:** the real card and [requirements/triggers/triggers.md](../requirements/triggers/triggers.md) still say "When something starts touching this". Changing it to "other" means changing the requirement, the When menu and the tests. Asked, not answered yet (2026-11-24).
 - Lines in the 300 px Entity inspector are tight: "set this Position to 0, -200" and "when other starts touching this" still wrap in Scratch and Blocky.
