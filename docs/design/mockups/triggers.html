@@ -233,7 +233,7 @@
   .o-scratch.blocky .sb { border-radius: 2px;
     clip-path: polygon(0 0, calc(var(--nx) + 14px) 0, calc(var(--nx) + 14px) 6px, calc(var(--nx) + 34px) 6px, calc(var(--nx) + 34px) 0, 100% 0,
       100% calc(100% - 6px), calc(var(--tx) + 34px) calc(100% - 6px), calc(var(--tx) + 34px) 100%, calc(var(--tx) + 14px) 100%, calc(var(--tx) + 14px) calc(100% - 6px), 0 calc(100% - 6px)); }
-  .o-scratch.blocky .sb.hat { padding-top: 13px; box-shadow: inset 0 4px 0 rgba(255,255,255,.22);
+  .o-scratch.blocky .sb.hat { padding-top: 13px;
     clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 34px calc(100% - 6px), 34px 100%, 14px 100%, 14px calc(100% - 6px), 0 calc(100% - 6px)); }
   .o-scratch.blocky .sk-dd, .o-scratch.blocky .sk-num { border-radius: 2px; }
 </style>
@@ -276,7 +276,7 @@ const TRIGGERS = [
       { icon: 'hourglass', verb: 'Wait', wait: true, words: [t('Wait'), n('2 s')], fields: [['For', '2 s']] },
       { icon: 'move', verb: 'Set', words: [t('Set'), e('this'), v('Position'), t('to'), n('0, 0')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Position', true], ['To', '0, 0']] },
     ],
-    repeat: 'at most every 3 s',
+    repeat: 'at most every 3 s', every: 3,
   },
 ];
 
@@ -291,7 +291,7 @@ const lower = (ws) => ws.map((w, i) => i === 0 && w.k === 't' ? t(w.x[0].toLower
 const whenWords = (tr) => [t('When'), ...lower(tr.when.words)];
 const fields = (list) => `<div class="fields">${list.map(([lab, val, menu]) => `<div class="frow"><span class="lab">${lab}</span><span class="pill">${val}${menu ? '<span>▾</span>' : ''}</span></div>`).join('')}</div>`;
 const head = (tr, withIcon = false) => `<div class="head">${withIcon ? `<span class="ev">${ic(tr.icon)}</span>` : ''}<span class="name">${tr.name}</span><span class="sw"></span><span class="icon-btn">${ic('ellipsis')}</span></div>`;
-const foot = (tr, label = 'Add') => `<div class="foot"><span class="add">${ic('plus')} ${label}</span><span class="rep">${ic('repeat')} ${tr.repeat}</span></div>`;
+const foot = (tr, label = 'Add', withRepeat = true) => `<div class="foot"><span class="add">${ic('plus')} ${label}</span>${withRepeat ? `<span class="rep">${ic('repeat')} ${tr.repeat}</span>` : ''}</div>`;
 const ADD_TRIGGER = `<div class="add-trigger">${ic('plus')} Add trigger</div>`;
 const all = (fn) => TRIGGERS.map(fn).join('') + ADD_TRIGGER;
 
@@ -449,15 +449,17 @@ function scratch(look) {
         if (w.k === 't') return `<span>${x}</span>`;
         return w.k === 'n' ? `<span class="sk-num">${x}</span>` : `<span class="sk-dd">${x}</span>`;
       }).join('');
+      // A C-shaped block: its words on top, the blocks it holds inside.
+      const wrap = (top, inner) => `<div class="sb ctl top">${words(top)}</div>
+           <div class="sc-mid"><div class="sc-arm"></div><div class="sc-inner">${inner}</div></div>
+           <div class="sb ctl bottom"></div>`;
       const stack = tr.dos.map((d) => `<div class="sb ${d.wait ? 'wait' : 'do'}">${words(d.words)}</div>`).join('');
-      const body = tr.ifs.length
-        ? `<div class="sb ctl top">${words([t('if'), ...tr.ifs[0].words])}</div>
-           <div class="sc-mid"><div class="sc-arm"></div><div class="sc-inner">${stack}</div></div>
-           <div class="sb ctl bottom"></div>`
-        : stack;
+      const guarded = tr.ifs.length ? wrap([t('if'), ...tr.ifs[0].words], stack) : stack;
+      // Every time needs no block; a cooldown wraps everything under the event.
+      const body = tr.every ? wrap([t('at most once every'), n(String(tr.every)), t('s')], guarded) : guarded;
       return `<div class="trig o-scratch ${look}">${head(tr)}<div class="script">
         <div class="sb hat">${ic(tr.icon)}${words([t('when'), ...(tr.ifs.length ? tr.when.short : tr.when.words)])}</div>${body}
-      </div>${foot(tr)}</div>`;
+      </div>${foot(tr, 'Add', false)}</div>`;
     });
 }
 
