@@ -7,184 +7,357 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 <style>
-  /* The editor's tokens (tokens.md), plus one amber for the event. */
+  /* The editor's tokens (tokens.md), plus mockup-only colours for an event and for the kinds of word. */
   :root {
     --app: #0d0f13; --panel: rgb(24, 27, 33); --raised: rgba(255,255,255,.04); --field: rgba(255,255,255,.055); --hover: rgba(255,255,255,.065);
     --text: #e4e8ef; --muted: #8b93a1; --faint: #586070; --accent: #4f8cff; --soft: rgba(79,140,255,.2); --ink: #8fb5ff;
-    --event: #e0a24a;
+    --event: #e0a24a; --check: #4fb8ad; --wait: #a58bf2;
+    --ent-bg: rgba(79,140,255,.16); --ent: #9cbdff;
+    --val-bg: rgba(165,139,242,.16); --val: #c9b8ff;
+    --num-bg: rgba(63,178,127,.16); --num: #84dcb3;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; min-height: 100%; background: var(--app); color: var(--text); font: 12px/1.5 "JetBrains Mono", ui-monospace, monospace; }
   svg.lucide { width: 14px; height: 14px; stroke-width: 1.8; flex: none; }
 
-  /* The page: a row of option buttons, one panel, one line under it. */
-  nav { display: flex; justify-content: center; gap: 6px; padding: 32px 16px 0; flex-wrap: wrap; }
-  nav button { font: inherit; color: var(--muted); background: none; border: 0; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+  /* The page: option buttons, a caption, one card. */
+  nav { display: flex; justify-content: center; gap: 4px; padding: 32px 16px 0; flex-wrap: wrap; max-width: 860px; margin: 0 auto; }
+  nav button { font: inherit; color: var(--muted); background: none; border: 0; padding: 7px 12px; border-radius: 8px; cursor: pointer; }
   nav button:hover { background: var(--hover); color: var(--text); }
   nav button.on { background: var(--soft); color: var(--ink); }
-  .caption { text-align: center; color: var(--muted); margin: 14px 16px 28px; }
-  .stage { display: flex; justify-content: center; padding: 0 16px 60px; }
+  .caption { text-align: center; color: var(--muted); margin: 16px 16px 6px; }
+  .keys { text-align: center; color: var(--faint); font-size: 10px; margin-bottom: 28px; }
+  .stage { display: flex; justify-content: center; padding: 0 16px 80px; }
 
-  /* The Entity inspector's Triggers card. */
-  .insp { width: 300px; background: var(--panel); border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.45); padding: 6px; }
-  .card-head { height: 32px; display: flex; align-items: center; padding: 0 10px; background: var(--raised); border-radius: 8px;
+  /* The Triggers card in the 300 px Entity inspector. Spacing: 8 outside, 12 inside a trigger, 8 between rows. */
+  .insp { width: 300px; background: var(--panel); border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.45); padding: 8px; }
+  .card-head { height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: var(--raised); border-radius: 10px;
     font-size: 10px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; }
-  .body { padding: 10px 4px 4px; display: flex; flex-direction: column; gap: 14px; }
-  .add { display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 8px; border-radius: 8px; color: var(--muted); cursor: pointer; }
+  .card-head svg { color: var(--muted); }
+  .body { padding: 12px 0 0; display: flex; flex-direction: column; gap: 12px; }
+  .add-trigger { display: flex; align-items: center; justify-content: center; gap: 8px; height: 36px; border-radius: 10px; color: var(--muted); cursor: pointer; border: 1px dashed rgba(255,255,255,.1); }
+  .add-trigger:hover { background: var(--hover); color: var(--text); border-color: transparent; }
+
+  .trig { background: var(--raised); border-radius: 12px; padding: 12px; }
+  .head { display: flex; align-items: center; gap: 10px; height: 24px; margin-bottom: 12px; }
+  .head .name { flex: 1; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .head .ev { color: var(--event); }
+  .sw { width: 26px; height: 15px; border-radius: 99px; background: var(--accent); position: relative; flex: none; }
+  .sw::after { content: ""; position: absolute; left: 13px; top: 2.5px; width: 10px; height: 10px; border-radius: 50%; background: #fff; }
+  .icon-btn { color: var(--muted); display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; flex: none; cursor: pointer; }
+  .icon-btn:hover { background: var(--hover); color: var(--text); }
+  .smallcaps { font-size: 10px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+  .add { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 8px; color: var(--muted); cursor: pointer; }
   .add:hover { background: var(--hover); color: var(--text); }
+  .foot { display: flex; align-items: center; gap: 4px; margin-top: 8px; margin-left: -10px; }
+  .foot .rep { margin-left: auto; color: var(--faint); display: inline-flex; gap: 6px; align-items: center; padding-right: 0; }
 
-  .head { display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 4px 0 8px; }
-  .head .name { flex: 1; font-weight: 600; }
-  .sw { width: 24px; height: 14px; border-radius: 99px; background: var(--accent); position: relative; flex: none; }
-  .sw::after { content: ""; position: absolute; left: 12px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: #fff; }
-  .more { color: var(--muted); display: grid; place-items: center; width: 22px; height: 22px; }
-  b { font-weight: 400; color: var(--ink); }
+  /* Words of a sentence, three looks. */
+  .w-dot { color: var(--ink); border-bottom: 1px dotted var(--ink); cursor: pointer; }
+  .w-hi { color: var(--ink); cursor: pointer; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: 6px; white-space: nowrap; cursor: pointer; }
+  .chip:hover { filter: brightness(1.2); }
+  .chip.e { background: var(--ent-bg); color: var(--ent); }
+  .chip.v { background: var(--val-bg); color: var(--val); }
+  .chip.n { background: var(--num-bg); color: var(--num); }
+  .chip.c { background: var(--field); color: var(--text); }
+  .chip.c::after { content: "▾"; font-size: 9px; color: var(--muted); }
+  .sent { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; line-height: 22px; }
+  .sent .t { color: var(--muted); }
+  .chip.g { background: var(--field); color: var(--text); }
 
-  /* 1 · Now: today's card */
-  .now .blk { background: var(--raised); border-radius: 10px; padding: 2px 8px 8px; }
-  .now .t { color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; margin: 8px 0 2px; display: flex; }
-  .now .t span { margin-left: auto; color: var(--faint); font-weight: 400; letter-spacing: 0; text-transform: none; }
-  .now b { border-bottom: 1px dotted var(--ink); }
-  .now .a { color: var(--muted); }
-
-  /* 2 · Steps: one short line per part */
-  .rows { display: flex; flex-direction: column; gap: 2px; }
-  .row { display: grid; grid-template-columns: 38px 1fr; align-items: center; min-height: 30px; padding: 0 8px; border-radius: 8px; cursor: pointer; }
-  .row:hover, .row.open { background: var(--hover); }
-  .row .k { color: var(--faint); }
-  .row.when .k { color: var(--event); }
-  .gap { height: 6px; }
-  .form { grid-column: 2; padding: 4px 0 8px; display: flex; flex-direction: column; gap: 4px; }
-  .pill { height: 24px; border-radius: 6px; background: var(--field); display: flex; align-items: center; padding: 0 8px; color: var(--text); }
+  /* A field: label then a pill, for the options that edit in a form. */
+  .fields { display: flex; flex-direction: column; gap: 6px; }
+  .frow { display: flex; align-items: center; gap: 10px; }
+  .frow .lab { width: 56px; color: var(--muted); flex: none; }
+  .pill { flex: 1; height: 26px; border-radius: 6px; background: var(--field); display: flex; align-items: center; padding: 0 10px; color: var(--text); }
   .pill span { margin-left: auto; color: var(--muted); font-size: 9px; }
 
-  /* 3 · Folded: one line per trigger */
-  .fold { border-radius: 10px; }
-  .fold.open { background: var(--raised); padding-bottom: 6px; }
-  .fold .line { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 10px; cursor: pointer; }
-  .fold:not(.open) .line:hover { background: var(--hover); }
-  .fold .line .ev { color: var(--event); }
-  .fold .line .txt { flex: 1; min-width: 0; }
-  .fold .line .sum { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* 1 · Now */
+  .o-now .sec { margin-top: 10px; }
+  .o-now .sec:first-of-type { margin-top: 0; }
+  .o-now .sec .smallcaps { display: flex; margin-bottom: 4px; }
+  .o-now .sec .smallcaps span { margin-left: auto; color: var(--faint); font-weight: 400; letter-spacing: 0; text-transform: none; }
+  .o-now .line { line-height: 22px; }
+  .o-now .addline { color: var(--muted); line-height: 22px; }
 
-  /* 4 · Sentence: one calm paragraph, values as soft pills */
-  .para { padding: 2px 8px; line-height: 30px; color: var(--muted); }
-  .para b { color: var(--text); background: var(--field); border-radius: 6px; padding: 3px 7px; cursor: pointer; }
-  .para b:hover { background: var(--soft); color: var(--ink); }
+  /* 2 · Chips and a lane */
+  .o-lane .lane { display: grid; grid-template-columns: 40px 1fr; gap: 10px; padding: 10px 0; }
+  .o-lane .lane:first-of-type { padding-top: 0; }
+  .o-lane .lane + .lane { border-top: 1px solid rgba(255,255,255,.05); }
+  .o-lane .lane .smallcaps { line-height: 22px; }
+  .o-lane .lane.when .smallcaps { color: var(--event); }
+  .o-lane .lane.if .smallcaps { color: var(--check); }
+  .o-lane .lane.do .smallcaps { color: var(--ink); }
+  .o-lane .stack { display: flex; flex-direction: column; gap: 8px; }
+  .o-lane .num { color: var(--faint); width: 10px; }
 
-  /* 5 · When / Then: two boxes */
-  .box { background: var(--raised); border-radius: 10px; padding: 10px; }
-  .box .lab { font-size: 10px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-  .box.ev .lab { color: var(--event); }
-  .box .item { display: flex; align-items: center; gap: 10px; height: 28px; }
-  .box .item svg { color: var(--muted); }
-  .box.ev .item svg { color: var(--event); }
-  .box .cond { color: var(--muted); margin-top: 4px; }
-  .arrow { display: flex; justify-content: center; color: var(--faint); margin: -8px 0; }
+  /* 3 · Icon rows */
+  .o-icons .list { display: flex; flex-direction: column; gap: 4px; margin: 0 -6px; }
+  .o-icons .row { display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: center; padding: 6px; border-radius: 10px; cursor: pointer; }
+  .o-icons .row:hover, .o-icons .row.open { background: var(--hover); }
+  .o-icons .tile { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: var(--soft); color: var(--ink); }
+  .o-icons .tile.when { background: color-mix(in srgb, var(--event) 18%, transparent); color: var(--event); }
+  .o-icons .tile.if { background: color-mix(in srgb, var(--check) 18%, transparent); color: var(--check); }
+  .o-icons .tile.wait { background: color-mix(in srgb, var(--wait) 18%, transparent); color: var(--wait); }
+  .o-icons .verb { font-weight: 600; line-height: 16px; }
+  .o-icons .args { color: var(--muted); line-height: 18px; }
+  .o-icons .args .w-hi { color: var(--ink); }
+  .o-icons .row .fields { grid-column: 1 / 3; padding: 6px 4px 4px; }
+  .o-icons .div { height: 1px; background: rgba(255,255,255,.05); margin: 4px 6px; }
+
+  /* 4 · Blocks */
+  .o-blocks .stack { display: flex; flex-direction: column; gap: 6px; }
+  .o-blocks .b { display: flex; gap: 10px; align-items: flex-start; padding: 9px 12px; border-radius: 10px; }
+  .o-blocks .b svg { margin-top: 4px; }
+  .o-blocks .b.when { background: color-mix(in srgb, var(--event) 14%, var(--panel)); border-radius: 16px 16px 10px 10px; }
+  .o-blocks .b.when svg { color: var(--event); }
+  .o-blocks .b.if { background: color-mix(in srgb, var(--check) 12%, var(--panel)); margin-left: 14px; }
+  .o-blocks .b.if svg { color: var(--check); }
+  .o-blocks .b.do { background: color-mix(in srgb, var(--accent) 11%, var(--panel)); margin-left: 14px; }
+  .o-blocks .b.do svg { color: var(--ink); }
+  .o-blocks .b.wait { background: color-mix(in srgb, var(--wait) 13%, var(--panel)); margin-left: 14px; }
+  .o-blocks .b.wait svg { color: var(--wait); }
+  .o-blocks .b .sent .t { color: var(--text); }
+  .o-blocks .foot { margin-left: 4px; }
+
+  /* 5 · Flow line */
+  .o-flow .flow { padding-left: 24px; }
+  .o-flow .node { position: relative; padding: 4px 0 14px; }
+  .o-flow .node::before { content: ""; position: absolute; left: -16px; top: 18px; bottom: -4px; width: 2px; background: rgba(255,255,255,.08); }
+  .o-flow .node:last-child { padding-bottom: 4px; }
+  .o-flow .node:last-child::before { display: none; }
+  .o-flow .m { position: absolute; left: -22px; top: 7px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--ink); background: var(--panel); }
+  .o-flow .node.when .m { border-color: var(--event); background: var(--event); }
+  .o-flow .node.if .m { border-color: var(--check); border-radius: 3px; transform: rotate(45deg) scale(.85); }
+  .o-flow .node .smallcaps { display: block; margin-bottom: 4px; }
+  .o-flow .node.when .smallcaps { color: var(--event); }
+  .o-flow .node.if .smallcaps { color: var(--check); }
+  .o-flow .later { position: relative; color: var(--wait); display: flex; align-items: center; gap: 6px; padding: 0 0 14px; }
+  .o-flow .later::before { content: ""; position: absolute; left: -16px; top: -4px; bottom: -4px; border-left: 2px dashed var(--wait); }
+
+  /* 6 · Steps */
+  .o-steps .list { display: flex; flex-direction: column; gap: 2px; margin: 0 -8px; }
+  .o-steps .row { display: grid; grid-template-columns: 40px 1fr; align-items: center; min-height: 32px; padding: 5px 8px; border-radius: 8px; }
+  .o-steps .row:hover { background: var(--hover); }
+  .o-steps .row .smallcaps { color: var(--faint); }
+  .o-steps .row.when .smallcaps { color: var(--event); }
+  .o-steps .space { height: 8px; }
+  .o-steps .foot { margin-left: -10px; }
+
+  /* 7 · Folded */
+  .o-fold .fold { background: var(--raised); border-radius: 12px; }
+  .o-fold .line { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; cursor: pointer; }
+  .o-fold .fold:not(.open) .line:hover { background: var(--hover); }
+  .o-fold .line .ev { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: color-mix(in srgb, var(--event) 18%, transparent); color: var(--event); flex: none; }
+  .o-fold .line .txt { flex: 1; min-width: 0; }
+  .o-fold .line .nm { font-weight: 600; }
+  .o-fold .line .sum { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .o-fold .line > svg { color: var(--muted); }
+  .o-fold .inside { padding: 0 12px 12px; }
+  .o-fold .inside .lane:first-of-type { padding-top: 4px; }
+
+  /* 8 · Sentence */
+  .o-sentence .para { line-height: 34px; color: var(--muted); }
+  .o-sentence .para .chip { height: 24px; padding: 0 6px; }
+
+  /* 9 · When / Then */
+  .o-wt .box { border-radius: 10px; padding: 12px; background: rgba(255,255,255,.035); }
+  .o-wt .box .smallcaps { margin-bottom: 8px; display: block; }
+  .o-wt .box.when { background: color-mix(in srgb, var(--event) 9%, transparent); }
+  .o-wt .box.when .smallcaps { color: var(--event); }
+  .o-wt .item { display: flex; align-items: flex-start; gap: 10px; padding: 4px 0; line-height: 20px; }
+  .o-wt .item svg { color: var(--muted); margin-top: 3px; }
+  .o-wt .box.when .item svg { color: var(--event); }
+  .o-wt .cond { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.06); color: var(--muted); display: flex; gap: 10px; align-items: flex-start; }
+  .o-wt .cond svg { color: var(--check); margin-top: 3px; }
+  .o-wt .arrow { display: flex; justify-content: center; color: var(--faint); height: 22px; align-items: center; }
+
+  /* 10 · Tree */
+  .o-tree .tree { display: flex; flex-direction: column; }
+  .o-tree .tn { position: relative; padding: 5px 0 5px 26px; line-height: 22px; }
+  .o-tree .tn::before { content: ""; position: absolute; left: 8px; top: 0; height: 17px; width: 12px; border-left: 1px solid rgba(255,255,255,.14); border-bottom: 1px solid rgba(255,255,255,.14); border-bottom-left-radius: 6px; }
+  .o-tree .tn::after { content: ""; position: absolute; left: 8px; top: 17px; bottom: 0; border-left: 1px solid rgba(255,255,255,.14); }
+  .o-tree .tn.last::after { display: none; }
+  .o-tree .root { display: flex; gap: 10px; align-items: center; line-height: 22px; padding-bottom: 4px; }
+  .o-tree .root svg { color: var(--event); }
+  .o-tree .tn .kw { color: var(--check); margin-right: 6px; }
+  .o-tree .tn .wait { color: var(--wait); }
 </style>
 </head>
 <body>
 
 <nav id="nav"></nav>
 <div class="caption" id="caption"></div>
+<div class="keys">← → or 1–9, 0 to switch</div>
 <div class="stage"><div class="insp">
-  <div class="card-head">Triggers</div>
+  <div class="card-head"><i data-lucide="zap"></i>Triggers</div>
   <div class="body" id="body"></div>
 </div></div>
 
 <script>
-// Two example triggers, written once in the shape most options use.
-const ic = (name) => `<i data-lucide="${name}"></i>`;
+// ---------- Two example triggers ----------
+// Word kinds: t text, e entity, v value, n number, c choice.
+const t = (x) => ({ k: 't', x }), e = (x) => ({ k: 'e', x }), v = (x) => ({ k: 'v', x }), n = (x) => ({ k: 'n', x }), c = (x) => ({ k: 'c', x });
+
 const TRIGGERS = [
   {
-    name: 'Coin pickup', icon: 'hand', sum: 'add 1 to coins, destroy this',
-    when: 'Something <b>starts</b> touching <b>this</b>',
-    ifs: ['<b>other</b> has tag <b>player</b>'],
+    name: 'Coin pickup', icon: 'hand', sum: 'Add 1 to coins, destroy this',
+    when: { verb: 'Touch starts', words: [t('Something'), c('starts'), t('touching'), e('this')] },
+    ifs: [{ icon: 'tag', verb: 'Has tag', words: [e('other'), c('has tag'), v('player')] }],
     dos: [
-      { icon: 'plus', text: 'Add <b>1</b> to <b>coins</b>', form: [['add', true], ['1', false], ['coins', true]] },
-      { icon: 'trash-2', text: 'Destroy <b>this</b>' },
+      { icon: 'plus', verb: 'Add', words: [t('Add'), n('1'), t('to'), v('coins')], fields: [['Change', 'add', true], ['Amount', '1'], ['Value', 'coins', true]] },
+      { icon: 'trash-2', verb: 'Destroy', words: [t('Destroy'), e('this')], fields: [['Target', 'this', true]] },
     ],
-    sentence: 'When something <b>starts</b> touching <b>this</b>, if <b>other</b> has tag <b>player</b>: add <b>1</b> to <b>coins</b>, then destroy <b>this</b>.',
+    repeat: 'every time',
   },
   {
-    name: 'Timed door', icon: 'radio', sum: 'move up, wait 2 s, move back',
-    when: 'Gets the event <b>open</b>',
+    name: 'Timed door', icon: 'radio', sum: 'Move up, wait 2 s, move back',
+    when: { verb: 'Custom event', words: [t('This gets'), v('open')] },
     ifs: [],
     dos: [
-      { icon: 'move', text: 'Set <b>Position</b> to <b>0, -200</b>' },
-      { icon: 'hourglass', text: 'Wait <b>2 s</b>' },
-      { icon: 'move', text: 'Set <b>Position</b> to <b>0, 0</b>' },
+      { icon: 'move', verb: 'Set', words: [t('Set'), e('this'), v('Position'), t('to'), n('0, -200')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Position', true], ['To', '0, -200']] },
+      { icon: 'hourglass', verb: 'Wait', wait: true, words: [t('Wait'), n('2 s')], fields: [['For', '2 s']] },
+      { icon: 'move', verb: 'Set', words: [t('Set'), e('this'), v('Position'), t('to'), n('0, 0')], fields: [['Change', 'set', true], ['Target', 'this', true], ['Value', 'Position', true], ['To', '0, 0']] },
     ],
-    sentence: 'When this gets the event <b>open</b>: set <b>Position</b> to <b>0, -200</b>, wait <b>2 s</b>, then set <b>Position</b> to <b>0, 0</b>.',
+    repeat: 'at most every 3 s',
   },
 ];
 
-const head = (tr) => `<div class="head"><span class="name">${tr.name}</span><span class="sw"></span><span class="more">${ic('ellipsis')}</span></div>`;
-const addTrigger = `<div class="add">${ic('plus')} Add trigger</div>`;
+// ---------- Shared pieces ----------
+const ic = (name) => `<i data-lucide="${name}"></i>`;
+const chipWords = (ws) => ws.map((w) => w.k === 't' ? `<span class="t">${w.x}</span>` : `<span class="chip ${w.k}">${w.x}</span>`).join('');
+const chips = (ws) => `<span class="sent">${chipWords(ws)}</span>`;
+const dotted = (ws) => ws.map((w) => w.k === 't' ? w.x : `<span class="w-dot">${w.x}</span>`).join(' ');
+const hi = (ws) => ws.map((w) => w.k === 't' ? w.x : `<span class="w-hi">${w.x}</span>`).join(' ');
+const lower = (ws) => ws.map((w, i) => i === 0 && w.k === 't' ? t(w.x[0].toLowerCase() + w.x.slice(1)) : w);
+const fields = (list) => `<div class="fields">${list.map(([lab, val, menu]) => `<div class="frow"><span class="lab">${lab}</span><span class="pill">${val}${menu ? '<span>▾</span>' : ''}</span></div>`).join('')}</div>`;
+const head = (tr, withIcon = false) => `<div class="head">${withIcon ? `<span class="ev">${ic(tr.icon)}</span>` : ''}<span class="name">${tr.name}</span><span class="sw"></span><span class="icon-btn">${ic('ellipsis')}</span></div>`;
+const foot = (tr, label = 'Add') => `<div class="foot"><span class="add">${ic('plus')} ${label}</span><span class="rep">${ic('repeat')} ${tr.repeat}</span></div>`;
+const ADD_TRIGGER = `<div class="add-trigger">${ic('plus')} Add trigger</div>`;
+const all = (fn) => TRIGGERS.map(fn).join('') + ADD_TRIGGER;
+
 let openRow = '0:0';
 let openFold = 0;
 
-function steps(tr, ti) {
-  const row = (cls, k, html, key, form) => {
-    const isOpen = key && openRow === key;
-    const fields = isOpen && form ? `<div class="form">${form.map(([x, menu]) => `<div class="pill">${x}${menu ? '<span>▾</span>' : ''}</div>`).join('')}</div>` : '';
-    return `<div class="row ${cls} ${isOpen ? 'open' : ''}" ${key ? `data-row="${key}"` : ''}><span class="k">${k}</span><span>${html}</span>${fields}</div>`;
-  };
-  return `<div class="rows">
-    ${row('when', 'when', tr.when)}
-    ${tr.ifs.map((x, i) => row('', i ? '' : 'if', x)).join('')}
-    <div class="gap"></div>
-    ${tr.dos.map((d, i) => row('', i ? '' : 'do', d.text, `${ti}:${i}`, d.form)).join('')}
-    <div class="add">${ic('plus')} Add</div>
-  </div>`;
+// Chips and a lane: used by option 2 and inside option 7.
+function lanes(tr) {
+  const lane = (cls, label, items, numbered) => `<div class="lane ${cls}"><span class="smallcaps">${label}</span><div class="stack">
+    ${items.map((ws, i) => `<div class="sent">${numbered ? `<span class="num">${i + 1}</span>` : ''}${chipWords(ws)}</div>`).join('')}</div></div>`;
+  return lane('when', 'When', [tr.when.words]) +
+    (tr.ifs.length ? lane('if', 'If', tr.ifs.map((p) => p.words)) : '') +
+    lane('do', 'Do', tr.dos.map((d) => d.words), true) + foot(tr);
 }
 
+// ---------- The options ----------
 const OPTIONS = [
   {
-    label: 'Now',
-    caption: "Today's card, for comparison.",
-    draw: () => TRIGGERS.map((tr) => `<div class="now"><div class="blk">${head(tr)}
-      <div class="t">When <span>one event</span></div>${tr.sentence.split(':')[0].replace(/, if .*/, '')}
-      <div class="t">If <span>all must be true</span></div>${tr.ifs.join('<br>')}<div class="a">+ Add check</div>
-      <div class="t">Do <span>top to bottom</span></div>${tr.dos.map((d) => d.text).join('<br>')}<div class="a">+ Add action</div>
-      <div class="t">Repeat</div><b>every time</b></div></div>`).join('') + addTrigger,
+    label: 'Now', caption: "Today's card, for comparison.",
+    draw: () => all((tr) => `<div class="trig o-now">${head(tr)}
+      <div class="sec"><div class="smallcaps">When<span>one event</span></div><div class="line">${dotted(tr.when.words)}</div></div>
+      <div class="sec"><div class="smallcaps">If<span>all must be true</span></div>${tr.ifs.map((p) => `<div class="line">${dotted(p.words)}</div>`).join('')}<div class="addline">+ Add check</div></div>
+      <div class="sec"><div class="smallcaps">Do<span>top to bottom</span></div>${tr.dos.map((d) => `<div class="line">${dotted(lower(d.words))}</div>`).join('')}<div class="addline">+ Add action</div></div>
+      <div class="sec"><div class="smallcaps">Repeat</div><div class="line"><span class="w-dot">${tr.repeat}</span></div></div></div>`),
   },
   {
-    label: 'Steps',
-    caption: 'One short line per part. Click an action to edit it.',
-    draw: () => TRIGGERS.map((tr, i) => `<div>${head(tr)}${steps(tr, i)}</div>`).join('') + addTrigger,
+    label: 'Chips', caption: 'A lane for When, If and Do; each word you can change is a chip, coloured by what it is.',
+    draw: () => all((tr) => `<div class="trig o-lane">${head(tr)}${lanes(tr)}</div>`),
   },
   {
-    label: 'Folded',
-    caption: 'One line per trigger. Click to open it.',
+    label: 'Icon rows', caption: 'Each part is an icon, a verb, and its details. Click a row to edit it.',
+    draw: () => all((tr, ti) => {
+      const row = (tile, icon, verb, ws, key, f) => {
+        const isOpen = key === openRow;
+        return `<div class="row ${isOpen ? 'open' : ''}" ${key ? `data-row="${key}"` : ''}><span class="tile ${tile}">${ic(icon)}</span>
+          <div><div class="verb">${verb}</div><div class="args">${hi(ws)}</div></div>${isOpen && f ? fields(f) : ''}</div>`;
+      };
+      return `<div class="trig o-icons">${head(tr)}<div class="list">
+        ${row('when', tr.icon, tr.when.verb, tr.when.words)}
+        ${tr.ifs.map((p) => row('if', p.icon, p.verb, p.words)).join('')}
+        <div class="div"></div>
+        ${tr.dos.map((d, i) => row(d.wait ? 'wait' : '', d.icon, d.verb, d.words.slice(1), `${ti}:${i}`, d.fields)).join('')}
+      </div>${foot(tr)}</div>`;
+    }),
+  },
+  {
+    label: 'Blocks', caption: 'Soft blocks: the event on top, checks and actions stacked under it.',
+    draw: () => all((tr) => `<div class="trig o-blocks">${head(tr)}<div class="stack">
+      <div class="b when">${ic(tr.icon)}${chips(tr.when.words)}</div>
+      ${tr.ifs.map((p) => `<div class="b if">${ic('circle-help')}${chips([t('If'), ...p.words])}</div>`).join('')}
+      ${tr.dos.map((d) => `<div class="b ${d.wait ? 'wait' : 'do'}">${ic(d.icon)}${chips(d.words)}</div>`).join('')}
+    </div>${foot(tr)}</div>`),
+  },
+  {
+    label: 'Flow', caption: 'A line from the event, through the check, to each action. A wait shows as a gap in time.',
+    draw: () => all((tr) => `<div class="trig o-flow">${head(tr)}<div class="flow">
+      <div class="node when"><span class="m"></span><span class="smallcaps">When</span>${hi(tr.when.words)}</div>
+      ${tr.ifs.map((p) => `<div class="node if"><span class="m"></span><span class="smallcaps">Only if</span>${hi(p.words)}</div>`).join('')}
+      ${tr.dos.map((d) => d.wait ? `<div class="later">${ic('hourglass')} ${d.words[1].x} later</div>` : `<div class="node"><span class="m"></span>${hi(d.words)}</div>`).join('')}
+    </div>${foot(tr)}</div>`),
+  },
+  {
+    label: 'Steps', caption: 'Plain lines with a quiet label in front. The calmest list.',
+    draw: () => all((tr) => {
+      const row = (cls, label, ws) => `<div class="row ${cls}"><span class="smallcaps">${label}</span><span>${hi(ws)}</span></div>`;
+      return `<div class="trig o-steps">${head(tr)}<div class="list">
+        ${row('when', 'When', tr.when.words)}
+        ${tr.ifs.map((p, i) => row('', i ? '' : 'If', p.words)).join('')}
+        <div class="space"></div>
+        ${tr.dos.map((d, i) => row('', i ? '' : 'Do', d.words)).join('')}
+      </div>${foot(tr)}</div>`;
+    }),
+  },
+  {
+    label: 'Folded', caption: 'One line per trigger. Click one to open it, drawn with chips.',
     draw: () => TRIGGERS.map((tr, i) => {
-      const isOpen = openFold === i;
-      return `<div class="fold ${isOpen ? 'open' : ''}"><div class="line" data-fold="${i}"><span class="ev">${ic(tr.icon)}</span>
-        <div class="txt"><div>${tr.name}</div>${isOpen ? '' : `<div class="sum">${tr.sum}</div>`}</div>
-        <span class="sw"></span>${ic(isOpen ? 'chevron-down' : 'chevron-right')}</div>
-        ${isOpen ? steps(tr, i) : ''}</div>`;
-    }).join('') + addTrigger,
+      const isOpen = i === openFold;
+      return `<div class="o-fold"><div class="fold ${isOpen ? 'open' : ''}">
+        <div class="line" data-fold="${i}"><span class="ev">${ic(tr.icon)}</span>
+          <div class="txt"><div class="nm">${tr.name}</div><div class="sum">${tr.sum}</div></div>
+          <span class="sw"></span>${ic(isOpen ? 'chevron-down' : 'chevron-right')}</div>
+        ${isOpen ? `<div class="inside o-lane">${lanes(tr)}</div>` : ''}</div></div>`;
+    }).join('') + ADD_TRIGGER,
   },
   {
-    label: 'Sentence',
-    caption: 'Reads as one sentence. Click a highlighted word to change it.',
-    draw: () => TRIGGERS.map((tr) => `<div>${head(tr)}<div class="para">${tr.sentence}</div></div>`).join('') + addTrigger,
+    label: 'Sentence', caption: 'The whole trigger as one sentence; the parts you can change are soft pills.',
+    draw: () => all((tr) => {
+      const ws = [t('When'), ...lower([tr.when.words[0]]), ...tr.when.words.slice(1)];
+      if (tr.ifs.length) ws.push(t(', if'), ...tr.ifs[0].words);
+      tr.dos.forEach((d, i) => { ws.push(t(i === 0 ? ':' : i === tr.dos.length - 1 ? ', then' : ','), ...lower(d.words)); });
+      ws.push(t('.'));
+      const html = ws.map((w) => w.k === 't' ? w.x : `<span class="chip g">${w.x}</span>`).join(' ').replace(/ ([,:.])/g, '$1');
+      return `<div class="trig o-sentence">${head(tr)}<div class="para">${html}</div></div>`;
+    }),
   },
   {
-    label: 'When / Then',
-    caption: 'The event in one box, what happens in another.',
-    draw: () => `<div>${head(TRIGGERS[0])}</div>` + [TRIGGERS[0]].map((tr) => `
-      <div class="box ev"><div class="lab">When</div><div class="item">${ic(tr.icon)}<span>${tr.when}</span></div>
-        ${tr.ifs.map((x) => `<div class="cond">only if ${x}</div>`).join('')}</div>
+    label: 'When / Then', caption: 'The event in one box, what happens in another.',
+    draw: () => all((tr) => `<div class="trig o-wt">${head(tr)}
+      <div class="box when"><span class="smallcaps">When</span><div class="item">${ic(tr.icon)}<span>${hi(tr.when.words)}</span></div>
+        ${tr.ifs.map((p) => `<div class="cond">${ic('filter')}<span>only if ${hi(p.words)}</span></div>`).join('')}</div>
       <div class="arrow">${ic('arrow-down')}</div>
-      <div class="box"><div class="lab">Then</div>${tr.dos.map((d) => `<div class="item">${ic(d.icon)}<span>${d.text}</span></div>`).join('')}</div>`).join('') + addTrigger,
+      <div class="box"><span class="smallcaps">Then</span>${tr.dos.map((d) => `<div class="item">${ic(d.icon)}<span>${hi(d.words)}</span></div>`).join('')}</div>
+      ${foot(tr)}</div>`),
+  },
+  {
+    label: 'Tree', caption: 'Like a file tree: the event is the root, and everything it does hangs under it.',
+    draw: () => all((tr) => {
+      const items = [
+        ...tr.ifs.map((p) => `<span class="kw">if</span>${hi(p.words)}`),
+        ...tr.dos.map((d) => d.wait ? `<span class="wait">${hi(d.words)}</span>` : hi(d.words)),
+      ];
+      return `<div class="trig o-tree">${head(tr)}<div class="tree">
+        <div class="root">${ic(tr.icon)}<span>${hi(tr.when.words)}</span></div>
+        ${items.map((x, i) => `<div class="tn ${i === items.length - 1 ? 'last' : ''}">${x}</div>`).join('')}
+      </div>${foot(tr)}</div>`;
+    }),
   },
 ];
 
+// ---------- Page ----------
 let current = 1;
 function render() {
   document.getElementById('nav').innerHTML = OPTIONS.map((o, i) =>
-    `<button class="${i === current ? 'on' : ''}" data-opt="${i}">${i + 1} · ${o.label}</button>`).join('');
+    `<button class="${i === current ? 'on' : ''}" data-opt="${i}">${(i + 1) % 10} · ${o.label}</button>`).join('');
   document.getElementById('caption').textContent = OPTIONS[current].caption;
   document.getElementById('body').innerHTML = OPTIONS[current].draw();
   lucide.createIcons();
@@ -195,14 +368,17 @@ document.addEventListener('click', (ev) => {
   const row = ev.target.closest('[data-row]');
   const fold = ev.target.closest('[data-fold]');
   if (opt) current = +opt.dataset.opt;
-  else if (row && !ev.target.closest('.form')) openRow = openRow === row.dataset.row ? null : row.dataset.row;
+  else if (row && !ev.target.closest('.fields')) openRow = openRow === row.dataset.row ? null : row.dataset.row;
   else if (fold) openFold = openFold === +fold.dataset.fold ? null : +fold.dataset.fold;
   else return;
   render();
 });
 document.addEventListener('keydown', (ev) => {
-  const n = Number(ev.key);
-  if (n >= 1 && n <= OPTIONS.length) { current = n - 1; render(); }
+  if (ev.key === 'ArrowRight') current = (current + 1) % OPTIONS.length;
+  else if (ev.key === 'ArrowLeft') current = (current + OPTIONS.length - 1) % OPTIONS.length;
+  else if (/^[0-9]$/.test(ev.key)) current = (Number(ev.key) + 9) % 10;
+  else return;
+  render();
 });
 render();
 </script>
