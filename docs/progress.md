@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**v1 is built** (stages 0 to 19, done 2026-11-19), with 2,048 tests in Node, 1,269 browser tests and 292 Playwright tests in three browsers. **The versions after v1 are small** (owner, round 12, 2026-11-20): v2 curves and gradients, v3 a first game without code, v4 the rest of the triggers, v5 scripts, v6 text, v7 `.entity` files and the builtin player; see [scope.md](scope.md). **v2 is done** (curves and gradients): built, tried by the owner, the [fixes](versions/v2/fixes.md) asked built, and the owner's last test passed (2026-11-22); its lasting parts are in [architecture/](architecture/README.md). **v3 is done** (a first game without code: tags, the World's variables and inputs, triggers, the Trigger tool, Win, Lose and Restart): built by the orchestrator, tried by the owner, its two [fixes](versions/v3/fixes.md) built, and marked sound by the owner (2026-11-22). **v4 is built** (the rest of the triggers, string and boolean variables on any entity, the shortcut list): the orchestrator built its [tasks](versions/v4/tasks.md) 1 to 17 (2026-11-22 to 2026-11-23), and **the owner is trying it** (task 18); the [fixes](versions/v4/fixes.md) asked so far are built: the trigger card's pickers and boxes, and **simpler triggers** (six events, one check, no Push, no Sensor setting; 2026-11-23). Its plan stays in [versions/v4/](versions/v4/requirements.md); its lasting parts are in [architecture/](architecture/README.md), mainly [core-model/triggers.md](architecture/core-model/triggers.md) and [triggers-in-play.md](architecture/triggers-in-play.md). The repo is public since 2026-11-20, so CI runs on every push.
+**v1 is built** (stages 0 to 19, done 2026-11-19), with 2,048 tests in Node, 1,269 browser tests and 292 Playwright tests in three browsers. **The versions after v1 are small** (owner, round 12, 2026-11-20): v2 curves and gradients, v3 a first game without code, v4 the rest of the triggers, v5 scripts, v6 text, v7 `.entity` files and the builtin player; see [scope.md](scope.md). **v2 is done** (curves and gradients): built, tried by the owner, the [fixes](versions/v2/fixes.md) asked built, and the owner's last test passed (2026-11-22); its lasting parts are in [architecture/](architecture/README.md). **v3 is done** (a first game without code: tags, the World's variables and inputs, triggers, the Trigger tool, Win, Lose and Restart): built by the orchestrator, tried by the owner, its two [fixes](versions/v3/fixes.md) built, and marked sound by the owner (2026-11-22). **v4 is built** (the rest of the triggers, string and boolean variables on any entity, the shortcut list): the orchestrator built its [tasks](versions/v4/tasks.md) 1 to 17 (2026-11-22 to 2026-11-23), and **the owner is trying it** (task 18); the [fixes](versions/v4/fixes.md) asked so far are built: the trigger card's pickers and boxes, and **simpler triggers** (six events, one check, no Push, no Sensor setting; 2026-11-23). **The trigger card becomes Scratch blocks** (owner, 2026-11-24, [fix](versions/v4/fixes.md) 4), picked from a mockup, not built yet. Its plan stays in [versions/v4/](versions/v4/requirements.md); its lasting parts are in [architecture/](architecture/README.md), mainly [core-model/triggers.md](architecture/core-model/triggers.md) and [triggers-in-play.md](architecture/triggers-in-play.md). The repo is public since 2026-11-20, so CI runs on every push.
 
 ## Last session (2026-11-24)
 
@@ -13,7 +13,9 @@ The owner finds the trigger card ugly and convoluted, so we made a mockup of oth
 3. The event now reads "When other starts touching this", `other` in the entity colour.
 4. Later the same day: Set's value box shows its path (`Transform › Position`), hovering a block opens an "add a block" slot, and Scratch and Blocky merged into one **Scratch** option in Scratch's own colours, slightly rounded.
 
-**Where we stopped:** the owner is choosing an option. What they said about each round is in [proposals/trigger-card-look.md](proposals/trigger-card-look.md). Nothing in the game changed.
+5. The owner picked **Scratch**. Its rules, with what each round dropped, moved from the proposal into [design/controls.md](design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks), as v4 fix 4; the proposal file is gone.
+
+**Where we stopped:** Scratch is picked but not built. Nothing in the game changed yet. A few points must be settled before building; they are listed under the rules in controls.md.
 
 ## Where things stand
 
@@ -43,7 +45,7 @@ Each item is removed in the same commit that settles it, wherever that commit is
 
 ## Next
 
-1. The owner picks a look for the trigger card ([proposal](proposals/trigger-card-look.md)); it is written into [design/controls.md](design/controls.md) and built as a v4 fix.
+1. Settle what Scratch needs first ([list](design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks)): resting by a trigger switching itself off (a requirement change), the word *Enabled* in the glossary, "other" in the event, the wider Entity inspector, and a block outside the If. Then plan and build v4 fix 4.
 2. The owner tries v4 (task 18), and the fixes asked go into `versions/v4/fixes.md`; then v5 (scripts) is planned.
 3. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
 
