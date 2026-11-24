@@ -587,14 +587,14 @@ function render() {
 // block has no slot above, so its top third is like its middle. Hovering an open slot keeps it open. The block above an
 // open slot shows its tooth. Keys are per trigger.
 // Nothing moves for SLOT_DELAY_MS after the mouse asks for a change (owner, 2026-11-24), so a mouse passing over blocks
-// doesn't push them. Then a slot takes about half a second: first the blocks move apart to make its room, then the
+// doesn't push them. Then a slot takes half a second: first the blocks move apart to make its room, then the
 // slot fades in; closing runs the other way. Every move eases in and out (owner).
 // A slot opening or closing above the hovered block would push it out from under the mouse, so the script (the box
 // that also scrolls sideways) scrolls by the same amount on every frame: the hovered block, and the point of it under
 // the mouse, stay where they were (owner, 2026-11-24). Once the mouse has left a script, it glides back to its start.
-const SLOT_DELAY_MS = 250;
-const SLOT_MOVE_MS = 300;
-const SLOT_FADE_MS = 250;
+const SLOT_DELAY_MS = 150;
+const SLOT_MOVE_MS = 275;
+const SLOT_FADE_MS = 225;
 const SETTLE_MS = 400; // how long a script the mouse left takes to scroll back to its start and drop its empty strips
 const easeInOut = (x) => (x < 0.5 ? 4 * x ** 3 : 1 - (2 - 2 * x) ** 3 / 2);
 const slotTime = new WeakMap(); // a slot → how far it is open, in ms, from 0 (closed) to SLOT_MOVE_MS + SLOT_FADE_MS
