@@ -14,7 +14,7 @@ How entities are picked, moved and arranged in the tree. **v1:** click and drag-
 - Dragging on empty space draws a selection box. **It selects every entity it touches.** Shift adds to the selection. Ctrl selects entities inside groups instead of their groups. *Why touch: the owner's change from "fully inside".*
 - Ctrl+A selects every entity directly inside the group you are inside. The World and the camera are left out.
 - Clicking empty space clears the selection. **With nothing selected the Entity inspector is hidden** (owner: 2026-11-19); the World's settings show when its row is selected.
-- A drag under 3 px is a click.
+- A drag under 3 screen pixels is a click.
 - A selection never holds an entity together with one of its parents. Adding the parent drops its selected children.
 - The World can only be selected alone.
 - The selection, and the group you are inside, are editor state. They are never saved in the level.
@@ -37,7 +37,7 @@ What counts as hit:
 | A shape or closed path with a fill | Inside and edge |
 | A shape with no StyleComponent, such as a trigger | Inside and edge, as the editor draws it with a faint fill. *Why: the owner couldn't click a trigger except on its edge (2026-11-22).* |
 | A shape with a StyleComponent and no fill | Edge only, so a big invisible sensor doesn't steal clicks |
-| An open path, a line | The line itself, with at least 5 px of tolerance at any zoom |
+| An open path, a line | The line itself, with at least 5 screen pixels of tolerance at any zoom |
 | A shape with an image fill | The whole shape, transparent parts included |
 | Text | Its box |
 | A group | Only through its children |
@@ -94,15 +94,15 @@ Source: round 6: LY2; old: SG-39 to SG-42
 
 - One Select tool moves, resizes and rotates, with no separate modes. Eight handles resize: four corners, four sides. Dragging just outside a corner rotates. There are no skew handles.
 - **The cursor shows what a press would do** (owner: 2026-11-21): a turning arrow just outside a corner, and a two-way arrow along the handle on a resize handle, kept through the drag. *Why: the owner found rotating worked with no sign the mouse was in the right place.*
-- Arrow keys move the selection 1 px. Shift+arrow moves 10 px. **Ctrl+Shift+arrow moves one grid step.** Moves follow the level's axes whatever the rotation.
+- Arrow keys move the selection 0.01 m. Shift+arrow moves 0.1 m. **Ctrl+Shift+arrow moves one grid step.** Moves follow the level's axes whatever the rotation.
 - **Z and X rotate the selection** (owner: 2026-11-17): Z counter-clockwise and X clockwise on screen, 1° a press, Shift+Z and Shift+X 10°. Each entity turns around the centre of its own box, as the rotate drag does, until Later turns several entities around the selection box's centre. A run of presses within 1 s is one undo step, `Rotate <name>`. The World and the camera are skipped with the skip rule's text; locked entities are left out. Ctrl+Z and Ctrl+X stay Undo and Cut.
-- **W, A, S and D resize the selection's shapes** (owner: 2026-11-17): D wider, A narrower, W taller, S shorter, 1 px a press, **Shift one grid step** (owner: 2026-11-19, replacing 10 px). Unlike the handles they **change the shape's values**, so an outline keeps its width: a rectangle's Width or Height, a circle's Radius by half a step on either axis, a polygon's or line's points spread from or pulled towards its bounds' centre. Each shape keeps its own centre and grows along its own axes, so a rotated rectangle gets longer along its own width. A size stops at its smallest, 1 px, and W and S do nothing on a flat line. A run of presses within 1 s is one undo step, `Resize <name>`. The World and the camera are skipped with the skip rule's text; locked entities and entities with no ShapeComponent are left out.
+- **W, A, S and D resize the selection's shapes** (owner: 2026-11-17): D wider, A narrower, W taller, S shorter, 0.01 m a press, **Shift one grid step** (owner: 2026-11-19, replacing 10 px). Unlike the handles they **change the shape's values**, so an outline keeps its width: a rectangle's Width or Height, a circle's Radius by half a step on either axis, a polygon's or line's points spread from or pulled towards its bounds' centre. Each shape keeps its own centre and grows along its own axes, so a rotated rectangle gets longer along its own width. A size stops at its smallest, 0.01 m, and W and S do nothing on a flat line. A run of presses within 1 s is one undo step, `Resize <name>`. The World and the camera are skipped with the skip rule's text; locked entities and entities with no ShapeComponent are left out.
 - A handle always follows the mouse on screen, whatever the rotation or scale of the parents.
 - The box of one rotated entity follows its rotation, so resizing works along the entity's own sides.
 - **Resizing changes the entity's scale, never its shape's values**, for a shape and a group alike (owner: 2026-11-16). The World is the one exception: its rectangle changes, from its centre.
 - Resizing never changes the outline width; the StyleComponent's Scale outline says whether the scale stretches it.
 - The readout shows the size the entity is drawn at, its scale counted.
-- Dragging a handle past the opposite side mirrors the entity. A size never rests at zero: on release each side is at least 1 px.
+- Dragging a handle past the opposite side mirrors the entity. A size never rests at zero: on release each side is at least 0.01 m.
 - A whole drag is one undo step.
 - A locked entity never moves through handles or arrow keys. A locked child still moves with its unlocked parent.
 

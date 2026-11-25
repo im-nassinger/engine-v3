@@ -8,10 +8,10 @@ The level-wide physics settings, all on the World entity. **v1:** gravity as one
 
 ### Gravity and background colour · v1
 
-- The World has a **PhysicsWorldComponent** holding gravity, game speed and the collision grid. *Why one component: all world physics settings in one place.*
+- The World has a **PhysicsWorldComponent** holding gravity, game speed and the collision grid, and from v4 *Pixels per metre* (see [lengths in metres](../editor/workspace.md#lengths-in-metres--v4)). *Why one component: all world physics settings in one place.*
 - **Gravity is one vector, x and y, in m/s²**, **default 0, 9.8**: straight down, since y points down. Each of x and y goes from −100 to 100 (standing yes, 2026-11-15: the old strength's limit of 100, per axis). *Why: a pull is a direction and a size, which one vector holds, like the kick the Push action took until 2026-11-23 (owner: 2026-11-15).*
 - Zero gravity is 0, 0, so it keeps no direction. Typing a new vector sets both again.
-- Sizes and speeds are in pixels. Gravity is in m/s², like real life, and mass is in kg. These are the only physical units.
+- Sizes are in metres and speeds in m/s, gravity in m/s², like real life, and mass in kg (owner, 2026-11-25: sizes and speeds were in pixels until v4).
 - The 9.8 default feels floaty for a platformer. The fix is the player's Gravity scale, not the world's gravity: the builtin platformer script sets it from its jump variables.
 - **The background colour is the fill of the World's StyleComponent**, which paints the World's rectangle, the level bounds. A soft light blue by default, **`#BFE3F5`**, with no outline, because the editor already draws the bounds as a thin frame. *Why: a StyleComponent already holds a fill, so the background needs no setting of its own, and Later an image fill becomes the background image (owner: 2026-11-13). Why this blue: every default shape colour stands out on it (standing yes, 2026-11-14).*
 - Triggers and scripts can change gravity and the World's whole StyleComponent during play, the background colour included. **Walls can't change during play**, because the bounds don't (standing yes, 2026-11-14). Changing gravity wakes every sleeping body, so nothing hangs in mid-air.
@@ -81,9 +81,9 @@ Source: scope PH7; round 6: 05 2.13; round 8: CF4; old: PH-80, PH-81
 
 - **A level has a fixed size.** Every level has a bounds rectangle, always. *Why: a physics world needs an edge, otherwise lost entities cost time forever and the camera has nothing to stop at.*
 - **The level bounds are the World's rectangle:** the World has a ShapeComponent holding a rectangle, and its width and height are the bounds' size. It is always a rectangle and can't be removed. *Why: the owner's change. A rectangle already has a size, a card and handles, so the bounds need no settings of their own (owner: 2026-11-13).*
-- Default size: **20000×10000 px**. The default camera is 1920×1080. *Why: the owner first made a new level square (2026-11-17), then kept 20000×10000 (owner: 2026-11-18): the redesign's 8000×8000 square was its example level only.*
+- Default size: **200×100 m**. The default camera is 19.2×10.8 m. *Why: the owner's 20000×10000 px at the default 100 px per metre (standing yes, 2026-11-25). Before: the owner first made a new level square (2026-11-17), then kept 20000×10000 (owner: 2026-11-18): the redesign's 8000×8000 square was its example level only.*
 - **The World's rectangle is centred on the level's origin**, and stays there. *Why: the World never moves, so its rectangle can't be moved either, and a centred rectangle needs no offset setting (owner: 2026-11-13).*
-- The bounds show as a thin frame in the editor. Resize them by dragging their handles with the World selected, or by typing the rectangle's width and height. **Dragging one edge moves the opposite edge by the same amount**, so the centre never moves. Example: bounds 20000 wide run from −10000 to 10000; dragging the right edge out by 1000 makes them 22000 wide, from −11000 to 11000.
+- The bounds show as a thin frame in the editor. Resize them by dragging their handles with the World selected, or by typing the rectangle's width and height. **Dragging one edge moves the opposite edge by the same amount**, so the centre never moves. Example: bounds 200 m wide run from −100 to 100 m; dragging the right edge out by 10 m makes them 220 m wide, from −110 to 110 m.
 - The camera stops at the bounds.
 - **The edges are all walls or all open**, set by one checkbox, **Walls**, on the PhysicsWorldComponent. Off by default, so all four edges are open. A wall blocks everything that collides. *Why: one toggle is enough; a choice per edge is more than a level needs (owner: 2026-11-13).*
 - **The World's rectangle is never solid.** The World can't take a BodyComponent or a SurfaceComponent: the Add Component menu shows both greyed out, with the reason "The World can't collide. To block the edges of the level, turn on Walls on the PhysicsWorldComponent." The only walls are the ones Walls makes. *Why: a solid rectangle the size of the level would trap every entity inside it (owner: 2026-11-13).*
@@ -100,9 +100,9 @@ Small features from the old draft and review that the scope review never asked a
 | Feature | Rule | Version |
 |---|---|---|
 | "Keep going" past an open edge | A setting to keep entities instead of removing them. The review only kept removal | Later |
-| Hard limit | Any body 100,000 px from the origin is removed, with a warning: the status text in v1, the Console from v5 | v1 |
-| Maximum level size | 200,000×200,000 px | v1 |
-| Gravity in pixels hint | Under Gravity: "490 px/s². An entity falls 245 px in the first second." | Later |
+| Hard limit | Any body 2,000 m from the origin is removed, with a warning: the status text in v1, the Console from v5 | v1 |
+| Maximum level size | 4,000×4,000 m | v1 |
+| Gravity hint | Under Gravity: "An entity falls 4.9 m in the first second." | Later |
 | Background image layout | Fill the screen or tile, and how much it scrolls with the camera, from 0% to 100% | Later |
 | Grid window details | Colours per tag, drag across cells to paint, "Collide with all" and "Collide with none" per row | Later |
 | Removal line in the Console | "Crate left the level and was removed." | Later |

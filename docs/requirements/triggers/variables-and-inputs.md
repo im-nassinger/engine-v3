@@ -33,7 +33,7 @@ Source: scope VA1; round 4: T2; round 9: 09 2.4b; owner: 2026-11-14; owner: 2026
 ### The variable types scripts need · v5
 
 - **A variable can also be an entity, an asset, a colour, a vector, an angle or tags.** Example: `door` set to the entity "Door 2". Change value only sets them. An If only checks "is" or "is not". *Why: they are the types scripts need, such as the door a button opens (owner: 2026-11-16).*
-- **A number variable can have limits:** a minimum, a maximum and a unit, such as `speed` from 0 to 1,500 px/s. Its value stays inside them, in the Entity inspector and during play: a value past a limit is held at it (standing yes, 2026-11-16).
+- **A number variable can have limits:** a minimum, a maximum and a unit, such as `speed` from 0 to 15 m/s. Its value stays inside them, in the Entity inspector and during play: a value past a limit is held at it (standing yes, 2026-11-16).
 - Scripts add the variables they need from a warning on the ScriptComponent's card, see [scripts](../scripts/scripts.md#the-scriptcomponent--v5).
 - *Why v5: they come with scripts (owner: 2026-11-20).*
 

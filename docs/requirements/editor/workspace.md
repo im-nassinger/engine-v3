@@ -4,7 +4,7 @@
 
 The frame around everything: where the islands sit, ☰ and the main menu, the debug box and the minimap, the seven tools, moving around the level view, the grid and snapping, and how the editor behaves inside a browser. **v1:** islands on top of a full-window level view (the redesign, owner: 2026-11-17), a show-only minimap, three of the seven tools on their number keys, pan and zoom from 1% to 1000%, and a grid you can snap to. **v2 to v6:** the other four tools, each with its version. **v4:** the searchable shortcut list. **Later:** resizing and collapsing panels, moving the view with the minimap, and snapping to other entities with pink guides. The shortcut table itself is in [shortcuts.md](shortcuts.md).
 
-Sizes in pixels are starting values until tested.
+The editor's own sizes are in screen pixels and are starting values until tested. Lengths in the level are in metres, see [lengths in metres](#lengths-in-metres--v4).
 
 ## Layout
 
@@ -60,7 +60,7 @@ Source: round 3: 01 2.2, 2.3; round 8: VW1; old: WS-16 to WS-27; owner: 2026-11-
 
 ### The debug box and the message pill · v1
 
-- **The debug box** is an island under the minimap, its right edge on the minimap's, as wide as its entries: `X: -3120  Y: -2410  GRID: 50  ZOOM: 9%`. The mouse position in level pixels, the grid size and the zoom; labels muted in capitals, values in tabular figures. **The grid size and the zoom can be clicked and typed over** (owner: 2026-11-19, replacing "it only shows them" of 2026-11-17): Enter or clicking away sets the value, Esc keeps the old one, and both give the keyboard back to the level view. A typed grid size is **not an undo step** (owner: 2026-11-19); it is rounded to a whole number and kept between 5 and 1,000; a typed zoom, such as `150` or `150%`, zooms about the middle of the level view, inside the zoom range. Text that isn't a number changes nothing and the message pill says why. The zoom also changes with the mouse wheel, the keys and the View menu.
+- **The debug box** is an island under the minimap, its right edge on the minimap's, as wide as its entries: `X: -31.2  Y: -24.1  GRID: 1  ZOOM: 9%`. The mouse position in metres (from v4), the grid size and the zoom; labels muted in capitals, values in tabular figures. **The grid size and the zoom can be clicked and typed over** (owner: 2026-11-19, replacing "it only shows them" of 2026-11-17): Enter or clicking away sets the value, Esc keeps the old one, and both give the keyboard back to the level view. A typed grid size is **not an undo step** (owner: 2026-11-19); it is rounded to 0.01 m and kept between 0.05 and 10 m (see [the grid](#the-grid--v1)); a typed zoom, such as `150` or `150%`, zooms about the middle of the level view, inside the zoom range. Text that isn't a number changes nothing and the message pill says why. The zoom also changes with the mouse wheel, the keys and the View menu.
 - **The message pill** sits at the bottom middle of the level view, shown only while there is a message: a status text such as `Undid: Move 3 entities` or `The camera can't be deleted` for 4 seconds, or a failed save until it is fixed (owner: 2026-11-18).
 - No lasting tool hint, no selection summary and no message count. *Why: the tool column shows the tool, the Entities viewer and the Entity inspector show the selection, and each editor message already shows on its card (owner: 2026-11-17, 2026-11-18).*
 
@@ -139,7 +139,7 @@ Source: round 3: 01 2.5; old: WS-42 to WS-44, WS-140; owner: 2026-11-13
 
 - Space and drag pans. The mouse wheel zooms, keeping the point under the mouse fixed. Shift+wheel pans sideways.
 - **+ and - zoom at the mouse too**, like the wheel, while the mouse is over the level view; otherwise, as from the View menu, about the middle of the view. *Why: the owner expected the keys to zoom where they look, as the wheel does (owner: 2026-11-21).*
-- Zoom goes from **1% to 1000%**. 100% means one level pixel per screen pixel. *Why: the owner's range.*
+- Zoom goes from **1% to 1000%**. 100% means one level pixel per screen pixel, so 1 m is the World's *Pixels per metre* in screen pixels. *Why: the owner's range.*
 - **F** zooms to the selection, or to the whole level with nothing selected. Selecting never moves the view by itself.
 - Moving or zooming the view is never an undo step.
 - Outside the level bounds the level view shows the editor's own dark colour; the World's fill and the grid are drawn only inside (owner: 2026-11-17).
@@ -151,14 +151,14 @@ Source: scope ED1; round 3: 01 2.6; round 5: 02 2.5; old: WS-46 to WS-52, WS-56,
 ### The grid · v1
 
 - The grid can be shown or hidden, its size can be set by typing it in the debug box (owner: 2026-11-19), and entities can snap to it.
-- Default size: **50 px**, which is 1 metre. **The lines drawn are the grid size apart, with no fainter lines between them** (owner: 2026-11-22, replacing the fainter lines every 10 px). *Why: the grid you see is the grid you set, and the grid things snap to.* Zoomed far out, when lines would be under 8 screen px apart, only every fifth is drawn, then every 25th. The lines through the level's origin are slightly stronger.
+- Default size: **1 m** (100 px at the default scale; 50 px before v4). **The lines drawn are the grid size apart, with no fainter lines between them** (owner: 2026-11-22, replacing the fainter lines every 10 px). *Why: the grid you see is the grid you set, and the grid things snap to.* Zoomed far out, when lines would be under 8 screen px apart, only every fifth is drawn, then every 25th. The lines through the level's origin are slightly stronger.
 - Grid lines adapt to the background colour so they stay visible.
-- With grid snapping on, the edges of what you move, resize or draw always land on the nearest grid line, however far from one they are. On each axis, whichever of the two edges is nearest a line lands on it. **The centre never snaps** (owner: 2026-11-22): a shape 150 px wide with its centre on a 50 px line would have both edges between lines, so what you see would miss the grid. A shape the Shape tool places with a click snaps its edges the same way. Pasted entities snap too. *Why: snapping only within 6 screen px of a line, as before, left most drags unsnapped, and the owner found snapping didn't seem to work (owner: 2026-11-22).*
-- **What snaps is the shape's own edge, not its outline.** *Why: lining up the outline left a shape with the default 2 px outline 1 px off the line (owner: 2026-11-22).*
+- With grid snapping on, the edges of what you move, resize or draw always land on the nearest grid line, however far from one they are. On each axis, whichever of the two edges is nearest a line lands on it. **The centre never snaps** (owner: 2026-11-22): a shape 1.5 m wide with its centre on a 1 m line would have both edges between lines, so what you see would miss the grid. A shape the Shape tool places with a click snaps its edges the same way. Pasted entities snap too. *Why: snapping only within 6 screen px of a line, as before, left most drags unsnapped, and the owner found snapping didn't seem to work (owner: 2026-11-22).*
+- **What snaps is the shape's own edge, not its outline.** *Why: lining up the outline left a shape with the default 0.02 m outline 0.01 m off the line (owner: 2026-11-22).*
 - **Snapping goes to the lines drawn**: the grid size apart, or every fifth line or further when zoomed far out. *Why: what you move should land on a line you can see, and those lines follow the grid size you set (owner: 2026-11-22).*
 - Holding Ctrl during a drag turns snapping off until released.
 - Typed values and arrow-key moves are never snapped. Ctrl+Shift+arrow moves one grid step.
-- **The grid size is a whole number of pixels from 5 to 1,000.** *Why: whole numbers keep snapped positions whole, and the range covers fine tiles and coarse layout (standing yes, 2026-11-14).*
+- **The grid size is from 0.05 to 10 m, in steps of 0.01 m.** *Why: 0.01 m is 1 px at the default scale, so snapped positions stay whole pixels there, as whole numbers of pixels did before, and the range is the old 5 to 1,000 px at 100 px per metre, covering fine tiles and coarse layout (standing yes, 2026-11-14; in metres, standing yes, 2026-11-25).*
 - The grid size is saved in the project file. **Changing it is not an undo step** (owner: 2026-11-19, replacing 2026-11-13's undo step): Ctrl+Z never changes the grid size. Whether the grid is shown is saved in the browser.
 - **The grid is never drawn during play**, whatever its switch; it comes back at Stop. *Why: the owner wants it only in the editor, before testing the level (owner: 2026-11-21).*
 
@@ -166,7 +166,7 @@ Source: scope ED4; round 3: 01 2.6; round 5: FMT1; round 7: BND2; old: WS-53, WS
 
 ### Lengths in metres · v4
 
-Asked by the owner while trying v4 ([fix](../../versions/v4/fixes.md) 12, 2026-11-25), not planned in detail or built yet. It replaces "50 px per metre, not a setting" in [bodies](../physics/bodies.md) and the grid's default of 50 px.
+Asked by the owner while trying v4 ([fix](../../versions/v4/fixes.md) 12, 2026-11-25). The requirements say lengths in metres since v4 task 32; the physics and the editor are built by tasks 33 and 34. It replaces "50 px per metre, not a setting" in [bodies](../physics/bodies.md) and the grid's default of 50 px.
 
 - **The editor shows every length in metres, never in pixels**: positions, sizes, the grid size, speeds in m/s, the trigger blocks' boxes, the debug box. Pixels stay only inside the code.
 - **1 metre is 100 px by default**, so 1 px is 0.01 m, and the physics uses the same scale. *Why: the owner had to set a velocity of about 500 for an entity to move a small amount; in metres per second, 500 should be a lot.*
@@ -211,7 +211,7 @@ Small features from the old draft and review that the scope review never asked a
 | Hide all panels | `Ctrl+\` hides every island, leaving the level view and a small restore button | Later |
 | Temporary zoom tool | Hold Z: drag draws a zoom box, click zooms in, Alt+click zooms out | Later |
 | Scroll wheel pans | A setting for trackpads: two-finger scroll pans, pinch still zooms | Later |
-| Rulers | Rulers along the top and left in level pixels, off by default | Later |
+| Rulers | Rulers along the top and left in ☰'s unit, off by default | Later |
 | Whole pixels | A snapping switch that keeps positions on whole pixels, on by default | Later |
 | Short motion | Animations in the editor take 150 ms or less, and are off when the system asks for reduced motion | Later |
 

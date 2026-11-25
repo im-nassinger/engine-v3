@@ -11,7 +11,7 @@ A script is a `.lua` file from the Assets panel, attached to an entity through i
 - **An entity has one ScriptComponent, holding a list of `.lua` files** from the Assets panel. *Why one: an entity has at most one component of each type, so "its ScriptComponent" always means one thing, in the Entity inspector and in Lua.*
 - The `.lua` files are plain assets the component points to. Fixing a file fixes every entity that uses it.
 - **A script's values are the entity's variables.** The ScriptComponent holds only the list of files; the values, such as a speed or a door, live on the entity's VariablesComponent. *Why: one concept for named values, so nothing is stored in two places, and triggers can read and change a script's values too (owner: 2026-11-16).*
-- **A script lists the variables it needs in a `variables` table at its top, built with one `<type>_variable` function per type**, such as `speed = number_variable(400, { min = 0, max = 1500, unit = "px/s" })`. The table only describes them. The rules for reading and writing them are in [lua-api.md](lua-api.md#variables--v2).
+- **A script lists the variables it needs in a `variables` table at its top, built with one `<type>_variable` function per type**, such as `speed = number_variable(4, { min = 0, max = 15, unit = "m/s" })`. The table only describes them. The rules for reading and writing them are in [lua-api.md](lua-api.md#variables--v2).
 - **When the entity lacks some of them, the ScriptComponent's card shows a warning with a button:** "This script needs `speed` and `jump_height`. [Add variables]". The button adds a VariablesComponent if there is none, then only the missing variables, with the script's types, starting values and limits, as one Undo step. With several entities selected, it adds them to each. *Why: nothing happens behind the user's back, and editor messages never block, so a script changed later or added to many entities is covered too (owner: 2026-11-16).*
 - **A variable with the same name and another type is left as it is**, and the warning says so: "`speed` is a string here, but this script needs a number."
 - Scripts on one entity share its variables: two scripts that both need `speed` read the same one.
@@ -55,7 +55,7 @@ Source: round 3: D66; round 9: 10 2.2; old: LU-13, LU-18; owner: 2026-11-13
 
 - Scripts read and change the component values that are allowed to change during play, **with the same names as the Entity inspector**.
 - They are the same values a trigger's Change value offers.
-- Angles are in degrees and lengths in pixels, matching the Entity inspector. *Why degrees: this can't be changed once levels exist, so it was decided before any code.*
+- Angles are in degrees and lengths in metres, as the Entity inspector shows them by default, whatever ☰'s unit (standing yes, 2026-11-25: a script must not change meaning with an editor setting). *Why degrees: this can't be changed once levels exist, so it was decided before any code.*
 
 Source: round 1: D3; round 9: 10 2.7, 10 2.8; old: LU-57 to LU-62; owner: 2026-11-13
 
@@ -78,7 +78,7 @@ Source: scope LU5; round 9: 10 2.5; old: LU-39 to LU-42; owner: 2026-11-13
 
 ### What the Lua API covers · v5
 
-The **Lua API** is the set of functions the game gives scripts. It uses pixels and degrees. **Every function is top level**, such as `spawn(path)`, never inside a table such as `world.spawn(path)`. Lua's own libraries (`string`, `table`, `math`) stay as Lua has them. *Why: the owner's rule.* Every function is in [lua-api.md](lua-api.md), and example scripts in [lua-examples.md](lua-examples.md).
+The **Lua API** is the set of functions the game gives scripts. It uses metres and degrees. **Every function is top level**, such as `spawn(path)`, never inside a table such as `world.spawn(path)`. Lua's own libraries (`string`, `table`, `math`) stay as Lua has them. *Why: the owner's rule.* Every function is in [lua-api.md](lua-api.md), and example scripts in [lua-examples.md](lua-examples.md).
 
 The areas the API covers:
 

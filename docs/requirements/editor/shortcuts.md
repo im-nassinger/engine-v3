@@ -27,12 +27,12 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 | Del, Backspace | Delete the selection | Editor | Copy and paste, v1 |
 | Ctrl+A | Select all | Editor | Selecting, v1 |
 | Esc | See "What Esc does" in [workspace.md](workspace.md) | Everywhere | v1 |
-| Arrows | Move the selection 1 px | Editor | Handles, v1 |
-| Shift+arrows | Move the selection 10 px | Editor | Handles, v1 |
+| Arrows | Move the selection 0.01 m | Editor | Handles, v1 |
+| Shift+arrows | Move the selection 0.1 m | Editor | Handles, v1 |
 | Ctrl+Shift+arrows | Move the selection one grid step | Editor | Handles, v1 |
 | Z, X | Rotate the selection 1° counter-clockwise, clockwise; with the Shape tool, turn its preview (owner, 2026-11-17) | Editor | Handles, v1; the Shape tool, v1 |
 | Shift+Z, Shift+X | Rotate the selection 10° counter-clockwise, clockwise (owner, 2026-11-17) | Editor | Handles, v1 |
-| D, A, W, S | Resize the selection's shapes 1 px wider, narrower, taller, shorter, changing their values; with the Shape tool, size its preview (owner, 2026-11-17) | Editor | Handles, v1; the Shape tool, v1 |
+| D, A, W, S | Resize the selection's shapes 0.01 m wider, narrower, taller, shorter, changing their values; with the Shape tool, size its preview (owner, 2026-11-17) | Editor | Handles, v1; the Shape tool, v1 |
 | Shift+D, Shift+A, Shift+W, Shift+S | Resize the selection's shapes, or the Shape tool's preview, one grid step (owner, 2026-11-19). Shift+S was Snapping to entities' key (Later), which gets another key (owner, 2026-11-17) | Editor | Handles, v1; the Shape tool, v1 |
 | Ctrl+G, Ctrl+Shift+G | Group, ungroup | Editor | Groups, v1 |
 | Enter | Go into the selected group | Editor | Groups, v1 |

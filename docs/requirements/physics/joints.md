@@ -4,7 +4,7 @@
 
 A joint is an ordinary entity with a JointComponent that connects two bodies. **v1:** three joints (Hinge, Rope, Spring), the Joint tool, each joint's typed settings, and Rope and Spring that show in play when styled. **Later:** Weld, Rod, Slider and Wheel, dragging limits on the level, re-attaching an end or changing type, joints that break, and the joint warnings. Core rule: **no special cases for joints.** A joint moves and copies only when it is selected, and breaking is just being destroyed.
 
-All lengths are pixels and all angles are degrees. Positive angles and speeds are clockwise on screen. Values marked (tune) are starting points.
+All lengths are metres and all angles are degrees. Positive angles and speeds are clockwise on screen. Values marked (tune) are starting points.
 
 ## What a joint is
 
@@ -95,19 +95,19 @@ Rope:
 | Setting | What it does | Range | Default |
 |---|---|---|---|
 | Match drawn distance | Keeps the length equal to the gap between the ends | On or off | On |
-| Length | The longest the rope can get. Longer than the gap gives slack | 1 to 100,000 px | As drawn |
+| Length | The longest the rope can get. Longer than the gap gives slack | 0.01 to 1,000 m | As drawn |
 
 Spring:
 
 | Setting | What it does | Range | Default |
 |---|---|---|---|
 | Match drawn distance | The rest length stays equal to the gap between the ends | On or off | On |
-| Rest length | The length it pulls back to | 1 to 100,000 px | As drawn |
+| Rest length | The length it pulls back to | 0.01 to 1,000 m | As drawn |
 | Stiffness | Bounces per second. Higher is firmer | 0.1 to 15 | 2 |
 | Damping | How fast the bouncing dies out. 0 keeps bouncing, 1 settles at once | 0 to 1 | 0.3 |
 
 - **Rope and Spring share one Match drawn distance setting**, so switching a Rope to a Spring Later keeps it, and Lua has one `match_drawn_distance` (standing yes, 2026-11-14).
-- **Length and Rest length read as 100 px when a file leaves them out.** The Joint tool always sets them from the drawn gap, so only a file edited by hand can leave one out (standing yes, 2026-11-14).
+- **Length and Rest length read as 1 m when a file leaves them out.** The Joint tool always sets them from the drawn gap, so only a file edited by hand can leave one out (standing yes, 2026-11-14).
 - Limits always include the placed position: Min can't go above 0 and Max can't go below 0.
 - Limits are measured from how the joint was built, so turning things in the editor never makes them wrong.
 - *Why half a turn, not the full turn first written: Box2D 3.2 holds a Hinge's limits to 180° each way, so a limit past it would stop the joint at 180° anyway. The closest fix to the owner's range is Box2D's own (standing yes, 2026-11-16).*
@@ -124,8 +124,8 @@ Source: scope JO1; round 7: 06 2.5, 06 2.14, 06 2.15; old: JT-36 to JT-38, JT-79
 |---|---|
 | Weld | Flex (bounces per second when bent, 0 is rigid, 0 to 15) and Flex damping (0 to 1, default 0.7) |
 | Rod | Length, read-only. Move an end to change it |
-| Slider | Axis angle. Limit travel (on, −100 to 100 px). Motor, Motor speed (−6,000 to 6,000 px/s, default 100), Motor strength (100, tune), Resistance |
-| Wheel | Axis angle. Suspension stiffness (0.1 to 15, default 4) and damping (0 to 1, default 0.7). Limit travel (on, −20 to 20 px). Motor, Motor speed (default 720 °/s), Motor strength (20, tune) |
+| Slider | Axis angle. Limit travel (on, −1 to 1 m). Motor, Motor speed (−120 to 120 m/s, default 1), Motor strength (100, tune), Resistance |
+| Wheel | Axis angle. Suspension stiffness (0.1 to 15, default 4) and damping (0 to 1, default 0.7). Limit travel (on, −0.2 to 0.2 m). Motor, Motor speed (default 720 °/s), Motor strength (20, tune) |
 
 - Let connected objects collide is off for Weld, Slider and Wheel, and on for Rod.
 - Slider and Wheel show an arrow through the joint for their axis. Drag it to turn it.

@@ -74,7 +74,7 @@ end)
 
 ```lua
 variables = {
-    speed = number_variable(300, { min = 0, unit = "px/s" }),
+    speed = number_variable(3, { min = 0, unit = "m/s" }),
 }
 
 local function read_direction()
@@ -103,7 +103,7 @@ end)
 ```lua
 variables = {
     bolt = asset_variable("projectiles/bolt.entity"),
-    shot_speed = number_variable(800, { min = 0, unit = "px/s" }),
+    shot_speed = number_variable(8, { min = 0, unit = "m/s" }),
     cooldown = number_variable(0.5, { min = 0.1, unit = "s" }),
 }
 

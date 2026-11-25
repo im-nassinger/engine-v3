@@ -105,7 +105,7 @@ Planned in [fixes-9-to-13-plan.md](fixes-9-to-13-plan.md), confirmed by the owne
 - [x] 31. Fix 10, the blocks: Multiply, Divide and the variable picks
   - Read: requirements/triggers/triggers.md#multiply-divide-and-variables-in-every-value-box--v4, design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks
   - Done when: Change value's menu offers Multiply and Divide; every value box in every block offers the variables of its type, grouped as the variable menu groups them, and shows a chosen variable by name; a vector or colour box offers none; browser tests cover picking a variable in each block kind and switching back to a typed value; fixes.md row 10 says built
-- [ ] 32. Fix 12, the rules: lengths in metres
+- [x] 32. Fix 12, the rules: lengths in metres
   - Read: requirements/editor/workspace.md#lengths-in-metres--v4, requirements/physics/bodies.md, glossary.md, requirements/README.md
   - Done when: every requirement that says 50 px per metre or gives a length, speed or grid size in pixels says it in metres (the grid size's range and steps included, chosen under the standing yes); the glossary has *Pixels per metre*; architecture/ says where the scale lives; `node tools/check-docs.js` and `node tools/check-sources.js` pass
 - [ ] 33. Fix 12, the physics: pixels per metre as a World setting

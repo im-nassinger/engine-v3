@@ -2,13 +2,13 @@
 
 ## TL;DR
 
-`src/core/geometry` holds the maths every part shares: the **`Matrix2D`** of a TransformComponent and how to keep an entity in place when it changes parent, **bounds**, and the **polygon pipeline** that cuts each shape into **collision pieces**: convex pieces of at most 8 points, Box2D's limit. Drawing, Box2D, clicking, the physics view and the read-only Mass all use those same pieces, so what you see is what collides (owner, 2026-11-13). `src/core/math` holds **`DeterministicMath`**, the game's own sine, cosine, arctangent and exponent, built from arithmetic and square roots only, because the browser's `Math.sin` may differ between computers. Units are fixed: 50 px per metre, degrees clockwise on screen, y pointing down.
+`src/core/geometry` holds the maths every part shares: the **`Matrix2D`** of a TransformComponent and how to keep an entity in place when it changes parent, **bounds**, and the **polygon pipeline** that cuts each shape into **collision pieces**: convex pieces of at most 8 points, Box2D's limit. Drawing, Box2D, clicking, the physics view and the read-only Mass all use those same pieces, so what you see is what collides (owner, 2026-11-13). `src/core/math` holds **`DeterministicMath`**, the game's own sine, cosine, arctangent and exponent, built from arithmetic and square roots only, because the browser's `Math.sin` may differ between computers. Lengths are kept in pixels everywhere in the code and the level file; **the scale is the World's `PhysicsWorldComponent.pixelsPerMetre`** (default 100, from v4; a fixed 50 before), and only the physics adapter and the editor's display convert with it. Angles are degrees clockwise on screen, y pointing down.
 
 ## Units
 
 | Quantity | In the game, the Entity inspector and Lua | In Box2D | Converted by |
 |---|---|---|---|
-| Length, position | pixels | metres: px ÷ 50 | `Units.toMetres`, `Units.toPixels` |
+| Length, position | pixels in the code and the file; metres in the Entity inspector, the trigger blocks and Lua from v4 | metres: px ÷ the World's Pixels per metre | `Units.toMetres`, `Units.toPixels`, given the scale |
 | Angle | degrees, clockwise on screen | radians | `Units.toRadians`, `Units.toDegrees` |
 | Speed | px/s, °/s | m/s, rad/s | The same four functions: a speed converts like its length or angle |
 | Gravity | m/s² | m/s² | none |
@@ -17,6 +17,16 @@
 - **y points down everywhere, Box2D included.** In a y-down frame, Box2D's positive (counter-clockwise in y-up) rotation is clockwise on screen, which is the game's convention. So no sign is ever flipped. This settles the tech note "Clockwise ... Confirm".
 - Gravity is saved as the vector Box2D takes, so down is (0, +9.8).
 - Only the Box2D adapter converts to metres and radians. Everything else works in pixels and degrees.
+
+### Where the scale lives (v4, fix 12)
+
+*(standing yes, 2026-11-25; built by tasks 33 and 34 of [v4](../../versions/v4/tasks.md))*
+
+- **The one scale is a field of the World's PhysicsWorldComponent, `pixelsPerMetre`**, default 100, saved in the level and not changeable during play. The fixed `Units.PIXELS_PER_METRE` goes: `Units.toMetres` and `Units.toPixels` take the scale, and play reads it once from the World when it builds the physics world.
+- **Everything stored stays in pixels**: positions, sizes, outline widths, joint lengths, velocities in px/s, the grid size in the project file. So changing Pixels per metre leaves the level drawn as it was and changes only how big Box2D thinks it is. *Why: one unit for every number in the core, as before, and a level that looks the same whatever the scale; levels saved at 50 aren't converted, as the requirement says.*
+- **Showing and typing lengths is the editor's job**: a display unit (metres or pixels, ☰'s choice, saved in the browser's editor settings, never in the level) and the World's scale turn a stored pixel value into the text a field shows, and a typed value back into pixels. Fields say which of their numbers are lengths or speeds, so the conversion lives in one place, not in each card.
+- **Lua sees metres** (from v5): the script host converts at its boundary with the World's scale, as the Box2D adapter does.
+- Mass from density uses the same scale: a shape's area in px² ÷ pixelsPerMetre² is its area in m².
 
 ## Matrix2D and the TransformComponent
 

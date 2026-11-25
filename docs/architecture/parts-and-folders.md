@@ -55,7 +55,7 @@ src/
       pieces/            the polygon pipeline from a shape to collision pieces, line chains, mass
       path/              pathBox, splitCurve, nearestOnCurve, smoothHandles: a path's curves (v2)
       fitting/           fitCurves: the Pencil's drag fitted into curves (v2)
-    math/              DeterministicMath, units (px and metres, degrees and radians)
+    math/              DeterministicMath, units (px and metres at a given scale, degrees and radians)
     derived/           DerivedCaches, levelBoundsOf
       caches/            WorldMatrixCache, BoundsCache, HiddenCache, PiecesCache
       tags/              LevelTags: every tag in the level (v3)

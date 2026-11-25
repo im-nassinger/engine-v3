@@ -12,7 +12,7 @@ What the player sees. There is exactly one camera, an entity with a CameraCompon
 - It can't be deleted or duplicated, and a second one can't be added. It always sits directly inside the World.
 - In the Entities viewer it is an ordinary row. Where it sits changes nothing, because what is inside the camera is always drawn over the level.
 - The editor's own view is separate. Panning or zooming the editor never changes the camera.
-- The camera's position is the centre of what it shows. The default camera is **1920×1080**. **Width and height each go from 160 to 7,680 px**, the range the later custom View size allows, so it never refuses a saved level. *Why: the one range already in the requirements (standing yes, 2026-11-14).*
+- The camera's position is the centre of what it shows. The default camera is **19.2×10.8 m**. **Width and height each go from 1.6 to 76.8 m**, the range the later custom View size allows, so it never refuses a saved level. *Why: the one range already in the requirements (standing yes, 2026-11-14), 1920×1080 and 160 to 7,680 px at the default 100 px per metre (standing yes, 2026-11-25).*
 - **The camera's width and height can't change during play.** It is the area every player sees; zoom Later is the way to change it (standing yes, 2026-11-14).
 - A new level's camera starts at the level's origin, which is the middle of the level bounds. *Why: the World's rectangle is centred on the origin (owner: 2026-11-13).*
 - In the level view the camera shows as a frame of what players will see. Clicking inside the frame goes through to the level behind it. Clicking its edge selects the camera.
@@ -72,7 +72,7 @@ Source: owner: 2026-11-13
 
 ### Offset, dead zone, look-ahead · Later
 
-- **Offset:** added to the target's position, in level pixels. It doesn't turn with the target.
+- **Offset:** added to the target's position, in metres. It doesn't turn with the target.
 - **Dead zone** (width and height): the camera stays still while the target is inside this box. A box as tall as a normal jump keeps jumps from moving the camera.
 - **Look-ahead** (seconds, sideways only): the camera leads the target by its sideways speed times this value.
 - While the camera is selected, the dead zone shows as a dashed box inside the frame.

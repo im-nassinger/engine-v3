@@ -48,21 +48,21 @@ Run, jump, double jump, ledge grace time and slopes.
 
 | Setting | Range | Default |
 |---|---|---|
-| Run speed | 0 to 1500 px/s | 400 |
-| Acceleration | 0 to 10000 px/s² | 3000 |
-| Deceleration | 0 to 10000 px/s² | 3600 |
+| Run speed | 0 to 15 m/s | 4 |
+| Acceleration | 0 to 100 m/s² | 30 |
+| Deceleration | 0 to 100 m/s² | 36 |
 | Air control | 0 to 100% | 65 |
-| Jump height | 0 to 1000 px | 175 |
+| Jump height | 0 to 10 m | 1.75 |
 | Time to the top | 0.1 to 1.5 s | 0.38 |
 | Short hop height | 0 to Jump height | 60 |
 | Air jumps | 0 to 5 | 0 |
-| Air jump height | 0 to 1000 px | 140 |
+| Air jump height | 0 to 10 m | 1.4 |
 | Ledge grace time | 0 to 0.5 s | 0.1 |
 | Jump buffer | 0 to 0.5 s | 0.1 |
 | Feet | An entity | The feet sensor |
 | Max slope angle | 0 to 80° | 50 |
 | Fall gravity multiplier | 1 to 5 | 1.6 |
-| Max fall speed | 100 to 3000 px/s | 1100 |
+| Max fall speed | 1 to 30 m/s | 11 |
 | Half gravity near the top while jump is held | On or off | On |
 | Stick to slopes | On or off | On |
 | Keep platform speed on jump | On or off | On |
@@ -95,7 +95,7 @@ Source: scope EF5; round 1: D32, D61; round 7: 08 2.4, 08 2.12; round 8: CT1; ol
 
 ### The rest of the builtin scripts · Later
 
-Scripts for movement, enemies, health, pickups, the camera and showing variables. Speeds are px/s, times are seconds.
+Scripts for movement, enemies, health, pickups, the camera and showing variables. Lengths are metres, speeds m/s, times seconds.
 
 | Script | What it does | Main settings |
 |---|---|---|
@@ -104,7 +104,7 @@ Scripts for movement, enemies, health, pickups, the camera and showing variables
 | Move Along Path | Moves a Kinematic body along a path drawn on another entity | Path, Speed 150, Ping-pong, Loop or Once, Pause at ends 0.5 |
 | Rotate | Constant spin | Speed 90 °/s |
 | Patrol | Walks back and forth | Speed 120, Turn at walls, Turn at ledges |
-| Chase | Moves toward an entity with a tag | Tag `player`, Walk or Fly, Speed 200, Detect range 500 px |
+| Chase | Moves toward an entity with a tag | Tag `player`, Walk or Fly, Speed 2 m/s, Detect range 5 m |
 | Health | Holds health for its entity | Max health 3, Safe time after a hit 1 |
 | Damage | Hurts tagged entities on contact | Amount 1, Affects tag `player` |
 | Stomp | Lets a falling player defeat this entity | Bounce speed 600 |

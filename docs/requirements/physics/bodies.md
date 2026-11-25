@@ -4,7 +4,7 @@
 
 How entities move and collide. A **BodyComponent** says how something moves, a **SurfaceComponent** says how its shape collides. **v1:** add a body in one click, the Box2D body settings, the surface settings (density, friction, restitution), merging shapes in a group into one body, and the physics view. **v3:** surfaces and touching, for triggers and scripts: a Surface means solid, no Surface means things pass through. **Later:** one-way platforms and the warnings for setups that behave badly. Core rules: new shapes have no physics until you add it, collision always matches what you see, and touching is detected by the physics engine alone.
 
-Field names are Box2D's, so the Entity inspector, the Lua API and tutorials match. The scale is 50 px per metre and is not a setting; the owner asked to change it to 100 px per metre and show metres everywhere (2026-11-25, see [lengths in metres](../editor/workspace.md#lengths-in-metres--v4)).
+Field names are Box2D's, so the Entity inspector, the Lua API and tutorials match. **Lengths are in metres and speeds in m/s**, and the scale is the World's *Pixels per metre*, 100 by default (owner, 2026-11-25, replacing a fixed 50 px per metre; see [lengths in metres](../editor/workspace.md#lengths-in-metres--v4)).
 
 ## Bodies
 
@@ -46,7 +46,7 @@ Source: scope PH1; round 1: C6, D36, D39; round 2: O8; round 6: 05 2.1, 05 2.2, 
 - *Why these names: the owner wanted common terms. These are Box2D's (Unity and Godot are nearly the same), so the Entity inspector, the Lua API and tutorials match.*
 - Only the fields that matter for the chosen type are enabled. The others are greyed, with their values kept.
 - All of these can change during play.
-- Speed is capped at 6,000 px/s and spin at 7.5 turns per second (2,700 °/s). Higher values are quietly limited.
+- Speed is capped at 120 m/s and spin at 7.5 turns per second (2,700 °/s). Higher values are quietly limited.
 - *Why 7.5 turns, not the 15 first written: Box2D 3.2 turns a body at most 45° a step, so 15 turns per second can't happen. The closest fix to the owner's cap is Box2D's own (standing yes, 2026-11-16).*
 
 Source: scope PH2; round 3: P1; round 7: 05 2.4; old: PH-17 to PH-19; owner: 2026-11-19
@@ -57,7 +57,7 @@ Source: scope PH2; round 3: P1; round 7: 05 2.4; old: PH-17 to PH-19; owner: 202
 
 | Field | What it does | Range | Default |
 |---|---|---|---|
-| Density | How heavy it is for its size. A 100 px square at density 1 weighs 4 kg | 0 to 100 | 1 |
+| Density | How heavy it is for its size. A 1 m square at density 1 weighs 1 kg | 0 to 100 | 1 |
 | Friction | How much it grips. 0 is ice, 1 is very grippy. Both surfaces count, so ice is slippery on anything | 0 to 5 | 0.3 |
 | Restitution | How much speed it keeps after a hit. 0 stops dead, 1 bounces back fully. The bouncier of the two wins | 0 to 2 | 0 |
 
@@ -81,7 +81,7 @@ Source: scope PH3; round 1: C7; round 6: 05 2.5; round 7: SF1, SN1; round 8: CT1
 - *Why: Box2D detects touching, so we don't write a second collision system that would disagree at the edges and threaten determinism.*
 - A pass-through shape is drawn like any other shape, so its StyleComponent decides whether players see it. With no StyleComponent it is invisible, and only the physics view shows it.
 - Pass-through shapes add no weight.
-- Pass-through shapes check once per tick. A Dynamic body is noticed even when it passes one between two ticks, but a Kinematic one is not: at 600 px/s it travels 10 px each tick and can skip a pass-through shape thinner than that. *Why: this is how Box2D 3.2 sensors behave (standing yes, 2026-11-22; written for older Box2D as "any fast entity can skip a thin sensor").*
+- Pass-through shapes check once per tick. A Dynamic body is noticed even when it passes one between two ticks, but a Kinematic one is not: at 6 m/s it travels 0.1 m each tick and can skip a pass-through shape thinner than that. *Why: this is how Box2D 3.2 sensors behave (standing yes, 2026-11-22; written for older Box2D as "any fast entity can skip a thin sensor").*
 - A pass-through shape notices bodies of every type, Static and Kinematic included, whatever its own body's type. *Why: Box2D 3.2 sensors do, so a Static coin notices a Kinematic platform's rider and the platform too (standing yes, 2026-11-22; written for older Box2D as "a Static sensor can't notice a Kinematic body").*
 - *Why v3: noticing a touch is only for triggers and scripts, and triggers come in v3.*
 
@@ -123,7 +123,7 @@ Source: scope PH4; round 1: C8; round 6: 05 2.6; old: PH-24 to PH-31; owner: 202
 - A circle scaled evenly is a true circle. A circle scaled unevenly (an ellipse on screen) collides as a many-sided polygon.
 - Mirroring with a negative scale mirrors the collision too.
 - Shape and scale don't change during play.
-- Entities at rest sit about 1 px apart. It only shows when zoomed in.
+- Entities at rest sit about 0.02 m apart. It only shows when zoomed in.
 
 Source: round 6: 05 2.7; old: PH-32 to PH-38; owner: 2026-11-15
 
@@ -146,12 +146,12 @@ Editor messages for setups likely to behave badly. None of them stops you playin
 
 | When | Kind | Message | Fix button |
 |---|---|---|---|
-| Any physics shape under 1 px on its short side | Warning | "Too small to collide. It will be ignored during play." | |
-| A Dynamic or Kinematic shape under 5 px on its short side | Warning | "Very small for physics. It may jitter or slip through things. Try 5 px or more." | |
-| A Dynamic or Kinematic shape over 500 px long | Warning | "Very big for a moving entity, so it may feel slow or unstable. Split it into joined pieces, or make it Static." | Make Static |
-| A Static shape over 2,500 px long | Tip | "Long static shapes work, but past 2500 px contacts can get less exact. If things jitter here, split it." | |
+| Any physics shape under 0.02 m on its short side | Warning | "Too small to collide. It will be ignored during play." | |
+| A Dynamic or Kinematic shape under 0.1 m on its short side | Warning | "Very small for physics. It may jitter or slip through things. Try 0.1 m or more." | |
+| A Dynamic or Kinematic shape over 10 m long | Warning | "Very big for a moving entity, so it may feel slow or unstable. Split it into joined pieces, or make it Static." | Make Static |
+| A Static shape over 50 m long | Tip | "Long static shapes work, but past 50 m contacts can get less exact. If things jitter here, split it." | |
 | A Dynamic shape longer than 20 times its thickness | Tip | "Long thin moving shapes can wobble or slip through other moving things. Make it thicker, or turn on Bullet." | Turn on Bullet |
-| A pass-through shape with a touch trigger under 10 px on its short side | Tip | "Fast entities can pass through thin shapes unnoticed." | |
+| A pass-through shape with a touch trigger under 0.2 m on its short side | Tip | "Fast entities can pass through thin shapes unnoticed." | |
 | A Dynamic body whose shapes all let things pass through | Warning | "This will fall during play, because its body is Dynamic." | Make Static |
 | A group with a body and nothing inside that collides | Warning | "Car has a body, but nothing inside collides. It will fall through everything." | |
 | A Dynamic body with density 0 everywhere | Warning | "Nothing here has weight, so it counts as 1 kg and can't spin. Set Density above 0." | Set Density to 1 |
@@ -160,7 +160,7 @@ Editor messages for setups likely to behave badly. None of them stops you playin
 | Gravity longer than 30 m/s² | Tip | "Very strong gravity can make stacks jitter." | |
 | Level bounds smaller than the camera | Warning | "The level bounds are smaller than the camera view." | |
 
-The sizes come from Box2D's advice at 50 px per metre: moving shapes from 5 to 500 px, static shapes up to 2,500 px. The 1 px, 20 to 1 and 10 px figures are judgement calls to confirm in play.
+The sizes come from Box2D's advice, which is in metres whatever the scale: moving shapes from 0.1 to 10 m, static shapes up to 50 m. The 0.02 m, 20 to 1 and 0.2 m figures are judgement calls to confirm in play.
 
 Source: scope ED10; round 6: 05 2.9; round 10: EM1; old: PH-44 to PH-46; owner: 2026-11-15
 

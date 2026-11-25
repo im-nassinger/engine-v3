@@ -22,7 +22,7 @@ How values are edited and how mistakes are reversed. **v1:** the Entity inspecto
 
 | Field | Description |
 |---|---|
-| Position | Where the entity sits, in pixels, measured from its parent. |
+| Position | Where the entity sits, in metres, measured from its parent. |
 | Rotation | How far the entity is turned clockwise, in degrees, measured from its parent. |
 | Scale | How much the entity is stretched across and down, measured from its parent. Can't be 0. |
 | Skew | How far the entity is slanted, in degrees, measured from its parent. Between −90° and 90°. |
@@ -49,7 +49,7 @@ Source: round 3: S2; round 4: FT1; owner: 2026-11-15; owner: 2026-11-16
 
 - Enter commits and returns the keyboard to the level view. Tab commits and moves to the next field. Clicking away commits. Esc restores the old value. A value that didn't change makes no undo step.
 - Numbers show up to 2 decimals. A focused field shows the full value. Showing a rounded value never changes the stored one.
-- Units show as a faded suffix and may be typed: `px`, `°`, `%`, `px/s`, `s`. Rotation is in degrees, lengths and speeds in pixels. A vector's box is narrow, so its unit is hidden when it and the value don't both fit (standing yes, 2026-11-19).
+- Units show as a faded suffix and may be typed: `m`, `m/s`, `°`, `%`, `s`, and `px`, `px/s` when ☰'s unit is pixels. Rotation is in degrees, lengths in metres and speeds in m/s (pixels until 2026-11-25, see [lengths in metres](workspace.md#lengths-in-metres--v4)). A vector's box is narrow, so its unit is hidden when it and the value don't both fit (standing yes, 2026-11-19).
 - Both `1.5` and `1,5` are decimals. *Why: the owner's locale and many others use a comma.*
 - A number with both a minimum and a maximum is a filled slider: dragging across the field sets the value, changing the level while dragged and making one undo step when let go; a click without a drag types in it (owner, 2026-11-18).
 - An **entity** field is filled by dragging a row from the Entities viewer, from the **entity picker** (the Entities viewer's tree, with a search), or with its target icon, which lets you click an entity in the level view (owner, 2026-11-23: the picker replaced a flat dropdown). A deleted target shows a `missing entity` warning.

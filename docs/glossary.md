@@ -102,6 +102,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 | Sensor | An engine word only: the Box2D shape play builds for a pass-through shape under a touch trigger, which notices what overlaps it but pushes nothing. Users never see it. Until 2026-11-23 it was a SurfaceComponent setting (owner). |
 | One-way | A surface setting: things pass through from one side and land on the other. |
 | Gravity scale | How strongly gravity pulls a body: 1 is normal, 0 floats. |
+| Pixels per metre | The World's setting on its PhysicsWorldComponent saying how many level pixels make 1 metre, 100 by default. The physics and every length the editor shows in metres use it. Never the grid size. |
 | Damping | Slowing down over time, like air. Linear damping slows movement, angular damping slows spinning. |
 | Fixed rotation | A body setting that stops it from ever turning. |
 | Bullet | A body setting with extra checks so a fast entity doesn't pass through thin walls. |
@@ -248,7 +249,7 @@ Component names end in `Component`, the TransformComponent included (owner: 2026
 | TriggerComponent | A list of triggers (v3) | Any entity, the World included |
 | ScriptComponent | A list of `.lua` files (v5). Their values are the entity's variables | Any entity |
 | AssetComponent | Marks a linked copy and records its `.entity` file (Later) | A linked copy |
-| PhysicsWorldComponent | Gravity, game speed, the collision grid | The World |
+| PhysicsWorldComponent | Gravity, game speed, Pixels per metre, the collision grid | The World |
 | VariablesComponent | Variables: the level's on the World (v3), an entity's own on any other entity (v4) | Any entity, the World included |
 | InputComponent | The level's inputs (v3) | The World |
 
@@ -277,7 +278,6 @@ Don't use these. Each was replaced in the requirements review.
 | Message | Custom event | "Event" was already in use |
 | Anchor, ScreenAnchorComponent | Flex | One layout system |
 | HUD entity, HUD item | Entity inside the camera | They are ordinary entities |
-| Item, object | Entity | One word |
 | ImageComponent, sprite | Shape with an image fill | An image is not its own kind of entity |
 | RenderStyle | StyleComponent | Renamed |
 | Collision category, layer (physics) | Tag in the collision grid | One label system |

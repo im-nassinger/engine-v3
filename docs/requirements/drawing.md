@@ -15,7 +15,7 @@ How shapes, paths and text are made and how they look. **v1:** the Shape tool (r
 - Pan and zoom work during a multi-click drawing and don't end it.
 - A new entity goes inside the group you are inside, on top, named after what it is ("Rectangle 1", "Path 2"), and is selected.
 - New shapes have a TransformComponent, a ShapeComponent and a StyleComponent. **They have no physics until you add it.**
-- A press that moves less than 4 px is a click.
+- A press that moves less than 4 screen pixels is a click.
 - Drawing while inside a locked group is refused: "This group is locked".
 
 Source: round 1: D39; round 5: 03 2.1; old: DR-01 to DR-09
@@ -30,9 +30,9 @@ Source: round 1: D39; round 5: 03 2.1; old: DR-01 to DR-09
 - **Circle:** a circle has only a radius. A drag draws the circle that fits the dragged box, as if Shift were held. To make an ellipse, scale the circle unevenly in its TransformComponent: the shape stays a circle.
 - **Polygon:** each click adds a point. **Clicking the first point closes it into a polygon.** A polygon is always closed and can be any outline.
 - **Line:** **Enter finishes the polygon being drawn open, as a line**: an open chain of straight segments, 2 points or more. A single segment is a line with 2 points. Curved lines are paths. Esc, double-click, choosing another tool and Play finish it open too, so only clicking the first point closes it (standing yes, 2026-11-15: the owner named Enter; one rule for every other way of finishing). *Why a line is its own kind: Box2D calls it a chain and it is the usual way to make platformer ground. Why it isn't in the kinds menu: an open polygon is a line, so one choice draws both (owner: 2026-11-15).*
-- The size in px shows beside the mouse during a drag.
+- The size shows beside the mouse during a drag, in ☰'s unit.
 - **Z and X turn the preview** around its centre (owner: 2026-11-17): Z counter-clockwise and X clockwise on screen, 1° a press, Shift+Z and Shift+X 10°, as they turn a selection. The shape is made at that rotation, its TransformComponent's Rotation, and a drag measures the box along the turned sides. A polygon or line being drawn turns its placed points with it, and its points stay where they were placed. Turning makes no undo step. Choosing the Shape tool starts the preview straight; with tool lock on, the next shape keeps the turn.
-- A rectangle is at least 1 px on each side, and a circle at least 1 px across.
+- A rectangle is at least 0.01 m on each side, and a circle at least 0.01 m across.
 - **A line drawn perfectly flat has a height of 0**, and typing a height for it is refused with a status text, because points all on one row can't be spread. To slope it, move a point. The same goes for its width when drawn perfectly upright (standing yes, 2026-11-14).
 - Limits: 1,000 points in a polygon or line. Above 200 a note says "High detail may slow physics".
 
@@ -58,8 +58,8 @@ Source: owner: 2026-11-15
 
 ### W, A, S, D set the preview size · v1
 
-- With the Shape tool: D makes the preview wider, A narrower, W taller, S shorter, centred on the mouse. 1 px per press, Shift one grid step (owner: 2026-11-17; the grid step, owner: 2026-11-19).
-- The preview grows along its own sides, so a turned preview gets longer along its own width. A rectangle changes that side and a circle its width across, whichever the key, each stopping at 1 px; the next click places that size, remembered as a drag's size is. A polygon or line being drawn spreads its placed points from their middle, or pulls them in; W and S do nothing to a flat line (standing yes, 2026-11-17).
+- With the Shape tool: D makes the preview wider, A narrower, W taller, S shorter, centred on the mouse. 0.01 m per press, Shift one grid step (owner: 2026-11-17; the grid step, owner: 2026-11-19).
+- The preview grows along its own sides, so a turned preview gets longer along its own width. A rectangle changes that side and a circle its width across, whichever the key, each stopping at 0.01 m; the next click places that size, remembered as a drag's size is. A polygon or line being drawn spreads its placed points from their middle, or pulls them in; W and S do nothing to a flat line (standing yes, 2026-11-17).
 - During a drag the mouse sets the size, so the keys change nothing. Sizing the preview makes no undo step (standing yes, 2026-11-17).
 - The same keys resize selected shapes: see [Handles and arrow keys](editor/selection.md#handles-and-arrow-keys--v1).
 - *Why these steps: they match the arrow keys, so nothing is relearned, and unlike grid-only steps they allow small sizes.*
@@ -130,12 +130,12 @@ Source: scope DR3; round 6: PG1
 ### Convert a path to a polygon · Later
 
 - A path never collides. To make a drawn curve collide, right-click the path and choose **Convert to polygon**.
-- A dialog shows a slider for how many points to use and a live preview over the dimmed path. A readout such as "Stays within 2 px of the path" shows how closely it matches.
+- A dialog shows a slider for how many points to use and a live preview over the dimmed path. A readout such as "Stays within 0.02 m of the path" shows how closely it matches.
 - Accepting adds a ShapeComponent with the polygon's points to the same entity. The path is still what is drawn, and the shape is what collides.
 - Sharp corners stay exact, and more points go where the curve bends most.
 - An open path gives a line instead of a polygon.
 - The polygon never updates by itself when the path changes later, because physics should not change silently.
-- The first time, the slider starts at the lowest count that stays within 2 px, up to 64.
+- The first time, the slider starts at the lowest count that stays within 0.02 m, up to 64.
 
 Source: scope DR5; round 1: D22, D58; round 5: 03 2.8; old: DR-64 to DR-79
 
@@ -152,7 +152,7 @@ Source: scope DR5; round 1: D22, D58; round 5: 03 2.8; old: DR-64 to DR-79
 - **Scale outline**, a checkbox under the outline's width, off by default: off, the outline stays as wide as its width however the entity's own scale stretches it; on, it stretches with the shape. A scaled group still stretches the outlines inside it. A level saved before the checkbox reads with it off. *Why: an uneven scale would otherwise stretch the outline unevenly (owner: 2026-11-16; name, default and reach: standing yes, 2026-11-17).*
 - **A shape or path with no StyleComponent is invisible in play.** The editor still shows it as a thin outline. Text always shows.
 - The plain colour picker: a colour square, a hue slider, a see-through slider, a colour code field and a fixed palette. One drag in the picker is one undo step.
-- In v1 new shapes start with one default look: fill `#4A90D9`, outline `#1F3552`, width 2.
+- In v1 new shapes start with one default look: fill `#4A90D9`, outline `#1F3552`, width 0.02 m.
 - **In v1 the fill is a colour field that can be emptied.** An empty fill paints nothing. *Why: v1 has only solid colours, so the fixed list of field types needs nothing new yet (owner: 2026-11-13).*
 - **Every StyleComponent value can change during play.** *Why: they only change the look, and the background colour, the World's fill, already changes during play (standing yes, 2026-11-14).*
 
@@ -190,7 +190,7 @@ Source: scope DR7; round 5: 03 2.3; old: DR-18 to DR-20
 ### Images · Later
 
 - **An image is not its own kind of entity. It is a shape whose fill is the image.** There is no `ImageComponent`.
-- Dropping a PNG, JPEG, WebP or GIF on the level makes an entity with a TransformComponent, a rectangle ShapeComponent the image's size, and a StyleComponent with that image as its fill. 1 image pixel is 1 level pixel.
+- Dropping a PNG, JPEG, WebP or GIF on the level makes an entity with a TransformComponent, a rectangle ShapeComponent the image's size, and a StyleComponent with that image as its fill. 1 image pixel is 1 level pixel, so at 100 px per metre an image 200 pixels wide is 2 m wide.
 - The image's size is the rectangle's width and height, with a proportions lock.
 - A circle with an image fill shows the image cut to a circle, stretched with the circle's scale.
 - Settings that belong only to an image live on the image fill: **stretch or tile**, and **smooth or sharp** scaling. *Why: an asset is just a raw file, so its display settings can't live on it.*

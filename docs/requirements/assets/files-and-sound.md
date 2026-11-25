@@ -73,7 +73,7 @@ Images ship Later together with the image fill, see [drawing](../drawing.md).
 - Files import one by one. Each succeeds or fails alone, and a summary names each failure and its reason. One import is one undo step.
 - Importing a file that is already there adds nothing and selects the existing one. A new file with a used name gets a number.
 - An image with a side over 4096 px offers "Scale down and import".
-- Dropping an image on the level imports it and places it at its real size: 1 image pixel is 1 level pixel.
+- Dropping an image on the level imports it and places it at its real size: 1 image pixel is 1 level pixel, so at 100 px per metre an image 200 pixels wide is 2 m wide.
 - A missing image draws a grey placeholder in the editor and nothing in play, with a warning.
 
 Source: scope DR11; round 1: D30; round 5: 04 2.2, 04 2.3; old: AS-10 to AS-24, AS-31
