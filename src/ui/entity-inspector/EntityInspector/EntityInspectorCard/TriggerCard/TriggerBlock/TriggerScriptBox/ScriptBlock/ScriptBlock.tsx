@@ -35,6 +35,7 @@ type Band = 'top' | 'middle' | 'bottom';
 type OpenContextMenu = {
     contextPart: ContextPart;
     point: { x: number; y: number };
+    isReplaceOnly: boolean;
 };
 
 // How far the tooth hangs below the body; it is left out of the bands.
@@ -48,7 +49,7 @@ const FLOATING_BOXES = '.menu, .entity-picker, .trigger-word-field';
 // of the trigger's background, then its icon and words, each value box opening fix 2's picker or box. Its top
 // third asks for the slot above it, its bottom third the slot below, its middle third (and any value box)
 // none; the cursor says which. On the middle band a removable part shows its ×. A right click opens the
-// context menu of the part under the mouse.
+// context menu of the part under the mouse, and a click on the icon its Replace menu (owner, 2026-11-25).
 export function ScriptBlock({ block, zIndex, isEnd, isLast, onHover, ...wordProps }: ScriptBlockProps) {
     const [band, setBand] = useState<Band | undefined>(undefined);
     const [contextMenu, setContextMenu] = useState<OpenContextMenu | undefined>(undefined);
@@ -66,12 +67,26 @@ export function ScriptBlock({ block, zIndex, isEnd, isLast, onHover, ...wordProp
         if (isOnFloatingBox(event)) return;
 
         event.preventDefault();
-        const contextPart = contextPartAt(event, block);
+        const contextPart = contextPartAt(event.target, block);
         if (contextPart === undefined) return;
 
         const rect = event.currentTarget.getBoundingClientRect();
         const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-        setContextMenu({ contextPart, point });
+        setContextMenu({ contextPart, point, isReplaceOnly: false });
+    };
+
+    // The menu opens under the icon, as a value box's menu opens under the box.
+    const openReplaceMenu = (event: MouseEvent<HTMLButtonElement>) => {
+        const contextPart = contextPartAt(event.target, block);
+        if (contextPart === undefined) return;
+
+        const iconRect = event.currentTarget.getBoundingClientRect();
+        const blockElement = event.currentTarget.closest('.script-block');
+        if (blockElement === null) return;
+
+        const blockRect = blockElement.getBoundingClientRect();
+        const point = { x: iconRect.left - blockRect.left, y: iconRect.bottom - blockRect.top };
+        setContextMenu({ contextPart, point, isReplaceOnly: true });
     };
 
     return (
@@ -91,7 +106,13 @@ export function ScriptBlock({ block, zIndex, isEnd, isLast, onHover, ...wordProp
             onContextMenu={openContextMenu}
         >
             <i className="tooth" />
-            {icon !== undefined && <Icon icon={icon} />}
+            {icon !== undefined && (
+                <Tooltip label="Replace">
+                    <button type="button" className="icon-button" aria-label="Replace" onClick={openReplaceMenu}>
+                        <Icon icon={icon} />
+                    </button>
+                </Tooltip>
+            )}
             {block.groups.map((group, groupIndex) => (
                 <BlockGroup key={groupIndex} group={group} groupIndex={groupIndex} {...wordProps} />
             ))}
@@ -115,7 +136,7 @@ function isOnFloatingBox(event: MouseEvent<HTMLDivElement>) {
 
 function bandAt(event: PointerEvent<HTMLDivElement>, block: ScriptBlockModel): Band {
     const target = event.target;
-    const onValue = target instanceof Element && target.closest('.trigger-slot-word, .remove') !== null;
+    const onValue = target instanceof Element && target.closest('.trigger-slot-word, .remove, .icon-button') !== null;
     if (onValue) return 'middle';
 
     const rect = event.currentTarget.getBoundingClientRect();
@@ -129,8 +150,7 @@ function bandAt(event: PointerEvent<HTMLDivElement>, block: ScriptBlockModel): B
 
 // The part under the mouse, or the block's first part, such as the If bar's first check under its "if".
 // Undefined for a block with no part: the If's bottom bar.
-function contextPartAt(event: MouseEvent<HTMLDivElement>, block: ScriptBlockModel): ContextPart | undefined {
-    const target = event.target;
+function contextPartAt(target: EventTarget | null, block: ScriptBlockModel): ContextPart | undefined {
     const groupElement = target instanceof Element ? target.closest<HTMLElement>('.group') : null;
     const groupIndex = Number(groupElement?.dataset['group']);
     const hovered = block.groups[groupIndex];

@@ -23,6 +23,8 @@ export type BlockContextMenuProps = {
     contextPart: ContextPart;
     // Where the block was right-clicked, from its top left corner.
     point: Point;
+    // Only Replace's own menu, opened by a click on the block's icon.
+    isReplaceOnly: boolean;
     triggerIndex: number;
     commit: CommitTriggerEdit;
     onClose: () => void;
@@ -31,8 +33,15 @@ export type BlockContextMenuProps = {
 const NO_DELETE_REASON = 'A trigger always has its event';
 
 // A block's context menu (owner, 2026-11-25): Replace, opening beside it what can take the part's place, and
-// Delete. The event block can't be deleted.
-export function BlockContextMenu({ contextPart, point, triggerIndex, commit, onClose }: BlockContextMenuProps) {
+// Delete. The event block can't be deleted. A click on the block's icon opens what Replace opens, alone.
+export function BlockContextMenu({
+    contextPart,
+    point,
+    isReplaceOnly,
+    triggerIndex,
+    commit,
+    onClose,
+}: BlockContextMenuProps) {
     const anchorRef = useRef<HTMLSpanElement>(null);
     const { part, canRemove } = contextPart;
 
@@ -46,10 +55,13 @@ export function BlockContextMenu({ contextPart, point, triggerIndex, commit, onC
 
     const replaceEntries = triggerMenuEntries(contextPart.replaceMenu, replace);
     const disabledReason = canRemove ? undefined : NO_DELETE_REASON;
-    const entries: MenuEntry[] = [
+    let entries: MenuEntry[] = [
         { kind: 'submenu', id: 'replace', label: 'Replace', entries: replaceEntries.filter(isMenuItem) },
         { kind: 'action', id: 'delete', label: 'Delete', onChoose: remove, disabledReason },
     ];
+    if (isReplaceOnly) {
+        entries = replaceEntries;
+    }
 
     return (
         <span className="block-context-menu" ref={anchorRef} style={{ left: point.x, top: point.y }}>

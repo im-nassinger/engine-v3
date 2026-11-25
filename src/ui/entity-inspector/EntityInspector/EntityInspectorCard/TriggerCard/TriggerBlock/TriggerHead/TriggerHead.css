@@ -1,41 +1,24 @@
+/* The rows line up as a card's fields do: the label column, then the control. The Name row also has the
+   grip and the `…` menu; the switch sits at the start of the Enabled row's control. */
 .trigger-head {
-    display: flex;
+    display: grid;
+    grid-template-columns: var(--label) minmax(0, 1fr) auto auto;
+    grid-auto-rows: var(--row);
     align-items: center;
-    gap: var(--space-8);
-    height: 34px;
+    column-gap: var(--space-8);
+    padding-top: var(--space-4);
     padding-left: var(--space-4);
 
-    > .name {
-        flex: 1;
-        min-width: 0;
+    > .label {
         overflow: hidden;
-        font-weight: var(--weight-name);
+        color: var(--muted);
         text-overflow: ellipsis;
         white-space: nowrap;
-        cursor: grab;
-        touch-action: none;
-        user-select: none;
-    }
-
-    > .name-box {
-        flex: 1;
-        min-width: 0;
-        height: var(--input);
-        padding: 0 6px;
-        margin-left: -6px;
-        border: none;
-        border-radius: calc(var(--input) / 2);
-        outline: 1px solid var(--accent);
-        outline-offset: -1px;
-        background: var(--field);
-        color: var(--text);
-        font: inherit;
-        font-weight: var(--weight-name);
     }
 
     > .switch {
         position: relative;
-        flex-shrink: 0;
+        justify-self: start;
         width: 28px;
         height: 16px;
         padding: 0;

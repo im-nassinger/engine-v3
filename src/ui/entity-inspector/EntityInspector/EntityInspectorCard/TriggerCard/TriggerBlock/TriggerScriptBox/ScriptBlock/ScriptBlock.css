@@ -64,9 +64,28 @@
         display: block;
     }
 
-    > .icon {
+    /* A click opens the Replace menu (owner, 2026-11-25). As tall as its icon, not the editor's buttons, so
+       the block keeps its height. */
+    > .tooltip > .icon-button {
+        display: inline-flex;
         flex: none;
+        align-items: center;
+        height: auto;
+        padding: 0;
+        border: none;
+        border-radius: 4px;
+        background: none;
         color: var(--block-text);
+        cursor: pointer;
+
+        &:hover {
+            filter: brightness(1.15);
+        }
+
+        &:focus-visible {
+            outline: 1px solid var(--block-text);
+            outline-offset: 1px;
+        }
     }
 
     &[data-colour='event'] {

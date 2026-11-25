@@ -18,7 +18,7 @@ export function requireBlock(index = 0) {
 }
 
 export function blockName(index = 0) {
-    return requireElement(requireBlock(index), '.trigger-head .name').textContent;
+    return requireElement<HTMLInputElement>(requireBlock(index), 'input[aria-label="Trigger name"]').value;
 }
 
 // The script's parts by the sections they were once drawn in: When is the event block's words, If its

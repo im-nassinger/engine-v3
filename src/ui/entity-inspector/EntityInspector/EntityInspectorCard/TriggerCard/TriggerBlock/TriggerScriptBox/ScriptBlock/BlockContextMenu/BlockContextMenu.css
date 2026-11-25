@@ -1,4 +1,4 @@
-/* A point with no size where the block was right-clicked: the menu opens below it. */
+/* A point with no size where the block was right-clicked, or under its icon: the menu opens below it. */
 .block-context-menu {
     position: absolute;
     width: 0;

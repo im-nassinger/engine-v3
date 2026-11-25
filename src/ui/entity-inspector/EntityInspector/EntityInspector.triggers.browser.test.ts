@@ -279,7 +279,7 @@ describe('the trigger card', () => {
         expect(getComputedStyle(requireElement(requireBlock(), '.trigger-script-box')).opacity).toBe('0.45');
     });
 
-    test('the … menu renames, duplicates and deletes, each one step', async () => {
+    test('the Name box renames, and the … menu duplicates and deletes, each one step', async () => {
         const { level, button } = buildLevel();
         withTriggers(button, [{ actions: [{ kind: 'win' }] }]);
         const { session } = await showEntity(level, button);
@@ -290,7 +290,6 @@ describe('the trigger card', () => {
         await expect.poll(() => blocks().length).toBe(2);
         expect(triggersOf(button).map((trigger) => trigger.id)).toEqual([1, 2]);
 
-        await pickFromMenu(menuButton(), 'Rename');
         const nameBox = requireElement<HTMLInputElement>(requireBlock(), 'input[aria-label="Trigger name"]');
         await userEvent.clear(nameBox);
         await userEvent.type(nameBox, 'Goal{Enter}');

@@ -137,7 +137,7 @@ describe('the trigger card as Scratch blocks', () => {
 
         // One icon first on every block but the If's bottom bar, in the block's white.
         for (const block of [event, ifTop, add, destroy] as HTMLElement[]) {
-            expect(block.querySelector(':scope > svg.icon')).not.toBeNull();
+            expect(block.querySelector(':scope > .tooltip > .icon-button > svg.icon')).not.toBeNull();
         }
         expect(ifBottom?.querySelector('svg.icon')).toBeNull();
         expect(getComputedStyle(requireElement(event as HTMLElement, 'svg.icon')).color).toBe('rgb(255, 255, 255)');
@@ -318,6 +318,19 @@ describe('the trigger card as Scratch blocks', () => {
         await expect.poll(() => menuRowNamed('the level starts')).toBeDefined();
         menuRowNamed('the level starts')?.click();
         await expect.poll(() => triggersOf(door)[1]?.when).toEqual({ kind: 'levelStart' });
+    });
+
+    test("a click on a block's icon opens what Replace opens, with no Delete", async () => {
+        const { door } = await showDoor();
+        await expect.poll(() => scriptBlocks(1).length).toBe(4);
+
+        click(requireElement(scriptBlocks(1)[3] as HTMLElement, 'button.icon-button'));
+        await expect.poll(() => menuRowNamed('win')).toBeDefined();
+        expect(menuRowNamed('Delete')).toBeUndefined();
+        menuRowNamed('win')?.click();
+        await expect
+            .poll(() => triggersOf(door)[1]?.actions.map((action) => action.kind))
+            .toEqual(['change', 'change', 'win']);
     });
 
     test("the event's own box only switches between its kinds: starts or stops touching", async () => {

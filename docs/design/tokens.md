@@ -81,8 +81,8 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--island-gap` | 10 px: from the window's edge and between islands | requirement |
 | `--island-bar` | 48 px: ☰ and the tool column's width | requirement |
 | `--tool` | 34 px: a tool button, ☰'s button | requirement |
-| `--entity-inspector` | 344 px wide | requirement (owner, 2026-11-24: 300 px before; the trigger card's longest blocks need 344) |
-| `--entities-viewer` | 260 px wide | requirement |
+| `--entity-inspector` | 360 px wide | requirement (owner, 2026-11-25; 344 px before, 300 px before that) |
+| `--entities-viewer` | 360 px wide | requirement (owner, 2026-11-25; 260 px before) |
 | `--minimap` | 180 px wide | requirement |
 | `--minimap-height` | 93 px tall: inside the 3 px edge the picture is 174 × 87 px, the 2:1 of a new level's 20000 × 10000 bounds | stage 19, steps 6 and 13 (standing yes, 2026-11-18) |
 | `--debug-box` | 28 px tall | redesign 24 |
