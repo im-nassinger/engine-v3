@@ -76,7 +76,7 @@ export class OpenLevel {
             readOnly: services.readOnly,
         });
         this.liveEdit = new LiveEdit(level, this.editor);
-        this.messages = new EditorMessages(level, createV1Rules(services.registry), services.frames);
+        this.messages = new EditorMessages(level, createV1Rules(), services.frames);
         this.entityInspector = new EntityInspectorModel({
             level,
             selection: this.selection,

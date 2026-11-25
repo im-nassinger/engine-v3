@@ -6,7 +6,6 @@ import {
     ShapeComponent,
     SurfaceComponent,
     TriggerComponent,
-    VariablesComponent,
 } from '../../../core/components/index.ts';
 import { ManualFrames, ManualTimer } from '../../time/testing/index.ts';
 import { buildCommandTestSession } from '../testing/commandTestSession.ts';
@@ -124,44 +123,5 @@ describe('applyMessageFix', () => {
         frames.runFrame();
 
         expect(openLevel.messages.forEntity(pad.id)).toEqual([]);
-    });
-
-    test("a trigger's note comes and goes with the World's variables it names", () => {
-        const { session, frames } = buildCrates();
-        const openLevel = session.openLevel;
-        const world = openLevel.level.world;
-        world.addComponent(new VariablesComponent({ variables: [{ name: 'coins', value: 0 }] }));
-        const timer = openLevel.level.createEntity(world, 0);
-        const countingTrigger = {
-            id: 1,
-            name: null,
-            on: true,
-            when: { kind: 'levelStart' },
-            checks: [
-                {
-                    kind: 'value',
-                    target: { kind: 'this' },
-                    value: { kind: 'variable', name: 'coins' },
-                    compare: 'is',
-                    amount: 0,
-                },
-            ],
-            actions: [{ kind: 'win' }],
-        } as const;
-        timer.addComponent(new TriggerComponent({ triggers: [countingTrigger], nextTriggerId: 2 }));
-        frames.runFrame();
-        expect(openLevel.messages.forEntity(timer.id)).toEqual([]);
-
-        removeComponent(openLevel, [world.id], 'VariablesComponent');
-        frames.runFrame();
-
-        expect(openLevel.messages.forEntity(timer.id).map((message) => message.text)).toEqual([
-            "Doesn't run until every yellow part is set.",
-        ]);
-
-        openLevel.editor.undo();
-        frames.runFrame();
-
-        expect(openLevel.messages.forEntity(timer.id)).toEqual([]);
     });
 });

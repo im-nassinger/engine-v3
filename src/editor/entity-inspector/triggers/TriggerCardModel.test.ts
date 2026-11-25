@@ -46,6 +46,12 @@ function groupsOf(word: TriggerWord) {
     return word.entry.groups;
 }
 
+function menuChoices(word: TriggerWord) {
+    if (word.kind !== 'slot' || word.entry.kind !== 'menu') throw new Error('Not a menu.');
+
+    return word.entry.choices;
+}
+
 function menuLabels(word: TriggerWord) {
     if (word.kind !== 'slot' || word.entry.kind !== 'menu') throw new Error('Not a menu.');
 
@@ -173,18 +179,15 @@ describe('TriggerCardModel', () => {
         ]);
     });
 
-    test("a timer's event word picks after or every in place, keeping the time, then the events, which reset it", () => {
+    test("a timer's event word picks only after or every in place, keeping the time", () => {
         const sentence = sentenceOf(blockOf({ when: { kind: 'after', seconds: 5 } }), 0);
         const event = slotNamed(sentence, 'event');
-        const groups = groupsOf(event);
 
         expect(event.text).toBe('after');
-        expect(groups.map((group) => [group.title, group.choices.length])).toEqual([
-            ['Timer', 2],
-            ['Events', 6],
+        expect(menuChoices(event).map((choice) => choice.value)).toEqual([
+            { section: 'when', when: { kind: 'after', seconds: 5 } },
+            { section: 'when', when: { kind: 'every', seconds: 5 } },
         ]);
-        expect(groups[0]?.choices[1]?.value).toEqual({ section: 'when', when: { kind: 'every', seconds: 5 } });
-        expect(groups[1]?.choices[2]?.value).toEqual({ section: 'when', when: { kind: 'after', seconds: null } });
     });
 
     test('touching picks starts or stops in place, and a key or an input picks the other, keeping how it is pressed', () => {
@@ -192,14 +195,20 @@ describe('TriggerCardModel', () => {
         const key = slotNamed(sentenceOf(blockOf({ when: { kind: 'key', key: null, how: 'held' } }), 0), 'event');
 
         expect(touch.text).toBe('starts');
-        expect(groupsOf(touch)[0]?.choices.map((choice) => [choice.label, choice.value])).toEqual([
+        expect(menuChoices(touch).map((choice) => [choice.label, choice.value])).toEqual([
             ['starts touching', { section: 'when', when: { kind: 'touched' } }],
             ['stops touching', { section: 'when', when: { kind: 'untouched' } }],
         ]);
-        expect(groupsOf(key)[0]?.choices[1]?.value).toEqual({
+        expect(menuChoices(key)[1]?.value).toEqual({
             section: 'when',
             when: { kind: 'input', input: null, how: 'held' },
         });
+    });
+
+    test('an event with no other kind has no box: its words are plain text', () => {
+        const sentence = sentenceOf(blockOf({ when: { kind: 'levelStart' } }), 0);
+
+        expect(sentence.words).toEqual([{ kind: 'text', text: 'the level starts' }]);
     });
 
     test("a word's menu offers the World's inputs, the level's tags, and the keys", () => {
@@ -528,7 +537,7 @@ describe('TriggerCardModel', () => {
     test("a block takes the card's notes about its own trigger", () => {
         const note: CardNote = {
             kind: 'warning',
-            text: "Doesn't run until every yellow part is set.",
+            text: 'missing entity',
             fieldKey: 'triggers',
             itemId: 1,
             fix: undefined,

@@ -42,10 +42,14 @@ Slate islands and one bright blue accent (owner, 2026-11-17). **There is no line
 | `--block-add` | `#7d58b8` | An Add, Subtract or Flip block |
 | `--block-wait` | `#ad4a7c` | A Wait block |
 | `--block-destroy` | `#b5473d` | A Destroy block |
-| `--block-text` | `#ffffff` | Words and icons on a block; a menu box is the block's colour darkened by a quarter |
+| `--block-text` | `#ffffff` | Words and icons on a block; a menu box is the block's colour darkened by a fifth (v4 fix 5) |
 | `--block-number` | `#ffffff` | A number's oval on a block |
 | `--block-number-text` | `#575e75` | The text in a number's oval (Scratch's grey) |
-| `--block-shade` | `#000000` | Mixed in at 25% to darken a block's colour for its menu boxes |
+| `--block-shade` | `#000000` | Mixed in at 20% to darken a block's colour for its menu boxes |
+| `--block-select-ring` | `rgb(255 255 255 / 22%)` | The faint ring inside a block's menu box (v4 fix 5, standing yes, 2026-11-25) |
+| `--block-select-unset` | `#ffd77a` | An unset or missing value box on a block: a soft amber instead of the warning yellow (v4 fix 5) |
+| `--block-select-unset-ring` | `rgb(0 0 0 / 18%)` | The ring inside an unset value box |
+| `--block-select-unset-text` | `#4d3800` | The words in an unset value box |
 | `--block-gap` | `--panel` with 4% white, opaque | The 2 px ring around each block, the trigger's own background, cutting blocks apart |
 | `--block-slot` | `--panel` with 7% white | An empty "add a block" slot |
 | `--block-slot-hover` | `--panel` with 10% white | The slot under the mouse, or with its menu open |

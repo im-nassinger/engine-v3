@@ -34,6 +34,7 @@ export type {
     ScriptColour,
     ScriptGap,
     ScriptIcon,
+    ScriptReplaceMenu,
     ScriptWordGroup,
     TriggerScript,
 } from './triggers/TriggerScript.ts';

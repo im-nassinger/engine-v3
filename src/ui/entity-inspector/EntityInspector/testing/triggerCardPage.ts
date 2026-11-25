@@ -106,6 +106,17 @@ export function bandPoint(block: HTMLElement, band: 'top' | 'middle' | 'bottom')
     return { position: { x: EDGE_PX, y } };
 }
 
+// Right-clicks a block at its left end, halfway down, opening its context menu.
+export function openContextMenu(block: HTMLElement) {
+    const rect = block.getBoundingClientRect();
+    const clientX = rect.left + EDGE_PX;
+    const clientY = rect.top + rect.height / 2;
+    const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX, clientY });
+    block.dispatchEvent(event);
+
+    return event;
+}
+
 // A menu's rows, or the rows above the entity picker's tree.
 export function menuRows() {
     return [...document.querySelectorAll<HTMLElement>('.menu [role="menuitem"], .entity-picker [role="menuitem"]')];

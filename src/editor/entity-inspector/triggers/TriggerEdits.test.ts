@@ -43,6 +43,18 @@ function choiceOf(block: TriggerBlock, sectionIndex: number, slot: string, label
     throw new Error(`No ${slot} menu.`);
 }
 
+// An item of the Replace menu of a script block's first part.
+function replaceChoiceOf(block: TriggerBlock, blockIndex: number, label: string) {
+    const group = block.script.blocks[blockIndex]?.groups.find((candidate) => candidate.replaceMenu !== undefined);
+    const menu = group?.replaceMenu;
+    if (menu === undefined) throw new Error(`No Replace menu on block ${blockIndex}.`);
+
+    if (menu.kind === 'menu') return requireChoice(menu.choices, label);
+
+    const choices = menu.groups.flatMap((menuGroup) => menuGroup.choices);
+    return requireChoice(choices, label);
+}
+
 function requireChoice(choices: readonly TriggerChoice[], label: string) {
     const choice = choices.find((candidate) => candidate.label === label);
     if (choice === undefined) throw new Error(`No choice ${label}.`);
@@ -51,9 +63,9 @@ function requireChoice(choices: readonly TriggerChoice[], label: string) {
 }
 
 describe('TriggerEdits', () => {
-    test('a new event resets the When and keeps the checks and actions, as `Change trigger "Touched"`', () => {
+    test('replacing the event resets the When and keeps the checks and actions, as `Change trigger "Touched"`', () => {
         const { component, block } = buildCard([{ checks: [TAG_CHECK], actions: [{ kind: 'win' }] }]);
-        const choice = choiceOf(block(), 0, 'event', 'a key or input is pressed, released or held');
+        const choice = replaceChoiceOf(block(), 0, 'a key or input is pressed, released or held');
 
         const edit = TriggerEdits.picked(component, 0, choice.value);
 
@@ -114,9 +126,9 @@ describe('TriggerEdits', () => {
         expect(checkEdit.triggers[0]?.actions).toEqual(actions);
     });
 
-    test("an action's own word turns it into another kind, keeping its target", () => {
+    test('replacing an action turns it into another kind, keeping its target', () => {
         const { component, block } = buildCard([{ actions: [{ kind: 'destroy', target: { kind: 'other' } }] }]);
-        const choice = choiceOf(block(), 2, 'action', 'fire a custom event');
+        const choice = replaceChoiceOf(block(), 1, 'fire a custom event');
 
         const edit = TriggerEdits.picked(component, 0, choice.value);
 

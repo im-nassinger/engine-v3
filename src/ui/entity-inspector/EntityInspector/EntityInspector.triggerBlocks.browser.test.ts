@@ -19,6 +19,7 @@ import {
     bandPoint,
     menuRowNamed,
     menuRows,
+    openContextMenu,
     parts,
     scriptBlocks,
     sentences,
@@ -155,14 +156,15 @@ describe('the trigger card as Scratch blocks', () => {
         expect(bodyOf(event as HTMLElement).borderRadius).toBe('4px');
     });
 
-    test('menus are the block darkened by a quarter, numbers white ovals, a path dim, a time has a unit menu', async () => {
+    test('menus are pills of the block darkened by a fifth, numbers white ovals, a path dim, a time has a unit menu', async () => {
         await showDoor();
         await expect.poll(() => scriptBlocks(1).length).toBe(4);
 
         const tag = word('If', 'player');
         expect(tag.dataset['look']).toBe('menu');
         expect(getComputedStyle(tag, '::after').content).toBe('"▾"');
-        expect(rgbOf(getComputedStyle(tag).backgroundColor)).toEqual([35, 103, 94]);
+        expect(rgbOf(getComputedStyle(tag).backgroundColor)).toEqual([38, 110, 101]);
+        expect(getComputedStyle(tag).borderRadius).toBe('999px');
 
         const amount = word('Do', '1');
         expect(amount.dataset['look']).toBe('number');
@@ -274,5 +276,75 @@ describe('the trigger card as Scratch blocks', () => {
 
         await expect.poll(() => scriptBlocks(1).length).toBe(5);
         expect(shownSlots(1)).toHaveLength(0);
+    });
+
+    test("a block's context menu deletes its part as one step; the event block can't be deleted", async () => {
+        const { session, door } = await showDoor();
+        await expect.poll(() => scriptBlocks(0).length).toBe(5);
+
+        const event = openContextMenu(scriptBlocks(0)[0] as HTMLElement);
+        expect(event.defaultPrevented).toBe(true);
+        await expect.poll(() => menuRowNamed('Delete')).toBeDefined();
+        expect(menuRowNamed('Delete')?.getAttribute('aria-disabled')).toBe('true');
+        await userEvent.keyboard('{Escape}');
+        await expect.poll(() => menuRows()).toHaveLength(0);
+
+        const destroy = scriptBlocks(0)[3] as HTMLElement;
+        openContextMenu(destroy);
+        await expect.poll(() => menuRowNamed('Delete')).toBeDefined();
+        menuRowNamed('Delete')?.click();
+
+        await expect.poll(() => triggersOf(door)[0]?.actions.map((action) => action.kind)).toEqual(['change']);
+        expect(session.openLevel.history.undoCount).toBe(1);
+        expect(menuRows()).toHaveLength(0);
+    });
+
+    test("Replace opens the block's own menu beside it: an action becomes another, an event another event", async () => {
+        const { door } = await showDoor();
+        await expect.poll(() => scriptBlocks(1).length).toBe(4);
+
+        openContextMenu(scriptBlocks(1)[3] as HTMLElement);
+        await expect.poll(() => menuRowNamed('Replace')).toBeDefined();
+        click(menuRowNamed('Replace') as HTMLElement);
+        await expect.poll(() => menuRowNamed('win')).toBeDefined();
+        menuRowNamed('win')?.click();
+        await expect
+            .poll(() => triggersOf(door)[1]?.actions.map((action) => action.kind))
+            .toEqual(['change', 'change', 'win']);
+
+        openContextMenu(scriptBlocks(1)[0] as HTMLElement);
+        await expect.poll(() => menuRowNamed('Replace')).toBeDefined();
+        click(menuRowNamed('Replace') as HTMLElement);
+        await expect.poll(() => menuRowNamed('the level starts')).toBeDefined();
+        menuRowNamed('the level starts')?.click();
+        await expect.poll(() => triggersOf(door)[1]?.when).toEqual({ kind: 'levelStart' });
+    });
+
+    test("the event's own box only switches between its kinds: starts or stops touching", async () => {
+        await showDoor();
+        await expect.poll(() => scriptBlocks(0).length).toBe(5);
+
+        click(word('When', 'starts'));
+        await expect
+            .poll(() => menuRows().map((row) => row.textContent))
+            .toEqual(['starts touching', 'stops touching']);
+    });
+
+    test('the script is at least 4 blocks tall and at most 10, scrolling past them', async () => {
+        const level = Level.createNew();
+        const door = addBareEntity(level, 'Door');
+        const waits: Action[] = Array.from({ length: 14 }, () => ({ kind: 'wait', seconds: 1 }));
+        const short: Trigger = { ...TIMED_DOOR, id: 1, actions: [{ kind: 'win' }] };
+        const long: Trigger = { ...TIMED_DOOR, id: 2, actions: waits };
+        door.addComponent(new TriggerComponent({ triggers: [short, long], nextTriggerId: 3 }));
+        const shown = showEntityInspector(level);
+        select(shown.session, [door]);
+        await expect.poll(() => scriptBlocks(1).length).toBe(15);
+
+        const scripts = [...document.querySelectorAll<HTMLElement>('.trigger-script-box > .script')];
+        const [shortScript, longScript] = scripts.map((script) => script.getBoundingClientRect().height);
+        expect(shortScript).toBe(4 * 34 + 12);
+        expect(longScript).toBe(10 * 34 + 12);
+        expect((scripts[1] as HTMLElement).scrollHeight).toBeGreaterThan(10 * 34 + 12);
     });
 });

@@ -205,4 +205,34 @@ describe('TriggerScript', () => {
         expect(groups[0]?.choices[0]?.value).toMatchObject({ section: 'check', index: 1 });
         expect(groups[1]?.choices[0]?.value).toMatchObject({ section: 'action', index: 1, action: { kind: 'change' } });
     });
+
+    test("each block's Replace menu puts a part in its place: the events, a check, the actions keeping the target", () => {
+        const script = scriptOf({
+            checks: [PLAYER_TAG_CHECK, PLAYER_TAG_CHECK],
+            actions: [{ kind: 'destroy', target: { kind: 'other' } }],
+        });
+        const [event, ifTop, destroy] = script.blocks.map((block) => block.groups);
+
+        const eventGroup = event?.find((group) => group.replaceMenu !== undefined);
+        expect(eventGroup?.canRemove).toBe(false);
+        expect(eventGroup?.replaceMenu).toMatchObject({ kind: 'menu' });
+
+        const secondCheck = ifTop?.find((group) => group.part?.section === 'check' && group.part.index === 1);
+        expect(secondCheck?.replaceMenu).toMatchObject({
+            kind: 'menu',
+            choices: [{ value: { section: 'check', index: 1 } }],
+        });
+        expect(ifTop?.[0]?.replaceMenu).toBeUndefined();
+
+        const destroyMenu = destroy?.[0]?.replaceMenu;
+        if (destroyMenu?.kind !== 'groups') throw new Error('No action groups.');
+        const wait = destroyMenu.groups.flatMap((group) => group.choices).find((choice) => choice.label === 'wait');
+        expect(wait?.value).toEqual({ section: 'action', index: 0, action: { kind: 'wait', seconds: null } });
+    });
+
+    test("an action's own word is plain text, not a box", () => {
+        const script = scriptOf({ actions: [{ kind: 'destroy', target: { kind: 'other' } }] });
+
+        expect(wordsOf(blockAt(script, 1))[0]).toEqual({ kind: 'text', text: 'destroy' });
+    });
 });

@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
 import { useState } from 'react';
-import type { PointerEvent } from 'react';
+import type { MouseEvent, PointerEvent } from 'react';
 import { TriggerEdits } from '../../../../../../../../editor/entity-inspector/index.ts';
 import type {
     ScriptBlock as ScriptBlockModel,
@@ -10,6 +10,8 @@ import type {
 import type { OpenLevel } from '../../../../../../../../editor/session/index.ts';
 import { Icon, Tooltip } from '../../../../../../../shared/index.ts';
 import type { CommitTriggerEdit } from '../../../CommitTriggerEdit.ts';
+import { BlockContextMenu } from './BlockContextMenu/index.ts';
+import type { ContextPart } from './BlockContextMenu/index.ts';
 import { SCRIPT_ICONS } from './scriptIcons.ts';
 import { TriggerSlotWord } from './TriggerSlotWord/index.ts';
 import './ScriptBlock.css';
@@ -30,6 +32,11 @@ export type ScriptBlockProps = {
 
 type Band = 'top' | 'middle' | 'bottom';
 
+type OpenContextMenu = {
+    contextPart: ContextPart;
+    point: { x: number; y: number };
+};
+
 // How far the tooth hangs below the body; it is left out of the bands.
 const TOOTH_PX = 6;
 
@@ -40,9 +47,11 @@ const FLOATING_BOXES = '.menu, .entity-picker, .trigger-word-field';
 // One Scratch block (v4 fix 4): its body and tooth in its kind's colour, cut from its neighbours by a 2 px ring
 // of the trigger's background, then its icon and words, each value box opening fix 2's picker or box. Its top
 // third asks for the slot above it, its bottom third the slot below, its middle third (and any value box)
-// none; the cursor says which. On the middle band a removable part shows its ×.
+// none; the cursor says which. On the middle band a removable part shows its ×. A right click opens the
+// context menu of the part under the mouse.
 export function ScriptBlock({ block, zIndex, isEnd, isLast, onHover, ...wordProps }: ScriptBlockProps) {
     const [band, setBand] = useState<Band | undefined>(undefined);
+    const [contextMenu, setContextMenu] = useState<OpenContextMenu | undefined>(undefined);
     const icon = block.icon === undefined ? undefined : SCRIPT_ICONS[block.icon];
 
     const hover = (event: PointerEvent<HTMLDivElement>) => {
@@ -51,6 +60,18 @@ export function ScriptBlock({ block, zIndex, isEnd, isLast, onHover, ...wordProp
         setBand(hovered);
         const gap = gapOf(hovered, block);
         onHover(gap, event.currentTarget);
+    };
+
+    const openContextMenu = (event: MouseEvent<HTMLDivElement>) => {
+        if (isOnFloatingBox(event)) return;
+
+        event.preventDefault();
+        const contextPart = contextPartAt(event, block);
+        if (contextPart === undefined) return;
+
+        const rect = event.currentTarget.getBoundingClientRect();
+        const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+        setContextMenu({ contextPart, point });
     };
 
     return (
@@ -67,17 +88,26 @@ export function ScriptBlock({ block, zIndex, isEnd, isLast, onHover, ...wordProp
             style={{ zIndex }}
             onPointerMove={hover}
             onPointerLeave={() => setBand(undefined)}
+            onContextMenu={openContextMenu}
         >
             <i className="tooth" />
             {icon !== undefined && <Icon icon={icon} />}
             {block.groups.map((group, groupIndex) => (
-                <BlockGroup key={groupIndex} group={group} {...wordProps} />
+                <BlockGroup key={groupIndex} group={group} groupIndex={groupIndex} {...wordProps} />
             ))}
+            {contextMenu && (
+                <BlockContextMenu
+                    {...contextMenu}
+                    triggerIndex={wordProps.triggerIndex}
+                    commit={wordProps.commit}
+                    onClose={() => setContextMenu(undefined)}
+                />
+            )}
         </div>
     );
 }
 
-function isOnFloatingBox(event: PointerEvent<HTMLDivElement>) {
+function isOnFloatingBox(event: MouseEvent<HTMLDivElement>) {
     const target = event.target;
 
     return target instanceof Element && target.closest(FLOATING_BOXES) !== null;
@@ -97,6 +127,23 @@ function bandAt(event: PointerEvent<HTMLDivElement>, block: ScriptBlockModel): B
     return 'middle';
 }
 
+// The part under the mouse, or the block's first part, such as the If bar's first check under its "if".
+// Undefined for a block with no part: the If's bottom bar.
+function contextPartAt(event: MouseEvent<HTMLDivElement>, block: ScriptBlockModel): ContextPart | undefined {
+    const target = event.target;
+    const groupElement = target instanceof Element ? target.closest<HTMLElement>('.group') : null;
+    const groupIndex = Number(groupElement?.dataset['group']);
+    const hovered = block.groups[groupIndex];
+    const parts = block.groups.filter((group) => group.part !== undefined);
+    let group = parts[0];
+    if (hovered?.part !== undefined) {
+        group = hovered;
+    }
+    if (group?.part === undefined || group.replaceMenu === undefined) return undefined;
+
+    return { part: group.part, canRemove: group.canRemove, replaceMenu: group.replaceMenu };
+}
+
 function gapOf(band: Band, block: ScriptBlockModel) {
     if (band === 'top') return block.gapAbove;
     if (band === 'bottom') return block.gapBelow;
@@ -112,11 +159,12 @@ type WordProps = {
 
 type BlockGroupProps = WordProps & {
     group: ScriptWordGroup;
+    groupIndex: number;
 };
 
 // One part's words, then its × when it can be removed. It lays out as the block's own words (display:
 // contents), and says which part it is.
-function BlockGroup({ group, ...wordProps }: BlockGroupProps) {
+function BlockGroup({ group, groupIndex, ...wordProps }: BlockGroupProps) {
     const { part } = group;
     const label = `Remove ${group.words.map((word) => word.text).join(' ')}`;
 
@@ -127,7 +175,7 @@ function BlockGroup({ group, ...wordProps }: BlockGroupProps) {
     };
 
     return (
-        <span className="group" data-section={part?.section}>
+        <span className="group" data-section={part?.section} data-group={groupIndex}>
             {group.words.map((word, wordIndex) => (
                 <BlockWord key={wordKey(word, wordIndex)} word={word} {...wordProps} />
             ))}

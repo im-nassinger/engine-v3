@@ -43,9 +43,15 @@ export type ScriptIcon =
 export type ScriptWordGroup = {
     readonly part: TriggerRowPart | undefined;
     readonly words: readonly TriggerWord[];
-    // A check or an action: an × at the block's right end takes it away. The When never goes.
+    // A check or an action: an × at the block's right end, or Delete in the block's context menu, takes it
+    // away. The When never goes.
     readonly canRemove: boolean;
+    // What the block's context menu's Replace opens: the events, the checks or the actions, each put in the
+    // part's place. Undefined for joining words.
+    readonly replaceMenu: ScriptReplaceMenu | undefined;
 };
+
+export type ScriptReplaceMenu = TriggerWordEntry & { readonly kind: 'menu' | 'groups' };
 
 // One block of the script, top to bottom: the event, the If's top bar with its checks, each action, the
 // If's bottom bar. Its slot words are its value boxes.
@@ -116,7 +122,8 @@ export function triggerScript(trigger: Trigger, sources: SentenceSources): Trigg
 function eventBlock(trigger: Trigger, sources: SentenceSources): ScriptBlock {
     const sentence = TriggerSentence.ofWhen(trigger, sources);
     const words = [text('when'), ...eventWords(sentence.words, trigger.when)];
-    const group: ScriptWordGroup = { part: { section: 'when' }, words, canRemove: false };
+    const replaceMenu: ScriptReplaceMenu = { kind: 'menu', choices: sources.choices.events() };
+    const group: ScriptWordGroup = { part: { section: 'when' }, words, canRemove: false, replaceMenu };
 
     return {
         shape: 'event',
@@ -151,14 +158,16 @@ function eventWords(words: readonly TriggerWord[], when: When | null): TriggerWo
 }
 
 function ifTopBlock(trigger: Trigger, sources: SentenceSources): ScriptBlock {
-    const groups: ScriptWordGroup[] = [{ part: undefined, words: [text('if')], canRemove: false }];
+    const groups: ScriptWordGroup[] = [joiningGroup('if')];
     trigger.checks.forEach((_check, index) => {
         if (index > 0) {
-            groups.push({ part: undefined, words: [text('and')], canRemove: false });
+            groups.push(joiningGroup('and'));
         }
 
         const sentence = TriggerSentence.ofCheck(trigger, index, sources);
-        groups.push({ part: { section: 'check', index }, words: sentence.words, canRemove: true });
+        const checks = sources.choices.newChecks(index, sources.eventHasOther);
+        const replaceMenu: ScriptReplaceMenu = { kind: 'menu', choices: checks };
+        groups.push({ part: { section: 'check', index }, words: sentence.words, canRemove: true, replaceMenu });
     });
 
     return {
@@ -185,12 +194,14 @@ function actionBlock(
     if (action.kind === 'wait') {
         words = waitWords(words, part, { section: 'action', index, action });
     }
+    const actionGroups = sources.choices.actionGroups(index, action);
+    const replaceMenu: ScriptReplaceMenu = { kind: 'groups', groups: actionGroups };
 
     return {
         shape: 'action',
         colour: actionColour(action),
         icon: actionIcon(action),
-        groups: [{ part, words, canRemove: true }],
+        groups: [{ part, words, canRemove: true, replaceMenu }],
         isInsideIf: hasIf,
         gapAbove: index,
         gapBelow: index + 1,
@@ -225,6 +236,10 @@ function unitWord(part: TriggerRowPart, same: TriggerPartValue): TriggerWord {
         reason: undefined,
         entry: { kind: 'menu', choices: [seconds] },
     };
+}
+
+function joiningGroup(word: string): ScriptWordGroup {
+    return { part: undefined, words: [text(word)], canRemove: false, replaceMenu: undefined };
 }
 
 function text(word: string): TriggerWord {

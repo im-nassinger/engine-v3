@@ -17,3 +17,10 @@ What the owner asked to change while trying v4, in their words, and what became 
 | # | The owner's words | State |
 |---|---|---|
 | 4 | The trigger card is "ugly and convoluted"; after the [mockup](../../design/mockups/triggers.html)'s rounds: "we have a winner: lets do the scratch one." | **Built** (2026-11-25), by the orchestrator in tasks 19 to 26 of [tasks.md](tasks.md); task 27 is the owner's try. The card is Scratch blocks: an event block, one If wrapping the actions, blocks added from hover slots and removed with an ×. Repeat is gone (a trigger rests or fires once per run by setting its own *Enabled*), a fresh firing of a trigger switched off before it runs is dropped, the event says "other", and the Entity inspector is 344 px wide. The look is in [controls.md](../../design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks), the plan and the five points the owner confirmed in [fix-4-scratch-triggers.md](fix-4-scratch-triggers.md), the picks made while building in [decisions.md](../../decisions.md) |
+
+## 2026-11-25
+
+| # | The owner's words | State |
+|---|---|---|
+| 5 | Hovering a value box should close the slot (it already did; the owner's copy was older). Then: "make it so the element with all the scratch components have a minimum height that fits around 4 blocks, and a max height to fit 10 blocks. and remove that yellow warning "doesnt run until every yellow part is set.". and make it so all the selects of the scratch blocks have maximum rounded borders, like pills … and pick better colors for the selects and selects with no values. and add a context menu when the user right clicks a scratch block, with the options: Replace, Delete. … this way the When block … select will be used only to change it's own value (ex: from starts to stops) and not allow the user to use it to change the whole block itself." | **Built** (2026-11-25). See [controls.md](../../design/controls.md#v4-fix-5-the-blocks-after-the-owners-try); the picks made in [decisions.md](../../decisions.md) |
+

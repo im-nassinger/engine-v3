@@ -5,6 +5,5 @@ export { HighDetailRule } from './rules/HighDetailRule.ts';
 export { MissingEntityRule } from './rules/MissingEntityRule.ts';
 export { MissingInputsRule } from './rules/MissingInputsRule.ts';
 export { MissingPartnerRule } from './rules/MissingPartnerRule.ts';
-export { TriggerCantRunRule } from './rules/TriggerCantRunRule.ts';
 export { createV1Rules } from './rules/v1Rules.ts';
 export { EditorMessages } from './tracking/EditorMessages.ts';

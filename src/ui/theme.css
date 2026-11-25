@@ -41,6 +41,10 @@
     --block-number: #ffffff;
     --block-number-text: #575e75;
     --block-shade: #000000;
+    --block-select-ring: rgb(255 255 255 / 22%);
+    --block-select-unset: #ffd77a;
+    --block-select-unset-ring: rgb(0 0 0 / 18%);
+    --block-select-unset-text: #4d3800;
     --block-gap: color-mix(in srgb, #ffffff 4%, var(--panel));
     --block-slot: color-mix(in srgb, #ffffff 7%, var(--panel));
     --block-slot-hover: color-mix(in srgb, #ffffff 10%, var(--panel));

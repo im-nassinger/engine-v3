@@ -26,6 +26,7 @@ import {
     menuRowNamed,
     menuRows,
     notesOf,
+    openContextMenu,
     parts,
     pickerRowNamed,
     requireBlock,
@@ -103,6 +104,10 @@ async function showEntity(level: Level, entity: Entity) {
 
 async function pickFromMenu(opener: HTMLElement, label: string) {
     click(opener);
+    await pickRow(label);
+}
+
+async function pickRow(label: string) {
     await expect.poll(() => menuRowNamed(label)).toBeDefined();
     menuRowNamed(label)?.click();
     await expect.poll(() => menuRows().length).toBe(0);
@@ -112,7 +117,6 @@ function history(session: EditorSession) {
     return session.openLevel.history;
 }
 
-const CANT_RUN = "Doesn't run until every yellow part is set.";
 const PLAYER_TAG_CHECK: Check = {
     kind: 'value',
     target: { kind: 'other' },
@@ -173,14 +177,15 @@ describe('the trigger card', () => {
         ]);
     });
 
-    test('says a trigger with unset words does not run, and draws them yellow', async () => {
+    test('draws unset words in amber, with no note under the trigger', async () => {
         const { level, button } = buildLevel();
         withTriggers(button, [{ checks: [{ ...PLAYER_TAG_CHECK, amount: null }] }]);
         const { frames } = await showEntity(level, button);
         frames.runFrame();
 
-        await expect.poll(() => notesOf()).toEqual([CANT_RUN]);
-        expect(word('If', 'pick a tag').dataset['state']).toBe('unset');
+        await expect.poll(() => word('If', 'pick a tag').dataset['state']).toBe('unset');
+        expect(notesOf()).toEqual([]);
+        expect(getComputedStyle(word('If', 'pick a tag')).backgroundColor).toBe('rgb(255, 215, 122)');
         expect(getComputedStyle(word('If', 'pick a tag')).fontStyle).toBe('italic');
         expect(word('If', 'other').dataset['state']).toBe('set');
     });
@@ -191,7 +196,10 @@ describe('the trigger card', () => {
         await showEntity(level, button);
         await expect.poll(() => blocks().length).toBe(1);
 
-        await pickFromMenu(word('When', 'starts'), 'a key or input is pressed, released or held');
+        openContextMenu(scriptBlocks()[0] as HTMLElement);
+        await expect.poll(() => menuRowNamed('Replace')).toBeDefined();
+        click(menuRowNamed('Replace') as HTMLElement);
+        await pickRow('a key or input is pressed, released or held');
 
         await expect.poll(() => word('If', 'other').dataset['state']).toBe('greyed');
         expect(getComputedStyle(word('If', 'other')).textDecorationLine).toBe('line-through');

@@ -109,8 +109,6 @@ const EVENT_WORDS: Readonly<Record<WhenKind, string>> = {
     custom: 'this gets the custom event',
 };
 
-const EVENTS_TITLE = 'Events';
-
 const PRESSES: readonly Press[] = ['pressed', 'released', 'held'];
 
 const COMPARES: readonly Named<Compare>[] = [
@@ -447,21 +445,16 @@ export class TriggerChoices {
         });
     }
 
-    // What the event word opens: the When menu, and first, for touching, a key or an input, and a timer,
-    // the in-place choice between its two kinds, which keeps the rest of the When.
-    eventEntry(when: When | null): TriggerWordEntry {
-        const events = this.events();
-        const variants = when === null ? undefined : eventVariantsOf(when);
-        if (variants === undefined) return { kind: 'menu', choices: events };
+    // What the event word opens (owner, 2026-11-25): only the in-place choice between its kinds, for touching,
+    // a key or an input, and a timer, which keeps the rest of the When; the When menu while no event is
+    // picked. An event with no such choice has no box: the block's Replace changes it. Undefined for none.
+    eventEntry(when: When | null): TriggerWordEntry | undefined {
+        if (when === null) return { kind: 'menu', choices: this.events() };
 
-        const variantGroup: TriggerMenuGroup = {
-            title: variants.title,
-            choices: variants.choices,
-            emptyText: undefined,
-        };
-        const eventGroup: TriggerMenuGroup = { title: EVENTS_TITLE, choices: events, emptyText: undefined };
+        const variants = eventVariantsOf(when);
+        if (variants === undefined) return undefined;
 
-        return { kind: 'groups', groups: [variantGroup, eventGroup] };
+        return { kind: 'menu', choices: variants };
     }
 
     presses(place: Place<Press>) {
@@ -526,9 +519,10 @@ export class TriggerChoices {
         });
     }
 
-    // Add action's menu: the actions in their groups, each with what it does.
-    actionGroups(index: number): readonly TriggerMenuGroup[] {
-        const choices = this.actions(index, undefined);
+    // Add action's menu: the actions in their groups, each with what it does. Replacing an action keeps its
+    // target.
+    actionGroups(index: number, replaced?: Action): readonly TriggerMenuGroup[] {
+        const choices = this.actions(index, replaced);
 
         return ACTION_GROUPS.map((group) => {
             const inGroup = choices.filter((_choice, position) => {
@@ -925,13 +919,10 @@ function eventVariantsOf(when: When) {
     switch (when.kind) {
         case 'touched':
         case 'untouched':
-            return {
-                title: 'Touching',
-                choices: [
-                    choice('starts touching', place({ kind: 'touched' })),
-                    choice('stops touching', place({ kind: 'untouched' })),
-                ],
-            };
+            return [
+                choice('starts touching', place({ kind: 'touched' })),
+                choice('stops touching', place({ kind: 'untouched' })),
+            ];
         case 'key':
         case 'input': {
             let key: When = { kind: 'key', key: null, how: when.how };
@@ -942,7 +933,7 @@ function eventVariantsOf(when: When) {
                 input = when;
             }
 
-            return { title: 'Key or input', choices: [choice('a key', place(key)), choice('an input', place(input))] };
+            return [choice('a key', place(key)), choice('an input', place(input))];
         }
         case 'after':
         case 'every': {
@@ -950,7 +941,7 @@ function eventVariantsOf(when: When) {
             const after = choice('after', place({ kind: 'after', seconds }));
             const every = choice('every', place({ kind: 'every', seconds }));
 
-            return { title: 'Timer', choices: [after, every] };
+            return [after, every];
         }
         default:
             return undefined;

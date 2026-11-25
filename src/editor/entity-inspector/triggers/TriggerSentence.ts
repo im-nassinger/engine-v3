@@ -164,7 +164,8 @@ function numberEntry(value: number | null, unit: Unit | undefined): TriggerWordE
 }
 
 // "something starts touching this", "the key Space is pressed", "every 2 seconds", "the level starts". The
-// event word is the in-place word where the event has one (starts, key, every), so it opens both.
+// event word is the in-place word where the event has one (starts, key, every), opening its two kinds; any
+// other event's word is plain text, since the event block's Replace changes the event.
 function addWhenWords(builder: SentenceBuilder, when: When | null, choices: TriggerChoices) {
     const eventMenu = choices.eventEntry(when);
     const eventText = when === null ? null : TriggerChoices.eventWord(when.kind);
@@ -176,7 +177,11 @@ function addWhenWords(builder: SentenceBuilder, when: When | null, choices: Trig
     if (isPress) {
         builder.text('the');
     }
-    builder.slot({ slot: 'event', text: eventText, need: 'pick an event', entry: eventMenu });
+    if (eventMenu !== undefined) {
+        builder.slot({ slot: 'event', text: eventText, need: 'pick an event', entry: eventMenu });
+    } else if (eventText !== null) {
+        builder.text(eventText);
+    }
     if (when === null) return;
 
     switch (when.kind) {
@@ -342,9 +347,9 @@ function addActionWords(builder: SentenceBuilder, action: Action, index: number,
         return;
     }
 
-    const kinds = choices.actions(index, action);
+    // The action's own word is plain text: its block's Replace changes the action (owner, 2026-11-25).
     const kindText = TriggerChoices.actionWord(action.kind);
-    builder.slot({ slot: 'action', text: kindText, need: 'pick an action', entry: menuOf(kinds) });
+    builder.text(kindText);
 
     if (action.kind === 'destroy') {
         const targets = choices.targets(action.target, sources.eventHasOther, true, (target) => ({

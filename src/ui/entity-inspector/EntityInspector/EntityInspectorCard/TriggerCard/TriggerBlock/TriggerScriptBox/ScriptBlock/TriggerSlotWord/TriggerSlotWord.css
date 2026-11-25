@@ -1,5 +1,6 @@
-/* Menus in the block's colour darkened by a quarter, numbers as white ovals with Scratch's grey text
-   (design/mockups/triggers.html, Scratch). The block's colour comes down as --block. */
+/* Every value box is a pill (owner, 2026-11-25): menus in the block's colour darkened by a fifth with a faint
+   light ring, numbers white with Scratch's grey text. An unset one is a soft amber, so it stands out without
+   looking like an error. The block's colour comes down as --block. */
 .trigger-slot-word {
     display: inline-flex;
     flex: none;
@@ -7,8 +8,9 @@
     height: 22px;
     padding: 0 6px;
     border: none;
-    border-radius: 4px;
-    background: color-mix(in srgb, var(--block) 75%, var(--block-shade));
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--block) 80%, var(--block-shade));
+    box-shadow: inset 0 0 0 1px var(--block-select-ring);
     color: var(--block-text);
     font: inherit;
     white-space: pre;
@@ -23,6 +25,7 @@
 
     &[data-look='number'] {
         padding: 0 8px;
+        box-shadow: none;
         background: var(--block-number);
         color: var(--block-number-text);
     }
@@ -41,11 +44,12 @@
         outline-offset: 1px;
     }
 
-    /* Fix 2's warnings, in the box: unset or missing is yellow with dark words. */
+    /* Fix 2's warnings, in the box: unset or missing is amber with dark words. */
     &[data-state='unset'],
     &[data-state='missing'] {
-        background: var(--warning);
-        color: var(--app);
+        background: var(--block-select-unset);
+        box-shadow: inset 0 0 0 1px var(--block-select-unset-ring);
+        color: var(--block-select-unset-text);
     }
 
     &[data-state='unset'] {

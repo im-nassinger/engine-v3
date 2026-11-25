@@ -43,7 +43,7 @@ function buildModel() {
     const caches = new DerivedCaches(level);
     const folds = new CardFolds();
     const frames = new ManualFrames();
-    const messages = new EditorMessages(level, createV1Rules(createV1Registry()), frames);
+    const messages = new EditorMessages(level, createV1Rules(), frames);
     const model = new EntityInspectorModel({ level, selection, caches, registry: createV1Registry(), folds, messages });
 
     return { level, crate, other, selection, folds, frames, model };
