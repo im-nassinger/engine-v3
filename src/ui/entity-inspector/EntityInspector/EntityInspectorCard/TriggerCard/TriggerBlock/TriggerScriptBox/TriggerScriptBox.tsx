@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { PointerEvent, ReactNode } from 'react';
 import type {
     ScriptBlock as ScriptBlockModel,
@@ -39,7 +39,9 @@ export function TriggerScriptBox({ openLevel, script, triggerIndex, commit }: Tr
     const verticalBarRef = useRef<HTMLDivElement>(null);
     const horizontalBarRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
+    // Attached as the blocks are put on screen, before the browser can send them a pointer move: a move that
+    // came first would start a frame with no script, and the slot would not open until the next move.
+    useLayoutEffect(() => {
         motion.attach(scriptRef.current);
         return () => motion.dispose();
     }, [motion]);
