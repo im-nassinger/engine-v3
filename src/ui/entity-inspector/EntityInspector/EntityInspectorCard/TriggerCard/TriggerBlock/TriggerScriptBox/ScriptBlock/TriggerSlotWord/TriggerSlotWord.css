@@ -1,6 +1,6 @@
-/* Every value box is a pill (owner, 2026-11-25): menus in the block's colour darkened by a fifth with a faint
-   light ring, numbers white with Scratch's grey text. An unset one is a soft amber, so it stands out without
-   looking like an error. The block's colour comes down as --block. */
+/* Every value box is a pill (owner, 2026-11-25), with no ring (owner, 2026-11-25): menus in the block's
+   colour darkened by a fifth, numbers white with Scratch's grey text. An unset one is a soft amber, so it
+   stands out without looking like an error. The block's colour comes down as --block. */
 .trigger-slot-word {
     display: inline-flex;
     flex: none;
@@ -10,7 +10,6 @@
     border: none;
     border-radius: 999px;
     background: color-mix(in srgb, var(--block) 80%, var(--block-shade));
-    box-shadow: inset 0 0 0 1px var(--block-select-ring);
     color: var(--block-text);
     font: inherit;
     white-space: pre;
@@ -25,7 +24,6 @@
 
     &[data-look='number'] {
         padding: 0 8px;
-        box-shadow: none;
         background: var(--block-number);
         color: var(--block-number-text);
     }
@@ -48,7 +46,6 @@
     &[data-state='unset'],
     &[data-state='missing'] {
         background: var(--block-select-unset);
-        box-shadow: inset 0 0 0 1px var(--block-select-unset-ring);
         color: var(--block-select-unset-text);
     }
 

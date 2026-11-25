@@ -46,9 +46,7 @@ Slate islands and one bright blue accent (owner, 2026-11-17). **There is no line
 | `--block-number` | `#ffffff` | A number's oval on a block |
 | `--block-number-text` | `#575e75` | The text in a number's oval (Scratch's grey) |
 | `--block-shade` | `#000000` | Mixed in at 20% to darken a block's colour for its menu boxes |
-| `--block-select-ring` | `rgb(255 255 255 / 22%)` | The faint ring inside a block's menu box (v4 fix 5, standing yes, 2026-11-25) |
 | `--block-select-unset` | `#ffd77a` | An unset or missing value box on a block: a soft amber instead of the warning yellow (v4 fix 5) |
-| `--block-select-unset-ring` | `rgb(0 0 0 / 18%)` | The ring inside an unset value box |
 | `--block-select-unset-text` | `#4d3800` | The words in an unset value box |
 | `--block-gap` | `--panel` with 4% white, opaque | The 2 px ring around each block, the trigger's own background, cutting blocks apart |
 | `--block-slot` | `--panel` with 7% white | An empty "add a block" slot |
