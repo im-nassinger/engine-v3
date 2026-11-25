@@ -20,7 +20,7 @@ const ISLAND_GAP = 10;
 // The tool column, the Entity inspector and the Entities viewer side by side with their gaps. A narrower
 // window (1280×720 at 200% is 640 px) can't keep them 10 px apart; fitting small windows is v3, so there
 // they only must not overlap.
-const ISLANDS_ROW_WIDTH = 10 + 48 + 10 + 300 + 10 + 260 + 10;
+const ISLANDS_ROW_WIDTH = 10 + 48 + 10 + 344 + 10 + 260 + 10;
 // The level view's smallest zoom, 1%.
 const MIN_ZOOM = 0.01;
 // A new level's camera size.

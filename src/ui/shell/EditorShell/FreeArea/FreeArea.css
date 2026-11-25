@@ -5,7 +5,7 @@
     top: 0;
     right: calc(var(--island-gap) + var(--entities-viewer));
     bottom: 0;
-    left: calc(var(--beside-tools) + var(--entity-inspector));
+    left: calc(var(--beside-tools) + var(--entity-inspector-width));
     pointer-events: none;
 
     [data-entity-inspector-hidden='true'] > & {

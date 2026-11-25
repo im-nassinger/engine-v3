@@ -231,6 +231,19 @@ describe('the trigger card as Scratch blocks', () => {
         expect(slotAt(2, 1)).toBeNull();
     });
 
+    test("the mouse on a value box's menu opens no slot under it", async () => {
+        await showDoor();
+        await expect.poll(() => scriptBlocks(1).length).toBe(4);
+
+        click(word('Do', 'off', 1));
+        await expect.poll(() => menuRowNamed('on')).toBeDefined();
+        await userEvent.hover(menuRowNamed('on') as HTMLElement);
+        await new Promise(requestAnimationFrame);
+
+        expect(requireBlock(1).querySelectorAll('.script-slot')).toHaveLength(0);
+        expect(menuRowNamed('on')?.isConnected).toBe(true);
+    });
+
     test('a slot adds the picked block at its gap as one step', async () => {
         const { session, door } = await showDoor();
         await expect.poll(() => scriptBlocks(1).length).toBe(4);
@@ -247,5 +260,19 @@ describe('the trigger card as Scratch blocks', () => {
             .toEqual(['change', 'win', 'change', 'wait']);
         expect(session.openLevel.history.undoCount).toBe(1);
         expect(parts('Do', 1)).toHaveLength(4);
+    });
+
+    test('the slot an added block took stays closed, so the new block keeps its place', async () => {
+        await showDoor();
+        await expect.poll(() => scriptBlocks(1).length).toBe(4);
+
+        await hoverBand(blockBeside(1, 'above', 1), 'bottom');
+        await expect.poll(() => slotAt(1, 1)).not.toBeNull();
+        click(slotAt(1, 1) as HTMLElement);
+        await expect.poll(() => menuRowNamed('win')).toBeDefined();
+        menuRowNamed('win')?.click();
+
+        await expect.poll(() => scriptBlocks(1).length).toBe(5);
+        expect(requireBlock(1).querySelectorAll('.script-slot')).toHaveLength(0);
     });
 });

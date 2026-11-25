@@ -2,6 +2,21 @@
    least as wide as the card. Its own scrollbars and fades are task 25's. */
 .trigger-script-box {
     position: relative;
+    /* The blocks' stacking numbers (up to the arm's 1001) stay inside the script, under the editor's menus,
+       tooltips and dialogs. */
+    isolation: isolate;
+
+    /* A menu, picker or field opened from the script is drawn inside it: while one is open the script draws
+       above the cards and triggers around it, and the block or If holding it, or the slot's menu itself, above
+       every block (1002, over the arm). A block's own number is inline, hence !important. */
+    &:has(.menu, .entity-picker, .trigger-word-field) {
+        z-index: var(--stack-popup);
+    }
+
+    :is(.script-block, .script-if):has(.menu, .entity-picker, .trigger-word-field),
+    :is(.menu, .entity-picker, .trigger-word-field) {
+        z-index: 1002 !important;
+    }
 
     > .script {
         overflow: auto;

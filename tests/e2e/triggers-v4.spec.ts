@@ -24,6 +24,9 @@ const DOOR_WIN_LATEST_S = 6;
 const SCORE_START = 2;
 // Long enough for a ball to fall, a 2 s wait, and the slowest browser on CI.
 const END_TIMEOUT_MS = 20_000;
+// The door's journey builds two triggers, each block added by opening a slot, then plays past a 2 s wait:
+// the default 30 s leaves the wait for the end window too little on a slow, busy machine.
+const DOOR_JOURNEY_TIMEOUT_MS = 60_000;
 // Long enough for a save after the 2 s quiet delay, and for the slowest browser on CI.
 const SAVE_TIMEOUT_MS = 15_000;
 const SAVED_TITLE = 'Untitled level - engine-v3';
@@ -102,8 +105,12 @@ function triggerBlock(page: Page, index: number) {
     return card(page, 'TriggerComponent').locator('.trigger-block').nth(index);
 }
 
+// The script's parts by the sections they were once drawn in: When is the event block's words, If its checks,
+// Do its actions, each one part of a block.
+const PART_OF_TITLE: Record<string, string> = { When: 'when', If: 'check', Do: 'action' };
+
 function triggerSection(block: Locator, title: string) {
-    return block.locator(`.trigger-section[data-section="${title}"]`);
+    return block.locator(`.script-block .group[data-section="${PART_OF_TITLE[title]}"]`);
 }
 
 function triggerWord(block: Locator, title: string, text: string) {
@@ -119,7 +126,7 @@ async function pick(page: Page, opener: Locator, label: string) {
 
 // A menu's item, or one above the entity picker's tree, by its label and not the line under it.
 function menuItem(page: Page, label: string) {
-    const exactLabel = new RegExp(`^${label}$`);
+    const exactLabel = new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)}$`);
 
     return page.locator('.menu [role="menuitem"], .entity-picker [role="menuitem"]').filter({
         has: page.locator('.label:not(:has(span)), .label > span:first-child', { hasText: exactLabel }),
@@ -170,19 +177,49 @@ async function addTrigger(page: Page, event: string) {
     return block;
 }
 
+// How far a block's tooth hangs below its body, and how far inside its bottom third the mouse goes.
+const TOOTH_PX = 6;
+const BAND_EDGE_PX = 3;
+
+// How long one try at opening the slot and moving onto it may take before it starts again.
+const SLOT_TRY_MS = 2000;
+
+// The last gap's "add a block" slot opens when the mouse is on the bottom third of the block above it, and
+// stays open while the mouse is on the slot. A person's mouse goes from the band down to the slot; the test's
+// jumps there after waiting for the slot to stand still, and a slow machine may shift the blocks under it in
+// that wait, closing the slot, so the two moves are tried again until the mouse is on the open slot.
+async function openLastSlot(block: Locator) {
+    const gaps = await block
+        .locator('.script-block[data-gap-below]')
+        .evaluateAll((shown) => shown.map((one) => Number((one as HTMLElement).dataset['gapBelow'])));
+    const lastGap = Math.max(...gaps);
+    // With an If, the event block and the If's top both open gap 0; the If's top is the one just above it.
+    const above = block.locator(`.script-block[data-gap-below="${lastGap}"]`).last();
+    const slot = block.locator(`.script-slot[data-gap="${lastGap}"]`);
+    await expect(async () => {
+        await above.scrollIntoViewIfNeeded({ timeout: SLOT_TRY_MS });
+        const box = await above.boundingBox();
+        if (!box) throw new Error('The block above the last gap has no size.');
+        const band = { x: BAND_EDGE_PX, y: box.height - TOOTH_PX - BAND_EDGE_PX };
+        await above.hover({ position: band, timeout: SLOT_TRY_MS });
+        await slot.hover({ timeout: SLOT_TRY_MS });
+        await expect(slot).toBeVisible({ timeout: SLOT_TRY_MS });
+    }).toPass();
+}
+
+// Opens the last gap's "add a block" slot from the bottom third of the block above it, and picks an action.
 async function addAction(page: Page, block: Locator, kind: string) {
-    await pick(page, block.getByRole('button', { name: 'Add action' }), kind);
+    await openLastSlot(block);
+    await pick(page, block.locator('.script-slot'), kind);
 }
 
 // Each row's words joined by spaces, as the card reads: its text runs them together.
 function sentences(block: Locator, title: string) {
-    return triggerSection(block, title)
-        .locator('.trigger-sentence-row')
-        .evaluateAll((rows) =>
-            rows.map((row) =>
-                [...row.querySelectorAll('.text, .trigger-slot-word')].map((word) => word.textContent).join(' '),
-            ),
-        );
+    return triggerSection(block, title).evaluateAll((rows) =>
+        rows.map((row) =>
+            [...row.querySelectorAll('.text, .trigger-slot-word')].map((word) => word.textContent).join(' '),
+        ),
+    );
 }
 
 async function expectSentences(block: Locator, title: string, expected: readonly string[]) {
@@ -225,6 +262,7 @@ async function wonAfterSeconds(page: Page) {
 test('a button fires open on a door, which waits 2 s and flips door_open, and its becoming true wins', async ({
     page,
 }) => {
+    test.setTimeout(DOOR_JOURNEY_TIMEOUT_MS);
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
     await openEditor(page);
@@ -245,14 +283,14 @@ test('a button fires open on a door, which waits 2 s and flips door_open, and it
     await typeWord(page, opens, 'Do', 'how long', String(DOOR_WAIT_S));
     await addAction(page, opens, 'change a value');
     await pickValue(page, triggerWord(opens, 'Do', 'pick a value'), 'Variables', 'door_open');
-    await expectSentences(opens, 'When', ['this gets the custom event open']);
-    await expectSentences(opens, 'Do', [`wait ${DOOR_WAIT_S} s`, 'flip this door_open']);
+    await expectSentences(opens, 'When', ['when this gets the custom event open']);
+    await expectSentences(opens, 'Do', [`wait ${DOOR_WAIT_S} seconds`, 'flip this door_open']);
 
     const opened = await addTrigger(page, 'a variable changes');
     await pick(page, triggerWord(opened, 'When', 'pick a variable'), 'door_open');
     await pick(page, triggerWord(opened, 'When', 'changes'), 'becomes true');
     await addAction(page, opened, 'win');
-    await expectSentences(opened, 'When', ['the variable door_open of this becomes true']);
+    await expectSentences(opened, 'When', ['when the variable door_open of this becomes true']);
 
     // The button: the Trigger tool's pass-through rectangle under the ball, firing open on the door when touched.
     await tool(page, 'Trigger').click();
@@ -296,7 +334,7 @@ test('a ball touches a solid wall, which adds 1 to score and is destroyed, and s
     await pick(page, triggerWord(wins, 'When', 'changes'), 'becomes … or more');
     await typeIntoField(page, '3');
     await addAction(page, wins, 'win');
-    await expectSentences(wins, 'When', ['the variable score becomes 3 or more']);
+    await expectSentences(wins, 'When', ['when the variable score becomes 3 or more']);
 
     await placeBall(page, middle);
 
@@ -308,7 +346,7 @@ test('a ball touches a solid wall, which adds 1 to score and is destroyed, and s
     await pick(page, triggerWord(touched, 'Do', 'pick a value'), 'score');
     await typeWord(page, touched, 'Do', 'a value', '1');
     await addAction(page, touched, 'destroy');
-    await expectSentences(touched, 'When', ['something starts touching this']);
+    await expectSentences(touched, 'When', ['when other starts touching this']);
     await expectSentences(touched, 'Do', ['add 1 to score', 'destroy this']);
 
     await play(page);

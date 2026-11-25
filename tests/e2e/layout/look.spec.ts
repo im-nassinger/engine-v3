@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import type { Locator, Page } from '@playwright/test';
 
 const ISLANDS = ['Main menu', 'Tools', 'Entity inspector', 'Entities viewer', 'Minimap', 'Debug box'];
-const LONG_POSITION = '-35.25';
+const LONG_POSITION = '-1235.25';
 const SHORT_POSITION = '20';
 
 async function openEditor(page: Page) {

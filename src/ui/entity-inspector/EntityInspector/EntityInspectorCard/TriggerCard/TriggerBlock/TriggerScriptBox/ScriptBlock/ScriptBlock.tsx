@@ -33,6 +33,10 @@ type Band = 'top' | 'middle' | 'bottom';
 // How far the tooth hangs below the body; it is left out of the bands.
 const TOOTH_PX = 6;
 
+// The boxes a value box opens float over the card but sit inside its block, so the mouse moving over them
+// reaches the block too; it is not on the block then, and must not open or close a slot under the box.
+const FLOATING_BOXES = '.menu, .entity-picker, .trigger-word-field';
+
 // One Scratch block (v4 fix 4): its body and tooth in its kind's colour, cut from its neighbours by a 2 px ring
 // of the trigger's background, then its icon and words, each value box opening fix 2's picker or box. Its top
 // third asks for the slot above it, its bottom third the slot below, its middle third (and any value box)
@@ -42,6 +46,7 @@ export function ScriptBlock({ block, zIndex, isEnd, isLast, onHoverGap, ...wordP
     const icon = block.icon === undefined ? undefined : SCRIPT_ICONS[block.icon];
 
     const hover = (event: PointerEvent<HTMLDivElement>) => {
+        if (isOnFloatingBox(event)) return;
         const hovered = bandAt(event, block);
         setBand(hovered);
         onHoverGap(gapOf(hovered, block));
@@ -69,6 +74,12 @@ export function ScriptBlock({ block, zIndex, isEnd, isLast, onHoverGap, ...wordP
             ))}
         </div>
     );
+}
+
+function isOnFloatingBox(event: PointerEvent<HTMLDivElement>) {
+    const target = event.target;
+
+    return target instanceof Element && target.closest(FLOATING_BOXES) !== null;
 }
 
 function bandAt(event: PointerEvent<HTMLDivElement>, block: ScriptBlockModel): Band {

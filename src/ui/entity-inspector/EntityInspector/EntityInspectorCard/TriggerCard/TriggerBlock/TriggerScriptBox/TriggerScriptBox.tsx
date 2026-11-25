@@ -49,7 +49,14 @@ export function TriggerScriptBox({ openLevel, script, triggerIndex, commit }: Tr
         stepOf: (gap: number) => ({
             gap: script.gaps[gap],
             isMenuOpen: menuGap === gap,
-            onMenuOpen: (isOpen: boolean) => setMenuGap(isOpen ? gap : undefined),
+            onMenuOpen: (isOpen: boolean) => {
+                setMenuGap(isOpen ? gap : undefined);
+                // The added block takes the slot's place; the gap hovered before it now lies above the new
+                // block, and a slot left open there would jump the block away when the mouse next moves.
+                if (!isOpen) {
+                    setHoveredGap(undefined);
+                }
+            },
         }),
     };
     const eventIsEnd = ifTop === undefined && actions.length === 0 && !isGapOpen(0);

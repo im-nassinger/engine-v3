@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 // v3's journeys (testing.md, journeys 9 to 11): a trigger drawn with the Trigger tool that wins when a
 // tagged ball falls into it, then Restart and Leave; a key trigger adding to a body's velocity; the World's variables
@@ -87,8 +87,12 @@ function triggerBlock(page: Page) {
     return card(page, 'TriggerComponent').locator('.trigger-block').first();
 }
 
+// The script's parts by the sections they were once drawn in: When is the event block's words, If its checks,
+// Do its actions, each one part of a block.
+const PART_OF_TITLE: Record<string, string> = { When: 'when', If: 'check', Do: 'action' };
+
 function triggerSection(page: Page, title: string) {
-    return triggerBlock(page).locator(`.trigger-section[data-section="${title}"]`);
+    return triggerBlock(page).locator(`.script-block .group[data-section="${PART_OF_TITLE[title]}"]`);
 }
 
 function triggerWord(page: Page, title: string, text: string) {
@@ -103,26 +107,56 @@ async function pick(page: Page, opener: ReturnType<Page['locator']>, label: stri
 
 // A menu's item by its label alone, not the line under it.
 function menuItem(page: Page, label: string) {
-    const exactLabel = new RegExp(`^${label}$`);
+    const exactLabel = new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)}$`);
 
     return page.locator('.menu [role="menuitem"]').filter({
         has: page.locator('.label:not(:has(span)), .label > span:first-child', { hasText: exactLabel }),
     });
 }
 
-async function addTriggerRow(page: Page, label: 'Add check' | 'Add action', kind: string) {
-    await pick(page, triggerBlock(page).getByRole('button', { name: label }), kind);
+// How far a block's tooth hangs below its body, and how far inside its bottom third the mouse goes.
+const TOOTH_PX = 6;
+const BAND_EDGE_PX = 3;
+
+// How long one try at opening the slot and moving onto it may take before it starts again.
+const SLOT_TRY_MS = 2000;
+
+// The last gap's "add a block" slot opens when the mouse is on the bottom third of the block above it, and
+// stays open while the mouse is on the slot. A person's mouse goes from the band down to the slot; the test's
+// jumps there after waiting for the slot to stand still, and a slow machine may shift the blocks under it in
+// that wait, closing the slot, so the two moves are tried again until the mouse is on the open slot.
+async function openLastSlot(block: Locator) {
+    const gaps = await block
+        .locator('.script-block[data-gap-below]')
+        .evaluateAll((shown) => shown.map((one) => Number((one as HTMLElement).dataset['gapBelow'])));
+    const lastGap = Math.max(...gaps);
+    // With an If, the event block and the If's top both open gap 0; the If's top is the one just above it.
+    const above = block.locator(`.script-block[data-gap-below="${lastGap}"]`).last();
+    const slot = block.locator(`.script-slot[data-gap="${lastGap}"]`);
+    await expect(async () => {
+        await above.scrollIntoViewIfNeeded({ timeout: SLOT_TRY_MS });
+        const box = await above.boundingBox();
+        if (!box) throw new Error('The block above the last gap has no size.');
+        const band = { x: BAND_EDGE_PX, y: box.height - TOOTH_PX - BAND_EDGE_PX };
+        await above.hover({ position: band, timeout: SLOT_TRY_MS });
+        await slot.hover({ timeout: SLOT_TRY_MS });
+        await expect(slot).toBeVisible({ timeout: SLOT_TRY_MS });
+    }).toPass();
+}
+
+// Opens the last gap's "add a block" slot from the bottom third of the block above it, and picks a block.
+async function addBlock(page: Page, label: string) {
+    await openLastSlot(triggerBlock(page));
+    await pick(page, triggerBlock(page).locator('.script-slot'), label);
 }
 
 // Each row's words joined by spaces, as the card reads: its text runs them together.
 function sentences(page: Page, title: string) {
-    return triggerSection(page, title)
-        .locator('.trigger-sentence-row')
-        .evaluateAll((rows) =>
-            rows.map((row) =>
-                [...row.querySelectorAll('.text, .trigger-slot-word')].map((word) => word.textContent).join(' '),
-            ),
-        );
+    return triggerSection(page, title).evaluateAll((rows) =>
+        rows.map((row) =>
+            [...row.querySelectorAll('.text, .trigger-slot-word')].map((word) => word.textContent).join(' '),
+        ),
+    );
 }
 
 async function expectSentences(page: Page, title: string, expected: readonly string[]) {
@@ -248,16 +282,16 @@ test('a trigger drawn with the Trigger tool wins when a tagged ball falls into i
     await expect(entityRow(page, 'Trigger 1')).toHaveAttribute('aria-selected', 'true');
     await expect(tool(page, 'Select')).toHaveAttribute('aria-pressed', 'true');
     await expect(card(page, 'SurfaceComponent')).toHaveCount(0);
-    await expectSentences(page, 'When', ['something starts touching this']);
+    await expectSentences(page, 'When', ['when other starts touching this']);
 
-    await addTriggerRow(page, 'Add check', 'a value');
+    await addBlock(page, 'if … (a value)');
     await triggerWord(page, 'If', 'pick a value').click();
     await menuItem(page, 'Tags').first().click();
     await menuItem(page, 'Tags').last().click();
     await expect(page.locator('.menu')).toHaveCount(0);
     await pick(page, triggerWord(page, 'If', 'pick a tag'), 'player');
     await expectSentences(page, 'If', ['other has the tag player']);
-    await addTriggerRow(page, 'Add action', 'win');
+    await addBlock(page, 'win');
     await expectSentences(page, 'Do', ['win']);
     await expect(triggerBlock(page).locator('.card-note-box')).toHaveCount(0);
 
@@ -296,8 +330,8 @@ test("a key trigger adds to its body's velocity, sending it up, when the key is 
     await card(page, 'TriggerComponent').getByRole('button', { name: 'Add trigger' }).click();
     await pick(page, triggerWord(page, 'When', 'pick an event'), 'a key or input is pressed, released or held');
     await pick(page, triggerWord(page, 'When', 'pick a key'), 'Space');
-    await expectSentences(page, 'When', ['the key Space is pressed']);
-    await addTriggerRow(page, 'Add action', 'change a value');
+    await expectSentences(page, 'When', ['when the key Space is pressed']);
+    await addBlock(page, 'change a value');
     await triggerWord(page, 'Do', 'pick a value').click();
     await menuItem(page, 'Body').click();
     await menuItem(page, 'Velocity').click();
