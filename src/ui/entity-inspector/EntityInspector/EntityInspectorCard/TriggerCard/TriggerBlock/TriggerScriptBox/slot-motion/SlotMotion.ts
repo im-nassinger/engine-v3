@@ -253,7 +253,9 @@ export class SlotMotion {
         const [topRoom, bottomRoom] = this.rooms();
         if (topRoom === undefined || bottomRoom === undefined) return;
 
-        const maxScroll = () => script.scrollHeight - script.clientHeight;
+        // Not scrollHeight: while the blocks are shorter than the script's least height, a strip growing below
+        // them fills empty space first and adds no scroll, so the hovered block moved, then jumped back.
+        const maxScroll = () => contentBottomOf(script, bottomRoom) - script.clientHeight;
         const moved = topOf(anchor) - this.anchorTop;
         const shortBelow = script.scrollTop + moved - maxScroll();
         if (moved > 0 && shortBelow > 0) {
@@ -269,7 +271,7 @@ export class SlotMotion {
         const hiddenTop = Math.min(topRoom.offsetHeight, script.scrollTop);
         setHeight(topRoom, topRoom.offsetHeight - hiddenTop);
         script.scrollTop -= hiddenTop;
-        const hiddenBottom = Math.min(bottomRoom.offsetHeight, maxScroll() - script.scrollTop);
+        const hiddenBottom = Math.max(0, Math.min(bottomRoom.offsetHeight, maxScroll() - script.scrollTop));
         setHeight(bottomRoom, bottomRoom.offsetHeight - hiddenBottom);
     }
 
@@ -377,6 +379,15 @@ function topOf(element: Element | null) {
 
 function setHeight(element: HTMLElement, height: number) {
     element.style.height = `${height}px`;
+}
+
+// Where the script's content ends, from the top of what it scrolls: the strip below the blocks and the
+// script's bottom padding. It can be above the view's bottom, where scrollHeight would say the view's height.
+function contentBottomOf(script: HTMLElement, bottomRoom: HTMLElement) {
+    const scrolledTop = script.getBoundingClientRect().top + script.clientTop - script.scrollTop;
+    const paddingBottom = parseFloat(getComputedStyle(script).paddingBottom);
+
+    return bottomRoom.getBoundingClientRect().bottom - scrolledTop + paddingBottom;
 }
 
 // A slot's room when open: its body's height, less the tooth that hangs into the block below.

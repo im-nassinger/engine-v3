@@ -96,17 +96,21 @@ const TIMED_DOOR: Trigger = {
 };
 
 async function showDoor() {
+    return showTrigger(TIMED_DOOR);
+}
+
+async function showTrigger(trigger: Trigger) {
     const level = Level.createNew();
     level.world.addComponent(new VariablesComponent({ variables: [{ name: 'coins', value: 0 }] }));
     const player = addBareEntity(level, 'Player');
     player.addComponent(new TagsComponent({ tags: ['player'] }));
     const door = addBareEntity(level, 'Door');
-    door.addComponent(new TriggerComponent({ triggers: [TIMED_DOOR], nextTriggerId: 2 }));
+    door.addComponent(new TriggerComponent({ triggers: [trigger], nextTriggerId: 2 }));
 
     const shown = showEntityInspector(level);
     select(shown.session, [door]);
     await expect.poll(() => cardOf('TriggerComponent')).not.toBeNull();
-    await expect.poll(() => scriptBlocks().length).toBe(4);
+    await expect.poll(() => scriptBlocks().length).toBe(trigger.actions.length + 1);
 
     return { ...shown, door };
 }
@@ -304,6 +308,24 @@ describe('adding a block on hover', () => {
             expect(Math.abs(sample.value - before)).toBeLessThanOrEqual(1);
         }
         expect(scriptOf().scrollTop).toBeGreaterThan(0);
+    });
+
+    // Shorter than its least height, the script can't scroll yet: the strip below the blocks has to fill the
+    // empty space first, or the hovered block moves down, then jumps back with the slot most of the way open.
+    test('the hovered block never moves in a script shorter than its least height', async () => {
+        await showTrigger({ ...TIMED_DOOR, actions: [{ kind: 'wait', seconds: 2 }] });
+        stopTheClock();
+        const wait = blockBeside(0, 'below');
+        const before = topOf(wait);
+
+        movePointerTo(wait, 'top');
+        const samples = runFrames(DELAY_MS + MOVE_MS - 2 * FRAME_MS, () => topOf(wait));
+
+        // Near full height the slot reaches the script's top edge and is scrolled up to 4 px clear of it, the block
+        // moving with it by design. Without the room filling the empty space first, it moved 17 px.
+        expect(slotLook(0).height).toBeGreaterThan(10);
+        const furthest = Math.max(...samples.map((sample) => Math.abs(sample.value - before)));
+        expect(furthest).toBeLessThanOrEqual(4);
     });
 
     test('the script keeps its height while a slot is open, and a clipped slot is scrolled into view', async () => {
