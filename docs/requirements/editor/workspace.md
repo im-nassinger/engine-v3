@@ -170,8 +170,9 @@ Asked by the owner while trying v4 ([fix](../../versions/v4/fixes.md) 12, 2026-1
 
 - **The editor shows every length in metres, never in pixels**: positions, sizes, the grid size, speeds in m/s, the trigger blocks' boxes, the debug box. Pixels stay only inside the code.
 - **1 metre is 100 px by default**, so 1 px is 0.01 m, and the physics uses the same scale. *Why: the owner had to set a velocity of about 500 for an entity to move a small amount; in metres per second, 500 should be a lot.*
-- **The unit can be changed in ☰**; metres is the default.
-- Open, to settle when it is planned: whether the pixels per metre follow the grid size or are their own setting (the owner isn't sure; 100 either way by default, and [rejected.md](../../rejected.md) still lists "showing pixels per metre as a setting"); which units ☰ offers; and what happens to levels saved at 50 px per metre.
+- **☰ offers two units: metres and pixels.** Metres is the default.
+- **Levels saved at 50 px per metre are not converted** (owner, 2026-11-25): levels can't be published yet, so the old ones don't need to keep working, see [principles](../../principles.md).
+- Open, to settle when it is planned: whether the pixels per metre follow the grid size or are their own setting. The owner isn't sure; 100 either way by default. (A setting was once rejected; the owner took that back on 2026-11-25.)
 
 Source: owner: 2026-11-25
 

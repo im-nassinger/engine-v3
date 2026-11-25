@@ -30,6 +30,7 @@ The rules every requirement follows, and the rules for proposing a change. They 
 | **The game decides nothing the creator should** | | No lives system, no title card |
 | **Determinism is a tested requirement** | The same level, seed, inputs and clock time give the same run on any computer | Touching is detected by the physics engine, not a second system |
 | **v1 is the smallest thing that can be tested** | Versions are decided in the scope review, not inside a requirement | v1 holds one level at a time, opens straight on the editor, and has no logic: you build a level and watch it run |
+| **Levels saved before publishing don't need to keep working** (owner, 2026-11-25) | Until levels can be published, a change may break the levels saved so far. No converting old levels, no keeping them working the old way | Going from 50 to 100 px per metre doesn't convert anything |
 | **Don't plan for what is certainly later** | Publishing, accounts, moderation, replays, sprite sheets, animations, parallax are not designed now | |
 
 ## Rules for proposing a change
