@@ -15,9 +15,10 @@ The owner tried fix 4's Scratch blocks (task 27) and asked for changes.
 
 4. [Fix](versions/v4/fixes.md) 8: a copied entity whose name ends in a number gets the next number for its word (copying `Entity 1` makes `Entity 2`), in Paste and Duplicate.
 
-5. The owner asked for more, written down to plan and build later ([fixes](versions/v4/fixes.md) 9 to 12): show the "Every entity tagged" target group even with no tag in the level; multiply and divide in Change value, and a variable in any trigger block's value box; the pen not closing a path ended on its first point ([bugs.md](bugs.md)); lengths in metres everywhere, 100 px per metre.
+5. The owner asked for more, written down to plan and build later ([fixes](versions/v4/fixes.md) 9 to 12): show the "Every entity tagged" target group even with no tag in the level; multiply and divide in Change value, and a variable of the matching type in any trigger block's value box; the pen not closing a path ended on its first point ([bugs.md](bugs.md), with tips on the likely cause); lengths in metres everywhere. Fix 12's questions were settled: ☰ offers metres and pixels, pixels per metre is a World setting, default 100, not the grid size (Claude, asked to decide), and old levels aren't converted.
+6. A new [principle](principles.md) (owner): until levels can be published, a change may break the levels saved so far; nothing is converted.
 
-**Where we stopped:** fixes 5 to 8 are built and committed, not pushed; the owner is still trying fix 4 (task 27).
+**Where we stopped:** fixes 5 to 8 are built and committed, not pushed; fix 8 isn't on Netlify yet. Fixes 9 to 12 are only in the docs. **The owner wants the next session to help decide what to do next** from the backlog: fixes 9 to 12, finishing the try of fix 4 (task 27), planning v5 (scripts), and the [open questions](#open-questions-for-the-owner) below. The owner may add more asks first.
 
 ## Where things stand
 
