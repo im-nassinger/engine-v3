@@ -81,8 +81,8 @@ async function shownGradient(page: Page) {
     };
 }
 
-function rectangleRows(page: Page) {
-    return page.getByRole('tree', { name: 'Entities' }).getByRole('treeitem').filter({ hasText: 'Rectangle 1' });
+function rectangleRow(page: Page, name: string) {
+    return page.getByRole('tree', { name: 'Entities' }).getByRole('treeitem').filter({ hasText: name });
 }
 
 // A click a quarter of the way along the gradient bar adds a stop there.
@@ -164,7 +164,7 @@ test('a gradient survives save, reload, copy and paste', async ({ page }) => {
     await expect(page.locator('.message-pill .message')).toHaveText('Saved in this browser');
     await page.reload();
 
-    await rectangleRows(page).click();
+    await rectangleRow(page, 'Rectangle 1').click();
     await expect(card).toHaveCount(1);
     expect(await shownGradient(page)).toEqual(made);
 
@@ -174,9 +174,8 @@ test('a gradient survives save, reload, copy and paste', async ({ page }) => {
     await page.mouse.move(crate.x + PASTE_OFFSET_PX, crate.y);
     await page.keyboard.press('ControlOrMeta+v');
 
-    await expect(rectangleRows(page)).toHaveCount(2);
-    // The copy is listed first, and selected, so the Entity inspector shows its fill.
-    await expect(rectangleRows(page).first()).toHaveAttribute('aria-selected', 'true');
-    await expect(rectangleRows(page).last()).toHaveAttribute('aria-selected', 'false');
+    // The copy takes the next number, and is selected, so the Entity inspector shows its fill.
+    await expect(rectangleRow(page, 'Rectangle 2')).toHaveAttribute('aria-selected', 'true');
+    await expect(rectangleRow(page, 'Rectangle 1')).toHaveAttribute('aria-selected', 'false');
     expect(await shownGradient(page)).toEqual(made);
 });

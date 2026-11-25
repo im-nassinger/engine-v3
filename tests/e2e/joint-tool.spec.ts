@@ -184,27 +184,17 @@ test('a Rope copied with its two boxes pastes joined to the copies', async ({ pa
     await page.keyboard.press('ControlOrMeta+c');
     await page.mouse.move(middle.x, middle.y + PASTE_OFFSET_PX / 2);
     await page.keyboard.press('ControlOrMeta+v');
-    await expect(rows(page, 'Rope 1')).toHaveCount(2);
+    // A paste gives each copy the next number for its word, so the copies are told apart by name.
+    await expect(rows(page, 'Rope 2')).toHaveCount(1);
+    await expect(rows(page, 'Rectangle 3')).toHaveCount(1);
+    await expect(rows(page, 'Rectangle 4')).toHaveCount(1);
 
-    // A paste keeps the names and goes on top, so the copies are renamed to tell them apart.
-    const renames = [
-        { name: 'Rectangle 1', renamed: 'Left copy' },
-        { name: 'Rectangle 2', renamed: 'Right copy' },
-    ];
-    for (const { name, renamed } of renames) {
-        await rows(page, name).first().click();
-        await page.keyboard.press('F2');
-        await page.keyboard.type(renamed);
-        await page.keyboard.press('Enter');
-        await expect(rows(page, renamed)).toHaveCount(1);
-    }
-
-    await rows(page, 'Rope 1').first().click();
+    await rows(page, 'Rope 2').click();
     const pastedEnds = [await jointEnd(page, 'A').textContent(), await jointEnd(page, 'B').textContent()];
-    expect(pastedEnds.join(' ')).toContain('Left copy');
-    expect(pastedEnds.join(' ')).toContain('Right copy');
+    expect(pastedEnds.join(' ')).toContain('Rectangle 3');
+    expect(pastedEnds.join(' ')).toContain('Rectangle 4');
 
-    await rows(page, 'Rope 1').last().click();
+    await rows(page, 'Rope 1').click();
     const originalEnds = [await jointEnd(page, 'A').textContent(), await jointEnd(page, 'B').textContent()];
     expect(originalEnds.join(' ')).toContain('Rectangle 1');
     expect(originalEnds.join(' ')).toContain('Rectangle 2');

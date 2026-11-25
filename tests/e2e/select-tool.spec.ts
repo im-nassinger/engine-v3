@@ -3,14 +3,15 @@ import type { Page } from '@playwright/test';
 
 type ScreenPoint = { x: number; y: number };
 
-// A click with the Shape tool places a rectangle of 100 by 100 px in the level, about 30 px on screen at
-// a new level's zoom in a 1280 by 720 window, so a point this far from its middle is still on it.
-const ON_CRATE_PX = 10;
+// A click with the Shape tool places a rectangle of 100 by 100 px in the level, about 21 px on screen at
+// a new level's zoom (21 %) in a 1280 by 720 window with 360 px panels, so a point this far from its
+// middle is well inside it.
+const ON_CRATE_PX = 5;
 // Far enough from the crate's middle to be off it, and inside the empty camera frame.
 const OFF_CRATE_PX = 100;
 // A press within 4 px of the last one, and within 500 ms, is a double-click, so a drag after a click
-// starts further away.
-const AWAY_FROM_CLICK_PX = 10;
+// starts further away, yet still inside the crate when it starts this far across and down from its middle.
+const AWAY_FROM_CLICK_PX = 6;
 
 // Opens the editor and draws a crate in the middle of the part no panel covers, then clears the selection.
 async function openEditorWithCrate(page: Page): Promise<ScreenPoint> {
