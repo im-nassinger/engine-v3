@@ -84,7 +84,7 @@ Planned in [fix-4-scratch-triggers.md](fix-4-scratch-triggers.md), confirmed by 
 - [x] 25. The script box's scrollbars and fades
   - Read: design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks, design/mockups/triggers.html
   - Done when: the script scrolls sideways under thin overlay bars that can be dragged, and fades with the grain where blocks are hidden, only on those edges; browser tests cover both
-- [ ] 26. Journeys and close fix 4's docs
+- [x] 26. Journeys and close fix 4's docs
   - Read: versions/v4/fix-4-scratch-triggers.md#docs-to-update-when-its-built, versions/v4/tasks.md#tasks
   - Done when: the Playwright journeys that make or edit triggers pass with the blocks in three browsers; the speed tests still meet their targets; every doc in "Docs to update" is updated; fixes.md row 4 says built
 - [ ] 27. Try point: make a coin, a door that opens on a custom event, and a spike that rests 1 second, all with the Scratch blocks, and say how the card feels

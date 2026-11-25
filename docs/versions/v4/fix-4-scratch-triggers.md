@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The owner picked **Scratch** from the [trigger card mockup](../../design/mockups/triggers.html) (2026-11-24, row 4 of [fixes.md](fixes.md)). This is the plan to build it. Its look and the rules settled over the mockup's rounds are in [controls.md](../../design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks); this file doesn't repeat them.
+The owner picked **Scratch** from the [trigger card mockup](../../design/mockups/triggers.html) (2026-11-24, row 4 of [fixes.md](fixes.md)). This is the plan it was built from (built 2026-11-25, tasks 19 to 26). Its look and the rules settled over the mockup's rounds are in [controls.md](../../design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks); this file doesn't repeat them.
 
 - **Mostly a new way to draw the same trigger.** A Scratch trigger is still When, one If, a flat Do list: the `Trigger` type keeps `when`, `checks` and `actions`, and `ActionRunner` keeps running the actions top to bottom, stopping at a Wait. Nothing nests, so play needs no "run a chain of blocks with scopes".
 - **The logic changes in two places:** Repeat goes (a trigger rests by switching itself off with blocks, and once per run becomes one block), and a fresh firing of a trigger that is off by the time it runs is dropped. Old levels aren't converted (owner, 2026-11-24).
