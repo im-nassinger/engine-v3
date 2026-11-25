@@ -19,7 +19,8 @@ export function triggerMenuEntries(entry: MenuWordEntry, pick: (choice: TriggerC
     return entry.groups.flatMap((group, index) => groupEntries(group, index, pick));
 }
 
-function groupEntries(group: TriggerMenuGroup, index: number, pick: (choice: TriggerChoice) => void) {
+// A group under its title, with a line before it after the first group; a group with no item says so, disabled.
+export function groupEntries(group: TriggerMenuGroup, index: number, pick: (choice: TriggerChoice) => void) {
     const entries: MenuEntry[] = [];
     if (index > 0) {
         entries.push({ kind: 'separator', id: `separator-${index}` });

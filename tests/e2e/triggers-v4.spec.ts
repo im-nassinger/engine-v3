@@ -341,7 +341,7 @@ test('a ball touches a solid wall, which adds 1 to score and is destroyed, and s
     // The wall: a surface on the ground under the ball, adding 1 to score and destroyed when touched.
     await placeShape(page, 'Rectangle', { x: middle.x, y: middle.y + WALL_BELOW_PX });
     await addComponent(page, 'SurfaceComponent');
-    const touched = await addTrigger(page, 'something starts or stops touching this');
+    const touched = await addTrigger(page, 'other starts or stops touching this');
     await addAction(page, touched, 'change a value');
     await pick(page, triggerWord(touched, 'Do', 'pick a value'), 'score');
     await typeWord(page, touched, 'Do', 'a value', '1');

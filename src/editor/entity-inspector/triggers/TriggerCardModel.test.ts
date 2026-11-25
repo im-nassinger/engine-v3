@@ -80,8 +80,8 @@ function valueInMenu(word: TriggerWord, label: string) {
 
 const WHEN_CASES: readonly (readonly [When | null, string])[] = [
     [null, 'pick an event'],
-    [{ kind: 'touched' }, 'something starts touching this'],
-    [{ kind: 'untouched' }, 'something stops touching this'],
+    [{ kind: 'touched' }, 'other starts touching this'],
+    [{ kind: 'untouched' }, 'other stops touching this'],
     [{ kind: 'input', input: 'jump', how: 'pressed' }, 'the input jump is pressed'],
     [{ kind: 'input', input: null, how: 'held' }, 'the input pick an input is held'],
     [{ kind: 'key', key: 'ArrowLeft' as KeyCode, how: 'released' }, 'the key Left arrow is released'],
@@ -170,7 +170,7 @@ describe('TriggerCardModel', () => {
         const event = slotNamed(sentenceOf(blockOf({ when: null }), 0), 'event');
 
         expect(menuLabels(event)).toEqual([
-            'something starts or stops touching this',
+            'other starts or stops touching this',
             'a key or input is pressed, released or held',
             'after or every few seconds',
             'the level starts',
@@ -242,7 +242,7 @@ describe('TriggerCardModel', () => {
             ['this', 'The entity this trigger is on'],
             ['other', 'The other entity of the event: the one touching or firing'],
         ]);
-        expect(picker.tagged.map((choice) => choice.label)).toEqual([
+        expect(picker.tagged?.choices.map((choice) => choice.label)).toEqual([
             'every entity tagged coin',
             'every entity tagged player',
         ]);
@@ -263,7 +263,7 @@ describe('TriggerCardModel', () => {
         const block = TriggerCardModel.build(component, context, []).triggers[0] as TriggerBlock;
         const picker = entitiesOf(slotNamed(sentenceOf(block, 2), 'target'));
 
-        expect(picker.tagged.map((choice) => choice.label)).toEqual([
+        expect(picker.tagged?.choices.map((choice) => choice.label)).toEqual([
             'every entity tagged coin',
             'every entity tagged player',
         ]);

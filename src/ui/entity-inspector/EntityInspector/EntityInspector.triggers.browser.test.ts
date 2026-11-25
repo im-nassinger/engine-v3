@@ -90,6 +90,13 @@ function withTriggers(entity: Entity, triggers: readonly Partial<Trigger>[]) {
     entity.addComponent(new TriggerComponent({ triggers: made, nextTriggerId: made.length + 1 }));
 }
 
+const NO_TAGS_YET = 'No entity has a tag yet: add a TagsComponent to one';
+
+// The titles above the entity picker's tree, such as "Every entity tagged".
+function pickerHeadings() {
+    return [...document.querySelectorAll('.entity-picker .heading')].map((heading) => heading.textContent);
+}
+
 function triggersOf(entity: Entity) {
     return entity.requireComponent(TriggerComponent).get('triggers');
 }
@@ -140,7 +147,7 @@ describe('the trigger card', () => {
         expect(word('When', 'pick an event').dataset['state']).toBe('unset');
         expect(scriptBlocks().map((block) => block.dataset['shape'])).toEqual(['event']);
 
-        await pickFromMenu(word('When', 'pick an event'), 'something starts or stops touching this');
+        await pickFromMenu(word('When', 'pick an event'), 'other starts or stops touching this');
         await expect.poll(() => sentences('When')).toEqual(['when other starts touching this']);
         expect(blockName()).toBe('Touched');
 
@@ -328,6 +335,43 @@ describe('the trigger card', () => {
         const search = requireElement<HTMLInputElement>(document, '.entity-picker input[aria-label="Search entities"]');
         await userEvent.type(search, 'butt{Enter}');
         await expect.poll(() => sentences('Do')).toEqual(['destroy this']);
+    });
+
+    test('the target menu\'s "Every entity tagged" group lists the level\'s tags, and picking one targets them', async () => {
+        const { level, button } = buildLevel();
+        withTriggers(button, [{ actions: [{ kind: 'destroy', target: { kind: 'other' } }] }]);
+        await showEntity(level, button);
+        await expect.poll(() => blocks().length).toBe(1);
+
+        click(word('Do', 'other'));
+        await expect.poll(() => pickerHeadings()).toEqual(['Every entity tagged']);
+        const tagRow = menuRowNamed('every entity tagged player');
+        expect(tagRow?.getAttribute('aria-disabled')).toBe('false');
+        expect(menuRowNamed(NO_TAGS_YET)).toBeUndefined();
+
+        tagRow?.click();
+        await expect.poll(() => sentences('Do')).toEqual(['destroy every player']);
+        expect(triggersOf(button)[0]?.actions[0]).toEqual({
+            kind: 'destroy',
+            target: { kind: 'tagged', tag: 'player' },
+        });
+    });
+
+    test('with no tag in the level, the "Every entity tagged" group still shows, with one greyed line saying how to add one', async () => {
+        const level = Level.createNew();
+        const button = addBareEntity(level, 'Button');
+        withTriggers(button, [{ actions: [{ kind: 'destroy', target: { kind: 'other' } }] }]);
+        await showEntity(level, button);
+        await expect.poll(() => blocks().length).toBe(1);
+
+        click(word('Do', 'other'));
+        await expect.poll(() => pickerHeadings()).toEqual(['Every entity tagged']);
+        const rows = menuRows().map((row) => row.textContent.trim());
+        expect(rows.filter((row) => row.startsWith('every entity tagged'))).toEqual([]);
+        expect(menuRowNamed(NO_TAGS_YET)?.getAttribute('aria-disabled')).toBe('true');
+
+        menuRowNamed(NO_TAGS_YET)?.click();
+        expect(sentences('Do')).toEqual(['destroy other']);
     });
 
     test('a vector opens two boxes, X and Y, typed in as one step', async () => {

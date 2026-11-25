@@ -95,8 +95,9 @@ export type TriggerTypedEntry =
 export type TriggerEntitiesEntry = {
     readonly kind: 'entities';
     readonly choices: readonly TriggerChoice[];
-    // Every entity with a tag, one item per tag; empty where a tag can't be the target, as in the tag check.
-    readonly tagged: readonly TriggerChoice[];
+    // "Every entity tagged", one item per tag of the level, or its empty text when no entity has a tag yet;
+    // undefined where a tag can't be the target, as in the tag check.
+    readonly tagged: TriggerMenuGroup | undefined;
     // The entity picked now, marked in the tree; undefined for none.
     readonly chosenId: EntityId | undefined;
     readonly placeEntity: (entityId: EntityId) => TriggerPartValue;

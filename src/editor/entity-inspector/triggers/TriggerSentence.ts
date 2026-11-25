@@ -45,7 +45,7 @@ type WordState = { state: TriggerWordState; reason: string | undefined };
 const MISSING_REASON = 'It was deleted: this part is skipped in play';
 
 // One row of the trigger card: a sentence of plain words and slots, each slot with its state and what it
-// opens. "something starts touching this", "other has the tag player", "add 1 to coins".
+// opens. "other starts touching this", "other has the tag player", "add 1 to coins".
 export class TriggerSentence {
     readonly words: readonly TriggerWord[];
 
@@ -99,6 +99,11 @@ class SentenceBuilder {
 
     text(text: string) {
         this.words.push({ kind: 'text', text });
+    }
+
+    // A fixed word naming an entity, in an entity's blue: the touching event's `other`.
+    entity(text: string) {
+        this.words.push({ kind: 'text', text, isEntity: true });
     }
 
     slot(word: SlotWord) {
@@ -163,7 +168,7 @@ function numberEntry(value: number | null, unit: Unit | undefined): TriggerWordE
     return { kind: 'number', value, unit, clearLabel: undefined };
 }
 
-// "something starts touching this", "the key Space is pressed", "every 2 seconds", "the level starts". The
+// "other starts touching this", "the key Space is pressed", "every 2 seconds", "the level starts". The
 // event word is the in-place word where the event has one (starts, key, every), opening its two kinds; any
 // other event's word is plain text, since the event block's Replace changes the event.
 function addWhenWords(builder: SentenceBuilder, when: When | null, choices: TriggerChoices) {
@@ -172,7 +177,7 @@ function addWhenWords(builder: SentenceBuilder, when: When | null, choices: Trig
     const isTouch = when?.kind === 'touched' || when?.kind === 'untouched';
     const isPress = when?.kind === 'key' || when?.kind === 'input';
     if (isTouch) {
-        builder.text('something');
+        builder.entity('other');
     }
     if (isPress) {
         builder.text('the');

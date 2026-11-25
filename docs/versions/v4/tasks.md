@@ -96,7 +96,7 @@ Planned in [fixes-9-to-13-plan.md](fixes-9-to-13-plan.md), confirmed by the owne
 - [x] 28. Fix 11: the pen closes a path ended on its first point
   - Read: bugs.md#the-pen-doesnt-close-a-path-ended-on-its-first-point, versions/v4/fixes.md
   - Done when: with snapping on and off, a press within the close ring, or one that snaps onto the first point, closes the path (from 3 points on) and it gets its fill; the cause found is written in bugs.md with the fix, the bug marked fixed; browser tests pin both cases; fixes.md row 11 says fixed
-- [ ] 29. Fix 9 and fix 13: the tag group and "other"
+- [x] 29. Fix 9 and fix 13: the tag group and "other"
   - Read: requirements/triggers/triggers.md#when-if-do--v3, requirements/triggers/triggers.md#events--v3, design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks
   - Done when: the target menu always shows "Every entity tagged", with one greyed line saying how to add a tag when the level has none; no text a creator sees, no requirement and no code comment says "something starts touching" (the Trigger tool's trigger, the sentences, the variables-and-inputs example all say "other"); browser tests cover the empty and filled tag group; fixes.md rows 9 and 13 say built
 - [ ] 30. Fix 10, the logic: multiply, divide and variables as values

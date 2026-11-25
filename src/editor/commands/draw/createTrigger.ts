@@ -9,7 +9,7 @@ import type { ShapeDrawing } from './createShape.ts';
 
 export type CreateTriggerOutcome = DrawnEntityOutcome;
 
-// The trigger the Trigger tool gives: "When something starts touching this", with nothing else set.
+// The trigger the Trigger tool gives: "When other starts touching this", with nothing else set.
 const FIRST_TRIGGER: Trigger = {
     id: 1,
     name: null,

@@ -15,7 +15,7 @@ import { EntityPicker } from '../../../../../../../../entity-picker/index.ts';
 import { Menu, Tooltip, useEntityRowDrop } from '../../../../../../../../shared/index.ts';
 import type { MenuEntry } from '../../../../../../../../shared/index.ts';
 import type { CommitTriggerEdit } from '../../../../CommitTriggerEdit.ts';
-import { actionsOf, triggerMenuEntries } from '../../../../triggerMenuEntries.ts';
+import { actionsOf, groupEntries, triggerMenuEntries } from '../../../../triggerMenuEntries.ts';
 import { TriggerWordField } from './TriggerWordField/index.ts';
 import './TriggerSlotWord.css';
 
@@ -136,13 +136,12 @@ function isMenuEntry(entry: TriggerWordEntry) {
     return entry.kind === 'menu' || entry.kind === 'groups' || entry.kind === 'submenus';
 }
 
-// `this` and `other`, then every entity with a tag, above the tree.
+// `this` and `other`, then every entity with a tag (or a greyed line saying how to add one), above the tree.
 function pickerEntriesOf(entry: TriggerEntitiesEntry, pick: (choice: TriggerChoice) => void) {
     const entries: MenuEntry[] = actionsOf(entry.choices, pick, 'target');
-    if (entry.tagged.length === 0) return entries;
+    if (entry.tagged === undefined) return entries;
 
-    entries.push({ kind: 'heading', id: 'tagged', label: 'Every entity tagged' });
-    entries.push(...actionsOf(entry.tagged, pick, 'tagged'));
+    entries.push(...groupEntries(entry.tagged, 0, pick));
 
     return entries;
 }

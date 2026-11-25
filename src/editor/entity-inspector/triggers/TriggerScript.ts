@@ -136,19 +136,14 @@ function eventBlock(trigger: Trigger, sources: SentenceSources): ScriptBlock {
     };
 }
 
-// The sentence's words, as the event block reads them: `other` names who touches (point B), in an
-// entity's blue with no box since it can't be changed; a time is a number with its unit as a menu.
+// The sentence's words, as the event block reads them (`other`, who touches, is already an entity's blue
+// with no box, since it can't be changed); a time is a number with its unit as a menu.
 function eventWords(words: readonly TriggerWord[], when: When | null): TriggerWord[] {
-    const shown = words.map((word) => {
-        if (word.kind === 'text' && word.text === 'something') return otherWord();
-
-        return word;
-    });
-    if (when?.kind !== 'after' && when?.kind !== 'every') return shown;
+    if (when?.kind !== 'after' && when?.kind !== 'every') return [...words];
 
     const timed = when;
     const choice: TriggerPartValue = { section: 'when', when: timed };
-    const withNumbers = shown.map((word) => {
+    const withNumbers = words.map((word) => {
         if (word.kind !== 'slot' || word.address.slot !== 'seconds' || timed.seconds === null) return word;
 
         return { ...word, text: String(timed.seconds) };
@@ -244,10 +239,6 @@ function joiningGroup(word: string): ScriptWordGroup {
 
 function text(word: string): TriggerWord {
     return { kind: 'text', text: word };
-}
-
-function otherWord(): TriggerWord {
-    return { kind: 'text', text: 'other', isEntity: true };
 }
 
 function eventIcon(when: When | null): ScriptIcon {

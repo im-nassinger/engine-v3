@@ -87,7 +87,7 @@ export const NO_OTHER_REASON = 'This event has no other entity';
 
 // The When menu: six events. Picking one gives its first kind; the in-place word picks the other.
 const EVENTS: readonly Omit<Named<WhenKind>, 'word'>[] = [
-    { value: 'touched', label: 'something starts or stops touching this' },
+    { value: 'touched', label: 'other starts or stops touching this' },
     { value: 'key', label: 'a key or input is pressed, released or held' },
     { value: 'after', label: 'after or every few seconds' },
     { value: 'levelStart', label: 'the level starts' },
@@ -164,6 +164,9 @@ const TRUTH_CHOICES: readonly boolean[] = [true, false];
 const NEW_NAME_LABEL = 'New name…';
 const NEW_TAG_LABEL = 'New tag…';
 const NO_LEVEL_VARIABLES = 'None yet: add them on the World';
+// The target menu's tag group, shown even when it is empty, so a creator learns that a tag can be the target.
+const EVERY_ENTITY_TAGGED = 'Every entity tagged';
+const NO_TAGS_YET = 'No entity has a tag yet: add a TagsComponent to one';
 const OTHER_DESCRIPTION = 'The other entity of the event: the one touching or firing';
 const TAG_COMPARES: readonly Named<Compare>[] = [
     { value: 'is', label: 'has', word: 'has' },
@@ -544,12 +547,12 @@ export class TriggerChoices {
         const otherReason = eventHasOther ? undefined : NO_OTHER_REASON;
         const otherChoice = described(choice('other', place({ kind: 'other' })), OTHER_DESCRIPTION);
 
-        const tagged: TriggerChoice[] = [];
-        if (withTags) {
-            for (const tag of this.levelTags) {
-                tagged.push(choice(`every entity tagged ${tag}`, place({ kind: 'tagged', tag })));
-            }
-        }
+        const tagChoices = this.levelTags.map((tag) =>
+            choice(`every entity tagged ${tag}`, place({ kind: 'tagged', tag })),
+        );
+        const tagged: TriggerMenuGroup | undefined = withTags
+            ? { title: EVERY_ENTITY_TAGGED, choices: tagChoices, emptyText: NO_TAGS_YET }
+            : undefined;
 
         const placeEntity = (entityId: EntityId) => {
             if (entityId === owner.id) return place({ kind: 'this' });
@@ -685,7 +688,7 @@ export class TriggerChoices {
         const chosenId = entityIdOf(amount);
         const placeEntity = (entityId: EntityId) => place({ entity: entityId });
 
-        return { kind: 'entities', choices: [], tagged: [], chosenId, placeEntity };
+        return { kind: 'entities', choices: [], tagged: undefined, chosenId, placeEntity };
     }
 
     // The level's tags, then "New tag…", which asks for one.
