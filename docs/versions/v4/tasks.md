@@ -87,4 +87,34 @@ Planned in [fix-4-scratch-triggers.md](fix-4-scratch-triggers.md), confirmed by 
 - [x] 26. Journeys and close fix 4's docs
   - Read: versions/v4/fix-4-scratch-triggers.md#docs-to-update-when-its-built, versions/v4/tasks.md#tasks
   - Done when: the Playwright journeys that make or edit triggers pass with the blocks in three browsers; the speed tests still meet their targets; every doc in "Docs to update" is updated; fixes.md row 4 says built
-- [ ] 27. Try point: make a coin, a door that opens on a custom event, and a spike that rests 1 second, all with the Scratch blocks, and say how the card feels
+- [x] 27. Try point: make a coin, a door that opens on a custom event, and a spike that rests 1 second, all with the Scratch blocks, and say how the card feels
+
+### v4 fixes 9 to 13: the last asks before v5
+
+Planned in [fixes-9-to-13-plan.md](fixes-9-to-13-plan.md), confirmed by the owner (2026-11-25). Every task also needs `npm run check` to pass, and each pick made while building goes in decisions.md.
+
+- [ ] 28. Fix 11: the pen closes a path ended on its first point
+  - Read: bugs.md#the-pen-doesnt-close-a-path-ended-on-its-first-point, versions/v4/fixes.md
+  - Done when: with snapping on and off, a press within the close ring, or one that snaps onto the first point, closes the path (from 3 points on) and it gets its fill; the cause found is written in bugs.md with the fix, the bug marked fixed; browser tests pin both cases; fixes.md row 11 says fixed
+- [ ] 29. Fix 9 and fix 13: the tag group and "other"
+  - Read: requirements/triggers/triggers.md#when-if-do--v3, requirements/triggers/triggers.md#events--v3, design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks
+  - Done when: the target menu always shows "Every entity tagged", with one greyed line saying how to add a tag when the level has none; no text a creator sees, no requirement and no code comment says "something starts touching" (the Trigger tool's trigger, the sentences, the variables-and-inputs example all say "other"); browser tests cover the empty and filled tag group; fixes.md rows 9 and 13 say built
+- [ ] 30. Fix 10, the logic: multiply, divide and variables as values
+  - Read: requirements/triggers/triggers.md#multiply-divide-and-variables-in-every-value-box--v4, architecture/core-model/triggers.md, architecture/triggers-in-play.md
+  - Done when: Change value has Multiply and Divide (numbers, and a vector by one number; dividing by 0 leaves the value); every value box's value can be a variable of its type (level's or the target's own), saved, loaded and read when the block runs; unit tests cover saving and loading, and `runHeadless` tests cover multiply, divide, divide by 0 and a variable read at run time in Change value, the If, Wait and Fire custom event
+- [ ] 31. Fix 10, the blocks: Multiply, Divide and the variable picks
+  - Read: requirements/triggers/triggers.md#multiply-divide-and-variables-in-every-value-box--v4, design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks
+  - Done when: Change value's menu offers Multiply and Divide; every value box in every block offers the variables of its type, grouped as the variable menu groups them, and shows a chosen variable by name; a vector or colour box offers none; browser tests cover picking a variable in each block kind and switching back to a typed value; fixes.md row 10 says built
+- [ ] 32. Fix 12, the rules: lengths in metres
+  - Read: requirements/editor/workspace.md#lengths-in-metres--v4, requirements/physics/bodies.md, glossary.md, requirements/README.md
+  - Done when: every requirement that says 50 px per metre or gives a length, speed or grid size in pixels says it in metres (the grid size's range and steps included, chosen under the standing yes); the glossary has *Pixels per metre*; architecture/ says where the scale lives; `node tools/check-docs.js` and `node tools/check-sources.js` pass
+- [ ] 33. Fix 12, the physics: pixels per metre as a World setting
+  - Read: requirements/editor/workspace.md#lengths-in-metres--v4, architecture/README.md, tech-notes.md
+  - Done when: the World's PhysicsWorldComponent has *Pixels per metre*, default 100, saved in the level and not changeable during play; the fixed `Units.PIXELS_PER_METRE` is gone and the physics, masses and test play use the World's value; a new level's grid is 100 px; old levels aren't converted; unit and `runHeadless` tests show a body falls the same in metres at 50 and 100 px per metre
+- [ ] 34. Fix 12, the editor: every length in metres
+  - Read: requirements/editor/workspace.md#lengths-in-metres--v4, design/controls.md
+  - Done when: ☰ offers Metres and Pixels, metres by default, saved in the browser; every length the editor shows or takes (the Entity inspector's boxes, the grid size, speeds in m/s, the trigger blocks' boxes, the debug box, rulers and size labels) is in the chosen unit, typed values converted back exactly; browser tests cover both units in the Entity inspector, the grid size and a trigger block; fixes.md row 12 says built
+- [ ] 35. Journeys and close fixes 9 to 13's docs
+  - Read: versions/v4/fixes-9-to-13-plan.md, versions/v4/tasks.md#tasks
+  - Done when: the Playwright journeys pass in three browsers with the new units; the speed tests still meet their targets; architecture/ and design/ match what was built; progress.md says fixes 9 to 13 are built and waiting for the owner's try
+- [ ] 36. Try point: draw a closed path with the pen, target a tag in an empty level, double a coin count with Multiply, use a variable in a Wait, and move things in metres, and say how it feels

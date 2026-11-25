@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**v1 is built** (stages 0 to 19, done 2026-11-19), with 2,048 tests in Node, 1,269 browser tests and 292 Playwright tests in three browsers. **The versions after v1 are small** (owner, round 12, 2026-11-20): v2 curves and gradients, v3 a first game without code, v4 the rest of the triggers, v5 scripts, v6 text, v7 `.entity` files and the builtin player; see [scope.md](scope.md). **v2 is done** (curves and gradients): built, tried by the owner, the [fixes](versions/v2/fixes.md) asked built, and the owner's last test passed (2026-11-22); its lasting parts are in [architecture/](architecture/README.md). **v3 is done** (a first game without code: tags, the World's variables and inputs, triggers, the Trigger tool, Win, Lose and Restart): built by the orchestrator, tried by the owner, its two [fixes](versions/v3/fixes.md) built, and marked sound by the owner (2026-11-22). **v4 is built** (the rest of the triggers, string and boolean variables on any entity, the shortcut list): the orchestrator built its [tasks](versions/v4/tasks.md) 1 to 17 (2026-11-22 to 2026-11-23), and **the owner tried it and found it ok** (task 18, 2026-11-24); the [fixes](versions/v4/fixes.md) asked so far are built: the trigger card's pickers and boxes, and **simpler triggers** (six events, one check, no Push, no Sensor setting; 2026-11-23). **The trigger card is Scratch blocks** (owner, 2026-11-24, [fix](versions/v4/fixes.md) 4), built by the orchestrator in tasks 19 to 26 (2026-11-25); the owner is trying it (task 27), and the first round of asks, fix 5, is built (2026-11-25). Its plan stays in [versions/v4/](versions/v4/requirements.md); its lasting parts are in [architecture/](architecture/README.md), mainly [core-model/triggers.md](architecture/core-model/triggers.md) and [triggers-in-play.md](architecture/triggers-in-play.md). The repo is public since 2026-11-20, so CI runs on every push.
+**v1 is built** (stages 0 to 19, done 2026-11-19), with 2,048 tests in Node, 1,269 browser tests and 292 Playwright tests in three browsers. **The versions after v1 are small** (owner, round 12, 2026-11-20): v2 curves and gradients, v3 a first game without code, v4 the rest of the triggers, v5 scripts, v6 text, v7 `.entity` files and the builtin player; see [scope.md](scope.md). **v2 is done** (curves and gradients): built, tried by the owner, the [fixes](versions/v2/fixes.md) asked built, and the owner's last test passed (2026-11-22); its lasting parts are in [architecture/](architecture/README.md). **v3 is done** (a first game without code: tags, the World's variables and inputs, triggers, the Trigger tool, Win, Lose and Restart): built by the orchestrator, tried by the owner, its two [fixes](versions/v3/fixes.md) built, and marked sound by the owner (2026-11-22). **v4 is built** (the rest of the triggers, string and boolean variables on any entity, the shortcut list): the orchestrator built its [tasks](versions/v4/tasks.md) 1 to 17 (2026-11-22 to 2026-11-23), and **the owner tried it and found it ok** (task 18, 2026-11-24); the [fixes](versions/v4/fixes.md) asked so far are built: the trigger card's pickers and boxes, and **simpler triggers** (six events, one check, no Push, no Sensor setting; 2026-11-23). **The trigger card is Scratch blocks** (owner, 2026-11-24, [fix](versions/v4/fixes.md) 4), built by the orchestrator in tasks 19 to 26 (2026-11-25); the owner tried it and found it ok (task 27, 2026-11-25), with fixes 5 to 8 built from the try; **fixes 9 to 13 are being built by the orchestrator** (tasks 28 to 36). Its plan stays in [versions/v4/](versions/v4/requirements.md); its lasting parts are in [architecture/](architecture/README.md), mainly [core-model/triggers.md](architecture/core-model/triggers.md) and [triggers-in-play.md](architecture/triggers-in-play.md). The repo is public since 2026-11-20, so CI runs on every push.
 
 ## Last session (2026-11-25)
 
@@ -18,7 +18,7 @@ The owner tried fix 4's Scratch blocks (task 27) and asked for changes.
 5. The owner asked for more, written down to plan and build later ([fixes](versions/v4/fixes.md) 9 to 12): show the "Every entity tagged" target group even with no tag in the level; multiply and divide in Change value, and a variable of the matching type in any trigger block's value box; the pen not closing a path ended on its first point ([bugs.md](bugs.md), with tips on the likely cause); lengths in metres everywhere. Fix 12's questions were settled: ☰ offers metres and pixels, pixels per metre is a World setting, default 100, not the grid size (Claude, asked to decide), and old levels aren't converted.
 6. A new [principle](principles.md) (owner): until levels can be published, a change may break the levels saved so far; nothing is converted.
 
-**Where we stopped:** fixes 5 to 8 are built and committed, not pushed; fix 8 isn't on Netlify yet. Fixes 9 to 12 are only in the docs. **The owner wants the next session to help decide what to do next** from the backlog: fixes 9 to 12, finishing the try of fix 4 (task 27), planning v5 (scripts), and the [open questions](#open-questions-for-the-owner) below. The owner may add more asks first.
+**Where we stopped:** fixes 5 to 8 are pushed and on Netlify. The owner settled the backlog (2026-11-25): the fix 4 try (task 27) is done, grid snapping is ok, the card says "other" (fix 13), and v4 fixes 9 to 13 come before v5. They are planned in [fixes-9-to-13-plan.md](versions/v4/fixes-9-to-13-plan.md) as tasks 28 to 36 of [tasks.md](versions/v4/tasks.md), built by the orchestrator, one session per task, to save the owner's tokens.
 
 ## Where things stand
 
@@ -41,12 +41,12 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 Each item is removed in the same commit that settles it, wherever that commit is made.
 
-1. **Try the new grid snapping** (2026-11-22): a dragged, resized or drawn shape now always lands on the nearest grid line, Ctrl turning it off; the grid draws only the grid size's lines, with no fainter ones.
+Nothing right now; the next try point is task 36.
 
 ## Next
 
-1. Plan and build v4 fixes 9 to 12 ([fixes.md](versions/v4/fixes.md)); the owner has more to add first. Fix 12's (metres) questions are settled in [workspace.md](requirements/editor/workspace.md#lengths-in-metres--v4).
-2. After the owner finishes trying fix 4 (task 27), v5 (scripts) is planned.
+1. The orchestrator builds v4 fixes 9 to 13, tasks 28 to 35 of [tasks.md](versions/v4/tasks.md); the owner tries them in task 36.
+2. Then v5 (scripts) is planned.
 3. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
 
 ## How to change a requirement
@@ -61,7 +61,7 @@ The original text of any review question can be found with `git log -p -S'"ID"' 
 
 ## Open questions for the owner
 
-- **"When other starts touching this" in the game too?** The mockup says it; the real card and the requirements still say "something" (2026-11-24).
+None right now. ("When other starts touching this" in the game too: yes, owner, 2026-11-25, fix 13.)
 
 Under the owner's standing yes (2026-11-14), Claude decides what the docs don't answer and lists it in [decisions.md](decisions.md#decided-under-the-standing-yes) for the owner to review whenever they like. The [review page](review.html) holds round 12's record, settled on 2026-11-20; earlier rounds are in git history.
 
