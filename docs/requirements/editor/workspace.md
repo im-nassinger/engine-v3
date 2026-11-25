@@ -172,7 +172,7 @@ Asked by the owner while trying v4 ([fix](../../versions/v4/fixes.md) 12, 2026-1
 - **1 metre is 100 px by default**, so 1 px is 0.01 m, and the physics uses the same scale. *Why: the owner had to set a velocity of about 500 for an entity to move a small amount; in metres per second, 500 should be a lot.*
 - **☰ offers two units: metres and pixels.** Metres is the default.
 - **Levels saved at 50 px per metre are not converted** (owner, 2026-11-25): levels can't be published yet, so the old ones don't need to keep working, see [principles](../../principles.md).
-- Open, to settle when it is planned: whether the pixels per metre follow the grid size or are their own setting. The owner isn't sure; 100 either way by default. (A setting was once rejected; the owner took that back on 2026-11-25.)
+- **Pixels per metre is its own setting, not the grid size**: a field on the World's PhysicsWorldComponent, beside Gravity, default 100, not changeable during play. **The grid's default becomes 1 m (100 px).** The ☰ unit choice is an editor setting saved in the browser, never in the level. *Why (Claude, asked by the owner to decide, 2026-11-25): the grid is a drawing aid people change often, to place things finer or coarser, and that must not change how fast things fall. Engines keep the two apart: GameMaker sets pixels to metres per room's physics world, Unity's 1 unit is 1 m whatever the grid, and Box2D's own advice is one fixed scale. A setting was once rejected; the owner took that back on 2026-11-25.*
 
 Source: owner: 2026-11-25
 

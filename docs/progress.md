@@ -44,7 +44,7 @@ Each item is removed in the same commit that settles it, wherever that commit is
 
 ## Next
 
-1. Plan and build v4 fixes 9 to 12 ([fixes.md](versions/v4/fixes.md)); the owner has more to add first. Fix 12 (metres) has open questions in [workspace.md](requirements/editor/workspace.md#lengths-in-metres--v4).
+1. Plan and build v4 fixes 9 to 12 ([fixes.md](versions/v4/fixes.md)); the owner has more to add first. Fix 12's (metres) questions are settled in [workspace.md](requirements/editor/workspace.md#lengths-in-metres--v4).
 2. After the owner finishes trying fix 4 (task 27), v5 (scripts) is planned.
 3. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
 
