@@ -164,6 +164,17 @@ Source: scope ED1; round 3: 01 2.6; round 5: 02 2.5; old: WS-46 to WS-52, WS-56,
 
 Source: scope ED4; round 3: 01 2.6; round 5: FMT1; round 7: BND2; old: WS-53, WS-54, WS-58 to WS-62; owner: 2026-11-13, 2026-11-14, 2026-11-19, 2026-11-21, 2026-11-22
 
+### Lengths in metres · v4
+
+Asked by the owner while trying v4 ([fix](../../versions/v4/fixes.md) 12, 2026-11-25), not planned in detail or built yet. It replaces "50 px per metre, not a setting" in [bodies](../physics/bodies.md) and the grid's default of 50 px.
+
+- **The editor shows every length in metres, never in pixels**: positions, sizes, the grid size, speeds in m/s, the trigger blocks' boxes, the debug box. Pixels stay only inside the code.
+- **1 metre is 100 px by default**, so 1 px is 0.01 m, and the physics uses the same scale. *Why: the owner had to set a velocity of about 500 for an entity to move a small amount; in metres per second, 500 should be a lot.*
+- **The unit can be changed in ☰**; metres is the default.
+- Open, to settle when it is planned: whether the pixels per metre follow the grid size or are their own setting (the owner isn't sure; 100 either way by default, and [rejected.md](../../rejected.md) still lists "showing pixels per metre as a setting"); which units ☰ offers; and what happens to levels saved at 50 px per metre.
+
+Source: owner: 2026-11-25
+
 ### Snapping to other entities · Later
 
 - With it on, the edges and centre of what you move snap to the edges and centres of other entities, to the camera frame and to the level bounds. Equal gaps between neighbours snap too.

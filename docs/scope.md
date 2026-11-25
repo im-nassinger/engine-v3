@@ -44,6 +44,8 @@ These versions were decided during the requirements review, or by the owner afte
 | A new level starts with the inputs left, right, up, down and jump | v3 | Inputs come in v3, and most games need these five (owner: 2026-11-13) |
 | Variables are a number, a string, a boolean, an entity, an asset, a colour, a vector, an angle or tags | v3 to v5 | Variables come from v3. The owner wants text too (owner: 2026-11-13), named the first three types (owner: 2026-11-14), and added the rest when variables replaced the values scripts kept (owner: 2026-11-16) |
 | Variables on any entity, number limits, and a warning on the ScriptComponent's card that adds the variables a script needs | v4 and v5 | They replace the values scripts kept on the ScriptComponent, which were v2 (owner: 2026-11-16) |
+| Multiply and divide in Change value, and a variable of the matching type in any trigger block's value box | v4 | Asked while trying v4, fix 10 (owner: 2026-11-25) |
+| Lengths shown in metres, 100 px per metre, the unit picked in ☰ | v4 | Asked while trying v4, fix 12 (owner: 2026-11-25) |
 | Flip a boolean variable in a trigger | v4 | A light switch is then one trigger (owner: 2026-11-14) |
 | Noticing touches, the random seed | v3 and v5 | Only triggers and scripts use them (owner: 2026-11-13). Since 2026-11-23 a shape with no Surface and a touch trigger is noticed by what passes through it, with no Sensor setting (owner) |
 | Convert a trigger into a script, and switching a script off with a checkbox that triggers can change | Later | A way out when a trigger needs branches or loops; links that switched the trigger switch the script (owner: 2026-11-20) |

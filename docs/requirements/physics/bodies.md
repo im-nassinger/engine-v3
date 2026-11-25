@@ -4,7 +4,7 @@
 
 How entities move and collide. A **BodyComponent** says how something moves, a **SurfaceComponent** says how its shape collides. **v1:** add a body in one click, the Box2D body settings, the surface settings (density, friction, restitution), merging shapes in a group into one body, and the physics view. **v3:** surfaces and touching, for triggers and scripts: a Surface means solid, no Surface means things pass through. **Later:** one-way platforms and the warnings for setups that behave badly. Core rules: new shapes have no physics until you add it, collision always matches what you see, and touching is detected by the physics engine alone.
 
-Field names are Box2D's, so the Entity inspector, the Lua API and tutorials match. The scale is 50 px per metre and is not a setting.
+Field names are Box2D's, so the Entity inspector, the Lua API and tutorials match. The scale is 50 px per metre and is not a setting; the owner asked to change it to 100 px per metre and show metres everywhere (2026-11-25, see [lengths in metres](../editor/workspace.md#lengths-in-metres--v4)).
 
 ## Bodies
 

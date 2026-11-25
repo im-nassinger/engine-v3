@@ -15,6 +15,8 @@ The owner tried fix 4's Scratch blocks (task 27) and asked for changes.
 
 4. [Fix](versions/v4/fixes.md) 8: a copied entity whose name ends in a number gets the next number for its word (copying `Entity 1` makes `Entity 2`), in Paste and Duplicate.
 
+5. The owner asked for more, written down to plan and build later ([fixes](versions/v4/fixes.md) 9 to 12): show the "Every entity tagged" target group even with no tag in the level; multiply and divide in Change value, and a variable in any trigger block's value box; the pen not closing a path ended on its first point ([bugs.md](bugs.md)); lengths in metres everywhere, 100 px per metre.
+
 **Where we stopped:** fixes 5 to 8 are built and committed, not pushed; the owner is still trying fix 4 (task 27).
 
 ## Where things stand
@@ -42,8 +44,8 @@ Each item is removed in the same commit that settles it, wherever that commit is
 
 ## Next
 
-1. The orchestrator builds v4 fix 4, tasks 19 to 27 in [versions/v4/tasks.md](versions/v4/tasks.md) ([plan](versions/v4/fix-4-scratch-triggers.md)), once the owner says to start it.
-2. After fix 4 is built and tried, v5 (scripts) is planned.
+1. Plan and build v4 fixes 9 to 12 ([fixes.md](versions/v4/fixes.md)); the owner has more to add first. Fix 12 (metres) has open questions in [workspace.md](requirements/editor/workspace.md#lengths-in-metres--v4).
+2. After the owner finishes trying fix 4 (task 27), v5 (scripts) is planned.
 3. The owner may review the picks made under the standing yes in [decisions.md](decisions.md) and [before-v2.md](before-v2.md).
 
 ## How to change a requirement

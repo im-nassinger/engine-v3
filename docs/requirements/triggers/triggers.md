@@ -14,6 +14,7 @@ A trigger is no-code logic on an entity, in three parts: **When** (one event), *
 - Every event gives the trigger two entities: **`this`**, the entity holding the trigger, and **`other`**, the entity that caused the event, when there is one. For touching, `other` is the entity that touched. For a custom event, it is the sender. A key, a timer, level start or a variable changing has no `other`, and checks and actions that use it are greyed out.
 - **The triggers were made simpler while the owner tried v4** (owner, 2026-11-23): the When menu from 12 events to 6, the three If checks into one, Push and the Sensor setting removed. *Why: "this whole trigger thing is looking very convoluted and bad. we need to simplify it as much as possible." Options that overlap let the user pick the wrong one and not know why nothing happens.* The plan is in [fix-3-simpler-triggers.md](../../versions/v4/fix-3-simpler-triggers.md).
 - **Each check and action picks its target from: `this`, `other`, an entity by name, or every entity with a tag.**
+- **The target menu always shows its "Every entity tagged" group** (owner, 2026-11-25, [v4 fix](../../versions/v4/fixes.md) 9, not built yet). In a level where no entity has a tag yet, the group holds one greyed line saying so and how to add one, such as "No entity has a tag yet. Add a Tags card to one." *Why: the group was hidden until some entity had a tag, so the owner couldn't tell that targeting by tag existed.*
 - In the Entity inspector a trigger reads as a **sentence with clickable parts**, such as "When other starts touching this, if other has the tag player: add 1 to coins, destroy this."
 - **Every clickable part is picked the way the rest of the editor picks it** (owner, 2026-11-23): an entity from the Entities viewer's tree, with a search, or by clicking it in the level view, or by dropping an Entities viewer row on it; a vector in two boxes, x and y; a colour in the colour box; a number in the number box with its unit. A value on an entity is picked in two steps, its component and then the value ("Transform › Position"), and the entity comes before the value in the sentence, since the values offered are that entity's. Every item of the Add check and Add action menus says in one line what it does. *Why: the owner found the first card lazy: a flat list of every entity, vectors typed as "0, -600" in a text box, "Transform position x" listed beside "Transform position y", and words such as "who is tagged…" that said nothing.*
 - A part that isn't set yet is highlighted and says what it needs. A trigger with unset parts doesn't run.
@@ -119,6 +120,20 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27; owner: 2026-11-13; owner: 2
 - *Why v3: what a coin, a spike and a goal need (owner: 2026-11-20).*
 
 Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b, 09 2.9; round 8: 09 2.4; old: TR-30 to TR-53, TR-78 to TR-84; owner: 2026-11-13; owner: 2026-11-15; owner: 2026-11-20; owner: 2026-11-23
+
+### Multiply, divide, and variables in every value box · v4
+
+Asked by the owner while trying v4 ([fix](../../versions/v4/fixes.md) 10, 2026-11-25), not built yet.
+
+- **Change value can also multiply and divide**, such as "multiply coins by 2" or "divide this Transform › Scale by 2". They work on numbers. **A vector is multiplied or divided by one number**, so "multiply other Body › Velocity by 0.5" halves its speed.
+- **Dividing by 0 leaves the value as it was**, as a target that lacks the value is skipped.
+- **Every value box in every block can hold a variable instead of a typed value** (owner: "all scratch blocks"), such as "add bonus to coins", "set this Transform › Rotation to angle", "if score is more than best", or "wait delay s". This includes Change value's amount, the If's amount, Wait's seconds and Fire custom event's number.
+- **Only variables of the box's type are offered:** a number variable in a number box, a string in a string box, a boolean in a boolean box. A vector or colour box takes none until those variable types come in v5.
+- The variables offered are the level's and the target's own, as the variable menu already groups them.
+- **The variable is read when the block runs**, so it uses the value it has at that moment.
+- *Why: the owner asked for multiply and divide, and to use variables everywhere a value of their type fits, so a value can depend on another.*
+
+Source: owner: 2026-11-25
 
 ### Fire custom event and Wait · v4
 
