@@ -6,7 +6,7 @@ import type { KeyCode } from '../../keys/index.ts';
 import { triggerName } from './triggerName.ts';
 
 function triggerOn(when: When | null, name: string | null = null): Trigger {
-    return { id: 1, name, on: true, when, checks: [], actions: [], repeat: { kind: 'everyTime' } };
+    return { id: 1, name, on: true, when, checks: [], actions: [] };
 }
 
 const NAMES: readonly (readonly [When | null, string])[] = [

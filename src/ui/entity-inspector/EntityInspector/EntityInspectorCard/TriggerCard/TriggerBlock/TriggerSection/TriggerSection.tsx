@@ -12,7 +12,7 @@ export type TriggerSectionProps = {
     commit: CommitTriggerEdit;
 };
 
-// When, If, Do or Repeat: a small-caps title with its hint at the right, over full-width rows of one
+// When, If or Do: a small-caps title with its hint at the right, over full-width rows of one
 // sentence each, and Add check or Add action at the end of If and Do.
 export function TriggerSection({ openLevel, section, triggerIndex, commit }: TriggerSectionProps) {
     const rowProps = { triggerIndex, commit };

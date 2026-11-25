@@ -14,7 +14,6 @@ import type {
     LiveValue,
     Press,
     ReadableValue,
-    Repeat,
     Target,
     Trigger,
     ValueRef,
@@ -25,6 +24,7 @@ import type { VariableValue } from '../variables/VariableValue.ts';
 
 type RawRecord = Readonly<Record<string, unknown>>;
 
+const TRIGGER_KEYS: readonly string[] = ['id', 'name', 'on', 'when', 'checks', 'actions'];
 const PRESSES: readonly Press[] = ['pressed', 'released', 'held'];
 const COMPARES: readonly Compare[] = ['is', 'isNot', 'more', 'less', 'atLeast', 'atMost'];
 const CHANGE_OPS: readonly ChangeOp[] = ['set', 'add', 'subtract', 'flip'];
@@ -33,11 +33,12 @@ const LIVE_VALUES: readonly LiveValue[] = ['speed', 'velocityX', 'velocityY'];
 const MAX_AMOUNT_DEPTH = 8;
 
 // A trigger from untrusted data: a file, the clipboard. Checks the shape only; normalizeTrigger cleans it.
+// A `repeat` saved before v4 fix 4 is ignored, whatever it holds: Repeat is gone, and old levels aren't
+// converted (owner, 2026-11-24).
 export function parseTrigger(raw: unknown): ParseOutcome<Trigger> {
     if (!isPlainObject(raw)) return refuse({ reason: 'wrongType' });
-    if (!hasExactlyKeys(raw, ['id', 'name', 'on', 'when', 'checks', 'actions', 'repeat'])) {
-        return refuse({ reason: 'wrongType' });
-    }
+    const keys = Object.hasOwn(raw, 'repeat') ? [...TRIGGER_KEYS, 'repeat'] : TRIGGER_KEYS;
+    if (!hasExactlyKeys(raw, keys)) return refuse({ reason: 'wrongType' });
 
     const id = raw['id'];
     if (!isPositiveWholeNumber(id)) return refuse({ reason: 'wrongType' });
@@ -58,9 +59,6 @@ export function parseTrigger(raw: unknown): ParseOutcome<Trigger> {
     if (!actions.ok) return actions;
     const keptActions = actions.value.filter((action) => action !== null);
 
-    const repeat = parseRepeat(raw['repeat']);
-    if (!repeat.ok) return repeat;
-
     return accept({
         id,
         name,
@@ -68,7 +66,6 @@ export function parseTrigger(raw: unknown): ParseOutcome<Trigger> {
         when: when.value,
         checks: checks.value,
         actions: keptActions,
-        repeat: repeat.value,
     });
 }
 
@@ -571,20 +568,6 @@ function parseTriggerOnRef(raw: RawRecord): ParseOutcome<ValueRef> {
     if (!isPositiveWholeNumber(trigger)) return refuse({ reason: 'wrongType' });
 
     return accept({ kind: 'triggerOn', trigger });
-}
-
-function parseRepeat(raw: unknown): ParseOutcome<Repeat> {
-    if (!isPlainObject(raw)) return refuse({ reason: 'wrongType' });
-
-    const kind = raw['kind'];
-    if (kind === 'everyTime' || kind === 'oncePerRun') return parseBareKind(raw, kind);
-    if (kind !== 'atMostEvery') return refuse({ reason: 'unknownChoice' });
-    if (!hasExactlyKeys(raw, ['kind', 'seconds'])) return refuse({ reason: 'wrongType' });
-
-    const seconds = parseFiniteNumber(raw['seconds']);
-    if (!seconds.ok) return seconds;
-
-    return accept({ kind, seconds: seconds.value });
 }
 
 // Change value's amount: any JSON value, since it is the changed field's own value, which the field's type

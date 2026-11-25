@@ -6,7 +6,7 @@ import type { Trigger } from '../../fields/index.ts';
 import { newTriggerId } from './newTriggerId.ts';
 
 function trigger(id: number): Trigger {
-    return { id, name: null, on: true, when: null, checks: [], actions: [], repeat: { kind: 'everyTime' } };
+    return { id, name: null, on: true, when: null, checks: [], actions: [] };
 }
 
 describe('newTriggerId', () => {

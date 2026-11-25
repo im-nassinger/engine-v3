@@ -7,7 +7,7 @@ import { Level } from '../../level/index.ts';
 import { CustomEventNames } from './CustomEventNames.ts';
 
 function trigger(id: number, when: When | null, actions: readonly Action[] = []): Trigger {
-    return { id, name: null, on: true, when, checks: [], actions, repeat: { kind: 'everyTime' } };
+    return { id, name: null, on: true, when, checks: [], actions };
 }
 
 function fire(name: string | null): Action {

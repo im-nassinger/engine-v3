@@ -29,7 +29,6 @@ export class TriggerEdits {
             when: null,
             checks: [],
             actions: [],
-            repeat: { kind: 'everyTime' },
         };
         const triggers = [...copiedTriggers(component), trigger];
 
@@ -73,8 +72,8 @@ export class TriggerEdits {
         return { ...picked, triggers };
     }
 
-    // A value typed into a word: seconds, a compared value, an amount, a Repeat's time, a custom
-    // event's name, a condition's value; null clears Fire's optional number.
+    // A value typed into a word: seconds, a compared value, an amount, a custom event's name,
+    // a condition's value; null clears Fire's optional number.
     static typed(component: TriggerComponent, triggerIndex: number, address: TriggerWordAddress, typed: JsonValue) {
         const trigger = triggerAt(component, triggerIndex);
         const changed = withTyped(trigger, address, typed);
@@ -185,8 +184,6 @@ function withPart(trigger: Trigger, value: TriggerPartValue): Trigger {
     switch (value.section) {
         case 'when':
             return { ...trigger, when: value.when };
-        case 'repeat':
-            return { ...trigger, repeat: value.repeat };
         case 'check': {
             const checks = withItemAt(trigger.checks, value.index, value.check);
             return { ...trigger, checks };
@@ -218,10 +215,6 @@ function withTyped(trigger: Trigger, address: TriggerWordAddress, typed: JsonVal
 
             return { ...trigger, when };
         }
-        case 'repeat':
-            if (slot !== 'repeatSeconds' || !isNumber(typed) || trigger.repeat.kind !== 'atMostEvery') return undefined;
-
-            return { ...trigger, repeat: { kind: 'atMostEvery', seconds: typed } };
         case 'check': {
             const check = trigger.checks[part.index];
             if (check === undefined) return undefined;

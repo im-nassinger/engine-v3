@@ -9,7 +9,6 @@ import type {
     Check,
     CheckedValue,
     Condition,
-    Repeat,
     Target,
     Trigger,
     ValueRef,
@@ -36,7 +35,6 @@ export function normalizeTrigger(trigger: Trigger): Trigger {
         when: normalizeWhen(trigger.when),
         checks: trigger.checks.map(normalizeCheck),
         actions: trigger.actions.map(normalizeAction),
-        repeat: normalizeRepeat(trigger.repeat),
     };
 }
 
@@ -193,10 +191,4 @@ function normalizeAmount(value: ValueRef | null, amount: JsonValue | null) {
     if (!isTagAmount) return amount;
 
     return wordOrNull(amount);
-}
-
-function normalizeRepeat(repeat: Repeat): Repeat {
-    if (repeat.kind !== 'atMostEvery') return repeat;
-
-    return { kind: 'atMostEvery', seconds: normalizeSeconds(repeat.seconds) };
 }

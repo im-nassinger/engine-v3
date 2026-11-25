@@ -21,7 +21,6 @@ import type {
     JsonValue,
     Press,
     ReadableValue,
-    RepeatKind,
     Target,
     Unit,
     ValueRef,
@@ -38,7 +37,7 @@ import type { Entity, EntityId } from '../../../core/level/index.ts';
 import { changeableValues, readableValues, sameValueRef, variableChangeOf } from '../../../core/triggers/index.ts';
 import type { ChangeableValue, TriggerContext } from '../../../core/triggers/index.ts';
 
-import { freshAction, freshCheck, freshRepeat, freshWhen, targetOf } from './freshParts.ts';
+import { freshAction, freshCheck, freshWhen, targetOf } from './freshParts.ts';
 import {
     amountText,
     fieldLabel,
@@ -156,12 +155,6 @@ const ACTION_GROUPS: readonly { readonly title: string; readonly kinds: readonly
     { title: 'The game', kinds: ['win', 'lose', 'restart'] },
 ];
 
-const REPEATS: readonly Named<RepeatKind>[] = [
-    { value: 'everyTime', label: 'every time', word: 'every time' },
-    { value: 'oncePerRun', label: 'once per run', word: 'once per run' },
-    { value: 'atMostEvery', label: 'at most once every few seconds', word: 'at most once every' },
-];
-
 const BOOLEAN_CHOICES: readonly Named<boolean>[] = [
     { value: true, label: 'on', word: 'on' },
     { value: false, label: 'off', word: 'off' },
@@ -210,10 +203,6 @@ export class TriggerChoices {
 
     static actionWord(kind: ActionKind) {
         return wordOf(ACTIONS, kind);
-    }
-
-    static repeatWord(kind: RepeatKind) {
-        return wordOf(REPEATS, kind);
     }
 
     // "changes" with no condition; "becomes 3 or more", "becomes anything but "closed"", "becomes true".
@@ -515,14 +504,6 @@ export class TriggerChoices {
         }
 
         return ops.map((op) => choice(op, place(op)));
-    }
-
-    repeats() {
-        return REPEATS.map((repeat) => {
-            const fresh = freshRepeat(repeat.value);
-
-            return choice(repeat.label, { section: 'repeat', repeat: fresh });
-        });
     }
 
     // Add check's menu: the one check, a value.

@@ -31,7 +31,6 @@ async function showEnded(action: Action) {
         when: { kind: 'levelStart' },
         checks: [],
         actions: [action],
-        repeat: { kind: 'everyTime' },
     } as const;
     level.world.addComponent(new TriggerComponent({ triggers: [trigger], nextTriggerId: 2 }));
 

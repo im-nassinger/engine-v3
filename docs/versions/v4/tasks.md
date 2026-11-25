@@ -66,7 +66,7 @@ Planned in [fix-4-scratch-triggers.md](fix-4-scratch-triggers.md), confirmed by 
 - [x] 19. The rules in the requirements and the glossary
   - Read: versions/v4/fix-4-scratch-triggers.md, requirements/triggers/triggers.md, glossary.md, requirements/README.md
   - Done when: the glossary has *Enabled* and lists Repeat and cooldown as dropped; triggers.md has no Repeat, the Wait rule says the run switching its own trigger off goes on, the event reads "when other starts touching this", and Change value names *Enabled*; workspace.md and tokens.md say 344 px; rejected.md has the two rows; `node tools/check-docs.js` and `node tools/check-sources.js` pass
-- [ ] 20. Repeat leaves the saved trigger
+- [x] 20. Repeat leaves the saved trigger
   - Read: versions/v4/fix-4-scratch-triggers.md#1-repeat-goes-logic, architecture/core-model/triggers.md
   - Done when: `Trigger` has no `repeat`; `parseTrigger` ignores a saved one; a saved trigger has no `repeat`; `TriggerRepeats`, the Repeat menu and their uses are gone; unit tests cover a trigger saved with and without `repeat`
 - [ ] 21. A switched-off trigger in play

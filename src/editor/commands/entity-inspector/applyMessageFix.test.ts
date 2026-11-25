@@ -119,7 +119,6 @@ describe('applyMessageFix', () => {
             when: { kind: 'touched' },
             checks: [],
             actions: [{ kind: 'win' }],
-            repeat: { kind: 'everyTime' },
         } as const;
         pad.addComponent(new TriggerComponent({ triggers: [touchTrigger], nextTriggerId: 2 }));
         frames.runFrame();
@@ -148,7 +147,6 @@ describe('applyMessageFix', () => {
                 },
             ],
             actions: [{ kind: 'win' }],
-            repeat: { kind: 'everyTime' },
         } as const;
         timer.addComponent(new TriggerComponent({ triggers: [countingTrigger], nextTriggerId: 2 }));
         frames.runFrame();

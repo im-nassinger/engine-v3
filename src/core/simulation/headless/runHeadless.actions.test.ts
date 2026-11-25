@@ -38,7 +38,6 @@ type TriggerParts = {
     readonly checks?: readonly Check[];
     readonly actions?: readonly Action[];
     readonly on?: boolean;
-    readonly repeat?: Trigger['repeat'];
 };
 
 function giveTriggers(entity: Entity, parts: readonly TriggerParts[]) {
@@ -49,7 +48,6 @@ function giveTriggers(entity: Entity, parts: readonly TriggerParts[]) {
         when: part.when ?? ON_SPACE,
         checks: part.checks ?? [],
         actions: part.actions ?? [],
-        repeat: part.repeat ?? { kind: 'everyTime' },
     }));
 
     entity.addComponent(new TriggerComponent({ triggers, nextTriggerId: triggers.length + 1 }));
@@ -140,7 +138,7 @@ describe('checks', () => {
         expect(coinsIn(simulation)).toBe(11);
     });
 
-    test("`other`'s tag may be on a group above it, and a failed check doesn't use up once per run", () => {
+    test("`other`'s tag may be on a group above it", () => {
         const level = levelWithCoins();
         const sensor = placeBody(level, level.world, transform(0, 0), 'static');
         const isPlayer: Check = {
@@ -150,9 +148,7 @@ describe('checks', () => {
             compare: 'is',
             amount: 'player',
         };
-        giveTriggers(sensor, [
-            { when: { kind: 'touched' }, checks: [isPlayer], actions: [addCoins(1)], repeat: { kind: 'oncePerRun' } },
-        ]);
+        giveTriggers(sensor, [{ when: { kind: 'touched' }, checks: [isPlayer], actions: [addCoins(1)] }]);
         const crate = placeBody(level, level.world, transform(100, 0));
         const playerGroup = place(level, level.world, transform(0, 0));
         giveTags(playerGroup, ['player']);

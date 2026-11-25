@@ -235,7 +235,6 @@ function buildButtonAndDoor() {
             },
         ],
         actions: [{ kind: 'destroy', target: { kind: 'entity', entity: door.id } }, { kind: 'win' }],
-        repeat: { kind: 'everyTime' },
     };
     button.addComponent(new TriggerComponent({ triggers: [opens], nextTriggerId: 2 }));
 

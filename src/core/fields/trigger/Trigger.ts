@@ -16,7 +16,6 @@ export type Trigger = {
     readonly when: When | null;
     readonly checks: readonly Check[];
     readonly actions: readonly Action[];
-    readonly repeat: Repeat;
 };
 
 export type Press = 'pressed' | 'released' | 'held';
@@ -124,10 +123,3 @@ export type Action =
     | { readonly kind: 'wait'; readonly seconds: number | null };
 
 export type ActionKind = Action['kind'];
-
-export type Repeat =
-    | { readonly kind: 'everyTime' }
-    | { readonly kind: 'oncePerRun' }
-    | { readonly kind: 'atMostEvery'; readonly seconds: number };
-
-export type RepeatKind = Repeat['kind'];

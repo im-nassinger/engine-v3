@@ -13,7 +13,7 @@ import type { TriggerRowPart, TriggerWordEntry } from './TriggerWord.ts';
 export type TriggerRow = {
     readonly part: TriggerRowPart;
     readonly sentence: TriggerSentence;
-    // Checks and actions show an × on hover; the When and the Repeat never go.
+    // Checks and actions show an × on hover; the When never goes.
     readonly canRemove: boolean;
     // A Wait with actions after it: a faint line under its row, so the actions after it read as later.
     readonly hasWaitLine: boolean;
@@ -29,21 +29,21 @@ export type TriggerAddRow = {
 };
 
 export type TriggerSection = {
-    readonly title: 'When' | 'If' | 'Do' | 'Repeat';
+    readonly title: 'When' | 'If' | 'Do';
     // At the title's right: "optional", "all must be true", "top to bottom".
     readonly hint: string | undefined;
     readonly rows: readonly TriggerRow[];
     readonly addRow: TriggerAddRow | undefined;
 };
 
-// One trigger's block: the head (its name, which drags it, the switch and the … menu), then When, If, Do
-// and Repeat, then its notes. An off trigger's sections fade.
+// One trigger's block: the head (its name, which drags it, the switch and the … menu), then When, If and
+// Do, then its notes. An off trigger's sections fade.
 export type TriggerBlock = {
     readonly id: number;
     readonly index: number;
     readonly name: string;
     readonly isOn: boolean;
-    readonly sections: readonly [TriggerSection, TriggerSection, TriggerSection, TriggerSection];
+    readonly sections: readonly [TriggerSection, TriggerSection, TriggerSection];
     // The editor messages about this trigger, such as "Doesn't run until every yellow part is set.".
     readonly notes: readonly CardNote[];
 };
@@ -84,12 +84,7 @@ function blockOf(
         index,
         name: triggerName(trigger),
         isOn: trigger.on,
-        sections: [
-            whenSection(trigger, sources),
-            ifSection(trigger, sources),
-            doSection(trigger, sources),
-            repeatSection(trigger, sources),
-        ],
+        sections: [whenSection(trigger, sources), ifSection(trigger, sources), doSection(trigger, sources)],
         notes: ownNotes,
     };
 }
@@ -138,11 +133,4 @@ function doSection(trigger: Trigger, sources: SentenceSources): TriggerSection {
     const addRow: TriggerAddRow = { label: 'Add action', entry, isNeeded: rows.length === 0 };
 
     return { title: 'Do', hint, rows, addRow };
-}
-
-function repeatSection(trigger: Trigger, sources: SentenceSources): TriggerSection {
-    const sentence = TriggerSentence.ofRepeat(trigger, sources);
-    const row: TriggerRow = { part: { section: 'repeat' }, sentence, canRemove: false, hasWaitLine: false };
-
-    return { title: 'Repeat', hint: undefined, rows: [row], addRow: undefined };
 }

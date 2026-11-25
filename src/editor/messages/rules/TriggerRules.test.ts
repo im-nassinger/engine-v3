@@ -19,7 +19,6 @@ function trigger(parts: Partial<Trigger>): Trigger {
         when: { kind: 'touched' },
         checks: [],
         actions: [{ kind: 'win' }],
-        repeat: { kind: 'everyTime' },
         ...parts,
     };
 }

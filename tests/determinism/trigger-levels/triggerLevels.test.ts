@@ -87,7 +87,7 @@ describe('the determinism levels with triggers do what they are built to show', 
         expect(ticks.at(-1)?.variables['coins']).toBe(5);
     });
 
-    test('trigger-timers: every, after, a switch off and on, and Repeat at most once a second', async () => {
+    test('trigger-timers: every, after, a switch off and on, and an input held', async () => {
         const ticks = await runTriggerLevel('trigger-timers');
         // Every 0.5 s until the after-4-s trigger switches the beat off in tick 240, the beat's own firing in
         // that tick first, then every 0.5 s again from the `up` press in tick 420.
@@ -95,8 +95,10 @@ describe('the determinism levels with triggers do what they are built to show', 
             30, 60, 90, 120, 150, 180, 210, 240, 450, 480, 510, 540, 570, 600,
         ]);
         expect(ticksReaching(ticks, 'late')).toEqual([120]);
-        // `jump` held from tick 60 to 330 fires at most once a second.
-        expect(ticksReaching(ticks, 'held')).toEqual([60, 120, 180, 240, 300]);
+        // `jump` held from tick 60 to 330 fires every tick it is held.
+        const held = ticksReaching(ticks, 'held');
+        expect(held).toHaveLength(271);
+        expect([held[0], held.at(-1)]).toEqual([60, 330]);
     });
 
     test('trigger-touch-groups: a cart of three shapes is counted once going in and once leaving', async () => {

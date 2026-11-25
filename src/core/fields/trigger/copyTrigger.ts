@@ -5,7 +5,6 @@ import type {
     Check,
     CheckedValue,
     Condition,
-    Repeat,
     Target,
     Trigger,
     ValueRef,
@@ -23,7 +22,6 @@ export function copyTrigger(trigger: Trigger): Trigger {
         when: copyWhen(trigger.when),
         checks: trigger.checks.map(copyCheck),
         actions: trigger.actions.map(copyAction),
-        repeat: copyRepeat(trigger.repeat),
     };
 }
 
@@ -151,12 +149,6 @@ function copyValueRef(value: ValueRef | null): ValueRef | null {
         case 'velocity':
             return { kind: 'velocity' };
     }
-}
-
-function copyRepeat(repeat: Repeat): Repeat {
-    if (repeat.kind === 'atMostEvery') return { kind: 'atMostEvery', seconds: repeat.seconds };
-
-    return { kind: repeat.kind };
 }
 
 function copyJson(value: JsonValue | null): JsonValue | null {

@@ -55,7 +55,6 @@ describe('createTrigger', () => {
                 when: { kind: 'touched' },
                 checks: [],
                 actions: [],
-                repeat: { kind: 'everyTime' },
             },
         ]);
         expect(triggers.get('nextTriggerId')).toBe(2);

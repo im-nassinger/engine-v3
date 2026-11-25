@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import { ShapeComponent, TriggerComponent } from '../../components/index.ts';
-import type { EntityId, Repeat, Trigger, When } from '../../fields/index.ts';
+import type { EntityId, Trigger, When } from '../../fields/index.ts';
 import { LevelWriter } from '../../level-data/index.ts';
 import { Level } from '../../level/index.ts';
 import type { Entity } from '../../level/index.ts';
@@ -16,12 +16,10 @@ import { place, placeBody, transform } from '../testing/scriptedLevel.ts';
 
 const START = { clockTimeMs: 0 };
 const NOTHING_HELD: TickInputs = { heldKeys: [], pressedKeys: [] };
-const EVERY_TIME: Repeat = { kind: 'everyTime' };
 const SPACE = 'Space' as KeyCode;
 
 type TriggerSetup = {
     readonly when: When;
-    readonly repeat?: Repeat;
     readonly on?: boolean;
 };
 
@@ -42,7 +40,6 @@ function giveTriggers(entity: Entity, setups: readonly TriggerSetup[]) {
         when: setup.when,
         checks: [],
         actions: [],
-        repeat: setup.repeat ?? EVERY_TIME,
     }));
     const nextTriggerId = triggers.length + 1;
 
@@ -342,37 +339,23 @@ describe('the order of a tick', () => {
     });
 });
 
-describe('Repeat', () => {
-    const holdSpace = () => ({ heldKeys: ['Space'], pressedKeys: [] });
-
-    test('"at most once every N s" drops the firings that come too soon', () => {
-        const level = smallLevel();
-        giveTriggers(level.world, [
-            { when: { kind: 'key', key: SPACE, how: 'held' }, repeat: { kind: 'atMostEvery', seconds: 0.1 } },
-        ]);
-
-        const heard = play(level, { ticks: 14, inputsAt: holdSpace });
-
-        expect(ticksOf(heard)).toEqual([1, 7, 13]);
-    });
-
-    test('"once per run" fires once', () => {
-        const level = smallLevel();
-        giveTriggers(level.world, [{ when: { kind: 'every', seconds: 1 / 60 }, repeat: { kind: 'oncePerRun' } }]);
-
-        expect(ticksOf(play(level, { ticks: 5 }))).toEqual([1]);
-    });
-
-    test('a touch trigger limited by Repeat drops the second entity touching in the same tick', () => {
+describe('every time', () => {
+    test('a trigger fires every time it hears its event, two touches in one tick too', () => {
         const level = smallLevel();
         const spike = placeStatic(level, level.world, 0);
-        giveTriggers(spike, [{ when: { kind: 'touched' }, repeat: { kind: 'oncePerRun' } }]);
+        giveTriggers(spike, [{ when: { kind: 'touched' } }]);
+        giveTriggers(level.world, [{ when: { kind: 'key', key: SPACE, how: 'held' } }]);
         const ball = placeStatic(level, level.world, 100);
         const crate = placeStatic(level, level.world, 200);
         const sensorEventsAt = atTick({ 2: [begin(spike, ball), begin(spike, crate)] });
+        const holdSpace = () => ({ heldKeys: ['Space'], pressedKeys: [] });
 
-        const heard = play(level, { ticks: 2, sensorEventsAt });
+        const heard = play(level, { ticks: 3, sensorEventsAt, inputsAt: holdSpace });
 
-        expect(heard.map((firing) => firing.other)).toEqual([ball.id]);
+        expect(ticksOf(heard.filter((firing) => firing.kind === 'key'))).toEqual([1, 2, 3]);
+        expect(heard.filter((firing) => firing.kind === 'touched').map((firing) => firing.other)).toEqual([
+            ball.id,
+            crate.id,
+        ]);
     });
 });

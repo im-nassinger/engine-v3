@@ -45,7 +45,6 @@ export type Trigger = {
     readonly when: When | null;
     readonly checks: readonly Check[];
     readonly actions: readonly Action[];
-    readonly repeat: Repeat;
 };
 
 export type When =
@@ -96,10 +95,9 @@ export type ValueRef =
     | { kind: 'tag' }                                      // op is add or subtract: add or remove the tag in amount
     | { kind: 'triggerOn'; trigger: number }               // a trigger on the target, by its id
     | { kind: 'velocity' };                                // fix 3: Body › Velocity of the body the target belongs to, px/s
-
-export type Repeat = { kind: 'everyTime' } | { kind: 'oncePerRun' } | { kind: 'atMostEvery'; seconds: number };
 ```
 
+- **No Repeat** (v4 fix 4): a trigger fires every time it hears its event, and rests by switching itself off. **`parseTrigger` ignores a saved `repeat`, whatever it holds, and `savedTrigger` writes none**, so an old level opens and its next save drops it; old levels aren't converted (owner, 2026-11-24). A damaged `repeat` doesn't refuse the trigger (standing yes, 2026-11-24). *Why: the value is never read, so refusing a whole level over it would only lose the user's work.*
 - **Unset is `null`**, so a trigger half made is saved and read back half made: a trigger with unset parts doesn't run.
 - **`triggerProblems(trigger, level)`** lists what stops a trigger running: an unset part, a missing entity, an unknown variable, input or value. **The Entity inspector and the game both call it.** A missing entity shows `missing` and only that action is skipped in play; an unset part stops the whole trigger.
 - **`changeableValues(entity, registry)`** lists what Change value may offer for a target: every field whose schema marks it `changeableInPlay`, Body › Velocity after a BodyComponent's fields (fix 3), the TagsComponent's tag, each trigger's on/off, and the World's variables. It reads the schemas only, so a component added later is offered with no trigger code. A vector is offered whole for Set, Add and Subtract, with its field's unit (owner, 2026-11-23). **`normalizeTrigger` turns a change saved on one axis** (`"axis": "x"` with a number, as v3 and v4 made them) into the whole vector with 0 on the other axis, so such a trigger is read the new way; play still adds to one axis for a trigger that never went through it. A component value in the check keeps its axis, since it compares one number.

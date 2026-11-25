@@ -51,7 +51,6 @@ export function triggerWith(parts: Partial<Trigger>): Trigger {
         when: { kind: 'touched' },
         checks: [],
         actions: [],
-        repeat: { kind: 'everyTime' },
         ...parts,
     };
 }

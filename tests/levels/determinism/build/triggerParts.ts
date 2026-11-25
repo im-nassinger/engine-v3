@@ -15,7 +15,6 @@ export type TriggerParts = {
     readonly when: When;
     readonly checks?: readonly Check[];
     readonly actions: readonly Action[];
-    readonly repeat?: Trigger['repeat'];
 };
 
 // The entity's triggers, with ids from 1 in list order, each named from its When.
@@ -27,7 +26,6 @@ export function giveTriggers(entity: Entity, parts: readonly TriggerParts[]) {
         when: part.when,
         checks: part.checks ?? [],
         actions: part.actions,
-        repeat: part.repeat ?? { kind: 'everyTime' },
     }));
     entity.addComponent(new TriggerComponent({ triggers, nextTriggerId: triggers.length + 1 }));
 

@@ -1,17 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import { TriggerComponent, VariablesComponent } from '../../components/index.ts';
-import type {
-    Action,
-    Check,
-    EntityId,
-    JsonValue,
-    Repeat,
-    Target,
-    Trigger,
-    VariableValue,
-    When,
-} from '../../fields/index.ts';
+import type { Action, Check, EntityId, JsonValue, Target, Trigger, VariableValue, When } from '../../fields/index.ts';
 import { LevelWriter } from '../../level-data/index.ts';
 import { Level } from '../../level/index.ts';
 import type { Entity } from '../../level/index.ts';
@@ -27,13 +17,11 @@ const OTHER: Target = { kind: 'other' };
 const LEVEL_START: When = { kind: 'levelStart' };
 // The World is entity 1 in a new level.
 const WORLD: Target = { kind: 'entity', entity: 1 };
-const EVERY_TIME: Repeat = { kind: 'everyTime' };
 
 type TriggerParts = {
     readonly when: When;
     readonly checks?: readonly Check[];
     readonly actions?: readonly Action[];
-    readonly repeat?: Repeat;
 };
 
 type HeardFiring = {
@@ -51,7 +39,6 @@ function giveTriggers(entity: Entity, parts: readonly TriggerParts[]) {
         when: part.when,
         checks: part.checks ?? [],
         actions: part.actions ?? [],
-        repeat: part.repeat ?? EVERY_TIME,
     }));
 
     entity.addComponent(new TriggerComponent({ triggers, nextTriggerId: triggers.length + 1 }));
@@ -138,7 +125,7 @@ describe('Wait', () => {
         expect(after[31]?.['n']).toBe(11);
     });
 
-    test('a resumed run asks neither its checks nor its Repeat again', () => {
+    test('a resumed run does not ask its checks again', () => {
         const level = levelWith({ gate: 0, closed: 0 });
         const isOpen: Check = {
             kind: 'value',
@@ -151,7 +138,6 @@ describe('Wait', () => {
             {
                 when: LEVEL_START,
                 checks: [isOpen],
-                repeat: { kind: 'oncePerRun' },
                 actions: [add('gate', 1), wait(1), add('closed', 1)],
             },
         ]);

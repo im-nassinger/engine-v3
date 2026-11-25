@@ -17,7 +17,6 @@ const FIRST_TRIGGER: Trigger = {
     when: { kind: 'touched' },
     checks: [],
     actions: [],
-    repeat: { kind: 'everyTime' },
 };
 
 // Finishing the Trigger tool's rectangle: a new entity that notices touching, named "Trigger 1" and

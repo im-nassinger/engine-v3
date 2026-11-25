@@ -12,7 +12,7 @@ export type TriggerBlockProps = {
     commit: CommitTriggerEdit;
 };
 
-// One trigger: its head, then When, If, Do and Repeat, then the notes about it. An off trigger's sections
+// One trigger: its head, then When, If and Do, then the notes about it. An off trigger's sections
 // fade.
 export function TriggerBlock({ openLevel, block, commit }: TriggerBlockProps) {
     return (

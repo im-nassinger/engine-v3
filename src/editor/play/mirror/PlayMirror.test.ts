@@ -285,7 +285,6 @@ describe('PlayMirror', () => {
                     },
                     { kind: 'change', target: { kind: 'this' }, value: coins, op: 'add', amount: 3 },
                 ],
-                repeat: { kind: 'everyTime' },
             },
         ] as const;
         level.world.addComponent(new TriggerComponent({ triggers: [...triggers], nextTriggerId: 2 }));
@@ -325,7 +324,6 @@ describe('PlayMirror', () => {
                     { kind: 'change', target: { kind: 'this' }, value: own('label'), op: 'set', amount: 'open' },
                     { kind: 'change', target: { kind: 'this' }, value: own('hits'), op: 'add', amount: 2 },
                 ],
-                repeat: { kind: 'everyTime' },
             },
         ] as const;
         door.addComponent(new TriggerComponent({ triggers: [...triggers], nextTriggerId: 2 }));

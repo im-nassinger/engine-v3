@@ -62,7 +62,6 @@ function withTriggers(entity: Entity, triggers: readonly Partial<Trigger>[]) {
             when: { kind: 'touched' },
             checks: [],
             actions: [],
-            repeat: { kind: 'everyTime' },
             ...parts,
         };
 
@@ -138,7 +137,10 @@ describe('the trigger card', () => {
         await pickFromMenu(addRow('Add action'), 'win');
         await expect.poll(() => sentences('Do')).toEqual(['win']);
         expect(addRow('Add action').dataset['needed']).toBe('false');
-        expect(sentences('Repeat')).toEqual(['every time']);
+        const titles = [...document.querySelectorAll<HTMLElement>('.trigger-block .trigger-section')].map(
+            (shown) => shown.dataset['section'],
+        );
+        expect(titles).toEqual(['When', 'If', 'Do']);
 
         frames.runFrame();
         await expect.poll(() => notesOf()).toEqual([]);
@@ -152,7 +154,6 @@ describe('the trigger card', () => {
                 when: { kind: 'touched' },
                 checks: [PLAYER_TAG_CHECK],
                 actions: [{ kind: 'win' }],
-                repeat: { kind: 'everyTime' },
             },
         ]);
     });

@@ -8,7 +8,7 @@ import { Level } from '../../level/index.ts';
 import { levelKeys } from './levelKeys.ts';
 
 function trigger(id: number, when: When | null): Trigger {
-    return { id, name: null, on: true, when, checks: [], actions: [], repeat: { kind: 'everyTime' } };
+    return { id, name: null, on: true, when, checks: [], actions: [] };
 }
 
 describe('levelKeys', () => {

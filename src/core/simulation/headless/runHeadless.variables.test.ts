@@ -52,7 +52,6 @@ function giveTriggers(entity: Entity, parts: readonly TriggerParts[]) {
         when: part.when,
         checks: part.checks ?? [],
         actions: part.actions ?? [],
-        repeat: { kind: 'everyTime' },
     }));
 
     entity.addComponent(new TriggerComponent({ triggers, nextTriggerId: triggers.length + 1 }));

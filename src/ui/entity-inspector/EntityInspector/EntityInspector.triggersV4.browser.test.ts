@@ -55,7 +55,6 @@ function withTrigger(entity: Entity, parts: Partial<Trigger>) {
         when: { kind: 'custom', name: 'open' },
         checks: [],
         actions: [],
-        repeat: { kind: 'everyTime' },
         ...parts,
     };
     entity.addComponent(new TriggerComponent({ triggers: [trigger], nextTriggerId: 2 }));
@@ -180,7 +179,6 @@ describe("the trigger card's v4 parts", () => {
                         amount: null,
                     },
                 ],
-                repeat: { kind: 'everyTime' },
             },
         ]);
     });

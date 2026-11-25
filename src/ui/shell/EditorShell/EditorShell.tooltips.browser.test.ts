@@ -70,7 +70,6 @@ function buildLevel() {
         when: { kind: 'touched' },
         checks: [],
         actions: [{ kind: 'win' }],
-        repeat: { kind: 'everyTime' },
     } as const;
     button.addComponent(new TriggerComponent({ triggers: [trigger], nextTriggerId: 2 }));
     const path = addNamed(level, level.world, 'Path 1');

@@ -8,14 +8,12 @@ import type { PlayTriggers } from '../triggers/PlayTriggers.ts';
 const LEVEL_START_TICK = 1;
 
 // Lists the tick's firings, in a fixed order: level start (the first tick only), keys and inputs, timers,
-// the waiting runs due this tick (in WaitingRuns' order, never asking Repeat again), then starts touching and
-// stops touching.
-// Inside each, triggers come in Entities viewer order. A trigger that is off hears nothing, and a firing
-// its Repeat already refuses is dropped here.
+// the waiting runs due this tick (in WaitingRuns' order), then starts touching and stops touching.
+// Inside each, triggers come in Entities viewer order. A trigger that is off hears nothing.
 export class EventPhase implements TickPhase {
     run(tick: TickContext) {
         const { triggers, inputs } = tick.run;
-        const listing = new FiringList(triggers, tick.tick);
+        const listing = new FiringList(triggers);
 
         triggers.startTick();
 
@@ -46,11 +44,9 @@ export class EventPhase implements TickPhase {
 class FiringList {
     readonly firings: TriggerFiring[] = [];
     private readonly triggers: PlayTriggers;
-    private readonly tick: number;
 
-    constructor(triggers: PlayTriggers, tick: number) {
+    constructor(triggers: PlayTriggers) {
         this.triggers = triggers;
-        this.tick = tick;
     }
 
     addAll(heard: readonly IndexedTrigger[]) {
@@ -70,7 +66,7 @@ class FiringList {
         }
     }
 
-    // A waiting run goes on where it stopped, so Repeat, which let it start, isn't asked again.
+    // A waiting run goes on where it stopped.
     addResumed(due: readonly WaitingRun[]) {
         for (const run of due) {
             this.firings.push({ ...run.firing, resumesAt: run.nextAction });
@@ -78,7 +74,7 @@ class FiringList {
     }
 
     add(indexed: IndexedTrigger, other: TriggerFiring['other']) {
-        const firing = this.triggers.hear(indexed, other, this.tick);
+        const firing = this.triggers.hear(indexed, other);
         if (firing === undefined) return;
 
         this.firings.push(firing);

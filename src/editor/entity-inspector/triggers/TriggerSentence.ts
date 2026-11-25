@@ -1,4 +1,4 @@
-import type { Action, Check, Repeat, Target, Trigger, Unit, VariableValue, When } from '../../../core/fields/index.ts';
+import type { Action, Check, Target, Trigger, Unit, VariableValue, When } from '../../../core/fields/index.ts';
 import { KeyCodes } from '../../../core/keys/index.ts';
 import type { TriggerProblem } from '../../../core/triggers/index.ts';
 
@@ -76,13 +76,6 @@ export class TriggerSentence {
 
         const builder = new SentenceBuilder({ section: 'action', index }, sources);
         addActionWords(builder, action, index, sources);
-
-        return new TriggerSentence(builder.words);
-    }
-
-    static ofRepeat(trigger: Trigger, sources: SentenceSources) {
-        const builder = new SentenceBuilder({ section: 'repeat' }, sources);
-        addRepeatWords(builder, trigger.repeat, sources.choices);
 
         return new TriggerSentence(builder.words);
     }
@@ -446,17 +439,6 @@ function joiningWord(action: ChangeAction) {
     if (action.op === 'subtract') return 'from';
 
     return 'to';
-}
-
-function addRepeatWords(builder: SentenceBuilder, repeat: Repeat, choices: TriggerChoices) {
-    const repeatText = TriggerChoices.repeatWord(repeat.kind);
-    const entry: TriggerWordEntry = { kind: 'menu', choices: choices.repeats() };
-    builder.slot({ slot: 'repeat', text: repeatText, need: 'every time', entry });
-    if (repeat.kind !== 'atMostEvery') return;
-
-    const secondsText = `${repeat.seconds} s`;
-    const secondsEntry = numberEntry(repeat.seconds, 's');
-    builder.slot({ slot: 'repeatSeconds', text: secondsText, need: 'how many seconds', entry: secondsEntry });
 }
 
 function targetWord(target: Target, entry: TriggerWordEntry, choices: TriggerChoices): SlotWord {

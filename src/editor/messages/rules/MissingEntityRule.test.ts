@@ -17,7 +17,6 @@ function destroys(...entities: readonly EntityId[]): Trigger {
         when: { kind: 'touched' },
         checks: [],
         actions: entities.map((entity) => ({ kind: 'destroy', target: { kind: 'entity', entity } })),
-        repeat: { kind: 'everyTime' },
     };
 }
 

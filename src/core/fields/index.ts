@@ -51,8 +51,6 @@ export type {
     LiveValue,
     Press,
     ReadableValue,
-    Repeat,
-    RepeatKind,
     Target,
     Trigger,
     ValueRef,

@@ -125,10 +125,7 @@
                                     "y": 0
                                 }
                             }
-                        ],
-                        "repeat": {
-                            "kind": "everyTime"
-                        }
+                        ]
                     },
                     {
                         "id": 2,
@@ -156,10 +153,7 @@
                                     "y": 0
                                 }
                             }
-                        ],
-                        "repeat": {
-                            "kind": "everyTime"
-                        }
+                        ]
                     },
                     {
                         "id": 3,
@@ -178,10 +172,7 @@
                             {
                                 "kind": "win"
                             }
-                        ],
-                        "repeat": {
-                            "kind": "everyTime"
-                        }
+                        ]
                     }
                 ],
                 "next_trigger_id": 4
@@ -374,10 +365,7 @@
                                             "kind": "this"
                                         }
                                     }
-                                ],
-                                "repeat": {
-                                    "kind": "everyTime"
-                                }
+                                ]
                             }
                         ],
                         "next_trigger_id": 2
@@ -458,10 +446,7 @@
                                             "kind": "this"
                                         }
                                     }
-                                ],
-                                "repeat": {
-                                    "kind": "everyTime"
-                                }
+                                ]
                             }
                         ],
                         "next_trigger_id": 2
@@ -542,10 +527,7 @@
                                             "kind": "this"
                                         }
                                     }
-                                ],
-                                "repeat": {
-                                    "kind": "everyTime"
-                                }
+                                ]
                             }
                         ],
                         "next_trigger_id": 2
@@ -626,10 +608,7 @@
                                             "kind": "this"
                                         }
                                     }
-                                ],
-                                "repeat": {
-                                    "kind": "everyTime"
-                                }
+                                ]
                             }
                         ],
                         "next_trigger_id": 2
@@ -710,10 +689,7 @@
                                             "kind": "this"
                                         }
                                     }
-                                ],
-                                "repeat": {
-                                    "kind": "everyTime"
-                                }
+                                ]
                             }
                         ],
                         "next_trigger_id": 2

@@ -7,7 +7,7 @@ import {
     VariablesComponent,
     createV1Registry,
 } from '../../components/index.ts';
-import type { Action, Check, Repeat, Target, Trigger, When } from '../../fields/index.ts';
+import type { Action, Check, Target, Trigger, When } from '../../fields/index.ts';
 import type { KeyCode } from '../../keys/index.ts';
 import { Level } from '../../level/index.ts';
 
@@ -49,7 +49,6 @@ function trigger(parts: Partial<Trigger>): Trigger {
         when: { kind: 'touched' },
         checks: [],
         actions: [],
-        repeat: { kind: 'everyTime' },
         ...parts,
     };
 }
@@ -283,8 +282,6 @@ const ACTION_CASES: readonly (readonly [Action, readonly object[]])[] = [
     ],
 ];
 
-const REPEATS: readonly Repeat[] = [{ kind: 'everyTime' }, { kind: 'oncePerRun' }, { kind: 'atMostEvery', seconds: 1 }];
-
 describe('triggerProblems', () => {
     test.each(WHEN_CASES)('the When %j has the problems %j', (when, problems) => {
         expect(problemsOf({ when })).toEqual(problems);
@@ -296,10 +293,6 @@ describe('triggerProblems', () => {
 
     test.each(ACTION_CASES)('the action %j has the problems %j', (action, problems) => {
         expect(problemsOf({ actions: [action] })).toEqual(problems);
-    });
-
-    test.each(REPEATS)('the Repeat %j stops nothing', (repeat) => {
-        expect(problemsOf({ repeat, actions: [{ kind: 'win' }] })).toEqual([]);
     });
 
     test('`other` under an event that has none is a problem, under touching it is not', () => {

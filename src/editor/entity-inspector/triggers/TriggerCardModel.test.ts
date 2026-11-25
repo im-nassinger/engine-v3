@@ -124,7 +124,7 @@ describe('TriggerCardModel', () => {
         expect(blockOf({ name: 'Pick up', on: false })).toMatchObject({ name: 'Pick up', isOn: false });
     });
 
-    test('a block has When, If, Do and Repeat, with their hints', () => {
+    test('a block has When, If and Do, with their hints', () => {
         const empty = blockOf({ actions: [{ kind: 'win' }] });
         const full = blockOf({
             checks: [PLAYER_TAG_CHECK],
@@ -135,7 +135,6 @@ describe('TriggerCardModel', () => {
             ['When', undefined],
             ['If', 'optional'],
             ['Do', undefined],
-            ['Repeat', undefined],
         ]);
         expect(full.sections[1].hint).toBe('all must be true');
         expect(full.sections[2].hint).toBe('top to bottom');
@@ -516,21 +515,14 @@ describe('TriggerCardModel', () => {
         expect(blockOf({ actions: [{ kind: 'win' }] }).sections[2].addRow?.isNeeded).toBe(false);
     });
 
-    test('checks and actions can be removed; the When and the Repeat cannot', () => {
+    test('checks and actions can be removed; the When cannot', () => {
         const block = blockOf({ checks: [CHECK_CASES[0]?.[0] as Check], actions: [{ kind: 'win' }] });
 
         expect(block.sections.map((section) => section.rows.map((row) => row.canRemove))).toEqual([
             [false],
             [true],
             [true],
-            [false],
         ]);
-    });
-
-    test('Repeat reads its setting, with the time for "at most once every"', () => {
-        expect(rowText(blockOf({ repeat: { kind: 'everyTime' } }), 3)).toBe('every time');
-        expect(rowText(blockOf({ repeat: { kind: 'oncePerRun' } }), 3)).toBe('once per run');
-        expect(rowText(blockOf({ repeat: { kind: 'atMostEvery', seconds: 2 } }), 3)).toBe('at most once every 2 s');
     });
 
     test("a block takes the card's notes about its own trigger", () => {

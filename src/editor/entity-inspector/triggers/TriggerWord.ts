@@ -1,10 +1,10 @@
-import type { Action, Check, JsonValue, Repeat, Unit, ValueType, When } from '../../../core/fields/index.ts';
+import type { Action, Check, JsonValue, Unit, ValueType, When } from '../../../core/fields/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
 import type { EntityId } from '../../../core/level/index.ts';
 import type { TriggerPart, TriggerSlot } from '../../../core/triggers/index.ts';
 
-// A row of the card: the When, one check, one action, or the Repeat setting.
-export type TriggerRowPart = TriggerPart | { readonly section: 'repeat' };
+// A row of the card: the When, one check or one action.
+export type TriggerRowPart = TriggerPart;
 
 // The word of a row a slot is: the ones triggerProblems names, and the ones that are never unset.
 export type TriggerWordSlot =
@@ -14,8 +14,6 @@ export type TriggerWordSlot =
     | 'action'
     // The axis the value check reads on a vector, x or y.
     | 'axis'
-    | 'repeat'
-    | 'repeatSeconds'
     // A variable changed When's condition: "changes" or "becomes 3 or more", one word.
     | 'becomes';
 
@@ -34,8 +32,7 @@ export type TriggerWordState = 'set' | 'unset' | 'optional' | 'greyed' | 'missin
 export type TriggerPartValue =
     | { readonly section: 'when'; readonly when: When }
     | { readonly section: 'check'; readonly index: number; readonly check: Check }
-    | { readonly section: 'action'; readonly index: number; readonly action: Action }
-    | { readonly section: 'repeat'; readonly repeat: Repeat };
+    | { readonly section: 'action'; readonly index: number; readonly action: Action };
 
 // One item of a word's menu. Picking it puts `value` in place of the row.
 export type TriggerChoice = {

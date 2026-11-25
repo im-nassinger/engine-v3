@@ -9,19 +9,17 @@ import { TouchLedger } from './TouchLedger.ts';
 import type { TriggerFiring } from './TriggerFiring.ts';
 import { triggerOf } from './TriggerIndex.ts';
 import type { IndexedTrigger, TriggerIndex } from './TriggerIndex.ts';
-import { TriggerRepeats } from './TriggerRepeats.ts';
 import { TriggerTimers } from './TriggerTimers.ts';
 import { VariableWatch } from './VariableWatch.ts';
 import { WaitingRuns } from './WaitingRuns.ts';
 
 // What a run keeps about its triggers between the tick phases: the index of who hears what, the touches,
-// the timers, each trigger's last firing, which triggers can run, the tags held, who hears which
+// the timers, which triggers can run, the tags held, who hears which
 // variable change, the runs stopped at a Wait, and this tick's firings.
 export class PlayTriggers {
     readonly index: TriggerIndex;
     readonly touches: TouchLedger;
     readonly timers: TriggerTimers;
-    readonly repeats: TriggerRepeats;
     readonly runnable: RunnableTriggers;
     readonly tags: TagCounts;
     readonly variables: VariableWatch;
@@ -37,7 +35,6 @@ export class PlayTriggers {
         this.index = index;
         this.touches = new TouchLedger(level, this.index);
         this.timers = new TriggerTimers(this.index);
-        this.repeats = new TriggerRepeats();
         this.runnable = new RunnableTriggers(level, registry);
         this.tags = new TagCounts(level);
         this.variables = new VariableWatch(this.index);
@@ -51,14 +48,10 @@ export class PlayTriggers {
         this.touches.readStep(this.sensorEvents, contactEvents);
     }
 
-    // The trigger's firing for an event, `other` its cause, or undefined when it doesn't hear it: it is off,
-    // or its Repeat refuses a firing this soon.
-    hear(indexed: IndexedTrigger, other: TriggerFiring['other'], tick: number): TriggerFiring | undefined {
+    // The trigger's firing for an event, `other` its cause, or undefined when it doesn't hear it: it is off.
+    hear(indexed: IndexedTrigger, other: TriggerFiring['other']): TriggerFiring | undefined {
         const trigger = triggerOf(indexed);
         if (trigger === undefined || !trigger.on) return undefined;
-
-        const allowed = this.repeats.allows(indexed.owner, indexed.triggerId, trigger.repeat, tick);
-        if (!allowed) return undefined;
 
         return { owner: indexed.owner, triggerId: indexed.triggerId, when: indexed.when, other };
     }
@@ -77,7 +70,6 @@ export class PlayTriggers {
         this.index.forget(removed);
         this.touches.forget(removed);
         this.timers.forget(removed);
-        this.repeats.forget(removed);
         this.runnable.forget(removed);
         this.waiting.forget(removed);
     }

@@ -36,7 +36,6 @@ export type { TouchChange, TouchChanges } from './triggers/TouchLedger.ts';
 export type { TriggerFiring } from './triggers/TriggerFiring.ts';
 export { TriggerIndex, triggerOf } from './triggers/TriggerIndex.ts';
 export type { IndexedTrigger } from './triggers/TriggerIndex.ts';
-export { TriggerRepeats } from './triggers/TriggerRepeats.ts';
 export { TriggerTimers } from './triggers/TriggerTimers.ts';
 export { RemovalMarks } from './removal/RemovalMarks.ts';
 export type { RemovalCause } from './removal/RemovalMarks.ts';

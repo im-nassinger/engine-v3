@@ -129,10 +129,7 @@
                                     "y": 0
                                 }
                             }
-                        ],
-                        "repeat": {
-                            "kind": "everyTime"
-                        }
+                        ]
                     }
                 ],
                 "next_trigger_id": 2
@@ -255,10 +252,7 @@
                                         "op": "add",
                                         "amount": 1
                                     }
-                                ],
-                                "repeat": {
-                                    "kind": "everyTime"
-                                }
+                                ]
                             },
                             {
                                 "id": 2,
@@ -282,10 +276,7 @@
                                         "op": "add",
                                         "amount": 1
                                     }
-                                ],
-                                "repeat": {
-                                    "kind": "everyTime"
-                                }
+                                ]
                             }
                         ],
                         "next_trigger_id": 3

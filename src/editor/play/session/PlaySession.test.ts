@@ -172,7 +172,6 @@ function withTrigger(level: Level, when: When, actions: readonly Action[]) {
         when,
         checks: [],
         actions,
-        repeat: { kind: 'everyTime' },
     } as const;
     level.world.addComponent(new TriggerComponent({ triggers: [trigger], nextTriggerId: 2 }));
 

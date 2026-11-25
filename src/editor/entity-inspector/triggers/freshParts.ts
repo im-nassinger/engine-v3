@@ -1,20 +1,9 @@
-import type {
-    Action,
-    ActionKind,
-    Check,
-    Repeat,
-    RepeatKind,
-    Target,
-    When,
-    WhenKind,
-} from '../../../core/fields/index.ts';
+import type { Action, ActionKind, Check, Target, When, WhenKind } from '../../../core/fields/index.ts';
 
 // "pick an entity": a target not picked yet.
 export const UNSET_TARGET: Target = { kind: 'entity', entity: null };
 
 const THIS_TARGET: Target = { kind: 'this' };
-
-const DEFAULT_REPEAT_SECONDS = 1;
 
 // A When of this kind with its own parts unset, as picking a new event gives.
 export function freshWhen(kind: WhenKind): When {
@@ -63,12 +52,6 @@ export function freshAction(kind: ActionKind, keptTarget: Target | undefined): A
         default:
             return { kind };
     }
-}
-
-export function freshRepeat(kind: RepeatKind): Repeat {
-    if (kind === 'atMostEvery') return { kind, seconds: DEFAULT_REPEAT_SECONDS };
-
-    return { kind };
 }
 
 export function targetOf(action: Action) {

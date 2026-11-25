@@ -32,18 +32,17 @@ export class TriggerPhase implements TickPhase {
             }
 
             for (const firing of round) {
-                runFiring(firing, run, runner, tick.tick);
+                runFiring(firing, run, runner);
             }
             round = chain.takeRound();
         }
     }
 }
 
-// Repeat is asked again, since an earlier firing of the same trigger this tick may have used it up, and so
-// is on/off, which an earlier action may have switched. A trigger with problems never runs. A firing whose
-// checks fail doesn't count for Repeat, so a once per run coin waits for the player. A waiting run resumed
-// goes on from its next action without asking its checks or Repeat again: "wait 2 s, then close" closes.
-function runFiring(firing: TriggerFiring, run: PlayRun, runner: ActionRunner, tick: number) {
+// On/off is asked again, since an earlier action may have switched it. A trigger with problems never runs.
+// A waiting run resumed goes on from its next action without asking its checks again: "wait 2 s, then
+// close" closes.
+function runFiring(firing: TriggerFiring, run: PlayRun, runner: ActionRunner) {
     const { triggers } = run;
     const trigger = triggerOf(firing);
     if (trigger === undefined || !trigger.on) return;
@@ -52,11 +51,9 @@ function runFiring(firing: TriggerFiring, run: PlayRun, runner: ActionRunner, ti
         runner.runActions(trigger.actions, firing, firing.resumesAt);
         return;
     }
-    if (!triggers.repeats.allows(firing.owner, firing.triggerId, trigger.repeat, tick)) return;
     if (!triggers.runnable.canRun(firing.owner, trigger)) return;
     if (!checksPass(trigger.checks, firing, run)) return;
 
-    triggers.repeats.fired(firing.owner, firing.triggerId, tick);
     triggers.fired.push(firing);
     runner.runActions(trigger.actions, firing);
 }
@@ -81,18 +78,18 @@ class ChainedEvents implements ActionEffects {
         );
         if (indexed === undefined) return;
 
-        this.queue(this.run.triggers.hear(indexed, null, this.tick));
+        this.queue(this.run.triggers.hear(indexed, null));
     }
 
     customEventFired(target: Entity, name: string, sender: Entity) {
         for (const indexed of this.run.triggers.index.customTriggersOf(target, name)) {
-            this.queue(this.run.triggers.hear(indexed, sender.id, this.tick));
+            this.queue(this.run.triggers.hear(indexed, sender.id));
         }
     }
 
     variableChanged(holder: Entity, name: string, before: VariableValue, after: VariableValue) {
         for (const indexed of this.run.triggers.variables.changed(holder, name, before, after)) {
-            this.queue(this.run.triggers.hear(indexed, null, this.tick));
+            this.queue(this.run.triggers.hear(indexed, null));
         }
     }
 

@@ -128,7 +128,6 @@ describe('TriggerEdits', () => {
                         amount: { x: 0, y: -600 },
                     },
                 ],
-                repeat: { kind: 'atMostEvery', seconds: 1 },
             },
         ]);
 
@@ -136,14 +135,12 @@ describe('TriggerEdits', () => {
         const value = TriggerEdits.typed(component, 0, { part: { section: 'check', index: 0 }, slot: 'amount' }, 10);
         const kickAt = { part: { section: 'action', index: 0 }, slot: 'amount' } as const;
         const kick = TriggerEdits.typed(component, 0, kickAt, { x: 200, y: -600 });
-        const repeat = TriggerEdits.typed(component, 0, { part: { section: 'repeat' }, slot: 'repeatSeconds' }, 2);
         const refused = TriggerEdits.typed(component, 0, { part: { section: 'when' }, slot: 'event' }, 3);
 
         expect(seconds?.label).toBe('Change trigger "After a time"');
         expect(seconds?.triggers[0]?.when).toEqual({ kind: 'after', seconds: 60 });
         expect(value?.triggers[0]?.checks[0]).toMatchObject({ amount: 10 });
         expect(kick?.triggers[0]?.actions[0]).toMatchObject({ amount: { x: 200, y: -600 } });
-        expect(repeat?.triggers[0]?.repeat).toEqual({ kind: 'atMostEvery', seconds: 2 });
         expect(refused).toBeUndefined();
     });
 

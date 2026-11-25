@@ -33,7 +33,6 @@ function checksEveryTick(entity: Entity, checks: readonly Check[]) {
         when: { kind: 'every', seconds: 1 / 60 },
         checks,
         actions: [],
-        repeat: { kind: 'everyTime' },
     };
 
     entity.addComponent(new TriggerComponent({ triggers: [trigger], nextTriggerId: 2 }));

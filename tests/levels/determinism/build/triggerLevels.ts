@@ -54,7 +54,7 @@ export function triggerCoins() {
 
 // The World's timers: every 0.5 s a ball hops and `beats` counts; after 2 s `late` is set; after 4 s the
 // beat is switched off, and pressing `up` switches it on again, counting from then; holding `jump` adds
-// to `held` at most once a second.
+// to `held` every tick.
 export function triggerTimers() {
     const level = Level.createNew();
     giveVariables(level, ['beats', 'late', 'held']);
@@ -69,11 +69,7 @@ export function triggerTimers() {
         },
         { when: { kind: 'after', seconds: 2 }, actions: [changeVariable(level, 'late', 'set', 1)] },
         { when: { kind: 'after', seconds: 4 }, actions: [switchTrigger(level.world, 1, false)] },
-        {
-            when: inputHeld('jump'),
-            actions: [changeVariable(level, 'held', 'add', 1)],
-            repeat: { kind: 'atMostEvery', seconds: 1 },
-        },
+        { when: inputHeld('jump'), actions: [changeVariable(level, 'held', 'add', 1)] },
         { when: { kind: 'input', input: 'up', how: 'pressed' }, actions: [switchTrigger(level.world, 1, true)] },
     ]);
 

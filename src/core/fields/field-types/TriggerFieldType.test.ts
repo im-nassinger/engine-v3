@@ -12,7 +12,6 @@ const EMPTY_TRIGGER = {
     when: null,
     checks: [],
     actions: [],
-    repeat: { kind: 'everyTime' },
 };
 
 function triggerWith(parts: Record<string, unknown>) {
@@ -143,7 +142,15 @@ const ACTIONS = [
     { kind: 'wait', seconds: null },
 ];
 
-const REPEATS = [{ kind: 'everyTime' }, { kind: 'oncePerRun' }, { kind: 'atMostEvery', seconds: 1 }];
+// What triggers saved before v4 fix 4 hold under `repeat`, the damaged ones too: all ignored.
+const OLD_REPEATS = [
+    { kind: 'everyTime' },
+    { kind: 'oncePerRun' },
+    { kind: 'atMostEvery', seconds: 1 },
+    { kind: 'twice' },
+    { kind: 'atMostEvery' },
+    null,
+];
 
 describe('TriggerFieldType', () => {
     test.each(WHENS)('reads back the When $kind as saved, unset parts as null', (when) => {
@@ -165,10 +172,21 @@ describe('TriggerFieldType', () => {
         expect(saved).toEqual(triggerWith({ actions: [action] }));
     });
 
-    test.each(REPEATS)('reads back the Repeat $kind as saved', (repeat) => {
-        const { saved } = readBack(triggerWith({ repeat }));
+    test('a trigger saved without repeat reads back as saved, with no repeat', () => {
+        const { parsed, saved } = readBack(EMPTY_TRIGGER);
 
-        expect(saved).toEqual(triggerWith({ repeat }));
+        expect(parsed).toEqual(EMPTY_TRIGGER);
+        expect(saved).toEqual(EMPTY_TRIGGER);
+        expect(saved).not.toHaveProperty('repeat');
+    });
+
+    test.each(OLD_REPEATS)('a trigger saved with the repeat %j reads it as gone, and saves none', (repeat) => {
+        const { parsed, saved } = readBack(triggerWith({ repeat }));
+
+        expect(parsed).toEqual(EMPTY_TRIGGER);
+        expect(parsed).not.toHaveProperty('repeat');
+        expect(saved).toEqual(EMPTY_TRIGGER);
+        expect(saved).not.toHaveProperty('repeat');
     });
 
     test('a trigger half made is saved and read back half made', () => {
@@ -187,8 +205,9 @@ describe('TriggerFieldType', () => {
 
     test.each([
         ['not an object', 'touched', 'wrongType'],
-        ['a key missing', { id: 1, name: null, on: true, when: null, checks: [], actions: [] }, 'wrongType'],
+        ['a key missing', { id: 1, name: null, on: true, when: null, checks: [] }, 'wrongType'],
         ['a key too many', { ...EMPTY_TRIGGER, colour: 'red' }, 'wrongType'],
+        ['a key too many beside an old repeat', { ...EMPTY_TRIGGER, repeat: null, colour: 'red' }, 'wrongType'],
         ['an id of 0', { ...EMPTY_TRIGGER, id: 0 }, 'wrongType'],
         ['an id that is not whole', { ...EMPTY_TRIGGER, id: 1.5 }, 'wrongType'],
         ['an unknown event', triggerWith({ when: { kind: 'clicked' } }), 'unknownChoice'],
@@ -264,7 +283,6 @@ describe('TriggerFieldType', () => {
             triggerWith({ actions: [{ kind: 'push', target: { kind: 'this' }, push: { kind: 'away' } }] }),
             'wrongType',
         ],
-        ['an unknown Repeat', triggerWith({ repeat: { kind: 'twice' } }), 'unknownChoice'],
         [
             'a custom event with a key too many',
             triggerWith({ when: { kind: 'custom', name: 'open', x: 1 } }),
@@ -323,7 +341,6 @@ describe('TriggerFieldType', () => {
             triggerWith({ actions: [{ kind: 'fire', name: 'open', amount: null }] }),
             'wrongType',
         ],
-        ['a Repeat with no time', triggerWith({ repeat: { kind: 'atMostEvery' } }), 'wrongType'],
     ])('refuses %s', (_description, raw, reason) => {
         const parsed = type.parse(raw);
 
@@ -362,7 +379,6 @@ describe('TriggerFieldType', () => {
                     amount: 1,
                 },
             ],
-            repeat: { kind: 'atMostEvery', seconds: 1_000_000 },
         });
 
         const normalized = type.normalize(requireParsed(raw));
@@ -389,7 +405,6 @@ describe('TriggerFieldType', () => {
             { kind: 'change', target: { kind: 'this' }, value: { kind: 'tag' }, op: 'add', amount: 'was_hit' },
             { kind: 'change', target: { kind: 'this' }, value: null, op: 'add', amount: 1 },
         ]);
-        expect(normalized.repeat).toEqual({ kind: 'atMostEvery', seconds: 86_400 });
         expect(normalized.when).toEqual(type.normalize(normalized).when);
     });
 
@@ -480,10 +495,9 @@ describe('TriggerFieldType', () => {
                 { kind: 'compare', variable: 'coins', compare: 'atLeast', value: 10 },
             ],
             actions: [change, { kind: 'destroy', target: { kind: 'this' } }],
-            repeat: { kind: 'oncePerRun' },
         });
 
-        const saved = type.serialize(type.normalize(requireParsed(v3)));
+        const saved = type.serialize(type.normalize(requireParsed({ ...v3, repeat: { kind: 'oncePerRun' } })));
 
         expect(saved).toEqual({
             ...v3,
