@@ -124,4 +124,7 @@ export type TriggerWord =
           // What the struck-through or missing word's tooltip says; undefined for the others.
           readonly reason: string | undefined;
           readonly entry: TriggerWordEntry;
+          // The variables a value box offers in place of a typed value (v4 fix 10), only those of its type,
+          // grouped as the variable menu groups them; undefined for a box that takes none.
+          readonly variables?: readonly TriggerMenuGroup[];
       };

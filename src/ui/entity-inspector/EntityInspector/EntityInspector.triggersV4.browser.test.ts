@@ -28,6 +28,8 @@ import {
     parts,
     sentences,
     word,
+    TYPED_BOX,
+    TYPED_INPUT,
 } from './testing/triggerCardPage.ts';
 
 beforeEach(async () => {
@@ -123,7 +125,7 @@ function menuLines() {
 }
 
 function wordField() {
-    return requireElement<HTMLElement>(document, '.trigger-word-field');
+    return requireElement<HTMLElement>(document, TYPED_BOX);
 }
 
 function wordFieldInput() {
@@ -132,10 +134,10 @@ function wordFieldInput() {
 
 async function typeIntoWord(opener: HTMLElement, text: string) {
     click(opener);
-    await expect.poll(() => document.querySelector('.trigger-word-field input')).not.toBeNull();
+    await expect.poll(() => document.querySelector(TYPED_INPUT)).not.toBeNull();
     await userEvent.clear(wordFieldInput());
     await userEvent.type(wordFieldInput(), `${text}{Enter}`);
-    await expect.poll(() => document.querySelector('.trigger-word-field')).toBeNull();
+    await expect.poll(() => document.querySelector(TYPED_BOX)).toBeNull();
 }
 
 describe("the trigger card's v4 parts", () => {
@@ -154,7 +156,7 @@ describe("the trigger card's v4 parts", () => {
         const stepsBeforeName = session.openLevel.history.undoCount;
         await openMenu(word('When', 'pick a name'), 'New name…');
         menuRowNamed('New name…')?.click();
-        await expect.poll(() => document.querySelector('.trigger-word-field')).not.toBeNull();
+        await expect.poll(() => document.querySelector(TYPED_BOX)).not.toBeNull();
         expect(requireElement(wordField(), '.hint').textContent).toBe('One word, such as open');
         expect(wordFieldInput().placeholder).toBe('Type a name');
         await userEvent.type(wordFieldInput(), 'open{Enter}');
@@ -210,7 +212,7 @@ describe("the trigger card's v4 parts", () => {
         await expect.poll(() => sentences('Do')).toEqual(['fire open on this with the number 2']);
 
         click(word('Do', 'with the number 2'));
-        await expect.poll(() => document.querySelector('.trigger-word-field .clear')).not.toBeNull();
+        await expect.poll(() => document.querySelector('.trigger-value-menu .clear')).not.toBeNull();
         click(buttonNamed(wordField(), 'No number'));
 
         const unsetNumber = 'with a number (for scripts)';
@@ -237,7 +239,7 @@ describe("the trigger card's v4 parts", () => {
         const checkWords = parts('If')[0]?.querySelectorAll<HTMLElement>('.trigger-slot-word');
         const valueWord = checkWords?.[2] as HTMLElement;
         click(valueWord);
-        await expect.poll(() => document.querySelector('.trigger-word-field input')).not.toBeNull();
+        await expect.poll(() => document.querySelector(TYPED_INPUT)).not.toBeNull();
         expect(wordFieldInput().placeholder).toBe('Type a text');
         await userEvent.type(wordFieldInput(), 'Bo{Enter}');
         await expect.poll(() => sentences('If')).toEqual(['player_name is "Bo"']);
@@ -248,7 +250,14 @@ describe("the trigger card's v4 parts", () => {
         menuRowNamed('door_open')?.click();
         await expect.poll(() => sentences('If')).toEqual(['this door_open is true or false']);
         await openMenu(word('If', 'true or false'), 'true');
-        expect(menuLines()).toEqual(['true', 'false']);
+        expect(menuLines()).toEqual([
+            'true',
+            'false',
+            '# Level variables',
+            'no boolean variables',
+            '# this',
+            'door_open | boolean',
+        ]);
         menuRowNamed('true')?.click();
         await expect.poll(() => sentences('If')).toEqual(['this door_open is true']);
     });

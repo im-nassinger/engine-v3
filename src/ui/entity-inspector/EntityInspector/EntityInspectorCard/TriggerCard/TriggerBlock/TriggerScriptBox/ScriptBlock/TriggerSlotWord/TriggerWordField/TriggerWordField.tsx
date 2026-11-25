@@ -5,7 +5,7 @@ import { TriggerTyping } from '../../../../../../../../../../editor/entity-inspe
 import type { TriggerTypedEntry } from '../../../../../../../../../../editor/entity-inspector/index.ts';
 import { ColourBox } from '../../../../../../../../../fields/index.ts';
 import { rectOf, usePopupClosing, usePopupPlacement } from '../../../../../../../../../shared/index.ts';
-import { TriggerTextBox } from './TriggerTextBox/index.ts';
+import { TriggerTextBox } from '../TriggerTextBox/index.ts';
 import { TriggerVectorBoxes } from './TriggerVectorBoxes/index.ts';
 import './TriggerWordField.css';
 

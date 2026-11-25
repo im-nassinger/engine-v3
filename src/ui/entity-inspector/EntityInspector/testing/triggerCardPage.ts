@@ -147,3 +147,8 @@ export function notesOf(blockIndex = 0) {
 
     return [...notes].map((note) => note.textContent.trim());
 }
+
+// The box a value word opens to type into: the small field, or the typed box above a value box's variables
+// (fix 10).
+export const TYPED_BOX = '.trigger-word-field, .trigger-value-menu';
+export const TYPED_INPUT = '.trigger-word-field input, .trigger-value-menu input';

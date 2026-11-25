@@ -123,7 +123,7 @@ Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b, 09 2.9; round 8:
 
 ### Multiply, divide, and variables in every value box · v4
 
-Asked by the owner while trying v4 ([fix](../../versions/v4/fixes.md) 10, 2026-11-25), not built yet.
+Asked by the owner while trying v4 ([fix](../../versions/v4/fixes.md) 10, 2026-11-25), built 2026-11-25.
 
 - **Change value can also multiply and divide**, such as "multiply coins by 2" or "divide this Transform › Scale by 2". They work on numbers. **A vector is multiplied or divided by one number**, so "multiply other Body › Velocity by 0.5" halves its speed. "Transform › Scale" doesn't change in play, so Change value doesn't offer it; Multiply and Divide work on every number and vector it does offer, such as "Transform › Position" (standing yes, 2026-11-25, see [decisions](../../decisions.md)).
 - **Dividing by 0 leaves the value as it was**, as a target that lacks the value is skipped.

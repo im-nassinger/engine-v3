@@ -198,6 +198,15 @@ The owner found triggers convoluted (2026-11-23); the plan is [fix-3-simpler-tri
 - **A click on a block's icon opens its Replace menu** (owner): the same menu as right click › Replace, alone, under the icon. The icon acts as the block's middle, so hovering it opens no slot, like a value box (Claude, standing yes, 2026-11-25).
 - **The Entity inspector and the Entities viewer are both 360 px wide** (owner).
 
+## v4 fix 10: variables in value boxes
+
+**Asked by the owner (2026-11-25), [fix](../versions/v4/fixes.md) 10. Built the same day.** What a box does is in the [requirements](../requirements/triggers/triggers.md#multiply-divide-and-variables-in-every-value-box--v4); this is how it looks.
+
+- **Change value's op box offers Multiply and Divide** after Set, Add and Subtract, where the value takes them: "multiply score by 2", "divide this Transform › Position by 2". The amount of either is a plain number, with no unit (standing yes, 2026-11-25).
+- **A value box that takes variables opens one menu** (standing yes, 2026-11-25): a box typed into (a number, a text) shows the box to type into on top, as before, and the variables under it; a box picked from (true or false, a tag) shows its values, then the variables. The variables come in the variable menu's groups, "Level variables" then the target's own under the target's name (`this` for a Wait), each group with a greyed line, such as "no number variables", when it has none. Picking one puts it in the box, which then reads the variable's name: "add bonus to score", "wait delay seconds". Typing a value, or picking one, switches the box back.
+- **A box that takes no variable opens as before:** a vector's X and Y, a colour's, a fill's, an entity's picker, Flip's, and a Change value whose value isn't picked yet.
+- **The If on a level's variable offers only the level's variables** (standing yes, 2026-11-25): its sentence shows no target, so an own variable would be read on an entity the block doesn't show.
+
 ## Icons
 
 - **Outline icons** (owner, 2026-11-14): 24 px drawings shown at 16 px, a 1.6 px stroke with round ends and corners, no fill. One open set for every icon: `lucide-react`, picked in stage 6 (standing yes, 2026-11-15, see [ui.md](../architecture/ui.md#stage-6s-choices)).

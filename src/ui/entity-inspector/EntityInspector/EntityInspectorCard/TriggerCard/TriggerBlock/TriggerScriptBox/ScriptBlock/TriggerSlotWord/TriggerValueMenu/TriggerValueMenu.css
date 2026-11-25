@@ -1,0 +1,5 @@
+/* The typed box above the variables, inset like the small field's. */
+.trigger-value-menu {
+    width: 208px;
+    padding: var(--space-4) var(--space-4) var(--space-8);
+}

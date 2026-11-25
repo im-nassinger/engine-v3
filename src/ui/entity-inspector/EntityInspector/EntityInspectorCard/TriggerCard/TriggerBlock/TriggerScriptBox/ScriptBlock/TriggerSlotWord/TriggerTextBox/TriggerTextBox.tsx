@@ -1,20 +1,20 @@
 import { useState } from 'react';
 import type { KeyboardEvent } from 'react';
-import type { JsonValue } from '../../../../../../../../../../../core/fields/index.ts';
-import { TriggerTyping } from '../../../../../../../../../../../editor/entity-inspector/index.ts';
-import type { TriggerTypedEntry } from '../../../../../../../../../../../editor/entity-inspector/index.ts';
-import { NumberBox } from '../../../../../../../../../../fields/index.ts';
+import type { JsonValue } from '../../../../../../../../../../core/fields/index.ts';
+import { TriggerTyping } from '../../../../../../../../../../editor/entity-inspector/index.ts';
+import type { TriggerTypedEntry } from '../../../../../../../../../../editor/entity-inspector/index.ts';
+import { NumberBox } from '../../../../../../../../../fields/index.ts';
 import './TriggerTextBox.css';
 
-type TextEntry = TriggerTypedEntry & { readonly kind: 'number' | 'text' | 'word' | 'value' };
+export type TriggerTextEntry = TriggerTypedEntry & { readonly kind: 'number' | 'text' | 'word' | 'value' };
 
 export type TriggerTextBoxProps = {
-    entry: TextEntry;
+    entry: TriggerTextEntry;
     onType: (value: JsonValue) => void;
     onClose: () => void;
 };
 
-const PLACEHOLDERS: Record<TextEntry['kind'], string> = {
+const PLACEHOLDERS: Record<TriggerTextEntry['kind'], string> = {
     number: 'Type a number',
     value: 'Type a value',
     text: 'Type a text',

@@ -6,6 +6,7 @@ import { TriggerEdits, VALUE_SEPARATOR } from '../../../../../../../../../editor
 import type {
     TriggerChoice,
     TriggerEntitiesEntry,
+    TriggerMenuGroup,
     TriggerTypedEntry,
     TriggerWord,
     TriggerWordEntry,
@@ -16,6 +17,8 @@ import { Menu, Tooltip, useEntityRowDrop } from '../../../../../../../../shared/
 import type { MenuEntry } from '../../../../../../../../shared/index.ts';
 import type { CommitTriggerEdit } from '../../../../CommitTriggerEdit.ts';
 import { actionsOf, groupEntries, triggerMenuEntries } from '../../../../triggerMenuEntries.ts';
+import type { TriggerTextEntry } from './TriggerTextBox/index.ts';
+import { TriggerValueMenu } from './TriggerValueMenu/index.ts';
 import { TriggerWordField } from './TriggerWordField/index.ts';
 import './TriggerSlotWord.css';
 
@@ -81,6 +84,12 @@ export function TriggerSlotWord({ openLevel, word, triggerIndex, commit }: Trigg
     const typedEntry = typedEntryOf(entry);
     if (asking?.asks !== undefined) {
         popup = <TriggerWordField entry={asking.asks} anchor={anchorRef} onType={typeValue} onClose={close} />;
+    } else if (isOpen && word.variables !== undefined && takesVariables(entry)) {
+        const typed = textEntryOf(entry);
+        const entries = valueMenuEntries(entry, word.variables, pick);
+        popup = (
+            <TriggerValueMenu typed={typed} entries={entries} anchor={anchorRef} onType={typeValue} onClose={close} />
+        );
     } else if (isOpen && entry.kind === 'entities') {
         const entries = pickerEntriesOf(entry, pick);
         popup = (
@@ -132,7 +141,33 @@ function typedEntryOf(entry: TriggerWordEntry): TriggerTypedEntry | undefined {
     return entry;
 }
 
-function isMenuEntry(entry: TriggerWordEntry) {
+// A box whose value is typed into one box, or picked from a menu: the boxes a variable may take the place of.
+function takesVariables(entry: TriggerWordEntry) {
+    return isMenuEntry(entry) || textEntryOf(entry) !== undefined;
+}
+
+function textEntryOf(entry: TriggerWordEntry): TriggerTextEntry | undefined {
+    const isText = entry.kind === 'number' || entry.kind === 'text' || entry.kind === 'word' || entry.kind === 'value';
+
+    return isText ? entry : undefined;
+}
+
+// A menu box's own values, then the variables' groups, a line before each.
+function valueMenuEntries(
+    entry: TriggerWordEntry,
+    variables: readonly TriggerMenuGroup[],
+    pick: (choice: TriggerChoice) => void,
+) {
+    const entries: MenuEntry[] = isMenuEntry(entry) ? triggerMenuEntries(entry, pick) : [];
+    const firstIndex = entries.length === 0 ? 0 : 1;
+    variables.forEach((group, index) => entries.push(...groupEntries(group, firstIndex + index, pick)));
+
+    return entries;
+}
+
+function isMenuEntry(
+    entry: TriggerWordEntry,
+): entry is Extract<TriggerWordEntry, { kind: 'menu' | 'groups' | 'submenus' }> {
     return entry.kind === 'menu' || entry.kind === 'groups' || entry.kind === 'submenus';
 }
 

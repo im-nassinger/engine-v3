@@ -27,6 +27,7 @@ import type {
     ValueRef,
     ValueType,
     VariableRef,
+    VariableAmount,
     VariableType,
     VariableValue,
     When,
@@ -35,7 +36,14 @@ import type {
 import { KeyCodes } from '../../../core/keys/index.ts';
 import type { KeyCode } from '../../../core/keys/index.ts';
 import type { Entity, EntityId } from '../../../core/level/index.ts';
-import { changeableValues, readableValues, sameValueRef, variableChangeOf } from '../../../core/triggers/index.ts';
+import {
+    amountTypeOf,
+    amountVariableType,
+    changeableValues,
+    readableValues,
+    sameValueRef,
+    variableChangeOf,
+} from '../../../core/triggers/index.ts';
 import type { ChangeableValue, TriggerContext } from '../../../core/triggers/index.ts';
 
 import { freshAction, freshCheck, freshWhen, targetOf } from './freshParts.ts';
@@ -124,7 +132,9 @@ const COMPARES: readonly Named<Compare>[] = [
 // A string or a boolean is only compared with is and is not.
 const EQUAL_COMPARES: readonly Compare[] = ['is', 'isNot'];
 
-const OPS: readonly ChangeOp[] = ['set', 'add', 'subtract'];
+// Every op, for a value whose ops aren't known yet (fix 10 adds Multiply and Divide).
+const OPS: readonly ChangeOp[] = ['set', 'add', 'subtract', 'multiply', 'divide'];
+const THIS: Target = { kind: 'this' };
 
 const ACTIONS: readonly Named<ActionKind>[] = [
     {
@@ -493,16 +503,71 @@ export class TriggerChoices {
         return named.map((compare) => choice(compare.label, place(compare.value)));
     }
 
-    // A variable's ops follow its type: Set, Add and Subtract for a number, Set for a string, Set and Flip
-    // for a boolean. Any other value offers v3's three.
+    // A variable's ops follow its type: every op for a number, Set for a string, Set and Flip for a
+    // boolean. A value known on its target offers its own ops (Multiply and Divide for a number or a vector,
+    // fix 10); any other value offers every op. The amount is kept where the new op reads it the same way.
     ops(action: ChangeAction, place: Place<ChangeOp>) {
         const type = this.changedVariableType(action);
         let ops = OPS;
         if (type !== undefined) {
             ops = variableChangeOf(type).ops;
+        } else if (action.value !== null) {
+            ops = this.offerFor(this.knownTarget(action.target), action.value)?.ops ?? OPS;
         }
 
         return ops.map((op) => choice(op, place(op)));
+    }
+
+    // The amount kept when the op changes to `op`: unchanged while the amount box reads the same type, else
+    // unset, so a vector added doesn't stay as a vector to multiply by.
+    keptAmount(action: ChangeAction, op: ChangeOp) {
+        const before = this.amountTypeOf(action);
+        const after = this.amountTypeOf({ ...action, op });
+        if (before?.constructor === after?.constructor) return action.amount;
+
+        return null;
+    }
+
+    // The variables Change value's amount box offers (fix 10): those of the type the box takes, the level's
+    // and the target's own. Undefined while the value is unset, and for a box that takes none (a vector's,
+    // a colour's, a fill's, an entity's).
+    changeAmountVariables(action: ChangeAction, index: number) {
+        const type = this.amountVariableTypeOf(action);
+        if (type === undefined) return undefined;
+
+        const place = (amount: VariableAmount) =>
+            ({ section: 'action', index, action: { ...action, amount } }) as const;
+        return this.variableMenus.amountGroups(type, action.target, place);
+    }
+
+    // The variables the If's amount box offers: those of the checked value's type (a string for a tag). A
+    // level's variable shows no target, so its check offers only the level's.
+    checkAmountVariables(check: Check, index: number) {
+        const checkedType = this.checkType(check);
+        if (checkedType === undefined) return undefined;
+
+        const type = checkedType === 'tag' ? 'string' : checkedType;
+        const isLevelVariable = check.value?.kind === 'variable' && check.value.own !== true;
+        const owner = isLevelVariable ? undefined : check.target;
+        const place = (amount: VariableAmount) => ({ section: 'check', index, check: { ...check, amount } }) as const;
+
+        return this.variableMenus.amountGroups(type, owner, place);
+    }
+
+    // The number variables Wait's seconds box offers: the level's and `this`'s own, where a Wait reads them.
+    waitVariables(action: Action & { readonly kind: 'wait' }, index: number) {
+        const place = (seconds: VariableAmount) =>
+            ({ section: 'action', index, action: { ...action, seconds } }) as const;
+
+        return this.variableMenus.amountGroups('number', THIS, place);
+    }
+
+    // The number variables Fire custom event's number box offers: the level's and the target's own.
+    fireVariables(action: Action & { readonly kind: 'fire' }, index: number) {
+        const place = (amount: VariableAmount) =>
+            ({ section: 'action', index, action: { ...action, amount } }) as const;
+
+        return this.variableMenus.amountGroups('number', action.target, place);
     }
 
     // Add check's menu: the one check, a value.
@@ -704,7 +769,9 @@ export class TriggerChoices {
     }
 
     // What the amount word reads once set: a choice's label rather than its stored value.
-    amountWord(action: ChangeAction, amount: JsonValue) {
+    amountWord(action: ChangeAction, amount: JsonValue | VariableAmount) {
+        if (isVariableAmount(amount)) return amount.name;
+
         const variableType = this.changedVariableType(action);
         if (variableType !== undefined && isVariableValue(amount)) return shownValue(amount);
 
@@ -771,8 +838,10 @@ export class TriggerChoices {
         return value.name;
     }
 
+    // None for Multiply and Divide, whose amount is a factor.
     private unitOf(action: ChangeAction) {
         if (action.value === null) return undefined;
+        if (action.op === 'multiply' || action.op === 'divide') return undefined;
 
         const target = this.knownTarget(action.target);
         return this.offerFor(target, action.value)?.unit;
@@ -783,10 +852,31 @@ export class TriggerChoices {
         if (value === null) return undefined;
 
         const variableType = this.changedVariableType(action);
-        if (variableType !== undefined) return variableChangeOf(variableType).amountType;
+        if (variableType !== undefined) {
+            return amountTypeOf({ ref: value, ...variableChangeOf(variableType) }, action.op);
+        }
 
         const target = this.knownTarget(action.target);
-        return this.offerFor(target, value)?.amountType;
+        const offer = this.offerFor(target, value);
+        if (offer === undefined) return undefined;
+
+        return amountTypeOf(offer, action.op);
+    }
+
+    // The type of variable the amount box takes; undefined while the value is unset or the box takes none.
+    private amountVariableTypeOf(action: ChangeAction): VariableType | undefined {
+        const value = action.value;
+        if (value === null || action.op === 'flip') return undefined;
+
+        const variableType = this.changedVariableType(action);
+        if (variableType !== undefined) {
+            return amountVariableType({ ref: value, ...variableChangeOf(variableType) }, action.op);
+        }
+
+        const offer = this.offerFor(this.knownTarget(action.target), value);
+        if (offer === undefined) return undefined;
+
+        return amountVariableType(offer, action.op);
     }
 
     private offerFor(target: Entity | undefined, value: ValueRef) {

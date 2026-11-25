@@ -102,7 +102,7 @@ Planned in [fixes-9-to-13-plan.md](fixes-9-to-13-plan.md), confirmed by the owne
 - [x] 30. Fix 10, the logic: multiply, divide and variables as values
   - Read: requirements/triggers/triggers.md#multiply-divide-and-variables-in-every-value-box--v4, architecture/core-model/triggers.md, architecture/triggers-in-play.md
   - Done when: Change value has Multiply and Divide (numbers, and a vector by one number; dividing by 0 leaves the value); every value box's value can be a variable of its type (level's or the target's own), saved, loaded and read when the block runs; unit tests cover saving and loading, and `runHeadless` tests cover multiply, divide, divide by 0 and a variable read at run time in Change value, the If, Wait and Fire custom event
-- [ ] 31. Fix 10, the blocks: Multiply, Divide and the variable picks
+- [x] 31. Fix 10, the blocks: Multiply, Divide and the variable picks
   - Read: requirements/triggers/triggers.md#multiply-divide-and-variables-in-every-value-box--v4, design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks
   - Done when: Change value's menu offers Multiply and Divide; every value box in every block offers the variables of its type, grouped as the variable menu groups them, and shows a chosen variable by name; a vector or colour box offers none; browser tests cover picking a variable in each block kind and switching back to a typed value; fixes.md row 10 says built
 - [ ] 32. Fix 12, the rules: lengths in metres

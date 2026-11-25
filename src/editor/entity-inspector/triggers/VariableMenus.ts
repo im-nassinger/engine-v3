@@ -1,6 +1,6 @@
 import { VariablesComponent } from '../../../core/components/index.ts';
 import { variableTypeOf } from '../../../core/fields/index.ts';
-import type { Target, VariableRef, VariableType } from '../../../core/fields/index.ts';
+import type { Target, VariableAmount, VariableRef, VariableType } from '../../../core/fields/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import type { TriggerContext } from '../../../core/triggers/index.ts';
 
@@ -75,6 +75,31 @@ export class VariableMenus {
             const title = targetText(owner, this.context.level) ?? 'the target';
             groups.push({ title, choices, emptyText: NO_OWN_VARIABLES });
         }
+
+        return groups;
+    }
+
+    // The variables a value box offers in place of a typed value (fix 10): only those of the box's type, the
+    // level's first, then `owner`'s own when it has a group, each group saying so when it has none. A box
+    // whose block reads no own variable passes no owner.
+    amountGroups(type: VariableType, owner: Target | undefined, place: (amount: VariableAmount) => TriggerPartValue) {
+        const ofType = (variable: KnownVariable) => variable.type === type;
+        const levelChoices = this.levelVariables()
+            .filter(ofType)
+            .map((variable) => variableChoice(variable, place({ kind: 'variable', name: variable.name })));
+        const groups: TriggerMenuGroup[] = [
+            { title: LEVEL_GROUP_TITLE, choices: levelChoices, emptyText: `no ${type} variables` },
+        ];
+        if (owner === undefined) return groups;
+
+        const variables = this.ownVariables(owner);
+        if (variables === undefined) return groups;
+
+        const ownChoices = variables
+            .filter(ofType)
+            .map((variable) => variableChoice(variable, place({ kind: 'variable', name: variable.name, own: true })));
+        const title = targetText(owner, this.context.level) ?? 'the target';
+        groups.push({ title, choices: ownChoices, emptyText: `no ${type} variables of its own` });
 
         return groups;
     }

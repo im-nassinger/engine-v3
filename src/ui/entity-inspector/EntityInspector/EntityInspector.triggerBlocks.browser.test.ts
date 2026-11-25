@@ -27,6 +27,7 @@ import {
     slotAt,
     slotButton,
     word,
+    TYPED_INPUT,
 } from './testing/triggerCardPage.ts';
 
 beforeEach(async () => {
@@ -187,8 +188,8 @@ describe('the trigger card as Scratch blocks', () => {
         await expect.poll(() => scriptBlocks(1).length).toBe(4);
 
         click(word('Do', '2', 1));
-        await expect.poll(() => document.querySelector('.trigger-word-field input')).not.toBeNull();
-        const input = requireElement<HTMLInputElement>(document, '.trigger-word-field input');
+        await expect.poll(() => document.querySelector(TYPED_INPUT)).not.toBeNull();
+        const input = requireElement<HTMLInputElement>(document, TYPED_INPUT);
         await userEvent.clear(input);
         await userEvent.type(input, '5{Enter}');
 

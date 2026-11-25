@@ -16,6 +16,7 @@ import { NO_OTHER_REASON, shownValue, TriggerChoices } from './TriggerChoices.ts
 import { amountText, readableAxis } from './valueNames.ts';
 import type { CheckedType } from './TriggerChoices.ts';
 import type {
+    TriggerMenuGroup,
     TriggerRowPart,
     TriggerWord,
     TriggerWordEntry,
@@ -45,6 +46,9 @@ type SlotWord = {
     readonly entry: TriggerWordEntry;
     // Unset and nothing missing, such as Fire's number: it reads in grey, not yellow.
     readonly isOptional?: boolean;
+    // The variables a value box offers in place of a typed value (fix 10); undefined for a box that takes
+    // none.
+    readonly variables?: readonly TriggerMenuGroup[];
     // The slots of triggerProblems this word shows, when it isn't its own: the condition of a variable
     // changed When is one word for its compare and its value.
     readonly problemSlots?: readonly TriggerWordSlot[];
@@ -135,6 +139,7 @@ class SentenceBuilder {
             state,
             reason,
             entry: word.entry,
+            ...(word.variables === undefined ? {} : { variables: word.variables }),
         });
     }
 
@@ -312,7 +317,8 @@ function addCheckWords(builder: SentenceBuilder, check: Check, index: number, so
 
     const checkedText = check.amount === null ? null : checkedAmountText(check.amount, type);
     const amountEntry = choices.checkAmountEntry(check, index);
-    builder.slot({ slot: 'amount', text: checkedText, need: amountNeed(type), entry: amountEntry });
+    const variables = choices.checkAmountVariables(check, index);
+    builder.slot({ slot: 'amount', text: checkedText, need: amountNeed(type), entry: amountEntry, variables });
 }
 
 // x or y, for a vector or a body's velocity.
@@ -382,7 +388,8 @@ function addActionWords(builder: SentenceBuilder, action: Action, index: number,
     if (action.kind === 'wait') {
         const secondsText = action.seconds === null ? null : amountText(action.seconds);
         const entry = numberEntry(typedNumber(action.seconds), 's');
-        builder.slot({ slot: 'seconds', text: secondsText, need: 'how long', entry });
+        const variables = choices.waitVariables(action, index);
+        builder.slot({ slot: 'seconds', text: secondsText, need: 'how long', entry, variables });
         builder.text('s');
     }
 }
@@ -414,6 +421,7 @@ function addFireWords(builder: SentenceBuilder, action: FireAction, index: numbe
         text: numberText,
         need: 'with a number (for scripts)',
         entry: amountEntry,
+        variables: choices.fireVariables(action, index),
         isOptional: true,
     });
 }
@@ -424,12 +432,16 @@ function addFireWords(builder: SentenceBuilder, action: FireAction, index: numbe
 function addChangeWords(builder: SentenceBuilder, action: ChangeAction, index: number, sources: SentenceSources) {
     const { choices } = sources;
 
-    const ops = choices.ops(action, (op) => ({ section: 'action', index, action: { ...action, op } }));
+    const ops = choices.ops(action, (op) => {
+        const amount = choices.keptAmount(action, op);
+        return { section: 'action', index, action: { ...action, op, amount } };
+    });
     builder.slot({ slot: 'op', text: action.op, need: 'set, add or subtract', entry: menuOf(ops) });
 
     const amountEntry = choices.amountEntry(action, index);
     const changeText = action.amount === null ? null : choices.amountWord(action, action.amount);
-    const amountWord: SlotWord = { slot: 'amount', text: changeText, need: 'a value', entry: amountEntry };
+    const variables = choices.changeAmountVariables(action, index);
+    const amountWord: SlotWord = { slot: 'amount', text: changeText, need: 'a value', entry: amountEntry, variables };
     const amountFirst = action.op === 'add' || action.op === 'subtract';
     if (amountFirst) {
         builder.slot(amountWord);
