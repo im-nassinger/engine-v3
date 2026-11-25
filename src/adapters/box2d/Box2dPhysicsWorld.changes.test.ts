@@ -42,7 +42,7 @@ function addFloor(world: PhysicsWorld, changes = {}) {
 
 describe('Box2dPhysicsWorld: setPose', () => {
     test('teleports a body and keeps its speed', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         const box = addBox(world, BOX, { x: 0, y: 0 });
         world.addVelocity(box, { x: 60, y: 0 });
@@ -58,7 +58,7 @@ describe('Box2dPhysicsWorld: setPose', () => {
     });
 
     test('wakes a sleeping body, which then falls', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         addFloor(world);
         const box = addBox(world, BOX, { x: 0, y: -20 });
@@ -73,7 +73,7 @@ describe('Box2dPhysicsWorld: setPose', () => {
     });
 
     test('moves a Static body, whose surface then holds things there', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         const floor = addFloor(world);
         addBox(world, BOX, { x: 0, y: 180 });
@@ -88,7 +88,7 @@ describe('Box2dPhysicsWorld: setPose', () => {
 
 describe('Box2dPhysicsWorld: addVelocity', () => {
     test('adds the same speed whatever the mass, on top of the speed it had', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const light = addBox(world, 2, { x: 0, y: 0 }, 0.1);
         const heavy = addBox(world, 3, { x: 0, y: 200 }, 10);
 
@@ -106,7 +106,7 @@ describe('Box2dPhysicsWorld: addVelocity', () => {
     });
 
     test('wakes a sleeping body', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         addFloor(world);
         const box = addBox(world, BOX, { x: 0, y: -20 });
@@ -120,7 +120,7 @@ describe('Box2dPhysicsWorld: addVelocity', () => {
     });
 
     test('a Static body keeps still', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const floor = addFloor(world);
 
         world.addVelocity(floor, { x: 600, y: 0 });
@@ -133,7 +133,7 @@ describe('Box2dPhysicsWorld: addVelocity', () => {
 describe('Box2dPhysicsWorld: setSurfaceSettings', () => {
     // How far a box pushed at 300 px/s slides along the floor in two seconds.
     function slide(friction: number, frictionAfterLanding: number) {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         addFloor(world);
         const box = world.createBody(bodyDefinition({ entity: BOX, position: { x: 0, y: -20 }, fixedRotation: true }));
@@ -160,7 +160,7 @@ describe('Box2dPhysicsWorld: setSurfaceSettings', () => {
 
     // The highest point a box dropped from 200 px above the floor reaches after its first bounce.
     function bounceHeight(restitution: number) {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         addFloor(world);
         addBox(world, BOX, { x: 0, y: -220 });
@@ -185,7 +185,7 @@ describe('Box2dPhysicsWorld: setSurfaceSettings', () => {
     });
 
     test('an entity with no surface in the world changes nothing', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
 
         expect(() => world.setSurfaceSettings(99, { friction: 1, restitution: 1 })).not.toThrow();
         world.destroy();
@@ -194,7 +194,7 @@ describe('Box2dPhysicsWorld: setSurfaceSettings', () => {
 
 describe('Box2dPhysicsWorld: setMotor', () => {
     function pinnedWheel() {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const ground = world.createBody(bodyDefinition({ entity: GROUND, type: 'static' }));
         const wheel = addBox(world, BOX, { x: 0, y: 0 });
         const joint = world.createJoint({

@@ -1,10 +1,6 @@
-import { Units } from '../../math/index.ts';
-
 import type { CollisionPiece } from './CollisionPiece.ts';
 import type { Matrix2D } from '../Matrix2D.ts';
 import type { Point } from '../Point.ts';
-
-const SQUARE_PIXELS_PER_SQUARE_METRE = Units.PIXELS_PER_METRE * Units.PIXELS_PER_METRE;
 
 // Sums kept while adding pieces up: the centre of mass is the mass-weighted sum of centres ÷ the mass.
 type Totals = {
@@ -30,13 +26,15 @@ export class MassProperties {
         this.centreOfMass = mass === 0 ? undefined : centreOfMass;
     }
 
-    // Mass is area in square metres × density: a 100 px square at density 1 is 2 m × 2 m = 4 kg.
-    static of(pieces: readonly CollisionPiece[], density: number) {
+    // Mass is area in square metres × density, at the World's Pixels per metre: a 100 px square at density 1
+    // is 1 m × 1 m = 1 kg at 100 px per metre, and 2 m × 2 m = 4 kg at 50.
+    static of(pieces: readonly CollisionPiece[], density: number, pixelsPerMetre: number) {
         const totals: Totals = { area: 0, mass: 0, weightedX: 0, weightedY: 0 };
+        const squarePixelsPerSquareMetre = pixelsPerMetre * pixelsPerMetre;
 
         for (const piece of pieces) {
             const { area, centre } = areaAndCentre(piece);
-            const mass = (area / SQUARE_PIXELS_PER_SQUARE_METRE) * density;
+            const mass = (area / squarePixelsPerSquareMetre) * density;
             addTo(totals, area, mass, centre);
         }
 

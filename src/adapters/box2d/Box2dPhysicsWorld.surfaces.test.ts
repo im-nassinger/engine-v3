@@ -24,7 +24,7 @@ beforeAll(async () => {
 });
 
 function createWorldWithGround() {
-    const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+    const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
     const ground = world.createBody(bodyDefinition({ entity: 1, type: 'static', position: { x: 0, y: 100 } }));
     world.addSurface(ground, surfaceDefinition({ entity: 1, pieces: [boxPiece(2000, 40)] }));
 
@@ -82,7 +82,7 @@ describe("Box2dPhysicsWorld's surfaces", () => {
         ['drawn downhill', [SLOPE_START, SLOPE_END]],
         ['drawn uphill', [SLOPE_END, SLOPE_START]],
     ])('a ball rolls along a line %s', (_direction, points) => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         const slope = world.createBody(bodyDefinition({ entity: 1, type: 'static' }));
         world.addSurface(slope, surfaceDefinition({ entity: 1, pieces: [linePiece(points)] }));
@@ -115,7 +115,7 @@ describe("Box2dPhysicsWorld's surfaces", () => {
             ],
         ],
     ])('a line %s stops a ball from below too', (_direction, points) => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         const ceiling = world.createBody(bodyDefinition({ entity: 1, type: 'static' }));
         world.addSurface(ceiling, surfaceDefinition({ entity: 1, pieces: [linePiece(points)] }));
@@ -130,7 +130,7 @@ describe("Box2dPhysicsWorld's surfaces", () => {
     });
 
     test('a line never hits another line', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         const floor = world.createBody(bodyDefinition({ entity: 1, type: 'static', position: { x: 0, y: 100 } }));
         const floorLine = [
@@ -153,7 +153,7 @@ describe("Box2dPhysicsWorld's surfaces", () => {
     });
 
     test('a sensor lets a body through', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         const sensor = world.createBody(bodyDefinition({ entity: 1, type: 'static', position: { x: 0, y: 100 } }));
         world.addSurface(sensor, surfaceDefinition({ entity: 1, pieces: [boxPiece(400, 40)], sensor: true }));
@@ -170,7 +170,7 @@ describe("Box2dPhysicsWorld's surfaces", () => {
         ['only sensors', { sensor: true }],
         ['density 0', { density: 0 }],
     ])('a Dynamic body whose surfaces are %s still falls, as 1 kg', (_case, changes) => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         const body = world.createBody(bodyDefinition({ entity: 2 }));
         world.addSurface(body, surfaceDefinition({ entity: 2, pieces: [boxPiece(40, 40)], ...changes }));
@@ -183,7 +183,7 @@ describe("Box2dPhysicsWorld's surfaces", () => {
 
     test('density makes a body heavier, so it pushes a lighter one aside', () => {
         function pushedDistance(density: number) {
-            const world = engine.createWorld({ gravity: NO_GRAVITY });
+            const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
             const poses = new BodyPoses();
             const thrown = world.createBody(bodyDefinition({ entity: 2, position: { x: -100, y: 0 } }));
             world.addSurface(thrown, surfaceDefinition({ entity: 2, pieces: [boxPiece(40, 40)], density }));
@@ -202,7 +202,7 @@ describe("Box2dPhysicsWorld's surfaces", () => {
     });
 
     test('a fast body is held to 6,000 px/s', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const body = world.createBody(bodyDefinition({ entity: 2 }));
         world.addSurface(body, surfaceDefinition({ entity: 2, pieces: [boxPiece(40, 40)] }));
         world.setVelocity(body, { linear: { x: 8000, y: 6000 }, spin: 0 });
@@ -217,7 +217,7 @@ describe("Box2dPhysicsWorld's surfaces", () => {
     });
 
     test('a spinning body is held to 7.5 turns per second, either way', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const clockwise = world.createBody(bodyDefinition({ entity: 2 }));
         const anticlockwise = world.createBody(bodyDefinition({ entity: 3, position: { x: 200, y: 0 } }));
         world.addSurface(clockwise, surfaceDefinition({ entity: 2, pieces: [boxPiece(40, 40)] }));
@@ -233,7 +233,7 @@ describe("Box2dPhysicsWorld's surfaces", () => {
     });
 
     test('slower bodies keep their speed and spin', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const body = world.createBody(bodyDefinition({ entity: 2 }));
         world.addSurface(body, surfaceDefinition({ entity: 2, pieces: [boxPiece(40, 40)] }));
         world.setVelocity(body, { linear: { x: 500, y: 0 }, spin: 720 });
@@ -247,14 +247,14 @@ describe("Box2dPhysicsWorld's surfaces", () => {
     });
 
     test('a surface on a missing body is refused', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
 
         expect(() => world.addSurface(7, surfaceDefinition({ pieces: [boxPiece(40, 40)] }))).toThrow("doesn't exist");
         world.destroy();
     });
 
     test('removing a surface merged into the ground lets a box fall through where it was', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         const ground = world.createBody(bodyDefinition({ entity: 1, type: 'static', position: { x: 0, y: 100 } }));
         world.addSurface(ground, surfaceDefinition({ entity: 3, pieces: [boxPiece(2000, 40)] }));
@@ -273,7 +273,7 @@ describe("Box2dPhysicsWorld's surfaces", () => {
     });
 
     test('a body that loses a merged surface keeps the mass of what is left', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const cart = world.createBody(bodyDefinition({ entity: 2 }));
         world.addSurface(cart, surfaceDefinition({ entity: 2, pieces: [boxPiece(40, 40)] }));
         world.addSurface(cart, surfaceDefinition({ entity: 3, pieces: [circlePiece(20, { x: 40, y: 0 })] }));

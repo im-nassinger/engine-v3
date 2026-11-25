@@ -108,7 +108,7 @@ Planned in [fixes-9-to-13-plan.md](fixes-9-to-13-plan.md), confirmed by the owne
 - [x] 32. Fix 12, the rules: lengths in metres
   - Read: requirements/editor/workspace.md#lengths-in-metres--v4, requirements/physics/bodies.md, glossary.md, requirements/README.md
   - Done when: every requirement that says 50 px per metre or gives a length, speed or grid size in pixels says it in metres (the grid size's range and steps included, chosen under the standing yes); the glossary has *Pixels per metre*; architecture/ says where the scale lives; `node tools/check-docs.js` and `node tools/check-sources.js` pass
-- [ ] 33. Fix 12, the physics: pixels per metre as a World setting
+- [x] 33. Fix 12, the physics: pixels per metre as a World setting
   - Read: requirements/editor/workspace.md#lengths-in-metres--v4, architecture/README.md, tech-notes.md
   - Done when: the World's PhysicsWorldComponent has *Pixels per metre*, default 100, saved in the level and not changeable during play; the fixed `Units.PIXELS_PER_METRE` is gone and the physics, masses and test play use the World's value; a new level's grid is 100 px; old levels aren't converted; unit and `runHeadless` tests show a body falls the same in metres at 50 and 100 px per metre
 - [ ] 34. Fix 12, the editor: every length in metres

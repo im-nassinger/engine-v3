@@ -4,7 +4,7 @@
     "physicsVersion": 1,
     "name": "trigger-touch-groups",
     "editor": {
-        "gridSize": 50,
+        "gridSize": 100,
         "foldedRows": []
     },
     "world": {
@@ -49,7 +49,8 @@
                     "x": 0,
                     "y": 9.8
                 },
-                "walls": false
+                "walls": false,
+                "pixels_per_metre": 50
             },
             "VariablesComponent": {
                 "variables": [

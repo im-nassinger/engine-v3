@@ -4,6 +4,7 @@ import type { Entity } from '../../level/index.ts';
 import { MassProperties } from '../../geometry/index.ts';
 
 import { mergesInto, mergesUp } from '../merging/mergesInto.ts';
+import { pixelsPerMetreOf } from '../scale/pixelsPerMetreOf.ts';
 
 // One surface that belongs to a body: its density, and what it would weigh at density 1, in level positions.
 export type BodySurface = {
@@ -19,7 +20,7 @@ export type BodyMassCaches = {
 };
 
 // The mass of a body: every surface that belongs to it, its own and the ones merged into it, added up in
-// level positions, so scaling the body or any shape in it changes the mass. The same pieces play collides
+// level positions at its World's Pixels per metre, so scaling the body or any shape in it changes the mass. The same pieces play collides
 // with, so the Entity inspector's Mass matches play.
 export class BodyMass {
     // undefined when the entity has no BodyComponent or merges into another body, since then it has no
@@ -28,7 +29,7 @@ export class BodyMass {
         if (!body.hasComponent(BodyComponent) || mergesInto(body) !== undefined) return undefined;
 
         const parts: MassProperties[] = [];
-        addSurfaces(body, body, caches, parts);
+        addSurfaces(body, caches, pixelsPerMetreOf(body), parts);
 
         return MassProperties.combine(parts);
     }
@@ -39,13 +40,15 @@ export class BodyMass {
         const surfaces: BodySurface[] = [];
         if (!body.hasComponent(BodyComponent) || mergesInto(body) !== undefined) return surfaces;
 
+        const pixelsPerMetre = pixelsPerMetreOf(body);
+
         forEachSurface(body, body, (entity) => {
             const surface = entity.getComponent(SurfaceComponent);
             const shape = caches.pieces.piecesOf(entity);
             if (surface === undefined || shape === undefined) return;
 
             const matrix = caches.worldMatrices.matrixOf(entity);
-            const massAtDensityOne = MassProperties.of(shape.pieces, 1).transformedBy(matrix).mass;
+            const massAtDensityOne = MassProperties.of(shape.pieces, 1, pixelsPerMetre).transformedBy(matrix).mass;
             surfaces.push({ entity, density: surface.get('density'), massAtDensityOne });
         });
 
@@ -53,9 +56,9 @@ export class BodyMass {
     }
 }
 
-function addSurfaces(entity: Entity, body: Entity, caches: BodyMassCaches, parts: MassProperties[]) {
-    forEachSurface(entity, body, (each) => {
-        const surface = surfaceMassOf(each, caches);
+function addSurfaces(body: Entity, caches: BodyMassCaches, pixelsPerMetre: number, parts: MassProperties[]) {
+    forEachSurface(body, body, (each) => {
+        const surface = surfaceMassOf(each, caches, pixelsPerMetre);
         if (surface !== undefined) {
             parts.push(surface);
         }
@@ -73,12 +76,12 @@ function forEachSurface(entity: Entity, body: Entity, visit: (entity: Entity) =>
     }
 }
 
-function surfaceMassOf(entity: Entity, caches: BodyMassCaches) {
+function surfaceMassOf(entity: Entity, caches: BodyMassCaches, pixelsPerMetre: number) {
     const surface = entity.getComponent(SurfaceComponent);
     const shape = caches.pieces.piecesOf(entity);
     if (surface === undefined || shape === undefined) return undefined;
 
-    const ownMass = MassProperties.of(shape.pieces, surface.get('density'));
+    const ownMass = MassProperties.of(shape.pieces, surface.get('density'), pixelsPerMetre);
 
     return ownMass.transformedBy(caches.worldMatrices.matrixOf(entity));
 }

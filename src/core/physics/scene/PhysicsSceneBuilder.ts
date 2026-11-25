@@ -55,7 +55,7 @@ export class PhysicsSceneBuilder {
         this.sensors = sensors;
     }
 
-    // Makes a world with the World's Gravity and builds the level into it. Only the surfaces of the touch
+    // Makes a world with the World's Gravity and Pixels per metre and builds the level into it. Only the surfaces of the touch
     // surfaces' contactEvents send contact events, and only its sensors are built without a SurfaceComponent.
     static build(
         level: Level,
@@ -63,8 +63,12 @@ export class PhysicsSceneBuilder {
         engine: PhysicsEngine,
         touchSurfaces: TouchSurfaces = NO_TOUCH_SURFACES,
     ): PhysicsScene {
-        const gravity = level.world.requireComponent(PhysicsWorldComponent).get('gravity');
-        const world = engine.createWorld({ gravity, contactEventSurfaces: touchSurfaces.contactEvents });
+        const physicsWorld = level.world.requireComponent(PhysicsWorldComponent);
+        const world = engine.createWorld({
+            gravity: physicsWorld.get('gravity'),
+            pixelsPerMetre: physicsWorld.get('pixelsPerMetre'),
+            contactEventSurfaces: touchSurfaces.contactEvents,
+        });
         const builder = new PhysicsSceneBuilder(level, caches, world, touchSurfaces.sensors);
 
         return builder.buildAll();

@@ -372,11 +372,11 @@ describe('Entity inspector fields', () => {
     test('Mass is typed with its unit, and sets the density that gives it in one step', async () => {
         const { crate, session } = await showCrate();
         const mass = boxOf('BodyComponent', 'mass');
-        expect(mass.value).toBe('4');
+        expect(mass.value).toBe('1');
         expect(fieldRow('BodyComponent', 'mass').textContent).toContain('kg');
         const density = crate.requireComponent(SurfaceComponent).get('density');
 
-        await typeInto(mass, '8');
+        await typeInto(mass, '2');
         await userEvent.keyboard('{Enter}');
 
         await expect.poll(() => crate.requireComponent(SurfaceComponent).get('density')).toBe(density * 2);

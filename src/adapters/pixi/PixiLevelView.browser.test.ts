@@ -311,11 +311,11 @@ describe('PixiLevelView overlays', () => {
         return { ...parts, level, overlays: parts.levelView.overlays };
     }
 
-    test('the grid draws a step every 50 px and its switch hides it', async () => {
+    test('the grid draws a step every 100 px, 1 m, and its switch hides it', async () => {
         const { settings, frames, overlays } = await showNewLevel();
 
         expect(overlays.grid.graphics.visible).toBe(true);
-        expect(overlays.grid.plan?.step).toBe(50);
+        expect(overlays.grid.plan?.step).toBe(100);
 
         settings.toggle('grid');
         expect(frames.pendingCount).toBe(1);
@@ -328,20 +328,20 @@ describe('PixiLevelView overlays', () => {
     test('a new grid size draws again with the new step', async () => {
         const { level, frames, overlays } = await showNewLevel();
 
-        level.editorData.setGridSize(100);
+        level.editorData.setGridSize(40);
         expect(frames.pendingCount).toBe(1);
         frames.runFrame();
 
-        expect(overlays.grid.plan?.step).toBe(100);
+        expect(overlays.grid.plan?.step).toBe(40);
     });
 
     test('zoomed far out, every fifth line is kept', async () => {
         const { view, frames, overlays } = await showNewLevel();
 
-        view.zoomAboutMiddle(0.1);
+        view.zoomAboutMiddle(0.05);
         frames.runFrame();
 
-        expect(overlays.grid.plan?.step).toBe(250);
+        expect(overlays.grid.plan?.step).toBe(500);
     });
 
     function alphaAt(levelView: PixiLevelView, x: number, y: number) {

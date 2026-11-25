@@ -25,9 +25,10 @@ function addSquare(level: Level, parent: Entity, position: Point) {
 }
 
 // Two squares at 100, 100 and 300, 100, and a group at 600, 300, turned, stretched and skewed, holding
-// one square at its origin. Snapping is the real grid's, 50 px, on. Screen and level are the same at zoom 1.
+// one square at its origin. Snapping is the real grid's, set to 50 px, on. Screen and level are the same at zoom 1.
 function buildMoveTest() {
     const level = Level.createNew();
+    level.editorData.setGridSize(50);
     const square = addSquare(level, level.world, { x: 100, y: 100 });
     const other = addSquare(level, level.world, { x: 300, y: 100 });
     const group = level.createEntity(level.world, 0);

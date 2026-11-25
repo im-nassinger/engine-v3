@@ -47,7 +47,7 @@ function ballEvent(kind: SensorEvent['kind']): SensorEvent {
 
 describe('Box2dPhysicsWorld: sensor events', () => {
     test('a body crossing a sensor sends one begin and one end, each in its own step, naming both entities', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         addCoin(world);
         const ball = addBall(world, { x: -200, y: 0 });
         // 600 px/s is 10 px a step: the edges meet after step 14, and part after step 26.
@@ -70,7 +70,7 @@ describe('Box2dPhysicsWorld: sensor events', () => {
     });
 
     test('each step gives only its own events', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         addCoin(world);
         addBall(world, { x: 0, y: 0 });
 
@@ -80,7 +80,7 @@ describe('Box2dPhysicsWorld: sensor events', () => {
     });
 
     test("a destroyed body's end comes with the next step, naming it, even when its slot holds a new surface", () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         addCoin(world);
         const ball = addBall(world, { x: 0, y: 0 });
         eventsOfStep(world);
@@ -98,7 +98,7 @@ describe('Box2dPhysicsWorld: sensor events', () => {
     });
 
     test("a destroyed sensor's end comes with the next step", () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const coin = addCoin(world);
         addBall(world, { x: 0, y: 0 });
         eventsOfStep(world);
@@ -110,7 +110,7 @@ describe('Box2dPhysicsWorld: sensor events', () => {
     });
 
     test('a sensor sees another sensor, marked as one, and each sees the other', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         addCoin(world);
         addBall(world, { x: 0, y: 0 }, { body: BALL_BODY, surface: BALL }, true);
 
@@ -137,7 +137,7 @@ describe('Box2dPhysicsWorld: sensor events', () => {
     });
 
     test('a surface on the ground is named after its body, the World', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const ground = world.createBody(bodyDefinition({ entity: 0, type: 'static' }));
         world.addSurface(ground, surfaceDefinition({ entity: 0, pieces: [boxPiece(400, 20)] }));
         const ballBody = world.createBody(bodyDefinition({ entity: BALL_BODY }));
@@ -150,7 +150,7 @@ describe('Box2dPhysicsWorld: sensor events', () => {
     });
 
     test('changing Friction or Restitution sends no sensor event', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         addCoin(world);
         addBall(world, { x: 0, y: 0 });
         eventsOfStep(world);

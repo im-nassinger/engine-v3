@@ -16,7 +16,7 @@ type JointEnds = {
 
 // A Hinge, in degrees, with the values play uses: a mirrored joint's limits and motor already flipped.
 // A turns against B; the angle between the two bodies at the start reads 0. Positive angles and motor
-// speeds are clockwise on screen. Motor strength and Resistance are in N·m at 50 px per metre.
+// speeds are clockwise on screen. Motor strength and Resistance are in N·m at the World's Pixels per metre.
 // Resistance acts only while Motor is off.
 export type HingeDefinition = JointEnds & {
     readonly type: 'hinge';

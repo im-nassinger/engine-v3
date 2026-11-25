@@ -40,6 +40,8 @@ export function buildShapeTest(snapper: Snapper = NO_SNAPPING) {
 export function buildShapeTestWithGrid() {
     return buildDrawingToolTest(new ShapeTool(), (session) => {
         const editorData = session.openLevel.level.editorData;
+        // The tests were written for a 50 px grid, the default before v4.
+        editorData.setGridSize(50);
         return new GridSnapper(editorData, session.viewSettings);
     });
 }

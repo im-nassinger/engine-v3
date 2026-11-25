@@ -1,4 +1,4 @@
-import { CameraComponent } from '../../../../src/core/components/index.ts';
+import { CameraComponent, PhysicsWorldComponent } from '../../../../src/core/components/index.ts';
 import type { Point } from '../../../../src/core/geometry/index.ts';
 import { Level } from '../../../../src/core/level/index.ts';
 
@@ -283,23 +283,34 @@ function point(x: number, y: number): Point {
     return { x, y };
 }
 
+// Every determinism level was built and recorded at the old fixed 50 px per metre. They keep that scale, so
+// making it the World's setting changed none of their hashes (v4 task 33, standing yes, 2026-11-25).
+function atFiftyPixelsPerMetre(build: () => Level) {
+    return () => {
+        const level = build();
+        level.world.requireComponent(PhysicsWorldComponent).set('pixelsPerMetre', 50);
+
+        return level;
+    };
+}
+
 // The determinism test's levels: stage 13's seven, stage 14's three with joints, stage 15's camera and v3's
 // three and v4's two with triggers, which read the recorded inputs in tests/levels/determinism/inputs/.
 export const DETERMINISM_LEVELS: readonly DeterminismLevel[] = [
-    { name: 'crate-pyramid', build: cratePyramid },
-    { name: 'merged-car', build: mergedCar },
-    { name: 'self-crossing-polygon', build: selfCrossingPolygon },
-    { name: 'leaving-open-edge', build: leavingOpenEdge },
-    { name: 'bouncing-balls', build: bouncingBalls },
-    { name: 'body-settings', build: bodySettings },
-    { name: 'transformed-group', build: transformedGroup },
-    { name: 'rope-bridge', build: ropeBridge },
-    { name: 'springs', build: springs },
-    { name: 'hinged-car', build: hingedCar },
-    { name: 'camera-follow', build: cameraFollow },
-    { name: 'trigger-coins', build: triggerCoins },
-    { name: 'trigger-timers', build: triggerTimers },
-    { name: 'trigger-touch-groups', build: triggerTouchGroups },
-    { name: 'trigger-doors', build: triggerDoors },
-    { name: 'trigger-hits', build: triggerHits },
+    { name: 'crate-pyramid', build: atFiftyPixelsPerMetre(cratePyramid) },
+    { name: 'merged-car', build: atFiftyPixelsPerMetre(mergedCar) },
+    { name: 'self-crossing-polygon', build: atFiftyPixelsPerMetre(selfCrossingPolygon) },
+    { name: 'leaving-open-edge', build: atFiftyPixelsPerMetre(leavingOpenEdge) },
+    { name: 'bouncing-balls', build: atFiftyPixelsPerMetre(bouncingBalls) },
+    { name: 'body-settings', build: atFiftyPixelsPerMetre(bodySettings) },
+    { name: 'transformed-group', build: atFiftyPixelsPerMetre(transformedGroup) },
+    { name: 'rope-bridge', build: atFiftyPixelsPerMetre(ropeBridge) },
+    { name: 'springs', build: atFiftyPixelsPerMetre(springs) },
+    { name: 'hinged-car', build: atFiftyPixelsPerMetre(hingedCar) },
+    { name: 'camera-follow', build: atFiftyPixelsPerMetre(cameraFollow) },
+    { name: 'trigger-coins', build: atFiftyPixelsPerMetre(triggerCoins) },
+    { name: 'trigger-timers', build: atFiftyPixelsPerMetre(triggerTimers) },
+    { name: 'trigger-touch-groups', build: atFiftyPixelsPerMetre(triggerTouchGroups) },
+    { name: 'trigger-doors', build: atFiftyPixelsPerMetre(triggerDoors) },
+    { name: 'trigger-hits', build: atFiftyPixelsPerMetre(triggerHits) },
 ];

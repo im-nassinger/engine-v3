@@ -42,9 +42,10 @@ const STEP_SECONDS = 1 / 60;
 const SUB_STEPS = 4;
 // Box2D gives a Dynamic body without mass none at all, and it never moves. The requirements give it 1 kg.
 const MASS_WITHOUT_SURFACES = 1;
-// The requirements' speed cap. Spin needs no setting: Box2D 3.2 holds it to 45° a step, 7.5 turns per
-// second, which is the requirements' spin cap (tech-notes.md).
-const MAX_SPEED_PIXELS_PER_SECOND = 6000;
+// The requirements' speed cap, in m/s whatever the scale, since Box2D works in metres. Spin needs no
+// setting: Box2D 3.2 holds it to 45° a step, 7.5 turns per second, which is the requirements' spin cap
+// (tech-notes.md).
+const MAX_SPEED_METRES_PER_SECOND = 120;
 
 type CreatedBody = {
     readonly bodyId: b2BodyId;
@@ -64,7 +65,7 @@ type CreatedJoint = {
     readonly type: JointDefinition['type'];
 };
 
-// One Box2D world. The only code that turns pixels into metres and degrees into radians. Box2D's angles
+// One Box2D world, at the scale it was made with. The only physics code that turns pixels into metres and degrees into radians. Box2D's angles
 // turn counter-clockwise with y up, which is clockwise on screen with y down, so angles keep their sign.
 // An object Box2D's bindings return from a function is a copy in wasm memory, deleted once read; one read
 // from a field (a move event's transform, a definition's motion locks) is a view into its parent, never
@@ -82,17 +83,19 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
     private readonly sensorEvents: SensorEvent[] = [];
     private readonly contactEventsOfStep: ContactEvent[] = [];
     private readonly contactEventSurfaces: ReadonlySet<EntityId>;
+    private readonly pixelsPerMetre: number;
     private destroyed = false;
 
     constructor(box2d: Box2DModule, settings: WorldSettings) {
         this.box2d = box2d;
         this.contactEventSurfaces = settings.contactEventSurfaces ?? new Set();
+        this.pixelsPerMetre = settings.pixelsPerMetre;
 
         const worldDefinition = box2d.b2DefaultWorldDef();
         const gravity = new box2d.b2Vec2(settings.gravity.x, settings.gravity.y);
         worldDefinition.gravity = gravity;
         gravity.delete();
-        worldDefinition.maximumLinearSpeed = Units.toMetres(MAX_SPEED_PIXELS_PER_SECOND);
+        worldDefinition.maximumLinearSpeed = MAX_SPEED_METRES_PER_SECOND;
 
         this.worldId = box2d.b2CreateWorld(worldDefinition);
         worldDefinition.delete();
@@ -105,7 +108,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         const bodyDefinition = box2d.b2DefaultBodyDef();
         bodyDefinition.type = this.box2dBodyType(definition.type);
 
-        const position = new box2d.b2Vec2(Units.toMetres(definition.position.x), Units.toMetres(definition.position.y));
+        const position = new box2d.b2Vec2(this.toMetres(definition.position.x), this.toMetres(definition.position.y));
         bodyDefinition.position = position;
         position.delete();
 
@@ -264,8 +267,8 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
             const rotation = transform.q;
 
             const entity = moveEvent.userData;
-            const x = Units.toPixels(position.x);
-            const y = Units.toPixels(position.y);
+            const x = this.toPixels(position.x);
+            const y = this.toPixels(position.y);
             const angleInRadians = DeterministicMath.atan2(rotation.s, rotation.c);
             const angle = Units.toDegrees(angleInRadians);
             into.recordMove(entity, { x, y, angle });
@@ -281,7 +284,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         const bodyId = this.bodyAt(body).bodyId;
 
         const box2dLinear = this.box2d.b2Body_GetLinearVelocity(bodyId);
-        const linear = { x: Units.toPixels(box2dLinear.x), y: Units.toPixels(box2dLinear.y) };
+        const linear = { x: this.toPixels(box2dLinear.x), y: this.toPixels(box2dLinear.y) };
         box2dLinear.delete();
         const spin = Units.toDegrees(this.box2d.b2Body_GetAngularVelocity(bodyId));
 
@@ -315,7 +318,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
 
         const bodyId = createdBody.bodyId;
         const current = box2d.b2Body_GetLinearVelocity(bodyId);
-        const sum = new box2d.b2Vec2(current.x + Units.toMetres(velocity.x), current.y + Units.toMetres(velocity.y));
+        const sum = new box2d.b2Vec2(current.x + this.toMetres(velocity.x), current.y + this.toMetres(velocity.y));
         current.delete();
         box2d.b2Body_SetLinearVelocity(bodyId, sum);
         sum.delete();
@@ -329,7 +332,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         if (createdBody.type === 'static') return;
 
         const bodyId = createdBody.bodyId;
-        const linear = new box2d.b2Vec2(Units.toMetres(velocity.x), Units.toMetres(velocity.y));
+        const linear = new box2d.b2Vec2(this.toMetres(velocity.x), this.toMetres(velocity.y));
         box2d.b2Body_SetLinearVelocity(bodyId, linear);
         linear.delete();
         box2d.b2Body_SetAwake(bodyId, true);
@@ -341,7 +344,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         const box2d = this.box2d;
         const bodyId = this.bodyAt(body).bodyId;
 
-        const linear = new box2d.b2Vec2(Units.toMetres(velocity.linear.x), Units.toMetres(velocity.linear.y));
+        const linear = new box2d.b2Vec2(this.toMetres(velocity.linear.x), this.toMetres(velocity.linear.y));
         box2d.b2Body_SetLinearVelocity(bodyId, linear);
         linear.delete();
         box2d.b2Body_SetAngularVelocity(bodyId, Units.toRadians(velocity.spin));
@@ -497,7 +500,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         distanceDefinition.enableSpring = true;
 
         if (definition.type === 'rope') {
-            const length = Units.toMetres(definition.length);
+            const length = this.toMetres(definition.length);
             distanceDefinition.length = length;
             distanceDefinition.hertz = 0;
             distanceDefinition.dampingRatio = 0;
@@ -505,7 +508,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
             distanceDefinition.minLength = 0;
             distanceDefinition.maxLength = length;
         } else {
-            distanceDefinition.length = Units.toMetres(definition.restLength);
+            distanceDefinition.length = this.toMetres(definition.restLength);
             distanceDefinition.hertz = definition.stiffness;
             distanceDefinition.dampingRatio = definition.damping;
             distanceDefinition.enableLimit = false;
@@ -581,7 +584,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
         const box2dCenter = this.toBox2dPoint(center);
         circle.center = box2dCenter;
         box2dCenter.delete();
-        circle.radius = Units.toMetres(radius);
+        circle.radius = this.toMetres(radius);
 
         const shapeId = box2d.b2CreateCircleShape(bodyId, shapeDefinition, circle);
         circle.delete();
@@ -594,7 +597,7 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
     private addPolygon(bodyId: b2BodyId, shapeDefinition: b2ShapeDef, points: readonly Point[]) {
         const box2d = this.box2d;
 
-        const pointsInMetres = points.map((point) => ({ x: Units.toMetres(point.x), y: Units.toMetres(point.y) }));
+        const pointsInMetres = points.map((point) => ({ x: this.toMetres(point.x), y: this.toMetres(point.y) }));
         const hull = box2d.b2ComputeHull(pointsInMetres);
         const shapes: b2ShapeId[] = [];
 
@@ -636,7 +639,15 @@ export class Box2dPhysicsWorld implements PhysicsWorld {
     }
 
     private toBox2dPoint(point: Point) {
-        return new this.box2d.b2Vec2(Units.toMetres(point.x), Units.toMetres(point.y));
+        return new this.box2d.b2Vec2(this.toMetres(point.x), this.toMetres(point.y));
+    }
+
+    private toMetres(pixels: number) {
+        return Units.toMetres(pixels, this.pixelsPerMetre);
+    }
+
+    private toPixels(metres: number) {
+        return Units.toPixels(metres, this.pixelsPerMetre);
     }
 
     private box2dBodyType(type: BodyType): b2BodyType {

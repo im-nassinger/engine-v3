@@ -6,6 +6,7 @@ import {
     InputComponent,
     JointComponent,
     NameComponent,
+    PhysicsWorldComponent,
     StyleComponent,
     TagsComponent,
     VariablesComponent,
@@ -284,6 +285,21 @@ describe('LevelReader missing values', () => {
 
         expect(body.get('type')).toBe('static');
         expect(body.get('gravityScale')).toBe(1);
+    });
+
+    test('reads a level saved before Pixels per metre at 100, its lengths and grid not converted', () => {
+        const levelData = newLevelData();
+        levelData.editor.gridSize = 50;
+        const savedWorld = levelData.world.components['PhysicsWorldComponent'] as Record<string, unknown>;
+        delete savedWorld['pixels_per_metre'];
+        const savedCamera = JSON.stringify(requireWorldChild(levelData, 0));
+
+        const level = expectRead(levelData);
+        const written = new LevelWriter().write(level);
+
+        expect(level.world.requireComponent(PhysicsWorldComponent).get('pixelsPerMetre')).toBe(100);
+        expect(level.editorData.gridSize).toBe(50);
+        expect(JSON.stringify(written.world.children[0])).toBe(savedCamera);
     });
 
     test('reads a level saved before Scale outline with the checkbox off', () => {

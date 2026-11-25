@@ -27,13 +27,13 @@ describe('Box2dPhysicsEngine', () => {
     test('a world before loading is refused', () => {
         const notLoaded = new Box2dPhysicsEngine();
 
-        expect(() => notLoaded.createWorld({ gravity: EARTH_GRAVITY })).toThrow('not loaded');
+        expect(() => notLoaded.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 })).toThrow('not loaded');
     });
 });
 
 describe('Box2dPhysicsWorld', () => {
     test('a Dynamic body falls about 245 px in its first 60 steps at the default gravity', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         world.createBody(bodyDefinition({ entity: 3, position: { x: 100, y: 50 } }));
 
@@ -48,7 +48,7 @@ describe('Box2dPhysicsWorld', () => {
     });
 
     test('a Static body never moves', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         world.createBody(bodyDefinition({ entity: 3, type: 'static' }));
 
@@ -59,7 +59,7 @@ describe('Box2dPhysicsWorld', () => {
     });
 
     test('a Kinematic body ignores gravity', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         world.createBody(bodyDefinition({ entity: 3, type: 'kinematic' }));
 
@@ -72,7 +72,7 @@ describe('Box2dPhysicsWorld', () => {
     });
 
     test('gravity scale scales the fall, and 0 floats', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         world.createBody(bodyDefinition({ entity: 3, gravityScale: 2 }));
         world.createBody(bodyDefinition({ entity: 4, gravityScale: 1 }));
@@ -86,7 +86,7 @@ describe('Box2dPhysicsWorld', () => {
     });
 
     test('linear damping slows the fall', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         world.createBody(bodyDefinition({ entity: 3, linearDamping: 2 }));
         world.createBody(bodyDefinition({ entity: 4 }));
@@ -98,7 +98,7 @@ describe('Box2dPhysicsWorld', () => {
     });
 
     test('positions and angles come back in pixels and degrees', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         world.createBody(bodyDefinition({ entity: 3, position: { x: 400, y: -250 }, angle: 30 }));
         world.setGravity(EARTH_GRAVITY);
@@ -113,7 +113,7 @@ describe('Box2dPhysicsWorld', () => {
     });
 
     test('a sleeping body wakes when gravity changes', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         world.createBody(bodyDefinition({ entity: 3 }));
 
@@ -129,7 +129,7 @@ describe('Box2dPhysicsWorld', () => {
     });
 
     test('only the bodies that moved are reported, by their entity', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         world.createBody(bodyDefinition({ entity: 3, type: 'static' }));
         world.createBody(bodyDefinition({ entity: 8 }));
@@ -141,7 +141,7 @@ describe('Box2dPhysicsWorld', () => {
     });
 
     test('a destroyed body stops moving and its handle is refused after', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const poses = new BodyPoses();
         const handle = world.createBody(bodyDefinition({ entity: 3 }));
 
@@ -154,7 +154,7 @@ describe('Box2dPhysicsWorld', () => {
     });
 
     test('a destroyed world refuses every call', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         world.destroy();
 
         expect(() => world.step()).toThrow('destroyed');
@@ -162,7 +162,7 @@ describe('Box2dPhysicsWorld', () => {
 
     test('two runs give the same numbers bit for bit', () => {
         function run() {
-            const world = engine.createWorld({ gravity: { x: 1.3, y: 9.8 } });
+            const world = engine.createWorld({ gravity: { x: 1.3, y: 9.8 }, pixelsPerMetre: 50 });
             const poses = new BodyPoses();
             world.createBody(bodyDefinition({ entity: 3, position: { x: 12.345, y: -7.5 }, angle: 17 }));
             world.createBody(bodyDefinition({ entity: 4, gravityScale: 0.7, linearDamping: 0.3 }));

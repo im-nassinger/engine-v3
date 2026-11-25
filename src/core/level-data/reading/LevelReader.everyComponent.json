@@ -48,7 +48,8 @@
                     "x": -4.5,
                     "y": 3
                 },
-                "walls": true
+                "walls": true,
+                "pixels_per_metre": 50
             },
             "VariablesComponent": {
                 "variables": [

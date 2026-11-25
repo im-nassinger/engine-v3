@@ -1,6 +1,7 @@
 export { BodyMass } from './mass/BodyMass.ts';
 export type { BodyMassCaches, BodySurface } from './mass/BodyMass.ts';
 export { densitiesForMass } from './mass/densitiesForMass.ts';
+export { pixelsPerMetreOf } from './scale/pixelsPerMetreOf.ts';
 export type { DensitiesForMass, SurfaceDensity } from './mass/densitiesForMass.ts';
 export type { BodyDefinition } from './contracts/BodyDefinition.ts';
 export type { BodyPose } from './contracts/BodyPose.ts';

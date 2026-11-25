@@ -2,7 +2,7 @@ import { BodyComponent } from '../../../core/components/index.ts';
 import { MassProperties } from '../../../core/geometry/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
-import { BodyMass } from '../../../core/physics/index.ts';
+import { BodyMass, pixelsPerMetreOf } from '../../../core/physics/index.ts';
 import type { BodyMassCaches } from '../../../core/physics/index.ts';
 
 // One end of a joint being placed: the body, or a surface with no body, and the point clicked on it, in
@@ -28,5 +28,5 @@ export function areaOf(body: Entity, caches: BodyMassCaches) {
     const pieces = caches.pieces.piecesOf(body)?.pieces ?? [];
     const matrix = caches.worldMatrices.matrixOf(body);
 
-    return MassProperties.of(pieces, 1).transformedBy(matrix).area;
+    return MassProperties.of(pieces, 1, pixelsPerMetreOf(body)).transformedBy(matrix).area;
 }

@@ -32,6 +32,7 @@ export type { NameValues } from './NameComponent/NameValues.ts';
 export { PathComponent } from './PathComponent/PathComponent.ts';
 export type { PathValues } from './PathComponent/PathValues.ts';
 export { PhysicsWorldComponent } from './PhysicsWorldComponent/PhysicsWorldComponent.ts';
+export { DEFAULT_PIXELS_PER_METRE } from './PhysicsWorldComponent/physicsWorldSchema.ts';
 export type { PhysicsWorldValues } from './PhysicsWorldComponent/PhysicsWorldValues.ts';
 export { ShapeComponent } from './ShapeComponent/ShapeComponent.ts';
 export type { ShapeValues } from './ShapeComponent/ShapeValues.ts';

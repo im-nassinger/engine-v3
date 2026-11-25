@@ -60,7 +60,7 @@ function addWeight(world: PhysicsWorld, position: Point): BodyHandle {
 
 // A weight whose centre is tied to a ground point at the origin.
 function hangingWeight(gravity: Point, start: Point, join: (ends: Ends) => RopeDefinition | SpringDefinition) {
-    const world = engine.createWorld({ gravity });
+    const world = engine.createWorld({ gravity, pixelsPerMetre: 50 });
     const ground = world.createBody(bodyDefinition({ entity: GROUND, type: 'static' }));
     const weight = addWeight(world, start);
     world.createJoint(join({ bodyA: weight, bodyB: ground, endA: start }));

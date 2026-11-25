@@ -180,6 +180,14 @@ describe('PhysicsSceneBuilder', () => {
         expect(build(level).world.settings.gravity).toEqual({ x: 1, y: -3 });
     });
 
+    test("the world converts at the World's Pixels per metre, 100 unless set", () => {
+        const level = Level.createNew();
+        expect(build(level).world.settings.pixelsPerMetre).toBe(100);
+
+        level.world.requireComponent(PhysicsWorldComponent).set('pixelsPerMetre', 50);
+        expect(build(level).world.settings.pixelsPerMetre).toBe(50);
+    });
+
     test('the world is told which surfaces send contact events, none unless asked', () => {
         const level = Level.createNew();
         const ball = withSurface(withBody(place(level, level.world, transform(0, 0))));

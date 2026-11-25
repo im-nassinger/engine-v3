@@ -47,10 +47,11 @@ const LINE: ShapeGeometry = {
 };
 
 // A 100 px square at 100, 100, a second one at 300, 100, and a group at 600, 300, turned, stretched and
-// skewed, holding a square at its origin. Snapping is the real grid's, 50 px. Screen and level are the
+// skewed, holding a square at its origin. Snapping is the real grid's, set to 50 px. Screen and level are the
 // same at zoom 1.
 function buildResizeTest() {
     const level = Level.createNew();
+    level.editorData.setGridSize(50);
     const square = addShape(level, level.world, { x: 100, y: 100 }, SQUARE);
     const other = addShape(level, level.world, { x: 300, y: 100 }, SQUARE);
     const group = level.createEntity(level.world, 0);

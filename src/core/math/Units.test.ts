@@ -3,11 +3,11 @@ import { describe, expect, test } from 'vitest';
 import { Units } from './Units.ts';
 
 describe('Units', () => {
-    test('has 50 pixels in a metre', () => {
-        expect(Units.toMetres(50)).toBe(1);
-        expect(Units.toMetres(100)).toBe(2);
-        expect(Units.toPixels(1)).toBe(50);
-        expect(Units.toPixels(-0.5)).toBe(-25);
+    test('converts lengths at the scale it is given', () => {
+        expect(Units.toMetres(100, 100)).toBe(1);
+        expect(Units.toMetres(100, 50)).toBe(2);
+        expect(Units.toPixels(1, 100)).toBe(100);
+        expect(Units.toPixels(-0.5, 50)).toBe(-25);
     });
 
     test('turns degrees into radians and back', () => {
@@ -18,7 +18,7 @@ describe('Units', () => {
     });
 
     test.each([0, 1, -37.5, 123.456, 1e6])('converts %d both ways and comes back', (value) => {
-        const metresAndBack = Units.toPixels(Units.toMetres(value));
+        const metresAndBack = Units.toPixels(Units.toMetres(value, 100), 100);
         const radiansAndBack = Units.toDegrees(Units.toRadians(value));
 
         expect(metresAndBack).toBeCloseTo(value, 9);

@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'vitest';
 
-import { BodyComponent, ShapeComponent, SurfaceComponent, TransformComponent } from '../../components/index.ts';
+import {
+    BodyComponent,
+    PhysicsWorldComponent,
+    ShapeComponent,
+    SurfaceComponent,
+    TransformComponent,
+} from '../../components/index.ts';
 import { DerivedCaches } from '../../derived/index.ts';
 import type { Entity } from '../../level/index.ts';
 import { Level } from '../../level/index.ts';
@@ -41,15 +47,25 @@ function massOf(entity: Entity, caches: DerivedCaches) {
 }
 
 describe('BodyMass', () => {
-    test('a 100 px square at density 1 is 4 kg', () => {
+    test('a 100 px square at density 1 is 1 kg at the default 100 px per metre', () => {
         const level = Level.createNew();
         const crate = addBody(addSurface(placeAt(level, level.world, 300, 200), SQUARE_100));
         const caches = new DerivedCaches(level);
 
         const mass = BodyMass.of(crate, caches);
 
-        expect(mass?.mass).toBe(4);
+        expect(mass?.mass).toBe(1);
         expect(mass?.centreOfMass).toEqual({ x: 300, y: 200 });
+    });
+
+    test("reads its World's Pixels per metre: the same square is 2 m × 2 m, 4 kg, at 50", () => {
+        const level = Level.createNew();
+        level.world.requireComponent(PhysicsWorldComponent).set('pixelsPerMetre', 50);
+        const crate = addBody(addSurface(placeAt(level, level.world, 300, 200), SQUARE_100));
+        const caches = new DerivedCaches(level);
+
+        expect(massOf(crate, caches)).toBe(4);
+        expect(BodyMass.surfacesOf(crate, caches)[0]?.massAtDensityOne).toBe(4);
     });
 
     test('a car of three shapes adds them up, centred in level positions', () => {
@@ -62,7 +78,7 @@ describe('BodyMass', () => {
 
         const mass = BodyMass.of(car, caches);
 
-        expect(mass?.mass).toBe(16);
+        expect(mass?.mass).toBe(4);
         expect(mass?.centreOfMass?.x).toBeCloseTo(525, 9);
         expect(mass?.centreOfMass?.y).toBeCloseTo(500, 9);
     });
@@ -74,8 +90,8 @@ describe('BodyMass', () => {
         addSurface(placeAt(level, trailer, 100, 0), SQUARE_100);
         const caches = new DerivedCaches(level);
 
-        expect(massOf(car, caches)).toBe(4);
-        expect(massOf(trailer, caches)).toBe(8);
+        expect(massOf(car, caches)).toBe(1);
+        expect(massOf(trailer, caches)).toBe(2);
     });
 
     test('a child body with Merge ticked adds its surface, and has no mass of its own', () => {
@@ -84,7 +100,7 @@ describe('BodyMass', () => {
         const door = addBody(addSurface(placeAt(level, car, 100, 0), SQUARE_100));
         const caches = new DerivedCaches(level);
 
-        expect(massOf(car, caches)).toBe(8);
+        expect(massOf(car, caches)).toBe(2);
         expect(BodyMass.of(door, caches)).toBeUndefined();
     });
 
@@ -104,10 +120,10 @@ describe('BodyMass', () => {
         const caches = new DerivedCaches(level);
 
         panel.requireComponent(TransformComponent).set('scale', { x: 2, y: 1 });
-        expect(massOf(car, caches)).toBeCloseTo(8, 9);
+        expect(massOf(car, caches)).toBeCloseTo(2, 9);
 
         car.requireComponent(TransformComponent).set('scale', { x: 1, y: 3 });
-        expect(massOf(car, caches)).toBeCloseTo(24, 9);
+        expect(massOf(car, caches)).toBeCloseTo(6, 9);
     });
 
     test('an entity without a BodyComponent has no mass', () => {

@@ -19,7 +19,7 @@ beforeAll(async () => {
 });
 
 function worldWith(contactEventSurfaces: readonly EntityId[], gravity = EARTH_GRAVITY) {
-    return engine.createWorld({ gravity, contactEventSurfaces: new Set(contactEventSurfaces) });
+    return engine.createWorld({ gravity, pixelsPerMetre: 50, contactEventSurfaces: new Set(contactEventSurfaces) });
 }
 
 // A Static 2,000 × 40 px floor at y = 200, its surface on an entity of its own.
@@ -107,7 +107,7 @@ describe('Box2dPhysicsWorld: contact events', () => {
     });
 
     test('a world made without the setting sends no contact events', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         addGround(world);
         addBox(world);
 

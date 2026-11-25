@@ -55,7 +55,7 @@ function addGround(world: PhysicsWorld, angle = 0) {
 
 // A 40 px box whose centre is 40 px right of a pin at the origin, so gravity swings it clockwise.
 function pinnedDoor(gravity: Point, changes: Partial<HingeDefinition> = {}, doorAngle = 0) {
-    const world = engine.createWorld({ gravity });
+    const world = engine.createWorld({ gravity, pixelsPerMetre: 50 });
     const ground = addGround(world);
     const door = addBox(world, DOOR, { x: 40, y: 0 }, doorAngle);
     world.createJoint(hinge({ bodyA: door, bodyB: ground, ...changes }));
@@ -103,7 +103,7 @@ describe("Box2dPhysicsWorld's Hinge", () => {
         expect(turnedRight.at(-1)).toBeCloseTo(30, 0);
         clockwise.world.destroy();
 
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const ground = addGround(world);
         const door = addBox(world, DOOR, { x: -40, y: 0 });
         world.createJoint(hinge({ bodyA: door, bodyB: ground, limitRotation: true, minAngle: -30, maxAngle: 10 }));
@@ -124,7 +124,7 @@ describe("Box2dPhysicsWorld's Hinge", () => {
     });
 
     test('limits count from the bodies placed, whatever the angle of B', () => {
-        const world = engine.createWorld({ gravity: EARTH_GRAVITY });
+        const world = engine.createWorld({ gravity: EARTH_GRAVITY, pixelsPerMetre: 50 });
         const ground = addGround(world, 90);
         const door = addBox(world, DOOR, { x: 40, y: 0 });
         world.createJoint(hinge({ bodyA: door, bodyB: ground, limitRotation: true, minAngle: -10, maxAngle: 10 }));
@@ -137,7 +137,7 @@ describe("Box2dPhysicsWorld's Hinge", () => {
 
     test('a motor turns a wheel at its speed, clockwise for a positive one', () => {
         for (const motorSpeed of [180, -90]) {
-            const world = engine.createWorld({ gravity: NO_GRAVITY });
+            const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
             const ground = addGround(world);
             const wheel = addBox(world, DOOR, { x: 0, y: 0 });
             world.createJoint(hinge({ bodyA: wheel, bodyB: ground, motor: true, motorSpeed }));
@@ -161,7 +161,7 @@ describe("Box2dPhysicsWorld's Hinge", () => {
 
     test('Resistance slows a spinning wheel, and does nothing while Motor is on', () => {
         const spinAfterHalfASecond = (changes: Partial<HingeDefinition>) => {
-            const world = engine.createWorld({ gravity: NO_GRAVITY });
+            const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
             const ground = addGround(world);
             const wheel = addBox(world, DOOR, { x: 0, y: 0 });
             world.createJoint(hinge({ bodyA: wheel, bodyB: ground, ...changes }));
@@ -185,7 +185,7 @@ describe("Box2dPhysicsWorld's Hinge", () => {
 
     test('Let connected objects collide pushes apart two overlapping hinged boxes, and only then', () => {
         const distanceAfterASecond = (letConnectedObjectsCollide: boolean) => {
-            const world = engine.createWorld({ gravity: NO_GRAVITY });
+            const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
             const poses = new BodyPoses();
             const car = addBox(world, 3, { x: 0, y: 0 }, 0, 60);
             const wheel = addBox(world, DOOR, { x: 10, y: 0 });
@@ -210,7 +210,7 @@ describe("Box2dPhysicsWorld's Hinge", () => {
     });
 
     test('each body keeps its own end: a hinge between two separate points pulls them together', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const ground = addGround(world);
         const door = addBox(world, DOOR, { x: 40, y: 0 });
         world.createJoint(hinge({ bodyA: door, bodyB: ground, endA: { x: 40, y: 0 }, endB: { x: 0, y: 0 } }));
@@ -246,7 +246,7 @@ describe("Box2dPhysicsWorld's Hinge", () => {
     });
 
     test('a joint with both ends on one body is refused', () => {
-        const world = engine.createWorld({ gravity: NO_GRAVITY });
+        const world = engine.createWorld({ gravity: NO_GRAVITY, pixelsPerMetre: 50 });
         const door = addBox(world, DOOR, { x: 0, y: 0 });
 
         expect(() => world.createJoint(hinge({ bodyA: door, bodyB: door }))).toThrow('two different bodies');

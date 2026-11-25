@@ -209,7 +209,7 @@ describe('EntityInspectorModel: fields', () => {
 
         expect(mass.kind).toBe('mass');
         expect(mass.isReadOnly).toBe(false);
-        expect(mass.value).toBeCloseTo(4);
+        expect(mass.value).toBeCloseTo(1);
     });
 
     test('shows one Mass and a Mixed Density for bodies of different sizes set to the same mass', () => {
@@ -220,7 +220,7 @@ describe('EntityInspectorModel: fields', () => {
 
         selection.replace([crate.id, other.id]);
 
-        expect(requireField(requireCard(model, 'BodyComponent'), 'mass').value).toBeCloseTo(10);
+        expect(requireField(requireCard(model, 'BodyComponent'), 'mass').value).toBeCloseTo(2.5);
         expect(requireField(requireCard(model, 'SurfaceComponent'), 'density').value).toBe(MIXED);
     });
 
@@ -400,13 +400,13 @@ describe('EntityInspectorModel: version', () => {
         const handle = addCrate(level, crate, 'Handle');
         selection.replace([crate.id]);
         const massBefore = requireField(requireCard(model, 'BodyComponent'), 'mass').value;
-        expect(massBefore).toBeCloseTo(8);
+        expect(massBefore).toBeCloseTo(2);
         const before = model.version.version;
 
         handle.requireComponent(SurfaceComponent).set('density', 2);
 
         expect(model.version.version).toBe(before + 1);
-        expect(requireField(requireCard(model, 'BodyComponent'), 'mass').value).toBeCloseTo(12);
+        expect(requireField(requireCard(model, 'BodyComponent'), 'mass').value).toBeCloseTo(3);
     });
 
     test('moves when a body is added above a shown entity, which then merges', () => {

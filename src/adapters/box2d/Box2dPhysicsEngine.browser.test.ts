@@ -8,7 +8,7 @@ test('Box2D loads in the browser and a Dynamic body falls', async () => {
     const engine = new Box2dPhysicsEngine();
     await engine.load();
 
-    const world = engine.createWorld({ gravity: { x: 0, y: 9.8 } });
+    const world = engine.createWorld({ gravity: { x: 0, y: 9.8 }, pixelsPerMetre: 50 });
     const poses = new BodyPoses();
     world.createBody({
         entity: 3,

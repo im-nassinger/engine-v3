@@ -14,10 +14,10 @@ const FALL_BEFORE_PAUSE_PX = 20;
 // During play the box is looked at in a column this far right of its middle, since the level's y axis
 // is drawn there, darker than the grid; the box is 100 px wide, about 67 px on screen.
 const OFF_AXIS_PX = 15;
-// The box's Linear damping. Gravity soon stops speeding it up, and it falls at about 120 px a second,
-// 2 px a tick: slowly enough to stay in the camera for several seconds of slow screenshots, and fast
+// The box's Linear damping. Gravity soon stops speeding it up, and it falls at about 9.8 ÷ 8 = 1.2 m a
+// second, 120 px at 100 px per metre, 2 px a tick: slowly enough to stay in the camera for several seconds of slow screenshots, and fast
 // enough that one tick moves it on screen. One tick is about 1.4 px on screen at the camera's zoom.
-const LINEAR_DAMPING = '4';
+const LINEAR_DAMPING = '8';
 const ONE_TICK_MOST_PX = 2;
 // How far above the camera's middle the box starts, so it has the camera's height to fall through.
 const START_ABOVE_PX = 300;
@@ -82,7 +82,11 @@ async function drawFallingBox(page: Page) {
     const start = await boxStart(page);
     await page.getByRole('toolbar', { name: 'Tools' }).getByRole('button', { name: 'Shape' }).click();
     await page.getByRole('group', { name: 'Kinds menu' }).getByRole('button', { name: 'Rectangle' }).click();
+    // Ctrl turns grid snapping off, so the box is centred on the click: snapped, a 1 m box's edges land on
+    // the 1 m grid lines, putting its middle half a metre to one side.
+    await page.keyboard.down('ControlOrMeta');
     await page.mouse.click(start.x, start.y);
+    await page.keyboard.up('ControlOrMeta');
     await expect(card(page, 'ShapeComponent')).toHaveCount(1);
 
     await addComponent(page, 'BodyComponent');

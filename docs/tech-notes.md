@@ -66,7 +66,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 - **Split polygons ahead of time** for every `.entity` file, so spawning does no polygon splitting during a tick.
 - **Preload** every image an `.entity` file uses when Play starts, or spawned art pops in.
 - **Moving a Kinematic body along a path:** set its velocity to (next point minus position) divided by the tick length, don't teleport it, so contacts stay valid. Path sampling must use only arithmetic and square roots, so every computer gets the same result.
-- **Speed limit.** Box2D caps movement per step, about 6,000 px/s at 60 ticks per second and 50 px per metre. Setting ranges stay below this. **Not so in 3.2:** there is no fixed cap per step; the world's `maximumLinearSpeed` (400 m/s by default) holds speed, and the adapter sets it to 6,000 px/s (`box2dFacts.test.ts`).
+- **Speed limit.** Box2D caps movement per step, about 6,000 px/s at 60 ticks per second and 50 px per metre. Setting ranges stay below this. **Not so in 3.2:** there is no fixed cap per step; the world's `maximumLinearSpeed` (400 m/s by default) holds speed, and the adapter sets it to 6,000 px/s (`box2dFacts.test.ts`). *Since v4 task 33 the adapter sets 120 m/s whatever the scale, which is 6,000 px/s at 50 px per metre and 12,000 at the default 100.*
 - **Ground contacts.** A Box2D contact can exist without touching, so use its touching state. **Holds in 3.2**, and Box2D filters for it: a contact 1 px apart exists, but sends no begin event and isn't in `b2Body_GetContactData` (`box2dFacts.test.ts`).
 - **Order of custom events.** Define a stable delivery order, and whether an event fired inside a handler arrives in the same tick. The 32-step limit for trigger chains should cover events fired by scripts too.
 - **Jump feel.** The platformer defaults come from Celeste's published values (0.1 s of grace, 0.65 air control) scaled to 1080p, and from the idea of falling faster than rising.
@@ -75,7 +75,7 @@ Facts and warnings for the architecture work, collected from the old research. *
 
 **These notes were written against Box2D v2.4.1.** Stage 13 rechecked each one against Box2D 3.2 (`box2d3-wasm` 6.0.0), with a small test against the real build in `src/adapters/box2d/box2dFacts.test.ts` unless another test is named. Each note ends with what that showed. Stage 14 rechecked the joint notes the same way, in `src/adapters/box2d/box2dJointFacts.test.ts`.
 
-| Limit | Box2D value | At 50 px per metre |
+| Limit | Box2D value | At 50 px per metre (the fixed scale before v4; double the px at v4's default 100) |
 |---|---|---|
 | Moving shapes (advice, not checked) | 0.1 to 10 m | 5 to 500 px |
 | Static shapes "without trouble" (advice, not checked) | up to 50 m | 2,500 px |

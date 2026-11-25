@@ -63,7 +63,7 @@ test('the grid size and the zoom are typed in the debug box, and Ctrl+Z leaves t
     await openEditor(page);
     const grid = page.getByRole('textbox', { name: 'GRID' });
     const zoom = page.getByRole('textbox', { name: 'ZOOM' });
-    await expect(grid).toHaveValue('50');
+    await expect(grid).toHaveValue('100');
 
     await grid.click();
     await page.keyboard.press('ControlOrMeta+a');

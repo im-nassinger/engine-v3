@@ -103,13 +103,13 @@ describe('DebugBox', () => {
 
     test('shows the grid size, following a change and a new level', async () => {
         const { session } = showWithEditor(Level.createNew(), createElement(DebugBox));
-        await expect.poll(() => valueOf('GRID')).toBe('50');
+        await expect.poll(() => valueOf('GRID')).toBe('100');
 
         session.openLevel.level.editorData.setGridSize(25);
         await expect.poll(() => valueOf('GRID')).toBe('25');
 
         session.replaceOpenLevel(Level.createNew());
-        await expect.poll(() => valueOf('GRID')).toBe('50');
+        await expect.poll(() => valueOf('GRID')).toBe('100');
     });
 
     test('shows the zoom as a whole percentage', async () => {
@@ -122,7 +122,7 @@ describe('DebugBox', () => {
 
     test('typing a grid size and Enter sets it, with no undo step', async () => {
         const { session } = showWithEditor(Level.createNew(), createElement(DebugBox));
-        await expect.poll(() => valueOf('GRID')).toBe('50');
+        await expect.poll(() => valueOf('GRID')).toBe('100');
 
         await typeOver('GRID', '25{Enter}');
 
@@ -134,14 +134,14 @@ describe('DebugBox', () => {
 
     test('Esc keeps the old grid size, and text that is not a number says why', async () => {
         const { session } = showWithEditor(Level.createNew(), createElement(DebugBox));
-        await expect.poll(() => valueOf('GRID')).toBe('50');
+        await expect.poll(() => valueOf('GRID')).toBe('100');
 
         await typeOver('GRID', '25{Escape}');
-        await expect.poll(() => valueOf('GRID')).toBe('50');
+        await expect.poll(() => valueOf('GRID')).toBe('100');
 
         await typeOver('GRID', 'big{Enter}');
         await expect.poll(() => session.status.current).toBe('Type the grid size as a number of pixels');
-        expect(session.openLevel.level.editorData.gridSize).toBe(50);
+        expect(session.openLevel.level.editorData.gridSize).toBe(100);
         expect(session.openLevel.history.undoCount).toBe(0);
     });
 

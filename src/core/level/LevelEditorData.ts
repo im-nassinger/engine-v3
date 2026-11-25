@@ -1,7 +1,7 @@
 import { VersionCounter } from '../events/index.ts';
 import type { EntityId } from '../fields/index.ts';
 
-const DEFAULT_GRID_SIZE = 50;
+const DEFAULT_GRID_SIZE = 100;
 const MIN_GRID_SIZE = 5;
 const MAX_GRID_SIZE = 1000;
 

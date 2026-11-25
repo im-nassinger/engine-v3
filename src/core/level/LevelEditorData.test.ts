@@ -3,10 +3,10 @@ import { describe, expect, test } from 'vitest';
 import { LevelEditorData } from './LevelEditorData.ts';
 
 describe('LevelEditorData', () => {
-    test('starts with a 50 px grid and nothing folded', () => {
+    test('starts with a 100 px grid, 1 m at the default scale, and nothing folded', () => {
         const editorData = new LevelEditorData();
 
-        expect(editorData.gridSize).toBe(50);
+        expect(editorData.gridSize).toBe(100);
         expect(editorData.foldedRows()).toEqual([]);
     });
 
@@ -36,7 +36,7 @@ describe('LevelEditorData', () => {
         const editorData = new LevelEditorData();
         const before = editorData.version.version;
 
-        editorData.setGridSize(50);
+        editorData.setGridSize(100);
         editorData.setFolded(3, false);
         expect(editorData.version.version).toBe(before);
 
