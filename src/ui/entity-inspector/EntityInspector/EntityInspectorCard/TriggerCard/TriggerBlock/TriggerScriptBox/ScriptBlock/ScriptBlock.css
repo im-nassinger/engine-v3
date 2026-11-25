@@ -58,6 +58,12 @@
         display: none;
     }
 
+    /* A block with nothing under it shows its tooth while the slot under it is open (SlotMotion). */
+    &[data-end='true'][data-open='true']::after,
+    &[data-end='true'][data-open='true'] > .tooth {
+        display: block;
+    }
+
     > .icon {
         flex: none;
         color: var(--block-text);
@@ -111,6 +117,11 @@
        them. */
     &[data-last='true'] {
         padding-bottom: 15px;
+    }
+
+    /* With the slot under it open, the If's bottom bar draws over that slot instead. */
+    &[data-last='true'][data-open='true'] {
+        padding-bottom: 13px;
     }
 
     /* The cursor says what the hovered band does (owner, 2026-11-24): up over a band that opens the slot

@@ -1,5 +1,6 @@
 /* The script scrolls sideways instead of wrapping: blocks fill a stack as wide as its longest line, and at
-   least as wide as the card. Its own scrollbars and fades are task 25's. */
+   least as wide as the card. Its own scrollbars and fades are task 25's.
+   An "add a block" slot opens and closes as SlotMotion moves it. */
 .trigger-script-box {
     position: relative;
     /* The blocks' stacking numbers (up to the arm's 1001) stay inside the script, under the editor's menus,
@@ -18,7 +19,10 @@
         z-index: 1002 !important;
     }
 
+    /* SlotMotion fixes its height while a slot is open, and grows the empty strips (.room) above or below the
+       blocks where it can't scroll far enough. */
     > .script {
+        box-sizing: border-box;
         overflow: auto;
         overflow-anchor: none;
         padding-bottom: 6px;

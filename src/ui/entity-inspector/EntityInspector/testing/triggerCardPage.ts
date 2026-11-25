@@ -56,9 +56,22 @@ export function scriptBlocks(blockIndex = 0) {
     return [...requireBlock(blockIndex).querySelectorAll<HTMLElement>('.script-block')];
 }
 
-// The open "add a block" slot of a gap, if any.
+// The "add a block" slot of a gap while it shows (opening, open or closing), if it does.
 export function slotAt(gap: number, blockIndex = 0) {
-    return requireBlock(blockIndex).querySelector<HTMLElement>(`.script-slot[data-gap="${gap}"]`);
+    return requireBlock(blockIndex).querySelector<HTMLElement>(`.script-slot[data-gap="${gap}"][data-shown="true"]`);
+}
+
+// Every slot that shows.
+export function shownSlots(blockIndex = 0) {
+    return [...requireBlock(blockIndex).querySelectorAll<HTMLElement>('.script-slot[data-shown="true"]')];
+}
+
+// The button a shown slot's menu opens from.
+export function slotButton(gap: number, blockIndex = 0) {
+    const slot = slotAt(gap, blockIndex);
+    if (slot === null) throw new Error(`The slot of gap ${gap} doesn't show.`);
+
+    return requireElement<HTMLElement>(slot, '.body');
 }
 
 // The block whose top or bottom third opens a gap's slot.

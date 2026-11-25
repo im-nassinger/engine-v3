@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import type { ReactNode } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { PointerEvent, ReactNode } from 'react';
 import type {
     ScriptBlock as ScriptBlockModel,
     TriggerScript,
@@ -8,6 +8,7 @@ import type { OpenLevel } from '../../../../../../../editor/session/index.ts';
 import type { CommitTriggerEdit } from '../../CommitTriggerEdit.ts';
 import { ScriptBlock } from './ScriptBlock/index.ts';
 import { ScriptSlot } from './ScriptSlot/index.ts';
+import { SlotMotion } from './slot-motion/SlotMotion.ts';
 import './TriggerScriptBox.css';
 
 export type TriggerScriptBoxProps = {
@@ -23,13 +24,21 @@ const TOP_Z = 990;
 const INSIDE_IF_Z = 900;
 const IF_BAR_Z = 1000;
 
-// A trigger's script: the event block, then the actions, inside the If's C when it has checks. An "add a
-// block" slot opens at a gap when the mouse is on the top or bottom third of a block next to it, and stays
-// open while its menu is. The timing, the motion and the scroll that keeps the hovered block still are task
-// 24's (docs/versions/v4/tasks.md); here a slot opens and closes at once.
+// The boxes a value box opens float over the card but sit inside the script (ScriptBlock).
+const FLOATING_BOXES = '.menu, .entity-picker, .trigger-word-field';
+
+// A trigger's script: the event block, then the actions, inside the If's C when it has checks. Every gap has
+// an "add a block" slot, hidden until the mouse asks for it from the top or bottom third of a block next to
+// it; SlotMotion opens and closes it, and keeps the hovered block still. A slot stays open while its menu is.
 export function TriggerScriptBox({ openLevel, script, triggerIndex, commit }: TriggerScriptBoxProps) {
-    const [hoveredGap, setHoveredGap] = useState<number | undefined>(undefined);
     const [menuGap, setMenuGap] = useState<number | undefined>(undefined);
+    const [motion] = useState(() => new SlotMotion());
+    const scriptRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        motion.attach(scriptRef.current);
+        return () => motion.dispose();
+    }, [motion]);
 
     const [eventBlock] = script.blocks;
     const ifTop = script.blocks.find((block) => block.shape === 'ifTop');
@@ -37,33 +46,41 @@ export function TriggerScriptBox({ openLevel, script, triggerIndex, commit }: Tr
     const actions = script.blocks.filter((block) => block.shape === 'action');
     if (eventBlock === undefined) return null;
 
-    const isGapOpen = (gap: number) => gap === hoveredGap || gap === menuGap;
-    const blockProps = { openLevel, triggerIndex, commit, onHoverGap: setHoveredGap };
+    const onHover = (gap: number | undefined, hovered: Element) => motion.hover(gap, hovered);
+    const blockProps = { openLevel, triggerIndex, commit, onHover };
     const stepsProps = {
         ...blockProps,
         actions,
         gapCount: script.gaps.length,
-        isGapOpen,
         isInsideIf: ifTop !== undefined,
         firstZ: ifTop === undefined ? TOP_Z - 1 : INSIDE_IF_Z,
+        onAdd: () => motion.added(),
         stepOf: (gap: number) => ({
             gap: script.gaps[gap],
             isMenuOpen: menuGap === gap,
             onMenuOpen: (isOpen: boolean) => {
-                setMenuGap(isOpen ? gap : undefined);
-                // The added block takes the slot's place; the gap hovered before it now lies above the new
-                // block, and a slot left open there would jump the block away when the mouse next moves.
-                if (!isOpen) {
-                    setHoveredGap(undefined);
-                }
+                const heldGap = isOpen ? gap : undefined;
+                setMenuGap(heldGap);
+                motion.holdOpen(heldGap);
             },
         }),
     };
-    const eventIsEnd = ifTop === undefined && actions.length === 0 && !isGapOpen(0);
+    const eventIsEnd = ifTop === undefined && actions.length === 0;
+
+    // Over the script's empty space or the If's arm, no slot is asked for; the arm is kept still.
+    const hoverScript = (event: PointerEvent<HTMLDivElement>) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        if (target.closest(`.script-block, .script-slot, ${FLOATING_BOXES}`) !== null) return;
+
+        const arm = target.closest('.arm');
+        motion.hover(undefined, arm);
+    };
 
     return (
-        <div className="trigger-script-box">
-            <div className="script" onPointerLeave={() => setHoveredGap(undefined)}>
+        <div className="trigger-script-box" onPointerMove={hoverScript} onPointerLeave={() => motion.leave()}>
+            <div className="script" ref={scriptRef}>
+                <div className="room" />
                 <div className="stack">
                     <ScriptBlock block={eventBlock} zIndex={TOP_Z} isEnd={eventIsEnd} isLast={false} {...blockProps} />
                     {ifTop === undefined && <ScriptSteps {...stepsProps} />}
@@ -73,6 +90,7 @@ export function TriggerScriptBox({ openLevel, script, triggerIndex, commit }: Tr
                         </ScriptIf>
                     )}
                 </div>
+                <div className="room" />
             </div>
         </div>
     );
@@ -82,7 +100,7 @@ type BlockProps = {
     openLevel: OpenLevel;
     triggerIndex: number;
     commit: CommitTriggerEdit;
-    onHoverGap: (gap: number | undefined) => void;
+    onHover: (gap: number | undefined, hovered: Element) => void;
 };
 
 type ScriptIfProps = BlockProps & {
@@ -98,7 +116,7 @@ function ScriptIf({ ifTop, ifBottom, children, ...blockProps }: ScriptIfProps) {
         <div className="script-if" style={{ zIndex: TOP_Z - 1 }}>
             <ScriptBlock block={ifTop} zIndex={IF_BAR_Z} isEnd={false} isLast={false} {...blockProps} />
             <div className="middle">
-                <div className="arm" onPointerMove={() => blockProps.onHoverGap(undefined)} />
+                <div className="arm" />
                 <div className="inner">{children}</div>
             </div>
             <ScriptBlock block={ifBottom} zIndex={IF_BAR_Z} isEnd={true} isLast={false} {...blockProps} />
@@ -115,14 +133,14 @@ type StepOf = (gap: number) => {
 type ScriptStepsProps = BlockProps & {
     actions: readonly ScriptBlockModel[];
     gapCount: number;
-    isGapOpen: (gap: number) => boolean;
     isInsideIf: boolean;
     firstZ: number;
+    onAdd: () => void;
     stepOf: StepOf;
 };
 
 // The actions top to bottom, each after the slot of the gap above it, then the last gap's slot.
-function ScriptSteps({ actions, gapCount, isGapOpen, isInsideIf, firstZ, stepOf, ...blockProps }: ScriptStepsProps) {
+function ScriptSteps({ actions, gapCount, isInsideIf, firstZ, stepOf, onAdd, ...blockProps }: ScriptStepsProps) {
     const gaps = Array.from({ length: gapCount }, (_unused, gap) => gap);
     const lastGap = gapCount - 1;
 
@@ -131,20 +149,20 @@ function ScriptSteps({ actions, gapCount, isGapOpen, isInsideIf, firstZ, stepOf,
         const slotZ = firstZ - 2 * gap;
         const isLastAction = gap === lastGap - 1;
         const step = stepOf(gap);
-        const isSlotShown = isGapOpen(gap) && step.gap !== undefined;
         const slotIsLast = gap === lastGap;
 
         return (
             <ScriptStep
                 key={gap}
                 action={action}
-                slot={isSlotShown ? step.gap : undefined}
+                slot={step.gap}
                 slotIsLast={slotIsLast}
                 slotZ={slotZ}
                 isMenuOpen={step.isMenuOpen}
                 onMenuOpen={step.onMenuOpen}
-                actionIsEnd={isLastAction && !isGapOpen(lastGap)}
-                actionIsLast={isLastAction && isInsideIf && !isGapOpen(lastGap)}
+                onAdd={onAdd}
+                actionIsEnd={isLastAction}
+                actionIsLast={isLastAction && isInsideIf}
                 slotPadsIf={slotIsLast && isInsideIf}
                 isInsideIf={isInsideIf}
                 {...blockProps}
@@ -160,6 +178,7 @@ type ScriptStepProps = BlockProps & {
     slotZ: number;
     isMenuOpen: boolean;
     onMenuOpen: (isOpen: boolean) => void;
+    onAdd: () => void;
     actionIsEnd: boolean;
     actionIsLast: boolean;
     slotPadsIf: boolean;
@@ -167,9 +186,9 @@ type ScriptStepProps = BlockProps & {
 };
 
 function ScriptStep(props: ScriptStepProps) {
-    const { action, slot, slotIsLast, slotZ, isMenuOpen, onMenuOpen, ...rest } = props;
+    const { action, slot, slotIsLast, slotZ, isMenuOpen, onMenuOpen, onAdd, ...rest } = props;
     const { actionIsEnd, actionIsLast, slotPadsIf, isInsideIf, ...blockProps } = rest;
-    const { triggerIndex, commit } = blockProps;
+    const { triggerIndex, commit, onHover } = blockProps;
 
     return (
         <>
@@ -182,6 +201,8 @@ function ScriptStep(props: ScriptStepProps) {
                     isInsideIf={isInsideIf}
                     isMenuOpen={isMenuOpen}
                     onMenuOpen={onMenuOpen}
+                    onHover={onHover}
+                    onAdd={onAdd}
                     triggerIndex={triggerIndex}
                     commit={commit}
                 />

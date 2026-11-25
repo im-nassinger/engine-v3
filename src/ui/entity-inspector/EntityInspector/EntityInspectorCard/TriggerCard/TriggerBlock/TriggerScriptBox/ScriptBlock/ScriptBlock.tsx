@@ -24,8 +24,8 @@ export type ScriptBlockProps = {
     isEnd: boolean;
     // The last block inside the If, whose bottom bar covers 2 px more of it.
     isLast: boolean;
-    // The gap the mouse asks to open, undefined for none.
-    onHoverGap: (gap: number | undefined) => void;
+    // The mouse is on the block, asking for a gap's slot (undefined for none).
+    onHover: (gap: number | undefined, block: Element) => void;
 };
 
 type Band = 'top' | 'middle' | 'bottom';
@@ -41,7 +41,7 @@ const FLOATING_BOXES = '.menu, .entity-picker, .trigger-word-field';
 // of the trigger's background, then its icon and words, each value box opening fix 2's picker or box. Its top
 // third asks for the slot above it, its bottom third the slot below, its middle third (and any value box)
 // none; the cursor says which. On the middle band a removable part shows its ×.
-export function ScriptBlock({ block, zIndex, isEnd, isLast, onHoverGap, ...wordProps }: ScriptBlockProps) {
+export function ScriptBlock({ block, zIndex, isEnd, isLast, onHover, ...wordProps }: ScriptBlockProps) {
     const [band, setBand] = useState<Band | undefined>(undefined);
     const icon = block.icon === undefined ? undefined : SCRIPT_ICONS[block.icon];
 
@@ -49,7 +49,8 @@ export function ScriptBlock({ block, zIndex, isEnd, isLast, onHoverGap, ...wordP
         if (isOnFloatingBox(event)) return;
         const hovered = bandAt(event, block);
         setBand(hovered);
-        onHoverGap(gapOf(hovered, block));
+        const gap = gapOf(hovered, block);
+        onHover(gap, event.currentTarget);
     };
 
     return (

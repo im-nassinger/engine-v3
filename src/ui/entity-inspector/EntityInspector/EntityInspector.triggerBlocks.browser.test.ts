@@ -20,10 +20,11 @@ import {
     menuRowNamed,
     menuRows,
     parts,
-    requireBlock,
     scriptBlocks,
     sentences,
+    shownSlots,
     slotAt,
+    slotButton,
     word,
 } from './testing/triggerCardPage.ts';
 
@@ -218,17 +219,16 @@ describe('the trigger card as Scratch blocks', () => {
         await hoverBand(position, 'bottom');
         await expect.poll(() => slotAt(2, 1)).not.toBeNull();
         expect(getComputedStyle(position).cursor).toBe('s-resize');
-        expect(requireBlock(1).querySelectorAll('.script-slot')).toHaveLength(1);
+        expect(shownSlots(1)).toHaveLength(1);
 
         await hoverBand(position, 'middle');
         await expect.poll(() => slotAt(2, 1)).toBeNull();
         expect(getComputedStyle(position).cursor).toBe('auto');
 
-        // The slot opening above pushes the block down from under the mouse until task 24 keeps it still, so
-        // its up-arrow cursor isn't checked here.
         await hoverBand(position, 'top');
         await expect.poll(() => slotAt(1, 1)).not.toBeNull();
-        expect(slotAt(2, 1)).toBeNull();
+        expect(getComputedStyle(position).cursor).toBe('n-resize');
+        await expect.poll(() => slotAt(2, 1)).toBeNull();
     });
 
     test("the mouse on a value box's menu opens no slot under it", async () => {
@@ -240,7 +240,7 @@ describe('the trigger card as Scratch blocks', () => {
         await userEvent.hover(menuRowNamed('on') as HTMLElement);
         await new Promise(requestAnimationFrame);
 
-        expect(requireBlock(1).querySelectorAll('.script-slot')).toHaveLength(0);
+        expect(shownSlots(1)).toHaveLength(0);
         expect(menuRowNamed('on')?.isConnected).toBe(true);
     });
 
@@ -251,7 +251,7 @@ describe('the trigger card as Scratch blocks', () => {
         await hoverBand(blockBeside(1, 'above', 1), 'bottom');
         await expect.poll(() => slotAt(1, 1)).not.toBeNull();
         expect(slotAt(1, 1)?.textContent).toBe('add a block');
-        click(slotAt(1, 1) as HTMLElement);
+        click(slotButton(1, 1));
         await expect.poll(() => menuRowNamed('win')).toBeDefined();
         menuRowNamed('win')?.click();
 
@@ -268,11 +268,11 @@ describe('the trigger card as Scratch blocks', () => {
 
         await hoverBand(blockBeside(1, 'above', 1), 'bottom');
         await expect.poll(() => slotAt(1, 1)).not.toBeNull();
-        click(slotAt(1, 1) as HTMLElement);
+        click(slotButton(1, 1));
         await expect.poll(() => menuRowNamed('win')).toBeDefined();
         menuRowNamed('win')?.click();
 
         await expect.poll(() => scriptBlocks(1).length).toBe(5);
-        expect(requireBlock(1).querySelectorAll('.script-slot')).toHaveLength(0);
+        expect(shownSlots(1)).toHaveLength(0);
     });
 });

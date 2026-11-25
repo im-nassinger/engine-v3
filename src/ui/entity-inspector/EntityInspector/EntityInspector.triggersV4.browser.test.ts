@@ -22,6 +22,7 @@ import {
     blocks,
     lastGap,
     slotAt,
+    slotButton,
     menuRowNamed,
     menuRows,
     parts,
@@ -48,7 +49,7 @@ async function hoverBand(block: HTMLElement, band: 'top' | 'middle' | 'bottom') 
 async function addBlock(label: string, gap = lastGap()) {
     await hoverBand(blockBeside(gap, 'above'), 'bottom');
     await expect.poll(() => slotAt(gap)).not.toBeNull();
-    click(slotAt(gap) as HTMLElement);
+    click(slotButton(gap));
     await expect.poll(() => menuRowNamed(label)).toBeDefined();
     menuRowNamed(label)?.click();
     await expect.poll(() => menuRows().length).toBe(0);

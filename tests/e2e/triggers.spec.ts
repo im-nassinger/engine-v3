@@ -132,7 +132,7 @@ async function openLastSlot(block: Locator) {
     const lastGap = Math.max(...gaps);
     // With an If, the event block and the If's top both open gap 0; the If's top is the one just above it.
     const above = block.locator(`.script-block[data-gap-below="${lastGap}"]`).last();
-    const slot = block.locator(`.script-slot[data-gap="${lastGap}"]`);
+    const slot = block.locator(`.script-slot[data-gap="${lastGap}"][data-shown="true"]`);
     await expect(async () => {
         await above.scrollIntoViewIfNeeded({ timeout: SLOT_TRY_MS });
         const box = await above.boundingBox();
@@ -147,7 +147,7 @@ async function openLastSlot(block: Locator) {
 // Opens the last gap's "add a block" slot from the bottom third of the block above it, and picks a block.
 async function addBlock(page: Page, label: string) {
     await openLastSlot(triggerBlock(page));
-    await pick(page, triggerBlock(page).locator('.script-slot'), label);
+    await pick(page, triggerBlock(page).locator('.script-slot[data-shown="true"] > .body'), label);
 }
 
 // Each row's words joined by spaces, as the card reads: its text runs them together.
