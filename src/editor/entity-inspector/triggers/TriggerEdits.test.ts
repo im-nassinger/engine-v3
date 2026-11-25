@@ -95,6 +95,25 @@ describe('TriggerEdits', () => {
         expect(actionEdit.triggers[0]?.actions).toEqual([{ kind: 'win' }]);
     });
 
+    test("a slot's add menu puts an action in at its gap, and a check with the If's others, each labelled", () => {
+        const actions = [{ kind: 'win' }, { kind: 'lose' }] as const;
+        const { component, block } = buildCard([{ actions }]);
+        const middleGap = block().script.gaps[1];
+        if (middleGap === undefined) throw new Error('No gap 1.');
+        const choices = middleGap.addMenu.groups.flatMap((group) => group.choices);
+
+        const actionEdit = TriggerEdits.inserted(component, 0, requireChoice(choices, 'restart the level').value);
+        const checkEdit = TriggerEdits.inserted(component, 0, requireChoice(choices, 'if … (a value)').value);
+
+        expect(actionEdit.label).toBe('Add action to trigger "Touched"');
+        expect(actionEdit.triggers[0]?.actions).toEqual([{ kind: 'win' }, { kind: 'restart' }, { kind: 'lose' }]);
+        expect(checkEdit.label).toBe('Add check to trigger "Touched"');
+        expect(checkEdit.triggers[0]?.checks).toEqual([
+            { kind: 'value', target: { kind: 'other' }, value: null, compare: 'is', amount: null },
+        ]);
+        expect(checkEdit.triggers[0]?.actions).toEqual(actions);
+    });
+
     test("an action's own word turns it into another kind, keeping its target", () => {
         const { component, block } = buildCard([{ actions: [{ kind: 'destroy', target: { kind: 'other' } }] }]);
         const choice = choiceOf(block(), 2, 'action', 'fire a custom event');

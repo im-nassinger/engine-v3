@@ -1,0 +1,50 @@
+import {
+    CircleDashed,
+    Equal,
+    Flag,
+    Hand,
+    Hourglass,
+    Keyboard,
+    Minus,
+    Move,
+    Plus,
+    Power,
+    PowerOff,
+    Radio,
+    RotateCcw,
+    Send,
+    Skull,
+    Split,
+    Timer,
+    Trash2,
+    Trophy,
+    Variable,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import type { ScriptIcon } from '../../../../../../../../editor/entity-inspector/index.ts';
+
+// The drawing of each block's icon. The mockup's own: hand for a touch, radio for a custom event, split for
+// the If, move, power and power-off for a Set, plus, trash and hourglass; the rest are Claude's (standing yes,
+// 2026-11-24, docs/decisions.md).
+export const SCRIPT_ICONS: Record<ScriptIcon, LucideIcon> = {
+    noEvent: CircleDashed,
+    touch: Hand,
+    press: Keyboard,
+    timer: Timer,
+    levelStart: Flag,
+    variable: Variable,
+    customEvent: Radio,
+    if: Split,
+    set: Equal,
+    move: Move,
+    power: Power,
+    powerOff: PowerOff,
+    add: Plus,
+    subtract: Minus,
+    destroy: Trash2,
+    fire: Send,
+    win: Trophy,
+    lose: Skull,
+    restart: RotateCcw,
+    wait: Hourglass,
+};

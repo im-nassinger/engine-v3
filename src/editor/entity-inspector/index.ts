@@ -27,6 +27,7 @@ export type {
     ValueInputResult,
 } from './typing/ValueInput.ts';
 export { TriggerCardModel } from './triggers/TriggerCardModel.ts';
+export { VALUE_SEPARATOR } from './triggers/valueNames.ts';
 export type { TriggerAddRow, TriggerBlock, TriggerRow, TriggerSection } from './triggers/TriggerCardModel.ts';
 export type {
     ScriptBlock,

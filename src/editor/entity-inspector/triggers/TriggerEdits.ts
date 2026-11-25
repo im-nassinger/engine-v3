@@ -52,6 +52,26 @@ export class TriggerEdits {
         return replaced(component, triggerIndex, changed, label);
     }
 
+    // An item of a slot's add menu (v4 fix 4): an action goes in at the slot's gap, before the action now
+    // there; a check joins the If's, which wraps every action whatever the gap.
+    static inserted(component: TriggerComponent, triggerIndex: number, value: TriggerPartValue) {
+        const trigger = triggerAt(component, triggerIndex);
+        const name = triggerName(trigger);
+
+        if (value.section === 'action') {
+            const actions = withItemBefore(trigger.actions, value.index, value.action);
+            const changed = { ...trigger, actions };
+            return replaced(component, triggerIndex, changed, `Add action to trigger "${name}"`);
+        }
+        if (value.section === 'check') {
+            const checks = [...trigger.checks, value.check];
+            const changed = { ...trigger, checks };
+            return replaced(component, triggerIndex, changed, `Add check to trigger "${name}"`);
+        }
+
+        return TriggerEdits.picked(component, triggerIndex, value);
+    }
+
     // A menu item that asks for a value first, such as "becomes … or more" or "New name…": the pick and the
     // typed value are one step. Undefined when the value doesn't fit the word.
     static pickedAndTyped(
@@ -193,6 +213,15 @@ function withPart(trigger: Trigger, value: TriggerPartValue): Trigger {
             return { ...trigger, actions };
         }
     }
+}
+
+function withItemBefore<T>(items: readonly T[], index: number, item: T) {
+    if (index < 0 || index > items.length) throw new Error(`No place ${index} in a list of ${items.length}.`);
+
+    const changed = [...items];
+    changed.splice(index, 0, item);
+
+    return changed;
 }
 
 // The item in place, or added at the end when the index is just past it.

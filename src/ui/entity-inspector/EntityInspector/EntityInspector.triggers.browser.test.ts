@@ -18,16 +18,20 @@ import {
     showEntityInspector,
 } from './testing/entityInspectorPage.ts';
 import {
-    addRow,
+    bandPoint,
+    blockBeside,
     blockName,
     blocks,
+    lastGap,
     menuRowNamed,
     menuRows,
-    pickerRowNamed,
     notesOf,
+    parts,
+    pickerRowNamed,
     requireBlock,
-    section,
+    scriptBlocks,
     sentences,
+    slotAt,
     triggersCard,
     word,
 } from './testing/triggerCardPage.ts';
@@ -42,6 +46,20 @@ beforeEach(async () => {
 afterEach(() => {
     closeEntityInspectorPage();
 });
+
+async function hoverBand(block: HTMLElement, band: 'top' | 'middle' | 'bottom') {
+    await userEvent.hover(block, bandPoint(block, band));
+}
+
+// Opens a gap's slot from the block above it, and picks an item of its add menu.
+async function addBlock(label: string, gap = lastGap()) {
+    await hoverBand(blockBeside(gap, 'above'), 'bottom');
+    await expect.poll(() => slotAt(gap)).not.toBeNull();
+    click(slotAt(gap) as HTMLElement);
+    await expect.poll(() => menuRowNamed(label)).toBeDefined();
+    menuRowNamed(label)?.click();
+    await expect.poll(() => menuRows().length).toBe(0);
+}
 
 // A Player tagged `player`, and a bare Button for the triggers.
 function buildLevel() {
@@ -115,13 +133,13 @@ describe('the trigger card', () => {
         await expect.poll(() => blocks().length).toBe(1);
         expect(history(session).undoLabel).toBe('Add trigger');
         expect(word('When', 'pick an event').dataset['state']).toBe('unset');
-        expect(addRow('Add action').dataset['needed']).toBe('true');
+        expect(scriptBlocks().map((block) => block.dataset['shape'])).toEqual(['event']);
 
         await pickFromMenu(word('When', 'pick an event'), 'something starts or stops touching this');
-        await expect.poll(() => sentences('When')).toEqual(['something starts touching this']);
+        await expect.poll(() => sentences('When')).toEqual(['when other starts touching this']);
         expect(blockName()).toBe('Touched');
 
-        await pickFromMenu(addRow('Add check'), 'a value');
+        await addBlock('if … (a value)');
         await expect.poll(() => sentences('If')).toEqual(['other pick a value']);
         expect(history(session).undoLabel).toBe('Add check to trigger "Touched"');
         click(word('If', 'pick a value'));
@@ -130,17 +148,13 @@ describe('the trigger card', () => {
         await expect.poll(() => menuRows().filter((row) => row.textContent.includes('Tags')).length).toBe(2);
         menuRows().at(-1)?.click();
         await expect.poll(() => sentences('If')).toEqual(['other has the tag pick a tag']);
-        expect(section('If').querySelector('.hint')?.textContent).toBe('all must be true');
         await pickFromMenu(word('If', 'pick a tag'), 'player');
         await expect.poll(() => sentences('If')).toEqual(['other has the tag player']);
 
-        await pickFromMenu(addRow('Add action'), 'win');
+        await addBlock('win');
         await expect.poll(() => sentences('Do')).toEqual(['win']);
-        expect(addRow('Add action').dataset['needed']).toBe('false');
-        const titles = [...document.querySelectorAll<HTMLElement>('.trigger-block .trigger-section')].map(
-            (shown) => shown.dataset['section'],
-        );
-        expect(titles).toEqual(['When', 'If', 'Do']);
+        const shapes = scriptBlocks().map((block) => block.dataset['shape']);
+        expect(shapes).toEqual(['event', 'ifTop', 'action', 'ifBottom']);
 
         frames.runFrame();
         await expect.poll(() => notesOf()).toEqual([]);
@@ -201,29 +215,48 @@ describe('the trigger card', () => {
         await userEvent.clear(input);
         await userEvent.type(input, '2.5{Enter}');
 
-        await expect.poll(() => sentences('When')).toEqual(['after 2.5 seconds']);
+        await expect.poll(() => sentences('When')).toEqual(['when after 2.5 seconds']);
         expect(triggersOf(button)[0]?.when).toEqual({ kind: 'after', seconds: 2.5 });
         expect(history(session).undoCount).toBe(1);
         expect(document.querySelector('.trigger-word-field')).toBeNull();
     });
 
-    test('× on a check or an action removes it as one step', async () => {
+    test("× on a block's middle third removes its action as one step, and the When has none", async () => {
         const { level, button } = buildLevel();
         withTriggers(button, [{ actions: [{ kind: 'win' }, { kind: 'lose' }] }]);
         const { session } = await showEntity(level, button);
         await expect.poll(() => sentences('Do')).toEqual(['win', 'lose']);
-        expect(section('Do').querySelector('.hint')?.textContent).toBe('top to bottom');
-        expect(section('When').querySelector('.remove')).toBeNull();
+        expect(parts('When')[0]?.querySelector('.remove')).toBeNull();
 
-        const removeWin = requireElement<HTMLElement>(section('Do'), 'button[aria-label="Remove win"]');
+        const winBlock = scriptBlocks()[1] as HTMLElement;
+        const removeWin = requireElement<HTMLElement>(winBlock, 'button[aria-label="Remove win"]');
         expect(getComputedStyle(removeWin).visibility).toBe('hidden');
+        await hoverBand(winBlock, 'bottom');
+        expect(getComputedStyle(removeWin).visibility).toBe('hidden');
+        await hoverBand(winBlock, 'middle');
+        await expect.poll(() => getComputedStyle(removeWin).visibility).toBe('visible');
         click(removeWin);
 
         await expect.poll(() => sentences('Do')).toEqual(['lose']);
         expect(history(session).undoLabel).toBe('Remove action from trigger "Touched"');
     });
 
-    test('the switch turns a trigger off and fades its sections', async () => {
+    test("× on a check removes it, and the If's C goes with the last one", async () => {
+        const { level, button } = buildLevel();
+        withTriggers(button, [{ checks: [PLAYER_TAG_CHECK], actions: [{ kind: 'win' }] }]);
+        const { session } = await showEntity(level, button);
+        await expect.poll(() => sentences('If')).toEqual(['other has the tag player']);
+
+        const ifTop = requireElement<HTMLElement>(requireBlock(), '.script-block[data-shape="ifTop"]');
+        await hoverBand(ifTop, 'middle');
+        click(requireElement(ifTop, 'button[aria-label="Remove other has the tag player"]'));
+
+        await expect.poll(() => sentences('If')).toEqual([]);
+        expect(scriptBlocks().map((block) => block.dataset['shape'])).toEqual(['event', 'action']);
+        expect(history(session).undoLabel).toBe('Remove check from trigger "Touched"');
+    });
+
+    test('the switch turns a trigger off and fades its script', async () => {
         const { level, button } = buildLevel();
         withTriggers(button, [{ actions: [{ kind: 'win' }] }]);
         const { session } = await showEntity(level, button);
@@ -234,7 +267,7 @@ describe('the trigger card', () => {
         await expect.poll(() => requireBlock().dataset['on']).toBe('false');
         expect(triggersOf(button)[0]?.on).toBe(false);
         expect(history(session).undoLabel).toBe('Switch off trigger "Touched"');
-        expect(getComputedStyle(section('When')).opacity).toBe('0.45');
+        expect(getComputedStyle(requireElement(requireBlock(), '.trigger-script-box')).opacity).toBe('0.45');
     });
 
     test('the … menu renames, duplicates and deletes, each one step', async () => {

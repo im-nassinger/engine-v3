@@ -1,0 +1,81 @@
+/* Shaped like a block (ScriptBlock.css), in the panel's grey with muted words. */
+.script-slot {
+    --block: var(--block-slot);
+    --corner: 4px;
+    --corner-left: var(--corner);
+
+    position: relative;
+    isolation: isolate;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 40px;
+    padding: 9px 10px 13px;
+    margin-bottom: -6px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    line-height: 22px;
+    white-space: nowrap;
+    text-align: left;
+    cursor: pointer;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0 0 6px;
+        z-index: -2;
+        border-radius: var(--corner-left) var(--corner) var(--corner) var(--corner-left);
+        background: var(--block);
+        box-shadow: 0 0 0 2px var(--block-gap);
+    }
+
+    &::after,
+    > .tooth {
+        content: '';
+        position: absolute;
+        top: calc(100% - 7px);
+        left: 14px;
+        z-index: -1;
+        width: 20px;
+        height: 7px;
+        border-radius: 0 0 3px 3px;
+        background: var(--block);
+    }
+
+    > .tooth {
+        z-index: -3;
+        box-shadow: 0 0 0 2px var(--block-gap);
+    }
+
+    &[data-end='true']::after,
+    &[data-end='true'] > .tooth {
+        display: none;
+    }
+
+    &[data-inside-if='true'] {
+        --corner-left: 0px;
+    }
+
+    &[data-last='true'] {
+        padding-bottom: 15px;
+    }
+
+    &:hover,
+    &[aria-expanded='true'] {
+        --block: var(--block-slot-hover);
+
+        color: var(--text);
+    }
+
+    &:focus-visible {
+        outline: 1px solid var(--accent);
+        outline-offset: -1px;
+    }
+
+    > .icon {
+        flex: none;
+    }
+}

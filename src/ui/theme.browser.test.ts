@@ -37,7 +37,7 @@ const WIDTHS: readonly (readonly [string, string])[] = [
     ['--island-gap', '10px'],
     ['--island-bar', '48px'],
     ['--tool', '34px'],
-    ['--entity-inspector', '300px'],
+    ['--entity-inspector', '344px'],
     ['--entities-viewer', '260px'],
     ['--minimap', '180px'],
     ['--minimap-height', '93px'],

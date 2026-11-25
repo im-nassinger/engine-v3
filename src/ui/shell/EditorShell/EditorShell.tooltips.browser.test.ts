@@ -97,11 +97,14 @@ function iconButtons() {
     });
 }
 
-// A trigger's × shows only while the mouse is over its sentence.
+const BLOCK_TOOTH_PX = 6;
+
+// A trigger block's × shows only while the mouse is on the block's middle third.
 async function bringIntoView(button: HTMLButtonElement) {
-    const sentence = button.closest<HTMLElement>('.trigger-sentence-row');
-    if (sentence !== null) {
-        await userEvent.hover(sentence);
+    const block = button.closest<HTMLElement>('.script-block');
+    if (block !== null) {
+        const middle = (block.getBoundingClientRect().height - BLOCK_TOOTH_PX) / 2;
+        await userEvent.hover(block, { position: { x: 3, y: middle } });
     }
 }
 

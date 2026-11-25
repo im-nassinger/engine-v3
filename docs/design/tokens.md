@@ -36,6 +36,19 @@ Slate islands and one bright blue accent (owner, 2026-11-17). **There is no line
 | `--stop-ring` | `#ffffff` | The white ring around a colour stop's swatch |
 | `--scrollbar` | `rgba(255,255,255,.14)` | A scrollbar's thumb, on no track, in every list that scrolls (owner's fix, 2026-11-21) |
 | `--scrollbar-hover` | `rgba(255,255,255,.24)` | The thumb under the mouse, where the browser allows it (not Firefox) |
+| `--block-event` | `#b88133` | A trigger's event block (v4 fix 4, owner's tone, 2026-11-24) |
+| `--block-if` | `#2f897e` | The If's C, and Fire, Win, Lose and Restart blocks |
+| `--block-set` | `#3d66c3` | A Set block, whatever it sets |
+| `--block-add` | `#7d58b8` | An Add, Subtract or Flip block |
+| `--block-wait` | `#ad4a7c` | A Wait block |
+| `--block-destroy` | `#b5473d` | A Destroy block |
+| `--block-text` | `#ffffff` | Words and icons on a block; a menu box is the block's colour darkened by a quarter |
+| `--block-number` | `#ffffff` | A number's oval on a block |
+| `--block-number-text` | `#575e75` | The text in a number's oval (Scratch's grey) |
+| `--block-shade` | `#000000` | Mixed in at 25% to darken a block's colour for its menu boxes |
+| `--block-gap` | `--panel` with 4% white, opaque | The 2 px ring around each block, the trigger's own background, cutting blocks apart |
+| `--block-slot` | `--panel` with 7% white | An empty "add a block" slot |
+| `--block-slot-hover` | `--panel` with 10% white | The slot under the mouse, or with its menu open |
 
 The level view's own colours are in [level-view.md](level-view.md).
 

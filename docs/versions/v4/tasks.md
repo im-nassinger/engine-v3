@@ -75,7 +75,7 @@ Planned in [fix-4-scratch-triggers.md](fix-4-scratch-triggers.md), confirmed by 
 - [x] 22. The block model
   - Read: versions/v4/fix-4-scratch-triggers.md#4-the-card-becomes-blocks-look, design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks
   - Done when: the editor's model gives each trigger its blocks (kind, icon, words and value boxes, the If's two bars only when it has checks) and its gaps, with no gap outside the If; Set's value box shows its path (`Transform › Position`, `Triggers › Timed door › Enabled`); the add menu's entries come from it (the check group, then the actions); unit tests cover a trigger with and without checks, a Wait, a missing entity and an unset part
-- [ ] 23. The blocks on screen
+- [x] 23. The blocks on screen
   - Read: design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks, design/mockups/triggers.html
   - Done when: the Triggers card draws each trigger as the mockup's Scratch blocks (colours, icons, teeth, the ring, menus, number ovals, the unit menu), every value box opens fix 2's picker or box, the × removes a block, the Entity inspector is 344 px; browser tests cover drawing, editing a value and removing; a screenshot beside the mockup's matches
 - [ ] 24. Adding a block on hover

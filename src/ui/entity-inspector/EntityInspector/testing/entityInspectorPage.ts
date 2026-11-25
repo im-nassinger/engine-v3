@@ -28,7 +28,7 @@ let root: Root;
 // Before each test: an empty place the Entity inspector's size to show it in.
 export function openEntityInspectorPage() {
     container = document.createElement('div');
-    container.style.width = '300px';
+    container.style.width = '344px';
     container.style.height = '700px';
     document.body.append(container);
     root = createRoot(container);
@@ -77,7 +77,7 @@ export function showEntityInspector(level: Level, withPanel = false) {
     let shown: ReactElement = createElement(EntityInspector);
     if (withPanel) {
         container.style.width = '560px';
-        const entityInspectorPlace = createElement('div', { style: { width: '300px' } }, shown);
+        const entityInspectorPlace = createElement('div', { style: { width: '344px' } }, shown);
         const panelPlace = createElement('div', { style: { width: '260px' } }, createElement(EntitiesViewer));
         shown = createElement('div', { style: { display: 'flex', height: '700px' } }, entityInspectorPlace, panelPlace);
     }

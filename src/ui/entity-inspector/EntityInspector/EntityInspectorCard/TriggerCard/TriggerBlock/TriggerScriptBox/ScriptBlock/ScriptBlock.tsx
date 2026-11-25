@@ -1,0 +1,165 @@
+import { X } from 'lucide-react';
+import { useState } from 'react';
+import type { PointerEvent } from 'react';
+import { TriggerEdits } from '../../../../../../../../editor/entity-inspector/index.ts';
+import type {
+    ScriptBlock as ScriptBlockModel,
+    ScriptWordGroup,
+    TriggerWord,
+} from '../../../../../../../../editor/entity-inspector/index.ts';
+import type { OpenLevel } from '../../../../../../../../editor/session/index.ts';
+import { Icon, Tooltip } from '../../../../../../../shared/index.ts';
+import type { CommitTriggerEdit } from '../../../CommitTriggerEdit.ts';
+import { SCRIPT_ICONS } from './scriptIcons.ts';
+import { TriggerSlotWord } from './TriggerSlotWord/index.ts';
+import './ScriptBlock.css';
+
+export type ScriptBlockProps = {
+    openLevel: OpenLevel;
+    block: ScriptBlockModel;
+    triggerIndex: number;
+    commit: CommitTriggerEdit;
+    zIndex: number;
+    // Nothing under it, so no tooth.
+    isEnd: boolean;
+    // The last block inside the If, whose bottom bar covers 2 px more of it.
+    isLast: boolean;
+    // The gap the mouse asks to open, undefined for none.
+    onHoverGap: (gap: number | undefined) => void;
+};
+
+type Band = 'top' | 'middle' | 'bottom';
+
+// How far the tooth hangs below the body; it is left out of the bands.
+const TOOTH_PX = 6;
+
+// One Scratch block (v4 fix 4): its body and tooth in its kind's colour, cut from its neighbours by a 2 px ring
+// of the trigger's background, then its icon and words, each value box opening fix 2's picker or box. Its top
+// third asks for the slot above it, its bottom third the slot below, its middle third (and any value box)
+// none; the cursor says which. On the middle band a removable part shows its ×.
+export function ScriptBlock({ block, zIndex, isEnd, isLast, onHoverGap, ...wordProps }: ScriptBlockProps) {
+    const [band, setBand] = useState<Band | undefined>(undefined);
+    const icon = block.icon === undefined ? undefined : SCRIPT_ICONS[block.icon];
+
+    const hover = (event: PointerEvent<HTMLDivElement>) => {
+        const hovered = bandAt(event, block);
+        setBand(hovered);
+        onHoverGap(gapOf(hovered, block));
+    };
+
+    return (
+        <div
+            className="script-block"
+            data-shape={block.shape}
+            data-colour={block.colour}
+            data-end={isEnd}
+            data-last={isLast}
+            data-inside-if={block.isInsideIf}
+            data-gap-above={block.gapAbove}
+            data-gap-below={block.gapBelow}
+            data-band={band}
+            style={{ zIndex }}
+            onPointerMove={hover}
+            onPointerLeave={() => setBand(undefined)}
+        >
+            <i className="tooth" />
+            {icon !== undefined && <Icon icon={icon} />}
+            {block.groups.map((group, groupIndex) => (
+                <BlockGroup key={groupIndex} group={group} {...wordProps} />
+            ))}
+        </div>
+    );
+}
+
+function bandAt(event: PointerEvent<HTMLDivElement>, block: ScriptBlockModel): Band {
+    const target = event.target;
+    const onValue = target instanceof Element && target.closest('.trigger-slot-word, .remove') !== null;
+    if (onValue) return 'middle';
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const bodyHeight = rect.height - TOOTH_PX;
+    const y = event.clientY - rect.top;
+    if (y < bodyHeight / 3 && block.gapAbove !== undefined) return 'top';
+    if (y > (bodyHeight * 2) / 3 && block.gapBelow !== undefined) return 'bottom';
+
+    return 'middle';
+}
+
+function gapOf(band: Band, block: ScriptBlockModel) {
+    if (band === 'top') return block.gapAbove;
+    if (band === 'bottom') return block.gapBelow;
+
+    return undefined;
+}
+
+type WordProps = {
+    openLevel: OpenLevel;
+    triggerIndex: number;
+    commit: CommitTriggerEdit;
+};
+
+type BlockGroupProps = WordProps & {
+    group: ScriptWordGroup;
+};
+
+// One part's words, then its × when it can be removed. It lays out as the block's own words (display:
+// contents), and says which part it is.
+function BlockGroup({ group, ...wordProps }: BlockGroupProps) {
+    const { part } = group;
+    const label = `Remove ${group.words.map((word) => word.text).join(' ')}`;
+
+    const remove = () => {
+        if (part === undefined || part.section === 'when') return;
+
+        wordProps.commit((component) => TriggerEdits.removed(component, wordProps.triggerIndex, part));
+    };
+
+    return (
+        <span className="group" data-section={part?.section}>
+            {group.words.map((word, wordIndex) => (
+                <BlockWord key={wordKey(word, wordIndex)} word={word} {...wordProps} />
+            ))}
+            {group.canRemove && <RemoveButton label={label} onRemove={remove} />}
+        </span>
+    );
+}
+
+// A word keeps its place and its slot, so a word that becomes another slot is a new one.
+function wordKey(word: TriggerWord, wordIndex: number) {
+    if (word.kind === 'text') return `${wordIndex}-text`;
+
+    return `${wordIndex}-${word.address.slot}`;
+}
+
+type BlockWordProps = WordProps & {
+    word: TriggerWord;
+};
+
+function BlockWord({ word, ...wordProps }: BlockWordProps) {
+    if (word.kind === 'text') {
+        return (
+            <span className="text" data-entity={word.isEntity === true}>
+                {word.text}
+            </span>
+        );
+    }
+
+    return <TriggerSlotWord word={word} {...wordProps} />;
+}
+
+type RemoveButtonProps = {
+    label: string;
+    onRemove: () => void;
+};
+
+function RemoveButton({ label, onRemove }: RemoveButtonProps) {
+    return (
+        <span className="remove">
+            <Tooltip label={label}>
+                <button type="button" aria-label={label} onClick={onRemove}>
+                    <Icon icon={X} size="small" />
+                </button>
+            </Tooltip>
+        </span>
+    );
+}

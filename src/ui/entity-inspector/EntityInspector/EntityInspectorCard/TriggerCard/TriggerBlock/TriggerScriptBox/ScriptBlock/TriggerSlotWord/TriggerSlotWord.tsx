@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { JsonValue } from '../../../../../../../../../core/fields/index.ts';
 import type { EntityId } from '../../../../../../../../../core/level/index.ts';
-import { TriggerEdits } from '../../../../../../../../../editor/entity-inspector/index.ts';
+import { TriggerEdits, VALUE_SEPARATOR } from '../../../../../../../../../editor/entity-inspector/index.ts';
 import type {
     TriggerChoice,
     TriggerEntitiesEntry,
@@ -28,10 +28,11 @@ export type TriggerSlotWordProps = {
     commit: CommitTriggerEdit;
 };
 
-// A word that can change: underlined, it opens a menu under it, the entity picker for a target, or a
-// small field for a number or a value. Unset, it is yellow and says what it needs; `other` under an
-// event with none is struck through, and its tooltip says why. A row dragged from the Entities viewer and
-// dropped on a target word picks that entity.
+// A block's value box (v4 fix 4): a menu box in the block's colour darkened by a quarter, with a ▾, opening a
+// menu or the entity picker for a target; or a white oval opening a small field for a number or a value. A
+// value's path from its entity is dim, the value bright: `Transform › Position`. Unset, it is yellow and
+// says what it needs; `other` under an event with none is struck through, and its tooltip says why. A row
+// dragged from the Entities viewer and dropped on a target word picks that entity.
 export function TriggerSlotWord({ openLevel, word, triggerIndex, commit }: TriggerSlotWordProps) {
     const [isOpen, setIsOpen] = useState(false);
     // A picked item that asks for a value first, such as "New name…".
@@ -104,12 +105,13 @@ export function TriggerSlotWord({ openLevel, word, triggerIndex, commit }: Trigg
         <button
             type="button"
             className="trigger-slot-word"
+            data-look={typedEntry === undefined ? 'menu' : 'number'}
             data-state={word.state}
             aria-expanded={isOpen}
             ref={anchorRef}
             onClick={toggle}
         >
-            {word.text}
+            <SlotText text={word.text} />
         </button>
     );
 
@@ -143,4 +145,27 @@ function pickerEntriesOf(entry: TriggerEntitiesEntry, pick: (choice: TriggerChoi
     entries.push(...actionsOf(entry.tagged, pick, 'tagged'));
 
     return entries;
+}
+
+type SlotTextProps = {
+    text: string;
+};
+
+// The path's steps dim, the value bright; the text reads the same as the word's.
+function SlotText({ text }: SlotTextProps) {
+    const steps = text.split(VALUE_SEPARATOR);
+    const value = steps.pop();
+    if (steps.length === 0) return text;
+
+    return (
+        <>
+            {steps.map((step, stepIndex) => (
+                <span key={stepIndex} className="path">
+                    {step}
+                    {VALUE_SEPARATOR}
+                </span>
+            ))}
+            {value}
+        </>
+    );
 }

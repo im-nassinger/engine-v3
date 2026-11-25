@@ -1,6 +1,6 @@
-import { buttonNamed, requireCard, requireElement } from './entityInspectorPage.ts';
+import { requireCard, requireElement } from './entityInspectorPage.ts';
 
-// Reading and clicking the Triggers card: its blocks, their sections and sentences, the words and menus.
+// Reading and clicking the Triggers card: its triggers, their Scratch blocks and parts, the words and menus.
 
 export function triggersCard() {
     return requireCard('TriggerComponent');
@@ -21,25 +21,76 @@ export function blockName(index = 0) {
     return requireElement(requireBlock(index), '.trigger-head .name').textContent;
 }
 
-export function section(title: string, blockIndex = 0) {
-    return requireElement<HTMLElement>(requireBlock(blockIndex), `.trigger-section[data-section="${title}"]`);
+// The script's parts by the sections they were once drawn in: When is the event block's words, If its
+// checks, Do its actions, each one part of a block.
+const PART_OF_TITLE: Record<string, string> = { When: 'when', If: 'check', Do: 'action' };
+
+export function parts(title: string, blockIndex = 0) {
+    const part = PART_OF_TITLE[title];
+    const groups = requireBlock(blockIndex).querySelectorAll<HTMLElement>(
+        `.script-block .group[data-section="${part}"]`,
+    );
+
+    return [...groups];
 }
 
 export function sentences(title: string, blockIndex = 0) {
-    const rows = section(title, blockIndex).querySelectorAll<HTMLElement>('.trigger-sentence-row');
-
-    return [...rows].map((row) => {
-        const words = row.querySelectorAll<HTMLElement>('.text, .trigger-slot-word');
-        return [...words].map((word) => word.textContent).join(' ');
+    return parts(title, blockIndex).map((group) => {
+        const words = group.querySelectorAll<HTMLElement>('.text, .trigger-slot-word');
+        return [...words].map((shown) => shown.textContent).join(' ');
     });
 }
 
 export function word(title: string, text: string, blockIndex = 0) {
-    const words = section(title, blockIndex).querySelectorAll<HTMLElement>('.trigger-slot-word');
-    const found = [...words].find((candidate) => candidate.textContent === text);
+    const words = parts(title, blockIndex).flatMap((group) => [
+        ...group.querySelectorAll<HTMLElement>('.trigger-slot-word'),
+    ]);
+    const found = words.find((candidate) => candidate.textContent === text);
     if (found === undefined) throw new Error(`No word ${text} in ${title}.`);
 
     return found;
+}
+
+// The script's blocks, top to bottom: the event, the If's bars, the actions.
+export function scriptBlocks(blockIndex = 0) {
+    return [...requireBlock(blockIndex).querySelectorAll<HTMLElement>('.script-block')];
+}
+
+// The open "add a block" slot of a gap, if any.
+export function slotAt(gap: number, blockIndex = 0) {
+    return requireBlock(blockIndex).querySelector<HTMLElement>(`.script-slot[data-gap="${gap}"]`);
+}
+
+// The block whose top or bottom third opens a gap's slot.
+export function blockBeside(gap: number, side: 'above' | 'below', blockIndex = 0) {
+    const attribute = side === 'above' ? 'data-gap-below' : 'data-gap-above';
+
+    return requireElement<HTMLElement>(requireBlock(blockIndex), `.script-block[${attribute}="${gap}"]`);
+}
+
+// The last gap: after the last action, inside the If when there is one.
+export function lastGap(blockIndex = 0) {
+    const gaps = scriptBlocks(blockIndex).map((block) => Number(block.dataset['gapBelow'] ?? -1));
+
+    return Math.max(...gaps);
+}
+
+// How far the tooth hangs below a block's body; the bands leave it out.
+const TOOTH_PX = 6;
+const EDGE_PX = 3;
+
+// A point on a block's top, middle or bottom third, at its left end, for userEvent.hover. The block above
+// covers the top 6 px of a block with its own bottom, so the top third is reached under them.
+export function bandPoint(block: HTMLElement, band: 'top' | 'middle' | 'bottom') {
+    const bodyHeight = block.getBoundingClientRect().height - TOOTH_PX;
+    let y = bodyHeight / 2;
+    if (band === 'top') {
+        y = TOOTH_PX + EDGE_PX;
+    } else if (band === 'bottom') {
+        y = bodyHeight - EDGE_PX;
+    }
+
+    return { position: { x: EDGE_PX, y } };
 }
 
 // A menu's rows, or the rows above the entity picker's tree.
@@ -65,10 +116,6 @@ function labelOf(row: HTMLElement) {
     const first = label?.firstElementChild ?? label;
 
     return first?.textContent.trim();
-}
-
-export function addRow(label: string, blockIndex = 0) {
-    return buttonNamed(requireBlock(blockIndex), label);
 }
 
 export function notesOf(blockIndex = 0) {

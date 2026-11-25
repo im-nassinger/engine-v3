@@ -1,0 +1,166 @@
+/* A block is its body (::before, 6 px short of the bottom) and its tooth (::after, 20 px wide, hanging 7 px
+   into the block below), both slightly rounded (design/mockups/triggers.html, Scratch). The 2 px gap around
+   them is a ring of the trigger's background (box-shadow), so the tooth sits in a hole 2 px bigger on every
+   side. Layers, bottom to top: the tooth's ring (.tooth), the body and its ring, the tooth, which covers the
+   body's ring where they join. Every block shows 36 px of colour with its words centred: 9 px above them, of
+   which the block above covers 2, and 13 below, of which the next block covers 6. */
+.script-block {
+    --block: var(--block-if);
+    --tooth-x: 0px;
+    --corner: 4px;
+    --corner-top-left: var(--corner);
+    --corner-bottom-left: var(--corner);
+
+    position: relative;
+    isolation: isolate;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 5px;
+    min-height: 40px;
+    padding: 9px 10px 13px;
+    margin-bottom: -6px;
+    color: var(--block-text);
+    line-height: 22px;
+    white-space: nowrap;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0 0 6px;
+        z-index: -2;
+        border-radius: var(--corner-top-left) var(--corner) var(--corner) var(--corner-bottom-left);
+        background: var(--block);
+        box-shadow: 0 0 0 2px var(--block-gap);
+    }
+
+    &::after,
+    > .tooth {
+        content: '';
+        position: absolute;
+        top: calc(100% - 7px);
+        left: calc(var(--tooth-x) + 14px);
+        z-index: -1;
+        width: 20px;
+        height: 7px;
+        border-radius: 0 0 3px 3px;
+        background: var(--block);
+    }
+
+    > .tooth {
+        z-index: -3;
+        box-shadow: 0 0 0 2px var(--block-gap);
+    }
+
+    &[data-end='true']::after,
+    &[data-end='true'] > .tooth {
+        display: none;
+    }
+
+    > .icon {
+        flex: none;
+        color: var(--block-text);
+    }
+
+    &[data-colour='event'] {
+        --block: var(--block-event);
+    }
+
+    &[data-colour='set'] {
+        --block: var(--block-set);
+    }
+
+    &[data-colour='add'] {
+        --block: var(--block-add);
+    }
+
+    &[data-colour='wait'] {
+        --block: var(--block-wait);
+    }
+
+    &[data-colour='destroy'] {
+        --block: var(--block-destroy);
+    }
+
+    /* The event block has nothing above it. */
+    &[data-shape='event'] {
+        padding-top: 7px;
+    }
+
+    /* The If's bars: the top bar's tooth sits past the arm, and the corners that meet the arm are square, so
+       the C's lines run straight through its joints. */
+    &[data-shape='ifTop'] {
+        --tooth-x: 16px;
+        --corner-bottom-left: 0px;
+    }
+
+    &[data-shape='ifBottom'] {
+        --corner-top-left: 0px;
+
+        min-height: 30px;
+        padding: 0;
+    }
+
+    &[data-inside-if='true'] {
+        --corner-top-left: 0px;
+        --corner-bottom-left: 0px;
+    }
+
+    /* The last block in an If gets 2 px more below its words, since the If's bottom bar draws its line over
+       them. */
+    &[data-last='true'] {
+        padding-bottom: 15px;
+    }
+
+    /* The cursor says what the hovered band does (owner, 2026-11-24): up over a band that opens the slot
+       above, down over one that opens the slot below. */
+    &[data-band='top'] {
+        cursor: n-resize;
+    }
+
+    &[data-band='bottom'] {
+        cursor: s-resize;
+    }
+
+    > .group {
+        display: contents;
+    }
+
+    /* An action's × sits at the block's right end; a check's, after its own words in the If's bar. */
+    > .group:last-child > .remove {
+        margin-left: auto;
+        padding-left: var(--space-6);
+    }
+
+    .remove {
+        display: flex;
+        visibility: hidden;
+
+        &:focus-within {
+            visibility: visible;
+        }
+
+        button {
+            display: flex;
+            padding: 0;
+            border: none;
+            background: none;
+            color: var(--block-text);
+            opacity: 0.7;
+            cursor: pointer;
+
+            &:hover {
+                opacity: 1;
+            }
+
+            &:focus-visible {
+                outline: 1px solid var(--block-text);
+            }
+        }
+    }
+
+    &[data-band='middle'] .remove {
+        visibility: visible;
+    }
+}

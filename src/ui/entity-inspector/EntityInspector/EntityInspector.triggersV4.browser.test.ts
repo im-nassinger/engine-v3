@@ -16,7 +16,18 @@ import {
     select,
     showEntityInspector,
 } from './testing/entityInspectorPage.ts';
-import { addRow, blocks, menuRowNamed, menuRows, section, sentences, word } from './testing/triggerCardPage.ts';
+import {
+    bandPoint,
+    blockBeside,
+    blocks,
+    lastGap,
+    slotAt,
+    menuRowNamed,
+    menuRows,
+    parts,
+    sentences,
+    word,
+} from './testing/triggerCardPage.ts';
 
 beforeEach(async () => {
     openEntityInspectorPage();
@@ -28,6 +39,20 @@ beforeEach(async () => {
 afterEach(() => {
     closeEntityInspectorPage();
 });
+
+async function hoverBand(block: HTMLElement, band: 'top' | 'middle' | 'bottom') {
+    await userEvent.hover(block, bandPoint(block, band));
+}
+
+// Opens a gap's slot from the block above it, and picks an item of its add menu.
+async function addBlock(label: string, gap = lastGap()) {
+    await hoverBand(blockBeside(gap, 'above'), 'bottom');
+    await expect.poll(() => slotAt(gap)).not.toBeNull();
+    click(slotAt(gap) as HTMLElement);
+    await expect.poll(() => menuRowNamed(label)).toBeDefined();
+    menuRowNamed(label)?.click();
+    await expect.poll(() => menuRows().length).toBe(0);
+}
 
 // The World's `score` and `player_name`, and a Door with its own boolean `door_open` and a body.
 function buildLevel() {
@@ -112,10 +137,6 @@ async function typeIntoWord(opener: HTMLElement, text: string) {
     await expect.poll(() => document.querySelector('.trigger-word-field')).toBeNull();
 }
 
-function doRows() {
-    return [...section('Do').querySelectorAll<HTMLElement>('.trigger-sentence-row')];
-}
-
 describe("the trigger card's v4 parts", () => {
     test('makes "When this gets open: wait 2 s, flip door_open" from nothing', async () => {
         const { level, door } = buildLevel();
@@ -127,7 +148,7 @@ describe("the trigger card's v4 parts", () => {
         await expect.poll(() => blocks().length).toBe(1);
 
         await pickFromMenu(word('When', 'pick an event'), 'this gets a custom event');
-        await expect.poll(() => sentences('When')).toEqual(['this gets the custom event pick a name']);
+        await expect.poll(() => sentences('When')).toEqual(['when this gets the custom event pick a name']);
 
         const stepsBeforeName = session.openLevel.history.undoCount;
         await openMenu(word('When', 'pick a name'), 'New name…');
@@ -136,18 +157,17 @@ describe("the trigger card's v4 parts", () => {
         expect(requireElement(wordField(), '.hint').textContent).toBe('One word, such as open');
         expect(wordFieldInput().placeholder).toBe('Type a name');
         await userEvent.type(wordFieldInput(), 'open{Enter}');
-        await expect.poll(() => sentences('When')).toEqual(['this gets the custom event open']);
+        await expect.poll(() => sentences('When')).toEqual(['when this gets the custom event open']);
         expect(session.openLevel.history.undoCount).toBe(stepsBeforeName + 1);
 
-        await pickFromMenu(addRow('Add action'), 'wait');
-        await expect.poll(() => sentences('Do')).toEqual(['wait how long s']);
+        await addBlock('wait');
+        await expect.poll(() => sentences('Do')).toEqual(['wait how long seconds']);
         await typeIntoWord(word('Do', 'how long'), '2');
-        await expect.poll(() => sentences('Do')).toEqual(['wait 2 s']);
-        expect(doRows()[0]?.dataset['waitLine']).toBe('false');
+        await expect.poll(() => sentences('Do')).toEqual(['wait 2 seconds']);
 
-        await pickFromMenu(addRow('Add action'), 'change a value');
-        await expect.poll(() => doRows().length).toBe(2);
-        await expect.poll(() => sentences('Do')).toEqual(['wait 2 s', 'add a value to this pick a value']);
+        await addBlock('change a value');
+        await expect.poll(() => parts('Do').length).toBe(2);
+        await expect.poll(() => sentences('Do')).toEqual(['wait 2 seconds', 'add a value to this pick a value']);
         await openMenu(word('Do', 'pick a value'), 'Variables');
         expect(menuLines().slice(0, 4)).toEqual([
             '# Level variables',
@@ -158,10 +178,8 @@ describe("the trigger card's v4 parts", () => {
         click(menuRowNamed('Variables') as HTMLElement);
         await expect.poll(() => menuRowNamed('door_open')).toBeDefined();
         menuRowNamed('door_open')?.click();
-        await expect.poll(() => sentences('Do')).toEqual(['wait 2 s', 'flip this door_open']);
+        await expect.poll(() => sentences('Do')).toEqual(['wait 2 seconds', 'flip this door_open']);
 
-        expect(doRows()[0]?.dataset['waitLine']).toBe('true');
-        expect(getComputedStyle(doRows()[0] as HTMLElement, '::after').opacity).toBe('0.45');
         expect(triggersOf(door)).toEqual([
             {
                 id: 1,
@@ -215,7 +233,8 @@ describe("the trigger card's v4 parts", () => {
         click(word('If', 'is'));
         await expect.poll(() => menuRows().length).toBe(0);
 
-        const valueWord = section('If').querySelectorAll<HTMLElement>('.trigger-slot-word')[2] as HTMLElement;
+        const checkWords = parts('If')[0]?.querySelectorAll<HTMLElement>('.trigger-slot-word');
+        const valueWord = checkWords?.[2] as HTMLElement;
         click(valueWord);
         await expect.poll(() => document.querySelector('.trigger-word-field input')).not.toBeNull();
         expect(wordFieldInput().placeholder).toBe('Type a text');
@@ -239,8 +258,8 @@ describe("the trigger card's v4 parts", () => {
         await showEntity(level, door);
         await expect.poll(() => blocks().length).toBe(1);
 
-        await pickFromMenu(addRow('Add check'), 'a value');
-        const valueWord = requireElement<HTMLElement>(section('If'), '[data-state="unset"]');
+        await addBlock('if … (a value)');
+        const valueWord = requireElement<HTMLElement>(parts('If')[0] as HTMLElement, '[data-state="unset"]');
         await openMenu(valueWord, 'Body');
         expect(menuLines().slice(-4)).toEqual(['Transform', 'Body', 'Variables', 'Tags']);
         click(menuRowNamed('Body') as HTMLElement);

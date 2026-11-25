@@ -1,0 +1,56 @@
+/* The script scrolls sideways instead of wrapping: blocks fill a stack as wide as its longest line, and at
+   least as wide as the card. Its own scrollbars and fades are task 25's. */
+.trigger-script-box {
+    position: relative;
+
+    > .script {
+        overflow: auto;
+        overflow-anchor: none;
+        padding-bottom: 6px;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    /* 2 px: room for the blocks' ring. */
+    .stack {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        width: max-content;
+        min-width: 100%;
+        padding: 2px;
+    }
+
+    /* The If draws its top bar, arm and bottom bar above the blocks it holds; the arm draws its own lines
+       and covers the bars' lines where they meet it, so the If reads as one C. */
+    .script-if {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+
+        > .middle {
+            display: flex;
+        }
+    }
+
+    .arm {
+        position: relative;
+        z-index: 1001;
+        flex: none;
+        width: 16px;
+        background: var(--block-if);
+        box-shadow:
+            -2px 0 0 var(--block-gap),
+            inset -2px 0 0 var(--block-gap);
+    }
+
+    .inner {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        min-width: 0;
+    }
+}

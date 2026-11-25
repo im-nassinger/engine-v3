@@ -31,6 +31,19 @@
     --stop-ring: #ffffff;
     --scrollbar: rgb(255 255 255 / 14%);
     --scrollbar-hover: rgb(255 255 255 / 24%);
+    --block-event: #b88133;
+    --block-if: #2f897e;
+    --block-set: #3d66c3;
+    --block-add: #7d58b8;
+    --block-wait: #ad4a7c;
+    --block-destroy: #b5473d;
+    --block-text: #ffffff;
+    --block-number: #ffffff;
+    --block-number-text: #575e75;
+    --block-shade: #000000;
+    --block-gap: color-mix(in srgb, #ffffff 4%, var(--panel));
+    --block-slot: color-mix(in srgb, #ffffff 7%, var(--panel));
+    --block-slot-hover: color-mix(in srgb, #ffffff 10%, var(--panel));
 
     --font: 'JetBrains Mono', ui-monospace, monospace;
     --text-tiny: 10px;
@@ -46,7 +59,7 @@
     --island-gap: 10px;
     --island-bar: 48px;
     --tool: 34px;
-    --entity-inspector: 300px;
+    --entity-inspector: 344px;
     --entities-viewer: 260px;
     --minimap: 180px;
     --minimap-height: 93px;

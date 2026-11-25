@@ -46,7 +46,8 @@ export type TriggerBlock = {
     readonly name: string;
     readonly isOn: boolean;
     readonly sections: readonly [TriggerSection, TriggerSection, TriggerSection];
-    // The same trigger as Scratch blocks (v4 fix 4), which replace the sections once the card draws them.
+    // The same trigger as Scratch blocks (v4 fix 4), which the card draws. The sections above stay as the
+    // sentences' view its unit tests read (standing yes, 2026-11-24, docs/decisions.md).
     readonly script: TriggerScript;
     // The editor messages about this trigger, such as "Doesn't run until every yellow part is set.".
     readonly notes: readonly CardNote[];

@@ -1,11 +1,11 @@
 .trigger-block {
     display: flex;
     flex-direction: column;
-    padding: 2px var(--space-8) var(--space-10);
-    border-radius: 10px;
+    padding: 2px var(--space-10) var(--space-10);
+    border-radius: 12px;
     background: var(--raised);
 
-    &[data-on='false'] > .trigger-section {
+    &[data-on='false'] > .trigger-script-box {
         opacity: 0.45;
     }
 

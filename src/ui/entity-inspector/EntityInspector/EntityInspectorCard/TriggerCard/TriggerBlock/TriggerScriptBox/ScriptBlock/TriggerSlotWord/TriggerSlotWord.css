@@ -1,0 +1,68 @@
+/* Menus in the block's colour darkened by a quarter, numbers as white ovals with Scratch's grey text
+   (design/mockups/triggers.html, Scratch). The block's colour comes down as --block. */
+.trigger-slot-word {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    height: 22px;
+    padding: 0 6px;
+    border: none;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--block) 75%, var(--block-shade));
+    color: var(--block-text);
+    font: inherit;
+    white-space: pre;
+    cursor: pointer;
+
+    &[data-look='menu']::after {
+        content: '▾';
+        margin-left: 4px;
+        font-size: 9px;
+        opacity: 0.7;
+    }
+
+    &[data-look='number'] {
+        padding: 0 8px;
+        background: var(--block-number);
+        color: var(--block-number-text);
+    }
+
+    .path {
+        opacity: 0.7;
+    }
+
+    &:hover,
+    &[aria-expanded='true'] {
+        filter: brightness(1.15);
+    }
+
+    &:focus-visible {
+        outline: 1px solid var(--block-text);
+        outline-offset: 1px;
+    }
+
+    /* Fix 2's warnings, in the box: unset or missing is yellow with dark words. */
+    &[data-state='unset'],
+    &[data-state='missing'] {
+        background: var(--warning);
+        color: var(--app);
+    }
+
+    &[data-state='unset'] {
+        font-style: italic;
+    }
+
+    &[data-state='missing'] {
+        text-decoration: line-through;
+    }
+
+    /* Not set, and nothing is missing: Fire's "no number". */
+    &[data-state='optional'] {
+        opacity: 0.75;
+    }
+
+    &[data-state='greyed'] {
+        opacity: 0.5;
+        text-decoration: line-through;
+    }
+}

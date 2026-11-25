@@ -24,3 +24,13 @@ None of these was changed, since each follows a requirement or an owner's answer
 - **The bounds are 20000 × 10000**, so the minimap is wider than the mockup's square (owner, 2026-11-18).
 - **The dialog is titled `New level`**, with the question under it; the mockup uses the question as its title.
 - **The debug box keeps room for its numbers**, so it is wider than the mockup's.
+
+## The trigger blocks
+
+[trigger-blocks.png](trigger-blocks.png) (v4 task 23, 2026-11-24): the mockup's Scratch card beside the editor's, both drawing the mockup's two triggers, Coin pickup and Timed door. The colours, icons, teeth, ring, the If's C, menu boxes, number ovals and the unit menu match. What still differs:
+
+- **The words are fix 2's**, so a few boxes split or join differently: "has ▾ the tag ▾" for "has tag ▾", "this gets the custom event ▾" for "this gets", and the change's kind ("add ▾", "set ▾") is its own menu box.
+- **No fade at the clipped edge yet**: the script's scrollbars and fades are task 25's.
+- **`coins` is yellow** in the editor's picture: its test level's variable is reported unknown, which is the picture's set-up, not the blocks.
+
+It was taken by a one-off browser test that drew the card and a Playwright screenshot of the mockup, joined side by side.
