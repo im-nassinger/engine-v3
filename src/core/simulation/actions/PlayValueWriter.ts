@@ -164,13 +164,19 @@ export class PlayValueWriter {
         return true;
     }
 
-    // A timer switched on starts counting from this tick, and one switched off stops; switching off also
-    // cancels the trigger's waiting runs.
+    // A timer switched on starts counting from this tick, and one switched off stops. Setting Enabled to
+    // false cancels the trigger's waiting runs even when it is already off, so a resting trigger switched off
+    // from elsewhere stays off; the run doing the switching isn't waiting, so it goes on.
     private switchTrigger(entity: Entity, triggerId: number, on: boolean) {
         const component = entity.requireComponent(TriggerComponent);
         const triggers = component.get('triggers');
         const trigger = triggers.find((candidate) => candidate.id === triggerId);
         if (trigger === undefined) return false;
+
+        const { timers, waiting } = this.run.triggers;
+        if (!on) {
+            waiting.cancel(entity, triggerId);
+        }
         if (trigger.on === on) return true;
 
         component.set(
@@ -179,10 +185,8 @@ export class PlayValueWriter {
         );
         this.reportChange(entity, component, 'triggers');
 
-        const { timers, waiting } = this.run.triggers;
         if (!on) {
             timers.switchedOff(entity, triggerId);
-            waiting.cancel(entity, triggerId);
             return true;
         }
 

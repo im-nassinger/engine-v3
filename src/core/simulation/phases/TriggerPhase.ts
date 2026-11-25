@@ -39,18 +39,23 @@ export class TriggerPhase implements TickPhase {
     }
 }
 
-// On/off is asked again, since an earlier action may have switched it. A trigger with problems never runs.
-// A waiting run resumed goes on from its next action without asking its checks again: "wait 2 s, then
-// close" closes.
+// A fresh firing asks again whether its trigger is on, since an earlier action may have switched it off:
+// it is dropped. A waiting run resumed doesn't ask, so a run that switched its own trigger off to rest goes
+// on and can switch it on again; switching it off from elsewhere cancelled it (`WaitingRuns.stillResumes`).
+// It goes on from its next action without asking its checks again: "wait 2 s, then close" closes. A
+// trigger with problems never runs.
 function runFiring(firing: TriggerFiring, run: PlayRun, runner: ActionRunner) {
     const { triggers } = run;
     const trigger = triggerOf(firing);
-    if (trigger === undefined || !trigger.on) return;
+    if (trigger === undefined) return;
     if (firing.resumesAt !== undefined) {
+        if (!triggers.waiting.stillResumes(firing)) return;
+
         triggers.fired.push(firing);
         runner.runActions(trigger.actions, firing, firing.resumesAt);
         return;
     }
+    if (!trigger.on) return;
     if (!triggers.runnable.canRun(firing.owner, trigger)) return;
     if (!checksPass(trigger.checks, firing, run)) return;
 

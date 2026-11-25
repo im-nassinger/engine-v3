@@ -69,7 +69,7 @@ Planned in [fix-4-scratch-triggers.md](fix-4-scratch-triggers.md), confirmed by 
 - [x] 20. Repeat leaves the saved trigger
   - Read: versions/v4/fix-4-scratch-triggers.md#1-repeat-goes-logic, architecture/core-model/triggers.md
   - Done when: `Trigger` has no `repeat`; `parseTrigger` ignores a saved one; a saved trigger has no `repeat`; `TriggerRepeats`, the Repeat menu and their uses are gone; unit tests cover a trigger saved with and without `repeat`
-- [ ] 21. A switched-off trigger in play
+- [x] 21. A switched-off trigger in play
   - Read: versions/v4/fix-4-scratch-triggers.md#2-a-switched-off-trigger-in-play-logic, architecture/triggers-in-play.md
   - Done when: `TriggerPhase` drops a fresh firing whose trigger is off when reached, and runs a resumed one; `runHeadless` tests show a resting spike hurts once for two touches in one tick and again after the wait, a once-per-run trigger fires once and a trigger switched off by another trigger during its rest stays off
 - [ ] 22. The block model

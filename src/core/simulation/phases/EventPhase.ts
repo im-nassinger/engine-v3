@@ -1,7 +1,6 @@
 import type { TickContext, TickPhase } from '../run/TickPhase.ts';
 import type { TouchChange } from '../triggers/TouchLedger.ts';
 import type { TriggerFiring } from '../triggers/TriggerFiring.ts';
-import type { WaitingRun } from '../triggers/WaitingRuns.ts';
 import type { IndexedTrigger } from '../triggers/TriggerIndex.ts';
 import type { PlayTriggers } from '../triggers/PlayTriggers.ts';
 
@@ -67,10 +66,8 @@ class FiringList {
     }
 
     // A waiting run goes on where it stopped.
-    addResumed(due: readonly WaitingRun[]) {
-        for (const run of due) {
-            this.firings.push({ ...run.firing, resumesAt: run.nextAction });
-        }
+    addResumed(due: readonly TriggerFiring[]) {
+        this.firings.push(...due);
     }
 
     add(indexed: IndexedTrigger, other: TriggerFiring['other']) {

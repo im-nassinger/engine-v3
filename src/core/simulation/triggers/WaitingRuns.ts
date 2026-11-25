@@ -17,9 +17,11 @@ export type WaitingRun = {
 
 // The runs stopped at a Wait, kept until their tick comes. Due runs go in order of due tick, then trigger
 // order (Entities viewer order, then top to bottom in the card), then the order they started. Switching
-// a trigger off, or removing its entity, cancels its runs.
+// a trigger off, or removing its entity, cancels its runs, those due this tick and not yet run too.
 export class WaitingRuns {
     private runs: WaitingRun[] = [];
+    // The firings takeDue gave this tick, until a cancel takes them out.
+    private resuming = new Set<TriggerFiring>();
     private startedCount = 0;
     // Each entity's place in Entities viewer order when the run started; entities don't move in play.
     private readonly places = new Map<Entity, number>();
@@ -47,22 +49,38 @@ export class WaitingRuns {
         return true;
     }
 
-    // The runs due on this tick or before, taken out, in the order they resume.
-    takeDue(tick: number): readonly WaitingRun[] {
+    // The runs due on this tick or before, taken out as resumed firings, in the order they resume.
+    takeDue(tick: number): readonly TriggerFiring[] {
         const dueCount = this.runs.findIndex((run) => run.dueTick > tick);
         const end = dueCount === -1 ? this.runs.length : dueCount;
-        const due = this.runs.slice(0, end);
+        const due = this.runs.slice(0, end).map((run) => ({ ...run.firing, resumesAt: run.nextAction }));
         this.runs = this.runs.slice(end);
+        this.resuming = new Set(due);
 
         return due;
     }
 
+    // False once its trigger was switched off, or its entity removed, after takeDue gave it.
+    stillResumes(firing: TriggerFiring) {
+        return this.resuming.has(firing);
+    }
+
     cancel(owner: Entity, triggerId: number) {
         this.runs = this.runs.filter((run) => !sameTrigger(run.firing, owner, triggerId));
+        this.dropResuming((firing) => sameTrigger(firing, owner, triggerId));
     }
 
     forget(removed: ReadonlySet<Entity>) {
         this.runs = this.runs.filter((run) => !removed.has(run.firing.owner));
+        this.dropResuming((firing) => removed.has(firing.owner));
+    }
+
+    private dropResuming(goes: (firing: TriggerFiring) => boolean) {
+        for (const firing of [...this.resuming]) {
+            if (goes(firing)) {
+                this.resuming.delete(firing);
+            }
+        }
     }
 
     private compare(first: WaitingRun, second: WaitingRun) {
