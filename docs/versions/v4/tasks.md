@@ -63,7 +63,7 @@ The tasks that build v4 (the rest of the triggers, string and boolean variables 
 
 Planned in [fix-4-scratch-triggers.md](fix-4-scratch-triggers.md), confirmed by the owner (2026-11-24). Every task also needs `npm run check` to pass.
 
-- [ ] 19. The rules in the requirements and the glossary
+- [x] 19. The rules in the requirements and the glossary
   - Read: versions/v4/fix-4-scratch-triggers.md, requirements/triggers/triggers.md, glossary.md, requirements/README.md
   - Done when: the glossary has *Enabled* and lists Repeat and cooldown as dropped; triggers.md has no Repeat, the Wait rule says the run switching its own trigger off goes on, the event reads "when other starts touching this", and Change value names *Enabled*; workspace.md and tokens.md say 344 px; rejected.md has the two rows; `node tools/check-docs.js` and `node tools/check-sources.js` pass
 - [ ] 20. Repeat leaves the saved trigger

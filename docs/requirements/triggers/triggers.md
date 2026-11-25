@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-A trigger is no-code logic on an entity, in three parts: **When** (one event), **If** (optional checks), **Do** (a list of actions, run top to bottom). An entity's TriggerComponent holds a list of them. **Six events:** something starts or stops touching this, a key or input is pressed, released or held, after or every N seconds, the level starts (v3), a variable changes and this gets a custom event (v4). **One check**, a value compared (v3, any component value from v4). **Seven actions:** Change value, Destroy, Win, Lose and Restart (v3), Fire custom event and Wait (v4). Then the Repeat setting and the Trigger tool (v3), and Spawn (v7). **Later:** mouse events, "while touching" and "left the level", sound and camera shake actions, arrows to what a trigger affects, trigger lines in the Console, and Convert to script. Core rules: **if it's data, change it with Change value**, triggers and scripts share one list of events, and the order you see is the order things run.
+A trigger is no-code logic on an entity, in three parts: **When** (one event), **If** (optional checks), **Do** (a list of actions, run top to bottom). An entity's TriggerComponent holds a list of them. **Six events:** other starts or stops touching this, a key or input is pressed, released or held, after or every N seconds, the level starts (v3), a variable changes and this gets a custom event (v4). **One check**, a value compared (v3, any component value from v4). **Seven actions:** Change value, Destroy, Win, Lose and Restart (v3), Fire custom event and Wait (v4). Then the Trigger tool (v3), a trigger resting by switching its own *Enabled* off (v4), and Spawn (v7). **Later:** mouse events, "while touching" and "left the level", sound and camera shake actions, arrows to what a trigger affects, trigger lines in the Console, and Convert to script. Core rules: **if it's data, change it with Change value**, triggers and scripts share one list of events, and the order you see is the order things run.
 
 ## The trigger
 
@@ -14,10 +14,10 @@ A trigger is no-code logic on an entity, in three parts: **When** (one event), *
 - Every event gives the trigger two entities: **`this`**, the entity holding the trigger, and **`other`**, the entity that caused the event, when there is one. For touching, `other` is the entity that touched. For a custom event, it is the sender. A key, a timer, level start or a variable changing has no `other`, and checks and actions that use it are greyed out.
 - **The triggers were made simpler while the owner tried v4** (owner, 2026-11-23): the When menu from 12 events to 6, the three If checks into one, Push and the Sensor setting removed. *Why: "this whole trigger thing is looking very convoluted and bad. we need to simplify it as much as possible." Options that overlap let the user pick the wrong one and not know why nothing happens.* The plan is in [fix-3-simpler-triggers.md](../../versions/v4/fix-3-simpler-triggers.md).
 - **Each check and action picks its target from: `this`, `other`, an entity by name, or every entity with a tag.**
-- In the Entity inspector a trigger reads as a **sentence with clickable parts**, such as "When something starts touching this, if other has the tag player: add 1 to coins, destroy this."
+- In the Entity inspector a trigger reads as a **sentence with clickable parts**, such as "When other starts touching this, if other has the tag player: add 1 to coins, destroy this."
 - **Every clickable part is picked the way the rest of the editor picks it** (owner, 2026-11-23): an entity from the Entities viewer's tree, with a search, or by clicking it in the level view, or by dropping an Entities viewer row on it; a vector in two boxes, x and y; a colour in the colour box; a number in the number box with its unit. A value on an entity is picked in two steps, its component and then the value ("Transform › Position"), and the entity comes before the value in the sentence, since the values offered are that entity's. Every item of the Add check and Add action menus says in one line what it does. *Why: the owner found the first card lazy: a flat list of every entity, vectors typed as "0, -600" in a text box, "Transform position x" listed beside "Transform position y", and words such as "who is tagged…" that said nothing.*
 - A part that isn't set yet is highlighted and says what it needs. A trigger with unset parts doesn't run.
-- Each trigger can be switched on or off. It is a value like any other, so one trigger switches another on or off with Change value.
+- Each trigger can be switched on or off. **Its on/off value is *Enabled***, named like any other value (`Triggers › Timed door › Enabled`), so one trigger switches another on or off with Change value, and checks it with the value check (owner, 2026-11-24).
 - Triggers can be dragged to reorder, duplicated and deleted. Every edit is one undo step.
 - Triggers do nothing a script can't: both use the same events and the same Lua API underneath.
 - A trigger on a hidden entity still runs.
@@ -30,11 +30,12 @@ The When menu holds six events. Three have a word that picks between two kinds i
 
 | Event | Reads as | `other` |
 |---|---|---|
-| Touching | When something **starts** touching this. When something **stops** touching this | The entity touching |
+| Touching | When other **starts** touching this. When other **stops** touching this | The entity touching |
 | Key or input | When the **key** Space is pressed. When the **input** jump is pressed | None |
 | Timer | **After** 60 seconds. **Every** 2 seconds | None |
 | Level start | When the level starts | None |
 
+- **The event names who touches as `other`** (owner, 2026-11-24): "When other starts touching this", not "something". *Why: `other` is the word the If and the actions already use for the same entity, so the event names it once.*
 - **Touching covers solid and pass-through things alike** (owner, 2026-11-23): two solid entities bumping, and an entity overlapping a pass-through one, are the same event. *Why: whether an entity bumps or overlaps already follows from whether it has a Surface; with two events, the user can pick the wrong one, nothing fires, and they can't tell why.* Before that day, v3 noticed only overlaps, and v4 had a separate "this hits something" event for bumps.
 - **A Surface means solid, and no Surface means things pass through.** A touch trigger works on either: a shape with no SurfaceComponent and a touch trigger (on it, or on a group above it) is noticed by what passes through it. See [bodies](../physics/bodies.md#surfaces-and-touching--v3).
 - **Both sides hear a touch.** A solid player with a touch trigger, walking into a pass-through coin, hears it too, with the coin as `other`.
@@ -78,7 +79,7 @@ Source: scope TR4; round 9: 09 2.7b; decisions: D54; old: TR-66 to TR-72
 
 ### "While touching" and "left the level" · Later
 
-- **While touching** fires every tick for each entity that is touching, unless Repeat slows it down.
+- **While touching** fires every tick for each entity that is touching, unless the trigger switches itself off for a while.
 - **Left the level** fires on an entity just before it is removed for being fully outside an open edge of the level bounds.
 - *Why Later: touched and no longer touched cover the same cases with a little more work.*
 
@@ -101,12 +102,12 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27; owner: 2026-11-13; owner: 2
 
 | Action | What it does |
 |---|---|
-| Change value | Sets, adds to or subtracts from any component value on the target. From v4 a boolean variable can also be flipped |
+| Change value | Sets, adds to or subtracts from any component value on the target, a trigger's *Enabled* included. From v4 a boolean variable can also be flipped |
 | Destroy | Removes the target and its children |
 | Win, Lose | Ends the run as won or lost |
 | Restart | Restarts the level |
 
-- **If it's data, change it with Change value.** One action covers teleporting (the TransformComponent's position), a body's velocity, variables (on the World's VariablesComponent for the level's, or on any entity's for its own), tags, switching triggers on or off, a joint's motor, the camera's zoom and follow target, gravity. *Why: the owner pointed out that teleporting is just changing a component value. What is left on the list does something no value can.*
+- **If it's data, change it with Change value.** One action covers teleporting (the TransformComponent's position), a body's velocity, variables (on the World's VariablesComponent for the level's, or on any entity's for its own), tags, a trigger's *Enabled* (switching it on or off), a joint's motor, the camera's zoom and follow target, gravity. *Why: the owner pointed out that teleporting is just changing a component value. What is left on the list does something no value can.*
 - Change value only offers values that are allowed to change during play.
 - **A vector is set, added to or subtracted from whole**, such as "add 5, 0 to this Transform › Position" (owner, 2026-11-23). A trigger saved before, which added to one axis, reads as the same vector with 0 on the other axis. *Why: one value, one word; listing Position x and Position y beside Position looked like three values.*
 - **Body › Velocity can be set, added to and subtracted from**, as a vector in px/s, whatever the body's mass, so a jump pad feels the same for everything: "add 0, -500 to other Body › Velocity". It goes to the body the target belongs to, its own or the nearest one above it. *Why: it replaced Push, which did the same: if it's data, change it with Change value (owner, 2026-11-23). Lost: a push away from or towards `this` at a strength; scripts cover it from v5, and if it is missed it can come back as a way to fill a vector, not as an action.*
@@ -126,7 +127,8 @@ Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b, 09 2.9; round 8:
 | Fire custom event | Fires a named event on the target, with an optional number |
 | Wait | Delays the actions after it |
 
-- **Wait** is one action in the list. A trigger that fires again during a wait gets its own run, so two enemies in a "wait, then destroy other" trigger both die. Destroying the entity, or switching the trigger off, cancels what is still waiting. *Why a list with Wait: without a list, "add a coin, play a sound, destroy this" needs three triggers with the same When.*
+- **Wait** is one action in the list. A trigger that fires again during a wait gets its own run, so two enemies in a "wait, then destroy other" trigger both die. Destroying the entity, or switching the trigger off, cancels what is still waiting.
+- **A run that switches its own trigger off goes on** (owner, 2026-11-24): its later actions still run, and its Wait still ends, so it can switch the trigger on again. Switched off by anything else, the trigger's waiting runs are all cancelled, a resting run included, and it stays off. *Why: otherwise a trigger couldn't rest.* *Why a list with Wait: without a list, "add a coin, play a sound, destroy this" needs three triggers with the same When.*
 - **A wait is counted in whole ticks**, like timers, so it slows and stops with the game speed. Wait 0 continues in the next tick.
 - **A waiting run keeps its `this` and `other`.** If `other` is destroyed during the wait, the actions on it are skipped and the rest still run.
 - **Fire custom event** picks a target like any action, a name, and an optional number. The event goes down the tree, so each target and everything inside it hears it (see [custom events](#custom-events--v4)). Each hears it in the same tick, with `other` set to the entity whose trigger fired it, so it counts towards the 32 steps. A trigger reads the number nowhere in v4; scripts (v5) read it. *Why: carrying it now means a level saved in v4 doesn't change when scripts come (standing yes, 2026-11-22).*
@@ -154,14 +156,14 @@ Source: scope TR7; owner: 2026-11-14; owner: 2026-11-20
 
 Source: scope AS4, CM9; round 9: 09 2.4b
 
-### Repeat · v3
+### Resting and once per run · v4
 
-- Each trigger has one Repeat setting: **every time** (the default), **once per run**, or **at most once every N seconds**.
-- Example: a spike that hurts at most once a second.
-- Firings that arrive too soon are dropped, not queued.
-- *Why v3: small, and without it a trigger can fire every tick.*
+- **A trigger rests by switching its own *Enabled* off, then on again after a Wait**, such as a spike that hurts at most once a second: "set this `Triggers › Spike › Enabled` to false, subtract 1 from other health, wait 1 s, set this `Triggers › Spike › Enabled` to true". *Why: the owner rested a trigger this way while designing the Scratch card (2026-11-24), so one idea covers resting and the setting goes.*
+- **Once per run is one action, the trigger switching its own *Enabled* off**, with nothing switching it back. Another trigger can switch it on again.
+- **A firing of a trigger that is off by the time it would run is dropped**, not queued, even when the trigger was on when its event happened. So two enemies touching a resting spike in one tick are hurt once. A waiting run isn't dropped. *Why: the order you see is the order things run: once an action switched the trigger off, it is off for what comes after (standing yes, 2026-11-24).*
+- **This replaced v3's setting for how often a trigger may fire** (every time, once per run, or at most once every N seconds), dropped by the owner (2026-11-24), see [rejected.md](../../rejected.md). A level saved with that setting isn't converted: the setting is ignored.
 
-Source: scope TR8; round 5: T7; old: TR-55 to TR-57; owner: 2026-11-13
+Source: scope TR8; round 5: T7; old: TR-55 to TR-57; owner: 2026-11-13; owner: 2026-11-24
 
 ### Custom events · v4
 
@@ -197,7 +199,7 @@ Source: owner: 2026-11-20
 - When several entities touch at once, each is its own firing.
 - An entity placed or spawned already touching fires "touched" on the next physics step. It is never skipped.
 - **Triggers setting off triggers stop after 32 steps in one tick**, with a warning in the Console (in the message pill until the Console comes in v5). The game keeps running. A loop that goes through a Wait is fine, because it runs at most once per tick. *Why: it prevents endless loops.*
-- Restart resets everything: which triggers are on, used-up "once per run" triggers, timers, waiting runs, tags, and variables (except kept ones).
+- Restart resets everything: each trigger's *Enabled*, timers, waiting runs, tags, and variables (except kept ones).
 - Copying entities keeps links between the copies. A link to something outside the copies stays pointed at the original in the same level and becomes missing in another level.
 - A trigger that points to a deleted entity, file or trigger shows a `missing` warning. In play that action is skipped.
 
@@ -222,7 +224,7 @@ Source: scope LU8; round 10: TL1, TL2
 
 ### The Trigger tool · v3
 
-- **The Trigger tool, key 6, draws a rectangle that notices touching.** The new entity has a TransformComponent, a rectangle ShapeComponent, and a TriggerComponent holding one trigger that starts "When something starts touching this". It has no SurfaceComponent, so things pass through it (owner, 2026-11-23).
+- **The Trigger tool, key 6, draws a rectangle that notices touching.** The new entity has a TransformComponent, a rectangle ShapeComponent, and a TriggerComponent holding one trigger that starts "When other starts touching this". It has no SurfaceComponent, so things pass through it (owner, 2026-11-23).
 - It has no StyleComponent, so it isn't drawn in play, and it is selected by its edge.
 - Example: draw one over the end of a level, then add Win to its trigger.
 - *Why key 6: it is the next free key, so the keys have no gap until Text comes in v6 (standing yes, 2026-11-22).*
