@@ -86,9 +86,10 @@ class ChainedEvents implements ActionEffects {
         this.queue(this.run.triggers.hear(indexed, null));
     }
 
-    customEventFired(target: Entity, name: string, sender: Entity) {
+    customEventFired(target: Entity, name: string, sender: Entity, number: number | null) {
         for (const indexed of this.run.triggers.index.customTriggersOf(target, name)) {
-            this.queue(this.run.triggers.hear(indexed, sender.id));
+            const firing = this.run.triggers.hear(indexed, sender.id);
+            this.queue(firing === undefined ? undefined : { ...firing, number });
         }
     }
 

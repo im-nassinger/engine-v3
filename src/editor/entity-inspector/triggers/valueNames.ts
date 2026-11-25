@@ -1,6 +1,7 @@
 import { cardTitle, TriggerComponent } from '../../../core/components/index.ts';
 import type { ComponentRegistry } from '../../../core/components/index.ts';
-import type { JsonValue, LiveValue, ReadableValue, ValueRef } from '../../../core/fields/index.ts';
+import { isVariableAmount } from '../../../core/fields/index.ts';
+import type { JsonValue, LiveValue, ReadableValue, ValueRef, VariableAmount } from '../../../core/fields/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { triggerName } from '../../../core/triggers/index.ts';
 
@@ -88,8 +89,9 @@ function componentValueName(value: FieldValue, registry: ComponentRegistry) {
     return `${title}${VALUE_SEPARATOR}${label}`;
 }
 
-// What an amount reads as: a number, on or off, a tag, "100, 50" for a vector.
-export function amountText(amount: JsonValue) {
+// What an amount reads as: a number, on or off, a tag, "100, 50" for a vector, a variable's name.
+export function amountText(amount: JsonValue | VariableAmount) {
+    if (isVariableAmount(amount)) return amount.name;
     if (typeof amount === 'number') return String(amount);
     if (typeof amount === 'string') return amount;
     if (typeof amount === 'boolean') return amount ? 'on' : 'off';

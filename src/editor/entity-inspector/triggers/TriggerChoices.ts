@@ -7,6 +7,7 @@ import {
     ColourFieldType,
     EntityFieldType,
     FillFieldType,
+    isVariableAmount,
     NumberFieldType,
     VectorFieldType,
 } from '../../../core/fields/index.ts';
@@ -430,9 +431,11 @@ export class TriggerChoices {
         const type = this.checkType(check);
 
         if (type === 'tag') return { kind: 'menu', choices: this.tagsWithNew(place) };
-        if (check.value?.kind === 'variable') return this.variableValueEntry(type, check.amount, place);
+        // A variable as the amount shows an empty box here until the blocks offer variables (fix 10).
+        const typed = isVariableAmount(check.amount) ? null : check.amount;
+        if (check.value?.kind === 'variable') return this.variableValueEntry(type, typed, place);
 
-        return numberEntry(check.amount);
+        return numberEntry(typed);
     }
 
     // x and y, for a vector the value check reads.

@@ -17,6 +17,7 @@ import type {
     Target,
     Trigger,
     ValueRef,
+    VariableAmount,
     VariableRef,
     When,
 } from './Trigger.ts';
@@ -27,7 +28,7 @@ type RawRecord = Readonly<Record<string, unknown>>;
 const TRIGGER_KEYS: readonly string[] = ['id', 'name', 'on', 'when', 'checks', 'actions'];
 const PRESSES: readonly Press[] = ['pressed', 'released', 'held'];
 const COMPARES: readonly Compare[] = ['is', 'isNot', 'more', 'less', 'atLeast', 'atMost'];
-const CHANGE_OPS: readonly ChangeOp[] = ['set', 'add', 'subtract', 'flip'];
+const CHANGE_OPS: readonly ChangeOp[] = ['set', 'add', 'subtract', 'multiply', 'divide', 'flip'];
 const LIVE_VALUES: readonly LiveValue[] = ['speed', 'velocityX', 'velocityY'];
 // An amount is a value of a field, such as a fill: a few levels deep at most. Deeper is damaged data.
 const MAX_AMOUNT_DEPTH = 8;
@@ -213,6 +214,26 @@ function parseCondition(raw: unknown): ParseOutcome<Condition> {
     return accept({ compare: compare.value, value: value.value });
 }
 
+function parseCheckAmount(raw: unknown): ParseOutcome<VariableValue | VariableAmount> {
+    if (isPlainObject(raw)) return parseVariableAmount(raw);
+
+    return parseVariableValue(raw);
+}
+
+// A number box: a finite number, or a variable (fix 10).
+function parseNumberAmount(raw: unknown): ParseOutcome<number | VariableAmount> {
+    if (isPlainObject(raw)) return parseVariableAmount(raw);
+
+    return parseFiniteNumber(raw);
+}
+
+// A variable in a value box, in the shape Change value names a variable with.
+function parseVariableAmount(raw: RawRecord): ParseOutcome<VariableAmount> {
+    if (raw['kind'] !== 'variable') return refuse({ reason: 'wrongType' });
+
+    return parseVariableValueRef(raw);
+}
+
 function parseVariableValue(raw: unknown): ParseOutcome<VariableValue> {
     if (typeof raw === 'string' || typeof raw === 'boolean') return accept(raw);
 
@@ -283,7 +304,7 @@ function parseValueCheck(raw: RawRecord): ParseOutcome<Check> {
     const compare = parseChoice(raw['compare'], COMPARES);
     if (!compare.ok) return compare;
 
-    const amount = parseNullable(raw['amount'], parseVariableValue);
+    const amount = parseNullable(raw['amount'], parseCheckAmount);
     if (!amount.ok) return amount;
 
     return accept({
@@ -419,7 +440,7 @@ function parseFireAction(raw: RawRecord): ParseOutcome<Action> {
     const name = parseNullableText(raw['name']);
     if (!name.ok) return name;
 
-    const amount = parseNullable(raw['amount'], parseFiniteNumber);
+    const amount = parseNullable(raw['amount'], parseNumberAmount);
     if (!amount.ok) return amount;
 
     return accept({ kind: 'fire', target: target.value, name: name.value, amount: amount.value });
@@ -428,7 +449,7 @@ function parseFireAction(raw: RawRecord): ParseOutcome<Action> {
 function parseWaitAction(raw: RawRecord): ParseOutcome<Action> {
     if (!hasExactlyKeys(raw, ['kind', 'seconds'])) return refuse({ reason: 'wrongType' });
 
-    const seconds = parseNullable(raw['seconds'], parseFiniteNumber);
+    const seconds = parseNullable(raw['seconds'], parseNumberAmount);
     if (!seconds.ok) return seconds;
 
     return accept({ kind: 'wait', seconds: seconds.value });
@@ -446,7 +467,7 @@ function parseChangeAction(raw: RawRecord): ParseOutcome<Action> {
     const op = parseChoice(raw['op'], CHANGE_OPS);
     if (!op.ok) return op;
 
-    const amount = parseJsonValue(raw['amount'], 0);
+    const amount = parseChangeAmount(raw['amount']);
     if (!amount.ok) return amount;
 
     return accept({ kind: 'change', target: target.value, value: value.value, op: op.value, amount: amount.value });
@@ -568,6 +589,13 @@ function parseTriggerOnRef(raw: RawRecord): ParseOutcome<ValueRef> {
     if (!isPositiveWholeNumber(trigger)) return refuse({ reason: 'wrongType' });
 
     return accept({ kind: 'triggerOn', trigger });
+}
+
+// A variable (fix 10), checked whole, or a typed value.
+function parseChangeAmount(raw: unknown): ParseOutcome<JsonValue | VariableAmount> {
+    if (isPlainObject(raw) && raw['kind'] === 'variable') return parseVariableAmount(raw);
+
+    return parseJsonValue(raw, 0);
 }
 
 // Change value's amount: any JSON value, since it is the changed field's own value, which the field's type

@@ -8,9 +8,11 @@ import type {
     Target,
     Trigger,
     ValueRef,
+    VariableAmount,
     VariableRef,
     When,
 } from './Trigger.ts';
+import { isVariableAmount } from './Trigger.ts';
 
 // A copy sharing nothing with the trigger, its keys always in the same order, so two equal triggers save
 // as the same text. The optional axis is left out when it isn't set.
@@ -69,7 +71,7 @@ function copyCheck(check: Check): Check {
         target: copyTarget(check.target),
         value: copyCheckedValue(check.value),
         compare: check.compare,
-        amount: check.amount,
+        amount: copyAmount(check.amount),
     };
 }
 
@@ -113,7 +115,7 @@ function copyAction(action: Action): Action {
                 target: copyTarget(action.target),
                 value: copyValueRef(action.value),
                 op: action.op,
-                amount: copyJson(action.amount),
+                amount: isVariableAmount(action.amount) ? copyAmount(action.amount) : copyJson(action.amount),
             };
         case 'destroy':
             return { kind: 'destroy', target: copyTarget(action.target) };
@@ -122,10 +124,25 @@ function copyAction(action: Action): Action {
         case 'restart':
             return { kind: action.kind };
         case 'fire':
-            return { kind: 'fire', target: copyTarget(action.target), name: action.name, amount: action.amount };
+            return {
+                kind: 'fire',
+                target: copyTarget(action.target),
+                name: action.name,
+                amount: copyAmount(action.amount),
+            };
         case 'wait':
-            return { kind: 'wait', seconds: action.seconds };
+            return { kind: 'wait', seconds: copyAmount(action.seconds) };
     }
+}
+
+// A typed value as it is, a variable as a new object with its keys in order, `own` left out when unset.
+function copyAmount<Typed extends number | string | boolean>(
+    amount: Typed | VariableAmount | null,
+): Typed | VariableAmount | null {
+    if (!isVariableAmount(amount)) return amount;
+    if (amount.own === undefined) return { kind: 'variable', name: amount.name };
+
+    return { kind: 'variable', name: amount.name, own: true };
 }
 
 function copyValueRef(value: ValueRef | null): ValueRef | null {

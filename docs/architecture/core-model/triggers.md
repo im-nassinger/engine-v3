@@ -63,7 +63,9 @@ export type Target =
     | { kind: 'tagged'; tag: string | null };
 
 // Fix 3: one check, a value of the target compared with an amount.
-export type Check = { kind: 'value'; target: Target; value: CheckedValue | null; compare: Compare; amount: VariableValue | null };
+export type Check = { kind: 'value'; target: Target; value: CheckedValue | null; compare: Compare; amount: VariableValue | VariableAmount | null };
+// Fix 10: a variable in a value box, read when the block runs.
+export type VariableAmount = { kind: 'variable'; name: string; own?: true };
 export type CheckedValue =
     | { kind: 'variable'; name: string; own?: true }       // without own, the level's, read on the World whatever the target
     | { kind: 'tag' }                                      // is: has the tag (on it or a group above), isNot: doesn't
@@ -83,11 +85,11 @@ export type ReadableValue =                                               // v4
     | { kind: 'live'; live: 'speed' | 'velocityX' | 'velocityY' };       // read from physics, px/s
 
 export type Action =
-    | { kind: 'change'; target: Target; value: ValueRef | null; op: 'set' | 'add' | 'subtract' | 'flip'; amount: JsonValue | null }   // flip: v4
+    | { kind: 'change'; target: Target; value: ValueRef | null; op: 'set' | 'add' | 'subtract' | 'multiply' | 'divide' | 'flip'; amount: JsonValue | VariableAmount | null }   // flip: v4; multiply, divide: fix 10
     | { kind: 'destroy'; target: Target }
     | { kind: 'win' } | { kind: 'lose' } | { kind: 'restart' }
-    | { kind: 'fire'; target: Target; name: string | null; amount: number | null }   // v4
-    | { kind: 'wait'; seconds: number | null };                                      // v4
+    | { kind: 'fire'; target: Target; name: string | null; amount: number | VariableAmount | null }   // v4
+    | { kind: 'wait'; seconds: number | VariableAmount | null };                                      // v4
 
 export type ValueRef =
     | { kind: 'variable'; name: string; own?: true }       // without own, the level's, as v3 saved
@@ -124,3 +126,12 @@ The plan and the owner's words are in [fix-3-simpler-triggers.md](../../versions
 - **`triggerProblems` for the value check:** the value unset; a variable unknown on a known holder; a compare or amount its type lacks (`wrongType`, in `compare` or `amount`); a tag compared other than is or isNot, or with a non-word; a number the known target lacks (`unknownValue`). A level's variable has no target problem, since it is read on the World. `eventHasOther` is exported for the card.
 - **The SurfaceComponent lost `sensor`.** Format version 2's upgrade step, `removeSensorSetting` (`level-data/versions/`), removes a SurfaceComponent with `"sensor": true` and drops `"sensor": false` from the rest, walking the tree with a list, not by going down, so the 50,000-deep file still reaches the reader's depth limit. `FormatUpgrader.createCurrent()` holds it; the clipboard runs it on entities copied by a version 1 game (`entityWithoutSensor`). See [persistence.md](../persistence.md).
 
+
+### What fix 10 changed (2026-11-25)
+
+The plan is in [fixes-9-to-13-plan.md](../../versions/v4/fixes-9-to-13-plan.md); the picks are in [decisions.md](../../decisions.md).
+
+- **Multiply and Divide** join the ops. `changeableValues` offers them wherever it offers Add: a number or angle field, a vector field, a number variable, Body › Velocity. **`amountTypeOf(offer, op)`** gives what the amount is read with: one number for Multiply and Divide, the value's own type for the rest; `triggerProblems` and `PlayValueWriter` both call it.
+- **A value box may hold a `VariableAmount`** instead of a typed value: Change value's amount, the If's amount, Wait's seconds and Fire's number, not the When's. It is saved as `{ "kind": "variable", "name": "bonus" }`, with `"own": true` for an own one; no field's value has the kind `variable`, so `parseTrigger` reads any object with that kind as one, checked whole, and `isVariableAmount` tells the two apart. `normalizeTrigger` makes its name a word (unset when nothing is left).
+- **`amountVariableType(offer, op)`** gives the type of variable a Change value's amount box takes: a number for a number or angle and for Multiply and Divide, a string for a text or a tag, a boolean for a checkbox or a trigger's Enabled, none for a vector, a colour or a fill.
+- **`triggerProblems`** lists, in the box's slot (`amount`, or `seconds` for a Wait), a variable unknown where it is read (`unknownVariable`: the level's on the World, an own one on a target known while editing, on `this` for a Wait) and one of the wrong type or in a box that takes none (`wrongType`). A target only known in play is checked there. A level's variable compared with an own amount checks the check's target too.

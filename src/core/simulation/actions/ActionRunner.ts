@@ -1,4 +1,5 @@
-import type { Action, Target } from '../../fields/index.ts';
+import { MAX_WAIT_SECONDS } from '../../fields/index.ts';
+import type { Action, VariableAmount } from '../../fields/index.ts';
 import type { Entity } from '../../level/index.ts';
 
 import type { PlayRun } from '../run/PlayRun.ts';
@@ -7,8 +8,11 @@ import { secondsToTicks } from '../triggers/secondsToTicks.ts';
 import type { TriggerFiring } from '../triggers/TriggerFiring.ts';
 
 import type { ActionEffects } from './ActionEffects.ts';
+import { amountNow } from './amountNow.ts';
 import { PlayValueWriter } from './PlayValueWriter.ts';
 import { targetsOf } from './targetsOf.ts';
+
+type FireAction = Action & { readonly kind: 'fire' };
 
 // The ticks of a run's first second, 1 to 60.
 const RESTART_GUARD_TICKS = 60;
@@ -37,9 +41,10 @@ export class ActionRunner {
             if (action === undefined) return;
 
             if (action.kind === 'wait') {
-                if (action.seconds === null) continue;
+                const seconds = this.secondsOf(action.seconds, firing);
+                if (seconds === undefined) continue;
 
-                this.wait(firing, at + 1, action.seconds);
+                this.wait(firing, at + 1, seconds);
                 return;
             }
             this.runAction(action, firing);
@@ -54,7 +59,12 @@ export class ActionRunner {
                 if (value === null || (amount === null && op !== 'flip')) return;
 
                 for (const target of targetsOf(action.target, firing, this.run)) {
-                    this.writer.change(target, { value, op, amount });
+                    // A variable is read on each target as the change reaches it, so an earlier target's
+                    // change is seen; a target lacking an own variable is skipped.
+                    const amountHere = amount === null ? null : amountNow(amount, target, this.run);
+                    if (amountHere === undefined) continue;
+
+                    this.writer.change(target, { value, op, amount: amountHere });
                 }
                 return;
             }
@@ -63,15 +73,9 @@ export class ActionRunner {
                     this.destroy(target);
                 }
                 return;
-            case 'fire': {
-                const { name } = action;
-                if (name === null) return;
-
-                for (const hearer of this.hearersOf(action.target, firing)) {
-                    this.effects.customEventFired(hearer, name, firing.owner);
-                }
+            case 'fire':
+                this.fire(action, firing);
                 return;
-            }
             case 'wait':
                 // runActions stops at a Wait.
                 return;
@@ -88,24 +92,43 @@ export class ActionRunner {
     }
 
     // A custom event goes down the tree: each target and everything inside it, parents first, top row
-    // first, each entity once however many targets hold it.
-    private hearersOf(target: Target, firing: TriggerFiring) {
-        const hearers = new Set<Entity>();
-        for (const top of targetsOf(target, firing, this.run)) {
-            for (const entity of entitiesIn(top)) {
-                hearers.add(entity);
+    // first, each entity once however many targets hold it, with the number its target gave. A variable as
+    // the number is read on each target now; a target that lacks it, or holds no number there, is skipped.
+    private fire(action: FireAction, firing: TriggerFiring) {
+        const { name, amount } = action;
+        if (name === null) return;
+
+        const heard = new Set<Entity>();
+        for (const top of targetsOf(action.target, firing, this.run)) {
+            const number = amount === null ? null : amountNow(amount, top, this.run);
+            if (number !== null && typeof number !== 'number') continue;
+
+            for (const hearer of entitiesIn(top)) {
+                if (heard.has(hearer)) continue;
+
+                heard.add(hearer);
+                this.effects.customEventFired(hearer, name, firing.owner, number);
             }
         }
+    }
 
-        return hearers;
+    // A Wait's seconds, a variable read on the World or on `this` now and kept to 0 to an hour as a typed
+    // one is; undefined when the variable is missing or isn't a number, and the Wait is skipped.
+    private secondsOf(seconds: number | VariableAmount | null, firing: TriggerFiring) {
+        if (seconds === null) return undefined;
+
+        const now = amountNow(seconds, firing.owner, this.run);
+        if (typeof now !== 'number') return undefined;
+
+        return Math.min(Math.max(now, 0), MAX_WAIT_SECONDS);
     }
 
     // The rest goes on in whole ticks from now, at least the next tick, keeping `this` and `other`. A
     // trigger already holding 32 waiting runs drops this one, with a warning once per run.
     private wait(firing: TriggerFiring, nextAction: number, seconds: number) {
         const dueTick = this.tick + Math.max(1, secondsToTicks(seconds));
-        const { owner, triggerId, when, other } = firing;
-        const kept = this.run.triggers.waiting.add({ owner, triggerId, when, other }, nextAction, dueTick);
+        const { owner, triggerId, when, other, number } = firing;
+        const kept = this.run.triggers.waiting.add({ owner, triggerId, when, other, number }, nextAction, dueTick);
         if (kept) return;
 
         this.run.warnings.warn({ kind: 'tooManyWaitingRuns' });

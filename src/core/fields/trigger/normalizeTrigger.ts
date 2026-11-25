@@ -6,15 +6,18 @@ import type { JsonValue } from '../JsonValue.ts';
 
 import type {
     Action,
+    ChangeOp,
     Check,
     CheckedValue,
     Condition,
     Target,
     Trigger,
     ValueRef,
+    VariableAmount,
     VariableRef,
     When,
 } from './Trigger.ts';
+import { isVariableAmount } from './Trigger.ts';
 
 // The same as an entity's name.
 export const MAX_TRIGGER_NAME_LENGTH = 60;
@@ -135,8 +138,9 @@ function normalizeCheckedValue(value: CheckedValue | null): CheckedValue | null 
 }
 
 // A tag is a word like any tag; a string is cut as a string variable is.
-function normalizeCheckedAmount(value: CheckedValue | null, amount: VariableValue | null) {
+function normalizeCheckedAmount(value: CheckedValue | null, amount: VariableValue | VariableAmount | null) {
     if (amount === null) return null;
+    if (isVariableAmount(amount)) return normalizeVariableAmount(amount);
     if (value?.kind === 'tag' && typeof amount === 'string') return wordOrNull(amount);
 
     return normalizeVariableValue(amount);
@@ -145,7 +149,7 @@ function normalizeCheckedAmount(value: CheckedValue | null, amount: VariableValu
 function normalizeAction(action: Action): Action {
     switch (action.kind) {
         case 'change': {
-            const whole = wholeVectorChange(action.value, action.amount);
+            const whole = wholeVectorChange(action.value, action.op, action.amount);
             const value = normalizeValueRef(whole.value);
             const amount = normalizeAmount(value, whole.amount);
 
@@ -153,10 +157,16 @@ function normalizeAction(action: Action): Action {
         }
         case 'destroy':
             return { kind: 'destroy', target: normalizeTarget(action.target) };
-        case 'fire':
-            return { ...action, target: normalizeTarget(action.target), name: wordOrNull(action.name) };
+        case 'fire': {
+            const amount = isVariableAmount(action.amount) ? normalizeVariableAmount(action.amount) : action.amount;
+
+            return { ...action, target: normalizeTarget(action.target), name: wordOrNull(action.name), amount };
+        }
         case 'wait':
             if (action.seconds === null) return action;
+            if (isVariableAmount(action.seconds)) {
+                return { kind: 'wait', seconds: normalizeVariableAmount(action.seconds) };
+            }
 
             return { kind: 'wait', seconds: clamp(action.seconds, 0, MAX_WAIT_SECONDS) };
         default:
@@ -173,20 +183,32 @@ function normalizeValueRef(value: ValueRef | null): ValueRef | null {
     return { ...value, name };
 }
 
+// A variable's name made a word; a variable whose name has nothing left reads as unset.
+function normalizeVariableAmount(amount: VariableAmount): VariableAmount | null {
+    const name = wordOrNull(amount.name);
+    if (name === null) return null;
+
+    return { ...amount, name };
+}
+
 // Before 2026-11-23 a vector was added to one axis at a time, `{ ..., "axis": "x" }` with a number. It is
-// now added whole, so such a change reads as the same vector with 0 on the other axis.
-function wholeVectorChange(value: ValueRef | null, amount: JsonValue | null) {
+// now added whole, so such a change reads as the same vector with 0 on the other axis. Multiply and Divide
+// take one number for the whole vector, so theirs is kept as it is.
+function wholeVectorChange(value: ValueRef | null, op: ChangeOp, amount: JsonValue | VariableAmount | null) {
     if (value?.kind !== 'field' || value.axis === undefined) return { value, amount };
 
     const wholeValue: ValueRef = { kind: 'field', component: value.component, field: value.field };
-    if (typeof amount !== 'number') return { value: wholeValue, amount };
+    const isScaling = op === 'multiply' || op === 'divide';
+    if (typeof amount !== 'number' || isScaling) return { value: wholeValue, amount };
 
     const wholeAmount = value.axis === 'x' ? { x: amount, y: 0 } : { x: 0, y: amount };
     return { value: wholeValue, amount: wholeAmount };
 }
 
 // A tag added or removed is a word like any tag. Any other amount is checked by its field's type in play.
-function normalizeAmount(value: ValueRef | null, amount: JsonValue | null) {
+function normalizeAmount(value: ValueRef | null, amount: JsonValue | VariableAmount | null) {
+    if (isVariableAmount(amount)) return normalizeVariableAmount(amount);
+
     const isTagAmount = value?.kind === 'tag' && typeof amount === 'string';
     if (!isTagAmount) return amount;
 

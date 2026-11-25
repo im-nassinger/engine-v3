@@ -1,6 +1,7 @@
 import { BodyComponent, TriggerComponent, VariablesComponent } from '../../components/index.ts';
 import type { AnyComponentSchema, AnyFieldDefinition, ComponentRegistry } from '../../components/index.ts';
 import {
+    AngleFieldType,
     CheckboxFieldType,
     ListFieldType,
     MAX_STRING_VARIABLE_LENGTH,
@@ -24,7 +25,8 @@ export type ChangeableValue = {
 
 const SET_ONLY: readonly ChangeOp[] = ['set'];
 const ADD_OR_SUBTRACT: readonly ChangeOp[] = ['add', 'subtract'];
-const EVERY_OP: readonly ChangeOp[] = ['set', 'add', 'subtract'];
+// A number's and a vector's: a vector is multiplied or divided by one number (fix 10).
+const EVERY_OP: readonly ChangeOp[] = ['set', 'add', 'subtract', 'multiply', 'divide'];
 const SET_OR_FLIP: readonly ChangeOp[] = ['set', 'flip'];
 
 const NUMBER_AMOUNT = new NumberFieldType();
@@ -48,7 +50,8 @@ const VARIABLE_OFFERS: Readonly<Record<VariableType, Omit<ChangeableValue, 'ref'
 };
 
 // What Change value may offer for a target, read from the schemas only, so a component added later is offered
-// with no trigger code: every field marked changeableInPlay, a vector whole for Set, Add and Subtract, the tag
+// with no trigger code: every field marked changeableInPlay, a number or a vector whole for Set, Add,
+// Subtract, Multiply and Divide, the tag
 // to add or remove, a body's Velocity after its Body's fields, and, on an entity known while editing, its
 // variables with the ops their type allows and each of its triggers' on/off. The World's variables are the level's, named as v3 named
 // them; any other entity's are its own (`own: true`). With no entity (`other`, or every entity with a tag),
@@ -124,6 +127,14 @@ export function variableChangeOf(type: VariableType) {
     return VARIABLE_OFFERS[type];
 }
 
+// What the amount of this op on the value is read with: one number for Multiply and Divide, whatever the
+// value (a vector is scaled whole), the value's own amount type for the others.
+export function amountTypeOf(offer: ChangeableValue, op: ChangeOp): ValueType<unknown> {
+    if (op === 'multiply' || op === 'divide') return NUMBER_AMOUNT;
+
+    return offer.amountType;
+}
+
 function triggerValuesOf(target: Entity): readonly ChangeableValue[] {
     const triggers = target.getComponent(TriggerComponent)?.get('triggers') ?? [];
 
@@ -132,6 +143,18 @@ function triggerValuesOf(target: Entity): readonly ChangeableValue[] {
         ops: SET_ONLY,
         amountType: ON_AMOUNT,
     }));
+}
+
+// The type of variable the amount's value box takes (fix 10): a number for a number or an angle, and for
+// Multiply and Divide; a string for a text or a tag; a boolean for a checkbox or a trigger's on/off.
+// Undefined for every other box, a vector's, a colour's or a fill's, which takes none until v5.
+export function amountVariableType(offer: ChangeableValue, op: ChangeOp): VariableType | undefined {
+    const type = amountTypeOf(offer, op);
+    if (type instanceof NumberFieldType || type instanceof AngleFieldType) return 'number';
+    if (type instanceof TextFieldType) return 'string';
+    if (type instanceof CheckboxFieldType) return 'boolean';
+
+    return undefined;
 }
 
 // The same value: the same kind and the same names, axis and owner included.

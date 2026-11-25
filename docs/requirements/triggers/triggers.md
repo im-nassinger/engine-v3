@@ -103,7 +103,7 @@ Source: scope TR6; round 5: T5; old: TR-24 to TR-27; owner: 2026-11-13; owner: 2
 
 | Action | What it does |
 |---|---|
-| Change value | Sets, adds to or subtracts from any component value on the target, a trigger's *Enabled* included. From v4 a boolean variable can also be flipped |
+| Change value | Sets, adds to or subtracts from any component value on the target, a trigger's *Enabled* included. From v4 a boolean variable can also be flipped, and a number or a vector multiplied or divided |
 | Destroy | Removes the target and its children |
 | Win, Lose | Ends the run as won or lost |
 | Restart | Restarts the level |
@@ -125,12 +125,12 @@ Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b, 09 2.9; round 8:
 
 Asked by the owner while trying v4 ([fix](../../versions/v4/fixes.md) 10, 2026-11-25), not built yet.
 
-- **Change value can also multiply and divide**, such as "multiply coins by 2" or "divide this Transform › Scale by 2". They work on numbers. **A vector is multiplied or divided by one number**, so "multiply other Body › Velocity by 0.5" halves its speed.
+- **Change value can also multiply and divide**, such as "multiply coins by 2" or "divide this Transform › Scale by 2". They work on numbers. **A vector is multiplied or divided by one number**, so "multiply other Body › Velocity by 0.5" halves its speed. "Transform › Scale" doesn't change in play, so Change value doesn't offer it; Multiply and Divide work on every number and vector it does offer, such as "Transform › Position" (standing yes, 2026-11-25, see [decisions](../../decisions.md)).
 - **Dividing by 0 leaves the value as it was**, as a target that lacks the value is skipped.
-- **Every value box in every block can hold a variable instead of a typed value** (owner: "all scratch blocks"), such as "add bonus to coins", "set this Transform › Rotation to angle", "if score is more than best", or "wait delay s". This includes Change value's amount, the If's amount, Wait's seconds and Fire custom event's number.
+- **Every value box in every block can hold a variable instead of a typed value** (owner: "all scratch blocks"), such as "add bonus to coins", "set this Transform › Rotation to angle", "if score is more than best", or "wait delay s". This includes Change value's amount, the If's amount, Wait's seconds and Fire custom event's number. The event block's boxes ("after N s", "becomes 10 or more") keep typed values (standing yes, 2026-11-25). *Why: the confirmed plan names the actions and the If, and an event's value isn't read when a block runs: a timer counts from when it starts, and "becomes" compares the values before and after a change.*
 - **Only variables of the box's type are offered:** a number variable in a number box, a string in a string box, a boolean in a boolean box. A vector or colour box takes none until those variable types come in v5.
 - The variables offered are the level's and the target's own, as the variable menu already groups them.
-- **The variable is read when the block runs**, so it uses the value it has at that moment.
+- **The variable is read when the block runs**, so it uses the value it has at that moment. An own variable is read on the block's target, on `this` for a Wait, and a target that lacks it is skipped (standing yes, 2026-11-25).
 - *Why: the owner asked for multiply and divide, and to use variables everywhere a value of their type fits, so a value can depend on another.*
 
 Source: owner: 2026-11-25

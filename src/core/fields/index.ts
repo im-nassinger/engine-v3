@@ -54,10 +54,12 @@ export type {
     Target,
     Trigger,
     ValueRef,
+    VariableAmount,
     VariableRef,
     When,
     WhenKind,
 } from './trigger/Trigger.ts';
+export { isVariableAmount } from './trigger/Trigger.ts';
 export { TextFieldType } from './field-types/TextFieldType.ts';
 export type { TextFieldOptions } from './field-types/TextFieldType.ts';
 export { MAX_WORD_NAME_LENGTH, wordName } from './names/wordName.ts';

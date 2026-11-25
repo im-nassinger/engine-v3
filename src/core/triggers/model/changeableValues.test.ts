@@ -38,14 +38,17 @@ describe('changeableValues', () => {
         expect(offers).toEqual([
             {
                 ref: { kind: 'field', component: 'TransformComponent', field: 'position' },
-                ops: ['set', 'add', 'subtract'],
+                ops: ['set', 'add', 'subtract', 'multiply', 'divide'],
             },
             {
                 ref: { kind: 'field', component: 'TransformComponent', field: 'rotation' },
-                ops: ['set', 'add', 'subtract'],
+                ops: ['set', 'add', 'subtract', 'multiply', 'divide'],
             },
             { ref: { kind: 'tag' }, ops: ['add', 'subtract'] },
-            { ref: { kind: 'variable', name: 'worth', own: true }, ops: ['set', 'add', 'subtract'] },
+            {
+                ref: { kind: 'variable', name: 'worth', own: true },
+                ops: ['set', 'add', 'subtract', 'multiply', 'divide'],
+            },
             { ref: { kind: 'triggerOn', trigger: 1 }, ops: ['set'] },
             { ref: { kind: 'triggerOn', trigger: 3 }, ops: ['set'] },
         ]);
@@ -114,7 +117,10 @@ describe('changeableValues', () => {
         const open = offers.find((offer) => offer.ref.kind === 'variable' && offer.ref.name === 'door_open');
 
         expect(ops).toEqual([
-            { ref: { kind: 'variable', name: 'health', own: true }, ops: ['set', 'add', 'subtract'] },
+            {
+                ref: { kind: 'variable', name: 'health', own: true },
+                ops: ['set', 'add', 'subtract', 'multiply', 'divide'],
+            },
             { ref: { kind: 'variable', name: 'label', own: true }, ops: ['set'] },
             { ref: { kind: 'variable', name: 'door_open', own: true }, ops: ['set', 'flip'] },
         ]);

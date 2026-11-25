@@ -1,9 +1,19 @@
-import type { Action, Check, Target, Trigger, Unit, VariableValue, When } from '../../../core/fields/index.ts';
+import { isVariableAmount } from '../../../core/fields/index.ts';
+import type {
+    Action,
+    Check,
+    Target,
+    Trigger,
+    Unit,
+    VariableAmount,
+    VariableValue,
+    When,
+} from '../../../core/fields/index.ts';
 import { KeyCodes } from '../../../core/keys/index.ts';
 import type { TriggerProblem } from '../../../core/triggers/index.ts';
 
 import { NO_OTHER_REASON, shownValue, TriggerChoices } from './TriggerChoices.ts';
-import { readableAxis } from './valueNames.ts';
+import { amountText, readableAxis } from './valueNames.ts';
 import type { CheckedType } from './TriggerChoices.ts';
 import type {
     TriggerRowPart,
@@ -300,9 +310,9 @@ function addCheckWords(builder: SentenceBuilder, check: Check, index: number, so
         builder.slot(compareWord);
     }
 
-    const amountText = check.amount === null ? null : checkedAmountText(check.amount, type);
+    const checkedText = check.amount === null ? null : checkedAmountText(check.amount, type);
     const amountEntry = choices.checkAmountEntry(check, index);
-    builder.slot({ slot: 'amount', text: amountText, need: amountNeed(type), entry: amountEntry });
+    builder.slot({ slot: 'amount', text: checkedText, need: amountNeed(type), entry: amountEntry });
 }
 
 // x or y, for a vector or a body's velocity.
@@ -317,8 +327,9 @@ function addCheckAxisWord(builder: SentenceBuilder, check: Check, index: number,
     builder.slot({ slot: 'axis', text: axis, need: 'x or y', entry: menuOf(axes) });
 }
 
-// A tag as it is; a string variable's value in quotes.
-function checkedAmountText(amount: VariableValue, type: CheckedType | undefined) {
+// A tag as it is; a string variable's value in quotes; a variable by its name.
+function checkedAmountText(amount: VariableValue | VariableAmount, type: CheckedType | undefined) {
+    if (isVariableAmount(amount)) return amount.name;
     if (type === 'tag' && typeof amount === 'string') return amount;
 
     return comparedText(amount);
@@ -369,8 +380,8 @@ function addActionWords(builder: SentenceBuilder, action: Action, index: number,
         addFireWords(builder, action, index, sources);
     }
     if (action.kind === 'wait') {
-        const secondsText = action.seconds === null ? null : String(action.seconds);
-        const entry = numberEntry(action.seconds, 's');
+        const secondsText = action.seconds === null ? null : amountText(action.seconds);
+        const entry = numberEntry(typedNumber(action.seconds), 's');
         builder.slot({ slot: 'seconds', text: secondsText, need: 'how long', entry });
         builder.text('s');
     }
@@ -391,16 +402,16 @@ function addFireWords(builder: SentenceBuilder, action: FireAction, index: numbe
     }));
     builder.slot(targetWord(action.target, targets, choices));
 
-    const amountText = action.amount === null ? null : `with the number ${action.amount}`;
+    const numberText = action.amount === null ? null : `with the number ${amountText(action.amount)}`;
     const amountEntry: TriggerWordEntry = {
         kind: 'number',
-        value: action.amount,
+        value: typedNumber(action.amount),
         unit: undefined,
         clearLabel: 'No number',
     };
     builder.slot({
         slot: 'amount',
-        text: amountText,
+        text: numberText,
         need: 'with a number (for scripts)',
         entry: amountEntry,
         isOptional: true,
@@ -417,8 +428,8 @@ function addChangeWords(builder: SentenceBuilder, action: ChangeAction, index: n
     builder.slot({ slot: 'op', text: action.op, need: 'set, add or subtract', entry: menuOf(ops) });
 
     const amountEntry = choices.amountEntry(action, index);
-    const amountText = action.amount === null ? null : choices.amountWord(action, action.amount);
-    const amountWord: SlotWord = { slot: 'amount', text: amountText, need: 'a value', entry: amountEntry };
+    const changeText = action.amount === null ? null : choices.amountWord(action, action.amount);
+    const amountWord: SlotWord = { slot: 'amount', text: changeText, need: 'a value', entry: amountEntry };
     const amountFirst = action.op === 'add' || action.op === 'subtract';
     if (amountFirst) {
         builder.slot(amountWord);
@@ -443,6 +454,15 @@ function addChangeWords(builder: SentenceBuilder, action: ChangeAction, index: n
         builder.text('to');
         builder.slot(amountWord);
     }
+    if (action.op === 'multiply' || action.op === 'divide') {
+        builder.text('by');
+        builder.slot(amountWord);
+    }
+}
+
+// A typed number as it is; null for a variable, which a number box doesn't show.
+function typedNumber(amount: number | VariableAmount | null) {
+    return isVariableAmount(amount) ? null : amount;
 }
 
 function joiningWord(action: ChangeAction) {

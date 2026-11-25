@@ -1,6 +1,6 @@
 import { InputComponent, VariablesComponent } from '../../components/index.ts';
 import type { ComponentRegistry } from '../../components/index.ts';
-import { variableTypeOf } from '../../fields/index.ts';
+import { isVariableAmount, variableTypeOf } from '../../fields/index.ts';
 import type {
     Action,
     Check,
@@ -12,13 +12,15 @@ import type {
     Trigger,
     ValueRef,
     Variable,
+    VariableAmount,
     VariableRef,
+    VariableType,
     VariableValue,
     When,
 } from '../../fields/index.ts';
 import type { Entity, Level } from '../../level/index.ts';
 
-import { changeableValues, sameValueRef } from './changeableValues.ts';
+import { amountTypeOf, amountVariableType, changeableValues, sameValueRef } from './changeableValues.ts';
 import { readableValues, sameReadableValue } from './readableValues.ts';
 import { isReservedEventName } from './reservedEventNames.ts';
 
@@ -66,6 +68,8 @@ export type TriggerContext = {
 };
 
 const WHEN: TriggerPart = { section: 'when' };
+// A Wait has no target: an own variable in its seconds is `this`'s.
+const THIS: Target = { kind: 'this' };
 
 // What stops a trigger running, part by part. The Entity inspector and the game both read it, so a part
 // shown yellow is a part that doesn't run. A missing entity or trigger only skips its own check or action;
@@ -185,9 +189,10 @@ function comparesAs(value: VariableValue, compare: Compare) {
 function checkProblems(check: Check, part: TriggerPart, hasOther: boolean, context: TriggerContext) {
     const { value } = check;
     const isLevelVariable = value?.kind === 'variable' && value.own !== true;
+    const isOwnAmount = isVariableAmount(check.amount) && check.amount.own === true;
     const problems: TriggerProblem[] = [];
 
-    if (!isLevelVariable) {
+    if (!isLevelVariable || isOwnAmount) {
         problems.push(...targetProblems(check.target, part, hasOther, context));
     }
 
@@ -211,7 +216,7 @@ function checkedValueProblems(
         case 'variable':
             return checkedVariableProblems(check, value, part, context);
         case 'tag':
-            return checkedTagProblems(check, part);
+            return checkedTagProblems(check, part, context);
         default:
             return checkedNumberProblems(check, value, part, context);
     }
@@ -236,7 +241,12 @@ function checkedVariableProblems(check: Check, value: CheckedVariable, part: Tri
     }
     if (typeof found !== 'object') return problems;
 
-    if (amount !== null) {
+    if (isVariableAmount(amount)) {
+        if (!comparesAs(found.value, compare)) {
+            problems.push({ part, slot: 'compare', reason: 'wrongType' });
+        }
+        problems.push(...amountVariableProblems(amount, check.target, variableTypeOf(found.value), part, context));
+    } else if (amount !== null) {
         problems.push(...conditionProblems(found, { compare, value: amount }, part, 'amount'));
     } else if (!comparesAs(found.value, compare)) {
         problems.push({ part, slot: 'compare', reason: 'wrongType' });
@@ -245,8 +255,33 @@ function checkedVariableProblems(check: Check, value: CheckedVariable, part: Tri
     return problems;
 }
 
+// A variable in a value box (fix 10): it must be known where it is read, the level's on the World, an own
+// one on `holder` when that is known while editing, and of the box's type. `type` undefined: the box takes
+// no variable, such as a vector's or a colour's; `any`: the box's type is only known in play, which skips a
+// target whose variable the amount type refuses.
+function amountVariableProblems(
+    amount: VariableAmount,
+    holder: Target,
+    type: VariableType | 'any' | undefined,
+    part: TriggerPart,
+    context: TriggerContext,
+    slot: TriggerSlot = 'amount',
+): readonly TriggerProblem[] {
+    const ref: VariableRef =
+        amount.own === true
+            ? { owner: 'own', target: holder, name: amount.name }
+            : { owner: 'level', name: amount.name };
+    const found = findVariable(ref, context);
+
+    if (found === 'unknown') return [{ part, slot, reason: 'unknownVariable' }];
+    if (type === undefined) return [{ part, slot, reason: 'wrongType' }];
+    if (found === 'inPlay' || type === 'any' || variableTypeOf(found.value) === type) return [];
+
+    return [{ part, slot, reason: 'wrongType' }];
+}
+
 // "has the tag" (is) or "doesn't have the tag" (isNot), and a tag.
-function checkedTagProblems(check: Check, part: TriggerPart) {
+function checkedTagProblems(check: Check, part: TriggerPart, context: TriggerContext) {
     const problems: TriggerProblem[] = [];
 
     if (check.compare !== 'is' && check.compare !== 'isNot') {
@@ -254,6 +289,8 @@ function checkedTagProblems(check: Check, part: TriggerPart) {
     }
     if (check.amount === null) {
         problems.push({ part, slot: 'amount', reason: 'unset' });
+    } else if (isVariableAmount(check.amount)) {
+        problems.push(...amountVariableProblems(check.amount, check.target, 'string', part, context));
     } else if (typeof check.amount !== 'string') {
         problems.push({ part, slot: 'amount', reason: 'wrongType' });
     }
@@ -275,6 +312,8 @@ function checkedNumberProblems(check: Check, value: ReadableValue, part: Trigger
 
     if (check.amount === null) {
         problems.push({ part, slot: 'amount', reason: 'unset' });
+    } else if (isVariableAmount(check.amount)) {
+        problems.push(...amountVariableProblems(check.amount, check.target, 'number', part, context));
     } else if (typeof check.amount !== 'number') {
         problems.push({ part, slot: 'amount', reason: 'wrongType' });
     }
@@ -304,9 +343,18 @@ function actionProblems(action: Action, part: TriggerPart, hasOther: boolean, co
         case 'destroy':
             return targetProblems(action.target, part, hasOther, context);
         case 'fire':
-            return [...targetProblems(action.target, part, hasOther, context), ...eventNameProblems(action.name, part)];
+            return [
+                ...targetProblems(action.target, part, hasOther, context),
+                ...eventNameProblems(action.name, part),
+                ...(isVariableAmount(action.amount)
+                    ? amountVariableProblems(action.amount, action.target, 'number', part, context)
+                    : []),
+            ];
         case 'wait':
             if (action.seconds === null) return [{ part, slot: 'seconds', reason: 'unset' } as const];
+            if (isVariableAmount(action.seconds)) {
+                return amountVariableProblems(action.seconds, THIS, 'number', part, context, 'seconds');
+            }
 
             return [];
         default:
@@ -371,16 +419,25 @@ function valueProblems(
 ): readonly TriggerProblem[] {
     const target = knownTarget(action.target, context);
     const isPerEntity = value.kind === 'variable' || value.kind === 'triggerOn';
-    if (target === undefined && isPerEntity) return [];
+    const { amount, op } = action;
+    if (target === undefined && isPerEntity) {
+        // The value's type isn't known, so only whether the amount's variable is there.
+        if (!isVariableAmount(amount)) return [];
+
+        return amountVariableProblems(amount, action.target, 'any', part, context);
+    }
 
     const offers = changeableValues(target, context.registry);
     const offer = offers.find((candidate) => sameValueRef(candidate.ref, value));
     if (offer === undefined) return [{ part, slot: 'value', reason: missingValueReason(value) }];
-    if (!offer.ops.includes(action.op)) return [{ part, slot: 'value', reason: 'unknownValue' }];
-    if (action.amount === null || action.op === 'flip') return [];
+    if (!offer.ops.includes(op)) return [{ part, slot: 'value', reason: 'unknownValue' }];
+    if (amount === null || op === 'flip') return [];
+    if (isVariableAmount(amount)) {
+        return amountVariableProblems(amount, action.target, amountVariableType(offer, op), part, context);
+    }
 
-    const amount = offer.amountType.parse(action.amount);
-    if (!amount.ok) return [{ part, slot: 'amount', reason: 'badAmount' }];
+    const parsed = amountTypeOf(offer, op).parse(amount);
+    if (!parsed.ok) return [{ part, slot: 'amount', reason: 'badAmount' }];
 
     return [];
 }

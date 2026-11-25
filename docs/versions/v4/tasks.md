@@ -99,7 +99,7 @@ Planned in [fixes-9-to-13-plan.md](fixes-9-to-13-plan.md), confirmed by the owne
 - [x] 29. Fix 9 and fix 13: the tag group and "other"
   - Read: requirements/triggers/triggers.md#when-if-do--v3, requirements/triggers/triggers.md#events--v3, design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks
   - Done when: the target menu always shows "Every entity tagged", with one greyed line saying how to add a tag when the level has none; no text a creator sees, no requirement and no code comment says "something starts touching" (the Trigger tool's trigger, the sentences, the variables-and-inputs example all say "other"); browser tests cover the empty and filled tag group; fixes.md rows 9 and 13 say built
-- [ ] 30. Fix 10, the logic: multiply, divide and variables as values
+- [x] 30. Fix 10, the logic: multiply, divide and variables as values
   - Read: requirements/triggers/triggers.md#multiply-divide-and-variables-in-every-value-box--v4, architecture/core-model/triggers.md, architecture/triggers-in-play.md
   - Done when: Change value has Multiply and Divide (numbers, and a vector by one number; dividing by 0 leaves the value); every value box's value can be a variable of its type (level's or the target's own), saved, loaded and read when the block runs; unit tests cover saving and loading, and `runHeadless` tests cover multiply, divide, divide by 0 and a variable read at run time in Change value, the If, Wait and Fire custom event
 - [ ] 31. Fix 10, the blocks: Multiply, Divide and the variable picks

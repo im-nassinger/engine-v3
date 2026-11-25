@@ -78,18 +78,25 @@ export type CheckedValue =
     | { readonly kind: 'tag' }
     | ReadableValue;
 
+// A variable in a value box in place of a typed value (v4 fix 10), read when its block runs: the level's
+// (the World's), or with `own` one of the block's target's own (`this`'s for a Wait, which has no target).
+// Saved as `{ "kind": "variable", "name": "bonus" }`, with `"own": true` for an own one, the shape Change
+// value names a variable with; no field's value has that kind, so it can't be mistaken for a typed one.
+export type VariableAmount = { readonly kind: 'variable'; readonly name: string; readonly own?: true };
+
 // The one check: a value of the target compared with an amount, as Change value changes one. The amount is
-// the variable's value, the tag, or a number.
+// the variable's value, the tag, a number, or a variable read when the check runs.
 export type Check = {
     readonly kind: 'value';
     readonly target: Target;
     readonly value: CheckedValue | null;
     readonly compare: Compare;
-    readonly amount: VariableValue | null;
+    readonly amount: VariableValue | VariableAmount | null;
 };
 
-// Flip turns a boolean variable to the other value, and needs no amount.
-export type ChangeOp = 'set' | 'add' | 'subtract' | 'flip';
+// Flip turns a boolean variable to the other value, and needs no amount. Multiply and Divide (fix 10) work
+// on numbers, and on a vector by one number.
+export type ChangeOp = 'set' | 'add' | 'subtract' | 'multiply' | 'divide' | 'flip';
 
 // The value Change value changes on its target.
 export type ValueRef =
@@ -111,15 +118,28 @@ export type Action =
           readonly target: Target;
           readonly value: ValueRef | null;
           readonly op: ChangeOp;
-          readonly amount: JsonValue | null;
+          // The value's own value, a number for Multiply and Divide, or a variable (isVariableAmount).
+          readonly amount: JsonValue | VariableAmount | null;
       }
     | { readonly kind: 'destroy'; readonly target: Target }
     | { readonly kind: 'win' }
     | { readonly kind: 'lose' }
     | { readonly kind: 'restart' }
     // Each target hears the custom event in the same tick. The number is for scripts (v5); no trigger reads it.
-    | { readonly kind: 'fire'; readonly target: Target; readonly name: string | null; readonly amount: number | null }
+    | {
+          readonly kind: 'fire';
+          readonly target: Target;
+          readonly name: string | null;
+          readonly amount: number | VariableAmount | null;
+      }
     // The actions after it run this many seconds later.
-    | { readonly kind: 'wait'; readonly seconds: number | null };
+    | { readonly kind: 'wait'; readonly seconds: number | VariableAmount | null };
 
 export type ActionKind = Action['kind'];
+
+// Whether a value box holds a variable rather than a typed value.
+export function isVariableAmount(amount: unknown): amount is VariableAmount {
+    if (typeof amount !== 'object' || amount === null || Array.isArray(amount)) return false;
+
+    return 'kind' in amount && amount.kind === 'variable' && 'name' in amount && typeof amount.name === 'string';
+}

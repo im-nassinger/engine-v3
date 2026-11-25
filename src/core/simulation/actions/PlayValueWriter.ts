@@ -9,12 +9,12 @@ import {
     VariablesComponent,
 } from '../../components/index.ts';
 import type { AnyComponent } from '../../components/index.ts';
-import { TagsFieldType, VectorFieldType } from '../../fields/index.ts';
+import { NumberFieldType, TagsFieldType, VectorFieldType } from '../../fields/index.ts';
 import type { ChangeOp, JsonValue, ValueRef, VariableValue } from '../../fields/index.ts';
 import { Matrix2D } from '../../geometry/index.ts';
 import type { Point } from '../../geometry/index.ts';
 import type { Entity } from '../../level/index.ts';
-import { changeableValues, sameValueRef } from '../../triggers/index.ts';
+import { amountTypeOf, changeableValues, sameValueRef } from '../../triggers/index.ts';
 
 import type { PlayRun } from '../run/PlayRun.ts';
 import { entitiesIn } from '../triggers/entitiesIn.ts';
@@ -23,8 +23,8 @@ import { parentMatrixOf, placementNow } from './placementNow.ts';
 
 type FieldRef = ValueRef & { readonly kind: 'field' };
 
-// One Change value as the writer is given it: which value, how, and the amount as the trigger stores it.
-// Flip needs no amount, so its amount may be null and is never read.
+// One Change value as the writer is given it: which value, how, and the amount, a variable already read
+// (amountNow). Flip needs no amount, so its amount may be null and is never read.
 export type ValueChange = {
     readonly value: ValueRef;
     readonly op: ChangeOp;
@@ -49,6 +49,7 @@ const SURFACE_FIELDS: readonly string[] = ['friction', 'restitution'];
 const POSE_FIELDS: readonly string[] = ['position', 'rotation'];
 const TAGS = new TagsFieldType();
 const VELOCITY_AMOUNT = new VectorFieldType();
+const SCALE_AMOUNT = new NumberFieldType();
 // What a Flip is given in place of an amount, which it never reads.
 const FLIP_AMOUNT = { ok: true, value: true } as const;
 
@@ -73,7 +74,7 @@ export class PlayValueWriter {
         const offer = offers.find((candidate) => sameValueRef(candidate.ref, change.value));
         if (offer === undefined || !offer.ops.includes(change.op)) return false;
 
-        const amount = change.op === 'flip' ? FLIP_AMOUNT : offer.amountType.parse(change.amount);
+        const amount = change.op === 'flip' ? FLIP_AMOUNT : amountTypeOf(offer, change.op).parse(change.amount);
         if (!amount.ok) return false;
 
         const { value } = change;
@@ -91,8 +92,11 @@ export class PlayValueWriter {
 
     // Body › Velocity of the body the entity belongs to, its own or the nearest one above it, so a shape
     // inside a body's group, such as the `other` of a touch, moves its body. Set gives the speed in px/s,
-    // keeping the spin; Add and Subtract change it whatever the mass. A Static body doesn't move.
+    // keeping the spin; Add and Subtract change it whatever the mass; Multiply and Divide scale the speed it
+    // has now. A Static body doesn't move.
     private changeVelocity(entity: Entity, change: ValueChange) {
+        if (change.op === 'multiply' || change.op === 'divide') return this.scaleVelocity(entity, change);
+
         const amount = VELOCITY_AMOUNT.parse(change.amount);
         if (!amount.ok || change.op === 'flip') return false;
 
@@ -112,8 +116,25 @@ export class PlayValueWriter {
         return true;
     }
 
+    // Dividing by 0 leaves the speed as it is.
+    private scaleVelocity(entity: Entity, change: ValueChange) {
+        const amount = SCALE_AMOUNT.parse(change.amount);
+        if (!amount.ok) return false;
+
+        const body = bodyOfEntityOrAbove(entity, this.run);
+        if (body === undefined) return false;
+
+        const { world } = this.run.scene;
+        const { linear } = world.velocity(body.handle);
+        const x = changedNumber(change.op, linear.x, amount.value);
+        const y = changedNumber(change.op, linear.y, amount.value);
+        world.setLinearVelocity(body.handle, { x, y });
+
+        return true;
+    }
+
     // The amount was read with the variable's own type (changeableValues), and only the ops its type allows
-    // reach here: Set for any, Add and Subtract for a number, Flip for a boolean.
+    // reach here: Set for any, Add, Subtract, Multiply and Divide for a number, Flip for a boolean.
     private changeVariable(entity: Entity, name: string, op: ChangeOp, amount: VariableValue) {
         const component = entity.requireComponent(VariablesComponent);
         const variables = component.get('variables');
@@ -365,6 +386,11 @@ function changedNumber(op: ChangeOp, current: number, amount: number) {
             return current + amount;
         case 'subtract':
             return current - amount;
+        case 'multiply':
+            return current * amount;
+        // Dividing by 0 leaves the value as it was, as a target that lacks the value is skipped.
+        case 'divide':
+            return amount === 0 ? current : current / amount;
         // Flip is a boolean's alone: a number is never offered it.
         case 'flip':
             return current;
@@ -372,9 +398,14 @@ function changedNumber(op: ChangeOp, current: number, amount: number) {
 }
 
 // Set takes the amount whole; Add and Subtract change a number, a vector by a vector, or one axis of a
-// vector (a trigger saved with an axis that wasn't loaded through normalizeTrigger).
+// vector (a trigger saved with an axis that wasn't loaded through normalizeTrigger); Multiply and Divide a
+// number, or a vector by one number.
 function changedValue(op: ChangeOp, current: unknown, amount: unknown, axis: 'x' | 'y' | undefined): unknown {
     if (op === 'set') return amount;
+    const isScaling = op === 'multiply' || op === 'divide';
+    if (isScaling && axis === undefined && isPoint(current) && typeof amount === 'number') {
+        return { ...current, x: changedNumber(op, current.x, amount), y: changedNumber(op, current.y, amount) };
+    }
     if (axis === undefined && isPoint(current) && isPoint(amount)) {
         const x = changedNumber(op, current.x, amount.x);
         const y = changedNumber(op, current.y, amount.y);
