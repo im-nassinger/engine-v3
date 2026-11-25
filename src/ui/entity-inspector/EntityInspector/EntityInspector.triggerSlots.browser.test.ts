@@ -165,6 +165,20 @@ async function waitFullyOpen(gap: number) {
     await expect.poll(() => slotAt(gap)?.style.height, { timeout: 3000 }).toBe('');
 }
 
+function nextFrame() {
+    return new Promise((resolve) => requestAnimationFrame(resolve));
+}
+
+// Waits frame by frame, so the test sees the first frame `isDone` holds, not one a poll's interval later.
+async function framesUntil(isDone: () => boolean) {
+    const start = performance.now();
+    while (!isDone()) {
+        if (performance.now() - start > 3000) throw new Error('Timed out waiting frame by frame.');
+
+        await nextFrame();
+    }
+}
+
 function topOf(element: HTMLElement) {
     return element.getBoundingClientRect().top;
 }
@@ -243,6 +257,23 @@ describe('adding a block on hover', () => {
         expect(firstFading.time - start).toBeGreaterThanOrEqual(DELAY_MS);
         expect(firstShrinking.time - firstFading.time).toBeGreaterThanOrEqual(FADE_MS - FRAME_MS);
         expect(gone.time - firstFading.time).toBeGreaterThanOrEqual(OPEN_MS - FRAME_MS);
+    });
+
+    // A real slow frame, not the stopped clock: the slot's first frames are its costliest, and one long frame
+    // must not jump it most of the way open, which looks instant.
+    test('a slow frame as the slot starts opening moves it one frame, not the time it took', async () => {
+        await showDoor();
+        movePointerTo(blockBeside(1, 'above'), 'bottom');
+        await framesUntil(() => slotAt(1) !== null);
+        const start = performance.now();
+        while (performance.now() - start < 150) {
+            // The page is busy for 150 ms.
+        }
+        await nextFrame();
+        const afterSlowFrame = slotLook(1).height;
+
+        await waitFullyOpen(1);
+        expect(afterSlowFrame).toBeLessThan(slotLook(1).height / 2);
     });
 
     test('a mouse passing over a block for less than 200 ms opens nothing', async () => {

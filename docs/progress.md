@@ -11,7 +11,9 @@ The owner tried fix 4's Scratch blocks (task 27) and asked for changes.
 1. Hovering a value box seemed to leave the "add a block" slot open. It didn't reproduce on the current code in any browser, so the app was published to Netlify; there it worked.
 2. [Fix](versions/v4/fixes.md) 5, built: the script is 4 to 10 blocks tall; no "Doesn't run until every yellow part is set." note; value boxes are pills in new colours (amber when unset); a right click on a block opens Replace and Delete; the event's box only switches its own kind (starts or stops), and an action's own word is plain text, since Replace changes the block. The rules are in [controls.md](design/controls.md#v4-fix-5-the-blocks-after-the-owners-try), the picks in [decisions.md](decisions.md).
 
-**Where we stopped:** fixes 5 and 6 are built and committed, not pushed; the owner is still trying fix 4 (task 27).
+3. [Fix](versions/v4/fixes.md) 7: a slot sometimes opened at once instead of over 400 ms. A slow frame moved it by the whole time it took; a frame now moves it by 34 ms at most.
+
+**Where we stopped:** fixes 5 to 7 are built and committed, not pushed; the owner is still trying fix 4 (task 27).
 
 ## Where things stand
 

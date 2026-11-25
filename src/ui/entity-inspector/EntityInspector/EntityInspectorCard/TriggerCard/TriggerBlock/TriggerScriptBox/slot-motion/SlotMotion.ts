@@ -24,6 +24,9 @@ const REVEAL_MARGIN_PX = 4;
 // The slot's tooth hangs this far below its room into the block under it.
 const TOOTH_PX = 6;
 const FIRST_FRAME_MS = 16;
+// The most one frame moves a slot. A slow frame (the slot's first layout, a busy page) would otherwise jump
+// it most of the way open in one step, and it would look instant; a slow page runs the motion slower instead.
+const MAX_FRAME_MS = 34;
 
 type Ask = {
     gap: number | undefined;
@@ -134,7 +137,7 @@ export class SlotMotion {
         const now = performance.now();
         let elapsed = FIRST_FRAME_MS;
         if (this.lastFrame !== undefined) {
-            elapsed = now - this.lastFrame;
+            elapsed = Math.min(MAX_FRAME_MS, now - this.lastFrame);
         }
         this.lastFrame = now;
 
