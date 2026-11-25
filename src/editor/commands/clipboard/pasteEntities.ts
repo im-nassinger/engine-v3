@@ -7,6 +7,7 @@ import { AddEntitiesChange } from '../../history/index.ts';
 import type { EditOutcome } from '../../history/index.ts';
 import type { OpenLevel } from '../../session/index.ts';
 import { pasteRefusalText } from './pasteRefusalText.ts';
+import { withNextNames } from './withNextNames.ts';
 
 const LOCKED = 'This group is locked';
 const NAME_TYPE_NAME = NameComponent.schema.typeName;
@@ -25,7 +26,7 @@ export type PasteSpot = {
     readonly gridSize: number | undefined;
 };
 
-// Puts copied entities into the current group, on top, with new ids, each root kept as it looked when
+// Puts copied entities into the current group, on top, with new ids and next names (withNextNames), each root kept as it looked when
 // copied and the set placed by PastePlacement, then selects them, in one step "Paste 3 entities". Refused
 // whole, before anything changes, inside a locked group or when the reader refuses the entities.
 export function pasteEntities(
@@ -39,11 +40,12 @@ export function pasteEntities(
     if (caches.hidden.isLocked(group)) return { kind: 'refused', reason: LOCKED };
 
     const remapped = tools.remapping.remap(fragment, openLevel);
-    const check = tools.reader.checkSubtree(level, remapped, group);
+    const named = withNextNames(remapped, level);
+    const check = tools.reader.checkSubtree(level, named, group);
     if (!check.ok) return { kind: 'refused', reason: pasteRefusalText(check.refusal) };
 
     // checkSubtree read every root as an entity.
-    const roots = remapped as readonly EntityData[];
+    const roots = named as readonly EntityData[];
     const placement = new PastePlacement(fragment.box, spot.destination, spot.gridSize);
     const worldMatrix = caches.worldMatrices.matrixOf(level.world);
     const groupMatrix = caches.worldMatrices.matrixOf(group);

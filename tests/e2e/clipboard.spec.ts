@@ -38,7 +38,10 @@ async function drawRectangle(page: Page, at: ScreenPoint) {
 }
 
 function rectangleRows(page: Page) {
-    return page.getByRole('tree', { name: 'Entities' }).getByRole('treeitem').filter({ hasText: 'Rectangle 1' });
+    return page
+        .getByRole('tree', { name: 'Entities' })
+        .getByRole('treeitem')
+        .filter({ hasText: /Rectangle [0-9]+/ });
 }
 
 function statusText(page: Page) {

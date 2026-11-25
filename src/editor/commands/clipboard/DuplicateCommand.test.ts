@@ -65,6 +65,17 @@ describe('Duplicate', () => {
         expect(selectedEntities(session)[0]?.requireComponent(NameComponent).get('name')).toBe('Square');
     });
 
+    test('gives a name ending in a number the next number for its word', () => {
+        const { session, square, duplicate } = buildSession();
+        square.requireComponent(NameComponent).set('name', 'Entity 1');
+        select(session, [square]);
+
+        duplicate.run();
+
+        expect(selectedEntities(session)[0]?.requireComponent(NameComponent).get('name')).toBe('Entity 2');
+        expect(square.requireComponent(NameComponent).get('name')).toBe('Entity 1');
+    });
+
     test('brings everything inside a duplicated group', () => {
         const { session, level, group, child, duplicate } = buildSession();
         select(session, [group, child]);

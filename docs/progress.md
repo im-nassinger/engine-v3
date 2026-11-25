@@ -13,7 +13,9 @@ The owner tried fix 4's Scratch blocks (task 27) and asked for changes.
 
 3. [Fix](versions/v4/fixes.md) 7: a slot sometimes opened at once instead of over 400 ms. First fixed for slow frames (a frame moves it by 34 ms at most); the owner still saw it, and the real cause was a script shorter than its least height (one or two actions), where the slot jumped 27 px in one frame. Fixed and deployed.
 
-**Where we stopped:** fixes 5 to 7 are built and committed, not pushed; the owner is still trying fix 4 (task 27).
+4. [Fix](versions/v4/fixes.md) 8: a copied entity whose name ends in a number gets the next number for its word (copying `Entity 1` makes `Entity 2`), in Paste and Duplicate.
+
+**Where we stopped:** fixes 5 to 8 are built and committed, not pushed; the owner is still trying fix 4 (task 27).
 
 ## Where things stand
 

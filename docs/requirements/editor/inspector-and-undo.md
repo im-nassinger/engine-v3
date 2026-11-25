@@ -126,6 +126,7 @@ Source: scope ED10; round 6: 05 2.9; round 7: 06 2.13
 - Ctrl+C copies the selection, Ctrl+V pastes it, Ctrl+D duplicates it.
 - **Duplicate puts the copy on top of the original, in the same group, with no offset.** The copy becomes the selection. *Why: the owner's change.*
 - Paste puts the copy centred on the mouse when it is over the level view, otherwise at the centre of the view. Pasted entities go into the group you are inside, on top, and become the selection.
+- **A copy's name that ends in a number gets the next number for its word in the level** (v4): copying `Entity 1` makes `Entity 2`, and copying `Box 1` and `Box 2` together, next to them, makes `Box 3` and `Box 4`. It counts as new shapes do, one more than the highest number used. Entities inside a copied group are renamed the same way; a name with no number, such as `Crate`, stays. *Why: the owner's ask, so copies can be told apart.*
 - **Only what is selected is copied.** Nothing comes along because it is connected. A joint is copied only when the joint itself is selected.
 - Links between the copies are kept: a copied joint connects the copies of its entities if they were copied too. A link to something outside the copied set stays pointed at the original in the same level, and becomes `missing` in another level. **"The same level" means the same opening of it:** after a reload, New or Import, such links become `missing`. *Why: v1 has no level id, so the editor can only recognise the level it has open (owner: 2026-11-13).*
 - The World and the camera are skipped by copy, cut, duplicate and delete. If anything else was selected the command goes ahead, otherwise the message pill says why.
@@ -133,7 +134,7 @@ Source: scope ED10; round 6: 05 2.9; round 7: 06 2.13
 - A paste that would pass a limit is refused whole, naming the limit.
 - With nothing to paste: `Nothing to paste` in the message pill.
 
-Source: scope ED3; round 3: 01 2.9; round 7: 06 2.10; round 8: JC1; round 9: 09 2.18; old: WS-71 to WS-83; owner: 2026-11-13
+Source: scope ED3; round 3: 01 2.9; round 7: 06 2.10; round 8: JC1; round 9: 09 2.18; old: WS-71 to WS-83; owner: 2026-11-13; owner: 2026-11-25 (v4 fix 8)
 
 ### Delete · v1
 

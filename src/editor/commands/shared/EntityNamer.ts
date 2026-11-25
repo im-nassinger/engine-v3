@@ -2,18 +2,22 @@ import { labelName } from '../../../core/level/index.ts';
 import type { Level } from '../../../core/level/index.ts';
 
 // Names a new entity with a word and a number: one more than the highest number already used with that
-// word in the level, so "Group 3" follows "Group 2" even after "Group 1" was deleted. Group and createShape
-// use it.
+// word in the level, so "Group 3" follows "Group 2" even after "Group 1" was deleted. A namer also counts the
+// names it gave, so a paste of "Box 1" and "Box 2" names them "Box 3" and "Box 4". Group, createShape,
+// placeJoint, paste and Duplicate use it.
 export class EntityNamer {
     private readonly level: Level;
+    private readonly givenNumbers = new Map<string, number>();
 
     constructor(level: Level) {
         this.level = level;
     }
 
     nextName(word: string) {
-        const highest = this.highestNumberUsed(word);
-        const next = highest + 1;
+        const highestInLevel = this.highestNumberUsed(word);
+        const highestGiven = this.givenNumbers.get(word) ?? 0;
+        const next = Math.max(highestInLevel, highestGiven) + 1;
+        this.givenNumbers.set(word, next);
 
         return `${word} ${next}`;
     }

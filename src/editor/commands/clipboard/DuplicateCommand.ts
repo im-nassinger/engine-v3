@@ -11,12 +11,13 @@ import { stepLabel } from '../shared/stepLabel.ts';
 
 import { selectionSplit } from './copySelection.ts';
 import { pasteRefusalText } from './pasteRefusalText.ts';
+import { withNextNames } from './withNextNames.ts';
 
 const DUPLICATED = 'duplicated';
 const LOCKED = 'This group is locked';
 
 // Copies each selected entity in place, without the clipboard: the copy goes directly above its original
-// in the same group, with no offset, and the copies become the selection, in one step "Duplicate 3
+// in the same group, with no offset and the next name (withNextNames), and the copies become the selection, in one step "Duplicate 3
 // entities". Links inside the duplicated set point at the copies, links outside it keep their entity.
 // Refused whole, before anything stays changed, inside a locked group or over a limit.
 export class DuplicateCommand implements EditorCommand {
@@ -66,6 +67,7 @@ export class DuplicateCommand implements EditorCommand {
         // links between the roots point at the copies.
         const written = this.writer.writeSubtree(originals);
         const remapped = this.remapping.remap({ sourceToken: openLevel.sourceToken, entities: written }, openLevel);
+        const named = withNextNames(remapped, level);
         const label = stepLabel('Duplicate', originals);
 
         return editor.edit(label, (transaction) => {
@@ -74,7 +76,7 @@ export class DuplicateCommand implements EditorCommand {
             // One root at a time, each checked against the level as the earlier copies left it, so the
             // entity limit counts them all. A refusal rolls back the copies already in.
             for (const [offset, original] of originals.entries()) {
-                const copy = remapped[offset] as EntityData;
+                const copy = named[offset] as EntityData;
                 const parent = requireParent(original);
 
                 const check = reader.checkSubtree(level, [copy], parent);
