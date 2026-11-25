@@ -9,6 +9,7 @@ import type { CommitTriggerEdit } from '../../CommitTriggerEdit.ts';
 import { ScriptBlock } from './ScriptBlock/index.ts';
 import { ScriptSlot } from './ScriptSlot/index.ts';
 import { SlotMotion } from './slot-motion/SlotMotion.ts';
+import { ScriptView } from './script-view/ScriptView.ts';
 import './TriggerScriptBox.css';
 
 export type TriggerScriptBoxProps = {
@@ -33,12 +34,20 @@ const FLOATING_BOXES = '.menu, .entity-picker, .trigger-word-field';
 export function TriggerScriptBox({ openLevel, script, triggerIndex, commit }: TriggerScriptBoxProps) {
     const [menuGap, setMenuGap] = useState<number | undefined>(undefined);
     const [motion] = useState(() => new SlotMotion());
+    const [view] = useState(() => new ScriptView());
     const scriptRef = useRef<HTMLDivElement>(null);
+    const verticalBarRef = useRef<HTMLDivElement>(null);
+    const horizontalBarRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         motion.attach(scriptRef.current);
         return () => motion.dispose();
     }, [motion]);
+
+    useEffect(() => {
+        view.attach(scriptRef.current, verticalBarRef.current, horizontalBarRef.current);
+        return () => view.dispose();
+    }, [view]);
 
     const [eventBlock] = script.blocks;
     const ifTop = script.blocks.find((block) => block.shape === 'ifTop');
@@ -71,7 +80,7 @@ export function TriggerScriptBox({ openLevel, script, triggerIndex, commit }: Tr
     const hoverScript = (event: PointerEvent<HTMLDivElement>) => {
         const target = event.target;
         if (!(target instanceof Element)) return;
-        if (target.closest(`.script-block, .script-slot, ${FLOATING_BOXES}`) !== null) return;
+        if (target.closest(`.script-block, .script-slot, .script-bar, ${FLOATING_BOXES}`) !== null) return;
 
         const arm = target.closest('.arm');
         motion.hover(undefined, arm);
@@ -92,6 +101,8 @@ export function TriggerScriptBox({ openLevel, script, triggerIndex, commit }: Tr
                 </div>
                 <div className="room" />
             </div>
+            <div className="script-bar vertical" ref={verticalBarRef} />
+            <div className="script-bar horizontal" ref={horizontalBarRef} />
         </div>
     );
 }

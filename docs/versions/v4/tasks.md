@@ -81,7 +81,7 @@ Planned in [fix-4-scratch-triggers.md](fix-4-scratch-triggers.md), confirmed by 
 - [x] 24. Adding a block on hover
   - Read: design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks (Adding a block anywhere), design/mockups/triggers.html
   - Done when: the bands, cursors, 200 ms wait, 400 ms open and close, the still hovered block, the scroll to a clipped slot, the empty strip and the glide back work as in the mockup; clicking a slot opens the add menu and adds the block there, one undo step; a check added with no If wraps every action in one; browser tests cover each
-- [ ] 25. The script box's scrollbars and fades
+- [x] 25. The script box's scrollbars and fades
   - Read: design/controls.md#v4-fix-4-the-trigger-card-as-scratch-blocks, design/mockups/triggers.html
   - Done when: the script scrolls sideways under thin overlay bars that can be dragged, and fades with the grain where blocks are hidden, only on those edges; browser tests cover both
 - [ ] 26. Journeys and close fix 4's docs

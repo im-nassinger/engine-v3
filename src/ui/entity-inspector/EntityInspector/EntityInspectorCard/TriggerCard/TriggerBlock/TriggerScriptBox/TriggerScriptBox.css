@@ -1,5 +1,5 @@
 /* The script scrolls sideways instead of wrapping: blocks fill a stack as wide as its longest line, and at
-   least as wide as the card. Its own scrollbars and fades are task 25's.
+   least as wide as the card. ScriptView draws its own scrollbars and fades the edges hiding blocks.
    An "add a block" slot opens and closes as SlotMotion moves it. */
 .trigger-script-box {
     position: relative;
@@ -31,6 +31,74 @@
         &::-webkit-scrollbar {
             display: none;
         }
+    }
+
+    /* The script's own scrollbars: thin rounded bars over the blocks, taking no room. They show while the
+       mouse is on the script and widen under it; ScriptView places them and shows only those that can
+       scroll. Over every block; hidden while a menu, picker or field is open, which would draw under them. */
+    > .script-bar {
+        position: absolute;
+        z-index: 1100;
+        display: none;
+        box-sizing: border-box;
+        padding: 2px;
+        cursor: default;
+        opacity: 0;
+        transition: opacity 0.2s;
+
+        &.shown {
+            display: block;
+        }
+
+        &::before {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 99px;
+            background: color-mix(in srgb, var(--text) 30%, transparent);
+            transition: background 0.2s;
+        }
+
+        &:hover::before,
+        &.dragged::before {
+            background: color-mix(in srgb, var(--text) 55%, transparent);
+        }
+
+        &.vertical {
+            right: 0;
+            width: 8px;
+        }
+
+        &.horizontal {
+            bottom: 0;
+            height: 8px;
+        }
+
+        &.vertical:hover,
+        &.vertical.dragged {
+            width: 11px;
+        }
+
+        &.horizontal:hover,
+        &.horizontal.dragged {
+            height: 11px;
+        }
+    }
+
+    &:hover > .script-bar,
+    > .script-bar.dragged {
+        opacity: 1;
+    }
+
+    &:has(.menu, .entity-picker, .trigger-word-field) > .script-bar {
+        visibility: hidden;
+    }
+
+    /* The edge fade is a mask, which would hide the menu, picker or field floating past the script, so the
+       script cuts its edges plainly while one is open. ScriptView sets the mask inline, hence !important. */
+    &:has(.menu, .entity-picker, .trigger-word-field) > .script {
+        mask-image: none !important;
     }
 
     /* 2 px: room for the blocks' ring. */
