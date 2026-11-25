@@ -2,9 +2,11 @@ import { describe, expect, test } from 'vitest';
 
 import { PathComponent, TransformComponent } from '../../../core/components/index.ts';
 import { labelName } from '../../../core/level/index.ts';
+import type { SnapResult, Snapper } from '../../snapping/index.ts';
 import { TENS_SNAPPER } from '../shape/testing/shapeToolTest.ts';
 
 import { PEN_HINT } from './PenTool.ts';
+import { TOO_FEW_TO_CLOSE } from './states/PenIdleState.ts';
 import {
     BACKSPACE,
     ENTER,
@@ -23,6 +25,18 @@ const TRIANGLE = [
     { x: 300, y: 100 },
     { x: 200, y: 300 },
 ];
+
+// Rounds a point to the nearest 50 px, unless Ctrl is held: a step wider than the close ring.
+const FIFTIES_SNAPPER: Snapper = {
+    snapMove: (_bounds, offset): SnapResult => ({ point: offset, snappedX: false, snappedY: false }),
+    snapPoint: (point, _view, options): SnapResult => {
+        if (options.ctrlHeld) return { point, snappedX: false, snappedY: false };
+
+        const snapped = { x: Math.round(point.x / 50) * 50, y: Math.round(point.y / 50) * 50 };
+
+        return { point: snapped, snappedX: true, snappedY: true };
+    },
+};
 
 function undoCount(setup: PenSetup) {
     return setup.session.openLevel.history.undoCount;
@@ -148,7 +162,31 @@ describe('PenTool closing', () => {
         expect(setup.controller.active.id).toBe('select');
     });
 
-    test('with fewer than 3 points a press on the first point is ignored', () => {
+    test('a press that snaps onto the first point closes the path, though it is outside the ring', () => {
+        const setup = buildPenTest(FIFTIES_SNAPPER);
+
+        clicks(setup, TRIANGLE);
+        setup.controller.pointerMove(pointer({ x: 115, y: 90 }));
+        expect(setup.pen.penDrawing).toMatchObject({ next: { x: 100, y: 100 }, closing: true });
+        click(setup, { x: 115, y: 90 });
+
+        const path = madePath(setup);
+        expect(path.closed).toBe(true);
+        expect(placesOf(path)).toEqual(TRIANGLE);
+        expect(undoCount(setup)).toBe(1);
+    });
+
+    test('with Ctrl, which turns snapping off, a press outside the ring adds a point', () => {
+        const setup = buildPenTest(FIFTIES_SNAPPER);
+
+        clicks(setup, TRIANGLE);
+        click(setup, { x: 115, y: 90 }, { ctrl: true });
+
+        expect(setup.pen.penDrawing?.points).toHaveLength(4);
+        expect(undoCount(setup)).toBe(0);
+    });
+
+    test('with fewer than 3 points a press on the first point is ignored, and the status says why', () => {
         const setup = buildPenTest();
 
         clicks(setup, [
@@ -159,6 +197,7 @@ describe('PenTool closing', () => {
 
         expect(setup.pen.penDrawing?.points).toHaveLength(2);
         expect(undoCount(setup)).toBe(0);
+        expect(setup.session.status.current).toBe(TOO_FEW_TO_CLOSE);
     });
 
     test('the preview says when a press would close', () => {

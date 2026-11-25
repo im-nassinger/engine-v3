@@ -93,7 +93,7 @@ Planned in [fix-4-scratch-triggers.md](fix-4-scratch-triggers.md), confirmed by 
 
 Planned in [fixes-9-to-13-plan.md](fixes-9-to-13-plan.md), confirmed by the owner (2026-11-25). Every task also needs `npm run check` to pass, and each pick made while building goes in decisions.md.
 
-- [ ] 28. Fix 11: the pen closes a path ended on its first point
+- [x] 28. Fix 11: the pen closes a path ended on its first point
   - Read: bugs.md#the-pen-doesnt-close-a-path-ended-on-its-first-point, versions/v4/fixes.md
   - Done when: with snapping on and off, a press within the close ring, or one that snaps onto the first point, closes the path (from 3 points on) and it gets its fill; the cause found is written in bugs.md with the fix, the bug marked fixed; browser tests pin both cases; fixes.md row 11 says fixed
 - [ ] 29. Fix 9 and fix 13: the tag group and "other"

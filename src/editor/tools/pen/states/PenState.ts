@@ -25,8 +25,8 @@ export type PenStateHost = {
     // Where a click would add the next point, in that space: snapped, or with Shift at a multiple of 15°
     // from the last point.
     nextPlace(levelPosition: Point, modifiers: Modifiers, space: GroupSpace): Point;
-    // Within 8 screen px of the first point.
-    isNearFirst(levelPosition: Point): boolean;
+    // A press here ends on the first point: within 8 screen px of it, or placed on it by snapping.
+    endsOnFirst(levelPosition: Point, modifiers: Modifiers): boolean;
     // A read-only level or a locked group takes no new path; the status says why.
     refusesNewPath(): boolean;
     // A press on an end of the open path the pen was picked with starts drawing from it. True when it did.

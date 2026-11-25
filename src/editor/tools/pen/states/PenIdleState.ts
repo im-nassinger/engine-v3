@@ -7,9 +7,11 @@ import type { PenState, PenStateHost } from './PenState.ts';
 
 const MAX_POINTS = V1_LEVEL_LIMITS.maxPathPoints;
 export const TOO_MANY_POINTS = `A path holds at most ${MAX_POINTS.toLocaleString('en-US')} points`;
+export const TOO_FEW_TO_CLOSE = 'A path closes from 3 points on';
 
-// No button is down. A press starts a point, or closes the path on its first point from 3 points on. The
-// second press of a double-click and a right-click finish the drawing open.
+// No button is down. A press starts a point, or closes the path on its first point from 3 points on (with
+// fewer, it is ignored and the status says why). The second press of a double-click and a right-click
+// finish the drawing open.
 export class PenIdleState implements PenState {
     readonly isPressed = false;
     readonly placing = undefined;
@@ -40,9 +42,12 @@ export class PenIdleState implements PenState {
             return;
         }
 
-        if (host.isNearFirst(input.levelPosition)) {
+        if (host.endsOnFirst(input.levelPosition, input.modifiers)) {
             const first = path.points[0];
-            if (path.points.length < 3 || first === undefined) return;
+            if (path.points.length < 3 || first === undefined) {
+                host.context.status.show(TOO_FEW_TO_CLOSE);
+                return;
+            }
 
             host.goTo(new PenPressState(host, { input, place: first, space: path.space, closing: first }));
             return;

@@ -3,7 +3,7 @@ import type { PathGeometry, PathPoint, Point } from '../../../core/geometry/inde
 import type { EntityId } from '../../../core/level/index.ts';
 import { createPath, extendPath } from '../../commands/index.ts';
 import { READ_ONLY_REASON } from '../../history/index.ts';
-import { angleLocked } from '../shape/polygonDrawing.ts';
+import { angleLocked, samePoint } from '../shape/polygonDrawing.ts';
 import type { LevelPointerInput, Modifiers, Tool, ToolContext, ToolKey } from '../Tool.ts';
 
 import { inStoredOrder, keptIdOf, keptPathOf, reversedPoints } from './penContinuing.ts';
@@ -205,7 +205,7 @@ export class PenTool implements Tool {
             },
             spaceForPress: () => this.drawing?.space ?? this.groupSpace(),
             nextPlace: (levelPosition, modifiers, space) => this.nextPlace(levelPosition, modifiers, space),
-            isNearFirst: (levelPosition) => this.isNearFirst(levelPosition),
+            endsOnFirst: (levelPosition, modifiers) => this.endsOnFirst(levelPosition, modifiers),
             refusesNewPath: () => this.refusesNewPath(),
             continueFrom: (levelPosition) => this.continueFrom(levelPosition),
         };
@@ -369,6 +369,16 @@ export class PenTool implements Tool {
         return this.screenDistance(firstInLevel, levelPosition) <= CLOSE_PX;
     }
 
+    // Snapping can put a press outside the ring exactly on the first point's grid spot; that ends there too.
+    private endsOnFirst(levelPosition: Point, modifiers: Modifiers) {
+        const drawing = this.drawing;
+        const first = drawing?.points[0];
+        if (drawing === undefined || first === undefined) return false;
+        if (this.isNearFirst(levelPosition)) return true;
+
+        return samePoint(this.nextPlace(levelPosition, modifiers, drawing.space), first);
+    }
+
     private refusesNewPath() {
         const context = this.requireContext();
         const reason = lockedReason(context);
@@ -469,7 +479,10 @@ export class PenTool implements Tool {
         if (input === undefined) return { next: undefined, closing: false };
 
         const first = drawing?.points[0];
-        const closing = drawing !== undefined && drawing.points.length >= 3 && this.isNearFirst(input.levelPosition);
+        const closing =
+            drawing !== undefined &&
+            drawing.points.length >= 3 &&
+            this.endsOnFirst(input.levelPosition, input.modifiers);
         if (closing && first !== undefined) return { next: space.toLevel.apply(first), closing };
 
         const next = space.toLevel.apply(this.nextPlace(input.levelPosition, input.modifiers, space));
