@@ -108,7 +108,7 @@ test('About opens from Help, and Esc closes it', async ({ page }) => {
 
     const about = page.getByRole('dialog', { name: 'About engine-v3' });
     await expect(about).toBeVisible();
-    await expect(about).toContainText('Level file format version 1');
+    await expect(about).toContainText('Level file format version 2');
     await expect(about.getByRole('button', { name: 'OK' })).toBeFocused();
 
     await page.keyboard.press('Escape');

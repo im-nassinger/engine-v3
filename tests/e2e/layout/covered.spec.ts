@@ -284,13 +284,17 @@ const CASES: CoverCase[] = [
         },
     },
     {
-        name: "the Camera's Follow dropdown and its pick button's tooltip",
+        name: "the Camera's Follow entity picker and its pick button's tooltip",
         run: async (page, inspect) => {
             await selectRow(page, 'Camera');
             const camera = card(page, 'CameraComponent');
             await expect(camera).toHaveCount(1);
 
-            await inspectMenuButton(page, inspect, camera, 'Follow');
+            await camera.getByRole('button', { name: 'Follow' }).click();
+            const picker = camera.getByRole('dialog', { name: 'Pick an entity' });
+            await inspect('the Follow entity picker', picker);
+            await page.keyboard.press('Escape');
+            await expect(picker).toHaveCount(0);
             await inspectTooltips(
                 page,
                 inspect,
