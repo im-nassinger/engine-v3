@@ -28,6 +28,14 @@ export type {
 } from './typing/ValueInput.ts';
 export { TriggerCardModel } from './triggers/TriggerCardModel.ts';
 export type { TriggerAddRow, TriggerBlock, TriggerRow, TriggerSection } from './triggers/TriggerCardModel.ts';
+export type {
+    ScriptBlock,
+    ScriptColour,
+    ScriptGap,
+    ScriptIcon,
+    ScriptWordGroup,
+    TriggerScript,
+} from './triggers/TriggerScript.ts';
 export { TriggerChoices } from './triggers/TriggerChoices.ts';
 export { TriggerEdits } from './triggers/TriggerEdits.ts';
 export type { TriggerEdit } from './triggers/TriggerEdits.ts';

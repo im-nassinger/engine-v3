@@ -7,8 +7,8 @@ import { triggerName } from '../../../core/triggers/index.ts';
 // Between a component and one of its values in a word: "Transform › Position".
 export const VALUE_SEPARATOR = ' › ';
 
-// What Change value's value word reads: "coins", "Transform › Position", "tags", "Triggers › Touched",
-// "Body › Velocity". A
+// What Change value's value word reads, its path from the entity: "coins", "Transform › Position", "tags",
+// "Triggers › Timed door › Enabled", "Body › Velocity". A
 // vector's axis, which only a trigger made before vectors were added whole has, reads after it.
 export function valueName(value: ValueRef, registry: ComponentRegistry, target: Entity | undefined) {
     switch (value.kind) {
@@ -17,7 +17,7 @@ export function valueName(value: ValueRef, registry: ComponentRegistry, target: 
         case 'tag':
             return 'tags';
         case 'triggerOn':
-            return `${cardTitle('TriggerComponent')}${VALUE_SEPARATOR}${triggerLabel(value.trigger, target)}`;
+            return `${TRIGGERS_STEP}${VALUE_SEPARATOR}${enabledLabel(value.trigger, target)}`;
         case 'velocity':
             return `${cardTitle('BodyComponent')}${VALUE_SEPARATOR}${LIVE_LABELS.velocityX}`;
         case 'field': {
@@ -27,6 +27,15 @@ export function valueName(value: ValueRef, registry: ComponentRegistry, target: 
             return `${name} ${value.axis}`;
         }
     }
+}
+
+// The first step of a trigger's Enabled path: the component holds a list of triggers, so its path says
+// "Triggers", as the glossary writes it, though the card is titled "Trigger".
+const TRIGGERS_STEP = 'Triggers';
+
+// A trigger's Enabled as its component's submenu lists it: "Timed door › Enabled".
+export function enabledLabel(triggerId: number, target: Entity | undefined) {
+    return `${triggerLabel(triggerId, target)}${VALUE_SEPARATOR}Enabled`;
 }
 
 // What a live value reads in its submenu, its axis read apart: "Speed", "Velocity".

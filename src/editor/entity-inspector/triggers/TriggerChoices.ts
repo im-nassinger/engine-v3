@@ -45,7 +45,7 @@ import {
     LIVE_LABELS,
     readableAxis,
     readableName,
-    triggerLabel,
+    enabledLabel,
     valueName,
 } from './valueNames.ts';
 import { targetText } from './targetText.ts';
@@ -760,12 +760,13 @@ export class TriggerChoices {
         return { ...live, note: 'live' };
     }
 
-    // A value as its component's submenu lists it: "Position", "Tags", "Touched" for a trigger's on/off.
+    // A value as its component's submenu lists it: "Position", "Tags", "Touched › Enabled" for a trigger's
+    // on/off.
     private valueLabel(value: ValueRef, target: Entity | undefined) {
         if (value.kind === 'field') return fieldLabel(value, this.context.registry);
         if (value.kind === 'tag') return 'Tags';
         if (value.kind === 'velocity') return LIVE_LABELS.velocityX;
-        if (value.kind === 'triggerOn') return `${triggerLabel(value.trigger, target)} on/off`;
+        if (value.kind === 'triggerOn') return enabledLabel(value.trigger, target);
 
         return value.name;
     }

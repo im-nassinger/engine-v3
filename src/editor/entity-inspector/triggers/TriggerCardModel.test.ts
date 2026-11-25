@@ -363,7 +363,7 @@ describe('TriggerCardModel', () => {
         ).toEqual([
             ['Transform', ['Position', 'Rotation']],
             ['Tags', ['Tags']],
-            ['Trigger', ['Touched on/off']],
+            ['Trigger', ['Touched › Enabled']],
         ]);
     });
 
@@ -414,7 +414,7 @@ describe('TriggerCardModel', () => {
         expect(onAmount.text).toBe('off');
         expect(menuLabels(onAmount)).toEqual(['on', 'off']);
         expect(menuLabels(tagAmount)).toEqual(['coin', 'player', 'New tag…']);
-        expect(rowText(block, 2, 0)).toBe('set this Trigger › Touched to off');
+        expect(rowText(block, 2, 0)).toBe('set this Triggers › Touched › Enabled to off');
     });
 
     test("an amount opens the inspector's own boxes: a vector's two, a number with its unit, the colour box", () => {

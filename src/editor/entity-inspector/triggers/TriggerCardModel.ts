@@ -8,6 +8,8 @@ import type { CardNote } from '../model/CardNote.ts';
 import { TriggerChoices } from './TriggerChoices.ts';
 import { TriggerSentence } from './TriggerSentence.ts';
 import type { SentenceSources } from './TriggerSentence.ts';
+import { triggerScript } from './TriggerScript.ts';
+import type { TriggerScript } from './TriggerScript.ts';
 import type { TriggerRowPart, TriggerWordEntry } from './TriggerWord.ts';
 
 export type TriggerRow = {
@@ -44,6 +46,8 @@ export type TriggerBlock = {
     readonly name: string;
     readonly isOn: boolean;
     readonly sections: readonly [TriggerSection, TriggerSection, TriggerSection];
+    // The same trigger as Scratch blocks (v4 fix 4), which replace the sections once the card draws them.
+    readonly script: TriggerScript;
     // The editor messages about this trigger, such as "Doesn't run until every yellow part is set.".
     readonly notes: readonly CardNote[];
 };
@@ -85,6 +89,7 @@ function blockOf(
         name: triggerName(trigger),
         isOn: trigger.on,
         sections: [whenSection(trigger, sources), ifSection(trigger, sources), doSection(trigger, sources)],
+        script: triggerScript(trigger, sources),
         notes: ownNotes,
     };
 }

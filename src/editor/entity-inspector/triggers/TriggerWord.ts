@@ -15,7 +15,9 @@ export type TriggerWordSlot =
     // The axis the value check reads on a vector, x or y.
     | 'axis'
     // A variable changed When's condition: "changes" or "becomes 3 or more", one word.
-    | 'becomes';
+    | 'becomes'
+    // A time's unit in a block, a menu holding "seconds" only for now.
+    | 'unit';
 
 // Where a word sits, for typing a number into it.
 export type TriggerWordAddress = {
@@ -110,7 +112,8 @@ export type TriggerWordEntry =
     | TriggerTypedEntry;
 
 export type TriggerWord =
-    | { readonly kind: 'text'; readonly text: string }
+    // `isEntity`: a fixed word naming an entity, in an entity's blue, such as the event's `other`.
+    | { readonly kind: 'text'; readonly text: string; readonly isEntity?: true }
     | {
           readonly kind: 'slot';
           readonly address: TriggerWordAddress;
