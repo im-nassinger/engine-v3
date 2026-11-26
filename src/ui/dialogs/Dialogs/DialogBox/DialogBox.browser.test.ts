@@ -24,13 +24,13 @@ async function showDialog(onConfirm = vi.fn(), onClose = vi.fn()) {
 }
 
 describe("DialogBox's look", () => {
-    test('is a 400 px island centred over the scrim', async () => {
+    test('is a 380 px island centred over the scrim', async () => {
         await showDialog();
 
         const box = shownControl('.dialog-box > .box');
         const look = styleOf(box);
         expect(styleOf(shownControl('.dialog-box')).backgroundColor).toBe(tokenColour('--scrim'));
-        expect(box.getBoundingClientRect().width).toBe(400);
+        expect(box.getBoundingClientRect().width).toBe(380);
         expect(look.backgroundColor).toBe(tokenColour('--panel'));
         expect(look.borderTopLeftRadius).toBe('14px');
         expect(look.boxShadow).toBe(computedAs('box-shadow', 'var(--shade)'));

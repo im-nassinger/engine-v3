@@ -72,7 +72,7 @@ A field is a row of `--row` height: the label in `--muted` in a 120 px column, t
 - **Menu:** solid `--panel`, `--radius-menu` corners, 6 px inside, the `--shade` shadow, no edge. Entries are 28 px high with `--radius` corners, the shortcut in `--muted` at the right. **The hovered entry is `--accent-soft`** (a soft hover). A disabled entry is `--faint`. A submenu opens to the right of its entry.
 - **The main menu** opens to the right of ☰, its top level with ☰'s top: Play with its keys, then File, Edit, Arrange, View and Help, each with a right arrow.
 - **A kinds menu** (the Shape tool's Rectangle, Circle and Polygon; the Joint tool's Hinge, Rope and Spring) stands open to the right of its tool, 12 px from the tool column, **centred on the tool**, with a 7 px arrow on its left side in `--panel` pointing at the tool and joined to the menu with no seam. Each kind is an entry with its icon; the chosen one is drawn like the active tool: `--accent-soft`, its icon and words in `--accent-text`.
-- **Dialog:** 400 px wide, centred, over the `--scrim`, `--panel` with `--radius-island` corners and the `--shade`. A title in `--text-title` and weight 600, the text in `--muted`, then the buttons at the right with no line above them: the safe one first, the primary one last.
+- **Dialog:** 380 px wide, centred, over the `--scrim`, `--panel` with `--radius-island` corners and the `--shade`. A title in `--text-title` and weight 600, the text in `--muted`, then the buttons at the right with no line above them: the safe one first, the primary one last.
 - **Play bar:** a fully round pill at the top centre of the window, tinted with its state's colour at 16% over `--panel`, with the `--shade`. A label with a dot: PLAYING in `--playing`, PAUSED in `--paused`. Then Pause (Resume while paused), Step (disabled while running), Stop, each a round icon button with its key in `--muted`. STARTING (in `--playing`) while the game loads and ENDED (in `--muted`) once a run ended (stage 16). One line of `--text-size` under the pill shows why a run ended, "The game isn't responding", or a hint such as "Stop to edit".
 
 ## v2: the pen, the Pencil and gradients
@@ -110,7 +110,7 @@ Claude's proposal (standing yes, 2026-11-22), drawn in the [v3 mockup](mockups/v
 
 Claude's proposal (standing yes, 2026-11-22), drawn in the [v4 mockup](mockups/v4.html) from v3's approved look, for the owner to see in v4's try. Its shortcut search, trigger cards, variable menus and Variables cards work.
 
-- **The shortcut sheet** is an island at the top right, 320 px wide, in the Entities viewer's place, which it hides while open; it reaches down to 10 px above the minimap. *The v4 design put it over the Entity inspector, but the top right holds the Entities viewer; this is the closest fix (standing yes, 2026-11-22).*
+- **The shortcut sheet** is an island at the top right, 380 px wide (owner, 2026-11-26; 320 px before), in the Entities viewer's place, which it hides while open; it reaches down to 10 px above the minimap. *The v4 design put it over the Entity inspector, but the top right holds the Entities viewer; this is the closest fix (standing yes, 2026-11-22).*
   - **Its head:** the search field, a pill with a 1 px `--accent` ring while it has the focus, a search icon and "Search shortcuts", then a × icon button that closes the sheet.
   - **Its list scrolls:** one section per area (Tools, Selecting, Editing, View, Test play, File, Mouse), its title in the card head's small caps, then one 28 px row per shortcut: what it does in `--text` on the left, the keys on the right.
   - **A key cap** is `kbd`: `--text-tiny`, 18 px high, at least 18 px wide, `--raised` with `--radius` corners; the keys of one shortcut are joined by a `+` in `--faint`, and a second way is after a faint "or". On a Mac the caps read Cmd and Option.
@@ -194,9 +194,9 @@ The owner found triggers convoluted (2026-11-23); the plan is [fix-3-simpler-tri
 
 **Asked by the owner (2026-11-25), [fix](../versions/v4/fixes.md) 6. Built the same day.**
 
-- **The trigger's head is two labelled rows, drawn like a card's fields** (owner picked this from four options: "it looks more like how the other components render their values"): **Name**, an always-editable text box (Enter, Tab or clicking away renames, Esc doesn't), then a grip that drags the trigger to another place and the `…` menu; **Enabled**, the on/off switch. The `…` menu has Duplicate and Delete; Rename is gone, since the box renames (Claude, standing yes, 2026-11-25). The grip sits beside `…` so the labels line up at the left as on other cards (Claude, standing yes, 2026-11-25).
+- **The trigger's head is two labelled rows, drawn like a card's fields** (owner picked this from four options: "it looks more like how the other components render their values"): **Name**, an always-editable text box (Enter, Tab or clicking away renames, Esc doesn't), then a grip that drags the trigger to another place and the `…` menu (the grip is gone since 2026-11-26, see below); **Enabled**, the on/off switch. The `…` menu has Duplicate and Delete; Rename is gone, since the box renames (Claude, standing yes, 2026-11-25). The grip sits beside `…` so the labels line up at the left as on other cards (Claude, standing yes, 2026-11-25).
 - **A click on a block's icon opens its Replace menu** (owner): the same menu as right click › Replace, alone, under the icon. The icon acts as the block's middle, so hovering it opens no slot, like a value box (Claude, standing yes, 2026-11-25).
-- **The Entity inspector and the Entities viewer are both 400 px wide** (owner).
+- **The Entity inspector and the Entities viewer are both 400 px wide** (owner). *Since 2026-11-26, 380 px, with the dialogs and the shortcut sheet (owner).*
 
 ## v4 fix 10: variables in value boxes
 
@@ -221,3 +221,10 @@ The owner found triggers convoluted (2026-11-23); the plan is [fix-3-simpler-tri
 
 - **Outline icons** (owner, 2026-11-14): 24 px drawings shown at 16 px, a 1.6 px stroke with round ends and corners, no fill. One open set for every icon: `lucide-react`, picked in stage 6 (standing yes, 2026-11-15, see [ui.md](../architecture/ui.md#stage-6s-choices)).
 - v1 needs these: ☰, Select, Shape, Joint, the four shape kinds (rectangle, circle, polygon, line), the three joint types (hinge, rope, spring), group, World, camera, the eye and the eye crossed out, fold arrows (right and down), Play, Pause, Step, Stop, warning, tip, the target picker, `…`, plus, the right arrow of a submenu and the down arrow of a choice. **v2 adds** the Bézier pen, the Pencil, a path's kind icon, and Low, Medium and High smoothness.
+
+## The trigger's menu and window (owner, 2026-11-26)
+
+- **No drag grip.** The trigger's `…` menu has **Open in window**, a line, then **Move up**, **Move down**, **Duplicate** and **Delete**. Move up is disabled on the first trigger ("Already the first trigger"), Move down on the last; each move is one undo step and changes when the trigger runs. *"Open in window" is Claude's name for it, short and plain (standing yes, 2026-11-26).*
+- **The trigger window:** over the `--scrim`, a 600 px `--panel` box with `--radius-island` corners and the `--shade`, centred, at most the window's height less 40 px. A title bar ("Trigger" and a ✕), then the trigger's block as the card draws it: Name and Enabled, then the script, which may grow to 16 blocks tall instead of 10. Its edits are the card's, so the card under it follows. Esc, ✕ and a press on the scrim close it; a menu open in it takes Esc first. It closes when the trigger is deleted or the selection changes. Its `…` menu has no Open in window. *While it is open the scrim covers the level view, so the entity picker's crosshair can't pick there (Claude, standing yes, 2026-11-26: the window is modal, as asked).*
+- **Below the last block:** inside the script, the mouse anywhere under the last block opens the last gap's "add a block" slot, as the last block's bottom third does.
+

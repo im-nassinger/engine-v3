@@ -18,7 +18,7 @@ import { menuRowNamed, requireBlock, scriptBlocks, word } from './testing/trigge
 // only where the script scrolls, show while the mouse is on it and can be dragged; and a grainy fade on each
 // edge hiding blocks, only there.
 
-// "set this Triggers › Timed door › Enabled to false" is wider than the 400 px Entity inspector.
+// "set this Triggers › Timed door › Enabled to false" is wider than the 380 px Entity inspector.
 const TIMED_DOOR: Trigger = {
     id: 1,
     name: 'Timed door',

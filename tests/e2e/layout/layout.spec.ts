@@ -18,9 +18,9 @@ const ISLANDS = ['Main menu', 'Tools', 'Entity inspector', 'Entities viewer', 'M
 // From the window's edge and between islands.
 const ISLAND_GAP = 10;
 // The tool column, the Entity inspector and the Entities viewer side by side with their gaps. The panels
-// never shrink, so a narrower window (1280×720 at 150% is 853 px) overlaps them, and this test skips it
+// never shrink, so a narrower window (1280×720 at 200% is 640 px) overlaps them, and this test skips it
 // (owner, 2026-11-26: fitting small windows is Later).
-const ISLANDS_ROW_WIDTH = 10 + 48 + 10 + 400 + 10 + 400 + 10;
+const ISLANDS_ROW_WIDTH = 10 + 48 + 10 + 380 + 10 + 380 + 10;
 // The level view's smallest zoom, 1%.
 const MIN_ZOOM = 0.01;
 // A new level's camera size.

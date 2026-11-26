@@ -335,6 +335,50 @@ describe('the trigger card', () => {
         expect(history(session).undoLabel).toBe('Delete trigger "Goal"');
     });
 
+    test('the … menu moves a trigger up and down, each one step, and the ends refuse', async () => {
+        const { level, button } = buildLevel();
+        withTriggers(button, [
+            { name: 'First', actions: [{ kind: 'win' }] },
+            { name: 'Second', actions: [{ kind: 'lose' }] },
+        ]);
+        const { session } = await showEntity(level, button);
+        await expect.poll(() => blocks().length).toBe(2);
+        expect(requireBlock().querySelector('.trigger-drag-grip')).toBeNull();
+
+        click(requireElement(requireBlock(), 'button[aria-label="First menu"]'));
+        await expect.poll(() => menuRowNamed('Move up')).toBeDefined();
+        expect(menuRowNamed('Move up')?.getAttribute('aria-disabled')).toBe('true');
+        await pickRow('Move down');
+        await expect.poll(() => blockName()).toBe('Second');
+        expect(triggersOf(button).map((trigger) => trigger.name)).toEqual(['Second', 'First']);
+        expect(history(session).undoLabel).toBe('Move trigger "First"');
+
+        await pickFromMenu(requireElement(requireBlock(1), 'button[aria-label="First menu"]'), 'Move up');
+        await expect.poll(() => blockName()).toBe('First');
+    });
+
+    test('Open in window shows the trigger in a 600 px window whose edits reach the card, and Esc closes it', async () => {
+        const { level, button } = buildLevel();
+        withTriggers(button, [{ name: 'Goal', actions: [{ kind: 'win' }] }]);
+        await showEntity(level, button);
+        await expect.poll(() => blocks().length).toBe(1);
+        const triggerWindow = () => document.querySelector<HTMLElement>('.trigger-window');
+
+        await pickFromMenu(requireElement(requireBlock(), 'button[aria-label="Goal menu"]'), 'Open in window');
+        await expect.poll(() => triggerWindow()).not.toBeNull();
+        const box = requireElement<HTMLElement>(triggerWindow() as HTMLElement, '.box');
+        expect(box.getBoundingClientRect().width).toBe(600);
+        expect(box.querySelector('.trigger-block .script-block')).not.toBeNull();
+        expect(box.querySelector('button[aria-label="Goal menu"]')).not.toBeNull();
+
+        click(requireElement(box, 'button[role="switch"]'));
+        await expect.poll(() => requireBlock().dataset['on']).toBe('false');
+        expect(triggersOf(button)[0]?.on).toBe(false);
+
+        await userEvent.keyboard('{Escape}');
+        await expect.poll(() => triggerWindow()).toBeNull();
+    });
+
     test("a target word opens the entity picker: the Entities viewer's tree, its search, and this and other", async () => {
         const { level, player, button } = buildLevel();
         withTriggers(button, [{ actions: [{ kind: 'destroy', target: { kind: 'other' } }] }]);

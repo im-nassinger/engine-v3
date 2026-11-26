@@ -19,7 +19,7 @@ A trigger is no-code logic on an entity, in three parts: **When** (one event), *
 - **Every clickable part is picked the way the rest of the editor picks it** (owner, 2026-11-23): an entity from the Entities viewer's tree, with a search, or by clicking it in the level view, or by dropping an Entities viewer row on it; a vector in two boxes, x and y; a colour in the colour box; a number in the number box with its unit. A value on an entity is picked in two steps, its component and then the value ("Transform › Position"), and the entity comes before the value in the sentence, since the values offered are that entity's. Every item of the Add check and Add action menus says in one line what it does. *Why: the owner found the first card lazy: a flat list of every entity, vectors typed as "0, -600" in a text box, "Transform position x" listed beside "Transform position y", and words such as "who is tagged…" that said nothing.*
 - A part that isn't set yet is highlighted and says what it needs. A trigger with unset parts doesn't run.
 - Each trigger can be switched on or off. **Its on/off value is *Enabled***, named like any other value (`Triggers › Timed door › Enabled`), so one trigger switches another on or off with Change value, and checks it with the value check (owner, 2026-11-24).
-- Triggers can be dragged to reorder, duplicated and deleted. Every edit is one undo step.
+- Triggers can be moved up and down (owner, 2026-11-26; dragged before), duplicated, deleted, and opened in a wider window to edit. Every edit is one undo step.
 - Triggers do nothing a script can't: both use the same events and the same Lua API underneath.
 - A trigger on a hidden entity still runs.
 

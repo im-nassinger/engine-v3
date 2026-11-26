@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test';
 import type { Locator, Page } from '@playwright/test';
 
 const ISLANDS = ['Main menu', 'Tools', 'Entity inspector', 'Entities viewer', 'Minimap', 'Debug box'];
-// Too long for the vector box's unit beside it in the 360 px Entity inspector.
-const LONG_POSITION = '-123456789.25';
+// Too long for the vector box's unit beside it in the 380 px Entity inspector.
+const LONG_POSITION = '-1234567.25';
 const SHORT_POSITION = '20';
 
 async function openEditor(page: Page) {

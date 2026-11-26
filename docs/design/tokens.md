@@ -81,8 +81,8 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--island-gap` | 10 px: from the window's edge and between islands | requirement |
 | `--island-bar` | 48 px: ☰ and the tool column's width | requirement |
 | `--tool` | 34 px: a tool button, ☰'s button | requirement |
-| `--entity-inspector` | 400 px wide | requirement (owner, 2026-11-26; 360 px from 2026-11-25, 344 px before, 300 px before that) |
-| `--entities-viewer` | 400 px wide | requirement (owner, 2026-11-26; 360 px from 2026-11-25, 260 px before) |
+| `--entity-inspector` | 380 px wide | requirement (owner, 2026-11-26: 380 px; 400 px earlier that day, 360 px from 2026-11-25, 344 px before, 300 px before that) |
+| `--entities-viewer` | 380 px wide | requirement (owner, 2026-11-26: 380 px; 400 px earlier that day, 360 px from 2026-11-25, 260 px before) |
 | `--minimap` | 180 px wide | requirement |
 | `--minimap-height` | 93 px tall: inside the 3 px edge the picture is 174 × 87 px, the 2:1 of a new level's 20000 × 10000 bounds | stage 19, steps 6 and 13 (standing yes, 2026-11-18) |
 | `--debug-box` | 28 px tall | redesign 24 |
@@ -95,9 +95,10 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--icon` | 16 px | |
 | `--icon-small` | 13 px: in fields, menu entries and the debug box | |
 | `--indent` | 16 px per level of the Entities viewer tree | |
-| `--dialog` | 400 px wide | |
+| `--dialog` | 380 px wide | owner, 2026-11-26 (400 px before) |
 | `--end-window` | 320 px wide: the end window in test play | the v3 design |
-| `--shortcut-sheet` | 320 px wide: the shortcut sheet | the v4 design |
+| `--shortcut-sheet` | 380 px wide: the shortcut sheet | owner, 2026-11-26 (320 px from the v4 design before) |
+| `--trigger-window` | 600 px wide: the trigger window | owner, 2026-11-26 |
 | `--scrollbar-size` | 8 px: a scrollbar's width in WebKit; Firefox and Chromium draw their own thin one | owner's fix (2026-11-21) |
 
 ## Spacing, corners, the shadow

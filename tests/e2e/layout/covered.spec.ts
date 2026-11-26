@@ -26,10 +26,10 @@ const SIZES: WindowSize[] = [
     { name: '1280×720 at 200%', width: 1280, height: 720, zoom: 2 },
 ];
 
-// The width the Entity inspector and the Entities viewer need side by side: ☰'s column, both 400 px panels
+// The width the Entity inspector and the Entities viewer need side by side: ☰'s column, both 380 px panels
 // and the gaps. They never shrink, so in a narrower window they overlap (owner, 2026-11-26: fitting small
 // windows is Later), and the cases inside the Entity inspector skip it.
-const BOTH_PANELS_WIDTH_PX = 10 + 48 + 10 + 400 + 10 + 400 + 10;
+const BOTH_PANELS_WIDTH_PX = 10 + 48 + 10 + 380 + 10 + 380 + 10;
 
 // The corners are looked at this far inside, past a 4 px rounded corner and a fractional pixel's edge.
 const CORNER_INSET_PX = 4;

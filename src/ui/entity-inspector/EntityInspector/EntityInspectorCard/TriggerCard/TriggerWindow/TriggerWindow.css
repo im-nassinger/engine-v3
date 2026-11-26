@@ -1,0 +1,43 @@
+/* Over the whole editor, like a dialog; the box is 600 px wide and at most the window's height less 40 px,
+   its trigger scrolling inside. The script inside may grow to 16 blocks tall instead of 10. */
+.trigger-window {
+    position: fixed;
+    inset: 0;
+    z-index: var(--stack-dialog);
+    display: grid;
+    place-items: center;
+    background: var(--scrim);
+
+    > .box {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        width: var(--trigger-window);
+        max-height: calc(100% - 40px);
+        border-radius: var(--radius-island);
+        background: var(--panel);
+        box-shadow: var(--shade);
+        outline: none;
+
+        > .title-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-8) var(--space-8) var(--space-8) var(--space-14);
+
+            > h2 {
+                margin: 0;
+                font-size: var(--text-title);
+                font-weight: var(--weight-heading);
+            }
+        }
+
+        > .body {
+            --script-most-blocks: 16;
+
+            min-height: 0;
+            overflow: auto;
+            padding: 0 var(--space-8) var(--space-8);
+        }
+    }
+}

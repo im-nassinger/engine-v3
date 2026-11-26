@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react';
+import { useState } from 'react';
 import { TriggerComponent } from '../../../../../core/components/index.ts';
 import type { EntityId } from '../../../../../core/level/index.ts';
 import { editTriggers } from '../../../../../editor/commands/index.ts';
@@ -10,6 +11,7 @@ import { useLengthDisplay } from '../../../../hooks/index.ts';
 import { Icon } from '../../../../shared/index.ts';
 import type { CommitTriggerEdit } from './CommitTriggerEdit.ts';
 import { TriggerBlock } from './TriggerBlock/index.ts';
+import { TriggerWindow } from './TriggerWindow/index.ts';
 import './TriggerCard.css';
 
 export type TriggerCardProps = {
@@ -21,9 +23,12 @@ export type TriggerCardProps = {
 
 // The Triggers card's body: one block per trigger, then + Add trigger. Every edit is one step through
 // editTriggers; a refused one gives its reason as status text. Triggers are changed one entity at a time.
+// A trigger's `…` menu can open it in a wider window over the editor (owner, 2026-11-26), which closes when
+// the trigger is gone.
 export function TriggerCard({ openLevel, entityIds, notes }: TriggerCardProps) {
     'use no memo';
 
+    const [windowTriggerId, setWindowTriggerId] = useState<number | undefined>(undefined);
     const session = useEditorSession();
     const lengths = useLengthDisplay();
     const [entityId] = entityIds;
@@ -52,16 +57,36 @@ export function TriggerCard({ openLevel, entityIds, notes }: TriggerCardProps) {
     };
 
     const addTrigger = () => commit((current) => TriggerEdits.added(current));
+    const triggerCount = model.triggers.length;
+    const windowBlock = model.triggers.find((block) => block.id === windowTriggerId);
+    const closeWindow = () => setWindowTriggerId(undefined);
 
     return (
         <div className="trigger-card" data-several="false">
             {model.triggers.map((block) => (
-                <TriggerBlock key={block.id} openLevel={openLevel} block={block} commit={commit} />
+                <TriggerBlock
+                    key={block.id}
+                    openLevel={openLevel}
+                    block={block}
+                    triggerCount={triggerCount}
+                    commit={commit}
+                    onOpenWindow={() => setWindowTriggerId(block.id)}
+                />
             ))}
             <button type="button" className="add-trigger" onClick={addTrigger}>
                 <Icon icon={Plus} size="small" />
                 <span>Add trigger</span>
             </button>
+            {windowBlock !== undefined && (
+                <TriggerWindow onClose={closeWindow}>
+                    <TriggerBlock
+                        openLevel={openLevel}
+                        block={windowBlock}
+                        triggerCount={triggerCount}
+                        commit={commit}
+                    />
+                </TriggerWindow>
+            )}
         </div>
     );
 }

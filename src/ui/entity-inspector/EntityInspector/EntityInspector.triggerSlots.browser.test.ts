@@ -16,6 +16,7 @@ import {
 import {
     bandPoint,
     blockBeside,
+    lastGap,
     menuRowNamed,
     requireBlock,
     scriptBlocks,
@@ -203,6 +204,19 @@ describe('adding a block on hover', () => {
         const event = scriptBlocks()[0] as HTMLElement;
         await hoverBand(event, 'top');
         expect(getComputedStyle(event).cursor).toBe('auto');
+    });
+
+    test("hovering under the last block, inside the script, opens the last gap's slot", async () => {
+        await showTrigger({ ...TIMED_DOOR, actions: [{ kind: 'win' }] });
+        const script = scriptOf();
+        const last = scriptBlocks().at(-1) as HTMLElement;
+        const below = last.getBoundingClientRect().bottom + 12;
+        expect(below).toBeLessThan(script.getBoundingClientRect().bottom);
+
+        const rect = script.getBoundingClientRect();
+        await userEvent.hover(script, { position: { x: rect.width / 2, y: below - rect.top } });
+
+        await expect.poll(() => slotAt(lastGap())).not.toBeNull();
     });
 
     test('a value box acts as the middle wherever it reaches: it opens no slot and closes an open one', async () => {

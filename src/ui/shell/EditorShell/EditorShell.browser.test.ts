@@ -21,8 +21,8 @@ const WINDOW = { width: 1280, height: 800 };
 // From the window's edge and between islands.
 const GAP = 10;
 const TOOL_COLUMN = 48;
-const ENTITY_INSPECTOR = 400;
-const ENTITIES_VIEWER = 400;
+const ENTITY_INSPECTOR = 380;
+const ENTITIES_VIEWER = 380;
 const MINIMAP = { width: 180, height: 93 };
 const MAIN_MENU = 48;
 const DEBUG_BOX = 28;

@@ -1,8 +1,8 @@
 /* The rows line up as a card's fields do: the label column, then the control. The Name row also has the
-   grip and the `…` menu; the switch sits at the start of the Enabled row's control. */
+   `…` menu; the switch sits at the start of the Enabled row's control. */
 .trigger-head {
     display: grid;
-    grid-template-columns: var(--label) minmax(0, 1fr) auto auto;
+    grid-template-columns: var(--label) minmax(0, 1fr) auto;
     grid-auto-rows: var(--row);
     align-items: center;
     column-gap: var(--space-8);

@@ -8,7 +8,7 @@ import { showShell } from './testing/shellPage.ts';
 
 const WINDOW = { width: 1280, height: 800 };
 const GAP = 10;
-const SHEET_WIDTH = 320;
+const SHEET_WIDTH = 380;
 const MINIMAP_HEIGHT = 93;
 const DEBUG_BOX = 28;
 
@@ -85,7 +85,7 @@ async function openSheet() {
 }
 
 describe('EditorShell: the shortcut list', () => {
-    test('opens in the Entities viewer’s place, 320 px wide, down to 10 px above the minimap, the viewer hidden', async () => {
+    test('opens in the Entities viewer’s place, 380 px wide, down to 10 px above the minimap, the viewer hidden', async () => {
         const { session } = showShell();
         expect(sheet()).toBeNull();
 

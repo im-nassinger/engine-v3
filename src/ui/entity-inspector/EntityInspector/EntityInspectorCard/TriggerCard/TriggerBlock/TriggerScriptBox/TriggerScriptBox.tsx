@@ -78,13 +78,21 @@ export function TriggerScriptBox({ openLevel, script, triggerIndex, commit }: Tr
     };
     const eventIsEnd = ifTop === undefined && actions.length === 0;
 
-    // Over the script's empty space or the If's arm, no slot is asked for; the arm is kept still.
+    // Below the last block, the last gap's slot is asked for (owner, 2026-11-26), with nothing kept still, so
+    // the slot opens under the blocks. Over the rest of the script's empty space or the If's arm, no slot is
+    // asked for; the arm is kept still.
+    const lastGap = script.gaps.at(-1)?.index;
     const hoverScript = (event: PointerEvent<HTMLDivElement>) => {
         const target = event.target;
         if (!(target instanceof Element)) return;
         if (target.closest(`.script-block, .script-slot, .script-bar, ${FLOATING_BOXES}`) !== null) return;
 
         const arm = target.closest('.arm');
+        if (arm === null && isBelowBlocks(scriptRef.current, event.clientY)) {
+            motion.hover(lastGap, null);
+            return;
+        }
+
         motion.hover(undefined, arm);
     };
 
@@ -107,6 +115,17 @@ export function TriggerScriptBox({ openLevel, script, triggerIndex, commit }: Tr
             <div className="script-bar horizontal" ref={horizontalBarRef} />
         </div>
     );
+}
+
+// Whether a mouse at `clientY` is under the script's last block (or its open last slot): below the stack,
+// which ends with them, less its 2 px of padding.
+const STACK_PADDING_PX = 2;
+
+function isBelowBlocks(script: HTMLElement | null, clientY: number) {
+    const stack = script?.querySelector('.stack');
+    if (stack === null || stack === undefined) return false;
+
+    return clientY > stack.getBoundingClientRect().bottom - STACK_PADDING_PX;
 }
 
 type BlockProps = {
