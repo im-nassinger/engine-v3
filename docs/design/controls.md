@@ -177,7 +177,7 @@ The owner found triggers convoluted (2026-11-23); the plan is [fix-3-simpler-tri
 
 - **No block before or after the If** (owner, 2026-11-24, point C of the plan): with an If, there are no slots above or below it. The top third of the If's top bar and the bottom third of its bottom bar act like a middle, and the event block's bottom third opens the If's first inner slot. *Why: the If wraps the whole Do list, and play keeps one flat action list.*
 - **A check is added from a slot's menu** (owner, 2026-11-24, point D): the add menu starts with a check group, "if … (a value)", then the actions. With no If, the check wraps every action in a new If; with one, it is joined by "and". Removing the last check removes the If, so a trigger without checks draws no empty If.
-- **A block is removed with an ×** at its right end, shown while the mouse is on its middle band, as the old rows had (standing yes, 2026-11-24). Dragging blocks to reorder is left for later.
+- **A block is removed with an ×** at its right end, shown while the mouse is on its middle band, as the old rows had (standing yes, 2026-11-24). *Since 2026-11-26, while the mouse is anywhere on the block, fading in and out over 150 ms (owner).* Dragging blocks to reorder is left for later.
 
 ## v4 fix 5: the blocks after the owner's try
 

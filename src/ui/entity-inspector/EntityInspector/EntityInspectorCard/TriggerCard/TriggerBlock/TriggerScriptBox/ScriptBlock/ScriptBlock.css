@@ -163,12 +163,19 @@
         padding-left: var(--space-6);
     }
 
+    /* The × fades in while the mouse is anywhere on the block, its top and bottom thirds too (owner,
+       2026-11-26), and fades out after it leaves; hidden, it can't be clicked. */
     .remove {
         display: flex;
         visibility: hidden;
+        opacity: 0;
+        transition:
+            opacity 0.15s,
+            visibility 0.15s;
 
         &:focus-within {
             visibility: visible;
+            opacity: 1;
         }
 
         button {
@@ -190,7 +197,8 @@
         }
     }
 
-    &[data-band='middle'] .remove {
+    &[data-band] .remove {
         visibility: visible;
+        opacity: 1;
     }
 }

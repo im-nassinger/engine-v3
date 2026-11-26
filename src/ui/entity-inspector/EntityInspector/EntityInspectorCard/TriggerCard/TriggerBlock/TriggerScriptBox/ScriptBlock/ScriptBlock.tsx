@@ -48,7 +48,7 @@ const FLOATING_BOXES = '.menu, .entity-picker, .trigger-word-field';
 // One Scratch block (v4 fix 4): its body and tooth in its kind's colour, cut from its neighbours by a 2 px ring
 // of the trigger's background, then its icon and words, each value box opening fix 2's picker or box. Its top
 // third asks for the slot above it, its bottom third the slot below, its middle third (and any value box)
-// none; the cursor says which. On the middle band a removable part shows its ×. A right click opens the
+// none; the cursor says which. While the mouse is on the block, a removable part shows its ×. A right click opens the
 // context menu of the part under the mouse, and a click on the icon its Replace menu (owner, 2026-11-25).
 export function ScriptBlock({ block, zIndex, isEnd, isLast, onHover, ...wordProps }: ScriptBlockProps) {
     const [band, setBand] = useState<Band | undefined>(undefined);

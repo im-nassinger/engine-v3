@@ -262,7 +262,7 @@ describe('the trigger card', () => {
         expect(document.querySelector('.trigger-word-field')).toBeNull();
     });
 
-    test("× on a block's middle third removes its action as one step, and the When has none", async () => {
+    test('× shows on every band of a hovered block, removes its action as one step, and the When has none', async () => {
         const { level, button } = buildLevel();
         withTriggers(button, [{ actions: [{ kind: 'win' }, { kind: 'lose' }] }]);
         const { session } = await showEntity(level, button);
@@ -272,10 +272,11 @@ describe('the trigger card', () => {
         const winBlock = scriptBlocks()[1] as HTMLElement;
         const removeWin = requireElement<HTMLElement>(winBlock, 'button[aria-label="Remove win"]');
         expect(getComputedStyle(removeWin).visibility).toBe('hidden');
-        await hoverBand(winBlock, 'bottom');
-        expect(getComputedStyle(removeWin).visibility).toBe('hidden');
-        await hoverBand(winBlock, 'middle');
-        await expect.poll(() => getComputedStyle(removeWin).visibility).toBe('visible');
+        for (const band of ['top', 'bottom', 'middle'] as const) {
+            await hoverBand(winBlock, band);
+            await expect.poll(() => getComputedStyle(removeWin).visibility).toBe('visible');
+        }
+        await expect.poll(() => getComputedStyle(removeWin.closest('.remove') as Element).opacity).toBe('1');
         click(removeWin);
 
         await expect.poll(() => sentences('Do')).toEqual(['lose']);
