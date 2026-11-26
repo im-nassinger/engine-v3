@@ -117,4 +117,4 @@ Planned in [fixes-9-to-13-plan.md](fixes-9-to-13-plan.md), confirmed by the owne
 - [x] 35. Journeys and close fixes 9 to 13's docs
   - Read: versions/v4/fixes-9-to-13-plan.md, versions/v4/tasks.md#tasks
   - Done when: the Playwright journeys pass in three browsers with the new units; the speed tests still meet their targets; architecture/ and design/ match what was built; progress.md says fixes 9 to 13 are built and waiting for the owner's try
-- [ ] 36. Try point: draw a closed path with the pen, target a tag in an empty level, double a coin count with Multiply, use a variable in a Wait, and move things in metres, and say how it feels
+- [x] 36. Try point: draw a closed path with the pen, target a tag in an empty level, double a coin count with Multiply, use a variable in a Wait, and move things in metres, and say how it feels
