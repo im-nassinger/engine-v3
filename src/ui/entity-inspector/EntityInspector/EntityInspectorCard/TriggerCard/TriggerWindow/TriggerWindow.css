@@ -1,5 +1,5 @@
 /* Over the whole editor, like a dialog; the box is 600 px wide and at most the window's height less 40 px,
-   its trigger scrolling inside. The script inside may grow to 16 blocks tall instead of 10. */
+   its trigger scrolling inside. The script inside is 6 to 16 blocks tall instead of 4 to 10 (owner, 2026-11-26). */
 .trigger-window {
     position: fixed;
     inset: 0;
@@ -33,6 +33,7 @@
         }
 
         > .body {
+            --script-least-blocks: 6;
             --script-most-blocks: 16;
 
             min-height: 0;

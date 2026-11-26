@@ -357,7 +357,7 @@ describe('the trigger card', () => {
         await expect.poll(() => blockName()).toBe('First');
     });
 
-    test('Open in window shows the trigger in a 600 px window whose edits reach the card, and Esc closes it', async () => {
+    test('Open in window shows the trigger in a 600 px window, 6 blocks tall and with no … menu, whose edits reach the card, and Esc closes it', async () => {
         const { level, button } = buildLevel();
         withTriggers(button, [{ name: 'Goal', actions: [{ kind: 'win' }] }]);
         await showEntity(level, button);
@@ -369,7 +369,10 @@ describe('the trigger card', () => {
         const box = requireElement<HTMLElement>(triggerWindow() as HTMLElement, '.box');
         expect(box.getBoundingClientRect().width).toBe(600);
         expect(box.querySelector('.trigger-block .script-block')).not.toBeNull();
-        expect(box.querySelector('button[aria-label="Goal menu"]')).not.toBeNull();
+        expect(box.querySelector('button[aria-label="Goal menu"]')).toBeNull();
+        // 6 blocks of 34 px and 12 px for the ends, 2 more than in the card.
+        const script = requireElement<HTMLElement>(box, '.trigger-script-box > .script');
+        expect(script.getBoundingClientRect().height).toBe(6 * 34 + 12);
 
         click(requireElement(box, 'button[role="switch"]'));
         await expect.poll(() => requireBlock().dataset['on']).toBe('false');

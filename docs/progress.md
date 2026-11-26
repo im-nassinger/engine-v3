@@ -9,7 +9,7 @@
 The owner tried the build on Netlify and asked for changes, built and deployed:
 
 1. The Entity inspector and the Entities viewer are 400 px and never shrink; small windows are for later (they overlap under 888 px). Later that day: **380 px**, with the dialogs and the shortcut sheet (they overlap under 848 px).
-4. The trigger's drag grip is gone: its `…` menu has Open in window, Move up and Move down. **Open in window** shows the trigger in a 600 px window over a scrim. Hovering under a script's last block opens the last "add a block" slot. See [controls.md](design/controls.md#the-triggers-menu-and-window-owner-2026-11-26).
+4. The trigger's drag grip is gone: its `…` menu has Open in window, Move up and Move down. **Open in window** shows the trigger in a 600 px window over a scrim, its script at least 6 blocks tall and with no `…` menu. Hovering under a script's last block opens the last "add a block" slot. See [controls.md](design/controls.md#the-triggers-menu-and-window-owner-2026-11-26).
 2. Mass drags like Density (0 to the mass at density 100), and a Static or Kinematic body shows its Mass as `∞ kg`, read-only, instead of hiding it. The picks are in [decisions.md](decisions.md).
 3. The console's PixiJS `[BindGroup] … destroyed while still bound` warnings were looked into, not fixed: PixiJS keeps a never-cleared cache of every set of textures a Graphics drew, and warns when one is destroyed. Ours are gradient textures, destroyed when no entity uses them (changing a gradient's colours drops the old one). Harmless; reusing old gradient textures in `GradientTextures` instead of destroying them would silence it. Waiting for the owner.
 

@@ -21,14 +21,14 @@
 
     /* SlotMotion fixes its height while a slot is open, and grows the empty strips (.room) above or below the
        blocks where it can't scroll far enough. It is at least 4 blocks tall and at most 10 (owner,
-       2026-11-25), or as many as --script-most-blocks says, as the trigger window does: a block takes 34 px,
+       2026-11-25), or as many as --script-least-blocks and --script-most-blocks say, as the trigger window does: a block takes 34 px,
        the last one 40, and 6 px are left under it. */
     > .script {
         --block-step: 34px;
         --block-ends: 12px;
 
         box-sizing: border-box;
-        min-height: calc(4 * var(--block-step) + var(--block-ends));
+        min-height: calc(var(--script-least-blocks, 4) * var(--block-step) + var(--block-ends));
         max-height: calc(var(--script-most-blocks, 10) * var(--block-step) + var(--block-ends));
         overflow: auto;
         overflow-anchor: none;

@@ -9,6 +9,11 @@
     padding-top: var(--space-4);
     padding-left: var(--space-4);
 
+    /* In the trigger window, with no `…` menu. */
+    &[data-menu='false'] {
+        grid-template-columns: var(--label) minmax(0, 1fr);
+    }
+
     > .label {
         overflow: hidden;
         color: var(--muted);

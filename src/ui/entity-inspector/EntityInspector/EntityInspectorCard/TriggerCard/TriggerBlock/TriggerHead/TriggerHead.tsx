@@ -12,7 +12,7 @@ export type TriggerHeadProps = {
     // How many triggers the entity has, so the last can't move down.
     triggerCount: number;
     commit: CommitTriggerEdit;
-    // Opens the trigger in its own window; absent in that window.
+    // Opens the trigger in its own window. Absent in that window, which has no `…` menu (owner, 2026-11-26).
     onOpenWindow?: () => void;
 };
 
@@ -25,14 +25,17 @@ export function TriggerHead(props: TriggerHeadProps) {
     const switchTrigger = () => commit((component) => TriggerEdits.switched(component, index));
     const switchLabel = isOn ? `Switch off ${name}` : `Switch on ${name}`;
     const menu = <TriggerHeadMenu {...props} />;
+    const hasMenu = props.onOpenWindow !== undefined;
 
     return (
-        <div className="trigger-head">
+        <div className="trigger-head" data-menu={hasMenu}>
             <span className="label">Name</span>
             <TriggerNameBox block={block} commit={commit} />
-            <MenuButton label={`${name} menu`} menu={menu} look="quiet">
-                <Icon icon={Ellipsis} />
-            </MenuButton>
+            {hasMenu && (
+                <MenuButton label={`${name} menu`} menu={menu} look="quiet">
+                    <Icon icon={Ellipsis} />
+                </MenuButton>
+            )}
             <span className="label">Enabled</span>
             <button
                 type="button"
