@@ -11,7 +11,7 @@ A script is a `.lua` file from the Assets panel, attached to an entity through i
 - **An entity has one ScriptComponent, holding a list of `.lua` files** from the Assets panel. *Why one: an entity has at most one component of each type, so "its ScriptComponent" always means one thing, in the Entity inspector and in Lua.*
 - The `.lua` files are plain assets the component points to. Fixing a file fixes every entity that uses it.
 - **A script's values are the entity's variables.** The ScriptComponent holds only the list of files; the values, such as a speed or a door, live on the entity's VariablesComponent. *Why: one concept for named values, so nothing is stored in two places, and triggers can read and change a script's values too (owner: 2026-11-16).*
-- **A script lists the variables it needs in a `variables` table at its top, built with one `<type>_variable` function per type**, such as `speed = number_variable(4, { min = 0, max = 15, unit = "m/s" })`. The table only describes them. The rules for reading and writing them are in [lua-api.md](lua-api.md#variables--v2).
+- **A script lists the variables it needs in a `variables` table at its top, built with one `<type>_variable` function per type**, such as `speed = number_variable(4, { min = 0, max = 15, unit = "m/s" })`. The table only describes them. The rules for reading and writing them are in [lua-api.md](lua-api.md#variables--v5).
 - **When the entity lacks some of them, the ScriptComponent's card shows a warning with a button:** "This script needs `speed` and `jump_height`. [Add variables]". The button adds a VariablesComponent if there is none, then only the missing variables, with the script's types, starting values and limits, as one Undo step. With several entities selected, it adds them to each. *Why: nothing happens behind the user's back, and editor messages never block, so a script changed later or added to many entities is covered too (owner: 2026-11-16).*
 - **A variable with the same name and another type is left as it is**, and the warning says so: "`speed` is a string here, but this script needs a number."
 - Scripts on one entity share its variables: two scripts that both need `speed` read the same one.
@@ -20,7 +20,10 @@ A script is a `.lua` file from the Assets panel, attached to an entity through i
 - Any entity can have scripts, joints and the camera included.
 - Scripts in the list run top to bottom. Across entities they run in Entities viewer order, see [triggers](../triggers/triggers.md).
 - A script on a hidden entity still runs.
-- A new `.lua` file is made in the Assets panel. The builtin `.lua` files can be read as examples.
+- **A script is added from the ScriptComponent's card.** Its **Add script** menu lists the level's `.lua` files, and ends with **New script**, which makes a new file, adds it to the list and opens it in the code editor. With several entities selected, it adds the file to each, as one Undo step. The ScriptComponent itself comes from the Add Component menu, like any component. *Why: the card is where the list is seen, and it is the one way that works with several entities selected; dragging a file onto an entity can come later (standing yes, 2026-11-26).*
+- **Each row of the list shows the file's name, and a `…` menu with Open, Move up, Move down and Remove.** Removing a row never deletes the file. A double-click on the row opens the file.
+- **A row whose file was deleted shows `missing`** and runs nothing, the way a trigger's missing target shows `missing` (standing yes, 2026-11-26).
+- A new `.lua` file is made in the Assets panel or from Add script, see [the Assets panel](../assets/files-and-sound.md#the-assets-panel--v5). From v8 the builtin `.lua` files can be read as examples.
 
 Source: scope LU1; round 1: C12; round 3: S2; round 4: FT1; round 5: R45; round 9: 10 2.1; round 10: SC1, OR1; old: LU-01, LU-02, LU-04, LU-50; owner: 2026-11-13; owner: 2026-11-16
 
@@ -33,8 +36,10 @@ Source: scope LU1; round 1: C12; round 3: S2; round 4: FT1; round 5: R45; round 
 - There are no separate callbacks such as `onStart` or `onUpdate`. *Why: the owner wanted it unified. One pattern, read like the trigger sentence, and a new event later is just a new name.*
 - **Script event names are the trigger events in snake_case**, such as `on("no_longer_touched", ...)`. A handler gets `other` and the event's number. The list is in [lua-api.md](lua-api.md).
 - A custom event can't reuse a builtin event's name.
+- **Two trigger events have no script event of their own:** a key or input being **held** is `is_down(input)` or `is_key_down(key)` read in `on("tick", ...)`, and a **Timer** is `wait(seconds)`. *Why: Lua already writes each in a line or two, and a function or event, once shipped, can never be taken back (standing yes, 2026-11-26).*
+- **Custom events fired by scripts count toward the 32 steps in one tick** that stop triggers setting off triggers, see [triggers](../triggers/triggers.md#order-and-limits--v3). *Why: a script firing an event that makes it fire again is the same endless loop (standing yes, 2026-11-26).*
 - A trigger calls a script by firing a custom event.
-- **Scripts share values through custom events and variables, and nothing else.** To ask an entity for something, fire a custom event, such as `fire_event(other, "damage", 1)`, and the scripts on that entity decide what it means. For a level-wide value, use a variable. *Why: reuse before adding. The trade-off is that a script can't read another entity's private state, such as an enemy's health for a health bar. Since the API only grows, a function for that can come later.*
+- **Scripts share values through custom events and variables, and nothing else.** To ask an entity for something, fire a custom event, such as `fire_event(other, "damage", 1)`, and the scripts on that entity decide what it means. For a level-wide value, use a variable. Another entity's own variables, such as an enemy's `health` for a health bar, are read through its VariablesComponent like any component value, see [lua-api.md](lua-api.md#variables--v5) (owner, 2026-11-26). *Why: reuse before adding. A script's values are variables, so reading them needs no function of its own.*
 - Events from touching are delivered after the physics step, never during it, so every function can be called from every handler.
 - A touch event fires once per pair of entities, even when a polygon is split into pieces. Both sides get it.
 - The game runs 60 ticks per second.

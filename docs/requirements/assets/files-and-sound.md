@@ -14,7 +14,14 @@ The Assets panel is a small file system: folders of raw files, each with a path,
 - From v8 a read-only **`builtin` folder** holds the files that come with the game. See [builtin-content.md](builtin-content.md).
 - **Builtin files can't be changed.** To change one, duplicate it into one of your own folders and edit the copy. *Why: builtin files never change once released, so a game update never changes how a level plays (owner: 2026-11-13).*
 - Selecting a file shows its details at the bottom of the panel, not in the Entity inspector, so the selection in the level is kept.
-- F2 or a double-click renames a file. Del deletes it.
+- **In v5 the list is sorted by name.** Its **New script** button makes a `.lua` file named `script.lua` (`script_2.lua` if that is taken, and so on) holding a short start: an empty `variables` table and an empty `on("level_start", ...)` handler. Its name is selected for renaming at once. *Why: the start shows the two things every script is built from (standing yes, 2026-11-26).*
+- **A file's name ends in `.lua`**, added if it is left out. It can't be empty or hold `/` or `\`, and no two files have the same name, ignoring upper and lower case. *Why: `/` will mean a folder in v6, and Windows and macOS ignore case, so an exported package would lose one of two such files (standing yes, 2026-11-26).*
+- **F2, or Rename in a file's `…` menu, renames it. A double-click opens it in the code editor.** *Why: a double-click opening a file is what code editors do, and the code editor's rules already open a file on double-click (standing yes, 2026-11-26).*
+- **Renaming a file keeps every use working:** each ScriptComponent's row shows the new name. v6 makes this the rule for paths too.
+- **Del, or Delete in the `…` menu, deletes a file.** A file in use asks first, with a count, such as "3 entities use coin.lua. Delete it?". Its uses stay on their ScriptComponents and show `missing`. *Why: v5 can delete files, so this part of [Replacing and deleting](#replacing-and-deleting--later) comes now; the rest stays Later (standing yes, 2026-11-26).*
+- Making, renaming and deleting a file are each one Undo step in the level's history.
+- In v5 a selected file's details are its name, its size and how many entities use it.
+- A level's files are saved with it and go into its exported package, see [saving](../play-and-save/saving.md).
 - The panel is read-only during play.
 - *Why v5: it holds .lua files, which come in v5 (owner: 2026-11-20).*
 

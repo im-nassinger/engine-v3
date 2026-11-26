@@ -12,7 +12,7 @@ The Status column says which functions the review named and which the owner deci
 - **Functions take ids, never objects.** An id is a number. A destroyed entity's id no longer exists: functions given one do nothing, and `exists(id)` returns false.
 - Positions are **level positions in metres**, y pointing down. Angles are **degrees, clockwise on screen**. Speeds are m/s and °/s. Time is the level's time in seconds. Gravity alone is m/s², as in the Entity inspector.
 - **A script's own entity is `this`**, and a handler receives `other`, the words triggers use.
-- **A point is two numbers:** `local x, y = get_position(this)`. There is no vector type. Only a vector variable reads as a table, see [variables](#variables--v2).
+- **A point is two numbers:** `local x, y = get_position(this)`. There is no vector type. Only a vector variable reads as a table, see [variables](#variables--v5).
 - **Attributes use the Entity inspector's field names in snake_case:** the field "Linear damping" is the attribute `"linear_damping"`.
 - Colours are text, such as `"#4A90D9"`.
 - A function of its own exists only when it does more than change one value: velocity, level position, tags, spawning.
@@ -91,7 +91,7 @@ Source: round 9: 10 2.7; owner: 2026-11-13
 
 | Function | Does | Status |
 |---|---|---|
-| `get_variable(name)`, `set_variable(name, value)` | The level's variables, on the World. A script reads its own entity's through `variables`, see [variables](#variables--v2) | Owner |
+| `get_variable(name)`, `set_variable(name, value)` | The level's variables, on the World. A script reads its own entity's through `variables`, see [variables](#variables--v5) | Owner |
 | `is_down(input)`, `is_key_down(key)` | Whether an input or a raw key is held | Review |
 | `win()`, `lose()`, `restart()` | End or restart the run, at the end of the tick | Owner |
 | `get_time()` | The level's time in seconds | Owner |

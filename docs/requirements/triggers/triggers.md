@@ -252,7 +252,8 @@ Source: owner: 2026-11-13; owner: 2026-11-23
 ### Convert to script · Later
 
 - **Each trigger's `…` menu has Convert to script.** It makes a new `.lua` file in the Assets panel that does what the trigger did, named after the trigger, and adds it to the entity's ScriptComponent, adding the component if there is none. The trigger is removed. Example: "When touched, Do: Change value coins + 1, Destroy this" becomes a script with `on("touched", ...)` that adds to `coins` and destroys `this`.
-- **Triggers that switched it on or off with Change value now switch the script instead**, through the script's own on/off checkbox (see [scripts](../scripts/scripts.md#switching-a-script-off--v3)). A trigger that was off becomes a script that is off.
+- **Triggers that switched it on or off with Change value now switch the script instead**, through the script's own on/off checkbox (see [scripts](../scripts/scripts.md#switching-a-script-off--later)). A trigger that was off becomes a script that is off.
+- **The new script runs at the ScriptComponent's moment.** Cards have one fixed order, scripts above triggers (see [the Entity inspector](../editor/inspector-and-undo.md)), so on one entity a converted trigger now runs before the triggers that stay triggers, for the same event in the same tick. Nothing tries to keep its old moment. *Why: "the order you see is the order things run" stays true without a hidden order kept for converted scripts; when the moment matters, the remaining triggers can become scripts too (standing yes, 2026-11-26).*
 - The new file is ordinary readable Lua, to edit like any other script.
 - **It is one Undo step, and Undo is the only way back.** There is no converting a script into a trigger.
 - Every event, If check and action a trigger has must have a Lua equivalent, so every trigger can be converted.
