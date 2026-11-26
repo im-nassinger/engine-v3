@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Every feature in one line, with the version it ships in and why. **v1 is the smallest thing that can be tested: a level you build and watch.** Coloured shapes, groups, bodies, three joints, the camera following an entity, Play, Stop, Pause and Step, saving in the browser and export. **After v1 come small versions, each adding one thing you can try at once** (owner, 2026-11-20): **v2** curves and gradients, **v3** the first triggers and Win and Lose, **v4** the rest of the triggers and the shortcut list, **v5** scripts, the code editor, the Console and the Assets panel, **v6** text and entities inside the camera, **v7** `.entity` files, spawning and the builtin player. **Later** is everything in no planned version yet, accounts and publishing last. The exact rules for each feature are in [requirements/](requirements/README.md). Each topic file marks every feature with the same version as here.
+Every feature in one line, with the version it ships in and why. **v1 is the smallest thing that can be tested: a level you build and watch.** Coloured shapes, groups, bodies, three joints, the camera following an entity, Play, Stop, Pause and Step, saving in the browser and export. **After v1 come small versions, each adding one thing you can try at once** (owner, 2026-11-20): **v2** curves and gradients, **v3** the first triggers and Win and Lose, **v4** the rest of the triggers and the shortcut list, **v5** scripts, the code editor, the Console and a flat list of `.lua` files, **v6** folders and images (owner, 2026-11-26: v5 was split in two), **v7** text and entities inside the camera, **v8** `.entity` files, spawning and the builtin player. **Later** is everything in no planned version yet, accounts and publishing last. The exact rules for each feature are in [requirements/](requirements/README.md). Each topic file marks every feature with the same version as here.
 
 ## What the versions mean
 
@@ -12,9 +12,10 @@ Every feature in one line, with the version it ships in and why. **v1 is the sma
 | **v2** | Draw curves: the Bézier pen, the Pencil, gradients. |
 | **v3** | A first game without code: touching, tags, the first triggers, number variables on the World, inputs, Win and Lose. |
 | **v4** | The rest of the triggers, string and boolean variables on any entity, the shortcut list. |
-| **v5** | Scripts, the code editor, the Console, the Assets panel. |
-| **v6** | Text, and entities inside the camera. |
-| **v7** | `.entity` files, spawning, the builtin folder and the builtin player. |
+| **v5** | Scripts, the code editor, the Console, and the Assets panel as a flat list of `.lua` files. |
+| **v6** | Files and images: folders in the Assets panel, file paths that update themselves, importing images, the image fill and the World's background image. |
+| **v7** | Text, and entities inside the camera. |
+| **v8** | `.entity` files, spawning, the builtin folder and the builtin player. |
 | **Later** | In no planned version yet. A feature gets a number only when it joins a planned version. |
 
 **How versions were set.** The scope review (2026-11-13) set v1, v2, v3 for polish and Later, and the owner made v1 smaller the same day, moving all logic to v2 and accounts to v4. **On 2026-11-20 the owner replaced everything after v1 with small versions**: each adds one thing you can try at once, the most value for the least work first, and only the next few are planned. The old v3 (polish) and v4 (accounts and publishing) became Later. Round 11, which kept v2 as one big version, was dropped half way. A reason below that says "Was v1 in the scope review" or names an old version is history.
@@ -31,7 +32,7 @@ These versions were decided during the requirements review, or by the owner afte
 |---|---|---|
 | One level at a time, saved in the browser. New and Import replace it after asking. Export makes a `.editable` file; Ctrl+S saves in the browser now (owner: 2026-11-18) | v1 | A list of levels isn't v1. Without the browser copy, closing the tab would lose work |
 | Three joints: Hinge, Rope and Spring, with the Joint tool | v1 | Each does something the others can't |
-| Only three tools in v1: Select, Shape and Joint | v1 | The other tools make paths, triggers and text, which come in v2, v3 and v6 (owner: 2026-11-13; owner: 2026-11-20) |
+| Only three tools in v1: Select, Shape and Joint | v1 | The other tools make paths, triggers and text, which come in v2, v3 and v7 (owner: 2026-11-13; owner: 2026-11-20) |
 | Pause and Step | v1 | To watch a collision tick by tick (owner: 2026-11-13) |
 | The level's name, in the tab title and renamed from File → Rename level… (owner: 2026-11-18; not shown in the editor since the redesign) | v1 | It names the exported file. It was in no scope list (owner: 2026-11-13) |
 | The minimap, show-only | v1 | Part of the redesign; moving the view by clicking or dragging on it is Later (owner: 2026-11-18) |
@@ -59,7 +60,7 @@ Trigger templates were folded into component presets. Version history was reject
 
 ## Counts
 
-These counts are from before 2026-11-20, in the old versions. 117 features went through the scope review: 51 in v1, 65 in the old v2, 1 Later. After the owner made v1 smaller: **31 in v1, 20 in the old v2, 65 in the old v3, 1 Later**, and DR4 came forward to v1 on 2026-11-17, so **32 in v1 and 64 in the old v3**. Since 2026-11-20 the old v2 is spread over v2 to v7, and the old v3 is Later.
+These counts are from before 2026-11-20, in the old versions. 117 features went through the scope review: 51 in v1, 65 in the old v2, 1 Later. After the owner made v1 smaller: **31 in v1, 20 in the old v2, 65 in the old v3, 1 Later**, and DR4 came forward to v1 on 2026-11-17, so **32 in v1 and 64 in the old v3**. Since 2026-11-20 the old v2 is spread over v2 to v8, and the old v3 is Later.
 
 **The small features** at the end of each topic file never went through the scope review. The owner gave all 119 their version in round 7 of the architecture review (owner, 2026-11-14): **14 in v1, 12 in the old v2, 80 in the old v3, 13 Later.** They are listed only in their topic files.
 
@@ -113,10 +114,10 @@ Rules: [requirements/drawing](requirements/drawing.md)
 | DR5 | Convert a path to a polygon: right-click, then a dialog with a points slider and a live preview. This is how a drawn curve becomes something that collides. | Later | Paths are drawn in v1, and collision has shapes. Turning one into the other is an extra step. |
 | DR6 | The colour picker's extras: level colours, recent colours and the eyedropper. The plain picker (palette and a colour field) is in v1 either way. | Later | The plain picker is enough to test. |
 | DR7 | Two colour swatches on the toolbar, so new shapes use the last colours you picked. | Later | New shapes can start with one default colour. |
-| DR8 | The Text tool: type on the level, with font, size, weight, alignment, and Fit to text or Fixed width. | v6 | Its reason for v1 was a score on the screen, which needs variables. Text also brings fonts and sharp text. Was v1 in the scope review: A score on the screen needs text. |
+| DR8 | The Text tool: type on the level, with font, size, weight, alignment, and Fit to text or Fixed width. | v7 | Its reason for v1 was a score on the screen, which needs variables. Text also brings fonts and sharp text. Was v1 in the scope review: A score on the screen needs text. |
 | DR9 | Line height and letter spacing for text. | Later | The defaults read fine for a score or a title. |
 | DR10 | Lora, JetBrains Mono and Roboto Mono, beside Inter. | Later | One font is enough to test, and every font adds download size. |
-| DR11 | Images: drop a PNG, JPEG, WebP or GIF to make a rectangle with that image as its fill, set to stretch or tile, smooth or sharp. Images also bring the builtin Kenney art, licences, and a background image on the World. | Later | Coloured shapes are enough to build and test a level. Leaving images out also leaves out importing, licences and the builtin art. The builtin player would be coloured shapes in v1. |
+| DR11 | Images: drop a PNG, JPEG, WebP or GIF to make a rectangle with that image as its fill, set to stretch or tile, smooth or sharp. Images also bring the builtin Kenney art, licences, and a background image on the World. | v6 | Images in v6, the builtin Kenney art and licences Later (owner, 2026-11-26: v5 was split in two). Before: Coloured shapes are enough to build and test a level. Leaving images out also leaves out importing, licences and the builtin art. The builtin player would be coloured shapes in v1. |
 | DR12 | The Flip button, which sets the scale to −1. | Later | Typing −1 in the TransformComponent's scale does the same. |
 
 ## Assets
@@ -125,8 +126,8 @@ Rules: [requirements/assets](requirements/assets/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
-| AS1 | The Assets panel, with folders and the builtin folder, holding your .lua and .entity files. | v5 | It holds .lua files, which come in v5 (owner: 2026-11-20). Was v1 in the scope review: Scripts and .entity files live there. |
-| AS2 | Moving or renaming a file in the Assets panel updates every file path that points to it. Example: moving coin.entity into a pickups folder keeps every spawn of it working. | v5 | Comes with the Assets panel. Was v1 in the scope review: Otherwise moving a file silently breaks everything that uses it. |
+| AS1 | The Assets panel, with folders and the builtin folder, holding your .lua and .entity files. | v5, v6 and v8 | It holds .lua files, which come in v5 (owner: 2026-11-20); v5 has a flat list, folders come in v6 (owner, 2026-11-26: v5 was split in two), the builtin folder in v8. Was v1 in the scope review: Scripts and .entity files live there. |
+| AS2 | Moving or renaming a file in the Assets panel updates every file path that points to it. Example: moving coin.entity into a pickups folder keeps every spawn of it working. | v6 | Comes with folders (owner, 2026-11-26: v5 was split in two). Was v1 in the scope review: Otherwise moving a file silently breaks everything that uses it. |
 | AS3 | Search and sort in the Assets panel. | Later | A test level has few files. |
 | AS4 | Sound: import WAV, MP3 or OGG, then triggers and scripts start and stop sounds, with volume, loop, and start and end times. | Later | A silent level can still be tested. Sound brings importing, playing up to 32 at once, and the player's Volume slider with it. |
 | AS5 | Use as level music: right-click a sound to add a World trigger that plays it on a loop. | Later | Comes with sound. |
@@ -177,7 +178,7 @@ Rules: [requirements/camera](requirements/camera.md)
 | CM3 | Fixed size: the camera shows exactly its own box, with black bars if the window has different proportions. New levels in v1 would start in Fixed size instead of Fill window. | v1 | Positions inside the camera are then always the same, so a score stays in its corner without any layout. |
 | CM4 | Fill window: the same height, and wider windows see more of the level sideways. | Later | On a wider window, a score placed in the corner would no longer be in the corner. That needs the FlexComponent (CM5), so the two go together. |
 | CM5 | The FlexComponent: arrange children in a row or column, and place them against the screen's edges with the 3×3 picker. | Later | With Fixed size only, you can place things inside the camera by hand. |
-| CM6 | Entities inside the camera stay fixed on the screen. | v6 | Its reason is a score or a timer, which need variables. Was v1 in the scope review: A score or a timer on the screen. |
+| CM6 | Entities inside the camera stay fixed on the screen. | v7 | Its reason is a score or a timer, which need variables. Was v1 in the scope review: A score or a timer on the screen. |
 | CM7 | HUD mode: editing what's inside the camera dims the level. | Later | A comfort for editing the screen layout. |
 | CM8 | Camera zoom during play, from 0.1 to 10. Set with Change value, like any other value. | Later | An effect, not something a test needs. |
 | CM9 | The Camera shake action. | Later | An effect. |
@@ -188,10 +189,10 @@ Rules: [requirements/assets](requirements/assets/README.md)
 
 | Id | Feature | Version | Why this version |
 |---|---|---|---|
-| EF1 | Save a selection as an .entity file. Drag one into the level to place a copy. | v7 | It was v1 for spawning, which only triggers and scripts do. Copy and paste cover reuse inside one level. Was v1 in the scope review: Spawning needs .entity files. |
+| EF1 | Save a selection as an .entity file. Drag one into the level to place a copy. | v8 | It was v1 for spawning, which only triggers and scripts do. Copy and paste cover reuse inside one level. Was v1 in the scope review: Spawning needs .entity files. |
 | EF2 | Linked copies: editing the .entity file in its own tab updates every copy, and Make unique cuts the link. In v1, a placed copy would be a plain copy you can change freely. | Later | Linking needs a second editing tab and read-only fields. Plain copies are enough to test spawning. |
 | EF3 | Placing several copies: select an .entity file, then click in the level once per copy. Previews in the Assets panel. | Later | Dragging one at a time works. |
-| EF4 | The builtin platformer player: an .entity file using the builtin platformer script (run, jump, double jump, ledge grace time, slopes). Ledge grace time: you can still jump for a moment after running off an edge. | v7 | It is a script that reads inputs, and both come in v2. Was v1 in the scope review: It proves a creator can build a player with only what they have, and it's the fastest way to test a level. |
+| EF4 | The builtin platformer player: an .entity file using the builtin platformer script (run, jump, double jump, ledge grace time, slopes). Ledge grace time: you can still jump for a moment after running off an edge. | v8 | It is a script that reads inputs, and both come in v2. Was v1 in the scope review: It proves a creator can build a player with only what they have, and it's the fastest way to test a level. |
 | EF5 | The rest of the builtin .entity files: platforms, enemies, hazards, pickups, gadgets, projectiles, physics toys, the ragdoll. | Later | Each one is content to make and test. v1 needs the player, not a library. |
 | EF6 | The rest of the builtin scripts: enemies, health, pickups, camera, showing a variable, Move Along Path. | Later | Same reason: v1 needs the player's script. |
 
@@ -207,7 +208,7 @@ Rules: [requirements/triggers](requirements/triggers/README.md)
 | TR4 | Mouse events: this is clicked, the mouse is over this. | Later | Keys are enough for a platformer test. Mouse events also need the rules for which entity gets the click. |
 | TR5 | The events 'while touching' and 'left the level'. | Later | Touched and no longer touched cover the same cases with a little more work. |
 | TR6 | If: one check, a value compared: other has a tag, a variable compared, a component value compared with a number (one check since 2026-11-23, owner). | v3 and v4 | Logic comes after v1. Was v1 in the scope review: A coin that only the player can pick up needs the tag check. |
-| TR7 | Actions: Change value (Body › Velocity included, which replaced Push on 2026-11-23, owner), Spawn, Destroy, Fire custom event, Wait, Win, Lose, Restart. | v3, v4 and v7 | Logic comes after v1. Was v1 in the scope review: The full set except sound and camera shake. |
+| TR7 | Actions: Change value (Body › Velocity included, which replaced Push on 2026-11-23, owner), Spawn, Destroy, Fire custom event, Wait, Win, Lose, Restart. | v3, v4 and v8 | Logic comes after v1. Was v1 in the scope review: The full set except sound and camera shake. |
 | TR8 | The Repeat setting: every time, once per run, or at most once every N seconds. Example: a spike that hurts at most once a second. | v3 | Logic comes after v1. Was v1 in the scope review: Small, and without it a trigger can fire every tick. |
 | TR9 | Arrows from the selected entity to what its triggers affect. | Later | Helps reading big levels. |
 | VA1 | Variables on the World, and from 2026-11-16 on any entity: a name and a starting value, which triggers and scripts read and change. Example: coins = 0. | v3 to v5 | Logic comes after v1. Was v1 in the scope review: A score needs one. |

@@ -34,7 +34,7 @@ The requirements set speed targets for a level of 10,000 entities on a mid-range
 | **Shared drawings for identical shapes** | `EntityDrawing` builds each `Graphics` from values; equal values could share one PixiJS `GraphicsContext` | Drawing time grows with copies of one platform |
 | **Off-screen bodies updated less often in drawing** | The mirror applies every pose today | Test play drops frames with many off-screen bodies. Physics itself always runs every body: skipping any would break determinism |
 | **A byte limit on history** | `HistoryStep` sizes can be measured | Files in the Assets panel (v5) make steps large |
-| **Text redrawn at its real size** | `EntityDrawing` per kind of drawing | Text comes in v6 |
+| **Text redrawn at its real size** | `EntityDrawing` per kind of drawing | Text comes in v7 |
 
 ## Targets and their tests
 

@@ -34,9 +34,9 @@ Source: scope PH10; round 6: 05 2.14; old: PH-85; owner: 2026-11-15
 
 Source: scope PH11; round 3: D75; round 6: 05 2.14; round 9: 09 2.10; old: PH-87
 
-### Background image · Later
+### Background image · v6
 
-- The background can be an image instead of a colour: the World's StyleComponent gets an image fill. It comes with images.
+- The background can be an image instead of a colour: the World's StyleComponent gets an image fill. It comes with images, in v6 (owner, 2026-11-26: v5 was split in two).
 - A missing image falls back to the colour.
 
 Source: scope DR11; round 6: 05 2.14; old: PH-88

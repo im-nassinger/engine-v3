@@ -84,7 +84,7 @@ export type TickReport = {
     readonly changes: readonly ValueChanges[]; // v3: values Change value wrote, { entity, component, values }
     readonly end: RunEnd | null;              // v3: { kind: 'won' | 'lost', tick } or { kind: 'restart' }
     readonly warnings: readonly PlayWarning[]; // v3: play warnings first given in this batch
-    // later: Console lines (v5), spawned entities (v7)
+    // later: Console lines (v5), spawned entities (v8)
 };
 ```
 
@@ -120,7 +120,7 @@ v1 phases, in order:
 | `CameraPhase` | Follows the target with smoothing, stops at the bounds |
 | `EndOfTickPhase` | Removes marked entities, writes the report |
 
-- **Later versions add phases, not code paths.** v3 added `EventPhase` (keys, timers, level start, touches from the physics step) and `TriggerPhase` after `JointPathPhase`, with the chain limit of 32 counted in `TriggerPhase`'s rounds, and the run's end in `EndOfTickPhase` ([triggers-in-play.md](triggers-in-play.md#the-tick-from-v3)). v4's custom events join those rounds, which v5's `ScriptPhase` (in Entities viewer order) shares; v7 adds `SpawnPhase`. The order follows the requirements: touches are delivered after the physics step, destroys and spawns at the end of the tick.
+- **Later versions add phases, not code paths.** v3 added `EventPhase` (keys, timers, level start, touches from the physics step) and `TriggerPhase` after `JointPathPhase`, with the chain limit of 32 counted in `TriggerPhase`'s rounds, and the run's end in `EndOfTickPhase` ([triggers-in-play.md](triggers-in-play.md#the-tick-from-v3)). v4's custom events join those rounds, which v5's `ScriptPhase` (in Entities viewer order) shares; v8 adds `SpawnPhase`. The order follows the requirements: touches are delivered after the physics step, destroys and spawns at the end of the tick.
 - **The Lua host** is a contract in core, `ScriptEngine`, fulfilled in v5 by `adapters/lua/WasmoonScriptEngine`. The Lua API functions call a `GameApi` class in core, which uses the same schemas (`findFieldByAttribute`, `changeableInPlay`) as the Entity inspector.
 - **Restart** (v3) builds a new `Simulation` from the `LevelData` the game worker kept, with a fresh physics world, id counter and seed (and Lua state from v5), as the tech notes advise. Nothing is reset in place. See [triggers-in-play.md](triggers-in-play.md#restart).
 
@@ -204,7 +204,7 @@ Made under the standing yes (2026-11-16), before building. The [plan](../steps/s
 - **Limiting to the bounds uses the camera's own box**, which is the whole view in Fixed size. Where the level is smaller than the box in one direction, the camera sits on the bounds' middle in that direction. The later Fill window limits the shown view again on the drawing side, as the [tech notes](../tech-notes.md#camera) say.
 - **The teleport rule needs no code of its own:** a target far away is pulled to the margin's edge in one tick, which is the cut the requirement asks for.
 - **`CameraState` in `PlayRun` holds the position**, and `CameraPhase` (`core/simulation/phases/`) is the only code that changes it. The rules are plain functions in `core/simulation/camera/`. The run starts with the camera on its target, limited to the bounds, so there is no opening pan. A target that is missing or removed holds the last position; with no target the camera stays where it was placed, limited to the bounds. *Why: the requirement says the camera always ends up inside, also with nothing to follow.*
-- **The camera entity's TransformComponent isn't written during play**, like a body's: the report and `stateHash` read `CameraState`. The page's `PlayMirror` (stage 16) moves its camera from the report. *Why: nothing in v1 reads the camera's values in the play copy; entities inside the camera are v6, which can add the camera to `BodyMatrixSource`'s job then.*
+- **The camera entity's TransformComponent isn't written during play**, like a body's: the report and `stateHash` read `CameraState`. The page's `PlayMirror` (stage 16) moves its camera from the report. *Why: nothing in v1 reads the camera's values in the play copy; entities inside the camera are v7, which can add the camera to `BodyMatrixSource`'s job then.*
 - **`CameraPhase` runs after `LevelBoundsPhase` and before `EndOfTickPhase`**, so the target is read before a removal at the end of the tick, and the next tick finds it gone and holds.
 - **The determinism test gains `camera-follow`**, and the ten older levels are recorded again, since the camera now starts inside the bounds; only a level whose placed camera was outside them changes.
 - *As built (step 4, standing yes, 2026-11-16):* `camera-follow` is a ball rolling down two Static slopes to the right Wall, in 2,400 by 1,400 bounds with Walls, so the default 1,920 by 1,080 camera stops at the bounds both ways. Recording again left all ten older levels' hashes as they were: none placed its camera outside its bounds, and `leaving-open-edge` and `bouncing-balls`, smaller than the camera, already had it on their middle at the origin. `tests/determinism/camera-follow/` checks on every tick that the ball's origin is inside the camera's box, that the box is inside the bounds, and that the camera reaches both side limits. *Why: a level only a little bigger than the camera makes the limits happen within ten seconds.*

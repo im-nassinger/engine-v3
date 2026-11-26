@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Everything about the editor that isn't specific to one kind of entity: the workspace, the tools, the Entity inspector, selection, groups, the Entities viewer and undo. **In v1** you get fixed panels over a full-window level view, three of the seven tools (Select, Shape, Joint), pan and zoom, a grid, the Entity inspector with cards and partner notes, copy and paste, undo, click and box selection, handles, grouping, the Entities viewer and the eye icon. The other four tools come with their versions: the Pencil and the Bézier pen in v2, Trigger in v3 and Text in v6; the searchable shortcut list comes in v4. **Later** come panel resizing, snapping to entities, copying values, tips and more warnings, multi-entity resize and rotate, the path bar, hover outlines, Entities viewer search and the lock icon.
+Everything about the editor that isn't specific to one kind of entity: the workspace, the tools, the Entity inspector, selection, groups, the Entities viewer and undo. **In v1** you get fixed panels over a full-window level view, three of the seven tools (Select, Shape, Joint), pan and zoom, a grid, the Entity inspector with cards and partner notes, copy and paste, undo, click and box selection, handles, grouping, the Entities viewer and the eye icon. The other four tools come with their versions: the Pencil and the Bézier pen in v2, Trigger in v3 and Text in v7; the searchable shortcut list comes in v4. **Later** come panel resizing, snapping to entities, copying values, tips and more warnings, multi-entity resize and rotate, the path bar, hover outlines, Entities viewer search and the lock icon.
 
 ## Files
 

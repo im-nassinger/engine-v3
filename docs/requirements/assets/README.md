@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The files a level uses and what comes with the game. **Nothing here is in v1.** **In v5** the Assets panel holds `.lua` files in folders, and paths update themselves. **In v7** you can save and place `.entity` files and spawn from them, and the `builtin` folder has one platformer player with its script. **Later** come images and sounds, safe replace and delete, search, packages, My files, linked copies, and the full builtin library. Core rules: an asset is only the raw file, there is no "prefab" and no "behaviour", only files, and builtin content has no private powers.
+The files a level uses and what comes with the game. **Nothing here is in v1.** **In v5** the Assets panel holds a flat list of `.lua` files. **In v6** it gets folders, paths that update themselves, and imported images. **In v8** you can save and place `.entity` files and spawn from them, and the `builtin` folder has one platformer player with its script. **Later** come sounds, safe replace and delete, search, packages, My files, linked copies, and the full builtin library. Core rules: an asset is only the raw file, there is no "prefab" and no "behaviour", only files, and builtin content has no private powers.
 
 ## Files
 
@@ -16,16 +16,16 @@ The files a level uses and what comes with the game. **Nothing here is in v1.** 
 
 | Feature | Version | File |
 |---|---|---|
-| The Assets panel with folders | v5 | files-and-sound |
-| File paths that update themselves | v5 | files-and-sound |
-| Save a selection as an `.entity` file, place a copy | v7 | entity-files |
-| Spawning during play | v7 | entity-files |
-| The builtin folder, the builtin platformer player and script | v7 | builtin-content |
+| The Assets panel, a flat list | v5 | files-and-sound |
+| Folders, and file paths that update themselves | v6 | files-and-sound |
+| Save a selection as an `.entity` file, place a copy | v8 | entity-files |
+| Spawning during play | v8 | entity-files |
+| The builtin folder, the builtin platformer player and script | v8 | builtin-content |
 | Search and sort | Later | files-and-sound |
 | Replacing and deleting files safely | Later | files-and-sound |
 | Packages | Later | files-and-sound |
 | The My files folder | Later | files-and-sound |
-| Importing images | Later | files-and-sound |
+| Importing images | v6 | files-and-sound |
 | Sound, and Use as level music | Later | files-and-sound |
 | Linked copies | Later | entity-files |
 | Placing several copies, previews | Later | entity-files |

@@ -71,7 +71,7 @@ export class LevelReader {
     constructor(registry: ComponentRegistry, limits: LevelLimits, upgrader: FormatUpgrader);
     readJson(text: string): ReadOutcome<Level>;                   // level.json's text; not JSON is notALevel
     read(raw: unknown): ReadOutcome<Level>;                       // a whole level
-    readFragment(raw: unknown): ReadOutcome<EntityFragment>;      // the clipboard, .entity files (v7)
+    readFragment(raw: unknown): ReadOutcome<EntityFragment>;      // the clipboard, .entity files (v8)
 }
 
 export type ReadOutcome<T> = { ok: true; value: T } | { ok: false; refusal: ReadRefusal };
@@ -113,7 +113,7 @@ export type ReadRefusal =
   | Over 100,000 entities, deeper than 256, more than 1,000 points in a shape or 2,000 in a path | `overLimit` |
 
 - **The 256 MB limit is checked where the bytes are** (stage 2, standing yes, 2026-11-14), not by the reader: `read` takes data already parsed from JSON, so it can't count bytes, and measuring the level after each change would be slow. `LevelLimits` holds the number; the import worker counts the unpacked bytes and the save measures the text it already has, both in stage 12.
-- **The same reader** reads imports, the browser's saved level, the clipboard, the play copy in the worker and (v7) `.entity` files. So a damaged saved level and a damaged import fail the same way.
+- **The same reader** reads imports, the browser's saved level, the clipboard, the play copy in the worker and (v8) `.entity` files. So a damaged saved level and a damaged import fail the same way.
 
 ## The project file
 

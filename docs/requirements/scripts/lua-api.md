@@ -55,7 +55,7 @@ Source: round 9: 10 2.3; round 10: EV1; owner: 2026-11-13; owner: 2026-11-23
 | `get_world()`, `get_camera()` | The World's id, the camera's id | Owner |
 | `get_parent(id)`, `get_children(id)` | The parent's id, a list of the children's ids | Owner |
 | `exists(id)` | False once the entity is destroyed | Owner |
-| `spawn(path)` | Creates an entity from an `.entity` file. Returns its id, or `nil` at the spawn limit. Comes in v7, with `.entity` files | Review |
+| `spawn(path)` | Creates an entity from an `.entity` file. Returns its id, or `nil` at the spawn limit. Comes in v8, with `.entity` files | Review |
 | `destroy(id)` | Destroys the entity and its children at the end of the tick | Review |
 | `has_tag(id, tag)`, `add_tag(id, tag)`, `remove_tag(id, tag)` | Tags | Owner |
 

@@ -238,7 +238,7 @@ Component names end in `Component`, the TransformComponent included (owner: 2026
 | TagsComponent | The entity's tags (v3) | Any entity |
 | ShapeComponent | A rectangle, circle, polygon or line. On the World, a rectangle: the level bounds | Any entity, the World included |
 | PathComponent | A curved path. Read-only on Rope, Spring and Rod joints | Any entity |
-| TextComponent | Text and its font settings (v6) | Any entity |
+| TextComponent | Text and its font settings (v7) | Any entity |
 | StyleComponent | Fill, outline and opacity, for a shape, path or text. On the World, its fill is the background | Any entity that draws, the World included |
 | EffectsComponent | Pixelate, shadow, blur (Later) | Any entity that draws |
 | BodyComponent | Body type and how it moves | Any entity |

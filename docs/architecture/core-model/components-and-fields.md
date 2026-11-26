@@ -182,7 +182,7 @@ export type ComponentClass<T extends Component> = {
 - **A component never knows which entity holds it.** `set` and `writeValue` raise the component's own `changed` signal. `Entity.addComponent` subscribes to it and turns it into the level's `valueChanged` update, and `removeComponent` unsubscribes.
 - **Partner notes come from the schema** (Q5 and Q6, owner 2026-11-13): a component lists, as plain data, the partners it needs and when they are needed. The editor's `MissingPartnerRule` turns them into editor messages with an [Add ...] button. Removing a component removes only that one, so the cards left behind show their notes.
 - **Every note reads "Needs a X to Y. [Add X]"** (owner, 2026-11-13), with Y written per partner in the schema: "to draw anything" for a StyleComponent, "to collide" for a SurfaceComponent and a BodyComponent.
-- **`alsoSatisfiedBy`** (stage 2, standing yes, 2026-11-14): the StyleComponent's note shows only when the entity has neither a ShapeComponent nor a PathComponent, so its rule names ShapeComponent as `partner` (what the button adds) and PathComponent in `alsoSatisfiedBy`. v6 adds the TextComponent to the list. *Why: one `partner` can't say "either of two".*
+- **`alsoSatisfiedBy`** (stage 2, standing yes, 2026-11-14): the StyleComponent's note shows only when the entity has neither a ShapeComponent nor a PathComponent, so its rule names ShapeComponent as `partner` (what the button adds) and PathComponent in `alsoSatisfiedBy`. v7 adds the TextComponent to the list. *Why: one `partner` can't say "either of two".*
 
 ## Stored values
 
@@ -285,7 +285,7 @@ export function createV1Registry(): ComponentRegistry;
 
 | Later need | Where it plugs in | Changes to v1 code |
 |---|---|---|
-| TagsComponent, VariablesComponent, InputComponent, TriggerComponent (v3, built: [triggers.md](triggers.md)), ScriptComponent (v5), TextComponent (v6) | New component folders, registered in the registry | None; copying gained `mapEntities` for links inside a value |
+| TagsComponent, VariablesComponent, InputComponent, TriggerComponent (v3, built: [triggers.md](triggers.md)), ScriptComponent (v5), TextComponent (v7) | New component folders, registered in the registry | None; copying gained `mapEntities` for links inside a value |
 | Variables of nine types on any entity (v4 and v5) | Each variable on a VariablesComponent is drawn with its type's field type, limits included. A script's `variables` table is only read to offer [Add variables] | None |
 | `get_attribute`, `set_attribute`, Change value (v3) | `schema.findFieldByAttribute`, `writeValue`, guarded by `changeableInPlay` | None |
 | Images as fills (Later) | One more kind of `Fill` in `FillFieldType`, as v2 added the gradients by replacing `SolidFillFieldType` | None outside `core/fields/fill` and the fill's drawing and editor |

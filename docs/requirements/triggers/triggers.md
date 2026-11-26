@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-A trigger is no-code logic on an entity, in three parts: **When** (one event), **If** (optional checks), **Do** (a list of actions, run top to bottom). An entity's TriggerComponent holds a list of them. **Six events:** other starts or stops touching this, a key or input is pressed, released or held, after or every N seconds, the level starts (v3), a variable changes and this gets a custom event (v4). **One check**, a value compared (v3, any component value from v4). **Seven actions:** Change value, Destroy, Win, Lose and Restart (v3), Fire custom event and Wait (v4). Then the Trigger tool (v3), a trigger resting by switching its own *Enabled* off (v4), and Spawn (v7). **Later:** mouse events, "while touching" and "left the level", sound and camera shake actions, arrows to what a trigger affects, trigger lines in the Console, and Convert to script. Core rules: **if it's data, change it with Change value**, triggers and scripts share one list of events, and the order you see is the order things run.
+A trigger is no-code logic on an entity, in three parts: **When** (one event), **If** (optional checks), **Do** (a list of actions, run top to bottom). An entity's TriggerComponent holds a list of them. **Six events:** other starts or stops touching this, a key or input is pressed, released or held, after or every N seconds, the level starts (v3), a variable changes and this gets a custom event (v4). **One check**, a value compared (v3, any component value from v4). **Seven actions:** Change value, Destroy, Win, Lose and Restart (v3), Fire custom event and Wait (v4). Then the Trigger tool (v3), a trigger resting by switching its own *Enabled* off (v4), and Spawn (v8). **Later:** mouse events, "while touching" and "left the level", sound and camera shake actions, arrows to what a trigger affects, trigger lines in the Console, and Convert to script. Core rules: **if it's data, change it with Change value**, triggers and scripts share one list of events, and the order you see is the order things run.
 
 ## The trigger
 
@@ -151,7 +151,7 @@ Source: owner: 2026-11-25
 
 Source: scope TR7; round 10: WT1; round 11: WT2; owner: 2026-11-20
 
-### Spawn · v7
+### Spawn · v8
 
 | Action | What it does |
 |---|---|
@@ -160,7 +160,7 @@ Source: scope TR7; round 10: WT1; round 11: WT2; owner: 2026-11-20
 - **Spawn asks for TransformComponent values and has no target.** *Why: you say exactly where the new entity appears and how it is turned and sized (owner: 2026-11-14).*
   - **Position and rotation are measured from the entity the trigger is on.** Example: a cannon tilted 30° spawns a bullet at 0.4, 0: the bullet appears 0.4 m along the cannon, tilted 30°, wherever the cannon is. A trigger on the World measures from the level's origin. *Why: a moving cannon then works without a script (owner: 2026-11-14).*
   - **Spawn's values replace the TransformComponent saved in the `.entity` file.** *Why: what the trigger shows is what you get (owner: 2026-11-14).*
-- *Why v7: it comes with `.entity` files (owner: 2026-11-20).*
+- *Why v8: it comes with `.entity` files (owner: 2026-11-20).*
 
 Source: scope TR7; owner: 2026-11-14; owner: 2026-11-20
 
@@ -242,7 +242,7 @@ Source: scope LU8; round 10: TL1, TL2
 - **The Trigger tool, key 6, draws a rectangle that notices touching.** The new entity has a TransformComponent, a rectangle ShapeComponent, and a TriggerComponent holding one trigger that starts "When other starts touching this". It has no SurfaceComponent, so things pass through it (owner, 2026-11-23).
 - It has no StyleComponent, so it isn't drawn in play, and it is selected by its edge.
 - Example: draw one over the end of a level, then add Win to its trigger.
-- *Why key 6: it is the next free key, so the keys have no gap until Text comes in v6 (standing yes, 2026-11-22).*
+- *Why key 6: it is the next free key, so the keys have no gap until Text comes in v7 (standing yes, 2026-11-22).*
 - *Why v3: triggers are v3. "Trigger", not "Trigger zone": the owner's shorter name.*
 
 Source: owner: 2026-11-13; owner: 2026-11-23

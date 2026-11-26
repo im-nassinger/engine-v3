@@ -130,7 +130,7 @@ tests/
   levels/              test levels (.editable files) shared by the three above
 ```
 
-Each component folder is named exactly like its class, as the owner's React rules do for components, and holds the class, its values type and its schema (for example `BodyComponent/BodyComponent.ts`, `BodyValues.ts`, `bodySchema.ts`). v3 added `TagsComponent/`, `VariablesComponent/`, `InputComponent/` and `TriggerComponent/` beside them; `ScriptComponent/` (v5) and `TextComponent/` (v6) come the same way, and nothing else in `core` changes shape. ui's folders follow the owner's component rules: one component per folder, its child components as subfolders.
+Each component folder is named exactly like its class, as the owner's React rules do for components, and holds the class, its values type and its schema (for example `BodyComponent/BodyComponent.ts`, `BodyValues.ts`, `bodySchema.ts`). v3 added `TagsComponent/`, `VariablesComponent/`, `InputComponent/` and `TriggerComponent/` beside them; `ScriptComponent/` (v5) and `TextComponent/` (v7) come the same way, and nothing else in `core` changes shape. ui's folders follow the owner's component rules: one component per folder, its child components as subfolders.
 
 ## Rules for what goes where
 

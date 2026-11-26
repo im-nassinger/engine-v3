@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-A script is a `.lua` file from the Assets panel, attached to an entity through its ScriptComponent. **v5:** the ScriptComponent with a list of `.lua` files, each listing the variables it needs on its entity, `on(name, function)` for events, handles for entities, `wait(2)`, reading and changing component values, and Lua 5.4 with only its safe parts. **v7:** `spawn(path)`. **Later:** functions that come with later features, such as sound and the mouse. Core rules: **handles, not references**; scripts and triggers share one list of events; and **once a function ships it never changes**. Every function is in [lua-api.md](lua-api.md), and example scripts in [lua-examples.md](lua-examples.md).
+A script is a `.lua` file from the Assets panel, attached to an entity through its ScriptComponent. **v5:** the ScriptComponent with a list of `.lua` files, each listing the variables it needs on its entity, `on(name, function)` for events, handles for entities, `wait(2)`, reading and changing component values, and Lua 5.4 with only its safe parts. **v8:** `spawn(path)`. **Later:** functions that come with later features, such as sound and the mouse. Core rules: **handles, not references**; scripts and triggers share one list of events; and **once a function ships it never changes**. Every function is in [lua-api.md](lua-api.md), and example scripts in [lua-examples.md](lua-examples.md).
 
 ## Attaching scripts
 
@@ -59,11 +59,11 @@ Source: round 3: D66; round 9: 10 2.2; old: LU-13, LU-18; owner: 2026-11-13
 
 Source: round 1: D3; round 9: 10 2.7, 10 2.8; old: LU-57 to LU-62; owner: 2026-11-13
 
-### `spawn(path)` · v7
+### `spawn(path)` · v8
 
 - `spawn(path)` takes the path of an `.entity` file and **returns the new entity's id, which can be used straight away**, such as to set its speed. *Why: it fits handles, not references.*
 - The rules for spawned entities are in [entity files](../assets/entity-files.md).
-- *Why v7: it comes with `.entity` files (owner: 2026-11-20).*
+- *Why v8: it comes with `.entity` files (owner: 2026-11-20).*
 
 Source: scope TR7; round 3: D67; round 9: 10 2.4; old: LU-33 to LU-38; owner: 2026-11-13
 

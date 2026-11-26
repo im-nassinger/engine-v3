@@ -30,10 +30,11 @@ The full list, with the review decision behind each, is in [principles.md](princ
 | **v2** | Draw curves | The Bézier pen, the Pencil, gradients |
 | **v3** | A first game without code | Sensors, tags, the first triggers, number variables on the World, inputs, Win and Lose |
 | **v4** | Things that react to each other and to time | The rest of the triggers, string and boolean variables on any entity, the shortcut list |
-| **v5** | Code | Scripts, the code editor, the Console, the Assets panel |
-| **v6** | Text on screen | The Text tool, entities inside the camera |
-| **v7** | Reuse and a ready-made player | `.entity` files, spawning, the builtin folder and player |
-| **Later** | In no planned version yet | Images, sound, more joints, the collision grid, Flex, the pause menu, live values, editor comforts, the play file, and last accounts and publishing |
+| **v5** | Code | Scripts, the code editor, the Console, the Assets panel as a flat list of `.lua` files |
+| **v6** | Files and images | Folders, file paths that update themselves, importing images, the image fill, the World's background image |
+| **v7** | Text on screen | The Text tool, entities inside the camera |
+| **v8** | Reuse and a ready-made player | `.entity` files, spawning, the builtin folder and player |
+| **Later** | In no planned version yet | Sprite sheets and animations, sound, more joints, the collision grid, Flex, the pause menu, live values, editor comforts, the play file, and last accounts and publishing |
 
 After v1 every version is small and adds one thing you can try at once, the most value for the least work first, and only the next few are planned (owner, 2026-11-20). Every feature is listed in [scope.md](scope.md) with its version and reason.
 

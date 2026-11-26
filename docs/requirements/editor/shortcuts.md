@@ -71,7 +71,7 @@ The starting list of keyboard and mouse shortcuts, and the keys the editor must 
 | Shift while dragging | Lock a move to one axis, keep proportions, or snap a rotation to 15° | Handles, v1 |
 | Alt or Ctrl+Shift while resizing or drawing | Resize or draw from the centre | Handles, v1 |
 | Ctrl while dragging | Turn snapping off | Grid, v1 |
-| Double-click | Go into a group, edit points. Edit text from v6 | v1 |
+| Double-click | Go into a group, edit points. Edit text from v7 | v1 |
 | Alt+click | Select the next entity underneath | Next underneath, Later |
 | Alt+drag an entity | Drag out a copy | Unscoped |
 | Right-click | Context menu | Unscoped |

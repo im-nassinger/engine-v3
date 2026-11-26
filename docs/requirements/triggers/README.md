@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Logic without code. **Nothing here is in v1.** **In v3** an entity's TriggerComponent holds triggers shaped as When, If, Do, with events for touching, keys and inputs, timers and level start, one check (a value compared), five actions led by Change value, and a setting for how often a trigger fires; the World holds the level's number variables and inputs. **In v4** come custom events, a variable changing, component values in the check, Fire custom event and Wait, and string and boolean variables on any entity. Since 2026-11-23 there are six events, one check and seven actions (owner), and since 2026-11-24 a trigger rests, or fires once per run, by switching its own *Enabled* off (owner). **v5** adds the variable types scripts need, and **v7** Spawn. **Later:** mouse events, two more touch events, sound and camera actions, arrows to what a trigger affects, kept variables, gamepads, remapping and the mouse for scripts. Core rules: if it's data, change it with Change value, triggers and scripts share one list of events, and the order you see is the order things run.
+Logic without code. **Nothing here is in v1.** **In v3** an entity's TriggerComponent holds triggers shaped as When, If, Do, with events for touching, keys and inputs, timers and level start, one check (a value compared), five actions led by Change value, and a setting for how often a trigger fires; the World holds the level's number variables and inputs. **In v4** come custom events, a variable changing, component values in the check, Fire custom event and Wait, and string and boolean variables on any entity. Since 2026-11-23 there are six events, one check and seven actions (owner), and since 2026-11-24 a trigger rests, or fires once per run, by switching its own *Enabled* off (owner). **v5** adds the variable types scripts need, and **v8** Spawn. **Later:** mouse events, two more touch events, sound and camera actions, arrows to what a trigger affects, kept variables, gamepads, remapping and the mouse for scripts. Core rules: if it's data, change it with Change value, triggers and scripts share one list of events, and the order you see is the order things run.
 
 ## Files
 
@@ -30,7 +30,7 @@ Logic without code. **Nothing here is in v1.** **In v3** an entity's TriggerComp
 | Resting and once per run, with *Enabled* | v4 | triggers |
 | String and boolean variables, on any entity | v4 | variables-and-inputs |
 | The variable types scripts need, number limits | v5 | variables-and-inputs |
-| Spawn | v7 | triggers |
+| Spawn | v8 | triggers |
 | Mouse events | Later | triggers |
 | "While touching" and "left the level" | Later | triggers |
 | Play sound, Stop sound, Camera shake | Later | triggers |

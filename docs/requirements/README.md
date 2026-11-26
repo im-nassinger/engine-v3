@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-What the game does, in eight topics: editor, drawing, assets, physics, camera, triggers, scripts, play and save. **These are functional requirements only:** what a creator or player does and sees, never how it is built. Every feature is marked with its version, v1 to v7, or Later when it is in no planned version yet, with the reason where the review recorded one. Read a topic's TL;DR first, then its feature table, then the rules. For every feature and its version on one page, see [scope.md](../scope.md).
+What the game does, in eight topics: editor, drawing, assets, physics, camera, triggers, scripts, play and save. **These are functional requirements only:** what a creator or player does and sees, never how it is built. Every feature is marked with its version, v1 to v8, or Later when it is in no planned version yet, with the reason where the review recorded one. Read a topic's TL;DR first, then its feature table, then the rules. For every feature and its version on one page, see [scope.md](../scope.md).
 
 ## Topics
 

@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-What the player sees. There is exactly one camera, an entity with a CameraComponent, and the entities inside it stay fixed on the screen. **v1:** one camera in Fixed size that follows an entity with smoothing and stops at the level bounds. **v6:** entities inside the camera, for a score or timer. **Later:** following a tag, Fill window, the FlexComponent (the one layout system, also for placing things against the screen's edges), follow offset, dead zone and look-ahead, HUD mode, zoom during play, and camera shake. **Later:** parallax and more cameras. Core rules: there are no anchors, "HUD" is not a kind of entity, and the camera never rotates.
+What the player sees. There is exactly one camera, an entity with a CameraComponent, and the entities inside it stay fixed on the screen. **v1:** one camera in Fixed size that follows an entity with smoothing and stops at the level bounds. **v7:** entities inside the camera, for a score or timer. **Later:** following a tag, Fill window, the FlexComponent (the one layout system, also for placing things against the screen's edges), follow offset, dead zone and look-ahead, HUD mode, zoom during play, and camera shake. **Later:** parallax and more cameras. Core rules: there are no anchors, "HUD" is not a kind of entity, and the camera never rotates.
 
 ## The camera
 
@@ -100,7 +100,7 @@ Source: scope CM9; round 7: 07 2.6; round 9: 09 2.4b; old: CM-50 to CM-57
 
 ## Inside the camera
 
-### Entities inside the camera stay on the screen · v6
+### Entities inside the camera stay on the screen · v7
 
 - **An entity inside the camera stays fixed on the screen during play.** This is how a score or a timer is made.
 - **"HUD" is not a kind of entity**, only a short name for the entities inside the camera. The editor says "inside the camera". *Why: they are regular entities. The only difference is their parent.*
@@ -112,7 +112,7 @@ Source: scope CM9; round 7: 07 2.6; round 9: 09 2.4b; old: CM-50 to CM-57
 - Until Flex Later you place these entities by hand. With Fixed size their positions are the same on every screen.
 - In the level view, single clicks pass through the entities inside the camera, so they never block the level. Double-click the camera's frame, or select them in the Entities viewer, to reach them.
 - Something that moves with the view and touches the level, such as a wall that chases the player, can't be inside the camera. Make it a Kinematic body that the camera follows.
-- *Why v6: its reason is a score or a timer, which need variables and a short script, and it comes with the Text tool (owner: 2026-11-20).*
+- *Why v7: its reason is a score or a timer, which need variables and a short script, and it comes with the Text tool (owner: 2026-11-20).*
 
 Source: scope CM6; round 1: C4, D18; round 7: 07 2.14; round 8: HUD1, HUD2; old: CM-69, CM-70, CM-74, CM-75, CM-92 to CM-96; owner: 2026-11-13
 

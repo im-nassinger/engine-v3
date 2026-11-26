@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-How shapes, paths and text are made and how they look. **v1:** the Shape tool (rectangle, circle, polygon, line), changing a shape's kind, point editing by double-click, polygons that may cross themselves, and the StyleComponent with solid colours. **v2:** the Bézier pen and the Pencil, and gradients. **v6:** the Text tool with one font. **Later:** images (a shape with an image fill), Convert to polygon, the W/A/S/D size keys, colour picker extras, toolbar swatches, three more fonts, line height and letter spacing, Flip, and the EffectsComponent. Core rules: a shape can collide and a path never does, an image is not its own kind of entity, and each entity draws exactly one thing.
+How shapes, paths and text are made and how they look. **v1:** the Shape tool (rectangle, circle, polygon, line), changing a shape's kind, point editing by double-click, polygons that may cross themselves, and the StyleComponent with solid colours. **v2:** the Bézier pen and the Pencil, and gradients. **v6:** images (a shape with an image fill). **v7:** the Text tool with one font. **Later:** Convert to polygon, the W/A/S/D size keys, colour picker extras, toolbar swatches, three more fonts, line height and letter spacing, Flip, and the EffectsComponent. Core rules: a shape can collide and a path never does, an image is not its own kind of entity, and each entity draws exactly one thing.
 
 ## Drawing tools
 
@@ -145,7 +145,7 @@ Source: scope DR5; round 1: D22, D58; round 5: 03 2.8; old: DR-64 to DR-79
 
 - The StyleComponent works the same on everything that draws: a ShapeComponent, a PathComponent and a TextComponent. *Why: style belongs to anything drawn, not shapes only.*
 - It holds a **fill**, an **outline** (colour and width) and an **opacity**.
-- A fill is nothing, a solid colour, a gradient, or (Later) an image.
+- A fill is nothing, a solid colour, a gradient, or (v6) an image.
 - A path's fill paints only when the path is closed. A line has no fill.
 - On text, the fill colours the letters and the outline traces them.
 - Colours can be see-through. Outline width goes from 0 to 200, and 0 means no outline.
@@ -187,7 +187,7 @@ Source: scope DR6; round 6: ST2; old: DR-95, DR-96
 
 Source: scope DR7; round 5: 03 2.3; old: DR-18 to DR-20
 
-### Images · Later
+### Images · v6
 
 - **An image is not its own kind of entity. It is a shape whose fill is the image.** There is no `ImageComponent`.
 - Dropping a PNG, JPEG, WebP or GIF on the level makes an entity with a TransformComponent, a rectangle ShapeComponent the image's size, and a StyleComponent with that image as its fill. 1 image pixel is 1 level pixel, so at 100 px per metre an image 200 pixels wide is 2 m wide.
@@ -199,7 +199,8 @@ Source: scope DR7; round 5: 03 2.3; old: DR-18 to DR-20
 - The World's background can be an image.
 - Tint is an effect and waits for the EffectsComponent.
 - *Why a fill: proposed by the owner and extended the way Figma does it. Everything known about shapes (size, outline, opacity, physics, clicking) works on images for free, and three concepts disappear: image size, image opacity, hitboxes.*
-- Images bring importing, licences and the builtin Kenney art with them, see [assets](assets/README.md).
+- Images bring importing with them, see [assets](assets/README.md). Licences and the builtin Kenney art stay Later, with the full builtin library (standing yes, 2026-11-26: v6 is the creator's own images; the builtin art is a library of its own).
+- *Why v6: images need the Assets panel's import, which v6 brings with folders (owner, 2026-11-26: v5 was split in two).*
 
 Source: scope DR11; round 5: 04 2.3, 04 2.6, 04 2.7, 04 2.8; round 6: ST1, ST3
 
@@ -226,22 +227,22 @@ Source: round 5: 03 2.13; old: DR-117 to DR-122
 
 ## Text
 
-### The Text tool · v6
+### The Text tool · v7
 
 - Click on the level and type. The text shows in its real font, size, colour and rotation as you type.
 - Enter starts a new line. Esc or clicking elsewhere finishes. Empty text creates nothing, and emptying a text deletes the entity.
 - Double-clicking a text with Select edits it again.
-- **TextComponent settings in v6:** Width, font, weight, size, alignment.
+- **TextComponent settings in v7:** Width, font, weight, size, alignment.
 - **Width** is "Fit to text" or "Fixed". With Fixed, the text wraps at that width. The height always fits the text, so text never spills out of its box. *Why a two-option choice: it reads better than a checkbox.*
 - Size is a whole number from 8 to 400, default 32. **Dragging a corner of a text changes its size**, in whole numbers. *Why: the height always follows the text, so a corner has nothing else to change (owner: 2026-11-13).* Weight takes any value. Alignment is left, centre or right.
 - One style for the whole text. No mixed bold or colours.
 - **A text entity has a rectangle ShapeComponent as its box, like an image.** The rectangle isn't drawn. It is what you click, what Flex uses, and what collides if you add physics. With Fit to text the editor sets its width and height. With Fixed you set the width and the editor sets the height. *Why: the owner's idea. Text works exactly like images, and "text doesn't collide unless you add a shape" goes away.*
-- The one font in v6 is **Inter**. Fonts come with the game, so a level looks the same on every computer. A font is never removed from the list.
+- The one font in v7 is **Inter**. Fonts come with the game, so a level looks the same on every computer. A font is never removed from the list.
 - **Non-Latin text uses the system font, with a warning** that it may look different on other computers. Emoji too.
 - Text stays sharp at any zoom and inside a scaled group.
 - A text holds up to 10,000 characters.
 - Typing inside a text has its own undo. The whole edit is one level undo step when finished.
-- *Why v6: its reason is a score on the screen, which needs variables and a short script, so it comes after scripts (owner: 2026-11-20). Text also brings fonts and sharp text at any zoom.*
+- *Why v7: its reason is a score on the screen, which needs variables and a short script, so it comes after scripts (owner: 2026-11-20). Text also brings fonts and sharp text at any zoom.*
 
 Source: scope DR8; round 1: D27; round 3: F1; round 6: TX1; round 7: TX2; old: DR-100 to DR-116; owner: 2026-11-13
 

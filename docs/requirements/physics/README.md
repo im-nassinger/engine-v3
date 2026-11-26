@@ -30,7 +30,8 @@ How entities move, collide and connect. **In v1** you add a body in one click, s
 | One-way platforms | Later | bodies |
 | Warnings for physics and joints | Later | bodies, joints |
 | The collision grid, the Collision check | Later | world |
-| Gravity buttons, game speed, background image | Later | world |
+| Background image | v6 | world |
+| Gravity buttons, game speed | Later | world |
 | Weld, Rod, Slider, Wheel | Later | joints |
 | Drag limits, re-attach an end, change type | Later | joints |
 | Joints that break | Later | joints |

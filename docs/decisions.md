@@ -104,6 +104,10 @@ Triggers have no branches or loops on purpose, so the owner asked for a way out:
 
 The owner answered three questions before v5 is planned. **A script reads another entity's variables through its VariablesComponent**, with `get_component` and `get_attribute`, not with a function made for variables. **Choice and list variable types wait for Later.** **v5 is split in two smaller versions.** And **the sprite sheet editor, when it comes, picks its frames from the image files in the Assets panel**, the same files image fills use. Written in [lua-api.md](requirements/scripts/lua-api.md#variables--v5), [variables-and-inputs.md](requirements/triggers/variables-and-inputs.md) and [later.md](requirements/later.md).
 
+## 2026-11-26: v5 is split, and images move to v6
+
+The owner agreed to split v5 and to bring images forward. **v5:** scripts, the code editor, the Console, and the Assets panel as one flat list of `.lua` files. **v6:** folders, file paths that update themselves, importing images, the image fill and the World's background image. The old v6 (text) is now **v7** and the old v7 (`.entity` files, spawning, the builtin player) is now **v8**. Licences and the builtin Kenney art stay Later with the full builtin library (standing yes, 2026-11-26). *Why: smaller versions can be tried sooner, and images need the import that comes with the Assets panel's folders.* Written in [scope.md](scope.md) and the topic files of [requirements/](requirements/README.md).
+
 ## Still to decide
 
 Under the standing yes, new questions are decided and listed above instead of asked. The open points of 2026-11-16's variables change wait for the owner: see [progress.md](progress.md#open-questions-for-the-owner).

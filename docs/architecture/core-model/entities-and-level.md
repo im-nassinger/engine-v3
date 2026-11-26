@@ -9,7 +9,7 @@
 - `type EntityId = number`, declared in `core/fields` beside `EntityFieldType`, the lowest code that needs it, and exported again by `core/level`. Whole numbers starting at 1. A new level's World is 1 and its camera 2.
 - `EntityIdAllocator.next()` returns the highest id ever seen plus one. Loading a level, or restoring an entity on undo, calls `reserve(id)`, which only raises the highest.
 - **Never reused in a session:** a deleted entity's id stays free, so undo brings the entity back with the same id and every link to it works again. After a reload the history is gone, so reusing a deleted id is harmless.
-- **The play copy keeps the editor's ids** (owner, 2026-11-13). Spawned entities (v7) get ids from the run's own allocator, which starts above the level's highest id.
+- **The play copy keeps the editor's ids** (owner, 2026-11-13). Spawned entities (v8) get ids from the run's own allocator, which starts above the level's highest id.
 - Entity fields (a joint's A and B, the camera's follow target) store an `EntityId`. An id that no longer exists reads as `missing entity`.
 - Component ids for Lua (v5): each component type gets a fixed index in the registry, so a component id can be computed from the entity id and that index. Nothing is stored.
 
@@ -187,7 +187,7 @@ Values worked out from the tree, kept until something they depend on changes. Th
 | Undo of a delete | Kept, through `Level.restoreEntity` |
 | Copy, paste and duplicate | Replaced by new ids, see [clipboard](../editor/clipboard-and-shortcuts.md) |
 | The play copy | Kept |
-| `.entity` files and spawning (v7) | Replaced by new ids |
+| `.entity` files and spawning (v8) | Replaced by new ids |
 
 - **`readSubtree` as built** *(standing yes, 2026-11-15)*: each `EntityData` in the list it is given is a **root**, and the roots go into `parent` from `index` on, in their order, each with its nested `children` under it. *(Changed for the nested file, owner, 2026-11-15: until then each entity named its parent, and an entity whose parent wasn't listed before it was a root.)* It keeps the ids, and refuses, as `damaged`, an id already in the level, a CameraComponent or a PhysicsWorldComponent; it counts the entity and depth limits from the level and the parent it goes into. Every check runs before the level changes, so a refusal leaves it as it was. It gives the roots. An index outside the children throws, because the caller picked it. *Why: one reader for undo and paste, and paste puts several roots side by side.*
 - A component is copied with `component.copy()`, which clones each value through its field type, so a list or a point list is never shared between two components.

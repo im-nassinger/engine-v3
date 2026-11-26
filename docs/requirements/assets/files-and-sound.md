@@ -2,16 +2,16 @@
 
 ## TL;DR
 
-The Assets panel is a small file system: folders of raw files, each with a path, plus a read-only `builtin` folder. **v5:** the panel with folders, holding `.lua` files, and paths that update themselves when a file moves. **v7:** `.entity` files and the `builtin` folder. **Later:** importing images and sounds, playing sounds from triggers and scripts, replacing and deleting files safely, search and sort, packages, the My files folder, and trimming a sound. Core rule: **an asset is only the raw file.** Its settings live where it is used.
+The Assets panel is a small file system: folders of raw files, each with a path, plus a read-only `builtin` folder. **v5:** the panel as one flat list of `.lua` files. **v6:** folders, paths that update themselves when a file moves, and importing images. **v8:** `.entity` files and the `builtin` folder. **Later:** importing sounds, playing sounds from triggers and scripts, replacing and deleting files safely, search and sort, packages, the My files folder, and trimming a sound. Core rule: **an asset is only the raw file.** Its settings live where it is used.
 
 ## The Assets panel
 
-### Folders of files · v5
+### The Assets panel · v5
 
-- Each level has its own files, shown in the Assets panel as folders, like a file system. In v5 they are `.lua` files; `.entity` files join in v7, images and sounds Later.
+- Each level has its own files, shown in the Assets panel. **In v5 the panel is one flat list; folders, like a file system, come in v6.** *Why: v5 was split in two so scripts can be tried sooner (owner, 2026-11-26: v5 was split in two).* In v5 the files are `.lua` files; images join in v6, `.entity` files in v8, sounds Later.
 - Entities point to files and never hold their own copies. Fixing a file fixes every use.
 - **An asset is only the raw file. Settings never live on the asset.** They live where it is used: on an image fill, on a "Play sound" action. *Why: you never wonder where a setting is, and two places can use one file with different settings without copying it.*
-- From v7 a read-only **`builtin` folder** holds the files that come with the game. See [builtin-content.md](builtin-content.md).
+- From v8 a read-only **`builtin` folder** holds the files that come with the game. See [builtin-content.md](builtin-content.md).
 - **Builtin files can't be changed.** To change one, duplicate it into one of your own folders and edit the copy. *Why: builtin files never change once released, so a game update never changes how a level plays (owner: 2026-11-13).*
 - Selecting a file shows its details at the bottom of the panel, not in the Entity inspector, so the selection in the level is kept.
 - F2 or a double-click renames a file. Del deletes it.
@@ -20,13 +20,13 @@ The Assets panel is a small file system: folders of raw files, each with a path,
 
 Source: scope AS1; round 1: C13, C14; round 3: D67; round 5: 04 2.1; round 6: ST3, SND1; old: AS-01, AS-02, AS-05, AS-09; owner: 2026-11-13
 
-### File paths that update themselves · v5
+### File paths that update themselves · v6
 
 - Every path starts from the top of the Assets panel, such as `images/coin.png` or `pickups/coin.entity`.
 - Files are moved and renamed only in the Assets panel, which then updates every path that points to them, in the level and inside `.entity` files.
 - No two files can have the same path.
 - *Why paths: paths from the top mean moving an `.entity` file never breaks it, and auto-updating covers moving what it points to, like code editors updating imports. Hidden ids would never break either, but the files would stop being readable text.*
-- *Why v5: it comes with the Assets panel.*
+- *Why v6: it comes with folders (owner, 2026-11-26: v5 was split in two).*
 
 Source: scope AS2; round 8: AP1; owner: 2026-11-13
 
@@ -64,9 +64,9 @@ Source: scope AS9; round 2: O6; decisions: D59
 
 ## Images
 
-### Importing images · Later
+### Importing images · v6
 
-Images ship Later together with the image fill, see [drawing](../drawing.md).
+Images ship in v6 together with the image fill (owner, 2026-11-26: v5 was split in two), see [drawing](../drawing.md).
 
 - Import PNG, JPEG, WebP or GIF with the Import button, by dropping files on the panel or the level, or by pasting.
 - An animated GIF or WebP imports its first frame only, with a note. The kind of file is read from its contents, not its name. SVG is refused: "Export it as PNG".
