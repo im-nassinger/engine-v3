@@ -6,7 +6,7 @@ import type { CommandRegistry } from '../commands/index.ts';
 import type { OpenLevel } from '../session/index.ts';
 import type { Snapper } from '../snapping/index.ts';
 import type { StatusText } from '../status/index.ts';
-import type { ViewState } from '../view/index.ts';
+import type { ViewSettings, ViewState } from '../view/index.ts';
 
 import type { LevelCursor } from './LevelCursor.ts';
 
@@ -48,6 +48,8 @@ export type ToolContext = {
     // Read when used: New and Import replace the open level.
     readonly openLevel: OpenLevel;
     readonly view: ViewState;
+    // ☰'s length unit, which the drag readouts use.
+    readonly viewSettings: ViewSettings;
     readonly snapper: Snapper;
     readonly commands: CommandRegistry;
     readonly status: StatusText;

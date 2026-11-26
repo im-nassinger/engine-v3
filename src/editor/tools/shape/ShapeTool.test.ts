@@ -124,7 +124,7 @@ describe('the Shape tool', () => {
         const setup = buildShapeTest();
         setup.controller.pointerDown(pointer({ x: 0, y: 0 }));
         setup.controller.pointerMove(pointer({ x: 200, y: 100 }, { ctrl: true }));
-        expect(setup.tool.readout?.text).toBe('200 × 100 px');
+        expect(setup.tool.readout?.text).toBe('2 × 1 m');
 
         setup.controller.keyDown({
             code: 'ShiftLeft',
@@ -135,7 +135,7 @@ describe('the Shape tool', () => {
             repeat: false,
         });
 
-        expect(setup.tool.readout?.text).toBe('400 × 200 px');
+        expect(setup.tool.readout?.text).toBe('4 × 2 m');
     });
 
     test('a circle’s drag gives the circle that fits the box, as if Shift were held, and Alt from the centre', () => {
@@ -192,7 +192,7 @@ describe('the Shape tool', () => {
         const setup = buildShapeTest();
         setup.controller.pointerDown(pointer({ x: 0, y: 0 }));
         setup.controller.pointerMove(pointer({ x: 200, y: 100 }));
-        expect(setup.tool.readout).toEqual({ text: '200 × 100 px', at: { x: 200, y: 100 } });
+        expect(setup.tool.readout).toEqual({ text: '2 × 1 m', at: { x: 200, y: 100 } });
         setup.controller.pointerUp(pointer({ x: 200, y: 100 }));
         expect(setup.tool.readout).toBeUndefined();
 
@@ -200,7 +200,7 @@ describe('the Shape tool', () => {
         circle.tool.chooseKind('circle');
         circle.controller.pointerDown(pointer({ x: 0, y: 0 }));
         circle.controller.pointerMove(pointer({ x: 100, y: 30 }));
-        expect(circle.tool.readout?.text).toBe('⌀ 100 px');
+        expect(circle.tool.readout?.text).toBe('⌀ 1 m');
     });
 
     test('Shift pressed during a drag changes it without a move', () => {
@@ -217,7 +217,7 @@ describe('the Shape tool', () => {
             repeat: false,
         });
 
-        expect(setup.tool.readout?.text).toBe('200 × 200 px');
+        expect(setup.tool.readout?.text).toBe('2 × 2 m');
     });
 
     test('the press and the moving corner snap as points, and Ctrl turns that off', () => {

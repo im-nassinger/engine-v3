@@ -108,7 +108,7 @@ describe('Entity inspector: a path’s Points', () => {
         expect(numbers).toEqual(['1', '2', '3']);
         const x = requireElement<HTMLInputElement>(rowAt(1), '.vector-axis-box[data-axis="x"] input');
         const y = requireElement<HTMLInputElement>(rowAt(1), '.vector-axis-box[data-axis="y"] input');
-        expect([x.value, y.value]).toEqual(['50', '10']);
+        expect([x.value, y.value]).toEqual(['0.5', '0.1']);
         expect(requireElement<HTMLButtonElement>(rowAt(1), '.corner button').textContent).toBe('Sharp');
         expect(rowAt(1).querySelector('.fold')).toBeNull();
     });
@@ -118,7 +118,7 @@ describe('Entity inspector: a path’s Points', () => {
         const x = requireElement<HTMLInputElement>(rowAt(1), '.vector-axis-box[data-axis="x"] input');
 
         await userEvent.click(x);
-        await userEvent.fill(x, '70');
+        await userEvent.fill(x, '0.7');
         await userEvent.keyboard('{Enter}');
 
         await expect.poll(() => pointsOf(path)[1]).toEqual(sharp(70, 10));
@@ -141,7 +141,7 @@ describe('Entity inspector: a path’s Points', () => {
         const handleRows = rowAt(1).querySelectorAll('.path-handle-row');
         expect(handleRows[1]?.querySelector('.none')?.textContent).toBe('None');
         const handleX = requireElement<HTMLInputElement>(handleRows[0] as HTMLElement, '.vector-axis-box input');
-        expect(handleX.value).toBe('-10');
+        expect(handleX.value).toBe('-0.1');
     });
 
     test('choosing Sharp drops the handles and the fold arrow', async () => {

@@ -1,8 +1,16 @@
 import { AngleFieldType, NumberFieldType, VectorFieldType } from '../../../core/fields/index.ts';
 import type { FieldModel, NumberInputDefinition } from '../../../editor/entity-inspector/index.ts';
+import type { LengthDisplay } from '../../../editor/units/index.ts';
 
-// What ValueInput reads from a number, angle or vector field, stored or derived, or from Mass. A vector's boxes share it.
-export function numberInputOf(field: FieldModel): NumberInputDefinition {
+// What ValueInput reads from a number, angle or vector field, stored or derived, or from Mass, with a length
+// or a speed in ☰'s unit. A vector's boxes share it.
+export function numberInputOf(field: FieldModel, lengths: LengthDisplay): NumberInputDefinition {
+    const stored = storedInputOf(field);
+
+    return lengths.shown(stored);
+}
+
+function storedInputOf(field: FieldModel): NumberInputDefinition {
     const { definition } = field;
     const type = definition.type;
     const isNumber =

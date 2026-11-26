@@ -278,6 +278,9 @@ function buildContext(services: ToolServices, finished: (created: readonly Entit
         get view() {
             return services.view;
         },
+        get viewSettings() {
+            return services.viewSettings;
+        },
         get snapper() {
             return services.snapper;
         },

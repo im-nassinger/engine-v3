@@ -67,6 +67,7 @@ function buildRotateTest() {
             return session.openLevel;
         },
         view: session.view,
+        viewSettings: session.viewSettings,
         snapper: new GridSnapper(level.editorData, session.viewSettings),
         commands: createCommandRegistry(session),
         status: session.status,
@@ -283,7 +284,7 @@ describe('the readout', () => {
         tool.pointerDown(pointer({ x: 100, y: 100 }));
         tool.pointerMove(pointer({ x: 220, y: 60 }));
 
-        expect(tool.readout?.text).toBe('120, −40 px');
+        expect(tool.readout?.text).toBe('1.2, −0.4 m');
         tool.pointerUp(pointer({ x: 220, y: 60 }));
         expect(tool.readout).toBeUndefined();
     });
@@ -295,6 +296,6 @@ describe('the readout', () => {
         tool.pointerDown(pointer({ x: 150, y: 100 }));
         tool.pointerMove(pointer({ x: 250, y: 100 }));
 
-        expect(tool.readout?.text).toBe('200 × 100 px');
+        expect(tool.readout?.text).toBe('2 × 1 m');
     });
 });

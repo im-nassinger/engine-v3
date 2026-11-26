@@ -67,7 +67,7 @@ describe('the Trigger tool', () => {
 
         setup.controller.pointerDown(pointer({ x: 0, y: 0 }));
         setup.controller.pointerMove(pointer({ x: 120, y: 60 }));
-        expect(setup.tool.readout?.text).toBe('120 × 60 px');
+        expect(setup.tool.readout?.text).toBe('1.2 × 0.6 m');
         expect(setup.tool.drawing?.drawing.geometry).toEqual({ kind: 'rectangle', width: 120, height: 60 });
     });
 

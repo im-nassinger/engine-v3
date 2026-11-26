@@ -113,6 +113,7 @@ export function buildSessionWithTools(tools: readonly Tool[], snapper: Snapper =
             return session.openLevel;
         },
         view: session.view,
+        viewSettings: session.viewSettings,
         snapper,
         commands,
         status: session.status,

@@ -1,4 +1,5 @@
 import type { AngleFieldType, NumberFieldType, Unit, VectorFieldType } from '../../../core/fields/index.ts';
+import { withoutNoise } from '../../units/index.ts';
 
 // A vector field has a box per axis, and each box is typed like a number.
 export type NumberInputType = NumberFieldType | AngleFieldType | VectorFieldType;
@@ -48,7 +49,9 @@ export class ValueInput {
         if (isTooLarge) return { kind: 'invalid', reason: 'Too large' };
 
         const displayScale = definition.displayScale ?? 1;
-        const typedValue = typedNumber / displayScale;
+        // 0.07 m at 1/100 is 7 px, not 7.000000000000001.
+        const scaledValue = typedNumber / displayScale;
+        const typedValue = withoutNoise(scaledValue);
 
         const refusal = refusalOf(typedValue, definition);
         if (refusal !== undefined) return { kind: 'invalid', reason: refusal };

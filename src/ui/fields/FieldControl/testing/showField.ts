@@ -9,6 +9,7 @@ import type { FieldModel } from '../../../../editor/entity-inspector/index.ts';
 import { EditorSession } from '../../../../editor/session/index.ts';
 import { ManualClock, ManualFrames, ManualTimer } from '../../../../editor/time/testing/index.ts';
 import { CommandsContext } from '../../../commands/index.ts';
+import { EditorContext } from '../../../EditorContext.tsx';
 import type { EditorCommands } from '../../../commands/index.ts';
 import '../../../theme.css';
 import { FieldControl } from '../FieldControl.tsx';
@@ -68,7 +69,8 @@ export function showField(
         onCommitAxis: (axis, newValue) => committed.push({ [axis]: newValue }),
         onCommitEach: (valueFor) => committed.push(valueFor(value)),
     });
-    root.render(createElement(CommandsContext, { value: commands }, control));
+    const withCommands = createElement(CommandsContext, { value: commands }, control);
+    root.render(createElement(EditorContext, { value: session }, withCommands));
 
     return committed;
 }

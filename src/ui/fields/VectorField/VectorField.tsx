@@ -1,5 +1,6 @@
 import type { Axis } from '../../../editor/commands/index.ts';
 import type { MixedVector } from '../../../editor/entity-inspector/index.ts';
+import { useLengthDisplay } from '../../hooks/index.ts';
 import type { FieldProps } from '../FieldProps.ts';
 import { numberInputOf } from '../typing/numberInputOf.ts';
 import { VectorAxisBox } from './VectorAxisBox/index.ts';
@@ -10,7 +11,8 @@ const AXES: readonly Axis[] = ['x', 'y'];
 // Two boxes side by side, X and Y, each typed like a number. A box commits only its own axis, and an
 // axis the selected entities don't share reads Mixed on its own.
 export function VectorField({ field, onCommitAxis }: FieldProps) {
-    const definition = numberInputOf(field);
+    const lengths = useLengthDisplay();
+    const definition = numberInputOf(field, lengths);
     const vector = field.value as MixedVector;
 
     return (

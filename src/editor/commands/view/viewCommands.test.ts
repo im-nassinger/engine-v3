@@ -177,6 +177,22 @@ describe('The View menu switches', () => {
     });
 });
 
+describe('Metres and Pixels', () => {
+    test('choose the unit lengths show in, the chosen one ticked, metres at first', () => {
+        const { session, requireCommand } = buildSession();
+        const metres = requireCommand('view.metres');
+        const pixels = requireCommand('view.pixels');
+        expect(session.viewSettings.lengthUnit).toBe('metres');
+        expect(metres.checked?.()).toBe(true);
+
+        pixels.run();
+
+        expect(session.viewSettings.lengthUnit).toBe('pixels');
+        expect(pixels.checked?.()).toBe(true);
+        expect(metres.checked?.()).toBe(false);
+    });
+});
+
 describe('Every View command', () => {
     test('makes no undo step and leaves the level as it was', () => {
         const { session, registry } = buildSession();
@@ -186,7 +202,7 @@ describe('Every View command', () => {
             command.run();
         }
 
-        expect(viewCommands).toHaveLength(11);
+        expect(viewCommands).toHaveLength(13);
         expect(session.openLevel.history.undoLabel).toBeUndefined();
     });
 });

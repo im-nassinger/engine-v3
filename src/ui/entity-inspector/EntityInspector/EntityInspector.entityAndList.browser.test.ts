@@ -335,7 +335,7 @@ describe('the list field', () => {
         const secondX = requireElement<HTMLInputElement>(points(), '.list-field-row[data-index="1"] input');
 
         await userEvent.click(secondX);
-        await userEvent.fill(secondX, '80');
+        await userEvent.fill(secondX, '0.8');
         await userEvent.keyboard('{Enter}');
 
         expect(polygonPoints(level)[1]).toEqual({ x: 80, y: -50 });

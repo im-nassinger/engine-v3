@@ -7,6 +7,7 @@ import { FrameLabel, FRAME_LABEL_HEIGHT_PX } from './FrameLabel.ts';
 import { isDarkBackground, worldFillOf } from './levelBackground.ts';
 import type { OverlayScene } from './OverlayScene.ts';
 import { screenRectangleOf } from './screenPixels.ts';
+import { lengthDisplayOf } from '../../../editor/units/index.ts';
 
 const FRAME_WIDTH_PX = 1.5;
 const ON_LIGHT = { color: 0x141c28, alpha: 0.7 };
@@ -68,7 +69,8 @@ export class CameraFrameOverlay {
             .rect(onScreen.left, onScreen.top, onScreen.width, onScreen.height)
             .stroke({ ...look, width: FRAME_WIDTH_PX, join: 'miter' });
 
-        const size = `${camera.get('width')} × ${camera.get('height')}`;
+        const lengths = lengthDisplayOf(scene.settings.lengthUnit, level);
+        const size = lengths.sizeText(camera.get('width'), camera.get('height'));
         const topLeft = { x: onScreen.left, y: onScreen.top };
         const labelLook = labelStartsInBounds(level, scene, topLeft) ? look : ON_DARK;
         this.label.show(size, topLeft, labelLook.color);

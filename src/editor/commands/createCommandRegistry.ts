@@ -27,6 +27,7 @@ import { UndoCommand } from './edit/UndoCommand.ts';
 import { FitCameraFrameCommand } from './view/FitCameraFrameCommand.ts';
 import { FitSelectionCommand } from './view/FitSelectionCommand.ts';
 import { FitWholeLevelCommand } from './view/FitWholeLevelCommand.ts';
+import { LENGTH_UNIT_ENTRIES, LengthUnitCommand } from './view/LengthUnitCommand.ts';
 import { VIEW_SWITCH_ENTRIES, ViewSwitchCommand } from './view/ViewSwitchCommand.ts';
 import { ZoomInCommand } from './view/ZoomInCommand.ts';
 import { ZoomOutCommand } from './view/ZoomOutCommand.ts';
@@ -103,6 +104,9 @@ export function createCommandRegistry(
     registry.register(new FitWholeLevelCommand(session));
     registry.register(new FitSelectionCommand(session));
     registry.register(new FitCameraFrameCommand(session));
+    for (const entry of LENGTH_UNIT_ENTRIES) {
+        registry.register(new LengthUnitCommand(session, entry));
+    }
     if (play !== undefined) {
         registry.register(new PlayOrStopCommand(play));
         registry.register(new PauseOrResumeCommand(play));

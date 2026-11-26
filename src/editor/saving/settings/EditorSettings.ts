@@ -9,7 +9,14 @@ import type { ViewState, ViewSwitches } from '../../view/index.ts';
 import type { PersistAskedRecord } from '../contracts/PersistAskedRecord.ts';
 import type { SessionOpenRecord } from '../contracts/SessionOpenRecord.ts';
 import type { SettingsStore } from '../contracts/SettingsStore.ts';
-import { parseSettingsText, readFoldedCards, readSavedView, readViewSwitches } from './settingsValues.ts';
+import type { LengthUnit } from '../../units/index.ts';
+import {
+    parseSettingsText,
+    readFoldedCards,
+    readLengthUnit,
+    readSavedView,
+    readViewSwitches,
+} from './settingsValues.ts';
 import type { SavedView } from './settingsValues.ts';
 
 // The editor's small settings, kept between sessions as one JSON object in the SettingsStore. They are read
@@ -25,6 +32,7 @@ export class EditorSettings {
     private readonly others: Record<string, unknown>;
     private view: SavedView | undefined;
     private switches: ViewSwitches;
+    private lengthUnit: LengthUnit;
     private foldedCards: readonly ComponentTypeName[];
     private asked: boolean;
     private open: boolean;
@@ -40,6 +48,7 @@ export class EditorSettings {
         this.others = stored;
         this.view = readSavedView(stored.view);
         this.switches = readViewSwitches(stored.viewSwitches, DEFAULT_VIEW_SWITCHES);
+        this.lengthUnit = readLengthUnit(stored.lengthUnit);
         this.foldedCards = readFoldedCards(stored.foldedCards);
         this.asked = stored.persistAsked === true;
         this.open = stored.sessionOpen === true;
@@ -80,9 +89,9 @@ export class EditorSettings {
         return this.view;
     }
 
-    // The View menu's switches as they were saved, for the session's ViewSettings.
+    // The View menu's switches and the length unit as they were saved, for the session's ViewSettings.
     createViewSettings() {
-        return new ViewSettings(this.switches);
+        return new ViewSettings(this.switches, this.lengthUnit);
     }
 
     // Puts the view back where it was saved, then writes the view and the View menu's switches whenever they
@@ -103,6 +112,7 @@ export class EditorSettings {
         });
         const stopSwitches = viewSettings.version.subscribe(() => {
             this.switches = viewSettings.all();
+            this.lengthUnit = viewSettings.lengthUnit;
             this.writeNextFrame();
         });
         this.stopFollowing = [stopView, stopSwitches];
@@ -142,6 +152,7 @@ export class EditorSettings {
         const settings: Record<string, unknown> = {
             ...this.others,
             viewSwitches: this.switches,
+            lengthUnit: this.lengthUnit,
             foldedCards: this.foldedCards,
             persistAsked: this.asked,
             sessionOpen: this.open,

@@ -315,7 +315,7 @@ function addCheckWords(builder: SentenceBuilder, check: Check, index: number, so
         builder.slot(compareWord);
     }
 
-    const checkedText = check.amount === null ? null : checkedAmountText(check.amount, type);
+    const checkedText = check.amount === null ? null : checkedAmountText(check, check.amount, type, choices);
     const amountEntry = choices.checkAmountEntry(check, index);
     const variables = choices.checkAmountVariables(check, index);
     builder.slot({ slot: 'amount', text: checkedText, need: amountNeed(type), entry: amountEntry, variables });
@@ -334,9 +334,15 @@ function addCheckAxisWord(builder: SentenceBuilder, check: Check, index: number,
 }
 
 // A tag as it is; a string variable's value in quotes; a variable by its name.
-function checkedAmountText(amount: VariableValue | VariableAmount, type: CheckedType | undefined) {
+function checkedAmountText(
+    check: Check,
+    amount: VariableValue | VariableAmount,
+    type: CheckedType | undefined,
+    choices: TriggerChoices,
+) {
     if (isVariableAmount(amount)) return amount.name;
     if (type === 'tag' && typeof amount === 'string') return amount;
+    if (type === 'number' && typeof amount === 'number') return choices.checkNumberText(check, amount);
 
     return comparedText(amount);
 }

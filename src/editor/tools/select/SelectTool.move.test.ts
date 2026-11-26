@@ -49,6 +49,7 @@ function buildMoveTest() {
             return session.openLevel;
         },
         view: session.view,
+        viewSettings: session.viewSettings,
         snapper: new GridSnapper(level.editorData, session.viewSettings),
         commands: createCommandRegistry(session),
         status: session.status,

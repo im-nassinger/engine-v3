@@ -47,6 +47,7 @@ export function buildJointTest(snapper: Snapper = NO_SNAPPING) {
             return session.openLevel;
         },
         view: session.view,
+        viewSettings: session.viewSettings,
         snapper,
         commands: createCommandRegistry(session),
         status: session.status,

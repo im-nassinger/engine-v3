@@ -1,20 +1,22 @@
 import { ChoiceFieldType } from '../../../core/fields/index.ts';
 import { MIXED, ValueInput } from '../../../editor/entity-inspector/index.ts';
 import type { FieldModel } from '../../../editor/entity-inspector/index.ts';
+import type { LengthDisplay } from '../../../editor/units/index.ts';
 
 const MIXED_TEXT = 'Mixed';
 
-// A number rounded like a field shows it, with its unit; a choice by its option's label; a list, such as a
+// A number rounded like a field shows it, with its unit, a length in ☰'s unit; a choice by its option's label; a list, such as a
 // Rope's Points, by how many items it holds.
-export function readOnlyText(field: FieldModel) {
+export function readOnlyText(field: FieldModel, lengths: LengthDisplay) {
     const { value, definition } = field;
     if (value === MIXED) return { text: MIXED_TEXT, unit: undefined, isMixed: true };
 
     if (typeof value === 'number') {
-        const display = { displayScale: displayScaleOf(field), precision: precisionOf(field) };
+        const stored = { unit: definition.unit, displayScale: displayScaleOf(field), precision: precisionOf(field) };
+        const display = lengths.shown(stored);
         const text = ValueInput.format(value, display);
 
-        return { text, unit: definition.unit, isMixed: false };
+        return { text, unit: display.unit, isMixed: false };
     }
 
     if (Array.isArray(value)) return { text: String(value.length), unit: undefined, isMixed: false };

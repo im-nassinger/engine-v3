@@ -5,6 +5,7 @@ import type { TriggerContext } from '../../../core/triggers/index.ts';
 
 import type { CardNote } from '../model/CardNote.ts';
 
+import { LengthDisplay } from '../../units/index.ts';
 import { TriggerChoices } from './TriggerChoices.ts';
 import { TriggerSentence } from './TriggerSentence.ts';
 import type { SentenceSources } from './TriggerSentence.ts';
@@ -63,9 +64,15 @@ export class TriggerCardModel {
         this.triggers = triggers;
     }
 
-    // `notes` are the card's notes; each block takes the ones about its trigger.
-    static build(component: TriggerComponent, context: TriggerContext, notes: readonly CardNote[]) {
-        const choices = new TriggerChoices(context);
+    // `notes` are the card's notes; each block takes the ones about its trigger. `lengths` is how the blocks
+    // show a length or a speed, pixels when not given.
+    static build(
+        component: TriggerComponent,
+        context: TriggerContext,
+        notes: readonly CardNote[],
+        lengths: LengthDisplay = LengthDisplay.inPixels,
+    ) {
+        const choices = new TriggerChoices(context, lengths);
         const triggers = component.get('triggers');
         const blocks = triggers.map((trigger, index) => blockOf(trigger, index, context, choices, notes));
 

@@ -1,4 +1,5 @@
 import type { FieldModel } from '../../../editor/entity-inspector/index.ts';
+import { useLengthDisplay } from '../../hooks/index.ts';
 import { readOnlyText } from './readOnlyText.ts';
 import './ReadOnlyValue.css';
 
@@ -8,7 +9,8 @@ export type ReadOnlyValueProps = {
 
 // A value shown without a box, such as the Mass row or the World's Kind.
 export function ReadOnlyValue({ field }: ReadOnlyValueProps) {
-    const { text, unit, isMixed } = readOnlyText(field);
+    const lengths = useLengthDisplay();
+    const { text, unit, isMixed } = readOnlyText(field, lengths);
 
     return (
         <span className="read-only-value" data-mixed={isMixed}>

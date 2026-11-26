@@ -32,16 +32,24 @@ export class TriggerTyping {
     static shownText(entry: TriggerTypedEntry) {
         const { value } = entry;
         if (value === null) return '';
+        if (entry.kind === 'number' && typeof value === 'number') return ValueInput.formatFull(value, entry);
         if (typeof value === 'number' || typeof value === 'string') return String(value);
         if (isPoint(value)) return `${value.x}, ${value.y}`;
 
         return '';
     }
 
+    // One axis of the vector boxes, a length or a speed in ☰'s unit; empty while the vector is unset.
+    static axisText(entry: TriggerTypedEntry & { kind: 'vector' }, axis: 'x' | 'y') {
+        if (entry.value === null) return '';
+
+        return ValueInput.formatFull(entry.value[axis], entry);
+    }
+
     static parse(entry: TriggerTypedEntry, text: string): TriggerTypingResult {
         switch (entry.kind) {
             case 'number':
-                return parseNumber(text, entry.unit);
+                return parseNumber(text, entry);
             case 'text':
                 return parseText(text);
             case 'word':
@@ -64,10 +72,10 @@ export class TriggerTyping {
 
     // The vector field's two boxes: an empty box keeps its axis as it was, or 0 while the vector is unset.
     static parseAxes(entry: TriggerTypedEntry & { kind: 'vector' }, xText: string, yText: string): TriggerTypingResult {
-        const x = parseAxis(xText, entry.value?.x ?? 0, entry.unit);
+        const x = parseAxis(xText, entry.value?.x ?? 0, entry);
         if (x.kind === 'invalid') return { kind: 'invalid', reason: `x: ${x.reason}` };
 
-        const y = parseAxis(yText, entry.value?.y ?? 0, entry.unit);
+        const y = parseAxis(yText, entry.value?.y ?? 0, entry);
         if (y.kind === 'invalid') return { kind: 'invalid', reason: `y: ${y.reason}` };
 
         return { kind: 'value', value: { x: x.value, y: y.value } };
@@ -77,8 +85,11 @@ export class TriggerTyping {
 type AxisResult =
     { readonly kind: 'value'; readonly value: number } | { readonly kind: 'invalid'; readonly reason: string };
 
-function parseAxis(text: string, oldValue: number, unit: Unit | undefined): AxisResult {
-    const result = ValueInput.parseNumber(text, { label: 'The number', type: ANY_NUMBER, unit });
+// A number box's unit and, for a length or a speed in metres, its scale.
+type ShownBox = { readonly unit?: Unit; readonly displayScale?: number; readonly precision?: number };
+
+function parseAxis(text: string, oldValue: number, box: ShownBox): AxisResult {
+    const result = ValueInput.parseNumber(text, { ...box, label: 'The number', type: ANY_NUMBER });
     if (result.kind === 'restore') return { kind: 'value', value: oldValue };
 
     return result;
@@ -107,8 +118,8 @@ function parseWord(text: string): TriggerTypingResult {
     return { kind: 'value', value: name };
 }
 
-function parseNumber(text: string, unit: Unit | undefined): TriggerTypingResult {
-    const result = ValueInput.parseNumber(text, { label: 'The number', type: ANY_NUMBER, unit });
+function parseNumber(text: string, box: ShownBox): TriggerTypingResult {
+    const result = ValueInput.parseNumber(text, { ...box, label: 'The number', type: ANY_NUMBER });
     if (result.kind !== 'value') return result;
 
     return { kind: 'value', value: result.value };
@@ -131,8 +142,8 @@ function parseVector(text: string, valueType: VectorFieldType): TriggerTypingRes
     const match = VECTOR_PARTS.exec(text);
     if (match === null) return { kind: 'invalid', reason: 'Type two numbers, such as 0, 100' };
 
-    const x = parseNumber(match[1] as string, undefined);
-    const y = parseNumber(match[2] as string, undefined);
+    const x = parseNumber(match[1] as string, {});
+    const y = parseNumber(match[2] as string, {});
     if (x.kind !== 'value' || y.kind !== 'value') return { kind: 'invalid', reason: 'Not a number' };
 
     const point = { x: x.value, y: y.value };

@@ -6,6 +6,7 @@ import { TriggerCardModel, TriggerEdits } from '../../../../../editor/entity-ins
 import type { CardNote } from '../../../../../editor/entity-inspector/index.ts';
 import type { OpenLevel } from '../../../../../editor/session/index.ts';
 import { useEditorSession } from '../../../../EditorContext.tsx';
+import { useLengthDisplay } from '../../../../hooks/index.ts';
 import { Icon } from '../../../../shared/index.ts';
 import type { CommitTriggerEdit } from './CommitTriggerEdit.ts';
 import { TriggerBlock } from './TriggerBlock/index.ts';
@@ -24,6 +25,7 @@ export function TriggerCard({ openLevel, entityIds, notes }: TriggerCardProps) {
     'use no memo';
 
     const session = useEditorSession();
+    const lengths = useLengthDisplay();
     const [entityId] = entityIds;
     if (entityId === undefined || entityIds.length > 1) {
         return (
@@ -36,7 +38,7 @@ export function TriggerCard({ openLevel, entityIds, notes }: TriggerCardProps) {
     const { level, registry } = openLevel;
     const owner = level.requireEntity(entityId);
     const component = owner.requireComponent(TriggerComponent);
-    const model = TriggerCardModel.build(component, { owner, level, registry }, notes);
+    const model = TriggerCardModel.build(component, { owner, level, registry }, notes, lengths);
 
     const commit: CommitTriggerEdit = (makeEdit) => {
         const current = level.requireEntity(entityId).requireComponent(TriggerComponent);

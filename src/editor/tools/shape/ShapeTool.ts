@@ -8,7 +8,7 @@ import type { CreateShapeOutcome, ShapeDrawing } from '../../commands/index.ts';
 import { READ_ONLY_REASON } from '../../history/index.ts';
 import type { OpenLevel } from '../../session/index.ts';
 import type { DragReadout } from '../readout/DragReadout.ts';
-import { diameterReadout, sizeReadout } from '../readout/readoutText.ts';
+import { diameterReadout, readoutLengths, sizeReadout } from '../readout/readoutText.ts';
 import { sizingModifiers } from '../sizing/sizingModifiers.ts';
 import type { LevelPointerInput, Modifiers, Tool, ToolContext, ToolKey } from '../Tool.ts';
 
@@ -401,11 +401,19 @@ export class ShapeTool implements Tool {
         const kind = press.kind;
         const box = this.boxOf(press, input, modifiers);
         const drawing = placedDrawing(kind, box.size, box.centre, this.turn);
-        const text =
-            kind === 'circle'
-                ? diameterReadout(box.size.width)
-                : sizeReadout({ x: box.size.width, y: box.size.height });
+        const text = this.readoutOf(kind, box.size);
         this.show({ shape: { drawing, toLevel: press.space.toLevel }, readout: { text, at: input.levelPosition } });
+    }
+
+    // A circle's diameter, or any other kind's width and height, in ☰'s unit.
+    private readoutOf(kind: BoxKind, size: { readonly width: number; readonly height: number }) {
+        const context = this.context;
+        if (context === undefined) throw new Error('The Shape tool draws only while active.');
+
+        const lengths = readoutLengths(context);
+        if (kind === 'circle') return diameterReadout(size.width, lengths);
+
+        return sizeReadout({ x: size.width, y: size.height }, lengths);
     }
 
     private release(press: Press, input: LevelPointerInput) {

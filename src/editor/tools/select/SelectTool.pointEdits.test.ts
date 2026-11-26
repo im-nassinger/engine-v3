@@ -102,7 +102,7 @@ describe('SelectTool point edits', () => {
 
         tool.pointerDown(pointerAt(FIRST_POINT));
         tool.pointerMove(pointerAt({ x: 260, y: 260 }));
-        expect(tool.readout?.text).toBe('60, 60 px');
+        expect(tool.readout?.text).toBe('0.6, 0.6 m');
         tool.cancel();
 
         expect(pointsOf(polygon)).toEqual(before);

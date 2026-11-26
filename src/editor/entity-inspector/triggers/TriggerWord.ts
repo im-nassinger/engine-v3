@@ -78,11 +78,20 @@ export type TriggerTypedEntry =
           readonly kind: 'number';
           readonly value: number | null;
           readonly unit: Unit | undefined;
+          // A length or a speed in metres: the stored pixels times this, with these decimals (v4 fix 12).
+          readonly displayScale?: number;
+          readonly precision?: number;
           // The entry that leaves the number unset, "No number"; undefined when it must be set.
           readonly clearLabel: string | undefined;
       }
     // Two number boxes, x and y.
-    | { readonly kind: 'vector'; readonly value: Point | null; readonly unit: Unit | undefined }
+    | {
+          readonly kind: 'vector';
+          readonly value: Point | null;
+          readonly unit: Unit | undefined;
+          readonly displayScale?: number;
+          readonly precision?: number;
+      }
     // The colour box, with its swatch and the browser's picker. A Fill's takes a solid fill of the colour.
     | { readonly kind: 'colour'; readonly value: string | null; readonly isFill?: true }
     | { readonly kind: 'value'; readonly value: JsonValue | null; readonly valueType: ValueType<unknown> }

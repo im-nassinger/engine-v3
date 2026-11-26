@@ -17,8 +17,8 @@ export type TriggerVectorBoxesProps = {
 // Two pills side by side, X and Y, as a vector field has. Tab moves between them; Enter in either types
 // in both, an empty one keeping its axis (or 0). A box that isn't a number turns red with the reason.
 export function TriggerVectorBoxes({ entry, onType }: TriggerVectorBoxesProps) {
-    const [xText, setXText] = useState(() => axisText(entry, 'x'));
-    const [yText, setYText] = useState(() => axisText(entry, 'y'));
+    const [xText, setXText] = useState(() => TriggerTyping.axisText(entry, 'x'));
+    const [yText, setYText] = useState(() => TriggerTyping.axisText(entry, 'y'));
     const [refusal, setRefusal] = useState<string | undefined>(undefined);
 
     const typeIn = () => {
@@ -76,10 +76,4 @@ export function TriggerVectorBoxes({ entry, onType }: TriggerVectorBoxesProps) {
             {refusal !== undefined && <span className="refusal">{refusal}</span>}
         </div>
     );
-}
-
-function axisText(entry: VectorEntry, axis: 'x' | 'y') {
-    if (entry.value === null) return '';
-
-    return String(entry.value[axis]);
 }

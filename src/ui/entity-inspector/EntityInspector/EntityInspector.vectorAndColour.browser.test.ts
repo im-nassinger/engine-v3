@@ -51,6 +51,12 @@ function axisMessage(key: string, axis: 'x' | 'y', typeName = 'TransformComponen
     return box.querySelector('.field-message')?.textContent;
 }
 
+function unitOf(key: string, axis: 'x' | 'y') {
+    const row = fieldRow('TransformComponent', key);
+
+    return row.querySelector(`.vector-axis-box[data-axis="${axis}"] .unit`)?.textContent;
+}
+
 function codeBox(key: string) {
     return requireElement<HTMLInputElement>(fieldRow('StyleComponent', key), '.colour-box input:not([type])');
 }
@@ -115,7 +121,7 @@ describe('Entity inspector: the vector field', () => {
         const letters = [...row.querySelectorAll('.axis')].map((letter) => letter.textContent);
         expect(letters).toEqual(['X', 'Y']);
 
-        await typeInto(axisBox('position', 'y'), '40');
+        await typeInto(axisBox('position', 'y'), '0.4');
 
         await expect.poll(() => transformOf(crate).get('position')).toEqual({ x: 0, y: 40 });
         expect(undoCount(session)).toBe(1);
@@ -148,13 +154,42 @@ describe('Entity inspector: the vector field', () => {
         select(session, crates);
 
         await expect.poll(() => axisBox('position', 'y').placeholder).toBe('Mixed');
-        expect(axisBox('position', 'x').value).toBe('10');
+        expect(axisBox('position', 'x').value).toBe('0.1');
 
-        await typeInto(axisBox('position', 'x'), '5');
+        await typeInto(axisBox('position', 'x'), '0.05');
 
         await expect.poll(() => transformOf(first).get('position')).toEqual({ x: 5, y: 1 });
         expect(transformOf(second).get('position')).toEqual({ x: 5, y: 2 });
         expect(undoCount(session)).toBe(1);
+    });
+});
+
+describe("Entity inspector: lengths in ☰'s unit", () => {
+    test('a position shows and takes metres, 0.07 m being exactly 7 px', async () => {
+        const { crates } = await showCrates(1);
+        const crate = crates[0] as Entity;
+        transformOf(crate).set('position', { x: 123, y: 0 });
+
+        await expect.poll(() => axisBox('position', 'x').value).toBe('1.23');
+        expect(unitOf('position', 'x')).toBe('m');
+
+        await typeInto(axisBox('position', 'y'), '0.07');
+
+        await expect.poll(() => transformOf(crate).get('position')).toEqual({ x: 123, y: 7 });
+    });
+
+    test('in pixels a position shows and takes the stored pixels', async () => {
+        const { crates, session } = await showCrates(1);
+        const crate = crates[0] as Entity;
+        transformOf(crate).set('position', { x: 123, y: 0 });
+        session.viewSettings.setLengthUnit('pixels');
+
+        await expect.poll(() => axisBox('position', 'x').value).toBe('123');
+        expect(unitOf('position', 'x')).toBe('px');
+
+        await typeInto(axisBox('position', 'y'), '7');
+
+        await expect.poll(() => transformOf(crate).get('position')).toEqual({ x: 123, y: 7 });
     });
 });
 

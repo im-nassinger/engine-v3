@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MIXED, ValueInput } from '../../../editor/entity-inspector/index.ts';
+import { useLengthDisplay } from '../../hooks/index.ts';
 import { FieldMessage, useFieldMessage } from '../FieldMessage/index.ts';
 import type { FieldProps } from '../FieldProps.ts';
 import { NumberBox } from '../NumberBox/index.ts';
@@ -13,7 +14,8 @@ import './NumberField.css';
 // the level while dragged when given slide handlers. A value that can't be read gets a red ring and its
 // reason under the pill; one past a limit is clamped, with a brief note saying so.
 export function NumberField({ field, onCommit, slide }: FieldProps) {
-    const definition = numberInputOf(field);
+    const lengths = useLengthDisplay();
+    const definition = numberInputOf(field, lengths);
     const { message, refuse, noteClamp, clear } = useFieldMessage();
     // The value the slider is dragged to, shown in the box until it is let go.
     const [slidingValue, setSlidingValue] = useState<number | undefined>(undefined);

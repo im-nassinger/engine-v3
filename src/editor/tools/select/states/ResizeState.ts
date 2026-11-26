@@ -4,7 +4,7 @@ import type { LevelPointerInput } from '../../Tool.ts';
 import type { FrameHandle } from '../frame/FrameHandle.ts';
 import type { SelectionFrame } from '../frame/SelectionFrame.ts';
 import type { EntityResize } from '../resize/EntityResize.ts';
-import { sizeReadout } from '../../readout/readoutText.ts';
+import { sizeReadout, readoutLengths } from '../../readout/readoutText.ts';
 import { sizingModifiers } from '../../sizing/sizingModifiers.ts';
 import { resizeFactor } from '../resize/resizeFactor.ts';
 
@@ -74,6 +74,6 @@ export class ResizeState implements SelectState {
         });
 
         const size = this.resize.apply(stretch);
-        this.host.showReadout({ text: sizeReadout(size), at: input.levelPosition });
+        this.host.showReadout({ text: sizeReadout(size, readoutLengths(this.host.context)), at: input.levelPosition });
     }
 }

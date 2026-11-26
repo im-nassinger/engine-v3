@@ -4,6 +4,7 @@ import { levelBoundsOf } from '../../../../core/derived/index.ts';
 import { FrameLabel } from '../FrameLabel.ts';
 import type { OverlayScene } from '../OverlayScene.ts';
 import { onPixel, screenRectangleOf } from '../screenPixels.ts';
+import { lengthDisplayOf } from '../../../../editor/units/index.ts';
 
 const FRAME_COLOUR = 0xecf0f6;
 const EDGE: StrokeStyle = { color: FRAME_COLOUR, alpha: 0.35, width: 1, pixelLine: true };
@@ -45,7 +46,8 @@ export class BoundsOverlay {
         const bottom = onPixel(inView.bottom);
         this.edge.rect(left, top, right - left, bottom - top).stroke(EDGE);
 
-        const size = `${levelBounds.width} × ${levelBounds.height}`;
+        const lengths = lengthDisplayOf(scene.settings.lengthUnit, level);
+        const size = lengths.sizeText(levelBounds.width, levelBounds.height);
         this.label.show(size, { x: inView.left, y: inView.top }, FRAME_COLOUR);
         this.container.visible = true;
     }

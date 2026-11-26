@@ -152,6 +152,26 @@ describe('EditorSettings', () => {
         expect(session.viewSettings.all()).toEqual({ ...DEFAULT_VIEW_SWITCHES, grid: false });
     });
 
+    test('lengths show in metres until pixels is chosen, which the next opening reads back', () => {
+        const store = new InMemorySettingsStore();
+        const first = openEditor(store);
+        expect(first.session.viewSettings.lengthUnit).toBe('metres');
+
+        first.session.viewSettings.setLengthUnit('pixels');
+        first.frames.runFrame();
+        expect(storedJson(store)).toMatchObject({ lengthUnit: 'pixels' });
+
+        const second = openEditor(store);
+        expect(second.session.viewSettings.lengthUnit).toBe('pixels');
+    });
+
+    test('a length unit it does not know reads as metres', () => {
+        const storedText = JSON.stringify({ lengthUnit: 'inches' });
+        const { session } = openEditor(new InMemorySettingsStore(storedText));
+
+        expect(session.viewSettings.lengthUnit).toBe('metres');
+    });
+
     test('damaged folded cards drop alone', () => {
         const stored = { foldedCards: ['ShapeComponent', 3, 'Component', 'Body', 'ShapeComponent', 'NameComponent'] };
         const storedText = JSON.stringify(stored);
@@ -179,6 +199,7 @@ describe('EditorSettings', () => {
             sessionOpen: true,
             laterKey: 1234,
             viewSwitches: DEFAULT_VIEW_SWITCHES,
+            lengthUnit: 'metres',
             foldedCards: [],
             persistAsked: true,
         });

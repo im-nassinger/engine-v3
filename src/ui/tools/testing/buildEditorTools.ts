@@ -26,6 +26,7 @@ export function buildEditorTools(session: EditorSession, commands: CommandRegist
             return new GridSnapper(session.openLevel.level.editorData, session.viewSettings);
         },
         view: session.view,
+        viewSettings: session.viewSettings,
         commands,
         status: session.status,
         reader: session.reader,

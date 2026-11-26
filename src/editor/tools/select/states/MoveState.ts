@@ -1,7 +1,7 @@
 import type { Point } from '../../../../core/geometry/index.ts';
 import type { SelectionMove } from '../../../commands/index.ts';
 import type { LevelPointerInput } from '../../Tool.ts';
-import { moveReadout } from '../../readout/readoutText.ts';
+import { moveReadout, readoutLengths } from '../../readout/readoutText.ts';
 
 import type { SelectState, SelectStateHost } from './SelectState.ts';
 
@@ -41,7 +41,10 @@ export class MoveState implements SelectState {
     private moveTo(input: LevelPointerInput) {
         const offset = this.offsetTo(input);
         this.move.moveBy(offset);
-        this.host.showReadout({ text: moveReadout(offset), at: input.levelPosition });
+        this.host.showReadout({
+            text: moveReadout(offset, readoutLengths(this.host.context)),
+            at: input.levelPosition,
+        });
     }
 
     private offsetTo(input: LevelPointerInput) {

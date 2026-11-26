@@ -1,6 +1,8 @@
 import type { ComponentTypeName } from '../../../core/components/index.ts';
 import { MAX_ZOOM, MIN_ZOOM } from '../../view/index.ts';
 import type { ViewSwitch, ViewSwitches } from '../../view/index.ts';
+import { DEFAULT_LENGTH_UNIT, LENGTH_UNITS } from '../../units/index.ts';
+import type { LengthUnit } from '../../units/index.ts';
 
 // Where the level view was: the level position at its middle, and its zoom.
 export type SavedView = {
@@ -55,6 +57,13 @@ export function readViewSwitches(value: unknown, defaults: ViewSwitches): ViewSw
     }
 
     return switches;
+}
+
+// Metres or pixels; anything else reads as the default, metres.
+export function readLengthUnit(value: unknown): LengthUnit {
+    const known = LENGTH_UNITS.find((unit) => unit === value);
+
+    return known ?? DEFAULT_LENGTH_UNIT;
 }
 
 // Only names that can be a component type's are kept, so a damaged entry drops alone.

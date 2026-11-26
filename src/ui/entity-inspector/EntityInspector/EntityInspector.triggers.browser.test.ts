@@ -73,6 +73,31 @@ function buildLevel() {
     return { level, player, button };
 }
 
+function withPositionSet(entity: Entity, amount: { readonly x: number; readonly y: number }) {
+    const position = { kind: 'field', component: 'TransformComponent', field: 'position' } as const;
+    withTriggers(entity, [
+        { actions: [{ kind: 'change', target: { kind: 'this' }, value: position, op: 'set', amount }] },
+    ]);
+}
+
+function firstAmount(entity: Entity) {
+    const [trigger] = entity.requireComponent(TriggerComponent).get('triggers');
+    const action = trigger?.actions[0];
+
+    return action?.kind === 'change' ? action.amount : undefined;
+}
+
+// Types the two boxes of an open vector word, Enter in the second.
+async function typeVector(x: string, y: string) {
+    await expect.poll(() => document.querySelector('.trigger-word-field input[aria-label="Y"]')).not.toBeNull();
+    const xBox = requireElement<HTMLInputElement>(document, '.trigger-word-field input[aria-label="X"]');
+    const yBox = requireElement<HTMLInputElement>(document, '.trigger-word-field input[aria-label="Y"]');
+    await userEvent.clear(xBox);
+    await userEvent.type(xBox, x);
+    await userEvent.clear(yBox);
+    await userEvent.type(yBox, `${y}{Enter}`);
+}
+
 function withTriggers(entity: Entity, triggers: readonly Partial<Trigger>[]) {
     const made = triggers.map((parts, index) => {
         const trigger: Trigger = {
@@ -374,29 +399,31 @@ describe('the trigger card', () => {
         expect(sentences('Do')).toEqual(['destroy other']);
     });
 
-    test('a vector opens two boxes, X and Y, typed in as one step', async () => {
+    test('a vector opens two boxes, X and Y, in metres, typed in as one step', async () => {
         const { level, button } = buildLevel();
-        const position = { kind: 'field', component: 'TransformComponent', field: 'position' } as const;
-        withTriggers(button, [
-            {
-                actions: [
-                    { kind: 'change', target: { kind: 'this' }, value: position, op: 'set', amount: { x: 1, y: 2 } },
-                ],
-            },
-        ]);
+        withPositionSet(button, { x: 100, y: 250 });
         const { session } = await showEntity(level, button);
-        await expect.poll(() => sentences('Do')).toEqual(['set this Transform › Position to 1, 2']);
+        await expect.poll(() => sentences('Do')).toEqual(['set this Transform › Position to 1, 2.5']);
 
-        click(word('Do', '1, 2'));
-        await expect.poll(() => document.querySelector('.trigger-word-field input[aria-label="Y"]')).not.toBeNull();
-        const xBox = requireElement<HTMLInputElement>(document, '.trigger-word-field input[aria-label="X"]');
-        const yBox = requireElement<HTMLInputElement>(document, '.trigger-word-field input[aria-label="Y"]');
-        await userEvent.clear(xBox);
-        await userEvent.type(xBox, '100');
-        await userEvent.clear(yBox);
-        await userEvent.type(yBox, '-50{Enter}');
+        click(word('Do', '1, 2.5'));
+        await typeVector('0.07', '-0.5');
 
-        await expect.poll(() => sentences('Do')).toEqual(['set this Transform › Position to 100, -50']);
+        await expect.poll(() => sentences('Do')).toEqual(['set this Transform › Position to 0.07, -0.5']);
+        expect(firstAmount(button)).toEqual({ x: 7, y: -50 });
         expect(history(session).undoCount).toBe(1);
+    });
+
+    test('in pixels, the vector shows and takes the stored pixels', async () => {
+        const { level, button } = buildLevel();
+        withPositionSet(button, { x: 100, y: 250 });
+        const { session } = await showEntity(level, button);
+        session.viewSettings.setLengthUnit('pixels');
+        await expect.poll(() => sentences('Do')).toEqual(['set this Transform › Position to 100, 250']);
+
+        click(word('Do', '100, 250'));
+        await typeVector('7', '-50');
+
+        await expect.poll(() => sentences('Do')).toEqual(['set this Transform › Position to 7, -50']);
+        expect(firstAmount(button)).toEqual({ x: 7, y: -50 });
     });
 });

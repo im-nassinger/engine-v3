@@ -47,7 +47,7 @@ Source: scope ED6; round 1: D12; old: WS-02, WS-10, WS-12, WS-13
 | File | New, Import…, Save, Export…, Rename level…. See [saving](../play-and-save/saving.md) |
 | Edit | Undo, naming its step (such as `Undo: Move 3 entities`), Redo, Cut, Copy, Paste, Duplicate, Delete. Undo and Redo are greyed when empty |
 | Arrange | Group, Ungroup, Go into group |
-| View | **The View menu:** the editor's view settings, each a switch with a shortcut, saved in the browser and never in the level: Grid, Grid snapping right under it, Joint icons, Camera frame, Physics view; then the zooms: Zoom in, Zoom out, 100%, Whole level, Selection, Camera frame |
+| View | **The View menu:** the editor's view settings, each a switch with a shortcut, saved in the browser and never in the level: Grid, Grid snapping right under it, Joint icons, Camera frame, Physics view; then the zooms: Zoom in, Zoom out, 100%, Whole level, Selection, Camera frame; then the unit every length shows in, Metres or Pixels, the chosen one ticked (v4, [lengths in metres](#lengths-in-metres--v4)) |
 | Help | Keyboard shortcuts, About |
 
 - **Select all, Rename and Hide or show are in no menu for now**; their keys still work (owner: 2026-11-18).

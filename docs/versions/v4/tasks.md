@@ -111,7 +111,7 @@ Planned in [fixes-9-to-13-plan.md](fixes-9-to-13-plan.md), confirmed by the owne
 - [x] 33. Fix 12, the physics: pixels per metre as a World setting
   - Read: requirements/editor/workspace.md#lengths-in-metres--v4, architecture/README.md, tech-notes.md
   - Done when: the World's PhysicsWorldComponent has *Pixels per metre*, default 100, saved in the level and not changeable during play; the fixed `Units.PIXELS_PER_METRE` is gone and the physics, masses and test play use the World's value; a new level's grid is 100 px; old levels aren't converted; unit and `runHeadless` tests show a body falls the same in metres at 50 and 100 px per metre
-- [ ] 34. Fix 12, the editor: every length in metres
+- [x] 34. Fix 12, the editor: every length in metres
   - Read: requirements/editor/workspace.md#lengths-in-metres--v4, design/controls.md
   - Done when: ☰ offers Metres and Pixels, metres by default, saved in the browser; every length the editor shows or takes (the Entity inspector's boxes, the grid size, speeds in m/s, the trigger blocks' boxes, the debug box, rulers and size labels) is in the chosen unit, typed values converted back exactly; browser tests cover both units in the Entity inspector, the grid size and a trigger block; fixes.md row 12 says built
 - [ ] 35. Journeys and close fixes 9 to 13's docs

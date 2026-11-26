@@ -78,8 +78,8 @@ describe('DebugBox', () => {
         expect(valueOf('X')).toBe('');
 
         frames.runFrame();
-        await expect.poll(() => valueOf('X')).toBe('120');
-        expect(valueOf('Y')).toBe('−40');
+        await expect.poll(() => valueOf('X')).toBe('1.2');
+        expect(valueOf('Y')).toBe('−0.4');
 
         tools.mouse.leave();
         frames.runFrame();
@@ -96,20 +96,37 @@ describe('DebugBox', () => {
 
         tools.mouse.moveTo({ x: 120, y: -40 });
         frames.runFrame();
-        await expect.poll(() => valueOf('X')).toBe('120');
+        await expect.poll(() => valueOf('X')).toBe('1.2');
 
         expect(box.getBoundingClientRect().width).toBe(widthWithoutMouse);
     });
 
-    test('shows the grid size, following a change and a new level', async () => {
+    test('shows the grid size in metres, following a change and a new level', async () => {
         const { session } = showWithEditor(Level.createNew(), createElement(DebugBox));
-        await expect.poll(() => valueOf('GRID')).toBe('100');
+        await expect.poll(() => valueOf('GRID')).toBe('1');
 
         session.openLevel.level.editorData.setGridSize(25);
-        await expect.poll(() => valueOf('GRID')).toBe('25');
+        await expect.poll(() => valueOf('GRID')).toBe('0.25');
 
         session.replaceOpenLevel(Level.createNew());
+        await expect.poll(() => valueOf('GRID')).toBe('1');
+    });
+
+    test('in pixels, the mouse and the grid size show and take pixels', async () => {
+        const { session, tools, frames } = showWithEditor(Level.createNew(), createElement(DebugBox));
+        await expect.poll(() => valueOf('GRID')).toBe('1');
+
+        session.viewSettings.setLengthUnit('pixels');
         await expect.poll(() => valueOf('GRID')).toBe('100');
+        tools.mouse.moveTo({ x: 120.4, y: -39.6 });
+        frames.runFrame();
+        await expect.poll(() => valueOf('X')).toBe('120');
+        expect(valueOf('Y')).toBe('−40');
+
+        await typeOver('GRID', '25{Enter}');
+
+        await expect.poll(() => session.openLevel.level.editorData.gridSize).toBe(25);
+        expect(valueOf('GRID')).toBe('25');
     });
 
     test('shows the zoom as a whole percentage', async () => {
@@ -120,27 +137,27 @@ describe('DebugBox', () => {
         await expect.poll(() => valueOf('ZOOM')).toBe('250%');
     });
 
-    test('typing a grid size and Enter sets it, with no undo step', async () => {
+    test('typing a grid size in metres and Enter sets it, with no undo step', async () => {
         const { session } = showWithEditor(Level.createNew(), createElement(DebugBox));
-        await expect.poll(() => valueOf('GRID')).toBe('100');
+        await expect.poll(() => valueOf('GRID')).toBe('1');
 
-        await typeOver('GRID', '25{Enter}');
+        await typeOver('GRID', '0.25{Enter}');
 
         await expect.poll(() => session.openLevel.level.editorData.gridSize).toBe(25);
-        expect(valueOf('GRID')).toBe('25');
+        expect(valueOf('GRID')).toBe('0.25');
         expect(session.openLevel.history.undoCount).toBe(0);
         expect(document.activeElement).not.toBe(valueBox('GRID'));
     });
 
     test('Esc keeps the old grid size, and text that is not a number says why', async () => {
         const { session } = showWithEditor(Level.createNew(), createElement(DebugBox));
-        await expect.poll(() => valueOf('GRID')).toBe('100');
+        await expect.poll(() => valueOf('GRID')).toBe('1');
 
-        await typeOver('GRID', '25{Escape}');
-        await expect.poll(() => valueOf('GRID')).toBe('100');
+        await typeOver('GRID', '0.25{Escape}');
+        await expect.poll(() => valueOf('GRID')).toBe('1');
 
         await typeOver('GRID', 'big{Enter}');
-        await expect.poll(() => session.status.current).toBe('Type the grid size as a number of pixels');
+        await expect.poll(() => session.status.current).toBe('Type the grid size as a number, such as 1');
         expect(session.openLevel.level.editorData.gridSize).toBe(100);
         expect(session.openLevel.history.undoCount).toBe(0);
     });

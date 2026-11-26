@@ -1,4 +1,6 @@
 import { VersionCounter } from '../../core/events/index.ts';
+import { DEFAULT_LENGTH_UNIT } from '../units/index.ts';
+import type { LengthUnit } from '../units/index.ts';
 
 export type ViewSwitch = 'grid' | 'gridSnapping' | 'jointIcons' | 'cameraFrame' | 'physicsView';
 
@@ -15,14 +17,27 @@ export const DEFAULT_VIEW_SWITCHES: ViewSwitches = {
     physicsView: false,
 };
 
-// The View menu's switches: what the editor draws over the level, and whether moves snap to the grid. Saved in the browser, never in the
-// level, and never an undo step.
+// The View menu's switches: what the editor draws over the level, and whether moves snap to the grid; and
+// the unit lengths are shown in. Saved in the browser, never in the level, and never an undo step.
 export class ViewSettings {
     readonly version = new VersionCounter();
     private switches: ViewSwitches;
+    private unit: LengthUnit;
 
-    constructor(switches: ViewSwitches = DEFAULT_VIEW_SWITCHES) {
+    constructor(switches: ViewSwitches = DEFAULT_VIEW_SWITCHES, lengthUnit: LengthUnit = DEFAULT_LENGTH_UNIT) {
         this.switches = { ...switches };
+        this.unit = lengthUnit;
+    }
+
+    get lengthUnit() {
+        return this.unit;
+    }
+
+    setLengthUnit(lengthUnit: LengthUnit) {
+        if (this.unit === lengthUnit) return;
+
+        this.unit = lengthUnit;
+        this.version.increment();
     }
 
     isOn(viewSwitch: ViewSwitch) {

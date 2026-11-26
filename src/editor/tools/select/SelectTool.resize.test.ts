@@ -72,6 +72,7 @@ function buildResizeTest() {
             return session.openLevel;
         },
         view: session.view,
+        viewSettings: session.viewSettings,
         snapper: new GridSnapper(level.editorData, session.viewSettings),
         commands: createCommandRegistry(session),
         status: session.status,
@@ -210,7 +211,7 @@ describe('SelectTool resizing', () => {
         tool.pointerMove(pointer({ x: from.x + 100, y: from.y + 50 }));
 
         // 200 × 50 drawn, stretched to 300 × 100.
-        expect(tool.readout?.text).toBe('300 × 100 px');
+        expect(tool.readout?.text).toBe('3 × 1 m');
         expect(transformOf(square, 'scale')).toEqual({ x: 3, y: 1 });
     });
 

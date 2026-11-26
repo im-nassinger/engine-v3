@@ -31,6 +31,7 @@ export function createTools(session: EditorSession, commands: CommandRegistry) {
             return snapper;
         },
         view: session.view,
+        viewSettings: session.viewSettings,
         commands,
         status: session.status,
         reader: session.reader,

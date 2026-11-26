@@ -46,6 +46,9 @@ import {
 } from '../../../core/triggers/index.ts';
 import type { ChangeableValue, TriggerContext } from '../../../core/triggers/index.ts';
 
+import { LengthDisplay } from '../../units/index.ts';
+import type { ShownNumber } from '../../units/index.ts';
+import { ValueInput } from '../typing/ValueInput.ts';
 import { freshAction, freshCheck, freshWhen, targetOf } from './freshParts.ts';
 import {
     amountText,
@@ -197,9 +200,12 @@ export class TriggerChoices {
     private readonly levelTags: readonly string[];
     private readonly eventNames: readonly string[];
     private readonly variableMenus: VariableMenus;
+    private readonly lengths: LengthDisplay;
 
-    constructor(context: TriggerContext) {
+    // lengths: how the blocks show a length or a speed, pixels when not given.
+    constructor(context: TriggerContext, lengths: LengthDisplay = LengthDisplay.inPixels) {
         this.context = context;
+        this.lengths = lengths;
         this.levelTags = LevelTags.of(context.level);
         this.eventNames = CustomEventNames.of(context.level);
         this.variableMenus = new VariableMenus(context);
@@ -445,7 +451,8 @@ export class TriggerChoices {
         const typed = isVariableAmount(check.amount) ? null : check.amount;
         if (check.value?.kind === 'variable') return this.variableValueEntry(type, typed, place);
 
-        return numberEntry(typed);
+        const unit = this.checkUnitOf(check);
+        return this.shownNumberEntry(typed, unit);
     }
 
     // x and y, for a vector the value check reads.
@@ -721,13 +728,16 @@ export class TriggerChoices {
         if (action.value?.kind === 'tag') return { kind: 'menu', choices: this.tagsWithNew(place) };
 
         const unit = this.unitOf(action);
-        if (amountType === undefined) return numberEntry(action.amount, unit);
+        if (amountType === undefined) return this.shownNumberEntry(action.amount, unit);
 
         const isNumber = amountType instanceof NumberFieldType || amountType instanceof AngleFieldType;
-        if (isNumber) return numberEntry(action.amount, unit);
+        if (isNumber) return this.shownNumberEntry(action.amount, unit);
         if (amountType instanceof VectorFieldType) {
             const value = isPointLike(action.amount) ? { x: action.amount.x, y: action.amount.y } : null;
-            return { kind: 'vector', value, unit };
+            const stored: ShownNumber = { unit };
+            const shown = this.lengths.shown(stored);
+            const entry: TriggerTypedEntry = { kind: 'vector', value, ...shown, unit: shown.unit };
+            return entry;
         }
         if (amountType instanceof ColourFieldType) {
             const value = typeof action.amount === 'string' ? action.amount : null;
@@ -787,7 +797,53 @@ export class TriggerChoices {
             return this.targetWord(target) ?? 'pick an entity';
         }
 
+        const unit = this.unitOf(action);
+        if (typeof amount === 'number') return this.shownNumberText(amount, unit);
+        if (isPointLike(amount)) {
+            const x = this.shownNumberText(amount.x, unit);
+            const y = this.shownNumberText(amount.y, unit);
+            return `${x}, ${y}`;
+        }
+
         return amountText(amount);
+    }
+
+    // A number typed in a check, a length or a speed in ☰'s unit: "Body › Speed is more than 2".
+    checkNumberText(check: Check, amount: number) {
+        const unit = this.checkUnitOf(check);
+
+        return this.shownNumberText(amount, unit);
+    }
+
+    // A stored number as a block shows it: as it is, or a length or a speed in metres.
+    private shownNumberText(value: number, unit: Unit | undefined) {
+        const stored: ShownNumber = { unit };
+        const display = this.lengths.shown(stored);
+        if (display.displayScale === undefined) return String(value);
+
+        return ValueInput.formatFull(value, display);
+    }
+
+    // The number box for a typed amount, a length or a speed in ☰'s unit.
+    private shownNumberEntry(amount: JsonValue | null, unit: Unit | undefined) {
+        const stored: ShownNumber = { unit };
+        const shown = this.lengths.shown(stored);
+        const entry = numberEntry(amount, shown.unit);
+        if (shown.displayScale === undefined) return entry;
+
+        const scaled: TriggerTypedEntry = { ...entry, displayScale: shown.displayScale, precision: shown.precision };
+        return scaled;
+    }
+
+    // The unit of the number a check reads: a field's own, px/s for a body's velocity or speed, none for a
+    // variable or a tag.
+    private checkUnitOf(check: Check): Unit | undefined {
+        const { value } = check;
+        if (value === null || value.kind === 'variable' || value.kind === 'tag') return undefined;
+        if (value.kind === 'live') return 'px/s';
+
+        const schema = this.context.registry.find(value.component)?.schema;
+        return schema?.findField(value.field)?.unit;
     }
 
     valueWord(action: ChangeAction, value: ValueRef) {

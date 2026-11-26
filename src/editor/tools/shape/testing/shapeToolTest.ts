@@ -77,6 +77,7 @@ export function buildDrawingToolTest<T extends Tool>(tool: T, snapperOrMaker: Sn
             return session.openLevel;
         },
         view: session.view,
+        viewSettings: session.viewSettings,
         snapper,
         commands: createCommandRegistry(session),
         status: session.status,

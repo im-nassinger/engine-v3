@@ -56,6 +56,7 @@ function buildSelectTest() {
             return session.openLevel;
         },
         view: session.view,
+        viewSettings: session.viewSettings,
         snapper: NO_SNAPPING,
         commands: createCommandRegistry(session),
         status: session.status,

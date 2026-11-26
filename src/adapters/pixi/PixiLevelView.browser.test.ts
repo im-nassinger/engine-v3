@@ -385,14 +385,18 @@ describe('PixiLevelView overlays', () => {
         expect(overlays.grid.plan).toBeUndefined();
     });
 
-    test('the level bounds are labelled World with their size', async () => {
-        const { level, frames, overlays } = await showNewLevel();
+    test('the level bounds are labelled World with their size, in metres or in pixels', async () => {
+        const { level, settings, frames, overlays } = await showNewLevel();
         expect(overlays.bounds.isShowing).toBe(true);
-        expect(overlays.bounds.labelText).toBe('World 20000 × 10000');
+        expect(overlays.bounds.labelText).toBe('World 200 × 100 m');
 
-        level.world.requireComponent(ShapeComponent).set('geometry', { kind: 'rectangle', width: 200, height: 100 });
+        level.world.requireComponent(ShapeComponent).set('geometry', { kind: 'rectangle', width: 250, height: 100 });
         frames.runFrame();
-        expect(overlays.bounds.labelText).toBe('World 200 × 100');
+        expect(overlays.bounds.labelText).toBe('World 2.5 × 1 m');
+
+        settings.setLengthUnit('pixels');
+        frames.runFrame();
+        expect(overlays.bounds.labelText).toBe('World 250 × 100');
     });
 
     test('the camera label is dark on a light fill and light on a dark one', async () => {
@@ -417,11 +421,11 @@ describe('PixiLevelView overlays', () => {
         const { level, settings, frames, overlays } = await showNewLevel();
 
         expect(overlays.cameraFrame.isShowing).toBe(true);
-        expect(overlays.cameraFrame.labelText).toBe('Camera 1920 × 1080');
+        expect(overlays.cameraFrame.labelText).toBe('Camera 19.2 × 10.8 m');
 
         level.camera.requireComponent(CameraComponent).set('width', 800);
         frames.runFrame();
-        expect(overlays.cameraFrame.labelText).toBe('Camera 800 × 1080');
+        expect(overlays.cameraFrame.labelText).toBe('Camera 8 × 10.8 m');
 
         settings.set('cameraFrame', false);
         frames.runFrame();

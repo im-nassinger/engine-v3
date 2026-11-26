@@ -125,7 +125,7 @@ describe('the trigger card as Scratch blocks', () => {
         expect(sentences('When', 1)).toEqual(['when this gets the custom event open']);
         expect(sentences('Do', 1)).toEqual([
             'set this Triggers › Timed door › Enabled to off',
-            'set this Transform › Position to 0, -200',
+            'set this Transform › Position to 0, -2',
             'wait 2 seconds',
         ]);
 
