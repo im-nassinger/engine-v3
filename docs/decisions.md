@@ -100,6 +100,10 @@ This replaces round 10's SC1 ("script settings"), widens the owner's three varia
 
 Triggers have no branches or loops on purpose, so the owner asked for a way out: **Convert to script (v3)** replaces a trigger with a `.lua` file that does the same. Triggers that switched it on or off keep working, because a script gets an on/off checkbox that Change value can flip. This brings back "view this trigger as Lua", left out with no reason, in another shape. Written in [triggers.md](requirements/triggers/triggers.md#convert-to-script--v3), [scripts.md](requirements/scripts/scripts.md#switching-a-script-off--v3) and [scope.md](scope.md).
 
+## 2026-11-26: Before planning v5
+
+The owner answered three questions before v5 is planned. **A script reads another entity's variables through its VariablesComponent**, with `get_component` and `get_attribute`, not with a function made for variables. **Choice and list variable types wait for Later.** **v5 is split in two smaller versions.** And **the sprite sheet editor, when it comes, picks its frames from the image files in the Assets panel**, the same files image fills use. Written in [lua-api.md](requirements/scripts/lua-api.md#variables--v5), [variables-and-inputs.md](requirements/triggers/variables-and-inputs.md) and [later.md](requirements/later.md).
+
 ## Still to decide
 
 Under the standing yes, new questions are decided and listed above instead of asked. The open points of 2026-11-16's variables change wait for the owner: see [progress.md](progress.md#open-questions-for-the-owner).

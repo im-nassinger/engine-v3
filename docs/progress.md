@@ -76,9 +76,7 @@ Under the owner's standing yes (2026-11-14), Claude decides what the docs don't 
 
 Left open by 2026-11-16's variables change, for v5 or Later. (The two that mattered in v4 were settled under the standing yes on 2026-11-22, see [decisions.md](decisions.md).)
 
-- **Reading another entity's variables from a script**, such as an enemy's `health` for a health bar.
 - **Keep between runs for an entity's variables** (Later).
-- **Choice, variable and list types** for variables. The examples now name the level's `coins` directly instead of letting the creator pick it.
 
 Left open by 2026-11-20's Convert to script (Later):
 

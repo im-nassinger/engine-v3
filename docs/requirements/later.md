@@ -46,6 +46,7 @@ Source: round 6: 05 2.5; round 9: 09 2.14, 10 2.14; round 10: CP1; round 11: CP2
 
 - Not in v1 and not decided. The old draft had a sprite sheet editor that cut an image into a grid of frames and named animations, with modes Loop, Once and Ping-pong and a "when finished" animation.
 - With images now being a fill on a shape, this needs a fresh design.
+- **The frames come from the image files in the Assets panel**, the same files an image fill uses. *Why: an imported image is still a file, so the sprite sheet editor picks from what the creator already has (owner, 2026-11-26).*
 
 Source: round 1: D28; round 5: 04 2.9–2.11; decisions: D29
 

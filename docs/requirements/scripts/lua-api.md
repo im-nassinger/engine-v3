@@ -117,6 +117,7 @@ Source: round 9: 10 2.5, 10 2.7; round 11: CL1; owner: 2026-11-13
 - **A vector or tags variable reads as a read-only copy.** `variables.offset.x = 5` stops the script with "A vector variable is changed as a whole: `variables.offset = { x = 5, y = 20 }`". *Why: a copy that wrote through would also change every older copy kept in a local, with no error (owner: 2026-11-16).*
 - Writing a value of another type stops the script with an error, like any script error (standing yes, 2026-11-16).
 - A name the entity doesn't have reads as `nil` and puts one warning in the Console, like an unknown input name (standing yes, 2026-11-16).
+- **Another entity's variables are read through its VariablesComponent**, like any component value: `local vars = get_component(enemy, "VariablesComponent")`, then `get_attribute(vars, "health")`. *Why: no extra function just for variables; it is the same way a script reads any component (owner, 2026-11-26).* `set_attribute(vars, "health", 0)` changes one, since variables may change during play; the type rules above apply (standing yes, 2026-11-26).
 
 Source: round 10: SC1; owner: 2026-11-13; owner: 2026-11-16
 
