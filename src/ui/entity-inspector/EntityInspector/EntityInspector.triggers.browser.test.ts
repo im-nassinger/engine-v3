@@ -277,6 +277,14 @@ describe('the trigger card', () => {
             await expect.poll(() => getComputedStyle(removeWin).visibility).toBe('visible');
         }
         await expect.poll(() => getComputedStyle(removeWin.closest('.remove') as Element).opacity).toBe('1');
+        // The Replace button and the × take 5 px around them too, with the pointer.
+        const replace = requireElement<HTMLElement>(winBlock, 'button[aria-label="Replace"]').getBoundingClientRect();
+        const remove = removeWin.getBoundingClientRect();
+        const nearReplace = document.elementFromPoint(replace.left - 5, replace.top - 5);
+        const nearRemove = document.elementFromPoint(remove.right + 5, remove.bottom + 5);
+        expect(nearReplace?.closest('button')?.getAttribute('aria-label')).toBe('Replace');
+        expect(nearRemove?.closest('button')).toBe(removeWin);
+        expect(getComputedStyle(nearReplace as Element).cursor).toBe('pointer');
         click(removeWin);
 
         await expect.poll(() => sentences('Do')).toEqual(['lose']);

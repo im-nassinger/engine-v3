@@ -65,8 +65,11 @@
     }
 
     /* A click opens the Replace menu (owner, 2026-11-25). As tall as its icon, not the editor's buttons, so
-       the block keeps its height. */
+       the block keeps its height. Its hit area (::before) is 6 px bigger on every side but the words' (2 px),
+       so it is easy to click, and shows the pointer over the top and bottom thirds too (owner, 2026-11-26).
+       The block's outer 4 px still ask for slots. */
     > .tooltip > .icon-button {
+        position: relative;
         display: inline-flex;
         flex: none;
         align-items: center;
@@ -77,6 +80,12 @@
         background: none;
         color: var(--block-text);
         cursor: pointer;
+
+        &::before {
+            content: '';
+            position: absolute;
+            inset: -6px -2px -6px -6px;
+        }
 
         &:hover {
             filter: brightness(1.15);
@@ -163,6 +172,11 @@
         padding-left: var(--space-6);
     }
 
+    /* A check's × in the If's bar has words after it, which its hit area must not cover. */
+    > .group:not(:last-child) > .remove button::before {
+        right: -2px;
+    }
+
     /* The × fades in while the mouse is anywhere on the block, its top and bottom thirds too (owner,
        2026-11-26), and fades out after it leaves; hidden, it can't be clicked. */
     .remove {
@@ -178,7 +192,9 @@
             opacity: 1;
         }
 
+        /* Its hit area (::before) is 6 px bigger but on the words' side, as the Replace button's. */
         button {
+            position: relative;
             display: flex;
             padding: 0;
             border: none;
@@ -186,6 +202,12 @@
             color: var(--block-text);
             opacity: 0.7;
             cursor: pointer;
+
+            &::before {
+                content: '';
+                position: absolute;
+                inset: -6px -6px -6px -2px;
+            }
 
             &:hover {
                 opacity: 1;
