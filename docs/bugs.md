@@ -4,6 +4,18 @@
 
 Known bugs that aren't fixed yet, and how fixed ones were solved. A bug found while trying a version is also a row in that version's `fixes.md`. Bugs fixed before this file existed (2026-11-25) are in the fixes files and [decisions.md](decisions.md).
 
+## The hovered block's × test sometimes fails in Firefox (open, 2026-11-26)
+
+- **Seen**: `EntityInspector.triggers.browser.test.ts` › "× shows on every band of a hovered block…" failed once in Firefox during a full `npm run test:browser` run (`expected 'hidden' to be 'visible'`). It passed four times when run alone, with and without that day's gradient change.
+- **What is known**: it came with the × fading in on hover (commit `bab6c52`). Likely the fade or the hover is slower under the full suite's load than the poll's time.
+- **Fix**: not yet. Watch it in CI; if it fails again, wait for the fade to end instead of polling `visibility`.
+
+## PixiJS warned "[BindGroup] … destroyed while still bound" (fixed, 2026-11-26)
+
+- **Seen**: the warning in the browser's console after changing a gradient's colours.
+- **Cause**: PixiJS keeps a never-cleared cache of every set of textures a Graphics drew, and warns when one of them is destroyed. `GradientTextures` destroyed a gradient's texture when no entity used it any more.
+- **Fix**: a gradient no entity uses becomes a spare of its kind (linear or radial), and the next new gradient repaints the spare's canvas in place instead of making a new texture. The spares are never more than the most gradients shown at once. Test: `GradientDrawing.browser.test.ts`, "a changed gradient repaints the texture it let go of".
+
 ## A polygon press that snaps onto the first point adds a point there (open, 2026-11-25)
 
 - **Seen**: not seen by the owner; found in the code while fixing [the pen's](#the-pen-doesnt-close-a-path-ended-on-its-first-point).

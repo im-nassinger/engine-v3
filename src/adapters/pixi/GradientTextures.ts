@@ -34,11 +34,32 @@ function makeGradient(fill: GradientFill) {
     return gradient;
 }
 
+// Repaints a spare gradient's texture with another gradient's stops, in place. PixiJS caches every set of
+// textures a Graphics drew and never clears it, so destroying a drawn texture warns
+// "[BindGroup] … destroyed while still bound"; reusing it never does.
+function repaint(spare: FillGradient, fill: GradientFill) {
+    const fresh = makeGradient(fill);
+    const canvas = spare.texture.source.resource as HTMLCanvasElement;
+    const context = canvas.getContext('2d');
+    if (context === null) return fresh;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(fresh.texture.source.resource as HTMLCanvasElement, 0, 0);
+    spare.texture.source.update();
+    spare.colorStops = fresh.colorStops;
+    // Never drawn, so no Graphics holds it and destroying it is quiet.
+    fresh.destroy();
+
+    return spare;
+}
+
 // One FillGradient, and so one texture, for every entity whose gradient has the same kind and stops,
-// counted, and destroyed when the last one lets go. Without it 10,000 copied platforms with one gradient
-// would hold 10,000 textures.
+// counted. When the last one lets go, the gradient becomes a spare of its kind, repainted for the next
+// new gradient instead of destroyed (see repaint). Without sharing, 10,000 copied platforms with one
+// gradient would hold 10,000 textures; the spares are never more than the most gradients shown at once.
 export class GradientTextures {
     private readonly held = new Map<string, Held>();
+    private readonly spares: Record<GradientFill['kind'], FillGradient[]> = { linear: [], radial: [] };
 
     // How many textures are held, for tests.
     get count() {
@@ -50,7 +71,9 @@ export class GradientTextures {
         const key = keyOf(fill);
         let held = this.held.get(key);
         if (held === undefined) {
-            held = { gradient: makeGradient(fill), count: 0 };
+            const spare = this.spares[fill.kind].pop();
+            const gradient = spare === undefined ? makeGradient(fill) : repaint(spare, fill);
+            held = { gradient, count: 0 };
             this.held.set(key, held);
         }
         held.count += 1;
@@ -65,8 +88,8 @@ export class GradientTextures {
         held.count -= 1;
         if (held.count > 0) return;
 
-        held.gradient.destroy();
         this.held.delete(key);
+        this.spares[held.gradient.type].push(held.gradient);
     }
 
     dispose() {
@@ -74,5 +97,10 @@ export class GradientTextures {
             held.gradient.destroy();
         }
         this.held.clear();
+        for (const gradient of [...this.spares.linear, ...this.spares.radial]) {
+            gradient.destroy();
+        }
+        this.spares.linear = [];
+        this.spares.radial = [];
     }
 }

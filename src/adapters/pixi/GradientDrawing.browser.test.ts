@@ -260,4 +260,16 @@ describe('GradientTextures through the display', () => {
         expect(display.gradientTextureCount).toBe(1);
         expectColour(colourAt(display, 25, 50), redToBlue(0.08));
     });
+
+    test('a changed gradient repaints the texture it let go of, after it was drawn', () => {
+        const level = Level.createNew();
+        const square = addShape(level, { kind: 'rectangle', width: 40, height: 40 }, LEFT_TO_RIGHT, { x: 50, y: 50 });
+        const display = makeDisplay(level);
+        expectColour(colourAt(display, 32, 50), redToBlue(0.05));
+
+        square.requireComponent(StyleComponent).set('fill', linear({ x: 0, y: 0.5 }, { x: 1, y: 0.5 }, BLUE, RED));
+
+        expect(display.gradientTextureCount).toBe(1);
+        expectColour(colourAt(display, 32, 50), redToBlue(0.95));
+    });
 });
