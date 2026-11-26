@@ -114,7 +114,7 @@ Planned in [fixes-9-to-13-plan.md](fixes-9-to-13-plan.md), confirmed by the owne
 - [x] 34. Fix 12, the editor: every length in metres
   - Read: requirements/editor/workspace.md#lengths-in-metres--v4, design/controls.md
   - Done when: ☰ offers Metres and Pixels, metres by default, saved in the browser; every length the editor shows or takes (the Entity inspector's boxes, the grid size, speeds in m/s, the trigger blocks' boxes, the debug box, rulers and size labels) is in the chosen unit, typed values converted back exactly; browser tests cover both units in the Entity inspector, the grid size and a trigger block; fixes.md row 12 says built
-- [ ] 35. Journeys and close fixes 9 to 13's docs
+- [x] 35. Journeys and close fixes 9 to 13's docs
   - Read: versions/v4/fixes-9-to-13-plan.md, versions/v4/tasks.md#tasks
   - Done when: the Playwright journeys pass in three browsers with the new units; the speed tests still meet their targets; architecture/ and design/ match what was built; progress.md says fixes 9 to 13 are built and waiting for the owner's try
 - [ ] 36. Try point: draw a closed path with the pen, target a tag in an empty level, double a coin count with Multiply, use a variable in a Wait, and move things in metres, and say how it feels

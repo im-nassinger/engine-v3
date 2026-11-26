@@ -132,7 +132,7 @@ Claude's proposal (standing yes, 2026-11-22), drawn in the [v4 mockup](mockups/v
 The owner's ask while trying v4 (2026-11-23): every part of a trigger is picked the way the rest of the editor picks it. Built straight away; seen in Chromium screenshots.
 
 - **The entity picker** replaces every flat list of entities, in a trigger's entity words and in every entity field (a camera's Follow, a joint's A and B). A 280 px popup with the menu's `--panel`, `--radius-menu` corners and `--shade`, under the word or field:
-  - **First, what names no one entity**, as menu rows: a trigger's `this` ("The entity this trigger is on") and `other` ("The other entity of the event: the one touching, hit or firing", greyed with "This event has no other entity" under an event with none), then, where a tag can be the target, the heading "Every entity tagged" and a row per tag. An entity field's first row is None.
+  - **First, what names no one entity**, as menu rows: a trigger's `this` ("The entity this trigger is on") and `other` ("The other entity of the event: the one touching, hit or firing", greyed with "This event has no other entity" under an event with none), then, where a tag can be the target, the heading "Every entity tagged" and a row per tag, or, in a level with no tag yet, one greyed line "No entity has a tag yet: add a TagsComponent to one" (v4 fix 9). An entity field's first row is None.
   - **Then the search row:** a pill "Search entities" holding the keyboard, and the target icon. Typing keeps the entities whose name holds it, with their parents in `--muted` so each match shows where it sits; Enter picks the first match. The target icon closes the picker and picks the next entity clicked in the level view, as the entity field's icon does.
   - **Then the Entities viewer's tree**, its rows drawn as the panel draws them (30 px, the fold arrow, the kind icon, the name, 16 px per level) without the eye, folded as the panel is until folded here; folding here leaves the panel alone. The picked entity's row is `--accent-soft`. An entity that can't be picked (an entity field's World, camera and own entity) is `--faint`, and picking it shows the reason in the message pill. At most 320 px high, then it scrolls.
   - **A row dropped from the Entities viewer** on an entity word picks it, as on an entity field.
@@ -206,6 +206,16 @@ The owner found triggers convoluted (2026-11-23); the plan is [fix-3-simpler-tri
 - **A value box that takes variables opens one menu** (standing yes, 2026-11-25): a box typed into (a number, a text) shows the box to type into on top, as before, and the variables under it; a box picked from (true or false, a tag) shows its values, then the variables. The variables come in the variable menu's groups, "Level variables" then the target's own under the target's name (`this` for a Wait), each group with a greyed line, such as "no number variables", when it has none. Picking one puts it in the box, which then reads the variable's name: "add bonus to score", "wait delay seconds". Typing a value, or picking one, switches the box back.
 - **A box that takes no variable opens as before:** a vector's X and Y, a colour's, a fill's, an entity's picker, Flip's, and a Change value whose value isn't picked yet.
 - **The If on a level's variable offers only the level's variables** (standing yes, 2026-11-25): its sentence shows no target, so an own variable would be read on an entity the block doesn't show.
+
+## v4 fix 12: lengths in metres
+
+**Asked by the owner (2026-11-25), [fix](../versions/v4/fixes.md) 12. Built 2026-11-26.** What shows in metres is in the [requirements](../requirements/editor/workspace.md#lengths-in-metres--v4); this is how it looks.
+
+- **☰ › View ends with Metres and Pixels**, after the zooms, the chosen one ticked; metres by default, saved in the browser with the switches (standing yes, 2026-11-26).
+- **A length's box shows `m`, a speed's `m/s`**, where it showed `px` and `px/s`, and **as many more decimals as one pixel needs**: 2 more at 100 px per metre, so Position's 2 decimals become 4 (standing yes, 2026-11-26). In pixels every box shows as before.
+- **The debug box, the drag readouts and the level view's size labels show metres to the pixel**, such as `1.23` and `19.2 × 10.8 m`; the bounds and camera labels add ` m` in metres and stay bare in pixels (standing yes, 2026-11-26).
+- **The grid size box takes metres or pixels**, a `m` or `px` suffix choosing one, and rounds to a whole pixel; its refusal reads "Type the grid size as a number, such as 1" (standing yes, 2026-11-26).
+- **The trigger blocks' number ovals and vector boxes use the same unit**, as the Entity inspector does.
 
 ## Icons
 

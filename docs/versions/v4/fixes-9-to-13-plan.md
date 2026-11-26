@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The last of v4 before v5 is planned (owner, 2026-11-25). Smallest first: push and deploy, write down the owner's answers, the pen bug, the trigger card changes, then metres. Steps 1 and 2 are done by Claude; steps 3 to 7 are built by the orchestrator, one session per task, as tasks 28 to 35 of [tasks.md](tasks.md) (owner, 2026-11-25, to save tokens). The owner then tries fixes 9 to 13, and v5 (scripts) is planned after that.
+The last of v4 before v5 is planned (owner, 2026-11-25). Smallest first: push and deploy, write down the owner's answers, the pen bug, the trigger card changes, then metres. Steps 1 and 2 are done by Claude; steps 3 to 7 are built by the orchestrator, one session per task, as tasks 28 to 35 of [tasks.md](tasks.md) (owner, 2026-11-25, to save tokens). **Steps 3 to 7 are built** (tasks 28 to 35, 2026-11-26), waiting for the owner's try (task 36). The owner then tries fixes 9 to 13, and v5 (scripts) is planned after that.
 
 ## Steps
 
