@@ -4,15 +4,11 @@
 
 **v1 is built** (stages 0 to 19, done 2026-11-19), with 2,048 tests in Node, 1,269 browser tests and 292 Playwright tests in three browsers. **The versions after v1 are small** (owner, round 12, 2026-11-20): v2 curves and gradients, v3 a first game without code, v4 the rest of the triggers, v5 scripts, v6 files and images (v5 split in two, owner, 2026-11-26), v7 text, v8 `.entity` files and the builtin player; see [scope.md](scope.md). **v2 is done** (curves and gradients): built, tried by the owner, the [fixes](versions/v2/fixes.md) asked built, and the owner's last test passed (2026-11-22); its lasting parts are in [architecture/](architecture/README.md). **v3 is done** (a first game without code: tags, the World's variables and inputs, triggers, the Trigger tool, Win, Lose and Restart): built by the orchestrator, tried by the owner, its two [fixes](versions/v3/fixes.md) built, and marked sound by the owner (2026-11-22). **v4 is done** (the rest of the triggers, string and boolean variables on any entity, the shortcut list): the orchestrator built its [tasks](versions/v4/tasks.md) 1 to 17 (2026-11-22 to 2026-11-23), and **the owner tried it and found it ok** (task 18, 2026-11-24); the [fixes](versions/v4/fixes.md) asked so far are built: the trigger card's pickers and boxes, and **simpler triggers** (six events, one check, no Push, no Sensor setting; 2026-11-23). **The trigger card is Scratch blocks** (owner, 2026-11-24, [fix](versions/v4/fixes.md) 4), built by the orchestrator in tasks 19 to 26 (2026-11-25); the owner tried it and found it ok (task 27, 2026-11-25), with fixes 5 to 8 built from the try; fixes 9 to 13 were built by the orchestrator (tasks 28 to 35) and **the owner tried them and found everything working (task 36, 2026-11-26), so v4 is done**. **v5's requirements are written** ([versions/v5/requirements.md](versions/v5/requirements.md): scripts, the code editor, the Console, a flat list of `.lua` files) and **wait for the owner's review**, with one question; see Next below. Its plan stays in [versions/v4/](versions/v4/requirements.md); its lasting parts are in [architecture/](architecture/README.md), mainly [core-model/triggers.md](architecture/core-model/triggers.md) and [triggers-in-play.md](architecture/triggers-in-play.md). The repo is public since 2026-11-20, so CI runs on every push.
 
-## Last session (2026-11-26, later)
+## Last session (2026-11-26, evening)
 
-Wrote v5's requirements.
+Built the example platformer the owner asked for ([examples/platformer.md](examples/platformer.md)): `examples/blob-platformer.editable`, a keyboard character made only of triggers, with variable jump height, apex control, jump buffering, coyote time, a fall speed limit and corner correction, and 40 frames of animation shown by opacity. A headless test checks every mechanic. Found [a drawing order bug](bugs.md#a-shape-moved-by-a-trigger-is-drawn-in-front-of-everything-in-play-open-2026-11-26), not fixed yet.
 
-1. **[versions/v5/requirements.md](versions/v5/requirements.md)** lists every `· v5` feature, what v5 touches in v1 to v4, and what is not in v5.
-2. **The gaps were filled under the standing yes** and listed in [decisions.md](decisions.md): making, renaming and deleting a `.lua` file in the flat list ([files-and-sound.md](requirements/assets/files-and-sound.md#the-assets-panel--v5)), attaching a script from the card's Add script menu ([scripts.md](requirements/scripts/scripts.md#the-scriptcomponent--v5)), no script events for held keys and timers, and where a converted script runs (Convert to script, Later).
-3. Stale lines fixed: scripts.md still said a script can't read another entity's variables, and a few links pointed at old headings.
-
-**Where we stopped:** waiting for the owner's review of v5's requirements and their answer on the touch events' script names. Everything is committed, not pushed.
+**Where we stopped:** the owner plays the example level. v5's requirements still wait for review (below). Everything is committed, not pushed.
 
 ## Where things stand
 
@@ -36,6 +32,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 
 Each item is removed in the same commit that settles it, wherever that commit is made.
 
+- **Play the example platformer** ([examples/platformer.md](examples/platformer.md)) and say what to tune.
 - **Review v5's requirements** ([versions/v5/requirements.md](versions/v5/requirements.md)), and answer its one question: the touch events' script names, `"touched"` and `"no_longer_touched"` as approved, or `"starts_touching"` and `"stops_touching"` to match the trigger's words since 2026-11-24 (Claude recommends the second).
 
 ## Next

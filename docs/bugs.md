@@ -4,6 +4,12 @@
 
 Known bugs that aren't fixed yet, and how fixed ones were solved. A bug found while trying a version is also a row in that version's `fixes.md`. Bugs fixed before this file existed (2026-11-25) are in the fixes files and [decisions.md](decisions.md).
 
+## A shape moved by a trigger is drawn in front of everything in play (open, 2026-11-26)
+
+- **Seen**: in the [example platformer](examples/platformer.md), friends that bobbed with "every 0.6 s: add 0, -4 to this Transform › Position, wait, add 0, 4" were drawn in front of the blob, though the blob's row is above theirs in the Entities viewer. With the bobbing removed, the blob is drawn in front, as it should be.
+- **What is known**: a group with no body or surface, whose position a trigger changes. `EntityNode.placeChild` keeps the panel order, and `LevelDisplay.handleComponentChange` only applies the new matrix, so the order is likely lost in the render chunks (`ChunkedChildren`, one PixiJS render group per run of the World's children) when a chunk is uploaded again.
+- **Fix**: not yet. To see it: put a group with a bobbing trigger under a Dynamic body's row, overlapping it, and play. The example level dropped the bobbing until it is fixed.
+
 ## The hovered block's × test sometimes fails in Firefox (open, 2026-11-26)
 
 - **Seen**: `EntityInspector.triggers.browser.test.ts` › "× shows on every band of a hovered block…" failed once in Firefox during a full `npm run test:browser` run (`expected 'hidden' to be 'visible'`). It passed four times when run alone, with and without that day's gradient change.
