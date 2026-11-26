@@ -5,6 +5,7 @@ import type { EntityId } from '../../../../../core/level/index.ts';
 import type { EditOutcome } from '../../../../../editor/history/index.ts';
 import {
     FieldSlide,
+    MassSlide,
     setBodyMass,
     setFieldValue,
     setFieldValueEach,
@@ -28,13 +29,13 @@ export type CardFieldProps = {
 
 // One field's row: its label, whose hover shows the description if it has one, and the field type's control. A
 // committed value is one step on every shown entity, Mass through the densities; a refused one gives its reason as status text. A
-// slider or a gradient's stop changes the level while dragged and makes its one step when let go. A list
+// slider, Mass's too, or a gradient's stop changes the level while dragged and makes its one step when let go. A list
 // whose rows carry their own labels, such as the World's variables, has the card's whole width.
 export function CardField({ openLevel, typeName, entityIds, field }: CardFieldProps) {
     const session = useEditorSession();
     const { key, label, description } = field.definition;
     // The drag in progress, begun by the slider's first move.
-    const slideRef = useRef<FieldSlide | undefined>(undefined);
+    const slideRef = useRef<FieldSlide | MassSlide | undefined>(undefined);
 
     useEffect(() => {
         return () => slideRef.current?.cancel();
@@ -66,7 +67,10 @@ export function CardField({ openLevel, typeName, entityIds, field }: CardFieldPr
 
     const startedSlide = () => {
         if (slideRef.current === undefined) {
-            slideRef.current = new FieldSlide({ openLevel, entityIds, componentType: typeName, key });
+            slideRef.current =
+                field.kind === 'mass'
+                    ? new MassSlide({ openLevel, entityIds })
+                    : new FieldSlide({ openLevel, entityIds, componentType: typeName, key });
         }
 
         return slideRef.current;

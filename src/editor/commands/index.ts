@@ -119,6 +119,8 @@ export { addComponent } from './entity-inspector/addComponent.ts';
 export { applyMessageFix } from './entity-inspector/applyMessageFix.ts';
 export { FieldSlide } from './entity-inspector/FieldSlide.ts';
 export type { SlideOutcome, SlidField } from './entity-inspector/FieldSlide.ts';
+export { MassSlide } from './entity-inspector/MassSlide.ts';
+export type { SlidBodies } from './entity-inspector/MassSlide.ts';
 export { removeComponent } from './entity-inspector/removeComponent.ts';
 export { resetComponent } from './entity-inspector/resetComponent.ts';
 export { setBodyMass } from './entity-inspector/setBodyMass.ts';

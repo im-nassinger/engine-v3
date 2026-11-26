@@ -4,8 +4,9 @@ import type { FieldModel } from '../../../editor/entity-inspector/index.ts';
 import type { LengthDisplay } from '../../../editor/units/index.ts';
 
 const MIXED_TEXT = 'Mixed';
+const INFINITY_TEXT = '∞';
 
-// A number rounded like a field shows it, with its unit, a length in ☰'s unit; a choice by its option's label; a list, such as a
+// A number rounded like a field shows it, infinity as ∞, with its unit, a length in ☰'s unit; a choice by its option's label; a list, such as a
 // Rope's Points, by how many items it holds.
 export function readOnlyText(field: FieldModel, lengths: LengthDisplay) {
     const { value, definition } = field;
@@ -14,7 +15,8 @@ export function readOnlyText(field: FieldModel, lengths: LengthDisplay) {
     if (typeof value === 'number') {
         const stored = { unit: definition.unit, displayScale: displayScaleOf(field), precision: precisionOf(field) };
         const display = lengths.shown(stored);
-        const text = ValueInput.format(value, display);
+        // A Static or Kinematic body's Mass is infinite.
+        const text = value === Infinity ? INFINITY_TEXT : ValueInput.format(value, display);
 
         return { text, unit: display.unit, isMixed: false };
     }

@@ -39,10 +39,12 @@ Source: scope PH1; round 1: C6, D36, D39; round 2: O8; round 6: 05 2.1, 05 2.2, 
 | Angular damping | Slows spinning over time. Raise it to make balls stop rolling | 0 to 100 | 0 | Dynamic |
 | Fixed rotation | Never tips or spins. Use for players | On or off | Off | Dynamic |
 | Bullet | Extra checks so a very fast entity doesn't pass through other moving things | On or off | Off | Dynamic |
-| Mass | In kg: the shapes' area × density, so it updates as shapes and density change. Typing a mass sets the density that gives it | 0 or more | | Dynamic |
+| Mass | In kg: the shapes' area × density, so it updates as shapes and density change. Typing a mass, or dragging across the field as with Density, sets the density that gives it. A Static or Kinematic body shows ∞, read-only | 0 up to the mass at density 100 | | All |
 
 - **Mass is never stored.** Typing a mass sets the Density of the body's surfaces, its merged ones too, so the body weighs that much. Each body gets its own density, so bodies of different sizes set to one mass show a Mixed Density. A body whose surfaces have different densities keeps their ratios, and one whose densities are all 0 gets one density everywhere *(standing yes, 2026-11-19)*.
-- A mass that would need a density above 100 is refused with `That mass needs a density above 100`. A body with no area (no surfaces, or only lines) shows Mass read-only, since no density gives it a mass *(standing yes, 2026-11-19)*.
+- **Mass drags like Density** (owner, 2026-11-26): dragging across the field goes from 0 at its left edge to the heaviest mass the body can have at its right, where its densest surface reaches 100, and the level changes while dragged, as with any slider. A typed mass above that is set to it, with the usual note, as a typed Density above 100 is *(standing yes, 2026-11-26; it was refused before)*. *Why: the field now has both limits like every slider, and clamping is what every other field does.* With several bodies the heaviest is the lightest of their limits.
+- **A Static or Kinematic body's Mass shows `∞ kg`, read-only** (owner, 2026-11-26: for Static; Kinematic too, standing yes, 2026-11-26, since Box2D moves a Kinematic body as if infinitely heavy too). It was hidden before. Several bodies of different types show Mixed, read-only.
+- `setBodyMass` still refuses a mass that would need a density above 100 with `That mass needs a density above 100`, for any caller other than the field. A body with no area (no surfaces, or only lines) shows Mass read-only, since no density gives it a mass *(standing yes, 2026-11-19)*.
 - *Why these names: the owner wanted common terms. These are Box2D's (Unity and Godot are nearly the same), so the Entity inspector, the Lua API and tutorials match.*
 - Only the fields that matter for the chosen type are enabled. The others are greyed, with their values kept.
 - All of these can change during play.

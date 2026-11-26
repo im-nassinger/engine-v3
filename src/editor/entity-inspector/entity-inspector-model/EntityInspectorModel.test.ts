@@ -12,6 +12,7 @@ import {
     VariablesComponent,
 } from '../../../core/components/index.ts';
 import { DerivedCaches } from '../../../core/derived/index.ts';
+import { NumberFieldType } from '../../../core/fields/index.ts';
 import { Level } from '../../../core/level/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
 import { createV1Rules, EditorMessages } from '../../messages/index.ts';
@@ -233,13 +234,24 @@ describe('EntityInspectorModel: fields', () => {
         expect(requireField(requireCard(model, 'BodyComponent'), 'mass').isReadOnly).toBe(true);
     });
 
-    test('hides Mass on a body that is not Dynamic', () => {
+    test.each(['static', 'kinematic'] as const)('shows a %s body’s Mass as infinite and read-only', (type) => {
         const { crate, selection, model } = buildModel();
-        crate.requireComponent(BodyComponent).set('type', 'static');
+        crate.requireComponent(BodyComponent).set('type', type);
 
         selection.replace([crate.id]);
 
-        expect(findField(requireCard(model, 'BodyComponent'), 'mass')).toBeUndefined();
+        const mass = requireField(requireCard(model, 'BodyComponent'), 'mass');
+        expect(mass.value).toBe(Infinity);
+        expect(mass.isReadOnly).toBe(true);
+    });
+
+    test('gives Mass a maximum where Density reaches its limit, so it drags like Density', () => {
+        const { crate, selection, model } = buildModel();
+        selection.replace([crate.id]);
+
+        const mass = requireField(requireCard(model, 'BodyComponent'), 'mass');
+        const type = mass.definition.type;
+        expect(type instanceof NumberFieldType && type.max).toBeCloseTo(100);
     });
 
     test("greys a merged body's fields but Merge, and shows no Mass of its own", () => {

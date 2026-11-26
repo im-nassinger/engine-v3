@@ -9,7 +9,7 @@ import type {
 import { NumberFieldType } from '../../../core/fields/index.ts';
 import type { Point } from '../../../core/geometry/index.ts';
 import type { Entity } from '../../../core/level/index.ts';
-import { BodyMass, mergesInto } from '../../../core/physics/index.ts';
+import { BodyMass, heaviestMass, mergesInto } from '../../../core/physics/index.ts';
 import type { BodyMassCaches } from '../../../core/physics/index.ts';
 
 import type { FieldModel, MassRow } from '../model/CardModel.ts';
@@ -115,30 +115,35 @@ function derivedFieldModel(
     return { kind: 'derived', definition: derived, value, isEnabled: true, isReadOnly };
 }
 
-// Shown only when every shown entity is a Dynamic body with a mass of its own, not merged into another.
-// Read-only when a body has no area, such as one with no surfaces or only lines: no density gives it a mass.
+// Shown when every shown entity is a body with a mass of its own, not merged into another. A Static or
+// Kinematic body's mass is infinite, shown as ∞ and read-only (owner, 2026-11-26). Read-only too when a body
+// has no area, such as one with no surfaces or only lines: no density gives it a mass. Its type's maximum is
+// the heaviest mass every shown body can have, so dragging the field goes from 0 to Density's limit.
 function massRowModel(held: HeldComponents, caches: BodyMassCaches): FieldModel | undefined {
     if (held.schema.typeName !== BodyComponent.schema.typeName) return undefined;
 
-    const allDynamic = held.components.every((component) => component.readValue('type') === 'dynamic');
-    if (!allDynamic) return undefined;
-
     const masses: number[] = [];
-    let hasBodyWithoutArea = false;
-    for (const entity of held.entities) {
+    let isReadOnly = false;
+    let heaviest = Infinity;
+    for (const [index, entity] of held.entities.entries()) {
         const mass = BodyMass.of(entity, caches);
         if (mass === undefined) return undefined;
 
-        masses.push(mass.mass);
-        hasBodyWithoutArea ||= mass.area === 0;
+        const isDynamic = held.components[index]?.readValue('type') === 'dynamic';
+        masses.push(isDynamic ? mass.mass : Infinity);
+        isReadOnly ||= !isDynamic || mass.area === 0;
+        heaviest = Math.min(heaviest, heaviestMass(entity, caches));
     }
 
     const value = sameOrMixed(masses, isSameMass);
+    const type = isReadOnly ? MASS_ROW.type : new NumberFieldType({ min: 0, max: heaviest });
 
-    return { kind: 'mass', definition: MASS_ROW, value, isEnabled: true, isReadOnly: hasBodyWithoutArea };
+    return { kind: 'mass', definition: { ...MASS_ROW, type }, value, isEnabled: true, isReadOnly };
 }
 
 function isSameMass(first: number, second: number) {
+    if (first === second) return true;
+
     const largest = Math.max(Math.abs(first), Math.abs(second));
 
     return Math.abs(first - second) <= largest * SAME_MASS_SHARE;
