@@ -29,6 +29,7 @@ Everything known about the project: a 2D physics game with a level editor, for t
 | [rejected.md](rejected.md) | What we decided against, and why. Check it before proposing something |
 | [decisions.md](decisions.md) | Project-level choices: starting over, the reviews, how these docs are organised |
 | [decisions-v1.md](decisions-v1.md) | The smaller choices Claude made under the standing yes while v1 was built |
+| [examples/platformer.md](examples/platformer.md) | The plan for an example level: a keyboard platformer character made of triggers. Waiting for the owner's review |
 | [tech-notes.md](tech-notes.md) | Facts and warnings for the architecture work. Not requirements |
 
 ## Reading order
