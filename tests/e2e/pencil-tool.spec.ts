@@ -99,6 +99,8 @@ for (const chosen of SMOOTHNESSES) {
     test(`at ${chosen} smoothness, a stroke ending near its start closes and one that doesn't stays open`, async ({
         page,
     }) => {
+        // About 180 mouse moves take some 10 s here and can pass 30 s on CI's slower machines.
+        test.slow();
         await openEditor(page);
         const middle = await levelMiddle(page);
 

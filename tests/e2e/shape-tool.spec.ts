@@ -6,8 +6,11 @@ type ScreenPoint = { x: number; y: number };
 // A press within 4 px of the last one, and within 500 ms, is a double-click, so separate clicks in these
 // tests land further apart than this.
 const APART_PX = 60;
-// The size a click places before any drag has set one.
-const FIRST_SIDE = 100;
+// The size a click places before any drag has set one, in metres: 100 px at the default 100 px per metre.
+const FIRST_SIDE = 1;
+// The Entity inspector shows lengths in metres to 0.01 m, so sizes worked out from one another may differ
+// by a rounding step; 1 digit compares them to within 0.05 m.
+const CLOSE_DIGITS = 1;
 
 // Opens the editor with grid snapping off, so a drag's size follows the mouse exactly and two drags
 // of the same length give the same size wherever they start.
@@ -146,15 +149,15 @@ test('Shift keeps a dragged rectangle square, and Alt draws it from the press as
     await expectFinished(page, 'Rectangle 2');
     const square = await shapeSize(page);
     expect(square.width).toBe(square.height);
-    expect(square.width).toBeCloseTo(plain.width, 0);
+    expect(square.width).toBeCloseTo(plain.width, CLOSE_DIGITS);
 
     await pickShapeTool(page, 'Rectangle');
     const altStart = offset(middle, 0, 2 * APART_PX);
     await dragHolding(page, ['Alt'], altStart, offset(altStart, 120, 60));
     await expectFinished(page, 'Rectangle 3');
     const fromCentre = await shapeSize(page);
-    expect(fromCentre.width).toBeCloseTo(2 * plain.width, 0);
-    expect(fromCentre.height).toBeCloseTo(2 * plain.height, 0);
+    expect(fromCentre.width).toBeCloseTo(2 * plain.width, CLOSE_DIGITS);
+    expect(fromCentre.height).toBeCloseTo(2 * plain.height, CLOSE_DIGITS);
 });
 
 test('a circle by click, by drag, and by drag with Shift and Alt', async ({ page }) => {
@@ -178,13 +181,13 @@ test('a circle by click, by drag, and by drag with Shift and Alt', async ({ page
     const shiftStart = offset(middle, 0, 2 * APART_PX);
     await dragHolding(page, ['Shift'], shiftStart, offset(shiftStart, 120, 60));
     await expectFinished(page, 'Circle 3');
-    expect(await numberIn(shapeField(page, 'Radius'))).toBeCloseTo(dragged, 0);
+    expect(await numberIn(shapeField(page, 'Radius'))).toBeCloseTo(dragged, CLOSE_DIGITS);
 
     await pickShapeTool(page, 'Circle');
     const altStart = offset(middle, -3 * APART_PX, 2 * APART_PX);
     await dragHolding(page, ['Alt'], altStart, offset(altStart, 120, 60));
     await expectFinished(page, 'Circle 4');
-    expect(await numberIn(shapeField(page, 'Radius'))).toBeCloseTo(2 * dragged, 0);
+    expect(await numberIn(shapeField(page, 'Radius'))).toBeCloseTo(2 * dragged, CLOSE_DIGITS);
 });
 
 test('clicking the first point closes a polygon, and Enter finishes one open as a line', async ({ page }) => {

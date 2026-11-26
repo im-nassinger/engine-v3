@@ -19,10 +19,12 @@ const TRIGGER_HALF_WIDTH_PX = 120;
 const TRIGGER_TOP_BELOW_PX = 40;
 const TRIGGER_BOTTOM_BELOW_PX = 120;
 // The pushed box starts at the camera's middle, so it stays in view falling and rising. Its Linear damping
-// makes it fall slowly, about 80 px a second on screen, and the 1,200 px/s up added to its velocity moves it about 300 px up, 200 px on screen, before damping stops it: still plain to see after Chromium's
-// column screenshots, which take about 0.5 s each.
-const LINEAR_DAMPING = '4';
-const KICK_Y = '-1200';
+// makes it fall slowly, about 120 px a second (gravity over damping: 9.8 m/s² / 8 at the default 100 px per
+// metre), and the 24 m/s up added to its velocity moves it about 300 px up (24 m/s / 8) before damping stops
+// it: still plain to see after Chromium's column screenshots, which take about 0.5 s each, and up to a second
+// on a busy computer.
+const LINEAR_DAMPING = '8';
+const KICK_Y = '-24';
 const RISE_SEEN_PX = 20;
 // The box falls at about 80 px a second on screen; the editor's view giving way to play's moves it much more.
 const SLOW_FALL_MOST_PX_PER_S = 300;

@@ -37,6 +37,8 @@ const MAIN_MENU: Record<string, [string, string][]> = {
         ['Whole level', ''],
         ['Selection', 'F'],
         ['Camera frame', 'Shift+3'],
+        ['Metres', ''],
+        ['Pixels', ''],
     ],
     Help: [
         ['Keyboard shortcuts', '?'],

@@ -12,8 +12,8 @@ const APART_PX = 100;
 const ABOVE_PX = 80;
 // The Rope's ends, this far into each box from its inner edge.
 const ROPE_END_INSET_PX = 10;
-// Wide enough to be found in a 1 px column at the camera's zoom.
-const ROPE_OUTLINE_WIDTH = '8';
+// Wide enough to be found in a 1 px column at the camera's zoom: 0.08 m, 8 px at the default 100 px per metre.
+const ROPE_OUTLINE_WIDTH = '0.08';
 // A joint icon's fill is white; nothing else in this level is near it: the background is #BFE3F5,
 // the grid and outlines are dark, the boxes blue.
 const WHITE = { r: 0xff, g: 0xff, b: 0xff };

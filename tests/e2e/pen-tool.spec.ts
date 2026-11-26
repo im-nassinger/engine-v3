@@ -3,6 +3,8 @@ import type { Page } from '@playwright/test';
 
 type ScreenPoint = { x: number; y: number };
 
+// At 100% zoom one level pixel is one screen pixel, and a new level has the default 100 px per metre.
+const SCREEN_PX_PER_METRE = 100;
 const PEN_HINT = 'Click for a corner, drag for a curve. Click the first point to close. Enter finishes.';
 
 async function openEditorSnapping(page: Page) {
@@ -48,7 +50,8 @@ async function mouseInLevel(page: Page, at: ScreenPoint) {
     return { x: await read('X'), y: await read('Y') };
 }
 
-// The screen point of the grid spot nearest to `near`, at 100% zoom, measured from the debug box.
+// The screen point of the grid spot nearest to `near`, at 100% zoom, measured from the debug box, which
+// shows the mouse in metres; `gridSize` is in metres too.
 async function gridSpotNear(page: Page, near: ScreenPoint, gridSize: number): Promise<ScreenPoint> {
     const here = await mouseInLevel(page, near);
     const along = await mouseInLevel(page, offset(near, 40, 40));
@@ -57,7 +60,7 @@ async function gridSpotNear(page: Page, near: ScreenPoint, gridSize: number): Pr
     const spotX = Math.round(here.x / gridSize) * gridSize;
     const spotY = Math.round(here.y / gridSize) * gridSize;
 
-    return offset(near, (spotX - here.x) * signX, (spotY - here.y) * signY);
+    return offset(near, (spotX - here.x) * signX * SCREEN_PX_PER_METRE, (spotY - here.y) * signY * SCREEN_PX_PER_METRE);
 }
 
 function offset(point: ScreenPoint, dx: number, dy: number): ScreenPoint {
@@ -178,9 +181,9 @@ test('with grid snapping off, a press within the ring around the first point clo
 // ending the path on its first point but open, with no fill.
 test('with grid snapping on, a press that snaps onto the first point closes the path, filled', async ({ page }) => {
     await openEditorSnapping(page);
-    await typeInDebugBox(page, 'GRID', '100');
+    await typeInDebugBox(page, 'GRID', '1');
     await typeInDebugBox(page, 'ZOOM', '100');
-    const spot = await gridSpotNear(page, await levelMiddle(page), 100);
+    const spot = await gridSpotNear(page, await levelMiddle(page), 1);
 
     await page.keyboard.press('4');
     await click(page, spot);

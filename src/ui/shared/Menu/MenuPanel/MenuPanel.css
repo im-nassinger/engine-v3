@@ -1,7 +1,10 @@
 .menu-panel {
     display: flex;
     flex-direction: column;
-    min-width: 200px;
+    /* The room usePopupPlacement gives is for the whole panel, padding included, so a menu taller than
+       the window stops at its margin. 212 px keeps the 200 px of content the menus had before. */
+    box-sizing: border-box;
+    min-width: 212px;
     max-height: var(--popup-room, none);
     overflow-y: auto;
     padding: var(--space-6);

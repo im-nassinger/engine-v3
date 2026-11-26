@@ -43,8 +43,9 @@ test('the debug box shows the mouse position over the level view, and nothing on
     if (box === null) throw new Error('The level view has no box.');
 
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await expect(mouseX).toHaveText(/^−?\d+$/);
-    await expect(mouseY).toHaveText(/^−?\d+$/);
+    // In metres, to 0.01 m.
+    await expect(mouseX).toHaveText(/^−?\d+(\.\d+)?$/);
+    await expect(mouseY).toHaveText(/^−?\d+(\.\d+)?$/);
     const first = await mouseX.textContent();
 
     await page.mouse.move(box.x + box.width / 2 + 40, box.y + box.height / 2);
@@ -63,13 +64,14 @@ test('the grid size and the zoom are typed in the debug box, and Ctrl+Z leaves t
     await openEditor(page);
     const grid = page.getByRole('textbox', { name: 'GRID' });
     const zoom = page.getByRole('textbox', { name: 'ZOOM' });
-    await expect(grid).toHaveValue('100');
+    // In metres: a new level's grid is 1 m.
+    await expect(grid).toHaveValue('1');
 
     await grid.click();
     await page.keyboard.press('ControlOrMeta+a');
-    await page.keyboard.type('25');
+    await page.keyboard.type('0.25');
     await page.keyboard.press('Enter');
-    await expect(grid).toHaveValue('25');
+    await expect(grid).toHaveValue('0.25');
 
     await zoom.click();
     await page.keyboard.press('ControlOrMeta+a');
@@ -80,7 +82,7 @@ test('the grid size and the zoom are typed in the debug box, and Ctrl+Z leaves t
     // Enter gave the keyboard back to the level view; changing the grid size is not an undo step.
     await page.keyboard.press('ControlOrMeta+z');
     await expect(page.locator('.message-pill .message')).toHaveText('Nothing to undo');
-    await expect(grid).toHaveValue('25');
+    await expect(grid).toHaveValue('0.25');
 });
 
 test('the tool column shows Select as the active tool', async ({ page }) => {
