@@ -196,7 +196,7 @@ The owner found triggers convoluted (2026-11-23); the plan is [fix-3-simpler-tri
 
 - **The trigger's head is two labelled rows, drawn like a card's fields** (owner picked this from four options: "it looks more like how the other components render their values"): **Name**, an always-editable text box (Enter, Tab or clicking away renames, Esc doesn't), then a grip that drags the trigger to another place and the `…` menu; **Enabled**, the on/off switch. The `…` menu has Duplicate and Delete; Rename is gone, since the box renames (Claude, standing yes, 2026-11-25). The grip sits beside `…` so the labels line up at the left as on other cards (Claude, standing yes, 2026-11-25).
 - **A click on a block's icon opens its Replace menu** (owner): the same menu as right click › Replace, alone, under the icon. The icon acts as the block's middle, so hovering it opens no slot, like a value box (Claude, standing yes, 2026-11-25).
-- **The Entity inspector and the Entities viewer are both 360 px wide** (owner).
+- **The Entity inspector and the Entities viewer are both 400 px wide** (owner).
 
 ## v4 fix 10: variables in value boxes
 

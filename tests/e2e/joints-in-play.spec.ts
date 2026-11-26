@@ -7,9 +7,9 @@ type Colour = { readonly r: number; readonly g: number; readonly b: number };
 
 const BOX_HALF_PX = 40;
 // The two boxes' middles are this far left and right of the camera's middle, and this far above it,
-// so the Rope between them is off the level's x axis.
+// so the Rope between them is off the level's x axis, and in play, about 4 times bigger, below the Play bar.
 const APART_PX = 100;
-const ABOVE_PX = 80;
+const ABOVE_PX = 40;
 // The Rope's ends, this far into each box from its inner edge.
 const ROPE_END_INSET_PX = 10;
 // Wide enough to be found in a 1 px column at the camera's zoom: 0.08 m, 8 px at the default 100 px per metre.

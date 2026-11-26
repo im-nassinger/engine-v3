@@ -20,10 +20,10 @@ export const PANEL_HEIGHT = 600;
 let container: HTMLElement;
 let root: Root;
 
-// Before each test: an empty 360 by 600 px place to show the panel in.
+// Before each test: an empty 400 by 600 px place to show the panel in.
 export function openPanelPage() {
     container = document.createElement('div');
-    container.style.width = '360px';
+    container.style.width = '400px';
     container.style.height = `${PANEL_HEIGHT}px`;
     document.body.append(container);
     root = createRoot(container);

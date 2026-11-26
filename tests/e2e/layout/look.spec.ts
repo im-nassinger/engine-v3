@@ -3,7 +3,7 @@ import type { Locator, Page } from '@playwright/test';
 
 const ISLANDS = ['Main menu', 'Tools', 'Entity inspector', 'Entities viewer', 'Minimap', 'Debug box'];
 // Too long for the vector box's unit beside it in the 360 px Entity inspector.
-const LONG_POSITION = '-123456.25';
+const LONG_POSITION = '-123456789.25';
 const SHORT_POSITION = '20';
 
 async function openEditor(page: Page) {

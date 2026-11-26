@@ -5,13 +5,9 @@
     --under-main-menu: calc(var(--island-gap) * 2 + var(--island-bar));
     --islands-bottom: calc(var(--island-gap) * 2 + var(--debug-box));
     --beside-tools: calc(var(--island-gap) * 2 + var(--island-bar));
-    /* The Entity inspector's starting size, narrower only in a window too narrow for it beside the tool
-       column and the Entities viewer with their gaps (1280×720 at 200% is 640 px), so no island covers
-       another. 100% is the shell's width wherever it is used across. */
-    --entity-inspector-width: min(
-        var(--entity-inspector),
-        calc(100% - var(--beside-tools) - var(--entities-viewer) - var(--island-gap) * 2)
-    );
+    /* Always the Entity inspector's full width, even in a window too narrow for it beside the Entities
+       viewer, where they overlap (owner, 2026-11-26: fitting small windows is Later). */
+    --entity-inspector-width: var(--entity-inspector);
 
     position: fixed;
     inset: 0;

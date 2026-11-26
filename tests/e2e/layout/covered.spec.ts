@@ -12,6 +12,8 @@ type WindowSize = { name: string; width: number; height: number; zoom: number };
 type Inspect = (what: string, part: Locator) => Promise<boolean>;
 type CoverCase = {
     name: string;
+    // Looked at only in windows wide enough for both panels side by side.
+    isInEntityInspector?: boolean;
     run: (page: Page, inspect: Inspect) => Promise<void>;
 };
 
@@ -23,6 +25,11 @@ const SIZES: WindowSize[] = [
     { name: '1280×720 at 150%', width: 1280, height: 720, zoom: 1.5 },
     { name: '1280×720 at 200%', width: 1280, height: 720, zoom: 2 },
 ];
+
+// The width the Entity inspector and the Entities viewer need side by side: ☰'s column, both 400 px panels
+// and the gaps. They never shrink, so in a narrower window they overlap (owner, 2026-11-26: fitting small
+// windows is Later), and the cases inside the Entity inspector skip it.
+const BOTH_PANELS_WIDTH_PX = 10 + 48 + 10 + 400 + 10 + 400 + 10;
 
 // The corners are looked at this far inside, past a 4 px rounded corner and a fractional pixel's edge.
 const CORNER_INSET_PX = 4;
@@ -225,6 +232,7 @@ const CASES: CoverCase[] = [
     })),
     {
         name: "the Entity inspector's menus and dropdowns",
+        isInEntityInspector: true,
         run: async (page, inspect) => {
             await drawCrate(page);
             await addComponent(page, 'BodyComponent');
@@ -243,6 +251,7 @@ const CASES: CoverCase[] = [
     },
     {
         name: "the Entity inspector's tooltips",
+        isInEntityInspector: true,
         run: async (page, inspect) => {
             await drawCrate(page);
             await addComponent(page, 'BodyComponent');
@@ -267,6 +276,7 @@ const CASES: CoverCase[] = [
     },
     {
         name: "the Entity inspector's editor messages",
+        isInEntityInspector: true,
         run: async (page, inspect) => {
             await drawCrate(page);
             await addComponent(page, 'BodyComponent');
@@ -285,6 +295,7 @@ const CASES: CoverCase[] = [
     },
     {
         name: "the Camera's Follow entity picker and its pick button's tooltip",
+        isInEntityInspector: true,
         run: async (page, inspect) => {
             await selectRow(page, 'Camera');
             const camera = card(page, 'CameraComponent');
@@ -352,7 +363,10 @@ for (const coverCase of CASES) {
         test.setTimeout(CASE_TIMEOUT_MS);
         const problems: string[] = [];
 
-        for (const size of SIZES) {
+        const sizes = SIZES.filter(
+            (size) => !coverCase.isInEntityInspector || size.width / size.zoom >= BOTH_PANELS_WIDTH_PX,
+        );
+        for (const size of sizes) {
             const { context, page } = await openEditorAt(browser, size);
             const inspect: Inspect = async (what, part) => {
                 await expect(part).toBeVisible();
