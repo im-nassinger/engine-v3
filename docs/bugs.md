@@ -4,6 +4,12 @@
 
 Known bugs that aren't fixed yet, and how fixed ones were solved. A bug found while trying a version is also a row in that version's `fixes.md`. Bugs fixed before this file existed (2026-11-25) are in the fixes files and [decisions.md](decisions.md).
 
+## Shapes with no Style showed a bolt, and a shape that holds children couldn't be entered (fixed, 2026-11-27)
+
+- **Seen**: in the example platformer, every ground piece showed the trigger's bolt with no TriggerComponent, and double-clicking one kept it selected instead of going in.
+- **Cause**: the bolt was drawn on every shape with no StyleComponent. Double-click took "the hit is the entity it selects" to mean "not a group", but a parent is drawn and hit in front of its children, so a shape that holds children is hit on itself.
+- **Fix**: the bolt needs a TriggerComponent. A double-click goes in when a child of what it selects is under the mouse, and `SelectionPicker` never hits the current group itself. Tests: `planUnstyledShapes.test.ts`, `SelectTool.test.ts` (SelectTool groups).
+
 ## A shape moved by a trigger is drawn in front of everything in play (open, 2026-11-26)
 
 - **Seen**: in the [example platformer](examples/platformer.md), friends that bobbed with "every 0.6 s: add 0, -4 to this Transform › Position, wait, add 0, 4" were drawn in front of the blob, though the blob's row is above theirs in the Entities viewer. With the bobbing removed, the blob is drawn in front, as it should be.

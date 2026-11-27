@@ -19,8 +19,12 @@ export function doubleClick(host: SelectStateHost, point: Point) {
         return;
     }
 
-    // A group is hit only through its children, so the hit being deeper than what it selects means a group.
-    const goesInside = selectable !== hit || selectable === level.camera;
+    // A group is usually hit through its children, so the hit being deeper than what it selects means a
+    // group. A group that is also a shape is hit on its own shape, in front of its children, so it is a group
+    // when one of its children is under the mouse too (owner, 2026-11-27).
+    const isHitThroughAChild = selectable !== hit;
+    const isShapeOverItsChildren = host.picker.hasChildAt(selectable, point);
+    const goesInside = isHitThroughAChild || isShapeOverItsChildren || selectable === level.camera;
     if (!goesInside) {
         selection.replace([selectable.id]);
         if (editablePointsOf(selectable) !== undefined) {

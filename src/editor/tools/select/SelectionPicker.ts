@@ -28,12 +28,22 @@ export class SelectionPicker {
         this.context = context;
     }
 
+    // The group you are inside is never hit: a group that is also a shape would otherwise cover its own
+    // children, since a parent is drawn in front of them.
     targetAt(point: Point): PressTarget {
         const { hitTester, currentGroup } = this.context.openLevel;
-        const hit = hitTester.topmostAt(point, this.probe());
+        const hits = hitTester.allAt(point, this.probe());
+        const hit = hits.find((entity) => entity !== currentGroup.group);
         if (hit === undefined) return { hit: undefined, selectable: undefined };
 
         return { hit, selectable: hitTester.selectableFor(hit, currentGroup.group, false) };
+    }
+
+    // Whether anything inside the entity, at any depth, is under the point.
+    hasChildAt(entity: Entity, point: Point) {
+        const hits = this.context.openLevel.hitTester.allAt(point, this.probe());
+
+        return hits.some((hit) => entity.isAncestorOf(hit));
     }
 
     // What a selection box selects, front to back, each entity once. With

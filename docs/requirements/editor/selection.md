@@ -140,12 +140,14 @@ Source: scope SE3; round 5: 02 2.8; round 6: MS1; old: SG-57 to SG-61
 - After going in, the child under the mouse is selected, so another double-click goes one deeper. Enter on a selected group goes in too.
 - A single click outside the group you are inside clears the selection and stays inside. A double-click outside leaves.
 - Selecting an entity in the Entities viewer works at any depth.
+- Inside a shape that holds children, its own shape never blocks a click on them (owner, 2026-11-27).
 - Going in or out is never an undo step.
 - Dragging in the level view never changes an entity's parent. Parents change only in the Entities viewer or by grouping.
 
 | Double-click on | Result |
 |---|---|
 | A group | Go into it |
+| A shape that holds children, where one of them is under the mouse | Go into it, like a group (owner, 2026-11-27) |
 | Text | Edit the text |
 | A polygon, line or path | Edit its points |
 | A rectangle or circle, a joint | Select only |

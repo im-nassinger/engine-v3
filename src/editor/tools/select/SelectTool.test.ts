@@ -358,6 +358,36 @@ describe('SelectTool groups', () => {
         expect(selection.ids).toEqual([lone.id]);
     });
 
+    test('a double-click on a shape over its own child goes into it and selects the child', () => {
+        const { tool, selection, currentGroup, level, lone } = buildSelectTest();
+        const child = addSquare(level, lone, { x: 0, y: 0 });
+
+        doubleClick(tool, { x: 100, y: 100 });
+
+        expect(currentGroup.group).toBe(lone);
+        expect(selection.ids).toEqual([child.id]);
+    });
+
+    test('inside a shape that is a group, a click reaches the child its own shape covers', () => {
+        const { tool, selection, currentGroup, level, lone } = buildSelectTest();
+        const child = addSquare(level, lone, { x: 0, y: 0 });
+        currentGroup.enter(lone);
+
+        click(tool, { x: 100, y: 100 });
+
+        expect(selection.ids).toEqual([child.id]);
+    });
+
+    test('a double-click on a shape whose children are elsewhere only selects it', () => {
+        const { tool, selection, currentGroup, level, lone } = buildSelectTest();
+        addSquare(level, lone, { x: 0, y: 300 });
+
+        doubleClick(tool, { x: 100, y: 100 });
+
+        expect(currentGroup.group).toBe(level.world);
+        expect(selection.ids).toEqual([lone.id]);
+    });
+
     test('a double-click on the camera frame goes into the camera, reaching the entities inside it', () => {
         const { tool, selection, currentGroup, level, score } = buildSelectTest();
 
