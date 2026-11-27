@@ -16,7 +16,9 @@ Found on the way: a Firefox browser test fails when the whole Entity inspector f
 
 Then two more asks, built: **Multiply and Divide on a vector take an x and a y** (such as "multiply this Body › Velocity by 0.5, 1"), and **timers count seconds or ticks** ("every 1 tick"), picked in the unit's menu. The example platformer's every-tick triggers now use "every 1 tick". See [decisions.md](decisions.md).
 
-**Where we stopped:** all five are pushed and published on a new site, https://ecs-engine-2.netlify.app, as the old Netlify account ran out of deploy credits ([deploying.md](deploying.md)). v5's requirements still wait for review (below).
+Then, asked to make a better level from the example one: **a chase level** ([examples/chase.md](examples/chase.md), file `examples/blob-chase.editable`): the Blob runs home through a forest at dusk with a monster right behind, in the style of the owner's three reference pictures, and **the Blob was redrawn** for both levels. Built and checked headless and in the editor; not pushed.
+
+**Where we stopped:** the five fixes above are pushed and published on a new site, https://ecs-engine-2.netlify.app, as the old Netlify account ran out of deploy credits ([deploying.md](deploying.md)). v5's requirements still wait for review (below).
 
 ## Where things stand
 
@@ -41,6 +43,7 @@ The source, `~/projects/ecs-game-v2`, was left as it is. `tools/check-sources.js
 Each item is removed in the same commit that settles it, wherever that commit is made.
 
 - **Play the example platformer** ([examples/platformer.md](examples/platformer.md)) and say what to tune.
+- **Play the chase level** ([examples/chase.md](examples/chase.md)) and say whether the monster's speed and the look are right.
 - **Review v5's requirements** ([versions/v5/requirements.md](versions/v5/requirements.md)), and answer its one question: the touch events' script names, `"touched"` and `"no_longer_touched"` as approved, or `"starts_touching"` and `"stops_touching"` to match the trigger's words since 2026-11-24 (Claude recommends the second).
 
 ## Next

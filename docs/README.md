@@ -30,6 +30,7 @@ Everything known about the project: a 2D physics game with a level editor, for t
 | [decisions.md](decisions.md) | Project-level choices: starting over, the reviews, how these docs are organised |
 | [decisions-v1.md](decisions-v1.md) | The smaller choices Claude made under the standing yes while v1 was built |
 | [examples/platformer.md](examples/platformer.md) | An example level, built: a keyboard platformer character made of triggers, its file and how it works |
+| [examples/chase.md](examples/chase.md) | A second example level, built: the Blob chased through a forest at dusk by a monster, run home before it catches you |
 | [tech-notes.md](tech-notes.md) | Facts and warnings for the architecture work. Not requirements |
 
 ## Reading order
