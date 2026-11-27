@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-The editor is published on Netlify at https://ecs-engine.netlify.app (project `ecs-engine`, on the owner's second Netlify account, linked in `.netlify/state.json`), since 2026-11-23. The first account's https://engine-v3.netlify.app stays at the last version it got: that account ran out of deploy credits. The CLI holds both accounts; `npx -y netlify-cli switch` picks the active one, and the second account's token is in the CLI config file. Never ask the owner to log in: check with `npx -y netlify-cli status` first.
+The editor is published on Netlify at https://ecs-engine.netlify.app (project `ecs-engine`, on the owner's second Netlify account, linked in `.netlify/state.json`), since 2026-11-23. The first account's https://engine-v3.netlify.app stays at the last version it got: that account ran out of deploy credits. The CLI holds both accounts; `npx -y netlify-cli switch` picks the active one, and the second account's token is in the CLI config file. Never ask the owner to log in: check with `npx -y netlify-cli status` first. **On 2026-11-27 the second account ran out of deploy credits too** (`403 Account credit usage exceeded`), so https://ecs-engine.netlify.app stays at commit `c2f2a2e` until the owner adds credits or picks another host.
 
 ## How to deploy
 

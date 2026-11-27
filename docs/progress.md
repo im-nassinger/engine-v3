@@ -16,7 +16,7 @@ Found on the way: a Firefox browser test fails when the whole Entity inspector f
 
 Then two more asks, built: **Multiply and Divide on a vector take an x and a y** (such as "multiply this Body › Velocity by 0.5, 1"), and **timers count seconds or ticks** ("every 1 tick"), picked in the unit's menu. The example platformer's every-tick triggers now use "every 1 tick". See [decisions.md](decisions.md).
 
-**Where we stopped:** the first three fixes are pushed and published to Netlify; the last two are committed locally. v5's requirements still wait for review (below).
+**Where we stopped:** all five are pushed. The first three are on Netlify; publishing the last two failed, as the Netlify account is out of deploy credits ([deploying.md](deploying.md)). v5's requirements still wait for review (below).
 
 ## Where things stand
 
