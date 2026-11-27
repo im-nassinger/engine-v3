@@ -1,4 +1,4 @@
-import { ShapeComponent, StyleComponent } from '../../../../core/components/index.ts';
+import { ShapeComponent, StyleComponent, TriggerComponent } from '../../../../core/components/index.ts';
 import type { Point } from '../../../../core/geometry/index.ts';
 import type { Entity, Level } from '../../../../core/level/index.ts';
 import type { WorldMatrixCache } from '../../../../core/derived/index.ts';
@@ -20,7 +20,8 @@ export type UnstyledShapePlan = {
     readonly points: readonly Point[];
     // A line is open, and has no fill.
     readonly isClosed: boolean;
-    // The bolt in the shape's middle, or undefined for a line or a shape too small on screen to hold one.
+    // The bolt in a trigger's middle, or undefined for a shape with no TriggerComponent, a line, or a shape
+    // too small on screen to hold one.
     readonly bolt: BoltPlan | undefined;
 };
 
@@ -35,8 +36,9 @@ export type UnstyledShapeScene = {
     readonly worldMatrices: WorldMatrixCache;
 };
 
-// Every shape with no StyleComponent that is shown and on screen, in draw order, such as a trigger. A path
-// with no StyleComponent is left to the level's own thin line.
+// Every shape with no StyleComponent that is shown and on screen, in draw order, such as a trigger or an
+// invisible ground piece under painted children. Only a trigger gets the bolt (owner, 2026-11-27). A path with
+// no StyleComponent is left to the level's own thin line.
 export function planUnstyledShapes(scene: UnstyledShapeScene): UnstyledShapePlan[] {
     const plans: UnstyledShapePlan[] = [];
     const { level, view, worldMatrices } = scene;
@@ -50,7 +52,12 @@ export function planUnstyledShapes(scene: UnstyledShapeScene): UnstyledShapePlan
         const box = screenBox(points);
         if (box === undefined || isOffScreen(box, view)) continue;
 
-        const bolt = outline.isClosed ? boltIn(points) : undefined;
+        let bolt: BoltPlan | undefined;
+        const isTrigger = entity.hasComponent(TriggerComponent);
+        if (outline.isClosed && isTrigger) {
+            bolt = boltIn(points);
+        }
+
         plans.push({ entity, points, isClosed: outline.isClosed, bolt });
     }
 

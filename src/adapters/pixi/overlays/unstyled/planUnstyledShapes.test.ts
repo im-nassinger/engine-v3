@@ -5,6 +5,7 @@ import {
     ShapeComponent,
     StyleComponent,
     TransformComponent,
+    TriggerComponent,
 } from '../../../../core/components/index.ts';
 import { WorldMatrixCache } from '../../../../core/derived/index.ts';
 import type { ShapeGeometry } from '../../../../core/geometry/index.ts';
@@ -42,12 +43,19 @@ function addShape(level: Level, geometry: ShapeGeometry, position = { x: 0, y: 0
     return entity;
 }
 
+function addTrigger(level: Level, geometry: ShapeGeometry, position = { x: 0, y: 0 }) {
+    const trigger = addShape(level, geometry, position);
+    trigger.addComponent(new TriggerComponent());
+
+    return trigger;
+}
+
 const RECTANGLE: ShapeGeometry = { kind: 'rectangle', width: 200, height: 100 };
 
 describe('planUnstyledShapes', () => {
-    test('plans a shape with no StyleComponent, its edge on screen and the bolt in its middle', () => {
+    test('plans a trigger with no StyleComponent, its edge on screen and the bolt in its middle', () => {
         const scene = buildScene();
-        const trigger = addShape(scene.level, RECTANGLE);
+        const trigger = addTrigger(scene.level, RECTANGLE);
         const corner = scene.view.levelToScreen({ x: -100, y: -50 });
 
         const plans = planUnstyledShapes(scene);
@@ -67,7 +75,7 @@ describe('planUnstyledShapes', () => {
 
     test('the bolt grows with the zoom and is left out when the shape is small on screen or a line', () => {
         const scene = buildScene();
-        addShape(scene.level, RECTANGLE);
+        addTrigger(scene.level, RECTANGLE);
         const heightAt = (zoom: number) => {
             scene.view.zoomAboutMiddle(zoom);
             return planUnstyledShapes(scene)[0]?.bolt?.heightPx;
@@ -109,13 +117,23 @@ describe('planUnstyledShapes', () => {
         expect(plans).toHaveLength(1);
     });
 
+    test('a shape with no StyleComponent and no TriggerComponent gets its edge but no bolt', () => {
+        const scene = buildScene();
+        addShape(scene.level, RECTANGLE);
+
+        const plans = planUnstyledShapes(scene);
+
+        expect(plans).toHaveLength(1);
+        expect(plans[0]?.bolt).toBeUndefined();
+    });
+
     test('a line is open, and a shape off screen is left out', () => {
         const scene = buildScene();
         const points = [
             { x: 0, y: 0 },
             { x: 50, y: 0 },
         ];
-        addShape(scene.level, { kind: 'line', points });
+        addTrigger(scene.level, { kind: 'line', points });
         addShape(scene.level, RECTANGLE, { x: 100_000, y: 0 });
 
         const plans = planUnstyledShapes(scene);
