@@ -4,13 +4,14 @@ import { TriggerComponent } from '../../../../../core/components/index.ts';
 import type { EntityId } from '../../../../../core/level/index.ts';
 import { editTriggers } from '../../../../../editor/commands/index.ts';
 import { TriggerCardModel, TriggerEdits } from '../../../../../editor/entity-inspector/index.ts';
-import type { CardNote } from '../../../../../editor/entity-inspector/index.ts';
+import type { CardNote, TriggerBlock as TriggerBlockModel } from '../../../../../editor/entity-inspector/index.ts';
 import type { OpenLevel } from '../../../../../editor/session/index.ts';
 import { useEditorSession } from '../../../../EditorContext.tsx';
 import { useLengthDisplay } from '../../../../hooks/index.ts';
 import { Icon } from '../../../../shared/index.ts';
 import type { CommitTriggerEdit } from './CommitTriggerEdit.ts';
 import { TriggerBlock } from './TriggerBlock/index.ts';
+import { TriggerList } from './TriggerList/index.ts';
 import { TriggerWindow } from './TriggerWindow/index.ts';
 import './TriggerCard.css';
 
@@ -57,22 +58,23 @@ export function TriggerCard({ openLevel, entityIds, notes }: TriggerCardProps) {
     };
 
     const addTrigger = () => commit((current) => TriggerEdits.added(current));
-    const triggerCount = model.triggers.length;
-    const windowBlock = model.triggers.find((block) => block.id === windowTriggerId);
+    const triggerCount = model.ids.length;
+    const windowIndex = model.ids.findIndex((id) => id === windowTriggerId);
+    let windowBlock: TriggerBlockModel | undefined = undefined;
+    if (windowIndex !== -1) {
+        windowBlock = model.blockAt(windowIndex);
+    }
     const closeWindow = () => setWindowTriggerId(undefined);
 
     return (
         <div className="trigger-card" data-several="false">
-            {model.triggers.map((block) => (
-                <TriggerBlock
-                    key={block.id}
-                    openLevel={openLevel}
-                    block={block}
-                    triggerCount={triggerCount}
-                    commit={commit}
-                    onOpenWindow={() => setWindowTriggerId(block.id)}
-                />
-            ))}
+            <TriggerList
+                key={entityId}
+                openLevel={openLevel}
+                model={model}
+                commit={commit}
+                onOpenWindow={setWindowTriggerId}
+            />
             <button type="button" className="add-trigger" onClick={addTrigger}>
                 <Icon icon={Plus} size="small" />
                 <span>Add trigger</span>

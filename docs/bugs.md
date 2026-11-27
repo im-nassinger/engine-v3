@@ -4,6 +4,17 @@
 
 Known bugs that aren't fixed yet, and how fixed ones were solved. A bug found while trying a version is also a row in that version's `fixes.md`. Bugs fixed before this file existed (2026-11-25) are in the fixes files and [decisions.md](decisions.md).
 
+## The Entity inspector took seconds to show an entity with many triggers (fixed, 2026-11-27)
+
+- **Seen**: clicking the example platformer's Blob, with 202 triggers, took about 5 s before the Entity inspector showed it.
+- **Cause**: the trigger card built and drew all 202 triggers at once, and each script's `ScriptView` measured itself as it was put on the page, laying the whole page out again each time.
+- **Fix**: only the triggers near the view are built and drawn; the others are trigger placeholders until the panel scrolls to them. Tests: `triggerCard.browser.test.ts` (speed), `EntityInspector.triggers.browser.test.ts` (placeholders).
+
+## Firefox fails the × hover test when the whole Entity inspector folder runs (open, 2026-11-27)
+
+- **Seen**: `EntityInspector.triggers.browser.test.ts`, "× shows on every band of a hovered block", fails in Firefox when all of `src/ui/entity-inspector` runs, with the point 5 px past the × landing on the script's scrollbar. It passes run alone, and fails the same way on the code before the fix above.
+- **Cause**: not found yet.
+
 ## Shapes with no Style showed a bolt, and a shape that holds children couldn't be entered (fixed, 2026-11-27)
 
 - **Seen**: in the example platformer, every ground piece showed the trigger's bolt with no TriggerComponent, and double-clicking one kept it selected instead of going in.

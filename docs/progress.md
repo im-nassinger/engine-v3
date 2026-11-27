@@ -6,10 +6,13 @@
 
 ## Last session (2026-11-27)
 
-The owner played the example platformer in the editor and asked for two fixes, both built ([bugs.md](bugs.md#shapes-with-no-style-showed-a-bolt-and-a-shape-that-holds-children-couldnt-be-entered-fixed-2026-11-27)):
+The owner played the example platformer in the editor and asked for three fixes, all built ([bugs.md](bugs.md)):
 
 1. Only a shape with a TriggerComponent shows the bolt; other shapes with no StyleComponent keep only the dashed edge.
 2. A double-click on a shape that holds children goes into it when a child is under the mouse, and inside it, its own shape no longer blocks clicks on its children.
+3. The Entity inspector took about 5 s to show the Blob, with 202 triggers. Now only the triggers near the view are built and drawn, and it shows in about 40 ms ([performance.md](architecture/performance.md)).
+
+Found on the way: a Firefox browser test fails when the whole Entity inspector folder runs, before the fix too ([bugs.md](bugs.md)).
 
 **Where we stopped:** pushed and published to Netlify for the owner to try. v5's requirements still wait for review (below).
 

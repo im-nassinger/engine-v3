@@ -482,4 +482,25 @@ describe('the trigger card', () => {
         await expect.poll(() => sentences('Do')).toEqual(['set this Transform › Position to 7, -50']);
         expect(firstAmount(button)).toEqual({ x: 7, y: -50 });
     });
+
+    test('only the triggers near the view are drawn, the rest kept as placeholders until scrolled to', async () => {
+        const { level, button } = buildLevel();
+        const many = Array.from({ length: 60 }, () => ({ actions: [{ kind: 'win' } as const] }));
+        withTriggers(button, many);
+        await showEntity(level, button);
+
+        const items = () => [...triggersCard().querySelectorAll<HTMLElement>('.trigger-list-item')];
+        const drawnIds = () =>
+            items()
+                .filter((item) => item.dataset['drawn'] === 'true')
+                .map((item) => item.dataset['triggerId']);
+        expect(items()).toHaveLength(60);
+        await expect.poll(() => drawnIds()[0]).toBe('1');
+        expect(drawnIds()).not.toContain('60');
+
+        const cards = requireElement<HTMLElement>(entityInspectorContainer(), '.cards');
+        cards.scrollTop = cards.scrollHeight;
+        await expect.poll(() => drawnIds()).toContain('60');
+        expect(drawnIds()).not.toContain('1');
+    });
 });

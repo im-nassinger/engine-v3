@@ -132,7 +132,7 @@ Every agreed word, one line each, grouped by subject: the basics, the editor, dr
 
 | Word | Meaning |
 |---|---|
-| Trigger | No-code logic on an entity, in three parts: When (one event), If (optional checks), Do (actions in order). An entity's TriggerComponent holds a list of them. The **trigger window**, opened from a trigger's `…` menu (Open in window), shows one trigger in a 600 px window over the editor, for room to edit its script (owner, 2026-11-26). |
+| Trigger | No-code logic on an entity, in three parts: When (one event), If (optional checks), Do (actions in order). An entity's TriggerComponent holds a list of them. The **trigger window**, opened from a trigger's `…` menu (Open in window), shows one trigger in a 600 px window over the editor, for room to edit its script (owner, 2026-11-26). A **trigger placeholder** is the empty block the trigger card draws in place of a trigger far from the view, of its height, until the Entity inspector scrolls near it (standing yes, 2026-11-27). |
 | Event | Something the game reports to triggers and scripts, such as touching, a key, a timer or level start. Triggers and scripts share one list of event names. |
 | Custom event | An event you name yourself, such as `open`. A trigger or script fires it on an entity, and the triggers and scripts of that entity and of everything inside it react. Fired on the World, every entity can hear it. It can carry one number. |
 | Fire custom event | The action that fires a custom event on its target, with an optional number. |

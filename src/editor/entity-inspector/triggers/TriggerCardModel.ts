@@ -56,12 +56,28 @@ export type TriggerBlock = {
 
 // The Triggers card of one entity, as the mockup draws it: a block per trigger, then + Add trigger. React
 // draws the blocks and their sentences and never needs to know what a trigger is; each edit is a
-// TriggerEdits call.
+// TriggerEdits call. A block is built the first time it is asked for, so a card of hundreds of triggers
+// builds only the ones it draws (standing yes, 2026-11-27).
 export class TriggerCardModel {
-    readonly triggers: readonly TriggerBlock[];
+    // Each trigger's id, in order, without building its block.
+    readonly ids: readonly number[];
+    private readonly source: readonly Trigger[];
+    private readonly context: TriggerContext;
+    private readonly choices: TriggerChoices;
+    private readonly notes: readonly CardNote[];
+    private readonly built = new Map<number, TriggerBlock>();
 
-    private constructor(triggers: readonly TriggerBlock[]) {
-        this.triggers = triggers;
+    private constructor(
+        source: readonly Trigger[],
+        context: TriggerContext,
+        choices: TriggerChoices,
+        notes: readonly CardNote[],
+    ) {
+        this.source = source;
+        this.context = context;
+        this.choices = choices;
+        this.notes = notes;
+        this.ids = source.map((trigger) => trigger.id);
     }
 
     // `notes` are the card's notes; each block takes the ones about its trigger. `lengths` is how the blocks
@@ -74,9 +90,34 @@ export class TriggerCardModel {
     ) {
         const choices = new TriggerChoices(context, lengths);
         const triggers = component.get('triggers');
-        const blocks = triggers.map((trigger, index) => blockOf(trigger, index, context, choices, notes));
 
-        return new TriggerCardModel(blocks);
+        return new TriggerCardModel(triggers, context, choices, notes);
+    }
+
+    // Every block, each built if it wasn't yet.
+    get triggers(): readonly TriggerBlock[] {
+        return this.source.map((_trigger, index) => this.blockAt(index));
+    }
+
+    blockAt(index: number) {
+        const cached = this.built.get(index);
+        if (cached !== undefined) return cached;
+
+        const trigger = this.source[index];
+        if (trigger === undefined) throw new Error(`No trigger ${index} on the card.`);
+
+        const block = blockOf(trigger, index, this.context, this.choices, this.notes);
+        this.built.set(index, block);
+
+        return block;
+    }
+
+    // The trigger itself, for what the card shows before its block is built.
+    triggerAt(index: number) {
+        const trigger = this.source[index];
+        if (trigger === undefined) throw new Error(`No trigger ${index} on the card.`);
+
+        return trigger;
     }
 }
 

@@ -1,0 +1,5 @@
+.trigger-placeholder {
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: var(--raised);
+}
