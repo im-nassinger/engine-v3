@@ -21,17 +21,17 @@ import { MONSTER_FLOOR } from '../course/layout.ts';
 // The Gloom: a Kinematic body that glides through everything along MONSTER_FLOOR, at one speed, once the
 // level has started. It never looks at the Blob: its path is the same every run, a Wait between each
 // change of velocity, so the chase is fair and can be learned. Touching the Blob loses the run.
-export const MONSTER_START_X = -6550;
+export const MONSTER_START_X = -6650;
 export const MONSTER_SPEED = 455;
 export const MONSTER_START_DELAY_SECONDS = 0.8;
 const TICKS_PER_SECOND = 60;
 const FRAME_TICKS = 5;
 const FRAME_TAG = 'monster_frame';
 
-// The part of the beast that catches: its body and its jaws, not the claw reaching ahead.
-const CATCH_WIDTH = 250;
-const CATCH_HEIGHT = 380;
-const CATCH_CENTRE: Point = { x: 10, y: -230 };
+// The part of the wolf that catches: its jaws and chest, not its tail or hind legs.
+const CATCH_WIDTH = 280;
+const CATCH_HEIGHT = 300;
+const CATCH_CENTRE: Point = { x: 110, y: -220 };
 
 function poseTag(frame: number) {
     return `monster_pose_${frame}`;

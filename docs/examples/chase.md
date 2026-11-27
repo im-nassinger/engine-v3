@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-**Built (2026-11-27), waiting for the owner to play it.** A second example level, built by a script from the [example platformer](platformer.md)'s Blob: the Blob wakes in a forest at dusk with a monster, the Gloom, right behind it, and must run home before it is caught. The file to import is [`examples/blob-chase.editable`](../../examples/blob-chase.editable); the script is in `tests/levels/examples/chase/` (the course in `course/`, the art in `art/`, the monster in `monster/`, the headless player in `play/`). The look follows the owner's three reference pictures: a sunset sky with stars, layered purple forest, flat autumn trees. The Blob's art was redrawn for both levels. A headless test plays the whole course: a clean run wins with the monster about 770 px behind, half a second late about 550, and standing still is caught in under three seconds.
+**Built (2026-11-27), waiting for the owner to play it.** A second example level, built by a script from the [example platformer](platformer.md)'s Blob: the Blob wakes in a forest at dusk with a monster, the Gloom, right behind it, and must run home before it is caught. The file to import is [`examples/blob-chase.editable`](../../examples/blob-chase.editable); the script is in `tests/levels/examples/chase/` (the course in `course/`, the art in `art/`, the monster in `monster/`, the headless player in `play/`). The look follows the owner's three reference pictures: a sunset sky with stars, layered purple forest, flat autumn trees. The Blob's art was redrawn for both levels. A headless test plays the whole course: a clean run wins with the monster's middle about 870 px behind, half a second late about 650, and standing still is caught in under three seconds.
 
 ## What the owner asked (2026-11-27)
 
@@ -22,15 +22,15 @@
 
 ```
 Gloom          Kinematic body, Fixed rotation, own variable frame
-├── Jaws       250 by 380 px shape with no Surface: touching the Blob loses
+├── Jaws       280 by 300 px shape with no Surface over its jaws and chest: touching the Blob loses
 └── Art        6 frames, each a group of paths tagged monster_frame and monster_pose_<n>
 ```
 
 - **It glides through everything along a fixed path** (`MONSTER_FLOOR` in the layout, the height the Blob runs at). *Why: a Kinematic body ignores the course, so it never gets stuck, and a fixed path is the same every run, so the chase is fair and can be learned.*
 - **The path is one trigger**: "when the level starts: wait 0.8 s, set Body › Velocity to …, wait …, set …", one velocity and one Wait per stretch, each a whole number of ticks, so it ends each stretch where the layout says.
-- **455 px/s**, against the Blob's 460, starting at x −6,550, its claw on screen, and waiting 0.8 s. *Why: the Blob can't pull away, so the monster stays at the left edge of the screen the whole run; a clean run keeps about 1.3 s to spare, a start half a second late about 0.8 s.*
+- **455 px/s**, against the Blob's 460, starting at x −6,650, its head on screen, and waiting 0.8 s. *Why: the Blob can't pull away, so the monster stays at the left edge of the screen the whole run; a clean run keeps about 1.3 s to spare, a start half a second late about 0.8 s.*
 - **Animation**: every 5 ticks `frame` goes up by one, back to 0 after 5; "when `frame` becomes n" shows frame n by opacity, as the Blob does. The body heaves, the claw reaches, the jaw snaps and the smoke trailing behind it waves.
-- **Art** (redrawn 2026-11-27, owner: the first one looked unpolished, the teeth most of all): a hunched shadow beast with a mane swept back and tendrils trailing underneath, pale antlers, a long snout whose lower jaw swings open on a hinge, one glowing almond eye under a heavy brow, and a long arm with hooked claws coming out from behind its chest. **Each tooth stands on its jaw's edge**: its base follows the edge's curve, its sides curve in to a point, a shaded half gives it depth, and its length is kept to the room between the jaws, so the teeth of the two jaws never cross. The jaw and the inside of the mouth are drawn behind the body, so there is no seam at the throat. *Why antlers and a snout: a round purple ghost with a wide grin, the first idea for the redraw, was too close to a well-known existing character; a forest beast fits the level and is its own.*
+- **Art** (redrawn twice on 2026-11-27, owner: the first looked unpolished, the teeth most of all; the second, an antlered beast, "doesn't look like anything, and it's not scary"): **a huge shadow wolf at full gallop**, head low and snarling, a tall ear and a shaggy ruff, a deep chest and tucked belly, a bushy tail fraying into smoke, and one burning eye under a heavy brow, with wrinkles along its snout. **The legs are built joint by joint**: each frame says where each paw is (planted on the ground or lifted), and the elbow or knee is found from the bones' lengths, so planted paws touch the ground and the gallop reaches, gathers and pushes off; the far legs, drawn darker, are a frame behind. **Each tooth stands on its jaw's edge**: its base follows the edge, its sides curve in to a point, a shaded half gives it depth, and its length is kept to the room between the jaws, so the two rows never cross; the long fangs are at the front. *Why a wolf: everyone reads it at once, it belongs in a forest at dusk, and a snarling wolf is scary without being anyone's existing character.*
 
 ## The Blob's new art (both levels)
 
@@ -49,7 +49,7 @@ Gloom          Kinematic body, Fixed rotation, own variable frame
 
 ## How it was checked
 
-- `buildChase.test.ts` (in `npm test`): every trigger has no problems; a Blob that stays put loses within 3 s; a player that holds right and jumps at fixed take-off points (`play/runChase.ts`) wins, with the monster never closer than 600 px and never further than 900, and no play warnings; starting half a second late still wins, by less; falling in the stream loses.
+- `buildChase.test.ts` (in `npm test`): every trigger has no problems; a Blob that stays put loses within 3 s; a player that holds right and jumps at fixed take-off points (`play/runChase.ts`) wins, with the monster's middle never closer than 750 px and never further than 1,000, and no play warnings; starting half a second late still wins, by less; falling in the stream loses.
 - Played in the editor with Playwright: the level imports in about 0.1 s, plays with the camera following, and the Blob's run frames and the monster's frames show.
 
 ## Decided under the standing yes (2026-11-27)

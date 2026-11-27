@@ -2,172 +2,300 @@ import type { Point } from '../../../../../src/core/geometry/index.ts';
 
 import { glow, gradientPart, part, verticalGradient } from '../../platformer/art/artEntities.ts';
 import type { ArtPart } from '../../platformer/art/blobArt.ts';
-import { ellipsePath, smoothClosedPath, turnedEllipsePath } from '../../platformer/art/pathShapes.ts';
+import { ellipsePath, smoothClosedPath } from '../../platformer/art/pathShapes.ts';
 import type { OutlinePoint } from '../../platformer/art/pathShapes.ts';
 
-// The Gloom: a big shadow beast that glides after the Blob, facing right, in the same flat, outline-free
-// look as the Blob. Drawn round the point on the ground below its middle, y up negative; front parts
-// first. A hunched body with a swept-back mane and trailing tendrils, antlers, a long snout whose lower
-// jaw swings on a hinge, teeth standing on the jaws' edges, one glowing eye and a long clawed arm. Each
-// frame is one step of a loop: the body heaves, the claw reaches, the jaw opens and the tendrils wave.
+// The Gloom: a huge shadow wolf galloping after the Blob, facing right, in the same flat, outline-free
+// look as the Blob. Head low and snarling, hackles up, eyes burning, smoke streaming from its tail and
+// paws. Drawn round the point on the ground below its middle, y up negative; front parts first. Each
+// frame is one step of a gallop: the legs reach and gather, the body rocks, the jaws snap.
 export const MONSTER_FRAMES = 6;
 
-const BODY_TOP = '#4C3678FF';
-const BODY_MIDDLE = '#2C1D4EFF';
-const BODY_BOTTOM = '#170E2AFF';
-const RIM = '#B4548CFF';
-const SHEEN = '#6A51A0FF';
-const ARM = '#25183FFF';
-const ARM_BACK = '#170F29FF';
-const CLAW = '#EFE6DAFF';
-const CLAW_SHADE = '#C9BBAEFF';
-const HORN = '#8C7BB9FF';
-const HORN_SHADE = '#6B5B98FF';
-const EYE_TOP = '#FFF0A0FF';
-const EYE_BOTTOM = '#FFB23CFF';
-const EYE_GLOW = '#FFB347FF';
-const PUPIL = '#2A0A14FF';
-const MOUTH_EDGE = '#3A0A22FF';
-const MOUTH_INSIDE = '#7A1A42FF';
+const FUR_TOP = '#3E2C62FF';
+const FUR_MIDDLE = '#251840FF';
+const FUR_BOTTOM = '#120A21FF';
+const FAR_LEG = '#0E0819FF';
+const FAR_EAR_COLOUR = '#1C1234FF';
+const RIM = '#C2578EFF';
+const SNARL = '#0C0716FF';
+const EYE_TOP = '#FFF6B0FF';
+const EYE_BOTTOM = '#FFB02EFF';
+const EYE_GLOW = '#FF7A3AFF';
+const PUPIL = '#1A0508FF';
+const GUM = '#5A0F2CFF';
+const MOUTH = '#8E1C44FF';
 const TONGUE = '#D2557EFF';
 const TOOTH = '#F7F1E8FF';
-const TOOTH_SHADE = '#D8CCBFFF';
-const WISP = '#24163FFF';
+const TOOTH_SHADE = '#D5C8BBFF';
+const SMOKE = '#1C1033FF';
 
 type Pose = {
+    readonly frame: number;
+    readonly phase: number;
+    // The body rising and falling with the stride, in pixels.
     readonly bob: number;
-    // 0 with the claw drawn in, 1 at full reach.
-    readonly reach: number;
+    // The body's tilt, nose down positive, in radians.
+    readonly pitch: number;
     // 0 nearly shut, 1 wide open.
     readonly jaw: number;
-    readonly wave: number;
 };
 
 function poseOf(frame: number): Pose {
-    const angle = (frame / MONSTER_FRAMES) * 2 * Math.PI;
+    const phase = (frame / MONSTER_FRAMES) * 2 * Math.PI;
 
     return {
-        bob: Math.sin(angle) * 7,
-        reach: (1 + Math.sin(angle - 0.6)) / 2,
-        jaw: (1 + Math.cos(angle)) / 2,
-        wave: angle,
+        frame,
+        phase,
+        // Highest in the stretch, lowest when gathered.
+        bob: [-16, -6, 4, 8, 0, -10][frame] ?? 0,
+        pitch: [-0.03, 0.03, 0.06, 0.02, -0.04, -0.06][frame] ?? 0,
+        jaw: (1 + Math.cos(phase * 2)) / 2,
     };
 }
 
-function lifted(point: Point, pose: Pose): Point {
-    return { x: point.x, y: point.y + pose.bob };
+// The body's pose moves every point of the body: tilted round the middle of the back, then lifted.
+const BODY_PIVOT: Point = { x: -20, y: -240 };
+
+function posed(point: Point, pose: Pose): Point {
+    const x = point.x - BODY_PIVOT.x;
+    const y = point.y - BODY_PIVOT.y;
+    const cos = Math.cos(pose.pitch);
+    const sin = Math.sin(pose.pitch);
+
+    return { x: BODY_PIVOT.x + x * cos - y * sin, y: BODY_PIVOT.y + x * sin + y * cos + pose.bob };
 }
 
-// The silhouette, clockwise from the top of the hump: the head pushed forward on a long snout, the
-// mouth's upper edge under it, a deep chest, tendrils trailing underneath and a mane swept back.
-function bodyOutline(pose: Pose): OutlinePoint[] {
-    const sway = (index: number) => Math.sin(pose.wave + index * 1.4) * 12;
-    const outline: OutlinePoint[] = [
-        { x: -70, y: -462 },
-        { x: 30, y: -452 },
-        { x: 100, y: -418 },
-        { x: 160, y: -400 },
-        { x: 214, y: -380 },
-        { x: 262, y: -360 },
-        { x: 280, y: -336, sharp: true },
-        ...UPPER_JAW.slice(1, -1),
-        { x: 112, y: -300, sharp: true },
-        { x: 118, y: -240 },
-        { x: 128, y: -168 },
-        { x: 96, y: -108 },
-        { x: 36, y: -78 },
-        { x: -30 + sway(0), y: -16, sharp: true },
-        { x: -70, y: -84 },
-        { x: -150 + sway(1), y: -40, sharp: true },
-        { x: -156, y: -114 },
-        { x: -250 + sway(2), y: -92, sharp: true },
-        { x: -200, y: -176 },
-        { x: -214, y: -236 },
-        { x: -320 + sway(3) * 0.5, y: -272, sharp: true },
-        { x: -210, y: -318 },
-        { x: -296 + sway(4) * 0.5, y: -390, sharp: true },
-        { x: -168, y: -400 },
-        { x: -214 + sway(5) * 0.4, y: -478, sharp: true },
-        { x: -120, y: -460 },
-    ];
-
-    return outline.map((point) => ({ ...point, ...lifted(point, pose) }));
+function posedOutline(outline: readonly OutlinePoint[], pose: Pose): OutlinePoint[] {
+    return outline.map((point) => ({ ...point, ...posed(point, pose) }));
 }
 
-// The underside of the snout, nose to hinge: the mouth's upper edge.
-const UPPER_JAW: readonly OutlinePoint[] = [
-    { x: 280, y: -336 },
-    { x: 266, y: -318 },
-    { x: 220, y: -312 },
-    { x: 170, y: -310 },
-    { x: 112, y: -300 },
-];
-const HINGE: Point = { x: 112, y: -300 };
-const JAW_LENGTH = 158;
-
-// A stroke along a line of points, `startWidth` thick at the first and `endWidth` at the last, rounded
-// at the root and pointed at the tip.
-function taperedStroke(points: readonly Point[], startWidth: number, endWidth: number) {
+// The two edges of a limb along a line of joints, each joint with its own width.
+function limbEdges(joints: readonly Point[], widths: readonly number[]) {
     const left: OutlinePoint[] = [];
     const right: OutlinePoint[] = [];
-    points.forEach((point, index) => {
-        const before = points[Math.max(0, index - 1)] ?? point;
-        const after = points[Math.min(points.length - 1, index + 1)] ?? point;
+    joints.forEach((point, index) => {
+        const before = joints[Math.max(0, index - 1)] ?? point;
+        const after = joints[Math.min(joints.length - 1, index + 1)] ?? point;
         const dx = after.x - before.x;
         const dy = after.y - before.y;
         const length = Math.hypot(dx, dy) || 1;
-        const share = index / (points.length - 1);
-        const half = (startWidth + (endWidth - startWidth) * share) / 2;
+        const half = (widths[index] ?? 10) / 2;
         left.push({ x: point.x - (dy / length) * half, y: point.y + (dx / length) * half });
         right.push({ x: point.x + (dy / length) * half, y: point.y - (dx / length) * half });
     });
+
+    return { left, right };
+}
+
+// A limb with a rounded end.
+function limbPath(joints: readonly Point[], widths: readonly number[]) {
+    const { left, right } = limbEdges(joints, widths);
+
+    return smoothClosedPath([...left, ...right.reverse()]);
+}
+
+// A stroke tapering to a point, for brows and wrinkles.
+function taperedStroke(points: readonly Point[], startWidth: number, endWidth: number) {
+    const widths = points.map((_, index) => startWidth + ((endWidth - startWidth) * index) / (points.length - 1));
+    const { left, right } = limbEdges(points, widths);
     const tip = points.at(-1) ?? { x: 0, y: 0 };
 
     return smoothClosedPath([...left.slice(0, -1), { ...tip, sharp: true }, ...right.slice(0, -1).reverse()]);
 }
 
-// An antler: a beam curving up and back, with two tines rising from it.
-function antlerParts(base: Point, size: number, colour: string, pose: Pose): ArtPart[] {
-    const at = (x: number, y: number) => lifted({ x: base.x + x * size, y: base.y + y * size }, pose);
-    const beam = [at(0, 0), at(-14, -50), at(-46, -96), at(-96, -122), at(-150, -128)];
-    const firstTine = [at(-16, -56), at(4, -100), at(2, -146)];
-    const secondTine = [at(-60, -104), at(-60, -150), at(-80, -188)];
+// The mouth's upper edge, from the hinge under the eye to the nose.
+const HINGE: Point = { x: 214, y: -238 };
+const UPPER_JAW: readonly Point[] = [
+    { x: 214, y: -238 },
+    { x: 260, y: -244 },
+    { x: 300, y: -250 },
+    { x: 332, y: -258 },
+];
+const JAW_LENGTH = 118;
+
+// Points along a line with fur tufts sticking out to its left (outwards for a clockwise outline).
+function furAlong(from: Point, to: Point, tufts: number, depth: number): OutlinePoint[] {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const length = Math.hypot(dx, dy) || 1;
+    const out = { x: dy / length, y: -dx / length };
+    const points: OutlinePoint[] = [];
+    for (let i = 0; i < tufts; i++) {
+        const tip = (i + 0.6) / tufts;
+        const valley = (i + 1) / tufts;
+        const reach = depth * (0.7 + 0.3 * Math.sin(i * 2.1));
+        points.push({
+            x: from.x + dx * tip + out.x * reach - dx * 0.06,
+            y: from.y + dy * tip + out.y * reach,
+            sharp: true,
+        });
+        if (i < tufts - 1) {
+            points.push({ x: from.x + dx * valley, y: from.y + dy * valley });
+        }
+    }
+
+    return points;
+}
+
+// The wolf's silhouette, clockwise from the nose: snout, brow, a tall ear, a shaggy ruff down the neck,
+// the back, the rump, the tucked belly, a deep shaggy chest, the throat and the underside of the snout.
+const BODY: readonly OutlinePoint[] = [
+    { x: 340, y: -262, sharp: true },
+    { x: 322, y: -276 },
+    { x: 282, y: -288 },
+    { x: 252, y: -304 },
+    { x: 236, y: -320, sharp: true },
+    { x: 214, y: -404, sharp: true },
+    { x: 192, y: -334 },
+    ...furAlong({ x: 186, y: -334 }, { x: 64, y: -350 }, 6, 22),
+    { x: 30, y: -338 },
+    { x: -60, y: -316 },
+    { x: -150, y: -312 },
+    { x: -222, y: -300 },
+    { x: -262, y: -268 },
+    { x: -270, y: -222 },
+    { x: -250, y: -186 },
+    { x: -170, y: -196 },
+    { x: -90, y: -184 },
+    { x: -10, y: -168 },
+    ...furAlong({ x: 30, y: -160 }, { x: 170, y: -182 }, 5, 26),
+    { x: 196, y: -214 },
+    ...UPPER_JAW.map((point, index) => ({ ...point, sharp: index === 0 })),
+];
+
+// The ear on the far side, darker, behind the head.
+const FAR_EAR: readonly OutlinePoint[] = [
+    { x: 196, y: -330, sharp: true },
+    { x: 186, y: -398, sharp: true },
+    { x: 160, y: -336, sharp: true },
+];
+
+// The middle joint of two bones from `start` to `end`, bent to the side `bend` picks (1 forwards).
+function bentJoint(start: Point, end: Point, first: number, second: number, bend: 1 | -1): Point {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const reach = Math.min(Math.hypot(dx, dy), first + second - 0.5);
+    const along = Math.max(-1, Math.min(1, (first * first + reach * reach - second * second) / (2 * first * reach)));
+    const base = Math.atan2(dy, dx);
+    const angle = base - bend * Math.acos(along);
+
+    return { x: start.x + Math.cos(angle) * first, y: start.y + Math.sin(angle) * first };
+}
+
+// Where each paw is in each frame of the gallop: x from the hip, and how high it is lifted.
+type Stride = readonly (readonly [number, number])[];
+
+const FRONT_STRIDE: Stride = [
+    [150, 60],
+    [90, 0],
+    [10, 0],
+    [-70, 0],
+    [-120, 70],
+    [40, 90],
+];
+const HIND_STRIDE: Stride = [
+    [-170, 50],
+    [-70, 90],
+    [50, 50],
+    [90, 0],
+    [10, 0],
+    [-80, 0],
+];
+
+function strideAt(stride: Stride, frame: number) {
+    return stride[(frame + MONSTER_FRAMES) % MONSTER_FRAMES] ?? [0, 0];
+}
+
+const FRONT_HIP: Point = { x: 120, y: -214 };
+const HIND_HIP: Point = { x: -196, y: -230 };
+
+// A front leg: shoulder, elbow bent back, wrist, and the paw reaching forward.
+function frontLegParts(pose: Pose, frame: number, colour: string): ArtPart[] {
+    const hip = posed(FRONT_HIP, pose);
+    const [x, lift] = strideAt(FRONT_STRIDE, frame);
+    const paw = { x: FRONT_HIP.x + x, y: -12 - lift };
+    const wrist = { x: paw.x - 8, y: paw.y - 18 };
+    const elbow = bentJoint(hip, wrist, 100, 102, -1);
+    const folded = lift > 0 ? 0.6 : 0;
+    const toe = { x: paw.x + 24 - folded * 16, y: paw.y + 6 + folded * 8 };
 
     return [
-        part('Antler', taperedStroke(firstTine, 15 * size, 3), colour),
-        part('Antler', taperedStroke(secondTine, 14 * size, 3), colour),
-        part('Antler', taperedStroke(beam, 24 * size, 4), colour),
+        part('Paw', ellipsePath({ x: (paw.x + toe.x) / 2, y: (paw.y + toe.y) / 2 + 2 }, 20, 10), colour),
+        part('Leg', limbPath([hip, elbow, wrist, paw], [64, 34, 22, 22]), colour),
     ];
 }
-// An almond eye with a flat, slanted lid: angry. The inner corner, towards the other eye, sits lower.
-function eyeParts(centre: Point, innerOnLeft: boolean, size: number): ArtPart[] {
-    const drop = size * 0.55;
-    const leftLid = centre.y - size * 0.62 + (innerOnLeft ? drop : 0);
-    const rightLid = centre.y - size * 0.62 + (innerOnLeft ? 0 : drop);
-    const eye = smoothClosedPath([
-        { x: centre.x - size, y: leftLid + size * 0.2, sharp: true },
-        { x: centre.x + size, y: rightLid + size * 0.2, sharp: true },
-        { x: centre.x + size * 0.8, y: centre.y + size * 0.35 },
-        { x: centre.x, y: centre.y + size * 0.66 },
-        { x: centre.x - size * 0.8, y: centre.y + size * 0.35 },
-    ]);
-    const pupilCentre = { x: centre.x + size * 0.22, y: centre.y + size * 0.12 };
+
+// A hind leg: a big thigh, the knee bent forward, the hock bent back, and a long foot.
+function hindLegParts(pose: Pose, frame: number, colour: string): ArtPart[] {
+    const hip = posed(HIND_HIP, pose);
+    const [x, lift] = strideAt(HIND_STRIDE, frame);
+    const paw = { x: HIND_HIP.x + x, y: -12 - lift };
+    const hock = { x: paw.x - 26, y: paw.y - 58 };
+    const knee = bentJoint(hip, hock, 92, 92, 1);
+    const toe = { x: paw.x + 24, y: paw.y + 6 };
 
     return [
+        part('Paw', ellipsePath({ x: (paw.x + toe.x) / 2, y: (paw.y + toe.y) / 2 + 2 }, 20, 10), colour),
+        part('Leg', limbPath([hip, knee, hock, paw], [96, 40, 22, 22]), colour),
+    ];
+}
+
+// The tail streams back, bushy and shaggy, rising and falling with the stride, and frays into smoke.
+function tailParts(pose: Pose): ArtPart[] {
+    const wave = Math.sin(pose.phase) * 16;
+    const root = posed({ x: -252, y: -286 }, pose);
+    // A plume: it swells from the root, then narrows to a point, with a few tufts towards the tip.
+    const at = (along: number, across: number) => ({
+        x: root.x - 250 * along,
+        y: root.y - 30 * along + wave * along + across,
+    });
+    const outline: OutlinePoint[] = [
+        { ...at(-0.04, -22) },
+        at(0.25, -44),
+        at(0.5, -46),
+        { ...at(0.62, -52), sharp: true },
+        at(0.66, -38),
+        { ...at(0.8, -40), sharp: true },
+        at(0.84, -24),
+        { ...at(1, -4), sharp: true },
+        at(0.86, 14),
+        { ...at(0.82, 32), sharp: true },
+        at(0.68, 26),
+        { ...at(0.6, 40), sharp: true },
+        at(0.48, 30),
+        at(0.25, 26),
+        at(-0.04, 18),
+    ];
+    const tip = at(1, -4);
+    const smoke = [0, 1, 2].map((index) =>
         part(
-            'Glint',
-            ellipsePath({ x: pupilCentre.x + size * 0.28, y: pupilCentre.y - size * 0.1 }, 3, 3),
-            '#FFFFFFE6',
+            'Smoke',
+            ellipsePath({ x: tip.x - 20 - index * 46, y: tip.y + index * 8 }, 30 - index * 7, 18 - index * 4),
+            `${SMOKE.slice(0, 7)}${['80', '50', '28'][index]}`,
         ),
-        part('Pupil', ellipsePath(pupilCentre, size * 0.15, size * 0.42), PUPIL),
-        gradientPart('Eye', eye, EYE_BOTTOM, verticalGradient([EYE_TOP, EYE_BOTTOM])),
-        gradientPart('Eye glow', ellipsePath(centre, size * 3, size * 2.4), EYE_GLOW, glow(EYE_GLOW, '70')),
+    );
+
+    return [
+        gradientPart('Tail', smoothClosedPath(outline), FUR_MIDDLE, verticalGradient([FUR_TOP, FUR_BOTTOM])),
+        ...smoke,
     ];
 }
 
-// The lower jaw hangs from the hinge and swings open by `jaw`.
-function jawAngle(pose: Pose) {
-    return 0.1 + 0.34 * pose.jaw;
+function eyeParts(centre: Point): ArtPart[] {
+    const size = 23;
+    const eye = smoothClosedPath([
+        { x: centre.x - size, y: centre.y - size * 0.05, sharp: true },
+        { x: centre.x + size * 0.9, y: centre.y - size * 0.55, sharp: true },
+        { x: centre.x + size * 0.6, y: centre.y + size * 0.2 },
+        { x: centre.x - size * 0.2, y: centre.y + size * 0.45 },
+    ]);
+
+    return [
+        part('Glint', ellipsePath({ x: centre.x + 7, y: centre.y - 6 }, 2.6, 2.6), '#FFFFFFE6'),
+        part('Pupil', ellipsePath({ x: centre.x + 3, y: centre.y - 2 }, 3.4, 8), PUPIL),
+        gradientPart('Eye', eye, EYE_BOTTOM, verticalGradient([EYE_TOP, EYE_BOTTOM])),
+        gradientPart('Eye glow', ellipsePath(centre, 70, 52), EYE_GLOW, glow(EYE_GLOW, '88')),
+    ];
 }
 
 function turned(point: Point, angle: number): Point {
@@ -180,40 +308,37 @@ function turned(point: Point, angle: number): Point {
     };
 }
 
-// The lower jaw's top edge, hinge to tip, closed: a line along the upper jaw's, swung open by the angle.
-function lowerEdge(share: number, angle: number): Point {
-    return turned({ x: HINGE.x + JAW_LENGTH * share, y: HINGE.y - 6 * Math.sin(Math.PI * share) }, angle);
-}
-
 function upperEdge(share: number): Point {
-    const x = HINGE.x + JAW_LENGTH * share;
-    // Follow the drawn edge between its points.
-    for (let i = UPPER_JAW.length - 1; i > 0; i--) {
-        const from = UPPER_JAW[i];
-        const to = UPPER_JAW[i - 1];
-        if (from === undefined || to === undefined || x > to.x) continue;
-        const along = (x - from.x) / (to.x - from.x);
+    const x = HINGE.x + (UPPER_JAW.at(-1)!.x - HINGE.x) * share;
+    for (let i = 1; i < UPPER_JAW.length; i++) {
+        const from = UPPER_JAW[i - 1]!;
+        const to = UPPER_JAW[i]!;
+        if (x > to.x) continue;
 
-        return { x, y: from.y + (to.y - from.y) * along };
+        return { x, y: from.y + ((to.y - from.y) * (x - from.x)) / (to.x - from.x) };
     }
 
-    return { x, y: UPPER_JAW[0]?.y ?? 0 };
+    return UPPER_JAW.at(-1)!;
 }
 
-// A tooth standing on a jaw's edge, its base following the edge, its sides curving in to a point.
+// The lower jaw's top edge, hinge to chin, swung open by the angle.
+function lowerEdge(share: number, angle: number): Point {
+    return turned({ x: HINGE.x + JAW_LENGTH * share, y: HINGE.y + 2 }, angle);
+}
+
+// A tooth standing on an edge: its base follows the edge, its sides curve in to a point.
 function tooth(
     edge: (share: number) => Point,
     share: number,
     halfWidth: number,
     length: number,
     way: 1 | -1,
-    lean: number,
 ): ArtPart[] {
     const left = edge(share - halfWidth);
     const middle = edge(share);
     const right = edge(share + halfWidth);
-    const tip = { x: middle.x + lean, y: middle.y + way * length };
-    const bulge = (right.x - left.x) * 0.14;
+    const tip = { x: middle.x - way * 2, y: middle.y + way * length };
+    const bulge = (right.x - left.x) * 0.16;
     const side = (from: Point, outwards: number) => ({
         x: (from.x + tip.x) / 2 + outwards * bulge,
         y: (from.y + tip.y) / 2,
@@ -236,174 +361,147 @@ function tooth(
     return [part('Tooth shade', shade, TOOTH_SHADE), part('Tooth', shape, TOOTH)];
 }
 
-// The teeth go in front of the body; the jaw, tongue and the inside of the mouth go behind it, so the
-// jaw meets the throat with no seam.
-function mouthParts(pose: Pose): { readonly teeth: ArtPart[]; readonly behind: ArtPart[] } {
-    const angle = jawAngle(pose);
-    const up = (share: number) => lifted(upperEdge(share), pose);
-    const down = (share: number) => lifted(lowerEdge(share, angle), pose);
-    // The room between the jaws, so the teeth of the two never cross.
+// The snarl: the jaws, the teeth (long fangs at the front), the tongue, and the mouth behind them.
+function mouthParts(pose: Pose): { readonly front: ArtPart[]; readonly behind: ArtPart[] } {
+    const angle = 0.16 + 0.34 * pose.jaw;
+    const up = (share: number) => posed(upperEdge(share), pose);
+    const down = (share: number) => posed(lowerEdge(share, angle), pose);
     const gap = (share: number) => Math.hypot(down(share).x - up(share).x, down(share).y - up(share).y);
-    const upperTeeth: ArtPart[] = [];
-    // Shares along the jaw, hinge to nose; the fang is the second from the front.
-    const upperShares = [0.36, 0.48, 0.6, 0.72, 0.84, 0.94];
-    upperShares.forEach((share, index) => {
-        const fang = index === upperShares.length - 2;
-        const room = gap(share);
-        const length = fang ? Math.max(Math.min(30, room * 0.95), 18) : Math.min(15 + share * 4, room * 0.55);
-        upperTeeth.push(...tooth(up, share, fang ? 0.05 : 0.04, length, 1, fang ? -3 : -1));
-    });
-    const lowerTeeth: ArtPart[] = [];
-    for (const share of [0.42, 0.54, 0.66, 0.78, 0.9]) {
-        lowerTeeth.push(...tooth(down, share, 0.038, Math.min(13, gap(share) * 0.38), -1, 1));
-    }
 
-    const lowerJaw: OutlinePoint[] = [];
-    for (let i = 0; i <= 8; i++) {
-        lowerJaw.push(down(i / 8));
+    const teeth: ArtPart[] = [];
+    for (const share of [0.3, 0.42, 0.54, 0.66]) {
+        teeth.push(...tooth(up, share, 0.045, Math.min(14, gap(share) * 0.45), 1));
     }
-    const tip = lifted(turned({ x: HINGE.x + JAW_LENGTH + 6, y: HINGE.y + 10 }, angle), pose);
-    const chin = lifted(turned({ x: HINGE.x + JAW_LENGTH * 0.55, y: HINGE.y + 34 }, angle), pose);
-    const throat = lifted(turned({ x: HINGE.x - 30, y: HINGE.y + 50 }, angle), pose);
+    teeth.push(...tooth(up, 0.84, 0.065, Math.max(26, Math.min(40, gap(0.84) * 0.9)), 1));
+    for (const share of [0.36, 0.5, 0.64]) {
+        teeth.push(...tooth(down, share, 0.05, Math.min(12, gap(share) * 0.35), -1));
+    }
+    teeth.push(...tooth(down, 0.86, 0.07, Math.max(20, Math.min(30, gap(0.86) * 0.7)), -1));
+
+    const chin = posed(turned({ x: HINGE.x + JAW_LENGTH + 2, y: HINGE.y + 16 }, angle), pose);
+    const underJaw = posed(turned({ x: HINGE.x + JAW_LENGTH * 0.5, y: HINGE.y + 30 }, angle), pose);
+    const throat = posed({ x: HINGE.x - 30, y: HINGE.y + 40 }, pose);
+    const edge: OutlinePoint[] = [];
+    for (let i = 0; i <= 6; i++) {
+        edge.push(down(i / 6));
+    }
     const jaw = smoothClosedPath([
-        { ...lowerJaw[0]!, sharp: true },
-        ...lowerJaw.slice(1),
-        { ...tip, sharp: true },
-        chin,
+        { ...edge[0]!, sharp: true },
+        ...edge.slice(1),
+        { ...chin, sharp: true },
+        underJaw,
         throat,
     ]);
 
     const inside: OutlinePoint[] = [];
-    for (let i = 0; i <= 8; i++) {
-        inside.push(up(i / 8));
+    for (let i = 0; i <= 6; i++) {
+        inside.push({ ...up(i / 6), sharp: i === 0 || i === 6 });
     }
-    for (let i = 8; i >= 0; i--) {
-        inside.push(down(i / 8));
+    for (let i = 6; i >= 0; i--) {
+        inside.push(down(i / 6));
     }
+    const tongueBase = down(0.45);
 
     return {
-        teeth: [...upperTeeth, ...lowerTeeth],
+        front: teeth,
         behind: [
-            gradientPart('Jaw', jaw, BODY_MIDDLE, verticalGradient([BODY_MIDDLE, BODY_BOTTOM])),
-            part('Tongue', turnedEllipsePath(lifted(lowerEdge(0.42, angle), pose), 46, 9, angle), TONGUE),
-            gradientPart(
-                'Mouth',
-                smoothClosedPath(inside.map((point, index) => ({ ...point, sharp: index === 0 || index === 8 }))),
-                MOUTH_INSIDE,
-                verticalGradient([MOUTH_EDGE, MOUTH_INSIDE]),
-            ),
+            gradientPart('Jaw', jaw, FUR_MIDDLE, verticalGradient([FUR_MIDDLE, FUR_BOTTOM])),
+            part('Tongue', ellipsePath({ x: tongueBase.x, y: tongueBase.y - 5 }, 40, 9), TONGUE),
+            gradientPart('Mouth', smoothClosedPath(inside), MOUTH, verticalGradient([GUM, MOUTH])),
         ],
     };
 }
 
-// A long arm from the shoulder to the hand, thinning to the wrist, with a soft bend at the elbow.
-function armPath(shoulder: Point, hand: Point, thickness: number) {
-    const dx = hand.x - shoulder.x;
-    const dy = hand.y - shoulder.y;
-    const length = Math.hypot(dx, dy);
-    const along = { x: dx / length, y: dy / length };
-    const across = { x: -along.y, y: along.x };
-    const elbow = { x: shoulder.x + dx * 0.5 - across.x * 16, y: shoulder.y + dy * 0.5 - across.y * 16 };
-    const at = (point: Point, side: number, width: number) => ({
-        x: point.x + across.x * side * width,
-        y: point.y + across.y * side * width,
-    });
+// Wrinkles along the snout and a heavy brow: the snarl.
+function snarlParts(pose: Pose): ArtPart[] {
+    const line = (points: Point[], width: number) =>
+        taperedStroke(
+            points.map((point) => posed(point, pose)),
+            width,
+            2,
+        );
 
-    return smoothClosedPath([
-        at(shoulder, 1, thickness),
-        at(elbow, 1, thickness * 0.62),
-        at(hand, 1, thickness * 0.55),
-        { x: hand.x + along.x * thickness * 0.7, y: hand.y + along.y * thickness * 0.7 },
-        at(hand, -1, thickness * 0.55),
-        at(elbow, -1, thickness * 0.62),
-        at(shoulder, -1, thickness),
-    ]);
+    return [
+        part(
+            'Brow',
+            line(
+                [
+                    { x: 206, y: -318 },
+                    { x: 236, y: -312 },
+                    { x: 262, y: -296 },
+                ],
+                15,
+            ),
+            SNARL,
+        ),
+        part(
+            'Wrinkle',
+            line(
+                [
+                    { x: 272, y: -286 },
+                    { x: 284, y: -278 },
+                    { x: 290, y: -266 },
+                ],
+                6,
+            ),
+            SNARL,
+        ),
+        part(
+            'Wrinkle',
+            line(
+                [
+                    { x: 290, y: -288 },
+                    { x: 302, y: -280 },
+                    { x: 306, y: -268 },
+                ],
+                5,
+            ),
+            SNARL,
+        ),
+        part('Nose', ellipsePath(posed({ x: 334, y: -266 }, pose), 12, 9), SNARL),
+    ];
 }
 
-// Three hooked claws from the hand, fanned and curling down, each with a shaded underside.
-function clawParts(hand: Point, reach: number, colour: string, shade: string): ArtPart[] {
-    const parts: ArtPart[] = [];
-    for (const spread of [-1, 0, 1]) {
-        const base = { x: hand.x + 8, y: hand.y + spread * 10 };
-        const length = 38 - Math.abs(spread) * 7 + reach * 4;
-        const tip = { x: base.x + length, y: base.y + 14 + spread * 9 };
-        const top = { x: base.x + length * 0.55, y: base.y - 7 + spread * 3 };
-        const under = { x: base.x + length * 0.5, y: base.y + 4 + spread * 4 };
-        const claw = smoothClosedPath([
-            { x: base.x, y: base.y - 6, sharp: true },
-            top,
-            { ...tip, sharp: true },
-            under,
-            { x: base.x, y: base.y + 6, sharp: true },
-        ]);
-        const underside = smoothClosedPath([
-            { x: base.x, y: base.y + 1, sharp: true },
-            { x: under.x + 2, y: under.y - 3 },
-            { ...tip, sharp: true },
-            under,
-            { x: base.x, y: base.y + 6, sharp: true },
-        ]);
-        parts.push(part('Claw shade', underside, shade), part('Claw', claw, colour));
-    }
+// Smoke kicked up where the paws strike.
+function pawSmoke(pose: Pose): ArtPart[] {
+    return [0, 1].map((index) => {
+        const x = -170 - index * 130 - Math.sin(pose.phase + index) * 24;
+        const opacity = index === 0 ? '60' : '38';
 
-    return parts;
-}
-
-// Soft smoke left behind as it glides, fading away.
-function wispParts(pose: Pose): ArtPart[] {
-    const opacities = ['70', '48', '28'];
-
-    return opacities.map((opacity, index) => {
-        const centre = {
-            x: -230 - index * 70,
-            y: -120 - index * 34 + Math.sin(pose.wave + index * 1.2) * 14 + pose.bob,
-        };
-        const radius = 46 - index * 10;
-
-        return part('Wisp', ellipsePath(centre, radius, radius * 0.72), `${WISP.slice(0, 7)}${opacity}`);
+        return part(
+            'Smoke',
+            ellipsePath({ x, y: -16 - index * 6 }, 52 - index * 12, 18 - index * 3),
+            `${SMOKE.slice(0, 7)}${opacity}`,
+        );
     });
 }
 
 export function monsterFrameParts(frame: number): ArtPart[] {
     const pose = poseOf(frame);
-    const shoulder = lifted({ x: 70, y: -190 }, pose);
-    const hand = lifted({ x: 232 + 64 * pose.reach, y: -150 - 22 * pose.reach }, pose);
-    const backShoulder = lifted({ x: -20, y: -200 }, pose);
-    const backHand = lifted({ x: 150 - 40 * pose.reach, y: -96 + 12 * pose.reach }, pose);
-    const body = bodyOutline(pose);
-    const rim = body.map((point) => ({ ...point, x: point.x - 8, y: point.y - 7 }));
-    const sheen = turnedEllipsePath(lifted({ x: -70, y: -400 }, pose), 110, 36, -0.12);
-    const nostril = turnedEllipsePath(lifted({ x: 262, y: -346 }, pose), 6, 3.5, 0.4);
-
-    const brow = taperedStroke(
-        [lifted({ x: 136, y: -396 }, pose), lifted({ x: 176, y: -390 }, pose), lifted({ x: 204, y: -374 }, pose)],
-        16,
-        4,
-    );
-
     const mouth = mouthParts(pose);
+    const body = posedOutline(BODY, pose);
+    const rim = body.map((point) => ({ ...point, x: point.x - 7, y: point.y - 7 }));
+    // The legs on the far side are a frame behind.
+    const far = frame - 1;
 
     return [
-        ...mouth.teeth,
-        part('Nostril', nostril, MOUTH_EDGE),
-        part('Brow', brow, BODY_BOTTOM),
-        ...eyeParts(lifted({ x: 172, y: -366 }, pose), true, 24),
-        gradientPart('Sheen', sheen, SHEEN, glow(SHEEN, 'B0')),
+        ...mouth.front,
+        ...snarlParts(pose),
+        ...eyeParts(posed({ x: 248, y: -298 }, pose)),
+        ...frontLegParts(pose, frame, FUR_MIDDLE),
+        ...hindLegParts(pose, frame, FUR_MIDDLE),
         gradientPart(
             'Body',
             smoothClosedPath(body),
-            BODY_MIDDLE,
-            verticalGradient([BODY_TOP, BODY_MIDDLE, BODY_BOTTOM], [0, 0.55, 1]),
+            FUR_MIDDLE,
+            verticalGradient([FUR_TOP, FUR_MIDDLE, FUR_BOTTOM], [0, 0.5, 1]),
         ),
         ...mouth.behind,
-        // The arm comes out from behind the chest.
-        ...clawParts(hand, pose.reach, CLAW, CLAW_SHADE),
-        part('Arm', armPath(shoulder, hand, 34), ARM),
         part('Rim light', smoothClosedPath(rim), RIM),
-        ...antlerParts({ x: 120, y: -404 }, 1, HORN, pose),
-        ...antlerParts({ x: 60, y: -420 }, 0.85, HORN_SHADE, pose),
-        ...clawParts(backHand, pose.reach, HORN, HORN_SHADE),
-        part('Back arm', armPath(backShoulder, backHand, 26), ARM_BACK),
-        ...wispParts(pose),
+        part('Far ear', smoothClosedPath(posedOutline(FAR_EAR, pose)), FAR_EAR_COLOUR),
+        ...tailParts(pose),
+        ...frontLegParts(pose, far, FAR_LEG),
+        ...hindLegParts(pose, far, FAR_LEG),
+        ...pawSmoke(pose),
     ];
 }

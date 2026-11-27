@@ -42,8 +42,8 @@ describe('the chase example level', () => {
 
             expect(run.end).toBe('won');
             expect(Math.abs(run.blob.x - HOME.x)).toBeLessThan(120);
-            expect(run.closest).toBeGreaterThan(600);
-            expect(run.closest).toBeLessThan(900);
+            expect(run.closest).toBeGreaterThan(750);
+            expect(run.closest).toBeLessThan(1000);
             expect(run.warnings).toBe(0);
             // It glided through the hollow tree and down to the hollow.
             expect(run.monster.x).toBeGreaterThan(3000);
@@ -57,7 +57,7 @@ describe('the chase example level', () => {
             const run = runChase(engine, TICKS, TAKE_OFFS, 30);
 
             expect(run.end).toBe('won');
-            expect(run.closest).toBeLessThan(650);
+            expect(run.closest).toBeLessThan(760);
         },
         LONG,
     );
