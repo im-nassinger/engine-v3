@@ -25,11 +25,23 @@ export type ChangeableValue = {
 
 const SET_ONLY: readonly ChangeOp[] = ['set'];
 const ADD_OR_SUBTRACT: readonly ChangeOp[] = ['add', 'subtract'];
-// A number's and a vector's: a vector is multiplied or divided by one number (fix 10).
+// A number's and a vector's: a vector is multiplied or divided by a vector, x by x and y by y.
 const EVERY_OP: readonly ChangeOp[] = ['set', 'add', 'subtract', 'multiply', 'divide'];
 const SET_OR_FLIP: readonly ChangeOp[] = ['set', 'flip'];
 
 const NUMBER_AMOUNT = new NumberFieldType();
+
+// The factors a vector is multiplied or divided by, one per axis (2026-11-27). One number, as fix 10 saved
+// it and as a number variable gives it, reads as the same factor on both axes.
+export class VectorFactorsType extends VectorFieldType {
+    override parse(raw: unknown) {
+        if (typeof raw === 'number' && Number.isFinite(raw)) return super.parse({ x: raw, y: raw });
+
+        return super.parse(raw);
+    }
+}
+
+const VECTOR_FACTORS = new VectorFactorsType();
 const ON_AMOUNT = new CheckboxFieldType();
 const TAG_AMOUNT = new TextFieldType({ minLength: 1, trimmed: true });
 const STRING_AMOUNT = new TextFieldType({ maxLength: MAX_STRING_VARIABLE_LENGTH });
@@ -127,12 +139,12 @@ export function variableChangeOf(type: VariableType) {
     return VARIABLE_OFFERS[type];
 }
 
-// What the amount of this op on the value is read with: one number for Multiply and Divide, whatever the
-// value (a vector is scaled whole), the value's own amount type for the others.
+// What the amount of this op on the value is read with: for Multiply and Divide, a factor per axis for a
+// vector and one number for the rest; the value's own amount type for the other ops.
 export function amountTypeOf(offer: ChangeableValue, op: ChangeOp): ValueType<unknown> {
-    if (op === 'multiply' || op === 'divide') return NUMBER_AMOUNT;
+    if (op !== 'multiply' && op !== 'divide') return offer.amountType;
 
-    return offer.amountType;
+    return offer.amountType instanceof VectorFieldType ? VECTOR_FACTORS : NUMBER_AMOUNT;
 }
 
 function triggerValuesOf(target: Entity): readonly ChangeableValue[] {
@@ -149,6 +161,8 @@ function triggerValuesOf(target: Entity): readonly ChangeableValue[] {
 // Multiply and Divide; a string for a text or a tag; a boolean for a checkbox or a trigger's on/off.
 // Undefined for every other box, a vector's, a colour's or a fill's, which takes none until v5.
 export function amountVariableType(offer: ChangeableValue, op: ChangeOp): VariableType | undefined {
+    if (op === 'multiply' || op === 'divide') return 'number';
+
     const type = amountTypeOf(offer, op);
     if (type instanceof NumberFieldType || type instanceof AngleFieldType) return 'number';
     if (type instanceof TextFieldType) return 'string';

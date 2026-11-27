@@ -277,7 +277,7 @@ function whenWithTyped(when: When | null, slot: TriggerWordSlot, typed: JsonValu
     if (when === null) return undefined;
 
     const isTimer = when.kind === 'after' || when.kind === 'every';
-    if (isTimer && slot === 'seconds' && isNumber(typed)) return { kind: when.kind, seconds: typed };
+    if (isTimer && slot === 'time' && isNumber(typed)) return { ...when, time: typed };
     if (when.kind === 'custom' && slot === 'name' && typeof typed === 'string') return { ...when, name: typed };
 
     const hasCondition = when.kind === 'variableChanged' && when.becomes !== null;

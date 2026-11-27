@@ -9,12 +9,12 @@ import {
     VariablesComponent,
 } from '../../components/index.ts';
 import type { AnyComponent } from '../../components/index.ts';
-import { NumberFieldType, TagsFieldType, VectorFieldType } from '../../fields/index.ts';
+import { TagsFieldType, VectorFieldType } from '../../fields/index.ts';
 import type { ChangeOp, JsonValue, ValueRef, VariableValue } from '../../fields/index.ts';
 import { Matrix2D } from '../../geometry/index.ts';
 import type { Point } from '../../geometry/index.ts';
 import type { Entity } from '../../level/index.ts';
-import { amountTypeOf, changeableValues, sameValueRef } from '../../triggers/index.ts';
+import { amountTypeOf, changeableValues, sameValueRef, VectorFactorsType } from '../../triggers/index.ts';
 
 import type { PlayRun } from '../run/PlayRun.ts';
 import { entitiesIn } from '../triggers/entitiesIn.ts';
@@ -49,7 +49,7 @@ const SURFACE_FIELDS: readonly string[] = ['friction', 'restitution'];
 const POSE_FIELDS: readonly string[] = ['position', 'rotation'];
 const TAGS = new TagsFieldType();
 const VELOCITY_AMOUNT = new VectorFieldType();
-const SCALE_AMOUNT = new NumberFieldType();
+const SCALE_AMOUNT = new VectorFactorsType();
 // What a Flip is given in place of an amount, which it never reads.
 const FLIP_AMOUNT = { ok: true, value: true } as const;
 
@@ -92,7 +92,7 @@ export class PlayValueWriter {
 
     // Body › Velocity of the body the entity belongs to, its own or the nearest one above it, so a shape
     // inside a body's group, such as the `other` of a touch, moves its body. Set gives the speed in px/s,
-    // keeping the spin; Add and Subtract change it whatever the mass; Multiply and Divide scale the speed it
+    // keeping the spin; Add and Subtract change it whatever the mass; Multiply and Divide scale each axis of the speed it
     // has now. A Static body doesn't move.
     private changeVelocity(entity: Entity, change: ValueChange) {
         if (change.op === 'multiply' || change.op === 'divide') return this.scaleVelocity(entity, change);
@@ -126,8 +126,8 @@ export class PlayValueWriter {
 
         const { world } = this.run.scene;
         const { linear } = world.velocity(body.handle);
-        const x = changedNumber(change.op, linear.x, amount.value);
-        const y = changedNumber(change.op, linear.y, amount.value);
+        const x = changedNumber(change.op, linear.x, amount.value.x);
+        const y = changedNumber(change.op, linear.y, amount.value.y);
         world.setLinearVelocity(body.handle, { x, y });
 
         return true;
@@ -399,13 +399,9 @@ function changedNumber(op: ChangeOp, current: number, amount: number) {
 
 // Set takes the amount whole; Add and Subtract change a number, a vector by a vector, or one axis of a
 // vector (a trigger saved with an axis that wasn't loaded through normalizeTrigger); Multiply and Divide a
-// number, or a vector by one number.
+// number, or a vector by a factor per axis (amountTypeOf reads one number as the same on both).
 function changedValue(op: ChangeOp, current: unknown, amount: unknown, axis: 'x' | 'y' | undefined): unknown {
     if (op === 'set') return amount;
-    const isScaling = op === 'multiply' || op === 'divide';
-    if (isScaling && axis === undefined && isPoint(current) && typeof amount === 'number') {
-        return { ...current, x: changedNumber(op, current.x, amount), y: changedNumber(op, current.y, amount) };
-    }
     if (axis === undefined && isPoint(current) && isPoint(amount)) {
         const x = changedNumber(op, current.x, amount.x);
         const y = changedNumber(op, current.y, amount.y);

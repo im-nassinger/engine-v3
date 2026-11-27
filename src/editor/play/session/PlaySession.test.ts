@@ -728,7 +728,9 @@ describe('PlaySession', () => {
         });
 
         test('a Restart action after the first second restarts the run, which plays again from its start', async () => {
-            const level = withTrigger(levelWithACrate(), { kind: 'after', seconds: 1.5 }, [{ kind: 'restart' }]);
+            const level = withTrigger(levelWithACrate(), { kind: 'after', time: 1.5, unit: 'seconds' }, [
+                { kind: 'restart' },
+            ]);
             const { play, runner, framesFor } = setUp(level);
             play.play();
             await settle();

@@ -242,7 +242,7 @@ function isWhenSet(when: When) {
             return when.input !== null;
         case 'after':
         case 'every':
-            return when.seconds !== null;
+            return when.time !== null;
         case 'custom':
             return when.name !== null;
         case 'variableChanged':

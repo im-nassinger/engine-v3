@@ -270,7 +270,11 @@ describe('Change value', () => {
 
     test('switches a trigger off and on by its id, and a timer switched on counts from that tick', () => {
         const level = levelWithCoins();
-        const timer: TriggerParts = { when: { kind: 'after', seconds: 1 / 60 }, actions: [addCoins(1)], on: false };
+        const timer: TriggerParts = {
+            when: { kind: 'after', time: 1 / 60, unit: 'seconds' },
+            actions: [addCoins(1)],
+            on: false,
+        };
         const switchOn: Action = {
             kind: 'change',
             target: THIS,

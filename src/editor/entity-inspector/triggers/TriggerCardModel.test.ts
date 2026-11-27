@@ -85,8 +85,8 @@ const WHEN_CASES: readonly (readonly [When | null, string])[] = [
     [{ kind: 'input', input: 'jump', how: 'pressed' }, 'the input jump is pressed'],
     [{ kind: 'input', input: null, how: 'held' }, 'the input pick an input is held'],
     [{ kind: 'key', key: 'ArrowLeft' as KeyCode, how: 'released' }, 'the key Left arrow is released'],
-    [{ kind: 'after', seconds: 60 }, 'after 60 seconds'],
-    [{ kind: 'every', seconds: null }, 'every how many seconds'],
+    [{ kind: 'after', time: 60, unit: 'seconds' }, 'after 60 seconds'],
+    [{ kind: 'every', time: null, unit: 'seconds' }, 'every how many seconds'],
     [{ kind: 'levelStart' }, 'the level starts'],
 ];
 
@@ -180,13 +180,13 @@ describe('TriggerCardModel', () => {
     });
 
     test("a timer's event word picks only after or every in place, keeping the time", () => {
-        const sentence = sentenceOf(blockOf({ when: { kind: 'after', seconds: 5 } }), 0);
+        const sentence = sentenceOf(blockOf({ when: { kind: 'after', time: 5, unit: 'seconds' } }), 0);
         const event = slotNamed(sentence, 'event');
 
         expect(event.text).toBe('after');
         expect(menuChoices(event).map((choice) => choice.value)).toEqual([
-            { section: 'when', when: { kind: 'after', seconds: 5 } },
-            { section: 'when', when: { kind: 'every', seconds: 5 } },
+            { section: 'when', when: { kind: 'after', time: 5, unit: 'seconds' } },
+            { section: 'when', when: { kind: 'every', time: 5, unit: 'seconds' } },
         ]);
     });
 
@@ -222,10 +222,16 @@ describe('TriggerCardModel', () => {
         expect(menuLabels(key)).toContain('Left arrow');
     });
 
-    test('seconds open a number field in seconds', () => {
-        const seconds = slotNamed(sentenceOf(blockOf({ when: { kind: 'every', seconds: 2 } }), 0), 'seconds');
+    test('a time opens a number field in seconds, or with no unit in ticks', () => {
+        const seconds = slotNamed(
+            sentenceOf(blockOf({ when: { kind: 'every', time: 2, unit: 'seconds' } }), 0),
+            'time',
+        );
+        const ticks = slotNamed(sentenceOf(blockOf({ when: { kind: 'every', time: 3, unit: 'ticks' } }), 0), 'time');
 
         expect(seconds.entry).toEqual({ kind: 'number', value: 2, unit: 's' });
+        expect(ticks.entry).toEqual({ kind: 'number', value: 3, unit: undefined });
+        expect(ticks.text).toBe('3 ticks');
     });
 
     test.each(CHECK_CASES)('the check %j reads "%s"', (check, text) => {

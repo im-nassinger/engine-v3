@@ -1,14 +1,17 @@
-import type { Action, Trigger, When } from '../../../core/fields/index.ts';
+import type { Action, TimeUnit, Trigger, When } from '../../../core/fields/index.ts';
 
 import { TriggerSentence } from './TriggerSentence.ts';
 import type { SentenceSources } from './TriggerSentence.ts';
 import type {
+    TriggerChoice,
     TriggerMenuGroup,
     TriggerPartValue,
     TriggerRowPart,
     TriggerWord,
     TriggerWordEntry,
 } from './TriggerWord.ts';
+
+const TIME_UNITS: readonly TimeUnit[] = ['seconds', 'ticks'];
 
 // A block's colour: one per kind of block, whatever it changes (design/controls.md, v4 fix 4). Set is blue
 // whether it sets a Position or an Enabled. `action` is Fire, Win, Lose and Restart, which the mockup draws
@@ -137,19 +140,19 @@ function eventBlock(trigger: Trigger, sources: SentenceSources): ScriptBlock {
 }
 
 // The sentence's words, as the event block reads them (`other`, who touches, is already an entity's blue
-// with no box, since it can't be changed); a time is a number with its unit as a menu.
+// with no box, since it can't be changed); a time is a number with its unit, seconds or ticks, as a menu.
 function eventWords(words: readonly TriggerWord[], when: When | null): TriggerWord[] {
     if (when?.kind !== 'after' && when?.kind !== 'every') return [...words];
 
     const timed = when;
-    const choice: TriggerPartValue = { section: 'when', when: timed };
     const withNumbers = words.map((word) => {
-        if (word.kind !== 'slot' || word.address.slot !== 'seconds' || timed.seconds === null) return word;
+        if (word.kind !== 'slot' || word.address.slot !== 'time' || timed.time === null) return word;
 
-        return { ...word, text: String(timed.seconds) };
+        return { ...word, text: String(timed.time) };
     });
+    const units = TIME_UNITS.map((unit) => unitChoice(unit, { section: 'when', when: { ...timed, unit } }));
 
-    return [...withNumbers, unitWord({ section: 'when' }, choice)];
+    return [...withNumbers, unitWord({ section: 'when' }, timed.unit, units)];
 }
 
 function ifTopBlock(trigger: Trigger, sources: SentenceSources): ScriptBlock {
@@ -207,7 +210,7 @@ function actionBlock(
 function waitWords(words: readonly TriggerWord[], part: TriggerRowPart, same: TriggerPartValue) {
     const shown = words.filter((word) => word.kind !== 'text' || word.text !== 's');
 
-    return [...shown, unitWord(part, same)];
+    return [...shown, unitWord(part, 'seconds', [unitChoice('seconds', same)])];
 }
 
 function gapAt(trigger: Trigger, index: number, sources: SentenceSources): ScriptGap {
@@ -219,18 +222,20 @@ function gapAt(trigger: Trigger, index: number, sources: SentenceSources): Scrip
     return { index, addMenu: { kind: 'groups', groups: [checkGroup, ...actionGroups] } };
 }
 
-// A time's unit, a menu holding "seconds" only for now (ticks may follow). Picking it keeps the part as it is.
-function unitWord(part: TriggerRowPart, same: TriggerPartValue): TriggerWord {
-    const seconds = { label: 'seconds', disabledReason: undefined, value: same, note: undefined, asks: undefined };
-
+// A time's unit as a menu: a timer's offers seconds and ticks, a Wait's seconds only.
+function unitWord(part: TriggerRowPart, unit: TimeUnit, choices: readonly TriggerChoice[]): TriggerWord {
     return {
         kind: 'slot',
         address: { part, slot: 'unit' },
-        text: 'seconds',
+        text: unit,
         state: 'set',
         reason: undefined,
-        entry: { kind: 'menu', choices: [seconds] },
+        entry: { kind: 'menu', choices },
     };
+}
+
+function unitChoice(unit: TimeUnit, value: TriggerPartValue): TriggerChoice {
+    return { label: unit, disabledReason: undefined, value, note: undefined, asks: undefined };
 }
 
 function joiningGroup(word: string): ScriptWordGroup {

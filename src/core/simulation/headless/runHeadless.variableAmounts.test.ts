@@ -156,6 +156,7 @@ describe('Multiply and Divide', () => {
         const doubled = place(played, played.world, transform(10, -20));
         const halved = place(played, played.world, transform(10, -20));
         const kept = place(played, played.world, transform(10, -20));
+        const stretched = place(played, played.world, transform(10, -20));
         giveTriggers(played.world, [
             {
                 when: LEVEL_START,
@@ -181,6 +182,13 @@ describe('Multiply and Divide', () => {
                         op: 'divide',
                         amount: 0,
                     },
+                    {
+                        kind: 'change',
+                        target: { kind: 'entity', entity: stretched.id },
+                        value: POSITION,
+                        op: 'multiply',
+                        amount: { x: 3, y: 0.5 },
+                    },
                 ],
             },
         ]);
@@ -190,6 +198,7 @@ describe('Multiply and Divide', () => {
         expect(simulationAtEnd.positionOf(doubled.id)).toEqual({ x: 20, y: -40 });
         expect(simulationAtEnd.positionOf(halved.id)).toEqual({ x: 5, y: -10 });
         expect(simulationAtEnd.positionOf(kept.id)).toEqual({ x: 10, y: -20 });
+        expect(simulationAtEnd.positionOf(stretched.id)).toEqual({ x: 30, y: -10 });
     });
 
     test('Body › Velocity is scaled from the speed the body has now; dividing by 0 leaves it', () => {
@@ -198,9 +207,10 @@ describe('Multiply and Divide', () => {
         const velocity = { kind: 'velocity' } as const;
         giveTriggers(ball, [
             {
-                when: { kind: 'after', seconds: 3 / 60 },
+                when: { kind: 'after', time: 3 / 60, unit: 'seconds' },
                 actions: [
                     { kind: 'change', target: THIS, value: velocity, op: 'multiply', amount: 0.5 },
+                    { kind: 'change', target: THIS, value: velocity, op: 'multiply', amount: { x: 3, y: 2 } },
                     { kind: 'change', target: THIS, value: velocity, op: 'divide', amount: 0 },
                 ],
             },
@@ -222,6 +232,7 @@ describe('Multiply and Divide', () => {
         const set = engine.world.changes.filter((made) => made.call === 'setLinearVelocity');
         expect(set).toEqual([
             { call: 'setLinearVelocity', entity: ball.id, velocity: { x: 60, y: 0 } },
+            { call: 'setLinearVelocity', entity: ball.id, velocity: { x: 360, y: 0 } },
             { call: 'setLinearVelocity', entity: ball.id, velocity: { x: 120, y: 0 } },
         ]);
     });
@@ -309,7 +320,7 @@ describe('a variable as a value, read when its block runs', () => {
         };
         giveTriggers(guard, [
             {
-                when: { kind: 'every', seconds: 1 / 60 },
+                when: { kind: 'every', time: 1 / 60, unit: 'seconds' },
                 checks: [healthAboveLimit],
                 actions: [changeOwn(THIS, 'hits', 'add', 1), changeOwn(THIS, 'limit', 'add', 1)],
             },

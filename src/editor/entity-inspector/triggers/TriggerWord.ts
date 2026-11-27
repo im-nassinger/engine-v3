@@ -16,7 +16,7 @@ export type TriggerWordSlot =
     | 'axis'
     // A variable changed When's condition: "changes" or "becomes 3 or more", one word.
     | 'becomes'
-    // A time's unit in a block, a menu holding "seconds" only for now.
+    // A time's unit in a block: seconds or ticks for a timer, seconds for a Wait.
     | 'unit';
 
 // Where a word sits, for typing a number into it.

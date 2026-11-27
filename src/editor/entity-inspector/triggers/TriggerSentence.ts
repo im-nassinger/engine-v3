@@ -224,9 +224,9 @@ function addWhenWords(builder: SentenceBuilder, when: When | null, choices: Trig
         }
         case 'after':
         case 'every': {
-            const secondsText = when.seconds === null ? null : `${when.seconds} seconds`;
-            const entry = numberEntry(when.seconds, 's');
-            builder.slot({ slot: 'seconds', text: secondsText, need: 'how many seconds', entry });
+            const timeText = when.time === null ? null : `${when.time} ${when.unit}`;
+            const entry = numberEntry(when.time, when.unit === 'seconds' ? 's' : undefined);
+            builder.slot({ slot: 'time', text: timeText, need: `how many ${when.unit}`, entry });
             return;
         }
         case 'custom': {

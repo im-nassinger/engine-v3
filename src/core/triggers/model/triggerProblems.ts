@@ -34,7 +34,18 @@ export type TriggerPart =
 // `number` is the value a "variable changes" When compares with, whatever its type; `amount` what a check
 // compares with or Change value changes by; `name` a custom event's.
 export type TriggerSlot =
-    'event' | 'input' | 'key' | 'seconds' | 'target' | 'variable' | 'compare' | 'number' | 'value' | 'amount' | 'name';
+    | 'event'
+    | 'input'
+    | 'key'
+    | 'seconds'
+    | 'time'
+    | 'target'
+    | 'variable'
+    | 'compare'
+    | 'number'
+    | 'value'
+    | 'amount'
+    | 'name';
 
 // Reasons, never sentences: the editor writes what the user reads.
 export type TriggerProblemReason =
@@ -131,7 +142,7 @@ function whenProblems(when: When | null, context: TriggerContext): readonly Trig
             return [];
         case 'after':
         case 'every':
-            if (when.seconds === null) return [{ part: WHEN, slot: 'seconds', reason: 'unset' }];
+            if (when.time === null) return [{ part: WHEN, slot: 'time', reason: 'unset' }];
 
             return [];
         case 'custom':

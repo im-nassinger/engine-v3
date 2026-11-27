@@ -11,6 +11,7 @@ import type {
     CheckedValue,
     Condition,
     Target,
+    TimeUnit,
     Trigger,
     ValueRef,
     VariableAmount,
@@ -23,6 +24,7 @@ import { isVariableAmount } from './Trigger.ts';
 export const MAX_TRIGGER_NAME_LENGTH = 60;
 // A day: a timer longer than that is a mistake, and the tick count it makes stays small.
 export const MAX_TRIGGER_SECONDS = 86_400;
+const TICKS_PER_SECOND = 60;
 // An hour: a Wait holds a run in play until it is due, so a long one is a mistake.
 export const MAX_WAIT_SECONDS = 3600;
 
@@ -60,8 +62,11 @@ function wordOrNull(typed: string | null) {
     return word;
 }
 
-function normalizeSeconds(seconds: number) {
-    return clamp(seconds, 0, MAX_TRIGGER_SECONDS);
+// A time in ticks is whole, as the game runs whole ticks; both are kept to a day at most.
+function normalizeTime(time: number, unit: TimeUnit) {
+    if (unit === 'seconds') return clamp(time, 0, MAX_TRIGGER_SECONDS);
+
+    return clamp(Math.round(time), 0, MAX_TRIGGER_SECONDS * TICKS_PER_SECOND);
 }
 
 function normalizeWhen(when: When | null): When | null {
@@ -72,9 +77,9 @@ function normalizeWhen(when: When | null): When | null {
             return { kind: 'input', input: wordOrNull(when.input), how: when.how };
         case 'after':
         case 'every':
-            if (when.seconds === null) return { kind: when.kind, seconds: null };
+            if (when.time === null) return { kind: when.kind, time: null, unit: when.unit };
 
-            return { kind: when.kind, seconds: normalizeSeconds(when.seconds) };
+            return { kind: when.kind, time: normalizeTime(when.time, when.unit), unit: when.unit };
         case 'custom':
             return { kind: 'custom', name: wordOrNull(when.name) };
         case 'variableChanged':
@@ -193,7 +198,7 @@ function normalizeVariableAmount(amount: VariableAmount): VariableAmount | null 
 
 // Before 2026-11-23 a vector was added to one axis at a time, `{ ..., "axis": "x" }` with a number. It is
 // now added whole, so such a change reads as the same vector with 0 on the other axis. Multiply and Divide
-// take one number for the whole vector, so theirs is kept as it is.
+// came after it, so theirs is kept as it is.
 function wholeVectorChange(value: ValueRef | null, op: ChangeOp, amount: JsonValue | VariableAmount | null) {
     if (value?.kind !== 'field' || value.axis === undefined) return { value, amount };
 

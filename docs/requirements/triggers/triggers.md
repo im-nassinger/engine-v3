@@ -33,7 +33,7 @@ The When menu holds six events. Three have a word that picks between two kinds i
 |---|---|---|
 | Touching | When other **starts** touching this. When other **stops** touching this | The entity touching |
 | Key or input | When the **key** Space is pressed. When the **input** jump is pressed | None |
-| Timer | **After** 60 seconds. **Every** 2 seconds | None |
+| Timer | **After** 60 seconds. **Every** 2 seconds. **Every** 3 ticks | None |
 | Level start | When the level starts | None |
 
 - **The event names who touches as `other`** (owner, 2026-11-24): "When other starts touching this", not "something". *Why: `other` is the word the If and the actions already use for the same entity, so the event names it once.*
@@ -45,6 +45,7 @@ The When menu holds six events. Three have a word that picks between two kinds i
 - A trigger on a group hears touches on any part inside it. Parts of the group never set off the group's own trigger.
 - **Key or input** fires on press, on release, or while held. See [variables-and-inputs.md](variables-and-inputs.md).
 - **Timer:** fires once after a time, or again and again. It starts counting when its trigger is switched on, and slows down or stops with the game speed. Times are whole ticks, so timers never drift.
+- **A timer's time is in seconds or in ticks** (owner, 2026-11-27: "allow the user to run things each X frames"), picked in the unit's menu: "every 1 tick" runs on every tick of the game, 60 a second. A time in ticks is a whole number. *Why: a time in seconds can't say "every tick" exactly; 1/60 s was the closest. The word is tick, the glossary's word for one step of the game, not frame, since drawing follows the screen and a frame isn't always a tick.*
 - **Level start** on a spawned entity fires when it spawns.
 - *Why v3: enough for coins, hazards and a goal, steered with keys (owner: 2026-11-20).*
 
@@ -125,10 +126,10 @@ Source: scope TR7; round 1: D62; round 5: T6; round 9: 09 2.4b, 09 2.9; round 8:
 
 Asked by the owner while trying v4 ([fix](../../versions/v4/fixes.md) 10, 2026-11-25), built 2026-11-25.
 
-- **Change value can also multiply and divide**, such as "multiply coins by 2" or "divide this Transform › Scale by 2". They work on numbers. **A vector is multiplied or divided by one number**, so "multiply other Body › Velocity by 0.5" halves its speed. "Transform › Scale" doesn't change in play, so Change value doesn't offer it; Multiply and Divide work on every number and vector it does offer, such as "Transform › Position" (standing yes, 2026-11-25, see [decisions](../../decisions.md)).
+- **Change value can also multiply and divide**, such as "multiply coins by 2" or "divide this Transform › Scale by 2". They work on numbers. **A vector is multiplied or divided by an x and a y**, one factor per axis, so "multiply other Body › Velocity by 0.5, 1" halves its sideways speed only (owner, 2026-11-27: one number for both axes was too little). A number variable in that box is used on both axes, and a trigger saved with one number before then reads it on both. "Transform › Scale" doesn't change in play, so Change value doesn't offer it; Multiply and Divide work on every number and vector it does offer, such as "Transform › Position" (standing yes, 2026-11-25, see [decisions](../../decisions.md)).
 - **Dividing by 0 leaves the value as it was**, as a target that lacks the value is skipped.
 - **Every value box in every block can hold a variable instead of a typed value** (owner: "all scratch blocks"), such as "add bonus to coins", "set this Transform › Rotation to angle", "if score is more than best", or "wait delay s". This includes Change value's amount, the If's amount, Wait's seconds and Fire custom event's number. The event block's boxes ("after N s", "becomes 10 or more") keep typed values (standing yes, 2026-11-25). *Why: the confirmed plan names the actions and the If, and an event's value isn't read when a block runs: a timer counts from when it starts, and "becomes" compares the values before and after a change.*
-- **Only variables of the box's type are offered:** a number variable in a number box, a string in a string box, a boolean in a boolean box. A vector or colour box takes none until those variable types come in v5.
+- **Only variables of the box's type are offered:** a number variable in a number box, a string in a string box, a boolean in a boolean box. A vector or colour box takes none until those variable types come in v5, except a vector's Multiply and Divide box, which takes a number variable as the factor on both axes (standing yes, 2026-11-27).
 - The variables offered are the level's and the target's own, as the variable menu already groups them.
 - **The variable is read when the block runs**, so it uses the value it has at that moment. An own variable is read on the block's target, on `this` for a Wait, and a target that lacks it is skipped (standing yes, 2026-11-25).
 - *Why: the owner asked for multiply and divide, and to use variables everywhere a value of their type fits, so a value can depend on another.*

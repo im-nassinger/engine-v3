@@ -14,7 +14,7 @@ export function freshWhen(kind: WhenKind): When {
             return { kind, key: null, how: 'pressed' };
         case 'after':
         case 'every':
-            return { kind, seconds: null };
+            return { kind, time: null, unit: 'seconds' };
         case 'custom':
             return { kind, name: null };
         case 'variableChanged':

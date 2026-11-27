@@ -4,6 +4,7 @@ export {
     changeableValues,
     sameValueRef,
     variableChangeOf,
+    VectorFactorsType,
 } from './model/changeableValues.ts';
 export type { ChangeableValue } from './model/changeableValues.ts';
 export { readableValues, sameReadableValue } from './model/readableValues.ts';

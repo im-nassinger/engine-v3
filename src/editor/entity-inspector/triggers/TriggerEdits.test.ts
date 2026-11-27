@@ -140,7 +140,7 @@ describe('TriggerEdits', () => {
     test('a number is typed into its word; a word that takes none gives no edit', () => {
         const { component } = buildCard([
             {
-                when: { kind: 'after', seconds: null },
+                when: { kind: 'after', time: null, unit: 'seconds' },
                 checks: [
                     {
                         kind: 'value',
@@ -162,14 +162,14 @@ describe('TriggerEdits', () => {
             },
         ]);
 
-        const seconds = TriggerEdits.typed(component, 0, { part: { section: 'when' }, slot: 'seconds' }, 60);
+        const seconds = TriggerEdits.typed(component, 0, { part: { section: 'when' }, slot: 'time' }, 60);
         const value = TriggerEdits.typed(component, 0, { part: { section: 'check', index: 0 }, slot: 'amount' }, 10);
         const kickAt = { part: { section: 'action', index: 0 }, slot: 'amount' } as const;
         const kick = TriggerEdits.typed(component, 0, kickAt, { x: 200, y: -600 });
         const refused = TriggerEdits.typed(component, 0, { part: { section: 'when' }, slot: 'event' }, 3);
 
         expect(seconds?.label).toBe('Change trigger "After a time"');
-        expect(seconds?.triggers[0]?.when).toEqual({ kind: 'after', seconds: 60 });
+        expect(seconds?.triggers[0]?.when).toEqual({ kind: 'after', time: 60, unit: 'seconds' });
         expect(value?.triggers[0]?.checks[0]).toMatchObject({ amount: 10 });
         expect(kick?.triggers[0]?.actions[0]).toMatchObject({ amount: { x: 200, y: -600 } });
         expect(refused).toBeUndefined();

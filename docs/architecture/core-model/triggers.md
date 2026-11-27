@@ -51,11 +51,12 @@ export type When =
     | { kind: 'touched' } | { kind: 'untouched' }
     | { kind: 'input'; input: string | null; how: Press }
     | { kind: 'key'; key: KeyCode | null; how: Press }
-    | { kind: 'after'; seconds: number | null } | { kind: 'every'; seconds: number | null }
+    | { kind: 'after'; time: number | null; unit: TimeUnit } | { kind: 'every'; time: number | null; unit: TimeUnit }   // unit: 2026-11-27
     | { kind: 'levelStart' }
     | { kind: 'custom'; name: string | null }                             // v4
     | { kind: 'variableChanged'; variable: VariableRef | null; becomes: Condition | null };   // v4; null: any change
 export type Press = 'pressed' | 'released' | 'held';
+export type TimeUnit = 'seconds' | 'ticks';
 
 export type Target =
     | { kind: 'this' } | { kind: 'other' }
@@ -126,6 +127,13 @@ The plan and the owner's words are in [fix-3-simpler-triggers.md](../../versions
 - **`triggerProblems` for the value check:** the value unset; a variable unknown on a known holder; a compare or amount its type lacks (`wrongType`, in `compare` or `amount`); a tag compared other than is or isNot, or with a non-word; a number the known target lacks (`unknownValue`). A level's variable has no target problem, since it is read on the World. `eventHasOther` is exported for the card.
 - **The SurfaceComponent lost `sensor`.** Format version 2's upgrade step, `removeSensorSetting` (`level-data/versions/`), removes a SurfaceComponent with `"sensor": true` and drops `"sensor": false` from the rest, walking the tree with a list, not by going down, so the 50,000-deep file still reaches the reader's depth limit. `FormatUpgrader.createCurrent()` holds it; the clipboard runs it on entities copied by a version 1 game (`entityWithoutSensor`). See [persistence.md](../persistence.md).
 
+
+### Timers in ticks, and a vector's factor per axis (2026-11-27)
+
+Asked by the owner after v4; see [decisions.md](../../decisions.md).
+
+- **A timer saves its time and its unit**: `{ "kind": "every", "time": 3, "unit": "ticks" }`. `parseTrigger` still reads the old `{ "kind": "every", "seconds": 2 }` as 2 seconds, and the next save writes the new shape. `normalizeTrigger` rounds a time in ticks to a whole number and keeps both units to a day at most. `TriggerTimers` counts a time in ticks as it is, and one in seconds through `secondsToTicks`. The problem slot of an unset timer is `time`.
+- **Multiply and Divide on a vector read a factor per axis**: `amountTypeOf` gives `VectorFactorsType` for a vector (a field or Body › Velocity), a `VectorFieldType` whose `parse` also takes one number as the same factor on both axes, so a trigger saved before and a number variable both still work. `amountVariableType` gives a number for Multiply and Divide whatever the value, so a vector's factor box still offers number variables.
 
 ### What fix 10 changed (2026-11-25)
 

@@ -733,7 +733,9 @@ export class TriggerChoices {
         const isNumber = amountType instanceof NumberFieldType || amountType instanceof AngleFieldType;
         if (isNumber) return this.shownNumberEntry(action.amount, unit);
         if (amountType instanceof VectorFieldType) {
-            const value = isPointLike(action.amount) ? { x: action.amount.x, y: action.amount.y } : null;
+            // A factor saved as one number, before a vector's had one per axis, shows on both.
+            const parsed = amountType.parse(action.amount);
+            const value = parsed.ok ? { x: parsed.value.x, y: parsed.value.y } : null;
             const stored: ShownNumber = { unit };
             const shown = this.lengths.shown(stored);
             const entry: TriggerTypedEntry = { kind: 'vector', value, ...shown, unit: shown.unit };
@@ -1089,9 +1091,8 @@ function eventVariantsOf(when: When) {
         }
         case 'after':
         case 'every': {
-            const { seconds } = when;
-            const after = choice('after', place({ kind: 'after', seconds }));
-            const every = choice('every', place({ kind: 'every', seconds }));
+            const after = choice('after', place({ ...when, kind: 'after' }));
+            const every = choice('every', place({ ...when, kind: 'every' }));
 
             return [after, every];
         }

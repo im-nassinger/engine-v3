@@ -147,11 +147,18 @@ describe('TriggerScript', () => {
         });
     });
 
-    test("a timer event's time is a number with its unit's menu", () => {
-        const event = blockAt(scriptOf({ when: { kind: 'every', seconds: 2 } }), 0);
+    test("a timer event's time is a number with its unit's menu, seconds or ticks", () => {
+        const event = blockAt(scriptOf({ when: { kind: 'every', time: 2, unit: 'seconds' } }), 0);
+        const unit = slotOf(event, 'unit');
 
         expect([event.icon, textOf(event)]).toEqual(['timer', 'when every 2 seconds']);
-        expect(slotOf(event, 'unit').text).toBe('seconds');
+        expect(unit.text).toBe('seconds');
+        expect(unit.entry).toMatchObject({
+            choices: [
+                { label: 'seconds', value: { section: 'when', when: { kind: 'every', time: 2, unit: 'seconds' } } },
+                { label: 'ticks', value: { section: 'when', when: { kind: 'every', time: 2, unit: 'ticks' } } },
+            ],
+        });
     });
 
     test('Set shows the path of its value, with the power or move icon', () => {

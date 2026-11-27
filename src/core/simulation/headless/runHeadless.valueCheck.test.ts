@@ -30,7 +30,7 @@ function checksEveryTick(entity: Entity, checks: readonly Check[]) {
         id: 1,
         name: null,
         on: true,
-        when: { kind: 'every', seconds: 1 / 60 },
+        when: { kind: 'every', time: 1 / 60, unit: 'seconds' },
         checks,
         actions: [],
     };

@@ -147,7 +147,7 @@ describe('a switched-off trigger in play', () => {
     test('a once-per-run trigger, switching itself off first, fires once', () => {
         const level = countingLevel();
         giveTriggers(level.world, [
-            { when: { kind: 'every', seconds: 0.1 }, actions: [enabled(THIS, 1, false), count()] },
+            { when: { kind: 'every', time: 0.1, unit: 'seconds' }, actions: [enabled(THIS, 1, false), count()] },
         ]);
 
         const { counts } = play(level, 120);
@@ -158,10 +158,10 @@ describe('a switched-off trigger in play', () => {
     test('a trigger switched off by another trigger during its rest stays off', () => {
         const level = countingLevel();
         const door = placeStatic(level, 0);
-        giveTriggers(door, [resting({ kind: 'every', seconds: 0.1 })]);
+        giveTriggers(door, [resting({ kind: 'every', time: 0.1, unit: 'seconds' })]);
         const doorTarget: Target = { kind: 'entity', entity: door.id };
         giveTriggers(level.world, [
-            { when: { kind: 'after', seconds: 0.5 }, actions: [enabled(doorTarget, 1, false)] },
+            { when: { kind: 'after', time: 0.5, unit: 'seconds' }, actions: [enabled(doorTarget, 1, false)] },
         ]);
 
         const { counts, level: played } = play(level, 200);
@@ -176,7 +176,7 @@ describe('a switched-off trigger in play', () => {
         giveTriggers(door, [{ when: { kind: 'levelStart' }, actions: [wait(1), count()] }]);
         const doorTarget: Target = { kind: 'entity', entity: door.id };
         giveTriggers(level.world, [
-            { when: { kind: 'after', seconds: 61 / 60 }, actions: [enabled(doorTarget, 1, false)] },
+            { when: { kind: 'after', time: 61 / 60, unit: 'seconds' }, actions: [enabled(doorTarget, 1, false)] },
         ]);
 
         const { counts } = play(level, 70);

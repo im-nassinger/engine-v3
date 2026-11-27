@@ -14,7 +14,9 @@ The owner played the example platformer in the editor and asked for three fixes,
 
 Found on the way: a Firefox browser test fails when the whole Entity inspector folder runs, before the fix too ([bugs.md](bugs.md)).
 
-**Where we stopped:** pushed and published to Netlify for the owner to try. v5's requirements still wait for review (below).
+Then two more asks, built: **Multiply and Divide on a vector take an x and a y** (such as "multiply this Body › Velocity by 0.5, 1"), and **timers count seconds or ticks** ("every 1 tick"), picked in the unit's menu. The example platformer's every-tick triggers now use "every 1 tick". See [decisions.md](decisions.md).
+
+**Where we stopped:** the first three fixes are pushed and published to Netlify; the last two are committed locally. v5's requirements still wait for review (below).
 
 ## Where things stand
 

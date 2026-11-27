@@ -15,6 +15,7 @@ import type {
     Press,
     ReadableValue,
     Target,
+    TimeUnit,
     Trigger,
     ValueRef,
     VariableAmount,
@@ -27,6 +28,7 @@ type RawRecord = Readonly<Record<string, unknown>>;
 
 const TRIGGER_KEYS: readonly string[] = ['id', 'name', 'on', 'when', 'checks', 'actions'];
 const PRESSES: readonly Press[] = ['pressed', 'released', 'held'];
+const TIME_UNITS: readonly TimeUnit[] = ['seconds', 'ticks'];
 const COMPARES: readonly Compare[] = ['is', 'isNot', 'more', 'less', 'atLeast', 'atMost'];
 const CHANGE_OPS: readonly ChangeOp[] = ['set', 'add', 'subtract', 'multiply', 'divide', 'flip'];
 const LIVE_VALUES: readonly LiveValue[] = ['speed', 'velocityX', 'velocityY'];
@@ -141,13 +143,24 @@ function parseKeyWhen(raw: RawRecord): ParseOutcome<When> {
     return accept({ kind: 'key', key, how: how.value });
 }
 
+// `{ "kind": "every", "time": 2, "unit": "ticks" }`, or as saved before 2026-11-27, `{ "kind": "every",
+// "seconds": 2 }`, read as 2 seconds.
 function parseTimerWhen(raw: RawRecord, kind: 'after' | 'every'): ParseOutcome<When> {
-    if (!hasExactlyKeys(raw, ['kind', 'seconds'])) return refuse({ reason: 'wrongType' });
+    if (hasExactlyKeys(raw, ['kind', 'seconds'])) {
+        const seconds = parseNullable(raw['seconds'], parseFiniteNumber);
+        if (!seconds.ok) return seconds;
 
-    const seconds = parseNullable(raw['seconds'], parseFiniteNumber);
-    if (!seconds.ok) return seconds;
+        return accept({ kind, time: seconds.value, unit: 'seconds' });
+    }
+    if (!hasExactlyKeys(raw, ['kind', 'time', 'unit'])) return refuse({ reason: 'wrongType' });
 
-    return accept({ kind, seconds: seconds.value });
+    const time = parseNullable(raw['time'], parseFiniteNumber);
+    if (!time.ok) return time;
+
+    const unit = parseChoice(raw['unit'], TIME_UNITS);
+    if (!unit.ok) return unit;
+
+    return accept({ kind, time: time.value, unit: unit.value });
 }
 
 // A When of a kind that is gone: its shape is still checked, as any damaged data is refused.

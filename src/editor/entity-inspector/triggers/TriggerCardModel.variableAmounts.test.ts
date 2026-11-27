@@ -45,14 +45,22 @@ describe("the trigger card's value boxes (fix 10)", () => {
         expect(ops(change({ kind: 'variable', name: 'player_name' }, 'set', 'Bo'))).toEqual(['set']);
     });
 
-    test('multiply reads "multiply this Position by 2", and switching to it unsets a vector amount', () => {
+    test('multiply on a vector takes a factor per axis, and switching to it unsets an added vector', () => {
         const added = change(POSITION, 'add', { x: 1, y: 2 });
         const multiply = choiceNamed(choicesOf(slotOf(actionRow(added), 'op').entry), 'multiply');
         expect(multiply.value).toMatchObject({ action: { op: 'multiply', amount: null } });
 
+        const sentence = actionRow(change(POSITION, 'multiply', { x: 2, y: 0.5 }));
+        expect(sentence.text).toBe('multiply this Transform › Position by 2, 0.5');
+        expect(slotOf(sentence, 'amount').entry).toMatchObject({ kind: 'vector', value: { x: 2, y: 0.5 } });
+        expect(slotOf(sentence, 'amount').variables).toBeDefined();
+    });
+
+    test('a factor saved as one number before 2026-11-27 shows on both axes', () => {
         const sentence = actionRow(change(POSITION, 'multiply', 2));
+
         expect(sentence.text).toBe('multiply this Transform › Position by 2');
-        expect(slotOf(sentence, 'amount').entry).toMatchObject({ kind: 'number', unit: undefined });
+        expect(slotOf(sentence, 'amount').entry).toMatchObject({ kind: 'vector', value: { x: 2, y: 2 } });
     });
 
     test('a number amount offers the number variables, the level’s then the target’s own', () => {

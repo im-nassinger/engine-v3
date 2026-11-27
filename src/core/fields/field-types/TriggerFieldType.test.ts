@@ -40,8 +40,9 @@ const WHENS = [
     { kind: 'input', input: null, how: 'held' },
     { kind: 'key', key: 'Space', how: 'released' },
     { kind: 'key', key: null, how: 'pressed' },
-    { kind: 'after', seconds: 60 },
-    { kind: 'every', seconds: null },
+    { kind: 'after', time: 60, unit: 'seconds' },
+    { kind: 'every', time: null, unit: 'seconds' },
+    { kind: 'every', time: 3, unit: 'ticks' },
     { kind: 'levelStart' },
     { kind: 'custom', name: 'open' },
     { kind: 'custom', name: null },
@@ -160,6 +161,24 @@ describe('TriggerFieldType', () => {
         expect(again.when).toEqual(parsed.when);
     });
 
+    test('a timer saved with seconds, before 2026-11-27, reads as a time in seconds', () => {
+        const parsed = requireParsed(triggerWith({ when: { kind: 'every', seconds: 2 } }));
+
+        expect(parsed.when).toEqual({ kind: 'every', time: 2, unit: 'seconds' });
+    });
+
+    test('a time in ticks is made whole and kept within a day', () => {
+        const rounded = type.normalize(
+            requireParsed(triggerWith({ when: { kind: 'every', time: 2.6, unit: 'ticks' } })),
+        );
+        const capped = type.normalize(
+            requireParsed(triggerWith({ when: { kind: 'after', time: 1e9, unit: 'ticks' } })),
+        );
+
+        expect(rounded.when).toEqual({ kind: 'every', time: 3, unit: 'ticks' });
+        expect(capped.when).toEqual({ kind: 'after', time: 86_400 * 60, unit: 'ticks' });
+    });
+
     test.each(CHECKS)('reads back the check $kind as saved', (check) => {
         const { saved } = readBack(triggerWith({ checks: [check] }));
 
@@ -217,7 +236,16 @@ describe('TriggerFieldType', () => {
             triggerWith({ when: { kind: 'key', key: 'Tab', how: 'pressed' } }),
             'unbindableKey',
         ],
-        ['a time that is not a number', triggerWith({ when: { kind: 'after', seconds: '60' } }), 'wrongType'],
+        [
+            'a time that is not a number',
+            triggerWith({ when: { kind: 'after', time: '60', unit: 'seconds' } }),
+            'wrongType',
+        ],
+        [
+            'a time in an unknown unit',
+            triggerWith({ when: { kind: 'after', time: 60, unit: 'frames' } }),
+            'unknownChoice',
+        ],
         ['an unknown check', triggerWith({ checks: [{ kind: 'isMoving' }] }), 'unknownChoice'],
         [
             'an unknown comparison',
@@ -352,7 +380,7 @@ describe('TriggerFieldType', () => {
     test('normalize trims the name, makes words of tags, variables and inputs, and keeps times within a day', () => {
         const raw = triggerWith({
             name: '   ',
-            when: { kind: 'every', seconds: -2 },
+            when: { kind: 'every', time: -2, unit: 'seconds' },
             checks: [
                 {
                     kind: 'value',
@@ -384,7 +412,7 @@ describe('TriggerFieldType', () => {
         const normalized = type.normalize(requireParsed(raw));
 
         expect(normalized.name).toBeNull();
-        expect(normalized.when).toEqual({ kind: 'every', seconds: 0 });
+        expect(normalized.when).toEqual({ kind: 'every', time: 0, unit: 'seconds' });
         expect(normalized.checks).toEqual([
             {
                 kind: 'value',

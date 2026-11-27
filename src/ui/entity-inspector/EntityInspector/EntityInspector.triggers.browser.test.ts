@@ -242,7 +242,7 @@ describe('the trigger card', () => {
 
     test('a number word opens a small field, and Enter types it in as one step', async () => {
         const { level, button } = buildLevel();
-        withTriggers(button, [{ when: { kind: 'after', seconds: null }, actions: [{ kind: 'win' }] }]);
+        withTriggers(button, [{ when: { kind: 'after', time: null, unit: 'seconds' }, actions: [{ kind: 'win' }] }]);
         const { session } = await showEntity(level, button);
         await expect.poll(() => blocks().length).toBe(1);
 
@@ -257,7 +257,7 @@ describe('the trigger card', () => {
         await userEvent.type(input, '2.5{Enter}');
 
         await expect.poll(() => sentences('When')).toEqual(['when after 2.5 seconds']);
-        expect(triggersOf(button)[0]?.when).toEqual({ kind: 'after', seconds: 2.5 });
+        expect(triggersOf(button)[0]?.when).toEqual({ kind: 'after', time: 2.5, unit: 'seconds' });
         expect(history(session).undoCount).toBe(1);
         expect(document.querySelector('.trigger-word-field')).toBeNull();
     });

@@ -65,7 +65,7 @@ function fire(target: Target, name: string): Action {
 }
 
 function after(seconds: number): When {
-    return { kind: 'after', seconds };
+    return { kind: 'after', time: seconds, unit: 'seconds' };
 }
 
 function custom(name: string): When {

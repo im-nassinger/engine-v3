@@ -20,6 +20,10 @@ export type Trigger = {
 
 export type Press = 'pressed' | 'released' | 'held';
 
+// What a timer's time counts: seconds, or ticks, the game's steps, 60 to a second. Before 2026-11-27 a
+// timer was saved as `{ "kind": "every", "seconds": 2 }`; that still loads, as 2 seconds.
+export type TimeUnit = 'seconds' | 'ticks';
+
 // Six events as the user sees them. Touching (starts or stops), a key or an input, and a timer (after or
 // every) are each two kinds here, as v3 saved them, so a saved When keeps its shape; the trigger card shows
 // each pair as one event with the in-place word that picks between them.
@@ -29,8 +33,8 @@ export type When =
     | { readonly kind: 'untouched' }
     | { readonly kind: 'input'; readonly input: string | null; readonly how: Press }
     | { readonly kind: 'key'; readonly key: KeyCode | null; readonly how: Press }
-    | { readonly kind: 'after'; readonly seconds: number | null }
-    | { readonly kind: 'every'; readonly seconds: number | null }
+    | { readonly kind: 'after'; readonly time: number | null; readonly unit: TimeUnit }
+    | { readonly kind: 'every'; readonly time: number | null; readonly unit: TimeUnit }
     | { readonly kind: 'levelStart' }
     // An event named by the level, such as `open`, heard when a Fire custom event names it.
     | { readonly kind: 'custom'; readonly name: string | null }
@@ -95,7 +99,7 @@ export type Check = {
 };
 
 // Flip turns a boolean variable to the other value, and needs no amount. Multiply and Divide (fix 10) work
-// on numbers, and on a vector by one number.
+// on numbers, and on a vector by a factor per axis (2026-11-27; one number before, still read as both).
 export type ChangeOp = 'set' | 'add' | 'subtract' | 'multiply' | 'divide' | 'flip';
 
 // The value Change value changes on its target.
@@ -118,7 +122,8 @@ export type Action =
           readonly target: Target;
           readonly value: ValueRef | null;
           readonly op: ChangeOp;
-          // The value's own value, a number for Multiply and Divide, or a variable (isVariableAmount).
+          // The value's own value, a number for Multiply and Divide (a vector's: x and y factors), or a
+          // variable (isVariableAmount).
           readonly amount: JsonValue | VariableAmount | null;
       }
     | { readonly kind: 'destroy'; readonly target: Target }

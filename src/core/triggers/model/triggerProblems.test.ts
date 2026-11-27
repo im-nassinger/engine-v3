@@ -68,10 +68,10 @@ const WHEN_CASES: readonly (readonly [When | null, readonly object[]])[] = [
     [{ kind: 'input', input: 'fly', how: 'held' }, [{ ...WHEN, slot: 'input', reason: 'unknownInput' }]],
     [{ kind: 'key', key: 'KeyW' as KeyCode, how: 'released' }, []],
     [{ kind: 'key', key: null, how: 'pressed' }, [{ ...WHEN, slot: 'key', reason: 'unset' }]],
-    [{ kind: 'after', seconds: 60 }, []],
-    [{ kind: 'after', seconds: null }, [{ ...WHEN, slot: 'seconds', reason: 'unset' }]],
-    [{ kind: 'every', seconds: 2 }, []],
-    [{ kind: 'every', seconds: null }, [{ ...WHEN, slot: 'seconds', reason: 'unset' }]],
+    [{ kind: 'after', time: 60, unit: 'seconds' }, []],
+    [{ kind: 'after', time: null, unit: 'seconds' }, [{ ...WHEN, slot: 'time', reason: 'unset' }]],
+    [{ kind: 'every', time: 2, unit: 'seconds' }, []],
+    [{ kind: 'every', time: null, unit: 'seconds' }, [{ ...WHEN, slot: 'time', reason: 'unset' }]],
     [{ kind: 'levelStart' }, []],
     [{ kind: 'custom', name: 'open' }, []],
     [{ kind: 'custom', name: null }, [{ ...WHEN, slot: 'name', reason: 'unset' }]],
@@ -394,7 +394,9 @@ describe('triggerProblems', () => {
 
         expect(problemsOf({ when: { kind: 'touched' }, actions: [destroyOther] })).toEqual([]);
         expect(problemsOf({ when: { kind: 'custom', name: 'open' }, actions: [destroyOther] })).toEqual([]);
-        expect(problemsOf({ when: { kind: 'every', seconds: 1 }, actions: [destroyOther] })).toEqual(noOther);
+        expect(problemsOf({ when: { kind: 'every', time: 1, unit: 'seconds' }, actions: [destroyOther] })).toEqual(
+            noOther,
+        );
         const coinsChange: When = {
             kind: 'variableChanged',
             variable: { owner: 'level', name: 'coins' },

@@ -49,7 +49,7 @@ function copyWhen(when: When | null): When | null {
             return { kind: 'key', key: when.key, how: when.how };
         case 'after':
         case 'every':
-            return { kind: when.kind, seconds: when.seconds };
+            return { kind: when.kind, time: when.time, unit: when.unit };
     }
 }
 

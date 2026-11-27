@@ -52,6 +52,7 @@ export type {
     Press,
     ReadableValue,
     Target,
+    TimeUnit,
     Trigger,
     ValueRef,
     VariableAmount,

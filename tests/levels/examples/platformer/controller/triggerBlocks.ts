@@ -1,8 +1,6 @@
 import type { Action, Check, Compare, VariableValue, When } from '../../../../../src/core/fields/index.ts';
 import type { Entity } from '../../../../../src/core/level/index.ts';
 
-import { TICK_SECONDS } from './platformerFeel.ts';
-
 // The trigger blocks the example platformer is made of, in the words of the trigger card. Every variable
 // here is the blob's own, read and changed on `this` unless an entity is named.
 const THIS = { kind: 'this' } as const;
@@ -10,7 +8,7 @@ const THIS = { kind: 'this' } as const;
 export type Axis = 'velocityX' | 'velocityY';
 
 export function everyTick(): When {
-    return { kind: 'every', seconds: TICK_SECONDS };
+    return { kind: 'every', time: 1, unit: 'ticks' };
 }
 
 export function whenEvent(name: string): When {

@@ -64,11 +64,11 @@ export function triggerTimers() {
 
     giveTriggers(level.world, [
         {
-            when: { kind: 'every', seconds: 0.5 },
+            when: { kind: 'every', time: 0.5, unit: 'seconds' },
             actions: [changeVariable(level, 'beats', 'add', 1), addVelocity(ball, 0, -150)],
         },
-        { when: { kind: 'after', seconds: 2 }, actions: [changeVariable(level, 'late', 'set', 1)] },
-        { when: { kind: 'after', seconds: 4 }, actions: [switchTrigger(level.world, 1, false)] },
+        { when: { kind: 'after', time: 2, unit: 'seconds' }, actions: [changeVariable(level, 'late', 'set', 1)] },
+        { when: { kind: 'after', time: 4, unit: 'seconds' }, actions: [switchTrigger(level.world, 1, false)] },
         { when: inputHeld('jump'), actions: [changeVariable(level, 'held', 'add', 1)] },
         { when: { kind: 'input', input: 'up', how: 'pressed' }, actions: [switchTrigger(level.world, 1, true)] },
     ]);

@@ -44,9 +44,11 @@ export class TriggerTimers {
         const startTick = this.startedAt.get(timer.owner, timer.triggerId);
         if (startTick === undefined) return false;
         if (timer.when.kind !== 'after' && timer.when.kind !== 'every') return false;
-        if (timer.when.seconds === null) return false;
+        const { time, unit } = timer.when;
+        if (time === null) return false;
 
-        const interval = Math.max(1, secondsToTicks(timer.when.seconds));
+        const ticks = unit === 'ticks' ? Math.round(time) : secondsToTicks(time);
+        const interval = Math.max(1, ticks);
         const elapsed = tick - startTick;
         if (elapsed <= 0) return false;
 

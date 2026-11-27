@@ -1,4 +1,4 @@
-import type { Compare, Condition, Trigger, VariableValue, When } from '../../fields/index.ts';
+import type { Compare, Condition, TimeUnit, Trigger, VariableValue, When } from '../../fields/index.ts';
 import { KeyCodes } from '../../keys/index.ts';
 import type { KeyCode } from '../../keys/index.ts';
 
@@ -25,9 +25,9 @@ function nameOfWhen(when: When | null) {
             return `${keyLabel} ${when.how}`;
         }
         case 'after':
-            return timerName('After', when.seconds);
+            return timerName('After', when.time, when.unit);
         case 'every':
-            return timerName('Every', when.seconds);
+            return timerName('Every', when.time, when.unit);
         case 'levelStart':
             return 'Level start';
         case 'custom':
@@ -71,10 +71,11 @@ function keyName(key: KeyCode | null) {
     return KeyCodes.label(key);
 }
 
-// "After 60 s", "Every 0.5 s"; "After a time" while the time is unset.
-function timerName(start: string, seconds: number | null) {
-    if (seconds === null) return `${start} a time`;
+// "After 60 s", "Every 0.5 s", "Every 3 ticks"; "After a time" while the time is unset.
+function timerName(start: string, time: number | null, unit: TimeUnit) {
+    if (time === null) return `${start} a time`;
+    if (unit === 'ticks') return `${start} ${time} ${time === 1 ? 'tick' : 'ticks'}`;
 
-    const rounded = Math.round(seconds * 100) / 100;
+    const rounded = Math.round(time * 100) / 100;
     return `${start} ${rounded} s`;
 }

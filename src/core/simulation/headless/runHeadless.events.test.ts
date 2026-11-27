@@ -187,8 +187,8 @@ describe('timers', () => {
     test('"after" fires once, "every" again and again, both in whole ticks from the run start', () => {
         const level = smallLevel();
         giveTriggers(level.world, [
-            { when: { kind: 'after', seconds: 0.05 } },
-            { when: { kind: 'every', seconds: 0.05 } },
+            { when: { kind: 'after', time: 0.05, unit: 'seconds' } },
+            { when: { kind: 'every', time: 0.05, unit: 'seconds' } },
         ]);
 
         const heard = play(level, { ticks: 10 });
@@ -202,11 +202,31 @@ describe('timers', () => {
         ]);
     });
 
+    test('a time in ticks counts the ticks themselves: every 1 tick fires on each one', () => {
+        const level = smallLevel();
+        giveTriggers(level.world, [
+            { when: { kind: 'every', time: 1, unit: 'ticks' } },
+            { when: { kind: 'after', time: 4, unit: 'ticks' } },
+        ]);
+
+        const heard = play(level, { ticks: 5 });
+        const firedTicks = heard.map((firing) => [firing.tick, firing.trigger]);
+
+        expect(firedTicks).toEqual([
+            [1, 1],
+            [2, 1],
+            [3, 1],
+            [4, 1],
+            [4, 2],
+            [5, 1],
+        ]);
+    });
+
     test('a time of 0 s is due on the first tick, and a timer that is off never counts', () => {
         const level = smallLevel();
         giveTriggers(level.world, [
-            { when: { kind: 'after', seconds: 0 } },
-            { when: { kind: 'every', seconds: 0.05 }, on: false },
+            { when: { kind: 'after', time: 0, unit: 'seconds' } },
+            { when: { kind: 'every', time: 0.05, unit: 'seconds' }, on: false },
         ]);
 
         const heard = play(level, { ticks: 6 });
@@ -319,7 +339,7 @@ describe('the order of a tick', () => {
     test('level start, keys and inputs, timers, then starts touching and stops touching', () => {
         const level = smallLevel();
         giveTriggers(level.world, [
-            { when: { kind: 'every', seconds: 1 / 60 } },
+            { when: { kind: 'every', time: 1 / 60, unit: 'seconds' } },
             { when: { kind: 'key', key: SPACE, how: 'held' } },
             { when: { kind: 'levelStart' } },
         ]);
