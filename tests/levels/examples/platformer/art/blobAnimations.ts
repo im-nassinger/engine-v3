@@ -66,8 +66,9 @@ const IDLE_FRAMES = [
 function runFrame(step: number): FrameSpec {
     const angle = (step / 6) * 2 * Math.PI;
     const swing = Math.cos(angle) * 11;
-    const frontLift = Math.max(0, Math.sin(angle)) * 9;
-    const backLift = Math.max(0, -Math.sin(angle)) * 9;
+    // A foot is lifted while it swings forward and planted while it moves back, so the stride pushes the blob forward.
+    const frontLift = Math.max(0, -Math.sin(angle)) * 9;
+    const backLift = Math.max(0, Math.sin(angle)) * 9;
     const bob = -Math.abs(Math.sin(angle)) * 6;
 
     return {

@@ -60,7 +60,7 @@ Blob                    Dynamic body, Fixed rotation, an octagon Surface with Fr
 
 ## Animation
 
-- **Animations** (frames, seconds a frame): idle (8, 0.15, a slow breath and a blink), run (6, 0.07, legs and arms swinging, a bounce), rise (1, stretched), apex (1, arms out, legs tucked), fall (2, 0.1, arms up), land (2, 0.07, squashed, then played for 0.14 s after landing).
+- **Animations** (frames, seconds a frame): idle (8, 0.15, a slow breath and a blink), run (6, 0.07, legs and arms swinging, a bounce; each foot is lifted as it swings forward and planted as it moves back, so the stride matches the way the blob moves. Fixed 2026-11-27: the first build had it the other way, so the blob looked like it walked backwards), rise (1, stretched), apex (1, arms out, legs tucked), fall (2, 0.1, arms up), land (2, 0.07, squashed, then played for 0.14 s after landing).
 - **Each frame is drawn by the script** from a few numbers (squash, bob, lean, each leg's swing and lift, arms, eyes, mouth) in `art/blobAnimations.ts` and `art/blobArt.ts`, so every frame stays on model. The face sits towards the way the blob looks.
 - **Picking**: after the movement, the Blob picks the animation from `on_ground`, `move`, `land_time` and the vertical speed; a new animation starts at its first frame; `pose_next` is the animation's first pose plus `frame`, plus 20 facing left, and is copied to `pose` in one change.
 - **Showing**: one trigger per pose, "when `pose` becomes n: set the opacity of every entity tagged `blob_frame` to 0, then of every entity tagged `blob_pose_n` to 1", so the frame changes once a tick with no flicker.
