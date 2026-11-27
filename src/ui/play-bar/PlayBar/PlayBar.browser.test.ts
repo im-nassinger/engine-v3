@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { Level } from '../../../core/level/index.ts';
 import { placeBody, transform } from '../../../core/simulation/testing/scriptedLevel.ts';
+import { NOT_PAUSED_REASON } from '../../../editor/commands/index.ts';
 import { STOP_TO_EDIT_TEXT } from '../../../editor/play/index.ts';
 import { closeEditorPage, editorPageContainer, openEditorPage, showWithEditor } from '../../testing/editorPage.ts';
 import { PlayBar } from './PlayBar.tsx';
@@ -48,17 +49,28 @@ function message() {
     return bar()?.querySelector('.message')?.textContent ?? '';
 }
 
-// The Play bar's button whose name starts the way given.
+// The Play bar's button with the name given, which it carries as its accessible name.
 function button(name: string) {
     const buttons = [...(bar()?.querySelectorAll<HTMLElement>('.play-bar-button') ?? [])];
-    const found = buttons.find((each) => each.querySelector('.name')?.textContent === name);
+    const found = buttons.find((each) => each.getAttribute('aria-label') === name);
     if (found === undefined) throw new Error(`The Play bar has no ${name}.`);
 
     return found;
 }
 
-function keyOf(name: string) {
-    return button(name).querySelector('.shortcut')?.textContent;
+function tooltipText() {
+    return document.querySelector('[role="tooltip"]')?.textContent ?? '';
+}
+
+// What the button's tooltip says once the mouse rests on it.
+async function tooltipOf(name: string) {
+    await userEvent.hover(button(name));
+    await expect.poll(tooltipText, { timeout: 2000 }).not.toBe('');
+    const text = tooltipText();
+    await userEvent.unhover(button(name));
+    await expect.poll(tooltipText, { timeout: 2000 }).toBe('');
+
+    return text;
 }
 
 function pill() {
@@ -68,10 +80,10 @@ function pill() {
     return found;
 }
 
-// What the browser makes of a state's colour at 16% over the panels' colour, which each browser writes its own way.
-function tintOf(stateToken: string) {
+// What the browser makes of a colour token, which each browser writes its own way.
+function colourOf(token: string) {
     const probe = document.createElement('div');
-    probe.style.background = `color-mix(in srgb, var(${stateToken}) 16%, var(--panel))`;
+    probe.style.background = `var(${token})`;
     editorPageContainer().append(probe);
     const tint = getComputedStyle(probe).backgroundColor;
     probe.remove();
@@ -80,13 +92,17 @@ function tintOf(stateToken: string) {
 }
 
 describe('PlayBar', () => {
-    test('while playing: PLAYING, Pause, Step off and Stop, each with its key', async () => {
+    test('while playing: PLAYING, Step off, Pause and Stop, each named with its key in its tooltip', async () => {
         await showPlaying();
 
         expect(label()).toBe('PLAYING');
-        expect(keyOf('Pause')).toBe('F8');
-        expect(keyOf('Step')).toBe('F9');
-        expect(keyOf('Stop')).toBe('Ctrl+Enter');
+        const names = [...(bar()?.querySelectorAll('.play-bar-button') ?? [])].map((each) =>
+            each.getAttribute('aria-label'),
+        );
+        expect(names).toEqual(['Step', 'Pause', 'Stop']);
+        expect(await tooltipOf('Pause')).toBe('PauseF8');
+        expect(await tooltipOf('Stop')).toBe('StopCtrl+Enter');
+        expect(await tooltipOf('Step')).toBe(NOT_PAUSED_REASON);
         expect(button('Pause').getAttribute('aria-disabled')).toBe('false');
         expect(button('Step').getAttribute('aria-disabled')).toBe('true');
         expect(message()).toBe('');
@@ -118,7 +134,7 @@ describe('PlayBar', () => {
         expect(play.state).toBe('idle');
     });
 
-    test('the pill is fully round, has the shade and no edge, and takes the tint of its state', async () => {
+    test('the pill is fully round, has the shade and no edge, and its big button takes the colour of its state', async () => {
         await showPlaying();
         const look = getComputedStyle(pill());
 
@@ -126,13 +142,16 @@ describe('PlayBar', () => {
         expect(look.boxShadow).not.toBe('none');
         expect(look.borderTopStyle).toBe('none');
         expect(getComputedStyle(bar() ?? document.body).boxShadow).toBe('none');
-        expect(look.backgroundColor).toBe(tintOf('--playing'));
+        expect(look.backgroundColor).toBe(colourOf('--chip'));
+        expect(getComputedStyle(button('Pause')).backgroundColor).toBe(colourOf('--playing'));
 
         await userEvent.click(button('Pause'));
         await expect.poll(label).toBe('PAUSED');
+        // Away from the button, whose colour lightens under the mouse.
+        await userEvent.unhover(button('Resume'));
 
-        expect(getComputedStyle(pill()).backgroundColor).toBe(tintOf('--paused'));
-        expect(tintOf('--paused')).not.toBe(tintOf('--playing'));
+        expect(getComputedStyle(button('Resume')).backgroundColor).toBe(colourOf('--paused'));
+        expect(getComputedStyle(pill()).backgroundColor).toBe(colourOf('--chip'));
     });
 
     test('its buttons are round, and a message sits under the pill, not in it', async () => {
@@ -162,7 +181,9 @@ describe('PlayBar', () => {
         const { play, heldKeys } = await showPlaying();
         heldKeys.press('ArrowRight');
 
-        await userEvent.click(bar()?.querySelector('.state-label') ?? document.body);
+        // In the pill's left padding, beside Step, where the pill's round end still covers.
+        const middle = pill().getBoundingClientRect().height / 2;
+        await userEvent.click(pill(), { position: { x: 5, y: middle } });
 
         expect(heldKeys.codes()).toEqual([]);
         expect(play.state).toBe('playing');

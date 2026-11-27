@@ -3,14 +3,17 @@ import { shortcutText, useCommands } from '../../../commands/index.ts';
 import { Icon, Tooltip } from '../../../shared/index.ts';
 import './PlayBarButton.css';
 
+export type PlayBarButtonSize = 'small' | 'big';
+
 export type PlayBarButtonProps = {
     commandId: string;
     icon: LucideIcon;
+    size?: PlayBarButtonSize;
 };
 
-// One of the Play bar's commands: its icon, its name, which follows the run, and its key in --muted. A
-// disabled one says why in its tooltip.
-export function PlayBarButton({ commandId, icon }: PlayBarButtonProps) {
+// One of the Play bar's commands as a round icon. Its name, which follows the run, and its key show in the
+// tooltip; a disabled one's tooltip says why instead. The big one is filled with the state's colour.
+export function PlayBarButton({ commandId, icon, size = 'small' }: PlayBarButtonProps) {
     // availability() and the label answer differently while the command object stays the same, so the
     // React Compiler must not keep an old answer.
     'use no memo';
@@ -29,14 +32,25 @@ export function PlayBarButton({ commandId, icon }: PlayBarButtonProps) {
         runner.run(command);
     };
 
-    const button = (
-        <button type="button" className="play-bar-button" aria-disabled={isDisabled} onClick={handleClick}>
-            <Icon icon={icon} />
-            <span className="name">{command.label}</span>
-            {shortcut !== undefined && <span className="shortcut">{shortcut}</span>}
-        </button>
-    );
-    if (availability.enabled) return button;
+    let tooltipLabel = command.label;
+    let tooltipShortcut = shortcut;
+    if (!availability.enabled) {
+        tooltipLabel = availability.reason;
+        tooltipShortcut = undefined;
+    }
 
-    return <Tooltip label={availability.reason}>{button}</Tooltip>;
+    return (
+        <Tooltip label={tooltipLabel} shortcut={tooltipShortcut}>
+            <button
+                type="button"
+                className="play-bar-button"
+                data-size={size}
+                aria-label={command.label}
+                aria-disabled={isDisabled}
+                onClick={handleClick}
+            >
+                <Icon icon={icon} />
+            </button>
+        </Tooltip>
+    );
 }

@@ -25,8 +25,8 @@ Slate islands and one bright blue accent (owner, 2026-11-17). **There is no line
 | `--warning` | `#e5b931` | The warning icon, the `missing entity` text; a warning note is tinted with it at 10% |
 | `--tip` | `#5aa9f0` | The tip icon; a tip note is tinted with it at 10% |
 | `--danger` | `#e5534b` | A refused value's ring and message, a failed save in the message pill |
-| `--playing` | `#3fb27f` | The Play bar's tint and label while running |
-| `--paused` | `#e5b931` | The Play bar's tint and label while paused |
+| `--playing` | `#3fb27f` | The Play bar's big button while running |
+| `--paused` | `#e5b931` | The Play bar's big button while paused |
 | `--tooltip` | `#0b0d10` | Tooltips and the drag readout |
 | `--tooltip-text` | `#e8ebf0` | Text on them |
 | `--chip` | `rgba(13,15,19,.8)` | The message pill |
@@ -94,6 +94,9 @@ The level view's own colours are in [level-view.md](level-view.md).
 | `--label` | 120 px: a field's label column | |
 | `--icon` | 16 px | |
 | `--icon-small` | 13 px: in fields, menu entries and the debug box | |
+| `--icon-large` | 20 px: the icon in the Play bar's big button | owner, 2026-11-27 (Play bar variant C4) |
+| `--play-button` | 32 px: the Play bar's Step and Stop | owner, 2026-11-27 (Play bar variant C4) |
+| `--play-button-big` | 44 px: the Play bar's Pause or Resume | owner, 2026-11-27 (Play bar variant C4) |
 | `--indent` | 16 px per level of the Entities viewer tree | |
 | `--dialog` | 380 px wide | owner, 2026-11-26 (400 px before) |
 | `--end-window` | 320 px wide: the end window in test play | the v3 design |
@@ -106,6 +109,6 @@ The level view's own colours are in [level-view.md](level-view.md).
 - **Spacing** steps: `--space-4`, `--space-6`, `--space-8`, `--space-10` and `--space-14`, of 4, 6, 8, 10 and 14 px. A panel's content is inset 14 px (`--inset`). Cards and sections are split by space only.
 - **Corners:** `--radius` 8 px for controls (buttons, rows, menu entries, notes), `--radius-menu` 12 px for menus and tiles, `--radius-island` 14 px for islands and dialogs (owner, 2026-11-17), and `--radius-tool` 7 px for a button inside an island, the island's corner minus the 7 px around it, so their curves run parallel. Pill fields, the message pill and the Play bar are fully round.
 - **No borders, outlines or separator lines** (owner, 2026-11-17), except the focus ring a keyboard user needs and the minimap's 3 px edge in `--panel`.
-- **One shadow, `--shade`: `0 2px 5px rgba(0,0,0,.3)`**, under every grey container: ☰, the tool column, the Entity inspector, the Entities viewer, the minimap, the debug box, every menu (the kinds menus included), dialogs and the Play bar (owner, 2026-11-17). Nothing glows.
+- **One shadow, `--shade`: `0 2px 5px rgba(0,0,0,.3)`**, under every grey container: ☰, the tool column, the Entity inspector, the Entities viewer, the minimap, the debug box, every menu (the kinds menus included), dialogs and the Play bar (owner, 2026-11-17). Nothing glows but the Play bar's big button (owner, 2026-11-27).
 - **Stacking order** (stage 18, standing yes, 2026-11-17): the level view and the islands stack in page order, and four tokens sit over them, each over the one before: `--stack-floating` (10) for the kinds menus, the message pill, Back to level and the Play bar; `--stack-popup` (20) for menus and submenus; `--stack-tooltip` (30); `--stack-dialog` (40). No component sets a stacking number of its own. See [ui.md](../architecture/ui.md#styles).
 - **Motion:** none in v1. Every change shows at once. Animations come Later, at 150 ms or less (see [workspace.md](../requirements/editor/workspace.md)).

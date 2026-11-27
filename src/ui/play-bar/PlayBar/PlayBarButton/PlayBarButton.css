@@ -1,33 +1,53 @@
+/* The big button's colour is the Play bar's --state-colour, which the bar sets for its state. */
 .play-bar-button {
+    --size: var(--play-button);
+    --fill: var(--hover);
+
     display: flex;
     align-items: center;
-    gap: var(--space-6);
-    height: var(--control);
-    padding: 0 var(--space-10);
+    justify-content: center;
+    width: var(--size);
+    height: var(--size);
+    padding: 0;
     border: none;
     border-radius: 999px;
-    background: none;
+    background: var(--fill);
     color: var(--text);
     cursor: default;
 
-    > .shortcut {
-        color: var(--muted);
-    }
-
     &:hover {
-        background: var(--hover);
+        background: color-mix(in srgb, var(--text) 12%, transparent);
     }
 
-    &[aria-disabled='true'] {
-        background: none;
-        color: var(--faint);
+    &[data-size='big'] {
+        --size: var(--play-button-big);
+        --fill: var(--state-colour, var(--muted));
 
-        > .shortcut {
-            color: var(--faint);
+        color: var(--app);
+        box-shadow:
+            0 0 0 4px color-mix(in srgb, var(--fill) 25%, transparent),
+            0 0 22px color-mix(in srgb, var(--fill) 60%, transparent);
+
+        > .icon {
+            width: var(--icon-large);
+            height: var(--icon-large);
+            fill: currentColor;
         }
+
+        &:hover {
+            background: color-mix(in srgb, var(--fill) 85%, var(--text));
+        }
+    }
+
+    &[aria-disabled='true'],
+    &[aria-disabled='true']:hover {
+        background: var(--hover);
+        color: var(--faint);
+        box-shadow: none;
     }
 
     &:focus-visible {
         outline: 1px solid var(--accent);
+        outline-offset: 2px;
     }
 }

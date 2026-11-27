@@ -18,6 +18,8 @@ Then two more asks, built: **Multiply and Divide on a vector take an x and a y**
 
 Then, asked to make a better level from the example one: **a chase level** ([examples/chase.md](examples/chase.md), file `examples/blob-chase.editable`): the Blob runs home through a forest at dusk with a monster right behind, in the style of the owner's three reference pictures, and **the Blob was redrawn** for both levels. Built and checked headless and in the editor; not pushed.
 
+Then **the Play bar was redrawn** (owner picked variant C4 from twelve mockups): three round icon buttons on a dark pill, the big middle one in the state's colour, names and keys in tooltips ([controls.md](design/controls.md#menus-dialogs-the-play-bar)).
+
 **Where we stopped:** the five fixes above are pushed and published on a new site, https://ecs-engine-2.netlify.app, as the old Netlify account ran out of deploy credits ([deploying.md](deploying.md)). v5's requirements still wait for review (below).
 
 ## Where things stand
