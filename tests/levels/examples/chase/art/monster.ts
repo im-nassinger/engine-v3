@@ -282,17 +282,18 @@ function tailParts(pose: Pose): ArtPart[] {
 }
 
 function eyeParts(centre: Point): ArtPart[] {
-    const size = 23;
+    // A slanted almond: the top lid falls toward the snout, just under the brow.
+    const at = (dx: number, dy: number) => ({ x: centre.x + dx, y: centre.y + dy });
     const eye = smoothClosedPath([
-        { x: centre.x - size, y: centre.y - size * 0.05, sharp: true },
-        { x: centre.x + size * 0.9, y: centre.y - size * 0.55, sharp: true },
-        { x: centre.x + size * 0.6, y: centre.y + size * 0.2 },
-        { x: centre.x - size * 0.2, y: centre.y + size * 0.45 },
+        { ...at(-20, -8), sharp: true },
+        { ...at(18, 4), sharp: true },
+        at(8, 11),
+        at(-8, 9),
     ]);
 
     return [
-        part('Glint', ellipsePath({ x: centre.x + 7, y: centre.y - 6 }, 2.6, 2.6), '#FFFFFFE6'),
-        part('Pupil', ellipsePath({ x: centre.x + 3, y: centre.y - 2 }, 3.4, 8), PUPIL),
+        part('Glint', ellipsePath(at(-4, 2), 2, 2), '#FFFFFFE6'),
+        part('Pupil', ellipsePath(at(2, 4), 3, 5), PUPIL),
         gradientPart('Eye', eye, EYE_BOTTOM, verticalGradient([EYE_TOP, EYE_BOTTOM])),
         gradientPart('Eye glow', ellipsePath(centre, 70, 52), EYE_GLOW, glow(EYE_GLOW, '88')),
     ];
