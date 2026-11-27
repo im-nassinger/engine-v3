@@ -98,9 +98,10 @@ function frameNames() {
     return names;
 }
 
-function addBlob(level: Level) {
-    const startY = START.y - BLOB_HEIGHT / 2 - 1;
-    const blob = addEntity(level, level.world, 'Blob', at(START.x, startY));
+// The Blob, standing with its feet on `start`. The chase level builds it too.
+export function addBlob(level: Level, start: Point = START) {
+    const startY = start.y - BLOB_HEIGHT / 2 - 1;
+    const blob = addEntity(level, level.world, 'Blob', at(start.x, startY));
     addSurface(blob, blobOutline(), { friction: 0, restitution: 0, density: 1 });
     addBody(blob, { type: 'dynamic', fixedRotation: true });
     blob.addComponent(new TagsComponent({ tags: [PLAYER_TAG] }));
@@ -179,6 +180,17 @@ function keyCodes(codes: readonly string[]) {
     return codes.filter((code) => KeyCodes.isBindable(code));
 }
 
+// The World's inputs the Blob's triggers listen to.
+export function setBlobInputs(level: Level) {
+    level.world.requireComponent(InputComponent).set('inputs', [
+        { name: 'left', keys: keyCodes(['KeyA', 'ArrowLeft']) },
+        { name: 'right', keys: keyCodes(['KeyD', 'ArrowRight']) },
+        { name: 'up', keys: [] },
+        { name: 'down', keys: keyCodes(['KeyS', 'ArrowDown']) },
+        { name: 'jump', keys: keyCodes(['Space', 'KeyW', 'ArrowUp']) },
+    ]);
+}
+
 function setUpWorld(level: Level, blob: Entity) {
     setBounds(level, LEVEL_WIDTH, LEVEL_HEIGHT, true);
     const physics = level.world.requireComponent(PhysicsWorldComponent);
@@ -188,13 +200,7 @@ function setUpWorld(level: Level, blob: Entity) {
     const background = level.world.requireComponent(StyleComponent);
     background.set('fill', { kind: 'solid', colour: BACKGROUND });
 
-    level.world.requireComponent(InputComponent).set('inputs', [
-        { name: 'left', keys: keyCodes(['KeyA', 'ArrowLeft']) },
-        { name: 'right', keys: keyCodes(['KeyD', 'ArrowRight']) },
-        { name: 'up', keys: [] },
-        { name: 'down', keys: keyCodes(['KeyS', 'ArrowDown']) },
-        { name: 'jump', keys: keyCodes(['Space', 'KeyW', 'ArrowUp']) },
-    ]);
+    setBlobInputs(level);
 
     const camera = level.camera.requireComponent(CameraComponent);
     camera.set('follow', blob.id);

@@ -70,6 +70,10 @@ Blob                    Dynamic body, Fixed rotation, an octagon Surface with Fr
 - `buildPlatformer.test.ts` (in `npm test`): every trigger has no problems; running reaches 460 px/s and stops dead; a held jump rises over 270 px and a tap under 140; a press 5 ticks before landing jumps on landing; a jump 5 ticks after leaving a ledge works and one 8 ticks after falls; falling stops at the limit; facing left shows the left frames; touching the flower wins.
 - Played in the editor with Playwright: the level imports, plays with no errors, the camera follows, and the run and apex frames show.
 
+## Changed since
+
+- **The Blob was redrawn on 2026-11-27** for the [chase](chase.md): gradient body, gloss, belly, glinting eyes, a leaf sprout, and worried brows while running, jumping and falling. This level uses the same art.
+
 ## Changed from the plan
 
 - **The friends don't bob.** A trigger moving a drawn group drew it in front of the blob, an engine bug now in [bugs.md](../bugs.md). They bob again once it is fixed.

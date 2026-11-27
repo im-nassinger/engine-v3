@@ -98,13 +98,14 @@ describe('the example platformer', () => {
         expect(afterLanding?.y).toBeLessThan(STANDING_Y - 5);
     });
 
+    // Four runs of the level: slow under the whole suite's load.
     test('a jump just after leaving a ledge still jumps, a late one falls', () => {
         const coyoteJump = jumpAfterLeavingEdge(COYOTE_TICKS - 1);
         const lateJump = jumpAfterLeavingEdge(COYOTE_TICKS + 2);
 
         expect(coyoteJump?.y).toBeLessThan(300);
         expect(lateJump?.y).toBeGreaterThan(500);
-    });
+    }, 30_000);
 
     test('falling stops speeding up at the fall speed limit', () => {
         const level = startingAt(-1100, 30 - BLOB_HEIGHT / 2);

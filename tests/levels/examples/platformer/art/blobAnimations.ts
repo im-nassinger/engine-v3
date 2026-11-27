@@ -3,6 +3,7 @@
 export type Eyes = 'open' | 'closed' | 'squint';
 export type Mouth = 'smile' | 'open' | 'round';
 export type Arms = 'down' | 'out' | 'up';
+export type Brows = 'none' | 'worried';
 
 export type Leg = {
     // How far the foot swings forward (positive) or back, in pixels.
@@ -25,6 +26,8 @@ export type FrameSpec = {
     readonly armSwing: number;
     readonly eyes: Eyes;
     readonly mouth: Mouth;
+    // Worried brows while running, jumping and falling: something is always behind the blob.
+    readonly brows: Brows;
 };
 
 export type Animation = {
@@ -44,6 +47,7 @@ const STANDING: FrameSpec = {
     armSwing: 0,
     eyes: 'open',
     mouth: 'smile',
+    brows: 'none',
 };
 
 function breathing(squashY: number, eyes: Eyes = 'open'): FrameSpec {
@@ -82,6 +86,7 @@ function runFrame(step: number): FrameSpec {
         arms: 'out',
         armSwing: -swing * 0.6,
         mouth: 'open',
+        brows: 'worried',
     };
 }
 
@@ -98,6 +103,7 @@ const RISE_FRAMES: FrameSpec[] = [
         arms: 'down',
         armSwing: -5,
         mouth: 'round',
+        brows: 'worried',
     },
 ];
 
@@ -111,7 +117,8 @@ const APEX_FRAMES: FrameSpec[] = [
         backLeg: { swing: -4, lift: 12 },
         arms: 'out',
         armSwing: 0,
-        mouth: 'smile',
+        mouth: 'open',
+        brows: 'worried',
     },
 ];
 
@@ -126,6 +133,7 @@ function fallFrame(armSwing: number): FrameSpec {
         arms: 'up',
         armSwing,
         mouth: 'round',
+        brows: 'worried',
     };
 }
 

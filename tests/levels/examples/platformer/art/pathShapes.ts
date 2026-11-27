@@ -99,3 +99,39 @@ export function mirroredPath(path: PathGeometry): PathGeometry {
 
     return { closed: path.closed, points };
 }
+
+// Turns points round a centre by an angle in radians, clockwise on screen since y grows downwards.
+export function turnedOutline<T extends Point>(outline: readonly T[], centre: Point, angle: number): T[] {
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+
+    return outline.map((point) => {
+        const x = point.x - centre.x;
+        const y = point.y - centre.y;
+
+        return { ...point, x: centre.x + x * cos - y * sin, y: centre.y + x * sin + y * cos };
+    });
+}
+
+// An ellipse turned by an angle in radians.
+export function turnedEllipsePath(centre: Point, radiusX: number, radiusY: number, angle: number) {
+    return smoothClosedPath(turnedOutline(roundOutline(centre, radiusX, radiusY, 2, 8), centre, angle));
+}
+
+// A leaf: round at its middle, pointed at both ends, from its base along an angle (0 points up).
+export function leafPath(base: Point, length: number, width: number, angle: number) {
+    const outline: OutlinePoint[] = [
+        { x: 0, y: 0, sharp: true },
+        { x: width / 2, y: -length * 0.45 },
+        { x: 0, y: -length, sharp: true },
+        { x: -width / 2, y: -length * 0.45 },
+    ];
+    const placed = outline.map((point) => ({ ...point, x: point.x + base.x, y: point.y + base.y }));
+
+    return smoothClosedPath(turnedOutline(placed, base, angle));
+}
+
+// A closed outline of sharp corners, for crisp flat shapes such as teeth, claws and roofs.
+export function sharpPath(points: readonly Point[]): PathGeometry {
+    return smoothClosedPath(points.map((point) => ({ ...point, sharp: true })));
+}
